@@ -32,4 +32,3 @@ the canonical clone URL for the store.
 - **GIVEN** the store has a remote configured and store.yaml has the remote field
 - **WHEN** a teammate runs `openspec store doctor openspec-store` on a machine without the store
 - **THEN** the output SHALL include the git clone URL and `openspec store register` command
-
