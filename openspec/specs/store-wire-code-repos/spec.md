@@ -1,10 +1,9 @@
-## Purpose
+# store-wire-code-repos Specification
 
+## Purpose
 Wires code repos to the shared OpenSpec store via `store:` pointers, adds a
 git remote for team sharing, and cleans up the store root structure.
-
-## MODIFIED Requirements
-
+## Requirements
 ### Requirement: Code repos SHALL declare a store pointer
 
 Each code repo without a local `openspec/specs/` planning root SHALL include
@@ -56,3 +55,4 @@ to `docs/governance/`.
 - **GIVEN** non-standard files have been moved to `docs/governance/`
 - **WHEN** a reader navigates to `docs/governance/`
 - **THEN** all relocated files SHALL be present and cross-references SHALL resolve
+

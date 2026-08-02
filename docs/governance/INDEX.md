@@ -1,6 +1,6 @@
 # OpenSpec Framework Documentation
 
-> **Last Updated:** 2026-06-04  
+> **Last Updated:** 2026-08-02
 > **Status:** Active workspace index; see individual change folders for source-of-truth status
 
 ---
@@ -27,34 +27,51 @@ OpenSpec is the workspace specification framework for managing project changes, 
 
 ## Directory Structure
 
-### Core Framework
-- **openspec/** — Core OpenSpec framework documentation
-- **changes/** — All project change proposals organized by project
+### Core Framework (Official OpenSpec Layout)
+- **openspec/config.yaml** — Schema, context, rules, and operations configuration
+- **openspec/specs/** — Main specifications (source of truth for system behavior)
+- **openspec/changes/** — Active change proposals and archived changes
+- **docs/governance/** — Governance docs (AGENTS.md, INDEX.md, audit files, reports)
+
+### Multi-Repo Store Wiring
+
+The store is wired to 8 code repos via `store: openspec-store` pointers:
+- go-microservices, tdt-core, tdt-sheets, webhook-receiver
+- jira-daily-reports, ai-harness-skills, ops-automation-suite, agent-docs-sync
+
+Each repo's `openspec/config.yaml` contains `store: openspec-store` and resolves
+commands to this store automatically (verified: `source: "declared"`).
 
 ### Changes Directory
 
-The `changes/` directory contains project-specific change proposals and specifications:
+The `changes/` directory contains project-specific change proposals:
 
-#### Active Projects (5) - ALL COMPLETE ✅
+#### Active Changes (15)
 
-| Project | Status | Completion | Docs | Tests | Last Updated |
-|---------|--------|------------|------|-------|--------------|
-| **jira-comprehensive-management/** | ✅ Complete | 100% | 25 docs | 189/189 | 2026-05-17 |
-| **jira-gitlab-integration-v3/** | ✅ Complete | 100% | 23 docs | 28/28 | 2026-05-17 |
-| **missing-productivity-info-tracker/** | ✅ Complete | 100% | 10 docs | Production | 2026-05-17 |
-| **ops-automation-suite/** | ✅ Complete | 100% | 8 docs | Spec Ready | 2026-05-17 |
-| **skills-documentation-enhancement/** | ✅ Complete | 100% | 11 docs | 33/33 | 2026-05-18 |
-| **skill-split-compact/** | ✅ Complete | 100% | 6 docs | Docs | 2026-05-18 |
-| **dev-tooling-audit-and-enhancement/** | 📋 Draft | Spec Ready | 5 docs | - | 2026-05-24 |
-
-#### In-Flight Projects (0)
-
-_No in-flight changes. See [Recently Archived](#recently-archived-changes) for the latest completed work._
+| Change | Tasks | Last Updated |
+|--------|-------|--------------|
+| **complete-store-multi-repo-wiring** | 26/32 | 2026-08-02 |
+| **fix-ci-shipping-test-reliability** | 0/8 | 2026-08-02 |
+| **complete-cloud-deployment-and-cicd-readiness** | 9/18 | 1d ago |
+| **optimize-hermes-agent-configuration** | 22/59 | 2d ago |
+| **repair-openspec-main-spec-baseline** | 0/33 | 3d ago |
+| **align-jti-skill-runtime-contract** | 6/35 | 3d ago |
+| **dev-perf-gitlab-fail-fast** | 0/26 | 19d ago |
+| **pmp-migration-phase-3** | 13/73 | 23d ago |
+| **scheduler-stale-workflow-hardening** | 0/21 | 26d ago |
+| **sr-3859-futures-fx-trade-ticket-perf** | 0/66 | 29d ago |
+| **p3-release-3357-epic-planning** | 0/45 | 29d ago |
+| **python-gitlab-integration** | 0/140 | 6/14/2026 |
+| **jira-mr-only-comments** | 0/17 | 6/14/2026 |
+| **bootstrap-nexus-for-mobile** | 0/74 | 6/12/2026 |
+| **microsoft-teams-integration** | 4/58 | 5/30/2026 |
 
 #### Recently Archived Changes
 
 | Project | Capabilities | Archived |
 |---------|--------------|----------|
+| **complete-store-multi-repo-wiring** | `store-wire-code-repos` | 2026-08-02 |
+| **harden-store-multi-repo-wiring** | `store-command-resolution`, `store-structure-hygiene`, `store-artifact-rules` | 2026-08-02 |
 | **agent-device-skill** | `agent-device-skill-install`, `agent-device-verify-loop`, `agent-device-command-surface`, `agent-device-mcp-integration` | 2026-06-17 |
 
 #### Deferred Projects (2)
