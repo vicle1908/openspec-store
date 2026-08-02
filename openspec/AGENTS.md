@@ -68,3 +68,38 @@ openspec validate --strict --all
 Do not claim an OpenSpec change is complete when artifacts are missing,
 requirements lack scenarios, implementation tasks remain open, or verification
 has not succeeded.
+
+## Store Git Tracking
+
+This store is a git repository. All specs, archived changes, active changes,
+and reports are committed. Per official openspec.dev/docs/stores:
+
+> "A store is just a git repo. You commit, push, pull, and review it yourself."
+
+### Post-Archive Workflow
+
+After archiving a change, commit the store:
+
+```bash
+cd ~/Developer/openspec-store
+git add openspec/
+git commit -m "archive: <change-name> — merged delta specs into main specs"
+```
+
+### Post-Sync Workflow
+
+After syncing from external sources (GDrive, team repos), commit the store:
+
+```bash
+cd ~/Developer/openspec-store
+git add openspec/
+git commit -m "sync: pulled specs/archives from <source>"
+```
+
+### Health Check
+
+```bash
+openspec store doctor openspec-store    # verify store health
+git status                               # check for uncommitted work
+openspec validate --all --store openspec-store  # validate all specs
+```
