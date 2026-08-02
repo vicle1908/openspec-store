@@ -30,3 +30,20 @@ operations:
     guidance:
       - Ensure the affected change has no incomplete tasks, then sync any modified delta specs to main specs before archiving.
       - Validate the archived state, confirm the spec sync preserved all scenarios, and record the archived change for downstream verification.
+
+rules:
+  proposal:
+    - State the problem in one sentence before elaborating.
+    - List explicit non-goals.
+    - Identify affected ownership boundaries.
+  specs:
+    - Every normative requirement SHALL use SHALL or MUST.
+    - Every requirement SHALL have at least one scenario.
+    - Cover success, failure, and edge cases where applicable.
+  design:
+    - Reference existing patterns before introducing new ones.
+    - State transaction boundaries where affected.
+  tasks:
+    - Use hierarchical numbering such as 1, 1.1, and 1.2.
+    - Each task SHALL be completable in one session.
+    - Include explicit verification steps.
