@@ -1,6 +1,8 @@
+# Agent Docs Sync Resilience Specification
+
 ## Purpose
 
-This specification defines requirements for Docs Sync Resilience.
+Define resilience patterns for docs-sync: circuit breaker and retry around LLM calls, degradation management for unavailable services, and graceful fallback when code intelligence sources are unreachable.
 
 ## Requirements
 

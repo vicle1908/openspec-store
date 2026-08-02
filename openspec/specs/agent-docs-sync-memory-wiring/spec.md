@@ -1,6 +1,8 @@
+# Agent Docs Sync Memory Wiring Specification
+
 ## Purpose
 
-This specification defines requirements for Docs Sync Memory Wiring.
+Define the memory wiring contract for docs-sync: how sync state is initialized, read, and updated across agent-core Memory layers, including scratch-to-long-term promotion and eviction.
 
 ## Requirements
 

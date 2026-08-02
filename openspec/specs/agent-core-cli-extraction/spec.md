@@ -1,6 +1,6 @@
 ## Purpose
 
-This specification defines requirements for Agent Core Cli Extraction.
+Define the modular CLI architecture for agent-core: extracting monolithic app.py into thin wiring plus sub-modules (utils, schedules, skills, init, agent) while preserving all existing commands and test compatibility.
 
 ## Requirements
 

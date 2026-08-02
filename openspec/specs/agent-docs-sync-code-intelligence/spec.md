@@ -1,6 +1,6 @@
 ## Purpose
 
-This specification defines requirements for Agent Docs Sync Code Intelligence.
+Define code intelligence capabilities for docs-sync: source file parsing, GitNexus/Graphify graph queries, AST-based API extraction, and codebase scanning to determine which documentation is affected by code changes.
 
 ## Requirements
 

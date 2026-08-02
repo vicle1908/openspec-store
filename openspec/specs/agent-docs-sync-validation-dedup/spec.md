@@ -1,6 +1,8 @@
+# Agent Docs Sync Validation Dedup Specification
+
 ## Purpose
 
-This specification defines requirements for Docs Sync Validation Dedup.
+Define validation and deduplication for docs-sync: link integrity checking, duplicate detection across documentation files, and enforcement of documentation quality gates.
 
 ## Requirements
 

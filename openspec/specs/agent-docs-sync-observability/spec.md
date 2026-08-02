@@ -1,6 +1,8 @@
+# Agent Docs Sync Observability Specification
+
 ## Purpose
 
-This specification defines requirements for Docs Sync Observability.
+Define observability for docs-sync: OpenTelemetry tracing, Langfuse integration, cost/quality scoring, and structured audit trails for documentation generation and validation operations.
 
 ## Requirements
 

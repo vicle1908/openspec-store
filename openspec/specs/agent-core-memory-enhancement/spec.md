@@ -1,6 +1,6 @@
 ## Purpose
 
-This specification defines requirements for Agent Core Memory Enhancement.
+Define memory system enhancements for agent-core: context buffer optimization, scratch memory patterns, long-term Postgres memory with vector search, and unified facade improvements for consumer repos.
 
 ## Requirements
 
