@@ -16,7 +16,7 @@ archived changes unless the request explicitly targets historical correction.
 
 ## Specification Rules
 
-Follow `openspec/config.yaml`:
+Follow `openspec/config.yaml` (relative to store root, at `../../openspec/config.yaml` from this file):
 
 - Use one canonical Capabilities section with exact kebab-case IDs.
 - State goals, non-goals, affected ownership boundaries, contracts,
