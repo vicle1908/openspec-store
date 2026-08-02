@@ -20,6 +20,19 @@ context: |
   - Core Libraries: tdt_core SDK (JiraClientFactory, GitLabClientFactory)
   - Agent Framework: Pydantic AI v2, DBOS durable execution
 
+  ## Agent Ecosystem (Python 3.14, uv)
+  - agent-core: Shared agent runtime — foundation, tool registry, skill system,
+    memory, LLM gateway, agent_base (ReAct), resilience, orchestration (LangGraph),
+    evaluation, observability, CLI, SDK. Depends on tdt-core.
+  - agent-docs-sync: Documentation synchronization agent built on agent-core.
+    Detects code changes, maps to docs, validates links, orchestrates multi-repo sync.
+  - agent-harness: Planning harness for engineering tickets — 12-stage LangGraph
+    workflow with durable checkpointing, evidence-backed validation, human gates.
+    Read-only authority, artifact-root writes only. Depends on agent-core + tdt-core.
+  - Naming convention: agent-core-*, agent-docs-sync-*, agent-harness-* prefixes.
+    Standalone harness-skill specs live under _standalone/ in the store.
+  - Each repo has SPEC_INDEX.md mapping specs to modules and docs.
+
 operations:
   apply:
     guidance:
