@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-05-27
+updated: 2026-07-17
+status: complete
+note: Fixed code-daily-scan silent hangs on killed prior runs. Worktree resilience and timeout hardening. 26 tasks completed.

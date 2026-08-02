@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-07-09
+updated: 2026-07-17
+status: complete
+note: Expanded status taxonomy for Jira projects. 12 tasks completed. Remaining: live audit across 212 projects + coverage computation (requires Jira access), commit + PR (manual).

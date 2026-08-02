@@ -1,0 +1,85 @@
+name,description
+aside,description: Answer a quick side question without interrupting or losing context from the current task. Resume work automatically after answering.
+auto-update,description: Pull the latest ECC repo changes and reinstall the current managed targets.
+build-fix,description: Detect the project build system and incrementally fix build/type errors with minimal safe changes.
+checkpoint,"description: Create, verify, or list workflow checkpoints after running verification checks."
+code-review,description: Code review — local uncommitted changes or GitHub PR (pass PR number/URL for PR mode)
+cost-report,description: Generate a local Claude Code cost report from a cost-tracker SQLite database.
+cpp-build,"description: Fix C++ build errors, CMake issues, and linker problems incrementally. Invokes the cpp-build-resolver agent for minimal, surgical fixes."
+cpp-review,"description: Comprehensive C++ code review for memory safety, modern C++ idioms, concurrency, and security. Invokes the cpp-reviewer agent."
+cpp-test,"description: Enforce TDD workflow for C++. Write GoogleTest tests first, then implement. Verify coverage with gcov/lcov."
+ecc-guide,"description: Navigate ECC's current agents, skills, commands, hooks, install profiles, and docs from the live repository surface."
+evolve,name: evolve
+fastapi-review,"description: Review a FastAPI application for architecture, async correctness, dependency injection, Pydantic schemas, security, performance, and testability."
+feature-dev,description: Guided feature development with codebase understanding and architecture focus
+flutter-build,"description: Fix Dart analyzer errors and Flutter build failures incrementally. Invokes the dart-build-resolver agent for minimal, surgical fixes."
+flutter-review,"description: Review Flutter/Dart code for idiomatic patterns, widget best practices, state management, performance, accessibility, and security. Invokes the flutter-reviewer agent."
+flutter-test,"description: Run Flutter/Dart tests, report failures, and incrementally fix test issues. Covers unit, widget, golden, and integration tests."
+gan-build,description: Run a generator/evaluator build loop for implementation tasks with bounded iterations and scoring.
+gan-design,description: Run a generator/evaluator design loop for frontend or visual work with bounded iterations and scoring.
+go-build,"description: Fix Go build errors, go vet warnings, and linter issues incrementally. Invokes the go-build-resolver agent for minimal, surgical fixes."
+go-review,"description: Comprehensive Go code review for idiomatic patterns, concurrency safety, error handling, and security. Invokes the go-reviewer agent."
+go-test,"description: Enforce TDD workflow for Go. Write table-driven tests first, then implement. Verify 80%+ coverage with go test -cover."
+gradle-build,description: Fix Gradle build errors for Android and KMP projects
+harness-audit,description: Run a deterministic repository harness audit and return a prioritized scorecard.
+hookify-configure,description: Enable or disable hookify rules interactively
+hookify-help,description: Get help with the hookify system
+hookify-list,description: List all configured hookify rules
+hookify,description: Create hooks to prevent unwanted behaviors from conversation analysis or explicit instructions
+instinct-export,name: instinct-export
+instinct-import,name: instinct-import
+instinct-status,name: instinct-status
+jira,"description: Retrieve a Jira ticket, analyze requirements, update status, or add comments. Uses the jira-integration skill and MCP or REST API."
+kotlin-build,"description: Fix Kotlin/Gradle build errors, compiler warnings, and dependency issues incrementally. Invokes the kotlin-build-resolver agent for minimal, surgical fixes."
+kotlin-review,"description: Comprehensive Kotlin code review for idiomatic patterns, null safety, coroutine safety, and security. Invokes the kotlin-reviewer agent."
+kotlin-test,"description: Enforce TDD workflow for Kotlin. Write Kotest tests first, then implement. Verify 80%+ coverage with Kover."
+learn-eval,"description: ""Extract reusable patterns from the session, self-evaluate quality before saving, and determine the right save location (Global vs Project)."""
+learn,description: Extract reusable patterns from the current session and save them as candidate skills or guidance.
+loop-start,description: Start a managed autonomous loop pattern with safety defaults and explicit stop conditions.
+loop-status,"description: Inspect active loop state, progress, failure signals, and recommended intervention."
+marketing-campaign,"description: Plan and execute a full marketing campaign. Accepts a product brief and returns positioning, landing page copy, email sequence, social posts, ad variants, video scripts, and a content cal"
+model-route,"description: Recommend the best model tier for the current task based on complexity, risk, and budget."
+multi-backend,"description: Run a backend-focused multi-model workflow for APIs, algorithms, data, and business logic."
+multi-execute,description: Execute a multi-model implementation plan while preserving Claude as the only filesystem writer.
+multi-frontend,"description: Run a frontend-focused multi-model workflow for components, layouts, animation, and UI polish."
+multi-plan,description: Create a multi-model implementation plan without modifying production code.
+multi-workflow,"description: Run a full multi-model development workflow with research, planning, execution, optimization, and review."
+orch-add-feature,"description: Orchestrate building a brand-new feature end to end — research, plan, TDD, review, gated commit. Wrapper that kicks off the orch-add-feature skill."
+orch-build-mvp,"description: Orchestrate bootstrapping a working MVP from a design/spec doc — ingest, slice, scaffold, TDD, review, gated commit (reuses the GAN harness). Wrapper for the orch-build-mvp skill."
+orch-change-feature,"description: Orchestrate altering an existing, working feature to new desired behavior — update tests to the new spec, change impl, review, gated commit. Wrapper for the orch-change-feature skill."
+orch-fix-defect,"description: Orchestrate fixing a bug — reproduce it as a failing regression test, fix to green, review, gated commit. Wrapper for the orch-fix-defect skill."
+orch-refine-code,"description: Orchestrate a behavior-preserving refactor — confirm tests green, restructure without changing behavior, keep green, review, gated commit. Wrapper for the orch-refine-code skill."
+plan-prd,"description: ""Generate a lean, problem-first PRD and hand off to /plan for implementation planning."""
+plan,"description: Restate requirements, assess risks, and create step-by-step implementation plan. WAIT for user CONFIRM before touching any code."
+pm2,"description: Analyze a project and generate PM2 service commands for detected frontend, backend, or database services."
+pr,"description: ""Create a GitHub PR from current branch with unpushed commits — discovers templates, analyzes changes, pushes"""
+project-init,description: Detect a project's stack and produce a dry-run ECC onboarding plan using the repository's install manifests and stack mappings.
+projects,name: projects
+promote,name: promote
+prp-commit,"description: ""Quick commit with natural language file targeting — describe what to commit in plain English"""
+prp-implement,description: Execute an implementation plan with rigorous validation loops
+prp-plan,description: Create comprehensive feature implementation plan with codebase analysis and pattern extraction
+prp-pr,"description: ""Create a GitHub PR from current branch with unpushed commits — discovers templates, analyzes changes, pushes"""
+prp-prd,"description: ""Interactive PRD generator - problem-first, hypothesis-driven product spec with back-and-forth questioning"""
+prune,name: prune
+python-review,"description: Comprehensive Python code review for PEP 8 compliance, type hints, security, and Pythonic idioms. Invokes the python-reviewer agent."
+quality-gate,description: Run the ECC formatter quality gate for a single file and report remediation steps.
+react-build,"description: Fix React build failures (Vite, webpack, Next.js, CRA, Parcel, esbuild, Bun) incrementally — JSX/TSX compile errors, hydration mismatches, server/client component boundary failures, missi"
+react-review,"description: Comprehensive React/JSX code review for hook correctness, render performance, server/client component boundaries, accessibility, and React-specific security. Invokes the react-reviewer ag"
+react-test,"description: Enforce TDD workflow for React. Write React Testing Library tests first (behavior-focused, accessibility-first), then implement components. Detects Vitest or Jest and verifies coverage ta"
+refactor-clean,description: Safely identify and remove dead code with verification after each change.
+resume-session,description: Load the most recent session file from ~/.claude/session-data/ and resume work with full context from where the last session ended.
+review-pr,description: Comprehensive PR review using specialized agents
+rust-build,"description: Fix Rust build errors, borrow checker issues, and dependency problems incrementally. Invokes the rust-build-resolver agent for minimal, surgical fixes."
+rust-review,"description: Comprehensive Rust code review for ownership, lifetimes, error handling, unsafe usage, and idiomatic patterns. Invokes the rust-reviewer agent."
+rust-test,"description: Enforce TDD workflow for Rust. Write tests first, then implement. Verify 80%+ coverage with cargo-llvm-cov."
+santa-loop,description: Adversarial dual-review convergence loop — two independent model reviewers must both approve before code ships.
+save-session,description: Save current session state to a dated file in ~/.claude/session-data/ so work can be resumed in a future session with full context.
+security-scan,"description: Run AgentShield against agent, hook, MCP, permission, and secret surfaces."
+sessions,"description: Manage Claude Code session history, aliases, and session metadata."
+setup-pm,description: Configure your preferred package manager (npm/pnpm/yarn/bun)
+skill-create,name: skill-create
+skill-health,name: skill-health
+test-coverage,"description: Analyze coverage, identify gaps, and generate missing tests toward the target threshold."
+update-codemaps,description: Scan project structure and generate token-lean architecture codemaps.
+update-docs,"description: Sync documentation from source-of-truth files such as scripts, schemas, routes, and exports."

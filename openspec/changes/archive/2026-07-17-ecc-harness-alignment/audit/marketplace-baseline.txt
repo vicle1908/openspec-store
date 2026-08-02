@@ -1,0 +1,11 @@
+marketplace_sha: ec92b528471df708c2384ebbcc82b390b60f535a
+installed_sha: not-a-git-repo
+installed_version: 2.0.0
+new_commits_in_marketplace_since_installed: N/A
+audit_date: 2026-06-27
+auditor: openspec-apply-change (agent session)
+
+Notes:
+- Marketplace clone: /Users/lekhanhvinh/.claude/plugins/marketplaces/ecc
+- Installed: /Users/lekhanhvinh/.claude/plugins/cache/everything-claude-code/ecc/2.0.0
+- If marketplace is ahead, run Phase 1 of the playbook to enumerate new entries.

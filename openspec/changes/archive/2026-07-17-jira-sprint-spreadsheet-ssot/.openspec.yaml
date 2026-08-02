@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-06-12
+updated: 2026-07-17
+status: complete
+note: Sprint spreadsheet as single source of truth fully implemented across 8 sections: tdt-core search/create primitives, SprintScope resolver, KBS wiring, daily-reports consumption, config alignment, scheduling, docs/skills, and verification. Spreadsheet title now drives filter/board creation automatically.

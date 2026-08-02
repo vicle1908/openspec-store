@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-06-20
+updated: 2026-07-17
+status: complete
+note: Person Capacity worklog mode fully implemented across 16 sections (121 tasks). Display-name-keyed roster, JQL search, retry logic, unmapped author detection, Jira collision detection, trailing-empty fix, and 280+ tests. Remaining items (human sign-off, Day-7 review, optional production overwrite) are operational tasks, not code dependencies.

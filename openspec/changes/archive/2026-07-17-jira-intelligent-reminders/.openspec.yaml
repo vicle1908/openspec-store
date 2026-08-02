@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-06-14
+updated: 2026-07-17
+status: complete
+note: Jira intelligent reminders system. 8 tasks completed. 24 tests passing across 5 test files + CLI test. Remaining: live Jira verification (operational).

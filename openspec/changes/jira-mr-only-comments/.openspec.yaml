@@ -1,0 +1,13 @@
+schema: spec-driven
+created: 2026-05-20
+status: approved
+change: jira-mr-only-comments
+description: Restrict Jira Integration to MR-only comments on both GitLab projects
+artifacts:
+  proposal: proposal.md
+  design: design.md
+  spec: spec.md
+  tasks: tasks.md
+dependencies:
+  - glab CLI authenticated to git.ecomedic.vn
+  - Jira account with comment permissions on all 11 project keys

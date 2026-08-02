@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-05-30
+updated: 2026-07-17
+status: archived-spec-only
+note: Spec-only change — deployable-env-loading spec defined but no implementation tasks created. Spec preserved in archive for reference.

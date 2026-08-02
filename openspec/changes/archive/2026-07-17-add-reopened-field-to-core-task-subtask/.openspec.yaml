@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-06-20
+updated: 2026-07-17
+status: complete
+note: Added reopened field to tdt-core Task/Subtask models. 51 tasks completed. Remaining: live Jira backfill across 13 projects (operational, not code).

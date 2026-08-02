@@ -1,0 +1,11 @@
+schema: spec-driven
+created: 2026-07-04
+updated: 2026-07-17
+status: complete
+note: >
+  Ops scheduler omniroute jira failures. 32 tasks completed.
+  Core CODE implemented: health gate split (SOFT_CHECKS/HARD_CHECKS constants,
+  overall_status() function, /health/full returns 503 only on HARD failures),
+  8 unit tests passing. Remaining tasks are all operational (observability config
+  reload, live service verification, 7-day wait) or deferred (follow-up changes,
+  docs managed separately).

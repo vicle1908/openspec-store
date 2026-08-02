@@ -1,0 +1,8 @@
+schema: spec-driven
+created: 2026-07-18
+updated: 2026-07-18
+status: complete
+note: >
+  Added platform-specific (iOS, Android, QA) progress tracking to per-epic
+  spreadsheet tab. Each parent task shows subtask status+key for iOS/Android/QA
+  columns. Platform progress summary at top. 636 tests passing.

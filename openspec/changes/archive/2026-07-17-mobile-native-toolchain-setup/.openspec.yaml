@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-06-15
+updated: 2026-07-17
+status: complete
+note: Mobile native toolchain setup. 37 tasks completed. Phase A (baseline) done. Phase B (Gradle/Kotlin/AGP upgrades + iOS Swift 6) deferred to dedicated follow-up changes requiring device build testing.

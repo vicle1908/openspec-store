@@ -1,0 +1,19 @@
+hook_id,event,matcher,description
+post:bash:dispatcher,PostToolUse,Bash,"Consolidated Bash postflight dispatcher for logging, PR, and build notifications"
+post:ecc-context-monitor,PostToolUse,*,"Inject agent warnings on context exhaustion, high cost, scope creep, or tool loops"
+post:ecc-metrics-bridge,PostToolUse,*,Maintain running session metrics aggregate for statusline and context monitor
+post:edit:accumulator,PostToolUse,Edit|Write|MultiEdit,Record edited JS/TS file paths for batch format+typecheck at Stop time
+post:edit:console-warn,PostToolUse,Edit,Warn about console.log statements after edits
+post:edit:design-quality-check,PostToolUse,Edit|Write|MultiEdit,Warn when frontend edits drift toward generic template-looking UI
+post:session-activity-tracker,PostToolUse,*,Track per-session tool calls and file activity for ECC2 metrics
+post:mcp-health-check,PostToolUseFailure,*,"Track failed MCP tool calls, mark unhealthy servers, and attempt reconnect"
+pre:compact,PreCompact,*,Save state before context compaction
+pre:bash:dispatcher,PreToolUse,Bash,"Consolidated Bash preflight dispatcher for quality, tmux, push, and GateGuard checks"
+session:end:marker,SessionEnd,*,Session end lifecycle marker (non-blocking)
+session:start,SessionStart,*,Load previous context and detect package manager on new session
+stop:check-console-log,Stop,*,Check for console.log in modified files after each response
+stop:cost-tracker,Stop,*,Track token and cost metrics per session
+stop:desktop-notify,Stop,*,Send desktop notification (macOS/WSL) with task summary when Claude responds
+stop:evaluate-session,Stop,*,Evaluate session for extractable patterns
+stop:format-typecheck,Stop,*,Batch format (Biome/Prettier) and typecheck (tsc) all JS/TS files edited this response — runs once at Stop instead of after every Edit
+stop:session-end,Stop,*,Persist session state after each response (Stop carries transcript_path)

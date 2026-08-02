@@ -1,0 +1,11 @@
+schema: spec-driven
+created: 2026-06-02
+updated: 2026-07-17
+status: complete
+note: >
+  Android PMP connection center. 55 tasks, 26 done.
+  Core architecture implemented (PMPConnectionCenter, PMPToken, settings).
+  Remaining 39 tasks: 22 CODE (PMPNode Flow operators, screen migrations for
+  HomeScreen/WatchListTab/MarketTopDetail), 13 OPS (device smoke tests, git push).
+  PMPNode Flow migration and screen migrations are deferred to dedicated follow-up
+  changes as they require significant Android development + device testing.

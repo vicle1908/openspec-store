@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-07-26
+goal: Provide an execution-ready, symlink-safe agent-skill distribution contract
+  for the outer and nested repositories.

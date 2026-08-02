@@ -1,0 +1,30 @@
+schema: spec-driven
+created: 2026-06-10
+updated: 2026-06-11
+status: completed
+
+# Version history
+# 2026-06-10: Initial scan-mr implementation
+# 2026-06-11: Added scan-branch command, --feature filter, code-daily-scan repo
+
+change: android-scan-mr-command
+title: "scan-mr & scan-branch -- MR and branch-scoped code quality scanning"
+
+affected_repos:
+  - code-daily-scan
+
+dependencies:
+  - tdt-core (GitlabClientFactory, python-gitlab)
+  - ai-review (GitLabReviewPoster for --post-comment)
+
+capabilities:
+  - scan-mr: Scan files changed in a GitLab MR
+  - scan-branch: Compare branches and scan changed files
+  - --feature: Filter to specific package (e.g., com/tdt/pmobile3/ewallet)
+  - Git worktree: Checkout correct branch for accurate scanning
+
+non_goals:
+  - Full MR review with LLM reasoning (that's ai-review's domain)
+  - Duplicate ai-review's codebase scanning logic
+  - Automatic cleanup of MR/branch tabs on merge/close
+  - Cross-MR aggregation dashboard

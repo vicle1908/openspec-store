@@ -1,0 +1,102 @@
+schema: spec-driven
+created: 2026-05-24
+updated: 2026-05-24
+status: draft
+type: tooling
+
+metadata:
+  name: "Dev Tooling Audit & Enhancement"
+  description: "Audit and enhance development environment with Homebrew-first tooling"
+  version: "1.1"
+  completion: 0
+
+team:
+  lead: "DevOps Engineer"
+  members: []
+  reviewers:
+    - "Technical Lead"
+
+timeline:
+  start_date: "2026-05-24"
+  estimated_completion: "2026-05-28"
+  duration_weeks: 1
+
+effort:
+  total_hours: 20
+  phases: 5
+  tasks: 15
+
+dependencies:
+  internal: []
+  external:
+    - "Homebrew"
+    - "macOS ARM64"
+
+features:
+  functional_requirements: 6
+  non_functional_requirements: 4
+  integrations:
+    - "Shell (zsh)"
+    - "Git pre-commit"
+    - "mise version manager"
+
+technical_stack:
+  package_manager: "Homebrew"
+  shell: "zsh"
+  version_manager: "mise"
+  task_runner: "just"
+
+targets:
+  tools_to_install: 24
+  phase1_tools: 6  # Security
+  phase2_tools: 6  # Productivity
+  phase3_tools: 9  # Quality
+  phase4_tools: 3  # Language
+  documentation: true
+
+documents:
+  - name: "proposal.md"
+    description: "Change proposal with context and options"
+    status: "draft"
+  - name: "spec.md"
+    description: "Complete technical specification"
+    status: "draft"
+  - name: "tasks.md"
+    description: "Detailed task breakdown"
+    status: "draft"
+  - name: "design.md"
+    description: "Architecture and design decisions"
+    status: "draft"
+  - name: "VERIFICATION.md"
+    description: "Test and QA plan"
+    status: "draft"
+
+milestones:
+  - name: "Security Foundation"
+    week: 1
+    status: "pending"
+  - name: "Productivity Core"
+    week: 1
+    status: "pending"
+  - name: "Quality Tools"
+    week: 2
+    status: "pending"
+  - name: "Language Enhancement"
+    week: 2
+    status: "pending"
+  - name: "Documentation Complete"
+    week: 2
+    status: "pending"
+
+risks:
+  high: []
+  medium:
+    - "pre-commit hooks may break existing CI workflows"
+    - "mise configuration may conflict with existing version managers"
+  low:
+    - "Quality tools are additive only, low risk"
+
+approval:
+  required:
+    - "Technical Lead"
+  status: "pending"

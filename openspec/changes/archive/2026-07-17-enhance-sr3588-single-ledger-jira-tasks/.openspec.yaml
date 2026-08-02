@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-06-13
+updated: 2026-07-17
+status: complete
+note: SR-3588 single-ledger Jira tasks enhancement. 21 tasks completed. Remaining 4 tasks are all operational: Jira admin deletion + stakeholder sign-offs (PO, Android lead, iOS lead).

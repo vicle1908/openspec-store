@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-05-25
+updated: 2026-07-17
+status: complete
+note: Android PMP topmarket migration. 83 tasks completed. Remaining 16 tasks: 8 operational (device smoke tests, logcat, emulator), 5 deferred (separate sub-changes for HomeScreen/WatchList), 3 conditional rollbacks.

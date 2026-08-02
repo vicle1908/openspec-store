@@ -1,0 +1,798 @@
+{
+  "Franz Beckenbauer": {
+    "era": "historical",
+    "isGk": false,
+    "id": "88029918268908",
+    "resolvedName": "Franz Beckenbauer",
+    "card": "Epic",
+    "ovr": 84,
+    "attrs": {
+      "Fin": 69,
+      "Dri": 70,
+      "LowPass": 81,
+      "DefAwr": 76,
+      "Speed": 75,
+      "Head": 79
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Paolo Maldini": {
+    "era": "historical",
+    "isGk": false,
+    "id": "88031797317058",
+    "resolvedName": "Paolo Maldini",
+    "card": "Epic",
+    "ovr": 85,
+    "attrs": {
+      "Fin": 62,
+      "Dri": 75,
+      "LowPass": 75,
+      "DefAwr": 82,
+      "Speed": 74,
+      "Head": 80
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Erling Haaland": {
+    "era": "modern",
+    "isGk": false,
+    "id": "133543",
+    "resolvedName": "Erling Haaland",
+    "card": "Standard",
+    "ovr": 84,
+    "attrs": {
+      "Fin": 83,
+      "Dri": 67,
+      "LowPass": 60,
+      "DefAwr": 44,
+      "Speed": 80,
+      "Head": 68
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Harry Kane": {
+    "era": "modern",
+    "isGk": false,
+    "id": "47287",
+    "resolvedName": "Harry Kane",
+    "card": "Standard",
+    "ovr": 84,
+    "attrs": {
+      "Fin": 85,
+      "Dri": 67,
+      "LowPass": 77,
+      "DefAwr": 42,
+      "Speed": 61,
+      "Head": 80
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Darwin Núñez": {
+    "era": "modern",
+    "isGk": false,
+    "id": "16910517",
+    "resolvedName": "Darwin Núñez",
+    "card": "Standard",
+    "ovr": 78,
+    "attrs": {
+      "Fin": 70,
+      "Dri": 69,
+      "LowPass": 67,
+      "DefAwr": 48,
+      "Speed": 79,
+      "Head": 69
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Olivier Giroud": {
+    "era": "modern",
+    "isGk": false,
+    "id": "38627",
+    "resolvedName": "Olivier Giroud",
+    "card": "Standard",
+    "ovr": 78,
+    "attrs": {
+      "Fin": 74,
+      "Dri": 62,
+      "LowPass": 65,
+      "DefAwr": 48,
+      "Speed": 60,
+      "Head": 82
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Karim Benzema": {
+    "era": "modern",
+    "isGk": false,
+    "id": "16786160",
+    "resolvedName": "Karim Benzema",
+    "card": "Standard",
+    "ovr": 81,
+    "attrs": {
+      "Fin": 80,
+      "Dri": 74,
+      "LowPass": 70,
+      "DefAwr": 42,
+      "Speed": 64,
+      "Head": 77
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Kevin De Bruyne": {
+    "era": "modern",
+    "isGk": false,
+    "id": "44379",
+    "resolvedName": "Kevin De Bruyne",
+    "card": "Standard",
+    "ovr": 81,
+    "attrs": {
+      "Fin": 67,
+      "Dri": 70,
+      "LowPass": 83,
+      "DefAwr": 58,
+      "Speed": 64,
+      "Head": 51
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Bruno Fernandes": {
+    "era": "modern",
+    "isGk": false,
+    "id": "60512",
+    "resolvedName": "Bruno Fernandes",
+    "card": "Standard",
+    "ovr": 82,
+    "attrs": {
+      "Fin": 72,
+      "Dri": 73,
+      "LowPass": 80,
+      "DefAwr": 50,
+      "Speed": 64,
+      "Head": 60
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Jude Bellingham": {
+    "era": "modern",
+    "isGk": false,
+    "id": "132933",
+    "resolvedName": "Jude Bellingham",
+    "card": "Standard",
+    "ovr": 82,
+    "attrs": {
+      "Fin": 75,
+      "Dri": 74,
+      "LowPass": 76,
+      "DefAwr": 62,
+      "Speed": 75,
+      "Head": 67
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Federico Valverde": {
+    "era": "modern",
+    "isGk": false,
+    "id": "113911",
+    "resolvedName": "Federico Valverde",
+    "card": "Standard",
+    "ovr": 82,
+    "attrs": {
+      "Fin": 73,
+      "Dri": 74,
+      "LowPass": 78,
+      "DefAwr": 63,
+      "Speed": 75,
+      "Head": 51
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Rodri": {
+    "era": "modern",
+    "isGk": false,
+    "id": "110815",
+    "resolvedName": "Rodri",
+    "card": "Standard",
+    "ovr": 83,
+    "attrs": {
+      "Fin": 66,
+      "Dri": 70,
+      "LowPass": 79,
+      "DefAwr": 79,
+      "Speed": 61,
+      "Head": 72
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Declan Rice": {
+    "era": "modern",
+    "isGk": false,
+    "id": "108959",
+    "resolvedName": "Declan Rice",
+    "card": "Standard",
+    "ovr": 82,
+    "attrs": {
+      "Fin": 64,
+      "Dri": 73,
+      "LowPass": 76,
+      "DefAwr": 69,
+      "Speed": 66,
+      "Head": 64
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Casemiro": {
+    "era": "modern",
+    "isGk": false,
+    "id": "42669",
+    "resolvedName": "Casemiro",
+    "card": "Standard",
+    "ovr": 78,
+    "attrs": {
+      "Fin": 60,
+      "Dri": 61,
+      "LowPass": 69,
+      "DefAwr": 72,
+      "Speed": 58,
+      "Head": 75
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Mohamed Salah": {
+    "era": "modern",
+    "isGk": false,
+    "id": "83943203",
+    "resolvedName": "Mohamed Salah",
+    "card": "Standard",
+    "ovr": 83,
+    "attrs": {
+      "Fin": 81,
+      "Dri": 79,
+      "LowPass": 69,
+      "DefAwr": 40,
+      "Speed": 80,
+      "Head": 54
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Vinícius Júnior": {
+    "era": "modern",
+    "isGk": false,
+    "id": "117047",
+    "resolvedName": "Vinícius Júnior",
+    "card": "Standard",
+    "ovr": 84,
+    "attrs": {
+      "Fin": 77,
+      "Dri": 83,
+      "LowPass": 69,
+      "DefAwr": 40,
+      "Speed": 84,
+      "Head": 48
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Trent Alexander-Arnold": {
+    "era": "modern",
+    "isGk": false,
+    "id": "87961735641853",
+    "resolvedName": "T. Alexander-Arnold",
+    "card": "Epic",
+    "ovr": 84,
+    "attrs": {
+      "Fin": 58,
+      "Dri": 74,
+      "LowPass": 81,
+      "DefAwr": 67,
+      "Speed": 77,
+      "Head": 60
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Virgil van Dijk": {
+    "era": "modern",
+    "isGk": false,
+    "id": "44840",
+    "resolvedName": "Virgil van Dijk",
+    "card": "Standard",
+    "ovr": 83,
+    "attrs": {
+      "Fin": 46,
+      "Dri": 56,
+      "LowPass": 61,
+      "DefAwr": 79,
+      "Speed": 74,
+      "Head": 80
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Sergio Ramos": {
+    "era": "modern",
+    "isGk": false,
+    "id": "105655927053473",
+    "resolvedName": "Sergio Ramos",
+    "card": "Highlight",
+    "ovr": 81,
+    "attrs": {
+      "Fin": 60,
+      "Dri": 64,
+      "LowPass": 71,
+      "DefAwr": 77,
+      "Speed": 63,
+      "Head": 88
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Alphonso Davies": {
+    "era": "modern",
+    "isGk": false,
+    "id": "129961",
+    "resolvedName": "Alphonso Davies",
+    "card": "Standard",
+    "ovr": 79,
+    "attrs": {
+      "Fin": 66,
+      "Dri": 81,
+      "LowPass": 58,
+      "DefAwr": 62,
+      "Speed": 86,
+      "Head": 52
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Kyle Walker": {
+    "era": "modern",
+    "isGk": false,
+    "id": "41119",
+    "resolvedName": "Kyle Walker",
+    "card": "Standard",
+    "ovr": 77,
+    "attrs": {
+      "Fin": 57,
+      "Dri": 67,
+      "LowPass": 72,
+      "DefAwr": 65,
+      "Speed": 79,
+      "Head": 60
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Achraf Hakimi": {
+    "era": "modern",
+    "isGk": false,
+    "id": "84000040",
+    "resolvedName": "Achraf Hakimi",
+    "card": "Standard",
+    "ovr": 81,
+    "attrs": {
+      "Fin": 68,
+      "Dri": 79,
+      "LowPass": 72,
+      "DefAwr": 67,
+      "Speed": 84,
+      "Head": 60
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Ederson": {
+    "era": "modern",
+    "isGk": true,
+    "id": "105594186938079",
+    "resolvedName": "Ederson Moraes",
+    "card": "Highlight",
+    "ovr": 86,
+    "attrs": {
+      "GKRef": 77,
+      "GKrea": 80,
+      "GKawr": 78,
+      "GKcat": 78,
+      "GKpar": 82
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Thibaut Courtois": {
+    "era": "modern",
+    "isGk": true,
+    "id": "44383",
+    "resolvedName": "Thibaut Courtois",
+    "card": "Standard",
+    "ovr": 83,
+    "attrs": {
+      "GKRef": 80,
+      "GKrea": 74,
+      "GKawr": 77,
+      "GKcat": 77,
+      "GKpar": 82
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Filippo Inzaghi": {
+    "era": "historical",
+    "isGk": false,
+    "id": "88032065752516",
+    "resolvedName": "Filippo Inzaghi",
+    "card": "Epic",
+    "ovr": 84,
+    "attrs": {
+      "Fin": 80,
+      "Dri": 72,
+      "LowPass": 60,
+      "DefAwr": 47,
+      "Speed": 77,
+      "Head": 74
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Gerd Müller": {
+    "era": "historical",
+    "isGk": false,
+    "id": "88040655554922",
+    "resolvedName": "Gerd Müller",
+    "card": "Epic",
+    "ovr": 87,
+    "attrs": {
+      "Fin": 81,
+      "Dri": 78,
+      "LowPass": 60,
+      "DefAwr": 42,
+      "Speed": 78,
+      "Head": 78
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Didier Drogba": {
+    "era": "historical",
+    "isGk": false,
+    "id": "88032334188033",
+    "resolvedName": "Didier Drogba",
+    "card": "Epic",
+    "ovr": 83,
+    "attrs": {
+      "Fin": 82,
+      "Dri": 64,
+      "LowPass": 58,
+      "DefAwr": 46,
+      "Speed": 67,
+      "Head": 86
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Dennis Bergkamp": {
+    "era": "historical",
+    "isGk": false,
+    "id": "88029918268890",
+    "resolvedName": "Dennis Bergkamp",
+    "card": "Epic",
+    "ovr": 84,
+    "attrs": {
+      "Fin": 79,
+      "Dri": 75,
+      "LowPass": 75,
+      "DefAwr": 43,
+      "Speed": 71,
+      "Head": 57
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Francesco Totti": {
+    "era": "historical",
+    "isGk": false,
+    "id": "87963346275779",
+    "resolvedName": "Francesco Totti",
+    "card": "Epic",
+    "ovr": 84,
+    "attrs": {
+      "Fin": 78,
+      "Dri": 75,
+      "LowPass": 79,
+      "DefAwr": 43,
+      "Speed": 64,
+      "Head": 65
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Frank Lampard": {
+    "era": "historical",
+    "isGk": false,
+    "id": "17592454614492",
+    "resolvedName": "Frank Lampard",
+    "card": "Legendary",
+    "ovr": 88,
+    "attrs": {
+      "Fin": 82,
+      "Dri": 78,
+      "LowPass": 79,
+      "DefAwr": 64,
+      "Speed": 66,
+      "Head": 73
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Steven Gerrard": {
+    "era": "historical",
+    "isGk": false,
+    "id": "88030723575220",
+    "resolvedName": "Steven Gerrard",
+    "card": "Epic",
+    "ovr": 85,
+    "attrs": {
+      "Fin": 70,
+      "Dri": 69,
+      "LowPass": 75,
+      "DefAwr": 79,
+      "Speed": 76,
+      "Head": 68
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Andrea Pirlo": {
+    "era": "historical",
+    "isGk": false,
+    "id": "88033407929824",
+    "resolvedName": "Andrea Pirlo",
+    "card": "Epic",
+    "ovr": 86,
+    "attrs": {
+      "Fin": 73,
+      "Dri": 78,
+      "LowPass": 84,
+      "DefAwr": 79,
+      "Speed": 71,
+      "Head": 61
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Claude Makélélé": {
+    "era": "historical",
+    "isGk": false,
+    "id": "88029649836770",
+    "resolvedName": "Claude Makélélé",
+    "card": "Epic",
+    "ovr": 84,
+    "attrs": {
+      "Fin": 50,
+      "Dri": 63,
+      "LowPass": 79,
+      "DefAwr": 80,
+      "Speed": 75,
+      "Head": 54
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Ryan Giggs": {
+    "era": "historical",
+    "isGk": false,
+    "id": "17592186178992",
+    "resolvedName": "Ryan Giggs",
+    "card": "Legendary",
+    "ovr": 87,
+    "attrs": {
+      "Fin": 76,
+      "Dri": 86,
+      "LowPass": 77,
+      "DefAwr": 45,
+      "Speed": 83,
+      "Head": 61
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "David Beckham": {
+    "era": "historical",
+    "isGk": false,
+    "id": "89060441984433",
+    "resolvedName": "David Beckham",
+    "card": "Epic",
+    "ovr": 82,
+    "attrs": {
+      "Fin": 78,
+      "Dri": 68,
+      "LowPass": 79,
+      "DefAwr": 61,
+      "Speed": 69,
+      "Head": 60
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Ronald Koeman": {
+    "era": "historical",
+    "isGk": false,
+    "id": "88040387119435",
+    "resolvedName": "Ronald Koeman",
+    "card": "Epic",
+    "ovr": 86,
+    "attrs": {
+      "Fin": 74,
+      "Dri": 67,
+      "LowPass": 78,
+      "DefAwr": 77,
+      "Speed": 76,
+      "Head": 72
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Roberto Carlos": {
+    "era": "historical",
+    "isGk": false,
+    "id": "88029649833420",
+    "resolvedName": "Roberto Carlos",
+    "card": "Epic",
+    "ovr": 84,
+    "attrs": {
+      "Fin": 70,
+      "Dri": 77,
+      "LowPass": 68,
+      "DefAwr": 63,
+      "Speed": 86,
+      "Head": 60
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Cafu": {
+    "era": "historical",
+    "isGk": false,
+    "id": "88035555413453",
+    "resolvedName": "Cafu",
+    "card": "Epic",
+    "ovr": 85,
+    "attrs": {
+      "Fin": 68,
+      "Dri": 80,
+      "LowPass": 76,
+      "DefAwr": 74,
+      "Speed": 82,
+      "Head": 65
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Gianluigi Buffon": {
+    "era": "historical",
+    "isGk": true,
+    "id": "88040387118039",
+    "resolvedName": "Gianluigi Buffon",
+    "card": "Epic",
+    "ovr": 87,
+    "attrs": {
+      "GKRef": 81,
+      "GKrea": 84,
+      "GKawr": 82,
+      "GKcat": 80,
+      "GKpar": 80
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  },
+  "Manuel Neuer": {
+    "era": "historical",
+    "isGk": true,
+    "id": "33185",
+    "resolvedName": "Manuel Neuer",
+    "card": "Standard",
+    "ovr": 82,
+    "attrs": {
+      "GKRef": 78,
+      "GKrea": 82,
+      "GKawr": 77,
+      "GKcat": 71,
+      "GKpar": 72
+    },
+    "gameVersion": "eFootball 2026",
+    "lastUpdate": "2026/07/13",
+    "is2026": true,
+    "ok": true
+  }
+}

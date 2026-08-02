@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-07-09
+updated: 2026-07-17
+status: complete
+note: Retired Android local docs mirror. 7 tasks completed. Remaining: live drift validation and commit (deferred to deployment).

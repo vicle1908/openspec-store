@@ -1,0 +1,16 @@
+schema: spec-driven
+created: 2026-05-22
+status: implemented
+change: jira-kanban-from-spreadsheet-python
+description: Promote bash kanban-board-from-spreadsheet skill to dedicated Python repo using tdt-core, jira-skill, and Google Sheets API
+artifacts:
+  proposal: proposal.md
+  design: design.md
+  spec: spec.md
+  tasks: tasks.md
+dependencies:
+  - tdt-core[jira] for JiraClientFactory
+  - jira-skill for board/filter operations
+  - Google Sheets API (gspread or google-api-python-client) for spreadsheet read
+  - Existing archived spec at openspec/changes/archive/kanban-board-from-spreadsheet/
+predecessor: archive/kanban-board-from-spreadsheet (bash skill v1.3)

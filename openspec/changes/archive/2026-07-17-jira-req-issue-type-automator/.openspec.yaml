@@ -1,0 +1,10 @@
+schema: spec-driven
+created: 2026-07-03
+updated: 2026-07-17
+status: complete
+note: >
+  Jira req issue type automator. 24 tasks completed.
+  Full Python implementation: tdt-core IssueTypeSchemeClient SDK,
+  jira-skill CLI (create/update/list), REQ enum value, 14 tests passing.
+  Remaining 6 tasks are all live Jira operations (create "Req" across
+  classic projects, verify, commit).

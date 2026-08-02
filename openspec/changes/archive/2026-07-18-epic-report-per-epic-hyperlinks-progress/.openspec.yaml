@@ -1,0 +1,8 @@
+schema: spec-driven
+created: 2026-07-18
+updated: 2026-07-18
+status: complete
+note: >
+  Added clickable hyperlinks in iOS/Android/QA columns and Progress column
+  showing weighted subtask completion. Hyperlinks use STATUS (KEY) format.
+  Progress falls back to parent task status when no subtasks. 636 tests passing.

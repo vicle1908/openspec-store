@@ -1,0 +1,32 @@
+schema: spec-driven
+
+context: |
+  # Multi-Project Workspace
+
+  ## Go Microservices Platform
+  - 8 independently deployable Go services, shared platform module
+  - PostgreSQL, Kafka, Debezium CDC, Temporal, Redis, OTLP observability
+  - Architecture: DDD, hexagonal, CQRS-style handlers, ports/adapters
+  - Contracts: Protobuf managed with Buf; REST for MVP client API
+  - Operations: Docker Compose local, kind K8s validation, Argo CD GitOps
+  - Quality: structured logging, health checks, unit + integration tests
+
+  ## TDT Mobile Platform Ecosystem
+  - Mobile Apps: Swift (iOS), Kotlin (Android)
+  - Backend Services: Python 3.14 (FastAPI), Go (webhook-receiver)
+  - Infrastructure: Docker, launchd, uv (Python packaging)
+  - Databases: PostgreSQL, Redis
+  - APIs: Jira Cloud API v3, GitLab API v4, Google Sheets API
+  - Core Libraries: tdt_core SDK (JiraClientFactory, GitLabClientFactory)
+  - Agent Framework: Pydantic AI v2, DBOS durable execution
+
+operations:
+  apply:
+    guidance:
+      - Preserve existing work, read the nearest applicable AGENTS.md and owning documentation, and keep edits within the selected change and repository root.
+      - Read every concrete context file returned by the apply instructions before implementation and treat explicit user choices and repository policy as controlling.
+      - Run focused verification for each completed task, record exact evidence, and mark a checkbox complete only after its implementation and check succeed.
+  archive:
+    guidance:
+      - Ensure the affected change has no incomplete tasks, then sync any modified delta specs to main specs before archiving.
+      - Validate the archived state, confirm the spec sync preserved all scenarios, and record the archived change for downstream verification.

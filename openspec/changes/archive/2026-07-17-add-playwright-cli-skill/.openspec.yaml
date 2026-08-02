@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-06-12
+updated: 2026-07-17
+status: complete
+note: Playwright CLI skill for browser automation. 50 tasks completed. Remaining 5 tasks: 3 explicitly deferred (chromium install, chrome launch-debug, SharePoint CDP), 2 operational (commit, archive).

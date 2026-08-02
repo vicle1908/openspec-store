@@ -1,0 +1,60 @@
+schema: spec-driven
+created: 2026-05-18
+updated: 2026-05-18
+status: complete
+type: documentation
+
+metadata:
+  name: "skill-split-compact"
+  description: "Split oversized SKILL.md files into compact bodies with reference files"
+  version: "1.0"
+  completion: 100
+
+team:
+  lead: "Documentation Engineer"
+
+timeline:
+  start_date: "2026-05-18"
+  actual_completion: "2026-05-18"
+  duration_hours: 2
+
+effort:
+  total_hours: 2
+  phases: 2
+  tasks: 6
+
+features:
+  skills_processed: 6
+  total_lines_reduced: 1200
+  reference_files_created: 18
+
+deliverables:
+  - name: "spec.md"
+    status: "complete"
+  - name: "design.md"
+    status: "complete"
+  - name: "tasks.md"
+    status: "complete"
+  - name: "proposal.md"
+    status: "complete"
+  - name: ".openspec.yaml"
+    status: "complete"
+  - name: "VERIFICATION.md"
+    status: "complete"
+
+milestones:
+  - name: "Spec and design complete"
+    date: "2026-05-18"
+    status: "complete"
+  - name: "Tasks and proposal complete"
+    date: "2026-05-18"
+    status: "complete"
+  - name: "All SKILL.md files split and verified"
+    date: "2026-05-18"
+    status: "complete"
+
+approval:
+  required:
+    - "Technical Lead"
+  status: "approved"
+  approved_date: "2026-05-18"

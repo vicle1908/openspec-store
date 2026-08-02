@@ -1,0 +1,36 @@
+name: ai-review-structured-findings
+status: in_progress
+note: 95/108 tasks; remaining are manual verification and README documentation
+note: Implementation complete; verification checklist pending (integration tests, linting, mypy, security tests, manual verification)
+created: 2026-06-12
+updated: 2026-06-12
+owner: tdt-meta
+tags:
+  - ai-review
+  - quality
+  - security
+  - findings
+
+summary: >
+  Add structured finding extraction, validation, deduplication, and 
+  security fixes to the ai-review service.
+
+artifacts:
+  - proposal.md
+  - design.md
+  - specs/structured-findings/spec.md
+  - tasks.md
+
+applyRequires:
+  - proposal.md
+  - design.md
+  - specs/structured-findings/spec.md
+
+description: >
+  Current ai-review publishes findings as raw strings with hardcoded severity.
+  This change adds:
+  - Structured finding model with severity, file, line, message
+  - Regex-based finding extraction from LLM output
+  - Validation against diff context
+  - Cross-reviewer deduplication
+  - Security fixes (path traversal, timing-safe comparison)

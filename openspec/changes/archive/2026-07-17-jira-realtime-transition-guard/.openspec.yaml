@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-05-31
+updated: 2026-07-17
+status: complete
+note: Jira realtime transition guard. 10 tasks completed. 96 tests passing, 83% coverage on jira_guard/. Remaining: live Jira verification (operational) + deferred dry-run period.

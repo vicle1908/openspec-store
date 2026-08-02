@@ -1,0 +1,9 @@
+schema: spec-driven
+created: 2026-05-31
+updated: 2026-07-17
+status: complete
+note: >
+  Agent core quality gate — code implementation complete. Remaining work:
+  file splits (T4.2-T4.5, each 1000+ lines), mypy strict for jira-epic-report
+  (14 errors) and jira-skill (142 triaged), CI bootstrapping for 4 bare repos.
+  Each is a dedicated effort tracked in the tasks.md.

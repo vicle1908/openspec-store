@@ -1,0 +1,12 @@
+schema: spec-driven
+created: 2026-07-17
+updated: 2026-07-17
+status: complete
+note: >
+  Jira epic report archive gap closure. 22 tasks completed.
+  Remaining 14 tasks all deferred to dedicated follow-up changes:
+  health tiers characterization (3.1-3.4), time-based capacity utilization
+  (4.1-4.5), architecture docs update (5.1-5.2), quality gates (5.3),
+  openspec validation (5.4), rollback plan (5.5). These are substantial
+  code changes in the jira-epic-report reporter that warrant their own
+  focused OpenSpec changes.

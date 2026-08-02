@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PMP Migration — Phase 1, 2 &amp; 3</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:          #0d1117;
+      --surface:     #161b22;
+      --surface2:    #21262d;
+      --border:      #30363d;
+      --text:        #e6edf3;
+      --muted:       #8b949e;
+      --dim:         #484f58;
+      --blue:        #58a6ff;
+      --green:       #3fb950;
+      --yellow:      #d29922;
+      --red:         #f85149;
+      --purple:      #bc8cff;
+      --code-bg:     #0d1117;
+      --font:        'Segoe UI', system-ui, -apple-system, sans-serif;
+      --mono:        'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      --radius:      10px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.55; overflow-x: hidden; }
+
+    /* ── Sidebar ─────────────────────────────────────────── */
+    #sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0;
+      width: 220px; background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto; z-index: 100;
+    }
+    .sb-header { padding: 20px 16px 14px; border-bottom: 1px solid var(--border); }
+    .sb-header h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+    .sb-header p { font-size: 11px; color: var(--dim); margin-top: 3px; }
+    .sb-section { padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .sb-section-label { font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); padding: 8px 16px 3px; }
+    .sb-item { display: flex; align-items: center; gap: 8px; padding: 6px 16px; cursor: pointer; color: var(--muted); font-size: 12px; border-left: 3px solid transparent; transition: all .12s; }
+    .sb-item:hover { color: var(--text); background: var(--surface2); }
+    .sb-item.active { color: var(--blue); border-left-color: var(--blue); background: rgba(88,166,255,.07); }
+    .badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: .05em; flex-shrink: 0; }
+    .b1 { background: rgba(63,185,80,.15); color: var(--green); }
+    .b2 { background: rgba(210,153,34,.15); color: var(--yellow); }
+    .b3 { background: rgba(188,140,255,.15); color: var(--purple); }
+
+    /* ── Main ────────────────────────────────────────────── */
+    #main { margin-left: 220px; min-height: 100vh; }
+
+    /* ── Slides ──────────────────────────────────────────── */
+    .slide { min-height: 100vh; padding: 72px 72px 56px; border-bottom: 1px solid var(--border); }
+    .slide-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 14px; }
+
+    h1 { font-size: 44px; font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: var(--text); }
+    h2 { font-size: 28px; font-weight: 600; margin-bottom: 18px; }
+    h3 { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
+    .lead { font-size: 18px; color: var(--text); margin-bottom: 28px; max-width: 860px; }
+
+    /* ── Cards ───────────────────────────────────────────── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
+    .card h3 { font-size: 14px; font-weight: 600; margin-bottom: 7px; }
+    .card p, .card li { font-size: 13px; color: var(--muted); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+
+    /* ── Callout ─────────────────────────────────────────── */
+    .callout { border-radius: 8px; padding: 13px 16px; margin: 14px 0; font-size: 13px; border-left: 4px solid; }
+    .ci  { background: rgba(88,166,255,.07);  border-color: var(--blue);   color: var(--blue); }
+    .cs  { background: rgba(63,185,80,.07);   border-color: var(--green);  color: var(--green); }
+    .cw  { background: rgba(210,153,34,.07);  border-color: var(--yellow); color: var(--yellow); }
+    .cd  { background: rgba(248,81,73,.07);   border-color: var(--red);    color: var(--red); }
+    .cp  { background: rgba(188,140,255,.07); border-color: var(--purple); color: var(--purple); }
+
+    /* ── Code ───────────────────────────────────────────── */
+    pre, code { font-family: var(--mono); font-size: 12.5px; }
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; overflow-x: auto; line-height: 1.5; margin: 10px 0; }
+    code { background: rgba(88,166,255,.08); color: var(--blue); padding: 2px 5px; border-radius: 4px; font-size: .88em; }
+    pre code { background: transparent; color: var(--text); padding: 0; border-radius: 0; }
+    .code-label { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--dim); margin-bottom: 5px; }
+
+    /* ── Tables ─────────────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+    th { text-align: left; padding: 9px 14px; background: var(--surface2); color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--border); }
+    td { padding: 9px 14px; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { color: var(--text); font-weight: 500; }
+
+    /* ── Lists ──────────────────────────────────────────── */
+    ul, ol { padding-left: 22px; margin: 6px 0; }
+    li { font-size: 13px; color: var(--muted); margin-bottom: 5px; }
+    li strong { color: var(--text); }
+
+    /* ── Pills ──────────────────────────────────────────── */
+    .pill { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+    .pg { background: rgba(63,185,80,.15);  color: var(--green); }
+    .py { background: rgba(210,153,34,.15); color: var(--yellow); }
+    .pr { background: rgba(248,81,73,.15);  color: var(--red); }
+    .pb { background: rgba(88,166,255,.15);  color: var(--blue); }
+    .pp { background: rgba(188,140,255,.15); color: var(--purple); }
+
+    /* ── Divider ────────────────────────────────────────── */
+    .divider { height: 1px; background: var(--border); margin: 28px 0; }
+
+    /* ── Status strip ──────────────────────────────────── */
+    .strip { display: flex; gap: 16px; margin: 22px 0; }
+    .strip-item { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; text-align: center; }
+    .strip-val { font-size: 34px; font-weight: 700; line-height: 1; margin-bottom: 5px; }
+    .strip-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+
+    /* ── Decision ───────────────────────────────────────── */
+    .dec { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 10px; }
+    .dec-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+    .dec-body { font-size: 12px; color: var(--muted); }
+
+    /* ── Title slide ───────────────────────────────────── */
+    .title-slide { display: flex; flex-direction: column; justify-content: center; min-height: 100vh; text-align: center; padding: 72px; }
+
+    /* ── Phase colors ──────────────────────────────────── */
+    .ph1 { border-left: 4px solid var(--green); }
+    .ph2 { border-left: 4px solid var(--yellow); }
+    .ph3 { border-left: 4px solid var(--purple); }
+
+    /* ── Timeline ──────────────────────────────────────── */
+    .timeline { display: flex; gap: 0; margin: 16px 0; position: relative; }
+    .timeline::before { content: ''; position: absolute; left: 20px; right: 20px; top: 18px; height: 2px; background: var(--border); }
+    .tl-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .tl-dot { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; border: 2px solid; position: relative; z-index: 1; }
+    .tl-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); text-align: center; }
+
+    /* ── Flow row ──────────────────────────────────────── */
+    .flow { display: flex; align-items: center; gap: 0; margin: 10px 0; flex-wrap: wrap; }
+    .flow-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 8px 13px; font-size: 12px; color: var(--text); min-width: 110px; text-align: center; }
+    .flow-box.g  { border-color: var(--green);  background: rgba(63,185,80,.07); }
+    .flow-box.bl { border-color: var(--blue);   background: rgba(88,166,255,.07); }
+    .flow-box.p  { border-color: var(--purple); background: rgba(188,140,255,.07); }
+    .flow-box.y  { border-color: var(--yellow); background: rgba(210,153,34,.07); }
+    .flow-arr { color: var(--muted); font-size: 16px; padding: 0 7px; }
+
+    /* ── Spacer ─────────────────────────────────────────── */
+    .sp { height: 18px; }
+
+    /* ── Scrollbar ─────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── Responsive ────────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+      .grid-4 { grid-template-columns: 1fr 1fr; }
+      .slide { padding: 56px 40px 40px; }
+      #sidebar { width: 190px; }
+      #main { margin-left: 190px; }
+    }
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .slide { padding: 40px 20px 32px; }
+      #sidebar { display: none; }
+      #main { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════ -->
+<nav id="sidebar">
+  <div class="sb-header">
+    <h3>PMP Migration</h3>
+    <p>SR-3738 · Android</p>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-label">Overview</div>
+    <a class="sb-item" href="#title">
+      <span class="badge b1">All</span> Title
+    </a>
+    <a class="sb-item" href="#problem">
+      <span class="badge b1">All</span> The Problem
+    </a>
+    <a class="sb-item" href="#analogy">
+      <span class="badge b1">All</span> Hotel Analogy
+    </a>
+    <a class="sb-item" href="#ux">
+      <span class="badge b1">All</span> User Experience
+    </a>
+    <a class="sb-item" href="#overview-svg">
+      <span class="badge b1">All</span> Architecture
+    </a>
+    <a class="sb-item" href="#pooling">
+      <span class="badge b1">All</span> URL Pooling
+    </a>
+    <a class="sb-item" href="#sr3738">
+      <span class="badge b1">All</span> SR-3738 Fix
+    </a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-label">Phase 1 — Shipped</div>
+    <a class="sb-item" href="#p1-flow">
+      <span class="badge b1">P1</span> Data Flow
+    </a>
+    <a class="sb-item" href="#p1-bgfg">
+      <span class="badge b1">P1</span> App Bg / Fg
+    </a>
+    <a class="sb-item" href="#p1-iterations">
+      <span class="badge b1">P1</span> Iterations
+    </a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-label">Phase 2 — Shipped</div>
+    <a class="sb-item" href="#p2-goal">
+      <span class="badge b2">P2</span> TopMarket
+    </a>
+    <a class="sb-item" href="#p2-isalldata">
+      <span class="badge b2">P2</span> isAllDataReturned
+    </a>
+    <a class="sb-item" href="#p2-alias">
+      <span class="badge b2">P2</span> aliasFields
+    </a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-label">Phase 3 — Spec Ready</div>
+    <a class="sb-item" href="#p3-overview">
+      <span class="badge b3">P3</span> QUERY Support
+    </a>
+    <a class="sb-item" href="#p3-arch-svg">
+      <span class="badge b3">P3</span> Two-Path Arch
+    </a>
+    <a class="sb-item" href="#p3-query-flow">
+      <span class="badge b3">P3</span> Chart Data Flow
+    </a>
+    <a class="sb-item" href="#p3-procon">
+      <span class="badge b3">P3</span> Trade-offs
+    </a>
+    <a class="sb-item" href="#p3-tiers">
+      <span class="badge b3">P3</span> Migration Tiers
+    </a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-label">Consolidated</div>
+    <a class="sb-item" href="#all-decisions">
+      <span class="badge b1">All</span> Decisions
+    </a>
+    <a class="sb-item" href="#all-status">
+      <span class="badge b1">All</span> Status
+    </a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════ -->
+<div id="main">
+
+  <!-- ──────────────────────────────────────────
+       TITLE
+  ───────────────────────────────────────────── -->
+  <section id="title" class="slide ph1 title-slide">
+    <div style="display:flex;gap:12px;justify-content:center;margin-bottom:28px;">
+      <span class="pill pg">Phase 1 — Shipped</span>
+      <span class="pill py">Phase 2 — Shipped</span>
+      <span class="pill pp">Phase 3 — Spec</span>
+    </div>
+    <h1 style="font-size:60px;margin-bottom:12px;">PMP Migration</h1>
+    <div class="lead" style="margin:0 auto 36px;font-size:20px;">
+      From 985-line PMPUtilViewModel God Class<br>to Reactive, Lifecycle-Correct Connection Center
+    </div>
+
+    <div class="strip" style="max-width:720px;margin:0 auto 40px;">
+      <div class="strip-item">
+        <div class="strip-val" style="color:var(--green);">4</div>
+        <div class="strip-lbl">Screens Migrated P1</div>
+      </div>
+      <div class="strip-item">
+        <div class="strip-val" style="color:var(--yellow);">13</div>
+        <div class="strip-lbl">Screens Remaining P3</div>
+      </div>
+      <div class="strip-item">
+        <div class="strip-val" style="color:var(--purple);">5</div>
+        <div class="strip-lbl">Spec Files P3</div>
+      </div>
+      <div class="strip-item">
+        <div class="strip-val" style="color:var(--red);">1</div>
+        <div class="strip-lbl">Critical Risk P3</div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline" style="max-width:700px;margin:0 auto;">
+      <div class="tl-item">
+        <div class="tl-dot" style="border-color:var(--green);color:var(--green);background:rgba(63,185,80,.1);">P1</div>
+        <div class="tl-lbl">Connection Center<br/><span style="color:var(--green);">Shipped</span></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="border-color:var(--yellow);color:var(--yellow);background:rgba(210,153,34,.1);">P2</div>
+        <div class="tl-lbl">TopMarket<br/><span style="color:var(--yellow);">Shipped</span></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="border-color:var(--purple);color:var(--purple);background:rgba(188,140,255,.1);">P3</div>
+        <div class="tl-lbl">QUERY Support<br/><span style="color:var(--purple);">Spec Ready</span></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="border-color:var(--dim);color:var(--dim);background:var(--surface2);">T5</div>
+        <div class="tl-lbl">Delete Legacy<br/><span style="color:var(--dim);">Future</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:32px;margin-top:44px;">
+      <div style="font-size:12px;color:var(--muted);">
+        <span style="color:var(--blue);">SR-3738</span> · poems-mobile3-android · Kotlin
+      </div>
+      <div style="font-size:12px;color:var(--muted);">
+        iOS Equivalent: <span style="color:var(--green);">SR-2875 — Shipped Apr 2026</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       HOTEL FRONT DESK ANALOGY
+  ───────────────────────────────────────────── -->
+  <section id="analogy" class="slide ph1">
+    <div class="slide-tag"><span class="badge b1">Overview</span> Analogy</div>
+    <h1>The Hotel Front Desk</h1>
+    <p class="lead">PMPConnectionCenter is exactly like a hotel front desk. One desk, many guests, each guest gets a key card.</p>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin:16px 0;">
+      <svg viewBox="0 0 1080 480" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:800px;display:block;">
+        <defs>
+          <marker id="hl" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#58a6ff" opacity=".7"/></marker>
+        </defs>
+
+        <!-- Three guests (Fragments) -->
+        <g>
+          <rect x="40" y="40" width="160" height="60" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+          <text x="120" y="60" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">Guest 1 — WatchList</text>
+          <text x="120" y="80" text-anchor="middle" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif">wants stock prices</text>
+        </g>
+        <g>
+          <rect x="40" y="120" width="160" height="60" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+          <text x="120" y="140" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">Guest 2 — Trade</text>
+          <text x="120" y="160" text-anchor="middle" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif">wants stock prices</text>
+        </g>
+        <g>
+          <rect x="40" y="200" width="160" height="60" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+          <text x="120" y="220" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">Guest 3 — TopMarket</text>
+          <text x="120" y="240" text-anchor="middle" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif">wants top-movers</text>
+        </g>
+
+        <!-- Hotel front desk (Center) -->
+        <g>
+          <rect x="380" y="80" width="280" height="180" rx="12" fill="#0d1f3c" stroke="#58a6ff" stroke-width="2"/>
+          <rect x="380" y="80" width="280" height="32" rx="12" fill="#58a6ff" opacity=".15"/>
+          <text x="520" y="103" text-anchor="middle" fill="#58a6ff" font-size="14" font-weight="700" font-family="Segoe UI,sans-serif">HOTEL FRONT DESK</text>
+          <text x="520" y="135" text-anchor="middle" fill="#e6edf3" font-size="11" font-family="Segoe UI,sans-serif">PMPConnectionCenter</text>
+          <text x="520" y="160" text-anchor="middle" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif">One desk, serves all guests</text>
+          <text x="520" y="180" text-anchor="middle" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif">One phone line per supplier</text>
+          <text x="520" y="200" text-anchor="middle" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif">Stays open 24/7</text>
+          <text x="520" y="225" text-anchor="middle" fill="#3fb950" font-size="10" font-family="Segoe UI,sans-serif">✓ Survives guests going to sleep</text>
+          <text x="520" y="245" text-anchor="middle" fill="#3fb950" font-size="10" font-family="Segoe UI,sans-serif">✓ Reuses open phone lines</text>
+        </g>
+
+        <!-- Three key cards (Tokens) -->
+        <g>
+          <rect x="730" y="40" width="170" height="50" rx="6" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
+          <text x="815" y="58" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="600" font-family="Segoe UI,sans-serif">Key Card #1</text>
+          <text x="815" y="76" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">PMPToken (LIVE)</text>
+        </g>
+        <g>
+          <rect x="730" y="120" width="170" height="50" rx="6" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
+          <text x="815" y="138" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="600" font-family="Segoe UI,sans-serif">Key Card #2</text>
+          <text x="815" y="156" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">PMPToken (LIVE)</text>
+        </g>
+        <g>
+          <rect x="730" y="200" width="170" height="50" rx="6" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
+          <text x="815" y="218" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="600" font-family="Segoe UI,sans-serif">Key Card #3</text>
+          <text x="815" y="236" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">PMPToken (LIVE)</text>
+        </g>
+
+        <!-- Arrows from guests to desk -->
+        <line x1="200" y1="70"  x2="380" y2="140" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#hl)" opacity=".7"/>
+        <line x1="200" y1="150" x2="380" y2="170" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#hl)" opacity=".7"/>
+        <line x1="200" y1="230" x2="380" y2="200" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#hl)" opacity=".7"/>
+        <text x="285" y="115" text-anchor="middle" fill="#58a6ff" font-size="9" font-family="Segoe UI,sans-serif" opacity=".8">"I want prices"</text>
+
+        <!-- Arrows from desk to key cards -->
+        <line x1="660" y1="140" x2="730" y2="65"  stroke="#3fb950" stroke-width="1.5" marker-end="url(#hl)" opacity=".7"/>
+        <line x1="660" y1="170" x2="730" y2="145" stroke="#3fb950" stroke-width="1.5" marker-end="url(#hl)" opacity=".7"/>
+        <line x1="660" y1="200" x2="730" y2="225" stroke="#3fb950" stroke-width="1.5" marker-end="url(#hl)" opacity=".7"/>
+        <text x="695" y="105" text-anchor="middle" fill="#3fb950" font-size="9" font-family="Segoe UI,sans-serif" opacity=".8">"Here's your key"</text>
+
+        <!-- Bottom: what changes -->
+        <rect x="40" y="290" width="500" height="170" rx="10" fill="#0d2818" stroke="#3fb950" stroke-width="1" opacity=".8"/>
+        <text x="290" y="315" text-anchor="middle" fill="#3fb950" font-size="13" font-weight="700" font-family="Segoe UI,sans-serif">THE FIX (New)</text>
+        <text x="60" y="345" fill="#e6edf3" font-size="11" font-family="Segoe UI,sans-serif">✓ Front desk stays open 24/7</text>
+        <text x="60" y="365" fill="#e6edf3" font-size="11" font-family="Segoe UI,sans-serif">✓ Key card kept when guest naps</text>
+        <text x="60" y="385" fill="#e6edf3" font-size="11" font-family="Segoe UI,sans-serif">✓ One phone line per supplier, shared</text>
+        <text x="60" y="405" fill="#e6edf3" font-size="11" font-family="Segoe UI,sans-serif">✓ Guest 1 + Guest 2 same stock = 1 call</text>
+        <text x="60" y="425" fill="#e6edf3" font-size="11" font-family="Segoe UI,sans-serif">✓ Prices cached → instant on wake</text>
+        <text x="60" y="448" fill="#3fb950" font-size="11" font-family="Segoe UI,sans-serif">Key returned only at check-out (unsubscribe)</text>
+
+        <rect x="560" y="290" width="480" height="170" rx="10" fill="#2d0d0d" stroke="#f85149" stroke-width="1" opacity=".8"/>
+        <text x="800" y="315" text-anchor="middle" fill="#f85149" font-size="13" font-weight="700" font-family="Segoe UI,sans-serif">THE BUG (Legacy)</text>
+        <text x="580" y="345" fill="#e6edf3" font-size="11" font-family="Segoe UI,sans-serif">✗ Each guest brings own phone</text>
+        <text x="580" y="365" fill="#e6edf3" font-size="11" font-family="Segoe UI,sans-serif">✗ Phone hung up on every nap</text>
+        <text x="580" y="385" fill="#e6edf3" font-size="11" font-family="Segoe UI,sans-serif">✗ 3 guests, 3 phones for same stock</text>
+        <text x="580" y="405" fill="#e6edf3" font-size="11" font-family="Segoe UI,sans-serif">✗ Re-dial supplier on every wake</text>
+        <text x="580" y="425" fill="#e6edf3" font-size="11" font-family="Segoe UI,sans-serif">✗ ~200ms gap while re-dialing</text>
+        <text x="580" y="448" fill="#f85149" font-size="11" font-family="Segoe UI,sans-serif">Bottom sheet: phone never re-dials → frozen</text>
+
+      </svg>
+    </div>
+
+    <div class="callout ci">
+      <strong>The mental model:</strong> PMPConnectionCenter is the desk. <code>PMPNode</code> is a phone line to one supplier. <code>PMPToken</code> is your key card. <code>detach()</code> = put key in pocket and nap; <code>unsubscribe()</code> = return the key at check-out.
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       USER EXPERIENCE BEFORE / AFTER
+  ───────────────────────────────────────────── -->
+  <section id="ux" class="slide ph1">
+    <div class="slide-tag"><span class="badge b1">Overview</span> User Experience</div>
+    <h1>What the User Actually Feels</h1>
+    <p class="lead">Same actions on the phone. The user sees the difference.</p>
+
+    <div class="grid-2">
+      <!-- BEFORE -->
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span class="pill pr">BEFORE — Legacy</span>
+        </div>
+
+        <div style="background:#1a0d0d;border:1px solid var(--red);border-radius:10px;padding:18px;">
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;">
+            <div style="font-size:24px;">📱</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);">Open Trade screen</div>
+              <div style="font-size:11px;color:var(--muted);">User taps a stock to trade</div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(248,81,73,.2);">
+            <span style="color:var(--red);">⏳</span> Prices appear instantly
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(248,81,73,.2);">
+            <span style="color:var(--red);">⏳</span> User swipes to Home tab
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(248,81,73,.2);">
+            <span style="color:var(--red);">💥</span> Connection closes <code style="color:var(--red);">unSubscribeQueryRequest()</code>
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(248,81,73,.2);">
+            <span style="color:var(--red);">📱</span> User swipes back to Trade
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(248,81,73,.2);">
+            <span style="color:var(--red);">⏱️ ~200ms</span> Login + re-subscribe
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(248,81,73,.2);">
+            <span style="color:var(--red);">📱</span> User backgrounds app
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(248,81,73,.2);">
+            <span style="color:var(--red);">📱</span> User foregrounds app
+          </div>
+          <div style="font-size:11px;color:var(--red);padding:10px 0 0;border-top:1px solid rgba(248,81,73,.3);font-weight:600;">
+            💥 SR-3738: Prices frozen, never update
+          </div>
+        </div>
+      </div>
+
+      <!-- AFTER -->
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span class="pill pg">AFTER — New</span>
+        </div>
+
+        <div style="background:#0d1a0d;border:1px solid var(--green);border-radius:10px;padding:18px;">
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;">
+            <div style="font-size:24px;">📱</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);">Open Trade screen</div>
+              <div style="font-size:11px;color:var(--muted);">User taps a stock to trade</div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(63,185,80,.2);">
+            <span style="color:var(--green);">⚡</span> Prices appear instantly
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(63,185,80,.2);">
+            <span style="color:var(--green);">→</span> User swipes to Home tab
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(63,185,80,.2);">
+            <span style="color:var(--green);">🔑</span> Token kept open <code style="color:var(--green);">detach()</code>
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(63,185,80,.2);">
+            <span style="color:var(--green);">→</span> User swipes back to Trade
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(63,185,80,.2);">
+            <span style="color:var(--green);">⚡ instant</span> Cached snapshot, no re-login
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(63,185,80,.2);">
+            <span style="color:var(--green);">📱</span> User backgrounds app
+          </div>
+          <div style="font-size:11px;color:var(--muted);padding:8px 0;border-top:1px solid rgba(63,185,80,.2);">
+            <span style="color:var(--green);">📱</span> User foregrounds app
+          </div>
+          <div style="font-size:11px;color:var(--green);padding:10px 0 0;border-top:1px solid rgba(63,185,80,.3);font-weight:600;">
+            ✓ Prices resume immediately
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sp"></div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;">
+      <h3 style="margin-bottom:10px;">What the user sees in numbers</h3>
+      <div class="grid-4">
+        <div style="text-align:center;">
+          <div style="font-size:24px;font-weight:700;color:var(--red);">~200ms</div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">re-login flash<br/>(legacy)</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:24px;font-weight:700;color:var(--green);">0ms</div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">snapshot replay<br/>(new)</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:24px;font-weight:700;color:var(--red);">3</div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">TCP sockets<br/>3 users, 1 stock (legacy)</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:24px;font-weight:700;color:var(--green);">1</div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">TCP socket<br/>shared (new)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       THE PROBLEM
+  ───────────────────────────────────────────── -->
+  <section id="problem" class="slide ph1">
+    <div class="slide-tag"><span class="badge b1">Phase 1</span> Context</div>
+    <h1>The Problem</h1>
+    <p class="lead">PMPUtilViewModel is a 985-line god class with 30+ consumers — and a fundamental lifecycle bug that freezes prices.</p>
+
+    <div class="grid-2">
+      <!-- Legacy side -->
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <span class="pill pr">Legacy</span>
+          <span style="font-size:13px;color:var(--muted);">PMPUtilViewModel — 985 lines</span>
+        </div>
+
+        <div class="card" style="border-color:var(--red);">
+          <h3 style="color:var(--red);">Per-Fragment TCP Sockets</h3>
+          <p>Each Fragment opens its own socket. Same stock viewed in two screens = 2 TCP connections.</p>
+        </div>
+
+        <div class="card" style="border-color:var(--red);">
+          <h3 style="color:var(--red);">Reconnect Flash (~200ms)</h3>
+          <p>Every <code>onPause</code> → <code>unSubscribeQueryRequest()</code> sends STREAMING_UNSCRIBE. Server forgets subscription. <code>onResume</code> → <code>reSubscribe()</code> must rebuild from scratch.</p>
+        </div>
+
+        <div class="card" style="border-color:var(--red);">
+          <h3 style="color:var(--red);">SR-3738 — BottomSheet Lifecycle</h3>
+          <p><code>BottomSheetDialogFragment</code> onResume may not fire when navigating back. Prices freeze and never recover.</p>
+        </div>
+
+        <div class="card">
+          <h3 style="color:var(--yellow);">5 Callback Variants</h3>
+          <p>livePrices, USSO, history, confirm, status — each with its own fan-out logic mixed into the same 985-line class.</p>
+        </div>
+      </div>
+
+      <!-- New side -->
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <span class="pill pg">New</span>
+          <span style="font-size:13px;color:var(--muted);">PMPConnectionCenter + PMPViewModel</span>
+        </div>
+
+        <div class="card" style="border-color:var(--green);">
+          <h3 style="color:var(--green);">Process Singleton Pool</h3>
+          <p>One <code>PMPNode</code> per unique URL. Multiple fragments share one TCP socket. Ref-counted by token.</p>
+        </div>
+
+        <div class="card" style="border-color:var(--green);">
+          <h3 style="color:var(--green);">Stale-then-Live</h3>
+          <p>Connection survives <code>onPause</code>. App background → <code>suspendForBackground()</code>. App foreground → cached snapshots emitted immediately, then live ticks.</p>
+        </div>
+
+        <div class="card" style="border-color:var(--green);">
+          <h3 style="color:var(--green);">SR-3738 Fixed</h3>
+          <p><code>detach()</code> stops collector but leaves token open. <code>subscribe()</code> reuses cached token. BottomSheet lifecycle is irrelevant.</p>
+        </div>
+
+        <div class="card">
+          <h3 style="color:var(--blue);">Reactive SharedFlow API</h3>
+          <p>Fragments collect via <code>repeatOnLifecycle(STARTED)</code>. <code>PMPUpdate</code> carries topic, indices, data, and isAllDataReturned.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout cd" style="margin-top:16px;">
+      <strong>Root cause:</strong> <code>unSubscribeQueryRequest()</code> sends STREAMING_UNSUBSCRIBE — the server forgets the subscription. The fix is to never call it on Fragment <code>onPause</code>. Instead, <code>detach()</code> only cancels the collector. The connection stays open.
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       SOLUTION OVERVIEW SVG
+  ───────────────────────────────────────────── -->
+  <section id="overview-svg" class="slide ph1">
+    <div class="slide-tag"><span class="badge b1">Phase 1</span> Architecture</div>
+    <h1>Solution Architecture</h1>
+    <p class="lead">4 layers. Each layer does one job. Read top-to-bottom: triggers → routes → pools → collects.</p>
+
+    <!-- ══ LAYER DIAGRAM ═══════════════════════════════════════ -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;margin:20px 0;overflow-x:auto;">
+      <svg viewBox="0 0 1080 580" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:860px;display:block;font-family:'Segoe UI',sans-serif;">
+        <defs>
+          <marker id="A1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L0,9 L9,4.5 z" fill="#3fb950"/></marker>
+          <marker id="A2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L0,9 L9,4.5 z" fill="#58a6ff"/></marker>
+          <marker id="A3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L0,9 L9,4.5 z" fill="#bc8cff"/></marker>
+          <marker id="A4" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L0,9 L9,4.5 z" fill="#d29922"/></marker>
+          <filter id="SB" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity=".4"/></filter>
+        </defs>
+
+        <!-- ═══════════════════ TITLE ROW ═══════════════════ -->
+        <text x="540" y="32" text-anchor="middle" fill="#8b949e" font-size="11" letter-spacing="2">FROM APP EVENT → FRAGMENT DATA</text>
+
+        <!-- ═══════════════════ LAYER 1: TRIGGER ═══════════════════ -->
+        <rect x="40" y="60" width="1000" height="100" rx="14" fill="rgba(63,185,80,.06)" stroke="#3fb950" stroke-width="1.5" opacity="1"/>
+        <text x="70" y="85" fill="#3fb950" font-size="11" letter-spacing="1.5" font-weight="700">①  TRIGGER</text>
+        <text x="70" y="103" fill="#8b949e" font-size="11">App process-wide events. One source.</text>
+
+        <!-- Lifecycle Box -->
+        <rect x="200" y="78" width="280" height="64" rx="10" fill="#0d2818" stroke="#3fb950" stroke-width="2" filter="url(#SB)"/>
+        <text x="340" y="100" text-anchor="middle" fill="#3fb950" font-size="14" font-weight="700">ProcessLifecycleOwner</text>
+        <text x="340" y="120" text-anchor="middle" fill="#8b949e" font-size="11">when app goes background → ON_STOP</text>
+        <text x="340" y="136" text-anchor="middle" fill="#8b949e" font-size="11">when app comes back    → ON_START</text>
+
+        <!-- Fragment Box -->
+        <rect x="600" y="78" width="340" height="64" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5" filter="url(#SB)"/>
+        <text x="770" y="100" text-anchor="middle" fill="#e6edf3" font-size="14" font-weight="700">17 Fragments across the app</text>
+        <text x="770" y="120" text-anchor="middle" fill="#8b949e" font-size="11">each owns a PMPViewModel</text>
+        <text x="770" y="136" text-anchor="middle" fill="#8b949e" font-size="11">lifecycle: onResume · onPause · onDestroyView</text>
+
+        <!-- ↓ arrow L1 → L2 -->
+        <line x1="340" y1="160" x2="340" y2="195" stroke="#58a6ff" stroke-width="3" marker-end="url(#A2)"/>
+        <line x1="770" y1="160" x2="770" y2="195" stroke="#d29922" stroke-width="3" stroke-dasharray="6 4" marker-end="url(#A4)"/>
+        <text x="350" y="180" fill="#8b949e" font-size="10">subscribe()</text>
+
+        <!-- ═══════════════════ LAYER 2: ROUTE ═══════════════════ -->
+        <rect x="40" y="200" width="1000" height="100" rx="14" fill="rgba(88,166,255,.06)" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="70" y="225" fill="#58a6ff" font-size="11" letter-spacing="1.5" font-weight="700">②  ROUTE</text>
+        <text x="70" y="243" fill="#8b949e" font-size="11">Process singleton. One phone book for the whole app.</text>
+
+        <!-- Center Box -->
+        <rect x="200" y="218" width="740" height="64" rx="10" fill="#0d1f3c" stroke="#58a6ff" stroke-width="2.5" filter="url(#SB)"/>
+        <text x="570" y="240" text-anchor="middle" fill="#58a6ff" font-size="15" font-weight="700">PMPConnectionCenter</text>
+        <text x="570" y="260" text-anchor="middle" fill="#e6edf3" font-size="11">Kotlin object — one instance per process, lives for the whole app</text>
+        <text x="570" y="276" text-anchor="middle" fill="#8b949e" font-size="11">handles: foreground/background · subscribe/unsubscribe · URL routing</text>
+
+        <!-- ↓ arrow L2 → L3 -->
+        <line x1="570" y1="300" x2="570" y2="335" stroke="#3fb950" stroke-width="3" marker-end="url(#A1)"/>
+        <text x="580" y="320" fill="#3fb950" font-size="10">getOrCreateNode(url)</text>
+
+        <!-- ═══════════════════ LAYER 3: POOL ═══════════════════ -->
+        <rect x="40" y="340" width="1000" height="130" rx="14" fill="rgba(188,140,255,.06)" stroke="#bc8cff" stroke-width="1.5"/>
+        <text x="70" y="365" fill="#bc8cff" font-size="11" letter-spacing="1.5" font-weight="700">③  POOL</text>
+        <text x="70" y="383" fill="#8b949e" font-size="11">One node per unique URL. Same URL → same node.</text>
+
+        <!-- Two node boxes -->
+        <rect x="200" y="358" width="350" height="94" rx="10" fill="#0d2818" stroke="#3fb950" stroke-width="2" filter="url(#SB)"/>
+        <text x="375" y="380" text-anchor="middle" fill="#3fb950" font-size="14" font-weight="700">PMPNode</text>
+        <text x="375" y="398" text-anchor="middle" fill="#e6edf3" font-size="11">one TCP socket to one supplier URL</text>
+        <text x="375" y="418" text-anchor="middle" fill="#8b949e" font-size="10">state: Idle → Connecting → Connected → Suspended</text>
+        <text x="375" y="434" text-anchor="middle" fill="#8b949e" font-size="10">ref-counted by topic · 60s teardown grace</text>
+
+        <!-- Big vertical bar showing multiple nodes -->
+        <rect x="670" y="358" width="270" height="94" rx="10" fill="#0d2818" stroke="#bc8cff" stroke-width="2" stroke-dasharray="6 4" filter="url(#SB)"/>
+        <text x="805" y="380" text-anchor="middle" fill="#bc8cff" font-size="14" font-weight="700">... other nodes ...</text>
+        <text x="805" y="398" text-anchor="middle" fill="#e6edf3" font-size="11">historical URL node · alternative URLs</text>
+        <text x="805" y="418" text-anchor="middle" fill="#8b949e" font-size="10">one pool entry per unique URL</text>
+        <text x="805" y="434" text-anchor="middle" fill="#8b949e" font-size="10">shared across all fragments</text>
+
+        <!-- ↓ arrow L3 → L4 -->
+        <line x1="375" y1="470" x2="375" y2="505" stroke="#3fb950" stroke-width="3" marker-end="url(#A1)"/>
+        <line x1="805" y1="470" x2="805" y2="505" stroke="#bc8cff" stroke-width="3" marker-end="url(#A3)"/>
+        <text x="385" y="490" fill="#3fb950" font-size="10">emit(topic, data)</text>
+        <text x="815" y="490" fill="#bc8cff" font-size="10">emit(topic, chart)</text>
+
+        <!-- ═══════════════════ LAYER 4: COLLECT ═══════════════════ -->
+        <rect x="40" y="510" width="1000" height="50" rx="14" fill="rgba(210,153,34,.06)" stroke="#d29922" stroke-width="1.5"/>
+        <text x="70" y="535" fill="#d29922" font-size="11" letter-spacing="1.5" font-weight="700">④  COLLECT</text>
+
+        <rect x="180" y="518" width="820" height="34" rx="17" fill="#1a160d" stroke="#d29922" stroke-width="2" filter="url(#SB)"/>
+        <text x="590" y="540" text-anchor="middle" fill="#d29922" font-size="14" font-weight="700">PMPViewModel.pmpDataFlow : SharedFlow&lt;PMPUpdate&gt;</text>
+
+      </svg>
+    </div>
+
+    <!-- ══ LEGEND + ANNOTATIONS ═════════════════════════════════ -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px;">
+      <div class="callout ci" style="margin:0;">
+        <strong>How data flows:</strong> Fragment subscribes (top) → Center routes by URL (middle-top) → Existing Node emits ticks (middle-bottom) → Fragment collects updates (bottom).
+      </div>
+      <div class="callout cs" style="margin:0;">
+        <strong>How it survives lifecycle:</strong> <code>detach()</code> stops collecting (④). The connection (③) stays open. No new login on <code>onResume()</code>.
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       SOCKET / PHONE LINE POOLING
+  ───────────────────────────────────────────── -->
+  <section id="pooling" class="slide ph1">
+    <div class="slide-tag"><span class="badge b1">Overview</span> URL Pooling</div>
+    <h1>One Phone Line Per Supplier</h1>
+    <p class="lead">When 3 screens show the same stock, they share 1 TCP socket — not 3.</p>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin:16px 0;">
+      <svg viewBox="0 0 1080 460" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:800px;display:block;">
+        <defs>
+          <marker id="pl" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#3fb950" opacity=".8"/></marker>
+          <marker id="pr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#f85149" opacity=".8"/></marker>
+          <marker id="pb" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#58a6ff" opacity=".8"/></marker>
+        </defs>
+
+        <text x="20" y="25" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif" letter-spacing=".1em">USER SCREENS</text>
+        <text x="20" y="195" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif" letter-spacing=".1em">SHARED POOL</text>
+        <text x="20" y="365" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif" letter-spacing=".1em">SUPPLIERS (PMP server URLs)</text>
+
+        <!-- User screens -->
+        <g>
+          <rect x="200" y="40" width="180" height="55" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+          <text x="290" y="60" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">WatchList</text>
+          <text x="290" y="80" text-anchor="middle" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif">subscribes to AAPL</text>
+        </g>
+        <g>
+          <rect x="450" y="40" width="180" height="55" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+          <text x="540" y="60" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">TopMarket</text>
+          <text x="540" y="80" text-anchor="middle" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif">subscribes to AAPL</text>
+        </g>
+        <g>
+          <rect x="700" y="40" width="180" height="55" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+          <text x="790" y="60" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">Trade Sheet</text>
+          <text x="790" y="80" text-anchor="middle" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif">subscribes to AAPL</text>
+        </g>
+
+        <!-- Pool: PMPConnectionCenter -->
+        <rect x="180" y="180" width="720" height="90" rx="12" fill="#0d1f3c" stroke="#58a6ff" stroke-width="2"/>
+        <rect x="180" y="180" width="720" height="30" rx="12" fill="#58a6ff" opacity=".15"/>
+        <text x="540" y="201" text-anchor="middle" fill="#58a6ff" font-size="13" font-weight="700" font-family="Segoe UI,sans-serif">PMPConnectionCenter.nodes  ·  URL → PMPNode</text>
+
+        <!-- Two phone lines: HK, US -->
+        <rect x="260" y="225" width="240" height="36" rx="18" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="380" y="240" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="600" font-family="Segoe UI,sans-serif">📞 HK Phone Line</text>
+        <text x="380" y="255" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">PMPNode("https://pmp100.poems.com.sg")</text>
+
+        <rect x="560" y="225" width="240" height="36" rx="18" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="680" y="240" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="600" font-family="Segoe UI,sans-serif">📞 US Phone Line</text>
+        <text x="680" y="255" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">PMPNode("https://pmp-ny.example.com")</text>
+
+        <!-- Suppliers -->
+        <g>
+          <rect x="260" y="380" width="240" height="55" rx="8" fill="#0d2818" stroke="#3fb950" stroke-width="1"/>
+          <text x="380" y="402" text-anchor="middle" fill="#3fb950" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">🏢 HK PMP Server</text>
+          <text x="380" y="420" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">pmp100.poems.com.sg</text>
+        </g>
+        <g>
+          <rect x="560" y="380" width="240" height="55" rx="8" fill="#0d2818" stroke="#3fb950" stroke-width="1"/>
+          <text x="680" y="402" text-anchor="middle" fill="#3fb950" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif">🏢 US PMP Server</text>
+          <text x="680" y="420" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">pmp-ny.example.com</text>
+        </g>
+
+        <!-- Arrows: 3 screens → 1 phone line (NEW) -->
+        <line x1="290" y1="95"  x2="320" y2="225" stroke="#3fb950" stroke-width="1.5" marker-end="url(#pl)" opacity=".7"/>
+        <line x1="540" y1="95"  x2="400" y2="225" stroke="#3fb950" stroke-width="1.5" marker-end="url(#pl)" opacity=".7"/>
+        <line x1="790" y1="95"  x2="460" y2="225" stroke="#3fb950" stroke-width="1.5" marker-end="url(#pl)" opacity=".7"/>
+        <text x="370" y="160" text-anchor="middle" fill="#3fb950" font-size="10" font-family="Segoe UI,sans-serif" opacity=".8">All 3 share the same phone line</text>
+
+        <!-- Arrows: phone lines → suppliers -->
+        <line x1="380" y1="261" x2="380" y2="380" stroke="#3fb950" stroke-width="1.5" marker-end="url(#pl)" opacity=".7"/>
+        <line x1="680" y1="261" x2="680" y2="380" stroke="#3fb950" stroke-width="1.5" marker-end="url(#pl)" opacity=".7"/>
+
+        <!-- Right side: legacy comparison -->
+        <rect x="940" y="40" width="130" height="395" rx="10" fill="#1a0d0d" stroke="#f85149" stroke-width="1" opacity=".7"/>
+        <text x="1005" y="65" text-anchor="middle" fill="#f85149" font-size="11" font-weight="700" font-family="Segoe UI,sans-serif">LEGACY</text>
+        <text x="1005" y="82" text-anchor="middle" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">3 phones</text>
+
+        <g>
+          <rect x="950" y="100" width="110" height="40" rx="6" fill="#2d0d0d" stroke="#f85149" stroke-width="1"/>
+          <text x="1005" y="118" text-anchor="middle" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">📞 HK phone</text>
+          <text x="1005" y="132" text-anchor="middle" fill="#8b949e" font-size="8" font-family="Segoe UI,sans-serif">for WatchList</text>
+        </g>
+        <g>
+          <rect x="950" y="150" width="110" height="40" rx="6" fill="#2d0d0d" stroke="#f85149" stroke-width="1"/>
+          <text x="1005" y="168" text-anchor="middle" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">📞 HK phone</text>
+          <text x="1005" y="182" text-anchor="middle" fill="#8b949e" font-size="8" font-family="Segoe UI,sans-serif">for TopMarket</text>
+        </g>
+        <g>
+          <rect x="950" y="200" width="110" height="40" rx="6" fill="#2d0d0d" stroke="#f85149" stroke-width="1"/>
+          <text x="1005" y="218" text-anchor="middle" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">📞 HK phone</text>
+          <text x="1005" y="232" text-anchor="middle" fill="#8b949e" font-size="8" font-family="Segoe UI,sans-serif">for Trade</text>
+        </g>
+
+        <text x="1005" y="290" text-anchor="middle" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">3× sockets</text>
+        <text x="1005" y="305" text-anchor="middle" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">3× logins</text>
+        <text x="1005" y="320" text-anchor="middle" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">3× re-dials</text>
+        <text x="1005" y="335" text-anchor="middle" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">3× bandwidth</text>
+        <text x="1005" y="350" text-anchor="middle" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">3× battery</text>
+        <text x="1005" y="380" text-anchor="middle" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">3× chances to</text>
+        <text x="1005" y="395" text-anchor="middle" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">fail & freeze</text>
+
+        <text x="1005" y="420" text-anchor="middle" fill="#f85149" font-size="11" font-weight="700" font-family="Segoe UI,sans-serif">SR-3738</text>
+
+      </svg>
+    </div>
+
+    <div class="callout cs">
+      <strong>Result:</strong> 3 screens showing AAPL → 1 TCP socket to the HK server. 3× bandwidth savings, 3× login cost savings, 1× failure point instead of 3.
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       SR-3738 FIX
+  ───────────────────────────────────────────── -->
+  <section id="sr3738" class="slide ph1">
+    <div class="slide-tag"><span class="badge b1">Phase 1</span> SR-3738 Fix</div>
+    <h1>The Lifecycle Fix</h1>
+    <p class="lead"><code>detach()</code> stops the collector — the token stays open. <code>unsubscribe()</code> (only in <code>onDestroyView</code>) closes it.</p>
+
+    <div class="grid-2">
+      <div>
+        <h3>Migrated Fragment — Lifecycle Contract</h3>
+<pre><code>class MyFragment : Fragment() {
+  private val pmpViewModel:
+    PMPViewModel by viewModels()
+
+  override fun onViewCreated(...) {
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.repeatOnLifecycle(STARTED) {
+        pmpViewModel.pmpDataFlow.collect {
+          update → onPmpReceived(update)
+        }
+      }
+    }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    pmpViewModel.subscribe(counters, fields)
+  }
+
+  override fun onPause() {
+    super.onPause()
+    pmpViewModel.detach()  // collector stops
+                              // token stays OPEN ✅
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    pmpViewModel.unsubscribe()  // closes token
+  }
+}</code></pre>
+      </div>
+
+      <div>
+        <h3>Method Semantics</h3>
+        <table>
+          <thead>
+            <tr><th>Method</th><th>Collector</th><th>Token</th><th>Connection</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>subscribe()</code></td>
+              <td>Starts / restarts</td>
+              <td>Opens / reuses</td>
+              <td>Opens / reuses node</td>
+            </tr>
+            <tr>
+              <td><code>detach()</code></td>
+              <td style="color:var(--red);">Cancelled</td>
+              <td style="color:var(--green);">Stays OPEN</td>
+              <td style="color:var(--green);">Stays OPEN</td>
+            </tr>
+            <tr>
+              <td><code>unsubscribe()</code></td>
+              <td style="color:var(--red);">Cancelled</td>
+              <td style="color:var(--red);">Closed</td>
+              <td style="color:var(--yellow);">Ref count −1</td>
+            </tr>
+            <tr>
+              <td><code>onCleared()</code></td>
+              <td style="color:var(--red);">Safety net</td>
+              <td style="color:var(--red);">Closed</td>
+              <td style="color:var(--yellow);">Ref count −1</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="sp"></div>
+
+        <h3>WatchListTab — QUERY Support</h3>
+<pre><code>override fun onResume() {
+  super.onResume()
+  // LIVE prices
+  pmpViewModel.subscribe(counters, fields)
+  // Historical chart
+  pmpViewModel.subscribeForHistory(
+    counters, fields)
+}
+
+override fun onPause() {
+  super.onPause()
+  // Cancels BOTH collectors
+  pmpViewModel.detach()
+}
+
+override fun onDestroyView() {
+  super.onDestroyView()
+  // Closes BOTH tokens
+  pmpViewModel.unsubscribe()
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       DATA FLOW
+  ───────────────────────────────────────────── -->
+  <section id="p1-flow" class="slide ph1">
+    <div class="slide-tag"><span class="badge b1">Phase 1</span> Data Flow</div>
+    <h1>Subscribe Data Flow</h1>
+
+    <div class="flow">
+      <div class="flow-box g">Fragment.onResume()</div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box bl">pmpViewModel.subscribe()</div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box bl">PMPConnectionCenter.subscribe()</div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box bl">getOrCreateNode(url)</div>
+    </div>
+    <div style="margin-left:32px;">
+      <div class="flow" style="margin-top:8px;">
+        <div class="flow-box bl">node.subscribe(tokenId, topics, fields)</div>
+        <div class="flow-arr">→</div>
+        <div class="flow-box bl">refCounts++ · TokenSubscription added</div>
+        <div class="flow-arr">→</div>
+        <div class="flow-box bl">if Idle → node.connect()</div>
+        <div class="flow-arr">→</div>
+        <div class="flow-box bl">PMPConnection.login()</div>
+      </div>
+      <div class="flow" style="margin-top:8px;">
+        <div class="flow-box g">PMPToken returned (stored in pmpViewModel)</div>
+        <div class="flow-arr">→</div>
+        <div class="flow-box y">token.priceUpdates.collect {}</div>
+        <div class="flow-arr">→</div>
+        <div class="flow-box y">Fragment repeatOnLifecycle(STARTED)</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="grid-2">
+      <div>
+        <h3>App Background (ON_STOP)</h3>
+<pre><code>ProcessLifecycleOwner.ON_STOP
+  → PMPConnectionCenter.onAppBackground()
+    → for each PMPNode:
+      → suspendForBackground()
+        → connection?.logout()
+        → connection = null
+        → state = Suspended
+        → topicSnapshots KEPT    ✅
+        → topicRefCounts KEPT    ✅
+        → subscriberTokens KEPT  ✅</code></pre>
+      </div>
+      <div>
+        <h3>App Foreground (ON_START)</h3>
+<pre><code>ProcessLifecycleOwner.ON_START
+  → PMPConnectionCenter.onAppForeground()
+    → for each PMPNode with subscriptions:
+      → resumeAfterForeground()
+        → connection = PMPConnection(url)
+        → connection.login()
+        → resend STREAMING_SUBSCRIBE
+        → emit topicSnapshots to all tokens
+          (stale prices → then live prices)
+
+Fragment.onResume()
+  → pmpViewModel.subscribe()
+  → token reused
+  → collector reattaches
+  → first emit: latest snapshot ✅</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       APP BG/FG STATE TRANSITIONS
+  ───────────────────────────────────────────── -->
+  <section id="p1-bgfg" class="slide ph1">
+    <div class="slide-tag"><span class="badge b1">Phase 1</span> Node State Machine</div>
+    <h1>PMPNode State Transitions</h1>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin:16px 0;overflow-x:auto;">
+      <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:700px;display:block;">
+        <defs>
+          <marker id="as" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#58a6ff" opacity=".7"/></marker>
+          <marker id="asg" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#3fb950" opacity=".7"/></marker>
+          <marker id="asr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#f85149" opacity=".7"/></marker>
+          <marker id="asy" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#d29922" opacity=".7"/></marker>
+        </defs>
+
+        <!-- Idle state -->
+        <rect x="30" y="60" width="150" height="80" rx="12" fill="#21262d" stroke="#30363d" stroke-width="1.5"/>
+        <text x="105" y="95" text-anchor="middle" fill="#8b949e" font-size="15" font-weight="600" font-family="Segoe UI,sans-serif">Idle</text>
+        <text x="105" y="118" text-anchor="middle" fill="#484f58" font-size="10" font-family="Segoe UI,sans-serif">No connection</text>
+
+        <!-- Connecting state -->
+        <rect x="280" y="60" width="150" height="80" rx="12" fill="#0d2d1a" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="355" y="95" text-anchor="middle" fill="#3fb950" font-size="15" font-weight="600" font-family="Segoe UI,sans-serif">Connecting</text>
+        <text x="355" y="118" text-anchor="middle" fill="#484f58" font-size="10" font-family="Segoe UI,sans-serif">login() in progress</text>
+
+        <!-- Connected state -->
+        <rect x="530" y="60" width="150" height="80" rx="12" fill="#0d3d1a" stroke="#3fb950" stroke-width="2"/>
+        <text x="605" y="95" text-anchor="middle" fill="#3fb950" font-size="15" font-weight="700" font-family="Segoe UI,sans-serif">Connected</text>
+        <text x="605" y="118" text-anchor="middle" fill="#484f58" font-size="10" font-family="Segoe UI,sans-serif">Subscribed · receiving ticks</text>
+
+        <!-- Suspended state -->
+        <rect x="280" y="210" width="150" height="80" rx="12" fill="#2d1a0d" stroke="#d29922" stroke-width="1.5"/>
+        <text x="355" y="245" text-anchor="middle" fill="#d29922" font-size="15" font-weight="600" font-family="Segoe UI,sans-serif">Suspended</text>
+        <text x="355" y="268" text-anchor="middle" fill="#484f58" font-size="10" font-family="Segoe UI,sans-serif">logout() called · snapshots kept</text>
+
+        <!-- ── Transitions ── -->
+
+        <!-- Idle → Connecting: new subscription -->
+        <line x1="180" y1="100" x2="280" y2="100" stroke="#58a6ff" stroke-width="2" marker-end="url(#as)"/>
+        <text x="230" y="92" text-anchor="middle" fill="#58a6ff" font-size="10" font-family="Segoe UI,sans-serif">subscribe()</text>
+        <text x="230" y="104" text-anchor="middle" fill="#484f58" font-size="9" font-family="Segoe UI,sans-serif">if Idle && hasSubs</text>
+
+        <!-- Connecting → Connected: login success -->
+        <line x1="430" y1="100" x2="530" y2="100" stroke="#3fb950" stroke-width="2" marker-end="url(#asg)"/>
+        <text x="480" y="92" text-anchor="middle" fill="#3fb950" font-size="10" font-family="Segoe UI,sans-serif">loginCallback(rc=0)</text>
+        <text x="480" y="104" text-anchor="middle" fill="#484f58" font-size="9" font-family="Segoe UI,sans-serif">resend subscriptions</text>
+
+        <!-- Connected → Suspended: app background -->
+        <line x1="605" y1="140" x2="355" y2="210" stroke="#d29922" stroke-width="2" marker-end="url(#asy)"/>
+        <text x="545" y="175" text-anchor="middle" fill="#d29922" font-size="10" font-family="Segoe UI,sans-serif">ON_STOP</text>
+        <text x="545" y="187" text-anchor="middle" fill="#484f58" font-size="9" font-family="Segoe UI,sans-serif">suspendForBackground()</text>
+
+        <!-- Connecting → Idle: background mid-handshake -->
+        <line x1="355" y1="140" x2="355" y2="210" stroke="#f85149" stroke-width="2" marker-end="url(#asr)"/>
+        <text x="375" y="178" text-anchor="middle" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">logout()</text>
+        <text x="375" y="190" text-anchor="middle" fill="#484f58" font-size="9" font-family="Segoe UI,sans-serif">discard in-flight</text>
+
+        <!-- Suspended → Connecting: app foreground -->
+        <line x1="355" y1="210" x2="355" y2="140" stroke="#3fb950" stroke-width="2" marker-end="url(#asg)"/>
+        <text x="375" y="175" text-anchor="middle" fill="#3fb950" font-size="10" font-family="Segoe UI,sans-serif">ON_START</text>
+        <text x="375" y="187" text-anchor="middle" fill="#484f58" font-size="9" font-family="Segoe UI,sans-serif">resumeAfterForeground()</text>
+
+        <!-- Login fail: Connecting → Idle -->
+        <line x1="280" y1="100" x2="180" y2="100" stroke="#f85149" stroke-width="1.5" marker-end="url(#asr)" stroke-dasharray="4 2"/>
+        <text x="230" y="88" text-anchor="middle" fill="#f85149" font-size="9" font-family="Segoe UI,sans-serif">login fail</text>
+
+        <!-- 60s teardown from Idle -->
+        <line x1="105" y1="140" x2="105" y2="200" stroke="#484f58" stroke-width="1" stroke-dasharray="4 2" marker-end="url(#as)"/>
+        <text x="120" y="170" fill="#484f58" font-size="9" font-family="Segoe UI,sans-serif">60s timeout</text>
+        <text x="120" y="182" fill="#484f58" font-size="9" font-family="Segoe UI,sans-serif">logout()</text>
+
+        <!-- Legend -->
+        <text x="720" y="80" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif">Legend:</text>
+        <line x1="720" y1="100" x2="750" y2="100" stroke="#3fb950" stroke-width="2"/>
+        <text x="760" y="104" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">App foreground trigger</text>
+        <line x1="720" y1="120" x2="750" y2="120" stroke="#d29922" stroke-width="2"/>
+        <text x="760" y="124" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">App background trigger</text>
+        <line x1="720" y1="140" x2="750" y2="140" stroke="#58a6ff" stroke-width="2"/>
+        <text x="760" y="144" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">Normal transition</text>
+        <line x1="720" y1="160" x2="750" y2="160" stroke="#f85149" stroke-width="2"/>
+        <text x="760" y="164" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">Error / cancel path</text>
+
+        <!-- 60s teardown label -->
+        <text x="720" y="195" fill="#484f58" font-size="9" font-family="Segoe UI,sans-serif">60s teardown:</text>
+        <text x="720" y="210" fill="#484f58" font-size="9" font-family="Segoe UI,sans-serif">last token close →</text>
+        <text x="720" y="225" fill="#484f58" font-size="9" font-family="Segoe UI,sans-serif">logout() called</text>
+        <text x="720" y="240" fill="#484f58" font-size="9" font-family="Segoe UI,sans-serif">cancelled if new</text>
+        <text x="720" y="255" fill="#484f58" font-size="9" font-family="Segoe UI,sans-serif">subscription arrives</text>
+
+      </svg>
+    </div>
+
+    <div class="callout ci">
+      <strong>Stale callback guard (connSeq):</strong> A <code>MutableStateFlow&lt;Int&gt;</code> increments on each <code>connect()</code>.
+      Events carry the seq number at emission time; a stale callback from a previous connection is discarded if its seq doesn't match <code>connSeq.value</code>.
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       PHASE 1 ITERATIONS
+  ───────────────────────────────────────────── -->
+  <section id="p1-iterations" class="slide ph1">
+    <div class="slide-tag"><span class="badge b1">Phase 1</span> Design History</div>
+    <h1>Three Iterations Before Shipping</h1>
+    <p class="lead">Each pivot addressed a real production risk identified through careful analysis.</p>
+
+    <div class="grid-3">
+      <div class="card" style="border-color:var(--yellow);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <span class="pill py">Iteration 1</span>
+        </div>
+        <h3>Modify PMPUtilViewModel Internally</h3>
+        <p>Add a delegate to PMPConnectionCenter inside the existing 985-line class. Keep 30+ screens unchanged via a dispatch adapter.</p>
+        <div class="callout cw" style="margin-top:10px;">
+          <strong>Risk found:</strong> The center does not survive Fragment <code>onPause/onResume</code> — it closes on the Fragment's lifecycle.
+        </div>
+      </div>
+
+      <div class="card" style="border-color:var(--yellow);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <span class="pill py">Iteration 2</span>
+        </div>
+        <h3>Gate New Connections</h3>
+        <p>Add <code>isCenterActive()</code> gate to suppress legacy connection creation. Adapter dispatches into legacy callback chain.</p>
+        <div class="callout cw" style="margin-top:10px;">
+          <strong>Risk found:</strong> Two connections run in parallel — legacy is constructed before the gate fires. Double socket traffic.
+        </div>
+      </div>
+
+      <div class="card" style="border-color:var(--green);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <span class="pill pg">Iteration 3 — Shipped</span>
+        </div>
+        <h3>Pivot: New PMPViewModel</h3>
+        <p>Revert PMPUtilViewModel to Phase 1 state. Create new <code>PMPViewModel</code> (~150 lines) as a clean wrapper. Migrate one screen at a time.</p>
+        <div class="callout cs" style="margin-top:10px;">
+          <strong>Result:</strong> SR-3738 confirmed fixed. URL pooling works. NewOrderBottomSheet migrated.
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="grid-2">
+      <div class="dec">
+        <div class="dec-title">Flow-based state machine with Mutex</div>
+        <div class="dec-body">
+          <code>MutableStateFlow&lt;State&gt;</code> + <code>MutableSharedFlow&lt;ConnEvent&gt;</code> replaces <code>synchronized {}</code>.
+          The price-tick gate is enforced by <code>.combine(_state)</code> at the type level — not a runtime <code>if</code>.
+          <code>Mutex.withLock{}</code> can be held across suspend points; <code>synchronized{}</code> cannot.
+        </div>
+      </div>
+      <div class="dec">
+        <div class="dec-title">Kotlin object singleton</div>
+        <div class="dec-body">
+          No <code>Application</code> registration needed. Initializes lazily on first access.
+          Matches existing <code>PmpConnectionPool</code> pattern in the codebase.
+        </div>
+      </div>
+      <div class="dec">
+        <div class="dec-title">Per-URL node pooling</div>
+        <div class="dec-body">
+          One PMPNode per unique URL. Multiple fragments sharing the same URL reuse one TCP socket.
+          The PMP library allows multiple subscriptions on a single connection — multiplexing by URL maximizes reuse.
+        </div>
+      </div>
+      <div class="dec">
+        <div class="dec-title">60-second teardown grace</div>
+        <div class="dec-body">
+          After the last token closes, a node schedules a 60-second timer before calling <code>connection.logout()</code>.
+          Covers quick tab switches. Timer is cancellable — a new subscription clears it.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       PHASE 2 GOAL
+  ───────────────────────────────────────────── -->
+  <section id="p2-goal" class="slide ph2">
+    <div class="slide-tag"><span class="badge b2">Phase 2</span> TopMarket Migration</div>
+    <h1>Phase 2: TopMarket Screens</h1>
+    <p class="lead">4 files · ~4,000 lines · Migrated from PMPUtilViewModel callback pattern to PMPViewModel + repeatOnLifecycle.</p>
+
+    <div class="grid-4">
+      <div class="card" style="border-color:var(--yellow);">
+        <h3>MarketTopDetailBaseScreen</h3>
+        <p>1,328 lines · Base class for 3 subclasses</p>
+        <div style="margin-top:8px;"><span class="pill py">Topic-keyed</span></div>
+      </div>
+      <div class="card" style="border-color:var(--yellow);">
+        <h3>MarketTopBaseFragment</h3>
+        <p>715 lines · Base class for 4 fragments</p>
+        <div style="margin-top:8px;"><span class="pill py">Positional</span></div>
+      </div>
+      <div class="card" style="border-color:var(--yellow);">
+        <h3>TabMarketStockScreen</h3>
+        <p>1,608 lines · Standalone open class</p>
+        <div style="margin-top:8px;"><span class="pill py">Positional</span></div>
+      </div>
+      <div class="card" style="border-color:var(--red);">
+        <h3>IndicesDetailScreen</h3>
+        <p>366 lines · Only screen using 4-arg listener with isAllDataReturned</p>
+        <div style="margin-top:8px;"><span class="pill pr">Migrated last</span></div>
+      </div>
+    </div>
+
+    <div class="callout ci" style="margin-top:16px;">
+      <strong>Migration order matters:</strong> <code>IndicesDetailScreen</code> uses <code>isAllDataReturned</code> — the PMPViewModel sentinel must be implemented before it migrates. It runs last.
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Migration Pattern — Before / After</h3>
+    <div class="grid-2">
+      <div>
+        <div class="code-label">Before (Legacy)</div>
+<pre><code>class MarketTopDetailBaseScreen : BaseFragment() {
+  private val mMarketPMPUtilVM:
+    PMPUtilViewModel by viewModels()
+
+  override fun onViewCreated(...) {
+    mMarketPMPUtilVM.setOnResponseListener {
+      topic, linkedHashMap, _ ->
+      val index = getIndexByTopic(topic)
+          ?: return@setOnResponseListener
+      updateAdapter(index, linkedHashMap)
+    }
+  }
+}</code></pre>
+      </div>
+      <div>
+        <div class="code-label">After (Migrated)</div>
+<pre><code>class MarketTopDetailBaseScreen : BaseFragment() {
+  private val pmpViewModel:
+    PMPViewModel by viewModels()
+
+  override fun onViewCreated(...) {
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.repeatOnLifecycle(STARTED) {
+        pmpViewModel.pmpDataFlow.collect {
+          update → onPmpReceived(update)
+        }
+      }
+    }
+  }
+
+  private fun onPmpReceived(u: PMPUpdate) {
+    val idx = u.indices.firstOrNull() ?: return
+    updateAdapter(idx, u.data)
+  }
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       ISALLDATARETURNED
+  ───────────────────────────────────────────── -->
+  <section id="p2-isalldata" class="slide ph2">
+    <div class="slide-tag"><span class="badge b2">Phase 2</span> isAllDataReturned Sentinel</div>
+    <h1>Implementing isAllDataReturned</h1>
+    <p class="lead"><code>IndicesDetailScreen</code> is the only screen using the 4-arg listener — it must fire exactly once per batch.</p>
+
+    <div class="grid-2">
+      <div>
+        <h3>Algorithm — PMPViewModel</h3>
+<pre><code>class PMPViewModel : ViewModel() {
+  private val emissionCounter =
+    AtomicInteger(0)
+  private val expectedTopicCount =
+    AtomicInteger(0)
+
+  fun subscribe(counters, fields) {
+    // Rebuild index map
+    mHashmapIndexOfCounter.clear()
+    counters.forEachIndexed { idx, c ->
+      c.PMPTopic?.let { topic ->
+        mHashmapIndexOfCounter
+          .getOrPut(topic) { mutableListOf() }
+          .add(idx)
+      }
+    }
+    expectedTopicCount.set(
+      mHashmapIndexOfCounter.size)
+    emissionCounter.set(0)
+
+    collectorJob = viewModelScope.launch {
+      token.priceUpdates.collect { (topic, rawData) ->
+        val indices =
+          mHashmapIndexOfCounter[topic] ?: emptyList()
+        val aliasedData =
+          aliasFields(rawData, subscribeFields)
+
+        val count = emissionCounter.incrementAndGet()
+        val isLast = count >= expectedTopicCount.get()
+        if (isLast) emissionCounter.set(0)
+
+        _pmpDataFlow.tryEmit(PMPUpdate(
+          topic, indices, aliasedData,
+          isAllDataReturned = isLast))
+      }
+    }
+  }
+}</code></pre>
+      </div>
+
+      <div>
+        <h3>Edge Cases</h3>
+
+        <div class="card">
+          <h3>Single-topic subscription</h3>
+          <p>Every emission fires <code>isAllDataReturned=true</code>. Correct — a single-topic batch is always complete after one tick.</p>
+        </div>
+        <div class="card">
+          <h3>Collector cancelled mid-batch</h3>
+          <p><code>detach()</code> cancels the collector. Next <code>subscribe()</code> resets both counters. Stale value cannot affect the next batch.</p>
+        </div>
+        <div class="card">
+          <h3>Server delivers fewer topics</h3>
+          <p><code>isAllDataReturned</code> does NOT fire. Counter is not reset. Fires when the server delivers all topics — matching legacy <code>indexPmp == lastIndex</code> semantics.</p>
+        </div>
+        <div class="card">
+          <h3>Re-subscribe with different counters</h3>
+          <p><code>subscribe()</code> resets both counters at start. New batch starts cleanly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       ALIAS FIELDS
+  ───────────────────────────────────────────── -->
+  <section id="p2-alias" class="slide ph2">
+    <div class="slide-tag"><span class="badge b2">Phase 2</span> aliasFields Restoration</div>
+    <h1>Restoring Field Aliasing</h1>
+    <p class="lead">Legacy <code>getFinalHashMapPmpResponse()</code> aliased raw FIDs ("9") to canonical strings ("9,F009,P23"). Without this, migrated screens silently show empty price fields.</p>
+
+    <div class="grid-2">
+      <div>
+        <h3>The Problem</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Legacy aliases "9" → "9,F009,P23" in the callback:</p>
+<pre><code>// Legacy: data arrives keyed by alias
+aliased = {
+  "9,F009,P23": "123.45",   // aliased key
+  "11,F011,P8": "124.00"
+}
+
+// Consumer reads:
+linkMapPMP["9,F009,P23"]  // ✅ works with aliased
+linkMapPMP["9,F009,P23"]  // ❌ empty with raw — silent fail!</code></pre>
+
+        <div class="callout cd" style="margin-top:14px;">
+          <strong>Critical:</strong> The landed NewOrderBottomSheet migration does NOT call <code>aliasFields</code>. This may be silently broken for price fields that don't match raw FID lookups. Fix: add <code>aliasFields</code> to <code>PMPViewModel</code> in this MR.
+        </div>
+      </div>
+
+      <div>
+        <h3>The Solution — aliasFields()</h3>
+<pre><code>private fun aliasFields(
+  rawData: LinkedHashMap&lt;String, String&gt;,
+  subscribeFields: List&lt;
+    WatchListColumnsSettingModel&gt;
+): LinkedHashMap&lt;String, String&gt; {
+  val aliased = linkedMapOf&lt;String, String&gt;()
+  val canonicalValues =
+    subscribeFields.map { it.value }
+      // ["9,F009,P23", "11,F011,P8", ...]
+
+  rawData.forEach { (rawKey, value) ->
+    val canonical = canonicalValues.firstOrNull {
+      it.split(",").contains(rawKey)
+    }
+    if (canonical != null) {
+      aliased[canonical] = value
+    } else {
+      aliased[rawKey] = value  // pass through
+    }
+  }
+  return aliased
+}</code></pre>
+
+        <div class="callout ci" style="margin-top:12px;">
+          <strong>Placement:</strong> Private in PMPViewModel. PMPNode stays screen-agnostic (raw FIDs). Only the ViewModel's collector aliases.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       PHASE 3 OVERVIEW
+  ───────────────────────────────────────────── -->
+  <section id="p3-overview" class="slide ph3">
+    <div class="slide-tag"><span class="badge b3">Phase 3</span> STREAMING_QUERY Support</div>
+    <h1>Phase 3: Add Chart Data Support</h1>
+    <p class="lead">Add <code>STREAMING_QUERY</code> support to PMPConnectionCenter so WatchListTab can migrate with both live prices and historical chart data.</p>
+
+    <div class="grid-2" style="margin-bottom:18px;">
+      <div style="background:#0d1a0d;border:1px solid var(--green);border-radius:10px;padding:18px;">
+        <h3 style="color:var(--green);margin-bottom:10px;">📺 LIVE — What people are trading NOW</h3>
+        <p style="font-size:13px;color:var(--muted);">Continuous updates, multiple times per second during market hours. Like a TV news ticker — always on, always changing.</p>
+        <div style="margin-top:10px;font-family:Consolas,monospace;font-size:11px;color:var(--green);">
+          AAPL: $192.45 → $192.50 → $192.48 → ...
+        </div>
+      </div>
+      <div style="background:#1a0d3c;border:1px solid var(--purple);border-radius:10px;padding:18px;">
+        <h3 style="color:var(--purple);margin-bottom:10px;">📊 QUERY — Historical chart for the past year</h3>
+        <p style="font-size:13px;color:var(--muted);">A one-time batch of ~250 daily closing prices for the chart line. Like a library archive — you request it once, you get the whole book.</p>
+        <div style="margin-top:10px;font-family:Consolas,monospace;font-size:11px;color:var(--purple);">
+          $180.00, $182.50, $185.30, $181.00, $184.20, ...
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card" style="border-color:var(--purple);">
+        <h3 style="color:var(--purple);">PMPNode_HIST</h3>
+        <p>Separate PMPNode for <code>historicalURL</code>. Overrides <code>historyChartCallback</code> to process <code>QueryReturnBean</code>.</p>
+      </div>
+      <div class="card" style="border-color:var(--purple);">
+        <h3 style="color:var(--purple);">PMPQueryToken</h3>
+        <p>New Closeable class typed <code>SharedFlow&lt;Pair&lt;String, List&lt;String&gt;&gt;&gt;</code>. Compile-time safety — no runtime casts.</p>
+      </div>
+      <div class="card" style="border-color:var(--purple);">
+        <h3 style="color:var(--purple);">5th Flow Pipeline</h3>
+        <p><code>ConnEvent.ChartData</code> → <code>emitChartToAllQueryTokens()</code>. Gated on Connected state. Sub-sampled by listener.</p>
+      </div>
+    </div>
+
+    <div class="callout cd" style="margin-top:16px;">
+      <strong>Critical bug risk:</strong> PMPNode.listener currently only overrides <code>livePricesCallback</code>.
+      Adding STREAMING_QUERY without adding <code>override fun historyChartCallback(queryReturnBean: QueryReturnBean?)</code>
+      silently drops all chart data — the fragment never receives them.
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Feature Flags — All Default False</h3>
+    <div class="grid-4">
+      <div class="card">
+        <h3>FEATURE_PMP_CENTER_HOME</h3>
+        <p>T2 · P0 · HomeScreen</p>
+      </div>
+      <div class="card">
+        <h3>FEATURE_PMP_CENTER_WATCHLIST</h3>
+        <p>T2 · P0 · WatchListTab</p>
+      </div>
+      <div class="card">
+        <h3>FEATURE_PMP_CENTER_P1</h3>
+        <p>T3 · P1 · 4 screens</p>
+      </div>
+      <div class="card">
+        <h3>FEATURE_PMP_CENTER_P2</h3>
+        <p>T4 · P2 · 6 screens</p>
+      </div>
+    </div>
+
+    <div class="callout ci" style="margin-top:12px;">
+      All flags default <code>false</code>. Legacy path runs when flag is off. P0 screens (Home, WatchList) are the most-visited — side-by-side QA validates new path before defaulting to it. Flags removed in T5.
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       PHASE 3 ARCHITECTURE SVG
+  ───────────────────────────────────────────── -->
+  <section id="p3-arch-svg" class="slide ph3">
+    <div class="slide-tag"><span class="badge b3">Phase 3</span> Architecture</div>
+    <h1>Two Path, Two Token Architecture</h1>
+    <p class="lead">LIVE (per-product URL) and QUERY (historicalURL) use separate PMPNode instances and separate token classes.</p>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin:16px 0;overflow-x:auto;">
+      <svg viewBox="0 0 1080 560" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:900px;display:block;">
+        <defs>
+          <marker id="lg" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#3fb950" opacity=".8"/></marker>
+          <marker id="lp" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#bc8cff" opacity=".8"/></marker>
+          <marker id="la" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#58a6ff" opacity=".8"/></marker>
+          <marker id="lm" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#8b949e" opacity=".5"/></marker>
+          <filter id="lsh" x="-5%" y="-5%" width="110%" height="110%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity=".3"/></filter>
+          <linearGradient id="lvg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#bc8cff" stop-opacity="0"/><stop offset="50%" stop-color="#bc8cff" stop-opacity=".6"/><stop offset="100%" stop-color="#bc8cff" stop-opacity="0"/></linearGradient>
+        </defs>
+
+        <!-- Path backgrounds -->
+        <rect x="10" y="10" width="510" height="530" rx="10" fill="rgba(63,185,80,.03)" stroke="#3fb950" stroke-width="1" stroke-dasharray="4 3" opacity=".5"/>
+        <rect x="540" y="10" width="530" height="530" rx="10" fill="rgba(188,140,255,.03)" stroke="#bc8cff" stroke-width="1" stroke-dasharray="4 3" opacity=".5"/>
+
+        <!-- Divider -->
+        <line x1="545" y1="20" x2="545" y2="530" stroke="url(#lvg)" stroke-width="2"/>
+
+        <!-- Path labels -->
+        <text x="530" y="28" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="700" font-family="Segoe UI,sans-serif" letter-spacing=".1em">LIVE PATH</text>
+        <text x="1060" y="28" text-anchor="middle" fill="#bc8cff" font-size="11" font-weight="700" font-family="Segoe UI,sans-serif" letter-spacing=".1em">QUERY PATH</text>
+
+        <!-- ── PMPConnectionCenter (shared, centered) ── -->
+        <rect x="280" y="38" width="520" height="72" rx="8" fill="#0d1f3c" stroke="#58a6ff" stroke-width="1.5" filter="url(#lsh)"/>
+        <rect x="280" y="38" width="520" height="20" rx="8" fill="#58a6ff" opacity=".12"/>
+        <text x="540" y="53" text-anchor="middle" fill="#58a6ff" font-size="11" font-weight="700" font-family="Segoe UI,sans-serif">PMPConnectionCenter — Kotlin object</text>
+        <text x="300" y="75" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">nodes:</text>
+        <text x="348" y="75" fill="#58a6ff" font-size="10" font-family="Consolas,monospace">ConcurrentHashMap&lt;URL, PMPNode&gt;</text>
+        <text x="300" y="92" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">activeTokens:</text>
+        <text x="385" y="92" fill="#3fb950" font-size="10" font-family="Consolas,monospace">UUID → WeakRef(PMPToken)</text>
+        <text x="580" y="92" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">activeQueryTokens:</text>
+        <text x="710" y="92" fill="#bc8cff" font-size="10" font-family="Consolas,monospace">UUID → WeakRef(PMPQueryToken)</text>
+
+        <!-- ── PMPNode_LIVE ── -->
+        <rect x="25" y="128" width="470" height="150" rx="8" fill="#0d2818" stroke="#3fb950" stroke-width="1.5" filter="url(#lsh)"/>
+        <rect x="25" y="128" width="470" height="20" rx="8" fill="#3fb950" opacity=".12"/>
+        <text x="260" y="143" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="700" font-family="Segoe UI,sans-serif">PMPNode_LIVE — per-product URL</text>
+
+        <rect x="42" y="162" width="52" height="18" rx="9" fill="#21262d" stroke="#30363d"/>
+        <text x="68" y="174" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Consolas,monospace">Idle</text>
+        <rect x="102" y="162" width="72" height="18" rx="9" fill="#0d3d1a" stroke="#3fb950"/>
+        <text x="138" y="174" text-anchor="middle" fill="#3fb950" font-size="9" font-family="Consolas,monospace">Connected</text>
+        <rect x="182" y="162" width="72" height="18" rx="9" fill="#21262d" stroke="#30363d"/>
+        <text x="218" y="174" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Consolas,monospace">Suspended</text>
+
+        <text x="42" y="196" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">topicRefCounts · topicSnapshots · tokenSubscriptions</text>
+        <text x="42" y="214" fill="#3fb950" font-size="10" font-family="Segoe UI,sans-serif">P1-P4 Flow pipelines</text>
+
+        <rect x="42" y="228" width="38" height="18" rx="9" fill="#0d2818" stroke="#3fb950"/>
+        <text x="61" y="240" text-anchor="middle" fill="#3fb950" font-size="9" font-family="Consolas,monospace">P1</text>
+        <rect x="86" y="228" width="38" height="18" rx="9" fill="#0d2818" stroke="#3fb950"/>
+        <text x="105" y="240" text-anchor="middle" fill="#3fb950" font-size="9" font-family="Consolas,monospace">P2</text>
+        <rect x="130" y="228" width="38" height="18" rx="9" fill="#0d2818" stroke="#3fb950"/>
+        <text x="149" y="240" text-anchor="middle" fill="#3fb950" font-size="9" font-family="Consolas,monospace">P3</text>
+        <rect x="174" y="228" width="38" height="18" rx="9" fill="#0d2818" stroke="#3fb950"/>
+        <text x="193" y="240" text-anchor="middle" fill="#3fb950" font-size="9" font-family="Consolas,monospace">P4</text>
+        <rect x="218" y="228" width="38" height="18" rx="9" fill="#21262d" stroke="#30363d"/>
+        <text x="237" y="240" text-anchor="middle" fill="#30363d" font-size="9" font-family="Consolas,monospace">P5</text>
+
+        <text x="42" y="262" fill="#3fb950" font-size="10" font-family="Segoe UI,sans-serif">✅ livePricesCallback</text>
+        <text x="42" y="278" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">❌ historyChartCallback</text>
+
+        <!-- ── PMPNode_HIST ── -->
+        <rect x="550" y="128" width="500" height="150" rx="8" fill="#1a0d3c" stroke="#bc8cff" stroke-width="1.5" filter="url(#lsh)"/>
+        <rect x="550" y="128" width="500" height="20" rx="8" fill="#bc8cff" opacity=".12"/>
+        <text x="800" y="143" text-anchor="middle" fill="#bc8cff" font-size="11" font-weight="700" font-family="Segoe UI,sans-serif">PMPNode_HIST — historicalURL</text>
+
+        <rect x="567" y="162" width="52" height="18" rx="9" fill="#21262d" stroke="#30363d"/>
+        <text x="593" y="174" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Consolas,monospace">Idle</text>
+        <rect x="627" y="162" width="72" height="18" rx="9" fill="#1a0d3c" stroke="#bc8cff"/>
+        <text x="663" y="174" text-anchor="middle" fill="#bc8cff" font-size="9" font-family="Consolas,monospace">Connected</text>
+        <rect x="707" y="162" width="72" height="18" rx="9" fill="#21262d" stroke="#30363d"/>
+        <text x="743" y="174" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Consolas,monospace">Suspended</text>
+
+        <text x="567" y="196" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">queryTokenSubscriptions · topicRefCounts (QUERY)</text>
+        <text x="567" y="214" fill="#bc8cff" font-size="10" font-family="Segoe UI,sans-serif">P1-P5 Flow pipelines</text>
+
+        <rect x="567" y="228" width="38" height="18" rx="9" fill="#1a0d3c" stroke="#bc8cff"/>
+        <text x="586" y="240" text-anchor="middle" fill="#bc8cff" font-size="9" font-family="Consolas,monospace">P1</text>
+        <rect x="611" y="228" width="38" height="18" rx="9" fill="#1a0d3c" stroke="#bc8cff"/>
+        <text x="630" y="240" text-anchor="middle" fill="#bc8cff" font-size="9" font-family="Consolas,monospace">P2</text>
+        <rect x="655" y="228" width="38" height="18" rx="9" fill="#1a0d3c" stroke="#bc8cff"/>
+        <text x="674" y="240" text-anchor="middle" fill="#bc8cff" font-size="9" font-family="Consolas,monospace">P3</text>
+        <rect x="699" y="228" width="38" height="18" rx="9" fill="#1a0d3c" stroke="#bc8cff"/>
+        <text x="718" y="240" text-anchor="middle" fill="#bc8cff" font-size="9" font-family="Consolas,monospace">P4</text>
+        <rect x="743" y="228" width="38" height="18" rx="9" fill="#1a0d3c" stroke="#bc8cff" stroke-width="1.5"/>
+        <text x="762" y="240" text-anchor="middle" fill="#bc8cff" font-size="9" font-weight="700" font-family="Consolas,monospace">P5</text>
+        <text x="790" y="240" fill="#bc8cff" font-size="9" font-family="Segoe UI,sans-serif">NEW</text>
+
+        <text x="567" y="262" fill="#3fb950" font-size="10" font-family="Segoe UI,sans-serif">✅ historyChartCallback (NEW)</text>
+        <text x="567" y="278" fill="#f85149" font-size="10" font-family="Segoe UI,sans-serif">❌ livePricesCallback</text>
+
+        <!-- ── PMPToken ── -->
+        <rect x="25" y="298" width="470" height="88" rx="8" fill="#0d2818" stroke="#3fb950" stroke-width="1.5" filter="url(#lsh)"/>
+        <rect x="25" y="298" width="470" height="20" rx="8" fill="#3fb950" opacity=".12"/>
+        <text x="260" y="313" text-anchor="middle" fill="#3fb950" font-size="11" font-weight="700" font-family="Segoe UI,sans-serif">PMPToken — Closeable</text>
+        <text x="45" y="340" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">tokenId: UUID</text>
+        <text x="150" y="340" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">priceUpdates:</text>
+        <text x="240" y="340" fill="#3fb950" font-size="10" font-family="Consolas,monospace">SharedFlow&lt;Pair&lt;String, LinkedHashMap&lt;String, String&gt;&gt;&gt;</text>
+        <text x="45" y="360" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">replay=1 · extraBufferCapacity=64 · DROP_OLDEST</text>
+        <text x="45" y="377" fill="#3fb950" font-size="10" font-family="Segoe UI,sans-serif">close()</text>
+        <text x="90" y="377" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">→ decrement topicRefCounts → schedule 60s teardown</text>
+
+        <!-- ── PMPQueryToken ── -->
+        <rect x="550" y="298" width="500" height="88" rx="8" fill="#1a0d3c" stroke="#bc8cff" stroke-width="1.5" filter="url(#lsh)"/>
+        <rect x="550" y="298" width="500" height="20" rx="8" fill="#bc8cff" opacity=".12"/>
+        <text x="800" y="313" text-anchor="middle" fill="#bc8cff" font-size="11" font-weight="700" font-family="Segoe UI,sans-serif">PMPQueryToken — Closeable (NEW)</text>
+        <text x="570" y="340" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">tokenId: UUID</text>
+        <text x="660" y="340" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">priceUpdates:</text>
+        <text x="748" y="340" fill="#bc8cff" font-size="10" font-family="Consolas,monospace">SharedFlow&lt;Pair&lt;String, List&lt;String&gt;&gt;&gt;</text>
+        <text x="570" y="360" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">replay=1 · extraBufferCapacity=64 · DROP_OLDEST</text>
+        <text x="570" y="377" fill="#bc8cff" font-size="10" font-family="Segoe UI,sans-serif">close()</text>
+        <text x="618" y="377" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">→ remove from activeQueryTokens · QUERY is one-shot, no ref-count decrement</text>
+
+        <!-- ── PMPViewModel ── -->
+        <rect x="25" y="406" width="1030" height="120" rx="8" fill="#1a160d" stroke="#d29922" stroke-width="1.5" filter="url(#lsh)"/>
+        <rect x="25" y="406" width="1030" height="20" rx="8" fill="#d29922" opacity=".12"/>
+        <text x="540" y="421" text-anchor="middle" fill="#d29922" font-size="12" font-weight="700" font-family="Segoe UI,sans-serif">PMPViewModel — ViewModel (per Fragment)</text>
+
+        <text x="45" y="448" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">pmpToken:</text>
+        <text x="105" y="448" fill="#3fb950" font-size="10" font-family="Consolas,monospace">PMPToken?</text>
+        <text x="200" y="448" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">pmpQueryToken:</text>
+        <text x="305" y="448" fill="#bc8cff" font-size="10" font-family="Consolas,monospace">PMPQueryToken?</text>
+        <text x="455" y="448" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">emissionCounter:</text>
+        <text x="555" y="448" fill="#d29922" font-size="10" font-family="Consolas,monospace">AtomicInteger</text>
+
+        <text x="45" y="472" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">pmpDataFlow:</text>
+        <text x="130" y="472" fill="#d29922" font-size="10" font-family="Consolas,monospace">SharedFlow&lt;PMPUpdate&gt;</text>
+        <text x="350" y="472" fill="#8b949e" font-size="10" font-family="Segoe UI,sans-serif">(LIVE + QUERY + USSO unified)</text>
+        <text x="590" y="472" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">mHashmapIndexOfCounter:</text>
+        <text x="740" y="472" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">(LIVE)</text>
+
+        <text x="45" y="496" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">mChartTopicIndexMap:</text>
+        <text x="185" y="496" fill="#bc8cff" font-size="9" font-family="Segoe UI,sans-serif">(QUERY)</text>
+        <text x="280" y="496" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">subscribe()</text>
+        <text x="370" y="496" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">subscribeForHistory()</text>
+        <text x="520" y="496" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">detach()</text>
+        <text x="585" y="496" fill="#e6edf3" font-size="10" font-family="Consolas,monospace">unsubscribe()</text>
+        <text x="690" y="496" fill="#d29922" font-size="10" font-family="Consolas,monospace">aliasFields()</text>
+
+        <text x="45" y="518" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">collectorJob:</text>
+        <text x="130" y="518" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">Job?</text>
+        <text x="170" y="518" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">queryCollectorJob:</text>
+        <text x="290" y="518" fill="#8b949e" font-size="9" font-family="Segoe UI,sans-serif">Job?</text>
+
+        <!-- ── Arrows ── -->
+        <line x1="300" y1="110" x2="260" y2="128" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#la)" opacity=".7"/>
+        <line x1="780" y1="110" x2="800" y2="128" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#la)" opacity=".7"/>
+        <line x1="260" y1="278" x2="260" y2="298" stroke="#3fb950" stroke-width="1.5" marker-end="url(#lg)" opacity=".7"/>
+        <line x1="800" y1="278" x2="800" y2="298" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#lp)" opacity=".7"/>
+        <line x1="260" y1="386" x2="260" y2="406" stroke="#3fb950" stroke-width="1.5" marker-end="url(#lg)" opacity=".7"/>
+        <line x1="800" y1="386" x2="800" y2="406" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#lp)" opacity=".7"/>
+
+        <!-- phillip.pmp labels -->
+        <line x1="25" y1="200" x2="10" y2="200" stroke="#8b949e" stroke-width="1" stroke-dasharray="3 2" marker-end="url(#lm)" opacity=".4"/>
+        <text x="10" y="190" fill="#8b949e" font-size="8" font-family="Segoe UI,sans-serif" text-anchor="end" opacity=".5">phillip.pmp</text>
+        <text x="10" y="202" fill="#8b949e" font-size="8" font-family="Segoe UI,sans-serif" text-anchor="end" opacity=".5">per-product</text>
+
+        <line x1="550" y1="200" x2="330" y2="200" stroke="#8b949e" stroke-width="1" stroke-dasharray="3 2" marker-end="url(#lm)" opacity=".4"/>
+        <text x="335" y="190" fill="#8b949e" font-size="8" font-family="Segoe UI,sans-serif" opacity=".5">phillip.pmp</text>
+        <text x="335" y="202" fill="#8b949e" font-size="8" font-family="Segoe UI,sans-serif" opacity=".5">historicalURL</text>
+
+        <!-- P5 label -->
+        <rect x="268" y="14" width="50" height="20" rx="10" fill="#0d2818" stroke="#3fb950" stroke-width="1"/>
+        <text x="293" y="27" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="600" font-family="Segoe UI,sans-serif">P1-P4</text>
+        <rect x="745" y="14" width="50" height="20" rx="10" fill="#1a0d3c" stroke="#bc8cff" stroke-width="1"/>
+        <text x="770" y="27" text-anchor="middle" fill="#bc8cff" font-size="10" font-weight="600" font-family="Segoe UI,sans-serif">P5 NEW</text>
+
+      </svg>
+    </div>
+
+    <div class="callout cp">
+      <strong>Why separate PMPQueryToken:</strong> PMPToken.priceUpdates is typed as <code>LinkedHashMap&lt;String, String&gt;</code>.
+      Adding <code>List&lt;String&gt;</code> to the same flow requires runtime casts. A separate class gives compile-time type safety with zero overhead.
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       QUERY DATA FLOW
+  ───────────────────────────────────────────── -->
+  <section id="p3-query-flow" class="slide ph3">
+    <div class="slide-tag"><span class="badge b3">Phase 3</span> Chart Data Flow</div>
+    <h1>STREAMING_QUERY Data Flow</h1>
+
+    <div class="flow">
+      <div class="flow-box g">WatchListTab.onResume()</div>
+      <div class="flow-arr">→</div>
+      <div class="flow-box p">initPmpHistoryConnections()</div>
+    </div>
+    <div style="margin-left:32px;">
+      <div class="flow" style="margin-top:8px;">
+        <div class="flow-box p">pmpViewModel.subscribeForHistory(counters, fields)</div>
+        <div class="flow-arr">→</div>
+        <div class="flow-box p">PMPConnectionCenter.subscribeForHistory()</div>
+        <div class="flow-arr">→</div>
+        <div class="flow-box p">PMPNode_HIST.subscribeForHistory()</div>
+      </div>
+      <div class="flow" style="margin-top:8px;">
+        <div class="flow-box p">STREAMING_QUERY sent to historicalURL</div>
+        <div class="flow-arr">→</div>
+        <div class="flow-box p">QueryReturnBean received</div>
+        <div class="flow-arr">→</div>
+        <div class="flow-box p">historyChartCallback fires</div>
+        <div class="flow-arr">→</div>
+        <div class="flow-box p">emit(topic, chartPoints)</div>
+      </div>
+    </div>
+
+    <div class="sp"></div>
+
+    <div class="grid-2">
+      <div>
+        <h3>PMPNode — historyChartCallback Override</h3>
+<pre><code>// CRITICAL: must add this override!
+override fun historyChartCallback(
+  queryReturnBean: QueryReturnBean?
+) {
+  if (queryReturnBean == null) return
+
+  val dayCloses: List&lt;String&gt; =
+    queryReturnBean.itemList
+      .orEmpty()
+      .mapNotNull { it.val }
+      .takeLast(250)  // HISTORICAL_WORKING_DAY_POINT
+
+  // Sub-sample: keep every 10th + last
+  val sampled = dayCloses.filterIndexed
+    { i, _ -> i % 10 == 0 || i == dayCloses.lastIndex }
+
+  _event.tryEmit(ConnEvent.ChartData(
+    topic = queryReturnBean.topic ?: return,
+    chartPoints = sampled
+  ))
+}</code></pre>
+
+        <div class="callout ci" style="margin-top:12px;">
+          <strong>Sub-sampling:</strong> <code>SEGMENT_HISTORICAL_CHART = 10</code>, <code>HISTORICAL_WORKING_DAY_POINT = 250</code>. Done in PMPNode listener — fragments receive pre-processed data.
+        </div>
+      </div>
+
+      <div>
+        <h3>P5 ChartData Flow Pipeline</h3>
+<pre><code>_event
+  .filterIsInstance&lt;ConnEvent.ChartData&gt;()
+  .combine(_state) { chartData, state ->
+    chartData to (state == State.Connected)
+  }
+  .filter { (_, isConnected) -> isConnected }
+  .onEach { (chartData, _) ->
+    emitChartToAllQueryTokens(chartData)
+  }
+  .launchIn(scope)</code></pre>
+
+        <div class="sp"></div>
+
+        <h3>PMPViewModel — QUERY Collector</h3>
+<pre><code>queryCollectorJob = viewModelScope.launch {
+  pmpQueryToken?.priceUpdates?.collect {
+    (topic, chartPoints) ->
+    val indices =
+      mChartTopicIndexMap[topic] ?: emptyList()
+    if (indices.isEmpty()) return@collect
+    _pmpDataFlow.tryEmit(PMPUpdate(
+      kind = PMPUpdateKind.QUERY,
+      topic, indices,
+      data = null,
+      chartData = chartPoints,
+      isAllDataReturned = true))
+  }
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       PRO/CON
+  ───────────────────────────────────────────── -->
+  <section id="p3-procon" class="slide ph3">
+    <div class="slide-tag"><span class="badge b3">Phase 3</span> Trade-offs</div>
+    <h1>Legacy vs. New — Trade-offs</h1>
+
+    <table>
+      <thead>
+        <tr><th>Dimension</th><th>PMPUtilViewModel (legacy)</th><th>PMPCenter + PMPViewModel (new)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Connection pooling</td><td>Per-Fragment sockets — same stock = multiple TCP connections</td><td>Process singleton — one socket per URL across all fragments</td></tr>
+        <tr><td>Resume latency</td><td>logout → login → re-subscribe on every onResume (~200ms flash)</td><td>Cached snapshots emitted immediately, live ticks resume</td></tr>
+        <tr><td>Chart data support</td><td>Fully implemented in historyChartCallback</td><td>NEW — requires historyChartCallback override (currently missing!)</td></tr>
+        <tr><td>Type safety</td><td>Type-safe callbacks but mixed into 985-line god class</td><td>Separate PMPQueryToken class — compile-time type guarantees</td></tr>
+        <tr><td>Testability</td><td>AndroidViewModel — requires Robolectric / Instrumented tests</td><td>Plain Kotlin classes — pure JUnit unit tests possible</td></tr>
+        <tr><td>Scope of change</td><td>No change</td><td>25+ files across 4 tiers</td></tr>
+        <tr><td>Rollback risk</td><td>All-or-nothing revert</td><td>Feature flag per screen tier — partial rollback possible</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       MIGRATION TIERS
+  ───────────────────────────────────────────── -->
+  <section id="p3-tiers" class="slide ph3">
+    <div class="slide-tag"><span class="badge b3">Phase 3</span> Migration Tiers</div>
+    <h1>Incremental Migration Tiers</h1>
+
+    <div class="grid-4">
+      <div class="card" style="border-color:var(--blue);">
+        <h3 style="color:var(--blue);">T1 — Core</h3>
+        <p style="margin-bottom:8px;">Infrastructure</p>
+        <ul>
+          <li>PMPUpdate kind + chartData</li>
+          <li>historyChartCallback override</li>
+          <li>ConnEvent.ChartData + P5 pipeline</li>
+          <li>PMPQueryToken class</li>
+          <li>subscribeForHistory()</li>
+        </ul>
+        <div style="margin-top:8px;"><span class="pill pb">7 tasks</span></div>
+      </div>
+      <div class="card" style="border-color:var(--green);">
+        <h3 style="color:var(--green);">T2 — P0</h3>
+        <p style="margin-bottom:8px;">Most-visited screens</p>
+        <ul>
+          <li>HomeScreen (LIVE)</li>
+          <li>WatchListTab (LIVE + QUERY)</li>
+        </ul>
+        <p style="font-size:11px;color:var(--muted);margin-top:8px;">Both subscribe() and subscribeForHistory() in onResume.</p>
+        <div style="margin-top:8px;"><span class="pill pg">2 screens</span></div>
+      </div>
+      <div class="card" style="border-color:var(--yellow);">
+        <h3 style="color:var(--yellow);">T3 — P1</h3>
+        <p style="margin-bottom:8px;">Standard screens</p>
+        <ul>
+          <li>CounterDetail</li>
+          <li>OptionDetail</li>
+          <li>MarketDepth</li>
+          <li>TradeSummary</li>
+        </ul>
+        <div style="margin-top:8px;"><span class="pill py">4 screens</span></div>
+      </div>
+      <div class="card" style="border-color:var(--red);">
+        <h3 style="color:var(--red);">T5 — Delete</h3>
+        <p style="margin-bottom:8px;">Legacy deletion</p>
+        <ul>
+          <li>TabIdeas</li>
+          <li>TopPriceDetailCounter base</li>
+          <li>gitnexus_impact confirms zero callers</li>
+        </ul>
+        <p style="font-size:11px;color:var(--muted);margin-top:8px;">Delete PMPUtilViewModel, PmpConnectionPool.</p>
+        <div style="margin-top:8px;"><span class="pill pr">Delete 3 files</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       ALL DECISIONS
+  ───────────────────────────────────────────── -->
+  <section id="all-decisions" class="slide ph1">
+    <div class="slide-tag"><span class="badge b1">All Phases</span> Decisions</div>
+    <h1>Key Design Decisions</h1>
+
+    <div class="grid-2">
+      <div>
+        <div class="dec">
+          <div class="dec-title">D1: PMPUpdateKind enum + init{} invariants</div>
+          <div class="dec-body">Conservative choice matching PMPRequestType style. Sealed class rejected for lower boilerplate at 13+ consumption sites. init{} enforces LIVE: data≠null, QUERY: chartData≠null, USSO: data≠null.</div>
+        </div>
+        <div class="dec">
+          <div class="dec-title">D2: Separate PMPQueryToken class</div>
+          <div class="dec-body">PMPToken.priceUpdates is typed LinkedHashMap. Adding List&lt;String&gt; to same flow requires runtime casts. Separate class = compile-time safety.</div>
+        </div>
+        <div class="dec">
+          <div class="dec-title">D3: Historical URL = separate PMPNode</div>
+          <div class="dec-body">PMPSettingModel.liveChart.historicalURL is a different URL. Naturally gets its own node — no subclass needed.</div>
+        </div>
+        <div class="dec">
+          <div class="dec-title">D4: Flow-based state machine with Mutex</div>
+          <div class="dec-body">P1-P5 pipelines replace synchronized{} blocks. The type system enforces the Connected gate. Mutex.withLock{} can be held across suspend points.</div>
+        </div>
+      </div>
+      <div>
+        <div class="dec">
+          <div class="dec-title">D5: One collector per Fragment, dispatch on kind</div>
+          <div class="dec-body">Two collectors would race on pmpDataFlow replay=1. Single collector with switch on update.kind is canonical.</div>
+        </div>
+        <div class="dec">
+          <div class="dec-title">D6: Orphan chart topics silently dropped</div>
+          <div class="dec-body">Matches legacy: PMPUtilViewModel fires mOnQueryCallback only when listIndexOfCounter.isNotEmpty(). QUERY collector skips topics not in mChartTopicIndexMap.</div>
+        </div>
+        <div class="dec">
+          <div class="dec-title">D7: Per-subscribe emission counter</div>
+          <div class="dec-body">AtomicInteger tracks batch completion for isAllDataReturned. Resets on every subscribe() call. Single-topic = always isAllDataReturned=true.</div>
+        </div>
+        <div class="dec">
+          <div class="dec-title">D8: aliasFields restored in PMPViewModel</div>
+          <div class="dec-body">Raw FIDs ("9") → canonical values ("9,F009,P23"). Fixes both TopMarket migration and pre-existing NewOrderBottomSheet silently broken field lookups.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────
+       STATUS
+  ───────────────────────────────────────────── -->
+  <section id="all-status" class="slide ph1">
+    <div class="slide-tag"><span class="badge b1">All Phases</span> Status</div>
+    <h1>Consolidated Status</h1>
+
+    <div class="strip">
+      <div class="strip-item">
+        <div class="strip-val" style="color:var(--green);">Shipped</div>
+        <div class="strip-lbl">Phase 1</div>
+      </div>
+      <div class="strip-item">
+        <div class="strip-val" style="color:var(--yellow);">Shipped</div>
+        <div class="strip-lbl">Phase 2</div>
+      </div>
+      <div class="strip-item">
+        <div class="strip-val" style="color:var(--purple);">Spec OK</div>
+        <div class="strip-lbl">Phase 3</div>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card" style="border-color:var(--green);">
+        <h3 style="color:var(--green);">Phase 1 — Shipped</h3>
+        <ul>
+          <li>PMPConnectionCenter (Kotlin object)</li>
+          <li>PMPNode (Flow state machine)</li>
+          <li>PMPToken (Closeable)</li>
+          <li>PMPViewModel (per-Fragment)</li>
+          <li>NewOrderBottomSheet migrated</li>
+          <li>SR-3738 confirmed fixed</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:var(--yellow);">
+        <h3 style="color:var(--yellow);">Phase 2 — Shipped</h3>
+        <ul>
+          <li>isAllDataReturned algorithm</li>
+          <li>MarketTopDetailBaseScreen</li>
+          <li>MarketTopBaseFragment</li>
+          <li>TabMarketStockScreen</li>
+          <li>IndicesDetailScreen</li>
+          <li>aliasFields restored</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:var(--purple);">
+        <h3 style="color:var(--purple);">Phase 3 — Spec Ready</h3>
+        <ul>
+          <li>PMPUpdate.kind + chartData</li>
+          <li>PMPNode historyChartCallback</li>
+          <li>PMPConnectionCenter.subscribeForHistory()</li>
+          <li>PMPViewModel.subscribeForHistory()</li>
+          <li>Fragment lifecycle spec</li>
+          <li>5 spec files, strict-validated (838 lines)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="callout cd">
+      <strong>#1 Critical Risk:</strong> T1.4 must add <code>historyChartCallback</code> override to PMPNode.listener.
+      Without it, all chart data is silently dropped by the PMP library — data just disappears, no error, no exception.
+    </div>
+
+    <div class="callout cs" style="margin-top:12px;">
+      <strong>Ready:</strong> All 5 specs strict-validated. 838 lines of spec. Ready for T1 implementation.
+    </div>
+  </section>
+
+</div><!-- #main -->
+
+<script>
+  const sections = document.querySelectorAll('.slide');
+  const sidebarItems = document.querySelectorAll('.sb-item');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        sidebarItems.forEach(item => {
+          item.classList.remove('active');
+          if (item.getAttribute('href') === '#' + id) item.classList.add('active');
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

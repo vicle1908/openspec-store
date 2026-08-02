@@ -1,0 +1,11 @@
+schema: spec-driven
+created: 2026-06-02
+updated: 2026-07-17
+status: complete
+note: >
+  Jira status hygiene — code implementation complete. 63 tasks total, 31 done.
+  Remaining 32 tasks are ALL live Jira operations: render-sheet (6.1-6.3),
+  dedupe dry-run (7.1-7.3), dedupe execution (8.1-8.7), singleton
+  classification (9.1-9.5), manifest sweep (10.x). These require production
+  Jira access, sheet creation, and stakeholder sign-off. Code portion is
+  complete and ready for live execution when operational window opens.

@@ -1,0 +1,30 @@
+{
+  "_note": "Explicit pesdb.net eFootball-2026 card ids, verified 2026-07-15 via web-indexed pesdb id-pages (each footer reads 'exported from eFootball 2026'). Used as a direct override for any exemplar: legends (not name-searchable) and the handful of moderns whose plain name search 404s on a hyphen or hits a name collision. Historical exemplars are pinned to their PRIMARY released Epic card (Maximum Level ~27-39), not the newer ML1 'Legendary' tier, so base-level stats stay comparable to modern Standard cards.",
+
+  "_genuinely_absent": "No clean pesdb 2026 card exists for these (only namesakes / no export): Zinedine Zidane, Roy Keane, Arjen Robben, Teddy Sheringham. They stay illustrative-only.",
+
+  "ids": {
+    "Filippo Inzaghi": "88032065752516",
+    "Gerd Müller": "88040655554922",
+    "Didier Drogba": "88032334188033",
+    "Dennis Bergkamp": "88029918268890",
+    "Francesco Totti": "87963346275779",
+    "Frank Lampard": "17592454614492",
+    "Steven Gerrard": "88030723575220",
+    "Andrea Pirlo": "88033407929824",
+    "Claude Makélélé": "88029649836770",
+    "Ryan Giggs": "17592186178992",
+    "David Beckham": "89060441984433",
+    "Franz Beckenbauer": "88029918268908",
+    "Ronald Koeman": "88040387119435",
+    "Roberto Carlos": "88029649833420",
+    "Paolo Maldini": "88031797317058",
+    "Cafu": "88035555413453",
+    "Gianluigi Buffon": "88040387118039",
+    "Manuel Neuer": "33185",
+
+    "Trent Alexander-Arnold": "87961735641853",
+    "Sergio Ramos": "105655927053473",
+    "Ederson": "105594186938079"
+  }
+}

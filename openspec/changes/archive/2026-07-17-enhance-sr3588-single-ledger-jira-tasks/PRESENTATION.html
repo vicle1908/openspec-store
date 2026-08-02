@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SR-3588 USSO Single Ledger - Frontend Plan</title>
+    <style>
+        :root {
+            --primary: #0052CC;
+            --success: #36B37E;
+            --warning: #FFAB00;
+            --bg-dark: #172B4D;
+            --bg-light: #F4F5F7;
+            --text-primary: #253858;
+            --border: #DFE1E6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .slide {
+            min-height: 100vh;
+            padding: 50px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            border-bottom: 3px solid var(--border);
+            background: white;
+            position: relative;
+        }
+
+        .slide:nth-child(even) {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .title-slide {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--primary) 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .title-slide h1 { font-size: 2.8rem; font-weight: 700; margin-bottom: 12px; }
+        .title-slide h2 { font-size: 1.3rem; font-weight: 400; opacity: 0.9; margin-bottom: 20px; }
+        .title-slide .meta { font-size: 1rem; opacity: 0.8; }
+
+        h1 { font-size: 1.8rem; color: var(--primary); margin-bottom: 16px; }
+        h2 { font-size: 1.1rem; color: var(--primary); margin: 16px 0 10px; }
+
+        .jira-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-weight: 600;
+        }
+
+        .jira-link:hover { text-decoration: underline; }
+
+        .epic-link {
+            display: inline-block;
+            background: white;
+            color: var(--primary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-top: 16px;
+        }
+
+        .epic-link:hover { background: #f0f0f0; }
+
+        .badge {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 16px;
+            font-size: 1rem;
+        }
+
+        .badge.pending {
+            background: var(--warning);
+            color: #172B4D;
+        }
+
+        .badge.android {
+            background: #3DDC84;
+            color: #073042;
+        }
+
+        .badge.ios {
+            background: #172B4D;
+            color: white;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, var(--primary) 0%, #0065FF 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 10px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-box.green { background: linear-gradient(135deg, var(--success) 0%, #2D9E6C 100%); }
+        .stat-box.purple { background: linear-gradient(135deg, #6554C0 0%, #8777D9 100%); }
+        .stat-box.orange { background: linear-gradient(135deg, #FFAB00 0%, #FF8B00 100%); color: #172B4D; }
+
+        .stat-box .number { font-size: 2.4rem; font-weight: 700; line-height: 1; }
+        .stat-box .label { font-size: 0.85rem; opacity: 0.9; margin-top: 4px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            font-size: 0.75rem;
+        }
+
+        th, td {
+            padding: 7px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-dark);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.6rem;
+        }
+
+        tr:hover td { background: #f8fafc; }
+        tr:last-child td { border-bottom: none; }
+
+        .task-id {
+            font-family: 'SF Mono', Monaco, monospace;
+            color: var(--primary);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .task-id a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .task-id a:hover { text-decoration: underline; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-badge.done { background: #E3FCEF; color: #006644; }
+        .status-badge.in-progress { background: #DEEBFF; color: #0052CC; }
+        .status-badge.todo { background: #F4F5F7; color: #5E6C84; }
+        .status-badge.new { background: #FFF0E6; color: #FF8B00; }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .priority-badge.highest { background: #FF5630; color: white; }
+        .priority-badge.high { background: var(--warning); color: #172B4D; }
+        .priority-badge.medium { background: #DFE1E6; color: #42526E; }
+
+        .section-header {
+            background: #f0f7ff;
+            font-weight: 600;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 16px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+        }
+
+        .card h3 { margin: 0 0 10px; font-size: 1rem; }
+        .card.sprint1 { border-top: 4px solid var(--primary); }
+        .card.sprint2 { border-top: 4px solid #6554C0; }
+
+        .task-list {
+            list-style: none;
+            font-size: 0.85rem;
+        }
+
+        .task-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .task-list li:last-child { border-bottom: none; }
+
+        .task-list li::before {
+            content: '✓';
+            width: 18px;
+            height: 18px;
+            background: var(--success);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .task-list.discuss li::before {
+            content: '🔍';
+            background: var(--warning);
+        }
+
+        .footer {
+            background: var(--bg-dark);
+            color: white;
+            padding: 24px 60px;
+            text-align: center;
+        }
+
+        @media print {
+            .slide { page-break-after: always; min-height: 100vh; }
+        }
+
+        @media (max-width: 768px) {
+            .two-column { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Slide 1: Title -->
+<div class="slide title-slide">
+    <h1>SR-3588: USSO Single Ledger</h1>
+    <h2>Frontend Development Plan</h2>
+    <p class="meta">Epic: <a href="https://psplit.atlassian.net/browse/SR-3588" style="color: white; text-decoration: underline;">SR-3588</a></p>
+    <p class="meta">Backend APIs: Ready | Subtasks: Created</p>
+    <p class="meta">Team: 10 Android + 10 iOS + 15 QA</p>
+    <a href="https://psplit.atlassian.net/browse/SR-3588" class="epic-link">Open in Jira</a>
+</div>
+
+<!-- Slide 2: Current Jira Structure -->
+<div class="slide">
+    <h1>Jira Structure - Epic SR-3588</h1>
+    
+    <div class="stats-row">
+        <div class="stat-box green">
+            <div class="number">2</div>
+            <div class="label">Done</div>
+        </div>
+        <div class="stat-box">
+            <div class="number">1</div>
+            <div class="label">In Progress</div>
+        </div>
+        <div class="stat-box orange">
+            <div class="number">16</div>
+            <div class="label">To Do</div>
+        </div>
+        <div class="stat-box purple">
+            <div class="number">20</div>
+            <div class="label">Subtasks Created</div>
+        </div>
+    </div>
+
+    <h2>Epic Children (18 Tasks)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Jira</th>
+                <th>Summary</th>
+                <th>Status</th>
+                <th>Subtasks</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3637" target="_blank">SR-3637</a></td>
+                <td>[Planning] USSO Single Ledger</td>
+                <td><span class="status-badge done">Done</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3737" target="_blank">SR-3737</a></td>
+                <td>Architecture Design for USSO Single Ledger</td>
+                <td><span class="status-badge in-progress">In Progress</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3753" target="_blank">SR-3753</a></td>
+                <td>[probe] minimal child under SR-3588</td>
+                <td><span class="status-badge todo">To Do</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3754" target="_blank">SR-3754</a></td>
+                <td>[1.1] Solution Design & Alignment</td>
+                <td><span class="status-badge todo">To Do</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3755" target="_blank">SR-3755</a></td>
+                <td>[1.2] Trade Tab Updates</td>
+                <td><span class="status-badge todo">To Do</span></td>
+                <td><strong>10</strong> (SR-3801 to SR-3810)</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3756" target="_blank">SR-3756</a></td>
+                <td>[1.3] Market Tab Updates</td>
+                <td><span class="status-badge todo">To Do</span></td>
+                <td><strong>6</strong> (SR-3811 to SR-3816)</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3757" target="_blank">SR-3757</a></td>
+                <td>[1.4] Outstanding Position Updates</td>
+                <td><span class="status-badge todo">To Do</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3758" target="_blank">SR-3758</a></td>
+                <td>[1.5] Transaction History Updates</td>
+                <td><span class="status-badge todo">To Do</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3759" target="_blank">SR-3759</a></td>
+                <td>[1.6] Withdraw View Updates</td>
+                <td><span class="status-badge todo">To Do</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3760" target="_blank">SR-3760</a></td>
+                <td>[1.7] Position Enhancements</td>
+                <td><span class="status-badge todo">To Do</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3761" target="_blank">SR-3761</a></td>
+                <td>[1.8] Position Detail Improvements</td>
+                <td><span class="status-badge todo">To Do</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3762" target="_blank">SR-3762</a></td>
+                <td>[1.9] Global Search Enhancement</td>
+                <td><span class="status-badge todo">To Do</span></td>
+                <td><strong>4</strong> (SR-3817 to SR-3820)</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3763" target="_blank">SR-3763</a></td>
+                <td>[1.10] SIT Testing + Documentation</td>
+                <td><span class="status-badge todo">To Do</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3775" target="_blank">SR-3775</a></td>
+                <td>[Critical] CIS Flag API Contract</td>
+                <td><span class="status-badge new">To Do</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3776" target="_blank">SR-3776</a></td>
+                <td>[Phase 1 Blocker] M2 Platform Access Control</td>
+                <td><span class="status-badge new">To Do</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3777" target="_blank">SR-3777</a></td>
+                <td>[Phase 1] Options Activation Flow</td>
+                <td><span class="status-badge new">To Do</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3778" target="_blank">SR-3778</a></td>
+                <td>[Phase 1] Realized P/L Merged View</td>
+                <td><span class="status-badge new">To Do</span></td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3779" target="_blank">SR-3779</a></td>
+                <td>[Phase 1] Error Handling & Graceful Degradation</td>
+                <td><span class="status-badge new">To Do</span></td>
+                <td>-</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Slide 3: Trade Tab Subtasks (SR-3755) -->
+<div class="slide">
+    <h1>SR-3755: Trade Tab Updates - Subtasks</h1>
+    <span class="badge android">Android</span> <span class="badge ios">iOS</span>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Jira</th>
+                <th>Summary</th>
+                <th>Platform</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="section-header">
+                <td colspan="3"><strong>Android Subtasks (5)</strong></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3801" target="_blank">SR-3801</a></td>
+                <td>Android: CIS Flag Integration for Trade Tab</td>
+                <td><span style="color: #3DDC84; font-weight: 600;">Android</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3802" target="_blank">SR-3802</a></td>
+                <td>Android: Securities Renaming</td>
+                <td><span style="color: #3DDC84; font-weight: 600;">Android</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3803" target="_blank">SR-3803</a></td>
+                <td>Android: Options Tab Removal from Trade</td>
+                <td><span style="color: #3DDC84; font-weight: 600;">Android</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3804" target="_blank">SR-3804</a></td>
+                <td>Android: Merged Positions View</td>
+                <td><span style="color: #3DDC84; font-weight: 600;">Android</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3805" target="_blank">SR-3805</a></td>
+                <td>Android: Realized P/L Integration</td>
+                <td><span style="color: #3DDC84; font-weight: 600;">Android</span></td>
+            </tr>
+            <tr class="section-header">
+                <td colspan="3"><strong>iOS Subtasks (5)</strong></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3806" target="_blank">SR-3806</a></td>
+                <td>iOS: CIS Flag Integration for Trade Tab</td>
+                <td><span style="color: #172B4D; font-weight: 600;">iOS</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3807" target="_blank">SR-3807</a></td>
+                <td>iOS: Securities Renaming</td>
+                <td><span style="color: #172B4D; font-weight: 600;">iOS</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3808" target="_blank">SR-3808</a></td>
+                <td>iOS: Options Tab Removal from Trade</td>
+                <td><span style="color: #172B4D; font-weight: 600;">iOS</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3809" target="_blank">SR-3809</a></td>
+                <td>iOS: Merged Positions View</td>
+                <td><span style="color: #172B4D; font-weight: 600;">iOS</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3810" target="_blank">SR-3810</a></td>
+                <td>iOS: Realized P/L Integration</td>
+                <td><span style="color: #172B4D; font-weight: 600;">iOS</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Slide 4: Market Tab Subtasks (SR-3756) -->
+<div class="slide">
+    <h1>SR-3756: Market Tab Updates - Subtasks</h1>
+    <span class="badge android">Android</span> <span class="badge ios">iOS</span>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Jira</th>
+                <th>Summary</th>
+                <th>Platform</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="section-header">
+                <td colspan="3"><strong>Android Subtasks (3)</strong></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3811" target="_blank">SR-3811</a></td>
+                <td>Android: CIS Flag Integration for Market Tab</td>
+                <td><span style="color: #3DDC84; font-weight: 600;">Android</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3812" target="_blank">SR-3812</a></td>
+                <td>Android: Outstanding Positions Merged View</td>
+                <td><span style="color: #3DDC84; font-weight: 600;">Android</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3813" target="_blank">SR-3813</a></td>
+                <td>Android: Market Tab Filter/Sort Enhancements</td>
+                <td><span style="color: #3DDC84; font-weight: 600;">Android</span></td>
+            </tr>
+            <tr class="section-header">
+                <td colspan="3"><strong>iOS Subtasks (3)</strong></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3814" target="_blank">SR-3814</a></td>
+                <td>iOS: CIS Flag Integration for Market Tab</td>
+                <td><span style="color: #172B4D; font-weight: 600;">iOS</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3815" target="_blank">SR-3815</a></td>
+                <td>iOS: Outstanding Positions Merged View</td>
+                <td><span style="color: #172B4D; font-weight: 600;">iOS</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3816" target="_blank">SR-3816</a></td>
+                <td>iOS: Market Tab Filter/Sort Enhancements</td>
+                <td><span style="color: #172B4D; font-weight: 600;">iOS</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Slide 5: Search Subtasks (SR-3762) -->
+<div class="slide">
+    <h1>SR-3762: Global Search Enhancement - Subtasks</h1>
+    <span class="badge android">Android</span> <span class="badge ios">iOS</span>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Jira</th>
+                <th>Summary</th>
+                <th>Platform</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="section-header">
+                <td colspan="3"><strong>Android Subtasks (2)</strong></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3817" target="_blank">SR-3817</a></td>
+                <td>Android: Options Symbol Search</td>
+                <td><span style="color: #3DDC84; font-weight: 600;">Android</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3818" target="_blank">SR-3818</a></td>
+                <td>Android: Combined Search Results</td>
+                <td><span style="color: #3DDC84; font-weight: 600;">Android</span></td>
+            </tr>
+            <tr class="section-header">
+                <td colspan="3"><strong>iOS Subtasks (2)</strong></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3819" target="_blank">SR-3819</a></td>
+                <td>iOS: Options Symbol Search</td>
+                <td><span style="color: #172B4D; font-weight: 600;">iOS</span></td>
+            </tr>
+            <tr>
+                <td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3820" target="_blank">SR-3820</a></td>
+                <td>iOS: Combined Search Results</td>
+                <td><span style="color: #172B4D; font-weight: 600;">iOS</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Slide 6: Sprint Plan -->
+<div class="slide">
+    <h1>Sprint Plan</h1>
+    
+    <div class="two-column">
+        <div class="card sprint1">
+            <h3>Sprint 1: Solution & Design</h3>
+            <p style="color: #5E6C84; font-size: 0.85rem;">Weeks 1-2</p>
+            <ul class="task-list discuss">
+                <li>Solution design walkthrough</li>
+                <li>Requirements clarification</li>
+                <li>Architecture decisions</li>
+                <li>Figma design alignment</li>
+                <li>Open questions resolution</li>
+            </ul>
+            <p style="margin-top: 12px; font-size: 0.85rem;">
+                <strong>Key Task:</strong> <a href="https://psplit.atlassian.net/browse/SR-3754" class="jira-link">SR-3754</a>
+            </p>
+        </div>
+        
+        <div class="card sprint2">
+            <h3>Sprint 2: Implementation</h3>
+            <p style="color: #5E6C84; font-size: 0.85rem;">Weeks 3-4</p>
+            <ul class="task-list">
+                <li>CIS Integration (Trade + Market)</li>
+                <li>Options Tab Removal</li>
+                <li>Positions Merged View</li>
+                <li>Realized P/L</li>
+                <li>Global Search Enhancement</li>
+            </ul>
+            <p style="margin-top: 12px; font-size: 0.85rem;">
+                <strong>Tasks:</strong> SR-3801 to SR-3820
+            </p>
+        </div>
+    </div>
+
+    <h2 style="margin-top: 24px;">Sprint 1 Open Questions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Question</th>
+                <th>Impact</th>
+                <th>Owner</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>CIS Flag edge cases (network error, delayed response)?</td>
+                <td><span class="priority-badge highest">Highest</span></td>
+                <td>Backend + Mobile</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>M2 feature flag behavior (merged vs legacy)?</td>
+                <td><span class="priority-badge high">High</span></td>
+                <td>Backend</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Figma designs finalized for Phase 1 screens?</td>
+                <td><span class="priority-badge high">High</span></td>
+                <td>Design</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Merged View sorting strategy?</td>
+                <td><span class="priority-badge medium">Medium</span></td>
+                <td>Design + Mobile</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Slide 7: Summary -->
+<div class="slide">
+    <h1>Summary</h1>
+    
+    <div class="stats-row">
+        <div class="stat-box">
+            <div class="number">18</div>
+            <div class="label">Epic Children</div>
+        </div>
+        <div class="stat-box green">
+            <div class="number">20</div>
+            <div class="label">Subtasks Created</div>
+        </div>
+        <div class="stat-box purple">
+            <div class="number">10</div>
+            <div class="label">Android Tasks</div>
+        </div>
+        <div class="stat-box">
+            <div class="number">10</div>
+            <div class="label">iOS Tasks</div>
+        </div>
+    </div>
+
+    <h2>All Created Subtasks</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Jira</th>
+                <th>Summary</th>
+                <th>Parent</th>
+                <th>Platform</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3801" target="_blank">SR-3801</a></td><td>CIS Integration (Trade)</td><td>SR-3755</td><td>Android</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3802" target="_blank">SR-3802</a></td><td>Securities Renaming</td><td>SR-3755</td><td>Android</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3803" target="_blank">SR-3803</a></td><td>Options Tab Removal</td><td>SR-3755</td><td>Android</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3804" target="_blank">SR-3804</a></td><td>Merged Positions</td><td>SR-3755</td><td>Android</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3805" target="_blank">SR-3805</a></td><td>Realized P/L</td><td>SR-3755</td><td>Android</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3806" target="_blank">SR-3806</a></td><td>CIS Integration (Trade)</td><td>SR-3755</td><td>iOS</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3807" target="_blank">SR-3807</a></td><td>Securities Renaming</td><td>SR-3755</td><td>iOS</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3808" target="_blank">SR-3808</a></td><td>Options Tab Removal</td><td>SR-3755</td><td>iOS</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3809" target="_blank">SR-3809</a></td><td>Merged Positions</td><td>SR-3755</td><td>iOS</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3810" target="_blank">SR-3810</a></td><td>Realized P/L</td><td>SR-3755</td><td>iOS</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3811" target="_blank">SR-3811</a></td><td>CIS Integration (Market)</td><td>SR-3756</td><td>Android</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3812" target="_blank">SR-3812</a></td><td>Outstanding Positions</td><td>SR-3756</td><td>Android</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3813" target="_blank">SR-3813</a></td><td>Filter/Sort</td><td>SR-3756</td><td>Android</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3814" target="_blank">SR-3814</a></td><td>CIS Integration (Market)</td><td>SR-3756</td><td>iOS</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3815" target="_blank">SR-3815</a></td><td>Outstanding Positions</td><td>SR-3756</td><td>iOS</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3816" target="_blank">SR-3816</a></td><td>Filter/Sort</td><td>SR-3756</td><td>iOS</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3817" target="_blank">SR-3817</a></td><td>Options Symbol Search</td><td>SR-3762</td><td>Android</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3818" target="_blank">SR-3818</a></td><td>Combined Results</td><td>SR-3762</td><td>Android</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3819" target="_blank">SR-3819</a></td><td>Options Symbol Search</td><td>SR-3762</td><td>iOS</td></tr>
+            <tr><td class="task-id"><a href="https://psplit.atlassian.net/browse/SR-3820" target="_blank">SR-3820</a></td><td>Combined Results</td><td>SR-3762</td><td>iOS</td></tr>
+        </tbody>
+    </table>
+
+    <div style="margin-top: 32px; text-align: center;">
+        <h2 style="color: var(--success);">✅ All 20 Subtasks Created</h2>
+        <a href="https://psplit.atlassian.net/browse/SR-3588" class="epic-link">
+            View Epic in Jira: SR-3588
+        </a>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <p><strong>SR-3588 USSO Single Ledger - Frontend Plan</strong></p>
+    <p style="margin-top: 8px; opacity: 0.8;">20 Subtasks Created (SR-3801 to SR-3820)</p>
+</div>
+
+</body>
+</html>

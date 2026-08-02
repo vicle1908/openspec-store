@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-06-11
+updated: 2026-07-17
+status: archived-partial
+note: 14/85 tasks completed. Remaining 71 tasks ALL require manual Jira/PM actions: bulk task assignment (5), draft task finalization (5), parallel workstream setup (5), progress tracking (4), daily sprint operations (5), sprint coordination (5), SIT preparation (5), sprint closeout (5), requirements blocker follow-up (1), and various operational items. No code changes possible — this is a Jira project management workflow.

@@ -1,0 +1,34 @@
+schema: spec-driven
+created: 2026-07-16
+updated: 2026-07-17
+
+name: epic-plan-aware-analysis
+status: complete
+owner: lekhanhvinh
+description: |
+  Enrich Jira epic analysis with planned development sprint and timing,
+  target release version and date, and API deployment timing extracted from
+  the stakeholder-owned Epic Plan worksheet.
+
+artifacts:
+  - proposal.md
+  - design.md
+  - specs/epic-plan-extraction/spec.md
+  - specs/plan-aware-epic-analysis/spec.md
+  - specs/tdt-sheets-library/spec.md
+  - tasks.md
+
+affected_repos:
+  - jira-epic-report
+  - tdt-sheets
+
+tasks:
+  total: 66
+  completed: 66
+
+completion:
+  specification: done
+  implementation: done
+  testing: done
+  live_verification: done
+  archive: done

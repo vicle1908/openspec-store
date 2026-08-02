@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-06-27
+goal: "Align spec and code: GitLab MR notes (open/reopen/merge) + Jira comment
+  (merge only)"

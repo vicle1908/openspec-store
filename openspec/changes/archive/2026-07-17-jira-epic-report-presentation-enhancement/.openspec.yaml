@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-06-02
+updated: 2026-07-17
+status: complete
+note: Core blocking implementation and live verification complete; obsolete release, screenshot, staging, and gws-specific tasks were explicitly retired during archive reconciliation. Post-archive review transferred explicit empty-edge coverage, spreadsheet health/filter alignment, time-based capacity utilization, and role grouping to jira-epic-report-archive-gap-closure.

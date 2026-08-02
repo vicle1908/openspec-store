@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-06-11
+updated: 2026-07-17
+status: archived-partial
+note: 8/73 tasks completed. Remaining 65 tasks ALL require manual Jira actions: story breakdown (10), story point estimation (11), resource redistribution (3), stale task resolution (5), sprint allocation (2), epic status (3), documentation (3), subtask creation (14), and various manual follow-ups. No code changes possible — this is a Jira project management workflow.

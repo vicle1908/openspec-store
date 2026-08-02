@@ -1,0 +1,76 @@
+schema: spec-driven
+created: 2026-05-18
+updated: 2026-07-17
+
+name: jira-epic-report-generation
+version: 2.1.0
+status: complete
+priority: high
+
+description: |
+  Automated Jira epic report generation system that analyzes epics, tasks,
+  and sprint allocations to produce comprehensive status reports with risk
+  analysis and actionable recommendations. Built in Python with uv, extending
+  the existing jira-comprehensive-management skill (jira_mgmt package).
+
+owner: lekhanhvinh
+team: platform
+
+tags:
+  - jira
+  - reporting
+  - automation
+  - analytics
+  - risk-management
+  - python
+  - uv
+
+dependencies:
+  internal:
+    - jira-comprehensive-management (jira_mgmt package)
+    - jira-daily-reports (report patterns reference)
+    - jira-jql-builder (JQL patterns)
+  external:
+    - pydantic>=2.10.3
+    - typer>=0.15.1
+    - rich>=13.9.4
+    - jinja2>=3.1.5
+    - cachetools>=5.5.0
+    - pytest>=8.3.4
+    - ruff>=0.8.4
+    - mypy>=1.14.0
+
+python_version: '>=3.12'
+
+phases:
+  - name: research
+    status: complete
+    start: 2026-05-18
+    end: 2026-05-18
+  - name: spec
+    status: complete
+    start: 2026-05-18
+    end: 2026-05-18
+  - name: implementation
+    status: complete
+    end: 2026-07-17
+  - name: testing
+    status: complete
+    end: 2026-07-17
+    evidence: 626 tests passed at 84.39% coverage; explicit optional-empty dashboard paths remain tracked by jira-epic-report-archive-gap-closure
+  - name: deployment
+    status: complete
+    end: 2026-07-17
+    evidence: Live one-epic and five-epic dashboard generation verified
+
+success_criteria:
+  - Extends jira_mgmt.reporting.generate_epic_report()
+  - Risk identification with 9 weighted factors
+  - Resource utilization tracking across epics
+  - Multi-format output (Markdown, JSON, HTML)
+  - CLI with typer + rich
+  - Test coverage > 80%
+  - Report generation < 30s for 10 epics
+
+estimated_effort: 53 hours
+target_completion: 2026-06-03

@@ -1,0 +1,99 @@
+schema: spec-driven
+created: 2026-06-04
+updated: 2026-06-07
+status: implemented
+
+change: jira-ticket-intelligence
+title: Jira Ticket Intelligence
+bundle_version: "v1.0"
+description: |
+  Historical change package for the shared canonical ticket intelligence bundle and its
+  SDK-first analyzer/CLI extension work. The authoritative shipped contract lives in
+  `openspec/specs/ticket-intelligence-core/spec.md`.
+
+  This metadata records implemented scope at a high level, but exact requirement counts,
+  task counts, and test totals should be taken from the current permanent spec and live
+  verification rather than treated as frozen normative values.
+
+affected_repos:
+  - jira-skill (core contract)
+  - jira-epic-report (adapter)
+  - jira-daily-reports (adapter)
+  - webhook-receiver (adapter)
+
+dependencies:
+  - tdt-core (auth only)
+
+test_coverage:
+  fixtures: 8
+
+spec_requirements_notes: |
+  Core requirements (1-11): ✅ Met — bundle, signals, recommendations, policies,
+  visibility, multi-level surfaces, feedback, dependencies, auth, partial data, reuse
+  Extension requirements (12-22): ✅ Met — RCA classification, fix status detection,
+  filter collection, sheets writing, filter registry, continuous mode, CLI entry point,
+  reusable pipeline across any filter, SCM intelligence contract, operational logging
+
+tasks:
+  total: 55
+  completed: 55
+  deferred: 0
+  in_progress: 0
+  pending: 0
+
+phase_status:
+  phase_1_core_contract: complete
+  phase_2_normalize_adapters: complete
+  phase_3_new_capabilities: complete
+  phase_4_validation_rollout: complete
+  phase_5_rca_prevention_extension: complete
+
+signal_taxonomy:
+  implemented:
+    - RiskSignal
+    - BlockingSignal
+    - FreshnessSignal
+    - CapacitySignal
+    - CompletenessSignal
+    - InsightSignal
+    - DependencySignal
+    - RootCauseSignal
+    - FixStatusSignal
+  planned: []
+  total_current: 9
+  total_target: 9
+
+completion:
+  phase_1: done  # Core contract (bundle, signals, recommendations, redaction, snapshots, analyzer)
+  phase_2: done  # Normalize current analyzers into adapters (all 3 consumers)
+  phase_3: done  # Cross-repo validation and rollout
+  phase_4: done  # Validation and live verification
+  phase_5: done  # RCA + Prevention Signal Extension (implemented 2026-06-06)
+
+notes: |
+  This change is implemented and the shipped contract is exercised by focused verification
+  across `jira-skill` and its consumer adapters.
+  
+  Phase 5 (RCA + Prevention) is implemented with GitLab SCM enhancement:
+  - RootCauseSignal and FixStatusSignal (9 total signals)
+  - FilterSnapshotCollector and FilterRegistryReader
+  - SheetsBundleWriter for Google Sheets export
+  - Unified CLI with analyze-filter command (includes --filter-url, --auto)
+  - Continuous and incremental modes
+  - All 8 test fixtures updated with Phase 5 fields
+  - RCA patterns consolidated to canonical module
+  - Dynamic filter URL resolution implemented
+  - Skill documentation aligned to the current surface
+  
+  GitLab SCM Evidence Integration (2026-06-07):
+  - New modules: gitlab_evidence.py, scm_evidence.py
+  - Structured intelligence models: BranchRole, MergeRequestState, PipelineState
+  - GitlabEvidenceProvider with bounded concurrency (Semaphore(8))
+  - Branch role classification, MR state tracking, pipeline state resolution
+  - Confidence scoring for evidence reliability
+  - Enhanced collector with async GitLab enrichment
+  
+  Outstanding future enhancements (non-blocking):
+  - HIGH: Promote structured SCM evidence to first-class bundle fields
+  - MEDIUM: GitLab provider caching/batching optimization
+  - MEDIUM: Broader repo-resolution heuristics

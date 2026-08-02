@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-07-15
+updated: 2026-07-17
+status: complete
+note: Agent-core skill scope profiles fully implemented across 7 sections (30 tasks). Skill scope profiles, capability mapping, and cross-agent coordination contracts established.

@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-07-14
+updated: 2026-07-17
+status: complete
+note: Fixed pre-commit uv lock run. 19 tasks completed. 4 remaining items intentionally skipped (other repos deferred to their own changes).

@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-05-23
+updated: 2026-07-17
+status: complete
+note: Self-contained HTML slide deck (2.9MB) covering eFootball 2026 playing styles with real stats from pesdb.net, hi-res player portraits as data URIs, non-modal peek overlay with hover/touch/keyboard interactions, fully offline-compatible. 75/75 tasks complete. Validated with openspec validate --strict.

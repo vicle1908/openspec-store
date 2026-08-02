@@ -1,0 +1,52 @@
+## 1. Lock the v1.2 baseline and add failing v2 contract tests
+
+- [ ] 1.1 In `jira-skill/tests/fixtures/snapshots/`, preserve the current expected bundles as explicitly named v1.2 migration fixtures; add deserialization tests proving their `meta.version` remains `v1.2` and new `IssueSummary` fields receive backward-safe defaults.
+- [ ] 1.2 Add separate v2.0 golden outputs and focused model tests for `BundleVersion.current() == "v2.0"`, `RootCauseSignal.four_p_lens`, `secondary_categories`, `IssueSummary.four_p_lens`, and `IssueSummary.secondary_rca` without overwriting or relabeling the v1.2 fixtures.
+- [ ] 1.3 Replace the stale 65-case claim with an explicit v1.2-to-v2.0 mapping for the executable 45-case `TestRcaSurveyPrecision.SURVEY`; include all seven concrete categories, expected unclassified results, moved auth/network/silent-exit cases, multi-cause ordering, duplicate-pattern deduplication, the three-entry cap, empty input, and fixed confidence values.
+- [ ] 1.4 Add failing `SheetsWriter` tests for the exact 28-column schema, mapping-driven row materialization, positions 10/13/22–27, `" | "` secondary formatting, empty values, hyperlink column lookup, and a schema-derived Classification clear range resolving to `A1:AB1000` while Summary clearing remains unchanged.
+- [ ] 1.5 Confirm `jira-epic-report`, `jira-daily-reports`, and `webhook-receiver` still resolve editable `../jira-skill` sources in both `pyproject.toml` and `uv.lock`; record the sole current hardcoded v1 assertion in `webhook-receiver/tests/unit/test_analysis_adapter.py` and add explicit failing `BUNDLE_VERSION == "v2.0"` parity assertions in all three consumers.
+- [x] 1.6 Under `tdt-meta/config/codex/scripts/tests/`, add standard-library tests for all six description scalar forms, UTF-8 byte limits, the 800-byte warning, malformed frontmatter, root/nested placement, duplicate names, atomic failure, unchanged-write idempotence, three-index consistency, and matcher JSON-schema compatibility.
+
+## 2. Implement the v2.0 runtime contract in `jira-skill`
+
+- [ ] 2.1 Update `src/jira_skill/analysis/bundle.py` so `BundleVersion.current()` emits `v2.0` only after the v2 model is complete; add `IssueSummary.four_p_lens: str | None = None` and `IssueSummary.secondary_rca: list[str] = Field(default_factory=list)` without changing historical fixture versions.
+- [ ] 2.2 Update `src/jira_skill/analysis/signals.py` and `analysis/extractors/rca_patterns.py` so signal/catalog lenses share `Literal["People", "Procedures", "Policies", "Plant"]`, secondary-category documentation says ascending priority, and the seven concrete catalog entries use the exact v2 priority and lens mapping.
+- [ ] 2.3 Migrate v1.2 patterns explicitly: Silent Exit → Feature Not Working; Authentication and Network → 3rd Party; specific retained General UI patterns → UI Layout or Text/Font; unmatched content → the distinct `Other / Unclassified` sentinel. Preserve the existing QA-noise, issue-key, ticket, and lightweight SCM evidence boundaries.
+- [ ] 2.4 Update `src/jira_skill/analysis/rca.py` to remove `RCA_4P_BUCKET`, read the lens from the winning catalog entry, derive one priority map, deduplicate secondary matches by category, sort ascending, exclude the primary, cap at three, and keep the sentinel empty with `confidence=0.0`.
+- [ ] 2.5 Replace keyword-density and generic-code-hint confidence boosts with the fixed ladder: Crash `0.7`; UI/Wrong Data/Text/Feature `0.6`; 3rd Party `0.5`; Performance `0.4`; sentinel `0.0`. Keep only deduplicated, evidence-backed prevention additions from code hints and correct evidence wording that currently claims confidence was strengthened.
+- [ ] 2.6 Update `src/jira_skill/analysis/analyzer.py` so per-issue summaries mirror the primary RCA lens and bounded secondary list, and verify composite severity plus deterministic issue ordering against v2 score/rank fixtures.
+- [ ] 2.7 Update `src/jira_skill/analysis/sheets_writer.py` so `CLASSIFICATION_COLUMNS` has exactly 28 entries, each row is materialized from a column-keyed mapping, lens and secondary fields occupy positions 26–27, and the Classification clear range is derived from schema width through `AB`.
+- [ ] 2.8 Update `jira-skill` exports, fixtures, contract/RCA/analyzer/writer/impact/CLI tests, and inline version documentation; retain v1.0/v1.1/v1.2 deserialization coverage and bump emitted version assertions only for newly produced bundles.
+
+## 3. Verify and migrate the editable consumers
+
+- [ ] 3.1 In `jira-epic-report/tests/adapters/test_parity.py`, assert the shared `BUNDLE_VERSION == "v2.0"` and canonical analyzer delegation; run `uv run pytest tests/adapters/test_parity.py -q --no-cov`, then use the full suite for the repository-wide 80% coverage gate.
+- [ ] 3.2 In `jira-daily-reports/tests/adapters/test_parity.py`, assert `BUNDLE_VERSION == "v2.0"`, preserve daily-report policy behavior, and run `uv run pytest tests/adapters/test_parity.py -q`.
+- [ ] 3.3 In `webhook-receiver/tests/unit/test_analysis_adapter.py`, replace `startswith("v1.")` with the explicit supported v2 value; keep parity comparisons against the exported constant and run `uv run pytest tests/unit/test_analysis_adapter.py tests/adapters/test_parity.py -q`.
+- [ ] 3.4 Search all three consumers for removed RCA strings, bundle-version assumptions, and Classification positions; update only compatibility tests or documentation and do not add runtime guards where no external deserialization boundary exists.
+
+## 4. Replace skill-index generation and repair JTI metadata
+
+- [x] 4.1 Implement `tdt-meta/config/codex/scripts/build_skills_index.py` with `--check` and `--write`, direct-child discovery, stray/nested and duplicate-name rejection, the six supported scalar forms, decoded UTF-8 byte validation, deterministic rendering, semantic comparison, atomic replacement, and unchanged-write idempotence using only the standard library.
+- [x] 4.2 Make `build-skills-index.sh` invoke the Python entry point through `uv run --no-project python`; make `skill-validation-check.sh` delegate to `--check` while preserving its hook-facing JSON output and surfacing all validation errors and advisory warnings.
+- [ ] 4.3 Rewrite `.agents/skills/jira-ticket-intelligence/SKILL.md` with a routing-focused description below 1,024 bytes, nine signal families, one 28-column contract, Text/Font → Plant, the executable 45-case survey, current baseline-spec references, and only uv-backed executable permissions/examples.
+- [x] 4.4 Reconfirm no consumers reference `.agents/skills/_regenerate_index.py` or `config/codex/skills-index.json`; remove those files and the byte-identical root-level `.agents/skills/SKILL.md`, then update any documentation that presents them as active.
+- [x] 4.5 Run the new standard-library tests, run the builder in `--check` and `--write` modes, and verify an unchanged second write preserves file contents and mtimes.
+- [x] 4.6 Regenerate `.codex/skills-index.json`, `.agents/SKILLS_INDEX.md`, and `.agents/skills/SKILLS_INDEX.md`; verify all three contain the same 131 unique skills, the JTI description is normalized, no scalar marker is indexed as content, and both existing matcher scripts consume the unchanged JSON field schema.
+
+## 5. Align runtime documentation and all capability contracts
+
+- [ ] 5.1 Update `jira-skill/docs/bundle-contract.md` and `src/jira_skill/analysis/VERSIONING.md` with current v2.0 output, historical v1 deserialization, exact taxonomy/lens/confidence mapping, evidence boundaries, 28-column positions, and migration/rollback behavior.
+- [ ] 5.2 Remove active-looking links to archived changes from the JTI skill, point normative behavior to baseline `openspec/specs/` capabilities and runtime-owned constants, and remove the contradictory 24/26/28-column and 9/10-signal claims.
+- [ ] 5.3 Search baseline specs, active change artifacts, runtime docs, and the JTI skill for stale current-contract assertions (`v1.2`, removed categories, 24/26 columns, Module Source position 24, 65-case survey); retain only clearly labeled historical migration statements and keep all five finalized capability deltas coherent if implementation discoveries require a contract correction.
+
+## 6. Verify safety, quality, and rollout readiness
+
+- [ ] 6.1 In `jira-skill`, run `uv run pytest tests/analysis/ -q` plus affected impact/CLI suites and `tests/analysis/test_classify_filter_wrapper.py`, then verify `uv run jira-skill version` contains `Bundle version: v2.0`; treat the independently reported package/CLI version as a release concern.
+- [ ] 6.2 Run the full required suites in every changed consumer repo after the focused parity commands; acceptance SHALL require no live Jira, GitLab, or Google Sheets credentials.
+- [ ] 6.3 In `tdt-meta`, run `uv run --no-project python -m unittest discover -s config/codex/scripts/tests`, the canonical index `--check`, both matcher smoke tests, and a second unchanged `--write` idempotence check.
+- [ ] 6.4 In each changed Python repo, run `uv run ruff check . --fix`, `uv run ruff format .`, and the repository's strict `uv run mypy` command; review formatter changes before proceeding and never use direct `python`, `pytest`, `ruff`, `mypy`, or `pip` commands.
+- [ ] 6.5 Require `openspec validate --strict align-jti-skill-runtime-contract` to pass; run `openspec validate --all --strict --no-interactive --json`, compare its failures with the recorded 75 unrelated pre-existing baseline-spec failures, and introduce no new failure. Confirm every proposal capability still has one delta directory and no finalized JTI delta contains contradictory current-version/category/column requirements.
+- [ ] 6.6 From each changed repository, run GitNexus compare-scope change detection against `main` (`jira-skill`, each modified consumer, and `OpenSpec` for `tdt-meta`) and confirm only expected symbols, files, and execution flows are affected.
+- [ ] 6.7 Review `git status --short` separately in `tdt-meta`, `jira-skill`, `jira-epic-report`, `jira-daily-reports`, and `webhook-receiver`; preserve unrelated pre-existing edits, including other active OpenSpec changes and `webhook-receiver/AGENTS.md`.
+- [ ] 6.8 Record coordinated release and rollback notes: deploy the v2 runtime and editable consumers together, require explicit review if a non-editable v1 consumer is discovered, and roll back the runtime, fixtures, docs, and generated indexes as one set.
