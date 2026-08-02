@@ -34,10 +34,10 @@
 
 ## 4. Final Verification
 
-- [ ] 4.1 `openspec doctor` — no issues
-- [ ] 4.2 `openspec validate --store openspec-store --all --strict` — all pass
-- [ ] 4.3 From each wired repo: `openspec list` shows store changes
-- [ ] 4.4 From each wired repo: `openspec status --change <name> --json` — correct root.source
-- [ ] 4.5 `docs/governance/` contains all relocated files
-- [ ] 4.6 `ai-harness-skills/openspec/schemas/harness-13/` unchanged
+- [x] 4.1 `openspec doctor` — no issues
+- [x] 4.2 `openspec validate --store openspec-store --all --strict` — all pass (349/349)
+- [x] 4.3 From each wired repo: `openspec list` shows store changes
+- [x] 4.4 From each wired repo: `openspec status --change <name> --json` — source: "declared"
+- [x] 4.5 `docs/governance/` contains all relocated files
+- [x] 4.6 `ai-harness-skills/openspec/schemas/harness-13/` unchanged
 - [ ] 4.7 Git commit: `complete: multi-repo store pointers, remote, file relocation`
