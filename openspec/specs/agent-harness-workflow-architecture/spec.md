@@ -1,4 +1,4 @@
-# harness-workflow-architecture Specification
+# agent-harness-workflow-architecture Specification
 
 ## Purpose
 Defines the complete 12-stage workflow architecture for processing tickets end-to-end in large-scale SaaS microservices.

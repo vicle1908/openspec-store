@@ -1,6 +1,8 @@
+# Agent Docs Sync Parallel Multi-Repo Specification
+
 ## Purpose
 
-This specification defines requirements for Docs Sync Parallel Multi Repo.
+Define parallel multi-repository documentation sync: concurrent execution across configured TDT repositories with bounded parallelism, isolated state, and aggregated reporting.
 
 ## Requirements
 

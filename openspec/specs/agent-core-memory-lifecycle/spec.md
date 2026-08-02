@@ -1,6 +1,6 @@
 ## Purpose
 
-This specification defines requirements for Agent Core Memory Lifecycle.
+Define the memory lifecycle contract: initialization, eviction policies, persistence boundaries, and cleanup semantics across context buffer, scratch, and long-term memory layers.
 
 ## Requirements
 

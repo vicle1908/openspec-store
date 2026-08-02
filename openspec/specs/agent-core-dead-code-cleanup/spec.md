@@ -1,6 +1,6 @@
 ## Purpose
 
-This specification defines requirements for Agent Core Dead Code Cleanup.
+Define dead code detection and removal across agent-core modules: unused imports, unreachable branches, stale type aliases, and deprecated function paths that increase maintenance burden without behavioral value.
 
 ## Requirements
 

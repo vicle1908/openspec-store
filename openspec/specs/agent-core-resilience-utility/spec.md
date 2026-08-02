@@ -1,6 +1,6 @@
 ## Purpose
 
-This specification defines requirements for Agent Core Resilience Utility.
+Define resilience primitives for agent-core: circuit breaker state machine, retry with exponential backoff, bulkhead isolation, and timeout enforcement — usable as decorators and programmatic APIs.
 
 ## Requirements
 

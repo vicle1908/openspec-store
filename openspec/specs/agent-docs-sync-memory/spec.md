@@ -1,6 +1,8 @@
+# Agent Docs Sync Memory Specification
+
 ## Purpose
 
-This specification defines requirements for Docs Sync Memory.
+Define the memory layer for docs-sync: structured sync state persistence, change tracking, and cross-run context via agent-core Memory (scratch + long-term layers).
 
 ## Requirements
 

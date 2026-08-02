@@ -1,6 +1,6 @@
 ## Purpose
 
-This specification defines requirements for Agent Core Budget Enforcement.
+Define USD cost ceiling enforcement for LLM gateway calls via pydantic-ai model request hooks, including BudgetTracker lifecycle, cost estimation from tokens, and GatewayError propagation on budget exhaustion.
 
 ## Requirements
 

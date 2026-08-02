@@ -1,6 +1,6 @@
 ## Purpose
 
-This specification defines requirements for Agent Core Tool Resilience.
+Define tool-level resilience patterns: retry policies for flaky tools, circuit breaker integration for tool registries, timeout enforcement per tool call, and degraded-mode fallbacks when tools are unavailable.
 
 ## Requirements
 

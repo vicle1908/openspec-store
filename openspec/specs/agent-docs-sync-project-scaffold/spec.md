@@ -1,6 +1,6 @@
 ## Purpose
 
-This specification defines requirements for Agent Docs Sync Project Scaffold.
+Define the project scaffold capability for docs-sync: initial documentation structure creation, template-based doc generation, and repository-specific documentation layout conventions.
 
 ## Requirements
 
