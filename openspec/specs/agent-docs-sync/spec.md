@@ -1,3 +1,5 @@
+# agent-docs-sync Specification
+
 ## Purpose
 
 Define the supported deterministic documentation discovery, audit, generation,
