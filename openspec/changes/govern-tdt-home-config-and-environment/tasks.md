@@ -3,8 +3,9 @@
 Each task is provider-owned, limited to one focused work session, and includes a verification gate. Keep every task unchecked until the implementation and its named evidence pass on the canonical `tdt-core-home-security-kernel` worktree.
 
 Evidence is recorded in `tdt-core/PROVIDER_EVIDENCE.md`. The implementation
-candidate is `6fe4712`; canonical evidence hardening is integrated at `518ac81`
-and the final release-hash record at `1e212d2`. Runtime mutation of the real
+lineage begins at `6fe4712`; canonical evidence hardening is integrated at
+`518ac81`, the release-hash record at `1e212d2`, and the final candidate
+evidence alignment at `ce4a355`. Runtime mutation of the real
 `~/.tdt` root and downstream consumer adoption remain explicitly deferred.
 
 ## 1. Baseline and traceability
