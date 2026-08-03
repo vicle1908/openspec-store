@@ -1,76 +1,65 @@
-# Govern TDT_HOME Config and Environment
+# Govern TDT_HOME Provider Foundations
 
 ## Why
 
-The agent ecosystem has a canonical `TDT_HOME` resolver, but configuration, secrets, state, logs, and credentials are still resolved and protected inconsistently across consumers.
-
-The live `~/.tdt` audit found:
-
-- `tdt-core` provides `tdt_root()`, `.env` loading, state helpers, and scheduler config loading.
-- At least 18 source paths across `agent-core`, `agent-docs-sync`, `agent-harness`, `tdt-observability`, and `tdt-sheets` construct `~/.tdt` independently; several therefore ignore `TDT_HOME` or snapshot it at import time.
-- Both `config.toml` and `config.yaml` contain scheduler configuration, creating ambiguous ownership and precedence.
-- Scheduler database DSNs are present in general config files that are mode `0644`; the `~/.tdt` root is mode `0755`.
-- `~/.tdt/google-service-account.json` is a broken symlink, while a second credential file exists with mode `0600`.
-- Runtime material (logs, DuckDB/SQLite databases, PIDs, schedules, scripts, backups, and state) shares one root without a machine-checkable layout or permission audit.
+The TDT ecosystem has one intended `TDT_HOME` root but multiple consumers still resolve paths, environment files, configuration, and credentials with incompatible rules; this change establishes the secure provider contract before any downstream or live migration is attempted.
 
 ## What Changes
 
-- Expand the existing `tdt-env-loader-tdt-home` capability into the complete canonical `TDT_HOME` contract.
-- Make `tdt-core` the provider of dynamically evaluated paths for config, credentials, schedules, logs, state, and per-application runtime files.
-- Define explicit precedence profiles: unset or `development` keeps repo-local `.env` above process environment for backward compatibility; explicit `production` disables repo-local loading so process environment wins over `$TDT_HOME/.env`, typed non-secret config, and defaults.
-- Separate secrets from non-secret config. General YAML/TOML files may contain secret references or environment variable names, never secret values.
-- Add a `tdt` console entrypoint owned by the base `tdt-core` package, with a redacting `tdt config doctor` audit for runtime layout, duplicate keys, broken links, and effective access.
-- Add a separate workspace-bound `tdt config source-audit --workspace-root <path>` for repository conformance; runtime doctor remains usable from an installed wheel without sibling checkouts.
-- Migrate consumers provider-first, with isolated worktrees and focused tests in each repository.
-- Build `tdt-core` 0.3.x as the first version containing the provider contract, verify every consumer from a local isolated wheelhouse, and publish to Nexus only when DNS, credentials, and release authority are independently available.
-- Raise `tdt-observability` from Python 3.12+ to Python 3.14.x rather than adding a second path provider; treat this as an explicit compatibility break with release notes and rollback evidence.
-- Repair the live `~/.tdt` layout only after backup, dry-run, and successful compatibility checks.
-- Replace the draft's guessed path map and caller-asserted quiescence with consumer-owned, versioned deployment manifests. `tdt-core` validates and compiles those manifests into one canonical, digest-bound migration plan; apply accepts only that plan and fresh adapter-produced writer/principal evidence.
-- Implement filesystem mutation as a small descriptor-relative security kernel. The validated root is opened once, every descendant component is walked with `dir_fd` plus no-follow semantics, and creation/replacement/recovery never falls back to pathname-based `shutil` operations.
-- Treat the first failed implementation/review cycles as design evidence: provider packaging is blocked until journal tampering, rollback durability, credential access, mandatory manifest loading, governed scheduler config, and source-audit precision all have executable RED/GREEN tests and independent approval.
+- Make `tdt-core` the provider for call-time `TDT_HOME` resolution and bounded runtime path helpers.
+- Preserve development compatibility while adding an explicit production environment profile that cannot be selected by a dotenv file.
+- Govern typed non-secret configuration and require full-scalar environment references for secret-shaped settings.
+- Add fail-closed private filesystem primitives for provider-owned directory and file operations.
+- Add a redacting `tdt config doctor` command that works from an installed provider package and does not require sibling repositories.
+- Validate mandatory packaged provider registry/schema data before provider behavior is considered usable.
+- Verify the provider from a clean local wheelhouse, without an editable checkout or `PYTHONPATH` dependency.
+- Keep all live filesystem mutation, downstream migration, deployment rollout, and consumer-owned facts outside this change.
 
-## Modified Capabilities
+## Capabilities
 
-- `tdt-env-loader-tdt-home` — canonical resolution, precedence, layout, secret handling, diagnostics, and cross-repository adoption.
+### New Capabilities
 
-## New Capabilities
+- None. This change extends the existing `tdt-env-loader-tdt-home` capability.
 
-None. This change extends the existing capability that already owns `TDT_HOME` and environment loading.
+### Modified Capabilities
+
+- `tdt-env-loader-tdt-home`: make root selection, environment precedence, bounded paths, private provider operations, diagnostics, and provider packaging behavior explicit and testable.
 
 ## Ownership Boundaries
 
-- `tdt-core`: path/config API, precedence, diagnostics, descriptor-relative filesystem kernel, typed plan compiler/executor, source-audit engine, and contract tests. It owns schemas and validation, not consumer deployment facts.
-- Source-migration owners: `agent-core`, `agent-docs-sync`, `agent-harness`, `browser-cli`, `code-daily-scan`, `jira-daily-reports`, `jira-kanban-from-spreadsheet`, `jira-skill`, `tdt-observability`, `tdt-sheets`, and `webhook-receiver` replace executable private path construction with the provider API or an approved compatibility adapter.
-- Verification-only or classification consumers: `ai-review` and `jira-epic-report` are inventoried and smoke-tested; any executable bypass found by the AST audit promotes that repository to a source-migration owner.
-- `ai-harness-skills`: retain standalone runtime isolation while using the same root-resolution contract; it must not share agent-core or agent-harness state directories.
-- `~/.tdt`: operator-owned runtime surface; never committed to a repository.
-- `openspec-store`: normative capability and implementation plan only.
-- Each source-migration owner: a versioned manifest of its concrete legacy/canonical paths, reader/writer principals, launch mechanism, quiescence adapter, and value-free smoke probes. Placeholder or wildcard path-map rows are forbidden.
+- `tdt-core` owns provider APIs, environment/config behavior, the descriptor-relative security kernel, provider schemas, packaged registry validation, diagnostics, and provider release verification.
+- Consumer repositories own their executable legacy paths, dependency floors, deployment writers, reader/writer principals, launch mechanisms, compatibility adapters, and consumer verification evidence.
+- `openspec-store` owns the normative planning artifacts only; it does not own application code or operator runtime files.
+- `~/.tdt` remains operator-owned and is not modified by this change.
+- The existing `tdt-core-home-security-kernel` worktree is the implementation candidate. The staged `tdt-core-home-control-plane` worktree is retained as superseded review evidence and is not merged automatically.
 
-## Compatibility and Rollout
+## Explicit Non-Goals
 
-The default remains `~/.tdt`. Existing filenames remain readable during one compatibility window. `tdt-core` 0.3.x is built first with the security kernel, schemas, diagnostics, and synthetic plan executor; consumer source migration begins only after its wheel passes an isolated local-wheelhouse install with no sibling checkout. Consumers then contribute concrete manifests, after which a complete plan is compiled and exercised twice. Nexus publication at `nexus.tdt.internal` is a separate conditional release gate because this host currently lacks DNS resolution and credentials. In-workspace editable sources remain a development convenience, but release verification temporarily excludes them. `tdt-observability` moves to Python `>=3.14,<3.15`. Live migration is plan/attest/quiesce/journal/copy/verify/switch/recover, not a destructive move.
+- Migrating consumer source paths or changing consumer dependency metadata.
+- Compiling or applying a cross-repository migration plan.
+- Implementing live migration, deployment restart, rollback of deployed consumers, or operator cutover.
+- Changing `tdt-observability` Python compatibility or other repository-specific configuration schemas.
+- Publishing to Nexus or changing provider credentials.
+- Repairing permissions, links, configuration, credentials, logs, databases, schedules, or state under the live `~/.tdt` root.
+- Replacing `/opsx:verify` or introducing a new OpenSpec workflow schema.
+
+## Deferred Successor Changes
+
+The following work is intentionally deferred and SHALL receive separate owned changes:
+
+1. `govern-tdt-home-source-conformance` — consumer/deployment manifests, source audit, and repository-owned exceptions.
+2. `build-tdt-home-synthetic-migration-engine` — typed plans, attestations, journaled apply/recovery, and synthetic interruption testing.
+3. One provider-gated adoption change per consumer repository — source migration, metadata, deployment ownership, and consumer tests.
+4. `release-and-roll-out-tdt-home-provider` — provider-first deployment and reverse rollback rehearsal.
+5. `cut-over-live-tdt-home` — separately approved operator plan for the real `~/.tdt` tree.
+
+## Impact
+
+- Primary implementation repository: `tdt-core` (Python 3.14, `uv`, pytest, Ruff, strict mypy).
+- Primary provider surfaces: `src/tdt_core/paths.py`, `env.py`, `config.py`, CLI/diagnostics, provider schemas, packaged registry data, and focused tests.
+- Current provider release remains `0.2.x` until all provider gates pass; the change does not authorize a version bump by itself.
+- Verification must include focused tests, full provider gates, strict OpenSpec validation, and a clean wheelhouse installation.
 
 ## Rollback
 
-Restore consumer imports and dependency metadata/locks before rolling back `tdt-core`. The verified 0.3.x provider artifact and its helpers remain available as compatibility exports; they are not removed during routine rollback. Reinstall pre-change consumer wheels in a clean environment to prove rollback. Restore the journaled permission/config generation if live doctor or smoke checks fail; do not delete legacy files during this change.
-
-## Non-Goals
-
-- Redesign Jira, report, mobile scan, or application-specific configuration schemas.
-- Introduce Vault, a cloud secrets manager, or automated credential rotation.
-- Rotate credentials solely because their storage location changes.
-- Move logs or databases out of `TDT_HOME`.
-- Merge the standalone `ai-harness-skills` runtime with the agent ecosystem.
-- Change model/provider configuration unrelated to `TDT_HOME`.
-
-## Evidence and References
-
-- Existing implementation: `tdt_core.paths`, `tdt_core.env`, `tdt_core.config`, and scheduler settings.
-- Existing capability: `openspec/specs/tdt-env-loader-tdt-home/spec.md`.
-- [The Twelve-Factor App: Config](https://12factor.net/config) — deploy-varying configuration belongs outside code and should be orthogonal.
-- [python-dotenv](https://bbc2.github.io/python-dotenv/) — documents `override` precedence and parsing behavior.
-- [OWASP Secrets Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html) — standardization, least privilege, auditing, and lifecycle controls.
-- [Python 3.14 `os` documentation](https://docs.python.org/3.14/library/os.html) — documents `dir_fd`, `follow_symlinks`, descriptor-capability sets, `fsync`, and filesystem operations used by the security kernel.
-- [Python 3.14 `importlib.resources` documentation](https://docs.python.org/3.14/library/importlib.resources.html) — package resources are not guaranteed to be physical files and must be consumed through the resource API.
-- macOS `open(2)`/`rename(2)` manuals on the implementation host — define `openat`, `O_NOFOLLOW`, `O_DIRECTORY`, descriptor-relative rename, and per-path rename guarantees; Python-exposed primitives are measured by executable platform-capability tests rather than assumed from OS constants.
+Provider implementation can be rolled back by restoring the pre-change `tdt-core` artifact and metadata in the provider worktree. Because this change does not alter consumers or live `~/.tdt`, rollback does not require deleting or rewriting operator data. Any consumer or live migration rollback belongs to its successor change.
