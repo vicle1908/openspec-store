@@ -13,31 +13,30 @@ grows.
 Priority 1 — Correctness (P1):
 1. Fix `test_secret_scanning_policy.py` failures across all 3 repos by adding
    `.github/workflows/ci.yml` with gitleaks configuration matching test
-   assertions (Docker-based step, not GitHub Action)
+   assertions. Pre-scan with gitleaks to identify and resolve false-positive
+   findings (e.g., GitNexus metadata) via `.gitleaksignore` before enabling
+   the blocking workflow.
 2. Fix the stale docstring in `agent_harness/lifecycle_auth.py` which claims
    "not wired into the public runner yet" — it IS wired into
    `workflow/runner.py`, `workflow/graph.py`, and `cli.py`
 
 Priority 2 — Coverage (P2):
 3. Expand `llm_gateway` tests: add `BifrostGateway` and `ResilientGateway`
-   contract tests focusing on actual behavior (model resolution, fallback
-   delegation, availability checks)
+   contract tests focusing on actual observable behavior (model resolution,
+   availability checks, forced-state fallback). ResilientGateway's
+   `record_failure()` must be used to force breaker open (not private state
+   mutation) since the wrapper never naturally transitions the breaker.
 4. Expand `foundation` tests: add edge-case coverage for migration error
    paths, connection handling, and pool lifecycle
 
 Priority 3 — Architecture (P3):
-5. Expand `cli` tests: add edge-case coverage for error handling, URL
-   inputs, and output modes (basic review/propose/explore already have tests)
+5. Expand `cli` tests: add edge-case coverage for agent failure, JSON output,
+   and gateway error propagation (basic review/propose/explore already have tests)
 6. Reduce `agent-docs-sync` coupling: re-export all 7 required symbols through
    `agent_core.sdk` facade so docs-sync imports only from the public SDK
    surface (4 non-SDK import statements → 0)
 
 ## Capabilities
-
-### New Capabilities
-
-- CI secret scanning policy (gitleaks) — blocks PRs on secret detection
-- SDK lifecycle identity exports (7 new symbols)
 
 ### Modified Capabilities
 

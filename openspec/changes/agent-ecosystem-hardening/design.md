@@ -34,6 +34,12 @@ jobs:
           args: git --redact=100 --no-banner --verbose .
 ```
 
+**Pre-workflow validation:** Before enabling the blocking workflow, run
+gitleaks in `git` mode against each repo to identify any false-positive
+findings (e.g., from tracked metadata files). Resolve through exact-fingerprint
+`.gitleaksignore` entries per the existing exception policy in the quality-gate
+spec. Also validate the workflow YAML with `actionlint`.
+
 docs-sync has 2 failing tests (not 1): `test_ci_scans_full_history_with_redaction`
 AND `test_rollback_allows_only_a_synthetic_exact_fingerprint` both read the
 workflow file.
@@ -62,14 +68,17 @@ Current state: 559 LOC src, 153 LOC tests, ratio 0.27. Actual coverage: 76%.
 - `ResilientGateway`: class in resilient.py. Wraps any `LLMGateway` with
   `CircuitBreaker` per provider (opens after 5 failures, recovers after 30s)
   and `FallbackChain` for failover. Public API is `get_model()`, `is_available()`.
+  **Important:** The wrapper never calls `record_failure()` or `record_success()`,
+  so gateway operations cannot naturally cause breaker transitions. Tests must
+  use forced-state setup (5 `record_failure()` calls) to test fallback behavior.
 
 **What to test:**
 - BifrostGateway: `get_model()` returns a valid model instance, `from_env()`
   reads env vars correctly, error handling for missing config
 - ResilientGateway: `get_model()` delegates to inner gateway, `is_available()`
-  reflects breaker state, fallback chain delegation when primary is unavailable,
-  circuit breaker state transitions (closed → open → half_open)
-- Factory edge cases: unknown provider raises error, missing config fields
+  reflects breaker state, fallback to `fallbacks[0]` when breaker is open
+  (forced via `record_failure()` x5), breaker recovery after timeout
+- Factory edge cases: missing config fields
 
 **Do NOT test retry/timeout as if they exist in ResilientGateway** — the
 retry/timeout behavior lives in `agent_core.resilience` module, not in
@@ -102,10 +111,9 @@ Current state: 974 LOC src, 408 LOC tests, ratio 0.42. Actual coverage: 78%.
 - `test_explore_uses_agent_prompt` ✓
 
 **What to add (edge cases only):**
-- Error handling: invalid target path, network failure, agent timeout
-- Output modes: JSON output, verbose mode
-- URL-based review targets
-- Exit code behavior on failure
+- Agent failure: mock `_run_agent_prompt` to raise, verify error propagation
+- Gateway error: mock gateway failure, verify CLI reports error
+- JSON output mode (already exists for `init`, verify for `review`/`propose`)
 
 ## P3 — Architecture
 

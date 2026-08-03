@@ -1,11 +1,16 @@
 ## 1. P1 — Fix Secret Scanning Test Failures
 
-- [ ] 1.1 Create `.github/workflows/ci.yml` in agent-core with Docker-based gitleaks step matching test assertions (`docker://ghcr.io/gitleaks/gitleaks:v8.30.1`, `fetch-depth: 0`, `git --redact=100 --no-banner --verbose .`)
+- [ ] 1.1 Pre-scan: run `gitleaks detect --source . --log-opts="--all"` in each repo to identify any findings. For any deterministic false positives (e.g., metadata files), add exact-fingerprint entries to `.gitleaksignore` per the quality-gate exception policy.
+  - Verify: `gitleaks detect --source . --log-opts="--all" --no-banner` returns 0 findings in each repo
+- [ ] 1.2 Create `.github/workflows/ci.yml` in agent-core with Docker-based gitleaks step matching test assertions (`docker://ghcr.io/gitleaks/gitleaks:v8.30.1`, `fetch-depth: 0`, `git --redact=100 --no-banner --verbose .`)
   - Verify: `uv run pytest tests/test_secret_scanning_policy.py -v` passes (1 test was failing)
-- [ ] 1.2 Create `.github/workflows/ci.yml` in agent-docs-sync (same workflow)
+  - Verify: `actionlint .github/workflows/ci.yml` exits 0
+- [ ] 1.3 Create `.github/workflows/ci.yml` in agent-docs-sync (same workflow)
   - Verify: `uv run pytest tests/test_secret_scanning_policy.py -v` passes (2 tests were failing — both `test_ci_scans_full_history_with_redaction` and `test_rollback_allows_only_a_synthetic_exact_fingerprint`)
-- [ ] 1.3 Create `.github/workflows/ci.yml` in agent-harness (same workflow)
+  - Verify: `actionlint .github/workflows/ci.yml` exits 0
+- [ ] 1.4 Create `.github/workflows/ci.yml` in agent-harness (same workflow)
   - Verify: `uv run pytest tests/test_secret_scanning_policy.py -v` passes (1 test was failing)
+  - Verify: `actionlint .github/workflows/ci.yml` exits 0
 
 ## 2. P1 — Fix Harness lifecycle_auth Docstring
 
@@ -17,12 +22,12 @@
 
 - [ ] 3.1 Add BifrostGateway tests: `get_model()` returns valid model, `from_env()` reads env vars, error on missing BIFROST_URL
   - Verify: `uv run pytest tests/llm_gateway/ -v` includes new BifrostGateway tests
-- [ ] 3.2 Add ResilientGateway tests scoped to actual observable behavior:
-  - `get_model()` delegates to inner gateway
+- [ ] 3.2 Add ResilientGateway tests — use forced breaker state via `record_failure()` (NOT `_breaker._state` mutation which doesn't work because `_opened_at` stays 0):
+  - `get_model()` delegates to inner gateway (mock inner, verify delegation)
   - `is_available()` returns True when breaker is closed AND inner reports available
   - `is_available()` returns False when inner reports unavailable (breaker still closed)
-  - Fallback consultation when breaker is in open state (use `_breaker._state = 'open'` to force state for testing)
-  - Note: the wrapper never calls `record_failure()` so natural closed→open transitions via gateway calls are NOT observable — do not test these
+  - **Fallback test**: create ResilientGateway with `inner` (mock, always unavailable) + `fallbacks=[mock_fallback]`. Call `_breaker.record_failure()` 5 times to force breaker open. Then verify `is_available()` checks `fallbacks[0]`.
+  - **Note**: the wrapper only checks `fallbacks[0]`, NOT the `FallbackChain`. The chain is constructed but never executed.
   - Verify: `uv run pytest tests/llm_gateway/ -v` includes new ResilientGateway tests
 - [ ] 3.3 Add factory edge cases: missing config fields
   - Note: unknown provider is already tested in `test_factory.py::test_factory_create_unknown_provider`
@@ -46,7 +51,7 @@ Note: Basic review/propose/explore command tests already exist (verified). This 
 - [ ] 5.1 Add review error cases: agent failure (mock `_run_agent_prompt` to raise), gateway error propagation
   - Note: nonexistent paths are NOT errors — `_build_prompt_for_review()` treats them as generic URL/MR/path targets
   - Verify: `uv run pytest tests/cli/test_cli.py -v` includes new error-case tests
-- [ ] 5.2 Add propose/explore edge cases: empty input, malformed args, JSON output mode
+- [ ] 5.2 Add propose/explore edge cases: empty input, malformed args
   - Verify: `uv run pytest tests/cli/test_cli.py -v` includes new edge-case tests
 - [ ] 5.3 Verify coverage improved: `uv run pytest tests/cli/ --cov=src/agent_core/cli --cov-fail-under=80 --cov-report=term-missing`
 
