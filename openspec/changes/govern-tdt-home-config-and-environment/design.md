@@ -45,11 +45,11 @@ Effective precedence for development compatibility:
 4. typed non-secret app config under `$TDT_HOME`
 5. code defaults
 
-Production-safe mode disables repo-local `.env`; process environment then wins. The mode is selected explicitly (`TDT_ENV_PROFILE=development|production`) rather than inferred from a directory name. Unknown profiles fail closed.
+An unset profile defaults to `development` so existing callers retain the current repo-local `.env` override without configuration changes. Explicit production-safe mode disables repo-local `.env`; process environment then wins. A set mode uses `TDT_ENV_PROFILE=development|production` rather than being inferred from a directory name. Unknown non-empty profiles fail closed.
 
 `load_tdt_env()` remains idempotent by default, but a test-only reset/context API supports isolated verification without mutating module internals. Diagnostics report source names and overridden key names, never values.
 
-Why: this preserves the currently specified local override while preventing an accidental checkout-local override in production. It follows python-dotenv's documented distinction between `override=False` and `override=True`.
+Why: the unset default preserves the currently specified local override for all existing callers, while an explicit production profile prevents accidental checkout-local overrides. It follows python-dotenv's documented distinction between `override=False` and `override=True`.
 
 ## Decision 3: Config Ownership and Secret References
 

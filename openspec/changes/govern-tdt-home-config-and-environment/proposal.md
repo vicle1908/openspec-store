@@ -17,7 +17,7 @@ The live `~/.tdt` audit found:
 
 - Expand the existing `tdt-env-loader-tdt-home` capability into the complete canonical `TDT_HOME` contract.
 - Make `tdt-core` the provider of dynamically evaluated paths for config, credentials, schedules, logs, state, and per-application runtime files.
-- Define explicit precedence profiles: development keeps repo-local `.env` above process environment for compatibility; production disables repo-local loading so process environment wins over `$TDT_HOME/.env`, typed non-secret config, and defaults.
+- Define explicit precedence profiles: unset or `development` keeps repo-local `.env` above process environment for backward compatibility; explicit `production` disables repo-local loading so process environment wins over `$TDT_HOME/.env`, typed non-secret config, and defaults.
 - Separate secrets from non-secret config. General YAML/TOML files may contain secret references or environment variable names, never secret values.
 - Add a redacting `tdt config doctor` audit for runtime layout, duplicate keys, broken links, and permissions.
 - Add a separate workspace-bound `tdt config source-audit --workspace-root <path>` for repository conformance; runtime doctor remains usable from an installed wheel without sibling checkouts.

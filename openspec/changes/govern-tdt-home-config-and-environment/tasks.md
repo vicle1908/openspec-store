@@ -10,7 +10,7 @@
 ## 2. tdt-core provider contract (RED)
 
 - [ ] 2.1 Add failing tests that preserve every baseline behavior exactly: selected `.env` is read through python-dotenv for set/unset/empty/tilde roots, absent optional files do not raise, and no import-time root snapshot is used.
-- [ ] 2.2 Add failing tests for development and production precedence profiles, unknown-profile rejection, idempotency, and isolated test reset.
+- [ ] 2.2 Add failing tests proving an unset profile defaults to existing development precedence, explicit development and production precedence differ as specified, unknown non-empty profiles fail, and idempotency/test isolation remain intact.
 - [ ] 2.3 Add failing tests for typed path helpers, path containment, private creation modes, and concurrent directory creation.
 - [ ] 2.4 Add failing doctor tests for duplicate logical settings, literal secrets, permission drift, broken/escaping symlinks, malformed files, and foreign ownership.
 - [ ] 2.5 Seed canary secrets and assert they never occur in outputs produced by the governed loader, config parser, doctor, source audit, or migration: stdout, stderr, JSON, their logs, their exceptions, and their manifests.
@@ -19,11 +19,11 @@
 ## 3. tdt-core implementation (GREEN)
 
 - [ ] 3.1 Implement dynamic config, credentials, schedules, logs, state, and runtime path helpers backed only by `tdt_root()`.
-- [ ] 3.2 Implement explicit environment profiles and source-provenance reporting while preserving all six existing loader scenarios.
+- [ ] 3.2 Implement backward-compatible unset-profile behavior, explicit environment profiles, and source-provenance reporting while preserving all six existing loader scenarios.
 - [ ] 3.3 Implement typed shared-config loading, environment-reference resolution, duplicate ownership detection, and redacted validation errors.
 - [ ] 3.4 Implement workspace-independent `tdt config doctor` text/JSON/strict modes and separate `tdt config source-audit --workspace-root` modes with a versioned cross-repo conformance manifest.
 - [ ] 3.5 Implement `tdt config migrate --dry-run|--apply|--rollback` with locking, backup manifest, temporary files, fsync, atomic replace, and no source deletion.
-- [ ] 3.6 Document the canonical layout, precedence, secret-reference syntax, profile selection, doctor reason codes, migration, and rollback.
+- [ ] 3.6 Document the canonical layout, unset-profile development default, explicit precedence profiles, secret-reference syntax, doctor reason codes, migration, and rollback.
 - [ ] 3.7 Verify `tdt-core` with `uv run pytest`, `uv run ruff check src tests`, `uv run ruff format --check src tests`, and `uv run mypy src/tdt_core --strict`.
 - [ ] 3.8 Bump `tdt-core` to `0.3.0`, build wheel/sdist, inspect metadata, publish to the configured internal distribution channel, and install by version into a clean environment with no sibling source path; if no channel or release authority exists, stop before consumer migration.
 

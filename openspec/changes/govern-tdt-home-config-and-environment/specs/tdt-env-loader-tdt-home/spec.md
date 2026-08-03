@@ -48,7 +48,18 @@ The canonical root resolver SHALL apply user expansion to a non-empty `TDT_HOME`
 
 ### Requirement: Local `.env` override behaviour is preserved
 
-Development profile SHALL preserve the existing repo-local `.env` override. Production profile SHALL disable repo-local `.env` loading. Profile selection SHALL be explicit, and unknown values SHALL fail closed.
+An unset environment profile SHALL default to development behavior and preserve the existing repo-local `.env` override. Explicit development profile SHALL behave identically. Explicit production profile SHALL disable repo-local `.env` loading. Unknown non-empty profile values SHALL fail closed.
+
+#### Scenario: Environment profile is unset
+
+- **GIVEN** `TDT_ENV_PROFILE` is unset or empty
+- **AND** `$TDT_HOME/.env` exists
+- **AND** the current repository contains `.env`
+- **WHEN** `load_tdt_env()` is called
+- **THEN** it SHALL use development behavior without requiring new caller configuration
+- **AND** `$TDT_HOME/.env` SHALL be loaded without overriding values already in the process environment
+- **AND** the repo-local file SHALL be loaded with python-dotenv `override=True`
+- **AND** repo-local values SHALL therefore override process and `$TDT_HOME/.env` values exactly as before this change
 
 #### Scenario: Local .env exists
 
