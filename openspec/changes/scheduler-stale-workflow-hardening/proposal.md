@@ -77,10 +77,9 @@ override the default.
 ### 3. Register `_stale_workflow_cleaner` scheduled workflow
 A new `@_ENGINE.scheduled_workflow(cron="*/30 * * * *",
 cron_timezone="UTC", name="stale_workflow_cleaner")` will be added in
-`agent-core/src/agent_core/scheduler_setup.py`, calling the existing
-internal `_cancel_stale_error_workflows` and
-`_cancel_stale_enqueued_workflows` helpers from
-`tdt_core.scheduler.cli`. The schedule is registered alongside
+`agent-core/src/agent_core/scheduler_setup.py`, calling the public
+`cancel_stale_error_workflows` and `cancel_stale_enqueued_workflows` helpers
+from `tdt_core.scheduler.cli`. The schedule is registered alongside
 `daily_android_scan` / `daily_ios_scan` in the same module. To make the
 helpers accessible across the package boundary, they are renamed from
 the underscore-prefixed private form to a public module-level function
@@ -88,6 +87,11 @@ the underscore-prefixed private form to a public module-level function
 in `tdt-core/src/tdt_core/scheduler/cli.py`. The CLI subcommands
 (`tdt-scheduler cancel-stale-errors`, `cancel-orphan-enqueued`) continue
 to work via thin wrappers that call the now-public functions.
+
+The cleaner resolves the current application version once for the error
+cleanup call. The enqueued cleanup helper retains ownership of its own current
+version lookup against the shared system database, keeping the public helper
+signature compatible with existing startup and CLI callers.
 
 A YAML schedule manifest entry is **NOT** added — `agent-core` registers
 scheduled workflows via the `@_ENGINE.scheduled_workflow` decorator per

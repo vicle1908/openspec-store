@@ -26,10 +26,12 @@ unprocessed ticks are not back-filled.
 
 - **WHEN** the `_stale_workflow_cleaner` workflow is invoked by DBOS
 - **THEN** it SHALL call `cancel_stale_error_workflows(engine,
-  current_version=<current>)` AND
-  `cancel_stale_enqueued_workflows(engine, current_version=<current>)`
-  exactly once each, passing the engine instance and current application
-  version
+  current_version=<current>)` exactly once and
+  `cancel_stale_enqueued_workflows(engine)` exactly once
+- **AND** the error cleanup SHALL receive the current application version
+  selected by the scheduler
+- **AND** the enqueued cleanup SHALL resolve its current application version
+  from the shared system database according to its public helper contract
 
 #### Scenario: Cleaner logs results at INFO level
 

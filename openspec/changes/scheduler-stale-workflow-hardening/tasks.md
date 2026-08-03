@@ -80,7 +80,8 @@
   2. Monkeypatch `cancel_stale_error_workflows` and `cancel_stale_enqueued_workflows` to spy on calls
   3. Reimport `agent_core.scheduler_setup`
   4. Invoke the registered workflow function directly
-  5. Assert spies were called once each with the engine + current_version
+  5. Assert the error spy receives the engine plus `current_version`, while
+     the enqueued spy receives the engine using its public one-argument API
 - [x] 2.5 Add a test that verifies the cron schedule is `*/30 * * * *` and the registered name is `stale_workflow_cleaner`. The test inspects `fake_engine.schedule_registry.list()` (already returning `[]` in the existing test mock at line 23) OR asserts via a side effect on `fake_engine.scheduled_workflow.assert_called_with(...)`.
 - [x] 2.6 Run `ruff check . --fix && ruff format .` and `mypy agent-core/ --strict`.
 
