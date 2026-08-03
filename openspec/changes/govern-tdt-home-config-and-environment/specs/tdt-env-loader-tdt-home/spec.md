@@ -130,11 +130,21 @@ The default loader SHALL complete at most once per process under concurrent call
 - **AND** all callers SHALL observe the same terminal success or failure
 - **AND** a failed load SHALL NOT leave partial initialized state
 
+#### Scenario: Retry after failed load
+
+- **GIVEN** the sole first loading sequence fails after a file parser temporarily mutates process environment
+- **WHEN** all concurrent first callers observe that failure and a later caller retries after the cause is removed
+- **THEN** the failed sequence SHALL have restored every environment key it changed
+- **AND** all callers in the failed cohort SHALL have observed the same terminal failure
+- **AND** the later call SHALL perform one new complete loading sequence and publish success only after completion
+
 ## ADDED Requirements
 
 ### Requirement: Canonical TDT_HOME layout and path containment
 
 `tdt-core` SHALL provide dynamically evaluated helpers for config, credentials, schedules, logs, state, and app runtime paths. Generated paths MUST remain within the resolved `TDT_HOME`. Participating consumers SHALL use these helpers or pass an explicit injected path; a formally standalone repository MAY instead use a dependency-free compatibility adapter only when it passes the same committed contract vectors and preserves its declared isolation boundary.
+
+Filesystem mutation and security inspection SHALL operate from one retained descriptor for the validated resolved root. Every descendant component SHALL be validated and opened relative to its retained parent without following symlinks. Security-sensitive regular files SHALL be single-linked. Creation, replacement, backup, restoration, and verification SHALL use descriptor-relative operations, file and parent-directory fsync, and post-open identity/type/link-count/digest checks. If required platform primitives are unavailable, mutation SHALL fail closed.
 
 #### Scenario: Consumer requests a runtime path
 
@@ -147,6 +157,38 @@ The default loader SHALL complete at most once per process under concurrent call
 - **GIVEN** a requested app or filename contains traversal or resolves outside `TDT_HOME`
 - **WHEN** a path helper validates it
 - **THEN** the helper SHALL reject the request before file I/O
+
+#### Scenario: Descendant ancestor is replaced
+
+- **GIVEN** the resolved root has been opened and recorded by device/inode
+- **AND** a descendant directory is replaced with a symlink before an operation
+- **WHEN** the provider opens, creates, renames, deletes, backs up, restores, or inspects the descendant
+- **THEN** it SHALL reject the operation through no-follow descriptor-relative traversal
+- **AND** it SHALL NOT access or mutate the symlink target
+
+#### Scenario: Unsupported secure mutation primitive
+
+- **GIVEN** the host lacks a required descriptor-relative or no-follow primitive
+- **WHEN** a mutating or recovery operation is requested
+- **THEN** the operation SHALL fail before mutation
+- **AND** read-only path construction MAY remain available
+
+#### Scenario: First-run root creation
+
+- **GIVEN** the selected root does not exist
+- **AND** the default home or an explicit approved existing parent anchor is safely openable and satisfies bootstrap policy
+- **WHEN** the provider creates the root
+- **THEN** it SHALL create each validated missing component relative to the retained parent descriptor
+- **AND** fsync and reopen each component no-follow before descending
+- **AND** verify type, identity, owner, and declared policy before retaining the final root descriptor
+- **AND** a missing, replaced, symlinked, foreign, or unapproved bootstrap anchor SHALL fail without creation
+
+#### Scenario: Target platform capabilities are available
+
+- **GIVEN** the supported macOS and Python 3.14 runtime
+- **WHEN** the platform capability gate runs
+- **THEN** it SHALL prove the required `dir_fd` operations, no-follow/directory/close-on-exec flags, descriptor-relative create/rename/link/unlink behavior, directory fsync, and selected journal durability barrier
+- **AND** provider packaging SHALL remain blocked unless the recorded positive matrix passes without undocumented constants or pathname fallbacks
 
 #### Scenario: Standalone harness isolation
 
@@ -188,6 +230,21 @@ Shared settings SHALL have one declared owning config surface. Effective values 
 - **THEN** only a full scalar `${VAR_NAME}` with `VAR_NAME` matching `[A-Z][A-Z0-9_]*` SHALL be accepted
 - **AND** concatenation, defaults, nested expansion, `$VAR`, and malformed references SHALL fail without disclosing values
 
+#### Scenario: Non-string secret value
+
+- **GIVEN** a secret-shaped key contains a number, boolean, list, mapping, or null rather than a full-scalar reference
+- **WHEN** typed config parses it
+- **THEN** validation SHALL fail before accepting the value
+- **AND** no representation of the rejected value SHALL appear in outputs
+
+#### Scenario: Scheduler consumes governed config
+
+- **GIVEN** canonical scheduler YAML contains `${SCHEDULER_POSTGRES_DSN}`
+- **WHEN** scheduler settings are constructed
+- **THEN** the scheduler SHALL consume the governed typed parser and selected environment value
+- **AND** a literal scheduler DSN of any scalar/container type SHALL fail closed
+- **AND** missing optional scheduler values SHALL record `default` provenance
+
 ### Requirement: Secret values are excluded from general config and diagnostics
 
 Secret values SHALL come from the process environment, `$TDT_HOME/.env`, or a future approved secret provider. YAML/TOML config MAY contain environment references but SHALL NOT contain literal secret values. Values SHALL NOT appear in outputs produced by the governed loader, config parser, doctor, source audit, or migration, including their diagnostics, logs, exceptions, JSON, and manifests.
@@ -216,12 +273,22 @@ Secret values SHALL come from the process environment, `$TDT_HOME/.env`, or a fu
 
 The canonical root and security-sensitive subtrees SHALL grant access only to declared host, launchd, and container principals that require it. Numeric modes or ACLs SHALL be derived from verified effective access rather than applied blindly. Credential symlinks SHALL resolve safely to approved regular files whose targets satisfy their declared policy.
 
+The provider SHALL prove only the current host principal directly. Other launchd/container principals SHALL be accepted only through typed, fresh access attestations produced by registered deployment adapters and bound to root identity, plan digest, principal ID, required operation set, and expiry. The provider SHALL NOT infer another principal's access from mode bits alone.
+
 #### Scenario: Private tree creation
 
 - **WHEN** the provider creates root, credentials, schedules, state, logs, or backup paths
 - **THEN** single-principal directories/files SHOULD use `0700`/`0600`
 - **AND** shared host/container paths SHALL use the narrowest verified group/ACL policy that preserves required traversal and read/write access
 - **AND** unknown runtime principals SHALL block migration apply
+
+#### Scenario: Valid shared access policy
+
+- **GIVEN** a governed path declares a shared group or ACL writer policy
+- **AND** the metadata adapter plus fresh principal attestations prove the exact owner/group/mode/ACL/xattr/flag policy and required operations
+- **WHEN** doctor and migration preflight evaluate it
+- **THEN** the path SHALL be accepted even when a narrowly declared group write bit or ACL is required
+- **AND** foreign, overbroad, undeclared, or unprovable access SHALL fail without changing metadata
 
 #### Scenario: Bind-mounted container access
 
@@ -242,6 +309,19 @@ The canonical root and security-sensitive subtrees SHALL grant access only to de
 - **GIVEN** a credential symlink resolves outside approved credential locations
 - **WHEN** strict doctor runs
 - **THEN** it SHALL fail before the credential is read
+
+#### Scenario: Credential target policy drift
+
+- **GIVEN** a credential target is non-regular, hard-linked, foreign-owned, broader than its declared policy, or unreadable by a declared principal
+- **WHEN** strict doctor or migration preflight runs
+- **THEN** it SHALL report the path class and reason without reading content
+- **AND** migration apply SHALL fail without changing modes
+
+#### Scenario: Stale or unmapped principal evidence
+
+- **GIVEN** a required principal has no adapter, cannot be mapped, or has an expired/mismatched/failed access attestation
+- **WHEN** migration apply begins
+- **THEN** apply SHALL fail before journal preparation or filesystem mutation
 
 ### Requirement: Redacting configuration doctor
 
@@ -268,6 +348,10 @@ The base `tdt-core` distribution SHALL expose these commands through a `tdt` con
 
 Migration from the legacy layout SHALL support writer quiescence, dry-run, exclusive locking, a durable generation journal, value-free backup manifests, per-path atomic replacement with parent-directory fsync, restart recovery, verification, idempotent rerun, and rollback. It SHALL NOT claim tree-wide atomic rename and SHALL NOT delete legacy source files in this change.
 
+Migration SHALL be driven by a canonical immutable plan compiled from versioned consumer/deployment manifests. The plan SHALL bind root device/inode, exact concrete operations, config/credential choices, principal/writer/verifier IDs, source-manifest hashes, and a digest of canonical bytes. Placeholders, wildcards, shell strings, arbitrary executable paths, mutable PID inventories, caller-asserted quiescence, and unresolved choices SHALL be rejected.
+
+Apply and recovery SHALL acquire the canonical lock before selecting or reading a journal. Recovery SHALL accept only a generation UUID and SHALL resolve it below the anchored private migration directory. Journal header/records, plan, generation, root identity, relative path components, owner/mode/type/link count, backup metadata/digests, and hash chain SHALL be validated before mutation. This detects corruption and unauthorized modification under the declared ownership policy; it does not claim protection from a malicious process running as the same authorized owner without an external signing key.
+
 #### Scenario: Dry run
 
 - **WHEN** migration runs with `--dry-run`
@@ -290,11 +374,33 @@ Migration from the legacy layout SHALL support writer quiescence, dry-run, exclu
 - **AND** `switched` SHALL verify and commit only on success, otherwise restore
 - **AND** repeated recovery SHALL be idempotent
 
+#### Scenario: Journal or backup is tampered
+
+- **GIVEN** a generation contains an unsafe path, unknown schema/state, mismatched root/plan/generation, broken hash chain, or backup whose type/link-count/digest differs from recorded metadata
+- **WHEN** recovery starts with that generation UUID
+- **THEN** recovery SHALL fail closed without mutating active paths
+- **AND** it SHALL not accept an arbitrary journal pathname
+
+#### Scenario: Backup metadata is complete before switching
+
+- **GIVEN** a compiled plan contains file, symlink, and previously absent destinations
+- **WHEN** backup and staging complete
+- **THEN** every operation SHALL have validated metadata for relative path, preimage type, link text where applicable, device/inode, UID/GID, mode, size, digest, and prior absence
+- **AND** ACL/xattr/flag presence SHALL be captured by a registered metadata adapter or block the plan when exact restoration is unavailable
+- **AND** no active path SHALL switch until every required backup object and metadata record is durable and verified
+
 #### Scenario: Active writer is not quiescent
 
 - **GIVEN** a registered launchd, Compose, scheduler, observability, or report writer remains active and does not honor the shared lock
 - **WHEN** migration apply begins
 - **THEN** apply SHALL fail before switching any path
+
+#### Scenario: Writer quiescence evidence is incomplete
+
+- **GIVEN** any consumer/deployment manifest lacks a registered discovery/lock adapter
+- **OR** any configured writer is omitted, active without the shared lock, identified only by caller assertion/PID existence, or has stale evidence
+- **WHEN** dry-run or apply preflight runs
+- **THEN** the plan or preflight SHALL fail before switching any path
 
 #### Scenario: Successful migration and rerun
 
@@ -302,13 +408,23 @@ Migration from the legacy layout SHALL support writer quiescence, dry-run, exclu
 - **THEN** a second migration run SHALL make no further changes
 - **AND** rollback evidence and legacy source files SHALL remain available
 
+#### Scenario: Switched verification fails
+
+- **GIVEN** all path replacements completed
+- **AND** strict descriptor-based doctor or any plan verifier fails
+- **WHEN** commit or switched-state recovery evaluates the generation
+- **THEN** it SHALL enter durable reverse rollback rather than record `committed`
+- **AND** restored objects SHALL match recorded type, link text, owner, mode, size, and digest
+
 ### Requirement: Cross-repository conformance is enforced
 
 A committed manifest and AST-based verifier SHALL govern participating repositories. Direct home literals, private `TDT_HOME` parsing, and import-time root snapshots SHALL be rejected unless an exception has an owner, reason, and unexpired date.
 
 The verifier SHALL require an explicit workspace root. Missing registered repositories SHALL fail strict source audit but SHALL NOT affect runtime doctor.
 
-The manifest SHALL enumerate every classified ecosystem repository and executable path family. Omission of a discovered repository SHALL fail audit; comments and diagnostic messages MAY be classified separately from executable defaults.
+The manifest SHALL enumerate every registered participating repository and executable path family. Omission, identity mismatch, or an unreviewed role change for a registered participant SHALL fail audit; unrelated sibling repositories SHALL be ignored, and comments and diagnostic messages MAY be classified separately from executable defaults.
+
+The provider wheel SHALL contain mandatory versioned registry/rule package data loaded through the package-resource API: schema versions, rule IDs, the closed-world fifteen participant IDs, registered concrete-manifest locations, and required fields. Each participant repository SHALL own the concrete identity, include/path-family, exclusion, role, path/no-path, exception, deployment, and principal data at its registered location. Source audit SHALL validate and merge both layers. Missing, malformed, unknown-version, duplicate, unsafe, incomplete, or identity-mismatched provider or repository data SHALL fail before scanning. Provider-first release MAY be built with synthetic concrete manifests, but real workspace source audit and migration-plan generation SHALL remain unhealthy until all registered repository manifests exist and validate. Unrelated sibling repositories SHALL be ignored. Exceptions SHALL be validated independently and suppress only exact registered repository-relative path/rule matches. Operational manifest, inventory, parser, or traversal failures SHALL always exit non-zero; strict mode SHALL additionally make policy findings non-zero.
 
 Audit SHALL NOT follow repository symlinks or inspect `.env`, credential/key files, runtime databases/logs, dependency/vendor directories, virtual environments, caches, generated artifacts, or `$TDT_HOME`. Failures SHALL report no source excerpts or values.
 
@@ -324,6 +440,44 @@ Audit SHALL NOT follow repository symlinks or inspect `.env`, credential/key fil
 - **WHEN** the verifier runs
 - **THEN** the exception SHALL not suppress the finding
 - **AND** verification SHALL fail
+
+#### Scenario: Missing or malformed packaged manifest
+
+- **GIVEN** the installed provider lacks the source-audit manifest or its schema/content is invalid
+- **WHEN** source audit runs
+- **THEN** the report SHALL be unhealthy and strict mode SHALL exit non-zero
+- **AND** it SHALL not silently scan an empty repository set
+
+#### Scenario: Python alias and unrelated dictionary access
+
+- **GIVEN** one file uses `from pathlib import Path as P; P.home() / ".tdt"`
+- **AND** another file calls an unrelated dictionary's `.get("TDT_HOME")`
+- **WHEN** source audit runs
+- **THEN** it SHALL report the aliased executable path with repository, file, line, and rule ID
+- **AND** it SHALL not classify the unrelated dictionary call as environment access
+
+#### Scenario: Shadowed alias and executable default
+
+- **GIVEN** one lexical scope shadows an imported `Path` or `getenv` alias
+- **AND** another config model uses an executable default such as `Field(default="~/.tdt/state")`
+- **WHEN** source audit runs
+- **THEN** it SHALL not report the shadowed unrelated call
+- **AND** it SHALL report the executable default with repository, file, line, and rule ID
+- **AND** an equivalent docstring/help/log message SHALL not be a policy finding
+
+#### Scenario: Unrelated workspace repository
+
+- **GIVEN** the workspace contains a Git repository with no capability index, provider dependency, consumer manifest marker, or executable governed-path pattern
+- **WHEN** source audit runs
+- **THEN** it SHALL not require that repository in the TDT manifest
+- **AND** every registered participating repository that is missing SHALL still make the report unhealthy
+
+#### Scenario: Registered deployment artifact is unresolved
+
+- **GIVEN** a registered Compose or launchd artifact is missing, identity-mismatched, ambiguously active, has unresolved interpolation, or declares a writer/principal without a reconciled owner/access contract
+- **WHEN** source/deployment inventory validation runs
+- **THEN** validation SHALL fail before migration plan generation
+- **AND** unrelated Compose/plist artifacts outside the closed inventory SHALL be ignored
 
 #### Scenario: Installed runtime outside a workspace
 
@@ -344,6 +498,16 @@ The first provider artifact containing this contract SHALL be versioned, built, 
 - **AND** the hashed wheelhouse SHALL contain the complete locked runtime/transitive dependency closure
 - **AND** installation SHALL require no index, ambient cache, checkout, or `PYTHONPATH`
 - **AND** its import and configuration smoke tests SHALL pass
+
+#### Scenario: Installed provider artifact is internally consistent
+
+- **GIVEN** the reviewed provider artifact is installed from an empty-cache no-index wheelhouse without a checkout or `PYTHONPATH`
+- **WHEN** provider release verification runs
+- **THEN** distribution metadata and `tdt_core.__version__` SHALL both report `0.3.0`
+- **AND** the wheel SHALL contain the mandatory provider registry/rule package data
+- **AND** `tdt --help` SHALL work without scheduler extras
+- **AND** installed-wheel doctor, missing/invalid concrete-manifest failure, synthetic concrete-manifest source audit, plan-schema, and synthetic recovery smokes SHALL pass
+- **AND** any version, entrypoint, package-data, or smoke mismatch SHALL block consumer adoption
 
 #### Scenario: Consumer-first rollback
 
