@@ -1,0 +1,23 @@
+# Review scope template for 5-provider review
+# Copy this file to your change directory and customize
+
+change_name: <change-name>
+repositories:
+  - path: ~/Developer/<repo-name>
+    base: origin/main
+    head: HEAD
+    test_command: "uv run pytest --cov"
+specs:
+  - <spec-id>/spec.md
+docs:
+  - AGENTS.md
+  - README.md
+skills:
+  - <skill-name>
+excluded:
+  - .env
+  - .git/
+  - __pycache__/
+  - node_modules/
+  - .venv/
+coverage_threshold: 80
