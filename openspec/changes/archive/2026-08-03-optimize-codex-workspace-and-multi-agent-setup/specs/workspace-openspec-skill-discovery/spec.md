@@ -1,9 +1,5 @@
-# workspace-openspec-skill-discovery Specification
+## MODIFIED Requirements
 
-## Purpose
-Defines workspace-level discovery of OpenSpec Codex skills without weakening
-the managed skill-mirror contract of an individual repository.
-## Requirements
 ### Requirement: OpenSpec Codex skills SHALL be discoverable at workspace scope
 
 The workspace Codex skill surface SHALL contain the same 12 OpenSpec skills as
@@ -24,4 +20,3 @@ Adding or refreshing the workspace-root discovery surface MUST NOT remove or alt
 - **GIVEN** the workspace copies have been installed
 - **WHEN** the Go repository's documentation-currency validation checks its declared mirror pairs
 - **THEN** all pairs SHALL report identical digests
-
