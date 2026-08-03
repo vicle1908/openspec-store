@@ -33,6 +33,8 @@ Add typed helpers in `tdt-core`, all backed by `tdt_root()` and evaluated at cal
 
 No public constant may capture `TDT_HOME` at import time. Consumers may accept an explicit path for tests and dependency injection; their default must call the provider helper.
 
+`TDT_HOME` MUST resolve to an absolute path after `~` expansion; relative paths are rejected. The root itself may be a symlink only when doctor opens and records its stable resolved directory target. That resolved directory descriptor becomes the canonical anchor; no-follow ancestor checks apply only below it, so the one validated root link is not re-rejected. Namespace arguments (`app`, `kind`) use allowlisted identifiers (`[a-z0-9][a-z0-9-]*`), and `kind` is an enum. A filename is a single basename matching `[A-Za-z0-9][A-Za-z0-9._-]*`; separators, NUL, empty names, `.`/`..`, and leading-dot names are rejected unless a dedicated helper owns a fixed hidden filename such as `.env`. Writes use descriptor-relative/no-follow operations from the anchor where supported, reject descendant symlink ancestors and non-regular/hard-linked secret targets, and revalidate the opened object against the anchor.
+
 Why: this preserves the proven resolver and removes divergent implementations without creating another configuration framework.
 
 ## Decision 2: Explicit Precedence Profiles
@@ -47,7 +49,9 @@ Effective precedence for development compatibility:
 
 An unset profile defaults to `development` so existing callers retain the current repo-local `.env` override without configuration changes. Explicit production-safe mode disables repo-local `.env`; process environment then wins. A set mode uses `TDT_ENV_PROFILE=development|production` rather than being inferred from a directory name. Unknown non-empty profiles fail closed.
 
-`load_tdt_env()` remains idempotent by default, but a test-only reset/context API supports isolated verification without mutating module internals. Diagnostics report source names and overridden key names, never values.
+`TDT_ENV_PROFILE` is read only from the inherited process environment before any `.env` file is opened. Neither `$TDT_HOME/.env`, repo-local `.env`, YAML, nor TOML may select or change the profile. Loading then has two distinct phases: select and load only the resolved home `.env`; afterwards, development mode may load repo-local `.env` with `override=True`. “No other home `.env`” never prohibits the separately governed repo-local development override.
+
+`load_tdt_env()` uses a process-local re-entrant lock and a terminal initialized state so concurrent callers perform one complete load or observe its result; failed loads do not publish partial initialized state. A test-only isolation context acquires the same lock, refuses entry while another load/isolation context is active, snapshots/restores only keys it changes, and is unsupported for production concurrency. Diagnostics report source names and overridden key names, never values.
 
 Why: the unset default preserves the currently specified local override for all existing callers, while an explicit production profile prevents accidental checkout-local overrides. It follows python-dotenv's documented distinction between `override=False` and `override=True`.
 
@@ -60,27 +64,31 @@ Why: the unset default preserves the currently specified local override for all 
 
 Secret-shaped keys in YAML/TOML (`*_secret`, `*_token`, `*_password`, `*_dsn`, `*_api_key`, credentials) must contain an environment reference such as `${SCHEDULER_POSTGRES_DSN}`, not a literal. The loader resolves references after environment loading and emits only typed missing-key errors.
 
+The only supported reference grammar is the full scalar `${VAR_NAME}`, where `VAR_NAME` matches `[A-Z][A-Z0-9_]*`. Concatenation, defaults (`:-`), nested expansion, `$VAR`, and escaping are rejected. Classification is recursive and schema-aware; aliases are normalized to a canonical logical key before duplicate detection. The implementation maintains a committed ownership table mapping each shared logical key and alias to one typed model and one file surface.
+
 Duplicate logical settings across `config.toml` and `config.yaml` are diagnostic errors until migrated. Scheduler settings become owned by `config.yaml`; legacy TOML reads warn for one release, then are removed in a later change.
+
+The committed ownership/migration table is executable input, not prose. For each key it records aliases, legacy sources, canonical destination, secret classification, rewrite, and conflict policy. For scheduler keys: non-secret duplicates with equal normalized values remove the TOML copy; unequal values block apply for operator selection. A literal `postgres_dsn` is never copied into YAML: migration requires a selected existing process/`$TDT_HOME/.env` value, writes `${SCHEDULER_POSTGRES_DSN}`, and blocks when literal and environment values disagree or the referenced value is absent. Backups preserve the original bytes for rollback.
 
 Why: the live files prove that file mode alone is insufficient. Separating secret values makes config reviewable and aligns with Twelve-Factor and OWASP guidance.
 
-## Decision 4: Layout and Permission Policy
+## Decision 4: Layout and Effective-Access Policy
 
 Canonical layout:
 
-- `$TDT_HOME/.env`: secret environment, `0600`
-- `$TDT_HOME/credentials/`: credential files/links, directory `0700`, files/targets `0600`
-- `$TDT_HOME/config.yaml` and non-secret app config: `0600` during the legacy mixed-content window; later policy may allow `0640`
-- `$TDT_HOME/schedules/`: declarative manifests, directory `0700`, files `0600`
-- `$TDT_HOME/state/<app>/`: durable app state, directories `0700`, files `0600`
-- `$TDT_HOME/logs/<app>/`: logs, directories `0700`, files `0600`
-- `$TDT_HOME/backups/`: operator backups, directory `0700`, files `0600`
+- `$TDT_HOME/.env` and credential targets: readable only by verified runtime principals that require them.
+- `$TDT_HOME/credentials/`: credential links and targets, with least-privilege traversal/read access.
+- `$TDT_HOME/config.yaml`, schedules, state, logs, and backups: access derived from their declared reader/writer principals.
 
-The root is `0700`. Symlinks are allowed only when their resolved target exists, is a regular file, and meets the same permission policy. The migration supports the legacy root-level `google-service-account.json` name as a compatibility link to `credentials/google-service-account.json`.
+No fixed numeric mode is applied blindly. The doctor records host owner/group/ACL and the effective principals for launchd and Docker Compose. The current Compose app and scheduler run as container user `agent` over a host bind mount, so migration MUST prove traversal and required read/write access before tightening any mode. A default single-principal installation may use `0700` directories and `0600` files; shared host/container installations use the narrowest verified group/ACL mapping. Unknown or unmapped principals block apply.
 
-Why: logs, state, and config can contain operational identifiers or payloads even if they are not credential stores. A uniform private default is safer and auditable on this single-user workstation.
+Symlinks are allowed only when `lstat` identifies a link, its opened target is an approved regular file, ownership/access policy passes, and replacement races are detected. Explicit credential environment paths outside `$TDT_HOME/credentials` remain allowed only as declared external credential sources; doctor reports their metadata without enforcing root containment or reading content. The migration supports the legacy root-level `google-service-account.json` name as a compatibility link to `credentials/google-service-account.json`.
+
+Why: logs, state, and config can contain operational identifiers or payloads even if they are not credential stores. Least privilege remains the goal, but effective access must include every verified host/container principal rather than assuming one numeric owner.
 
 ## Decision 5: Redacting Doctor and Manifest
+
+The base `tdt-core` wheel owns a new Typer entrypoint `tdt = "tdt_core.cli:app"`. Typer and PyYAML become base runtime dependencies because doctor and config parsing must work without scheduler extras. `tdt_core.cli` owns the `config` group; doctor, source-audit, migrate, and recover are separate subcommands and modules.
 
 `tdt config doctor [--json] [--strict]` is a runtime/configuration check that requires no source checkout. It checks:
 
@@ -95,31 +103,37 @@ JSON output contains paths, key names, source classes, modes, and reason codes�
 
 `tdt config source-audit --workspace-root <path> [--json] [--strict]` is the separate source-governance command. The explicit workspace root contains the registered repositories. Missing repositories are failures in strict source-audit mode, while runtime doctor neither discovers nor requires repositories. The manifest names relative repository paths and allowed legacy exceptions with owner, reason, and expiry. Tests cover a complete workspace, a missing repository, an installed-wheel invocation outside a workspace, and an expired exception.
 
-## Decision 6: Migration and Transaction Boundaries
+Source audit never follows repository symlinks and excludes `.git`, virtual environments, dependency/vendor trees, caches, generated artifacts, `.env*`, credential/key files, runtime databases, logs, and `$TDT_HOME`. It analyzes Python AST plus shell/YAML/TOML/config literals using a value-free rule inventory; parser failures report path/rule/reason only and never source excerpts.
+
+## Decision 6: Migration, Compatibility, and Recovery Boundaries
 
 Migration command: `tdt config migrate --dry-run` then `tdt config migrate --apply`.
 
 Transaction boundary for live files:
 
-1. acquire an exclusive migration lock under `$TDT_HOME/state/tdt-core/`;
-2. create a timestamped backup manifest with path, mode, size, and SHA-256 (never content in logs);
-3. create private directories;
-4. copy credentials/config to temporary files in the destination;
-5. fsync, parse, and validate targets;
-6. atomically replace destinations and compatibility links;
-7. tighten permissions after secret references resolve successfully;
-8. run strict doctor and consumer smoke checks;
-9. retain originals and backup for rollback; no deletion in this change.
+1. discover every configured writer/reader (launchd, scheduler container, observability poller/collector, report processes) and require verified quiescence or explicit shared-lock participation;
+2. acquire the migration lock and create/fsync a durable journal with generation ID and `prepared` state;
+3. create a timestamped backup manifest with path, link, owner/access metadata, size, and SHA-256 (never content in logs);
+4. stage and fsync a complete destination generation, then validate parsing, links, and effective principals;
+5. for each sorted path, fsync an `intent(path, old_digest, staged_digest)` record, replace, fsync its parent, verify the active digest, then fsync `completed(path, active_digest)`; after every path is complete, fsync `switched`;
+6. run strict doctor and old/new consumer smoke checks, then fsync `committed`;
+7. recovery is fixed: `prepared`/`staged` journals discard staging and keep the old generation; `switching` journals always roll back every path with an intent record in reverse order from backup copies, regardless of whether `completed` was recorded; `switched` reruns verification and either records `committed` or rolls back; `rolling_back` resumes reverse rollback; only `committed` is success-terminal and `rolled_back` is rollback-terminal;
+8. retain originals and backup for rollback; no deletion in this change.
 
-A failure before step 6 leaves active paths unchanged. A failure afterward restores from the manifest before releasing the lock.
+Atomic rename is per path, not a tree-wide transaction. Safety therefore comes from quiescence, backup copies, the fixed journal oracle above, idempotent recovery, and a path-by-path compatibility policy. Tests terminate the migrator before/after each intent, replace, directory fsync, completion record, and state transition.
+
+A committed path map under `tdt-core` records, for every executable legacy path: repository/owner, old path, canonical helper/new path, reader/writer principals, read fallback, write target, compatibility mechanism (symlink, read-old/write-new, quiesced cutover, or explicit unsupported legacy reader), access policy, and removal milestone. Old and migrated consumers are tested against the same synthetic generation.
 
 ## Repository Rollout
 
-1. `tdt-core`: add contract tests, helpers, doctor, migration, and docs; bump to the first containing version `0.3.0`; build and publish its wheel to the configured internal distribution channel; verify installation from that channel without sibling source paths.
-2. Direct dependents currently using editable `tdt-core`: `agent-core`, `agent-docs-sync`, `agent-harness`. Add runtime floor `tdt-core>=0.3,<0.4`, retain the editable source only for local development, regenerate locks, and prove clean installs resolve the published wheel.
+1. `tdt-core`: add contract tests, helpers, CLI, doctor, source audit, migration/recovery, maps, and docs; bump to `0.3.0`; build an offline-complete local wheelhouse containing the provider plus locked runtime/transitive dependencies, record hashes, and verify with fresh cache-disabled installation without sibling source paths. Publish to Nexus only after a non-secret reachability/auth/authority preflight succeeds.
+2. Direct provider importers add `tdt-core>=0.3,<0.4`. `agent-docs-sync` becomes a direct dependency because its source will import path helpers; editable sources remain only in `[tool.uv.sources]` for development. Clean-install verification uses copied metadata with editable source mappings excluded and `uv pip install --no-index --find-links <wheelhouse>`.
 3. `tdt-observability`: explicitly raise Python support from `>=3.12` to `>=3.14,<3.15`, add `tdt-core>=0.3,<0.4`, regenerate its lock, and document the breaking floor change. `tdt-sheets` already targets 3.14 and adds the same provider floor. Optional-import fallback is forbidden for the required path contract.
-4. `ai-harness-skills`: either adopt a tiny public provider dependency or retain its local resolver behind conformance tests. Because it is standalone, it must continue using `$TDT_HOME/ai-harness` and never agent runtime state paths.
-5. Live `~/.tdt`: dry-run, backup, apply, strict doctor, and smoke verification only after all code changes pass.
+4. Source-migration owners are the eleven repositories named in the proposal. `ai-review` and `jira-epic-report` are verification/classification consumers. The conformance manifest enumerates all fourteen non-provider repositories and promotes any newly detected executable bypass to migration ownership.
+5. `ai-harness-skills` retains standalone `$TDT_HOME/ai-harness` isolation. If dependency review permits, it imports the provider; otherwise it implements a dependency-free `TdtRootContract` compatibility adapter generated/tested from the same contract vectors. Either route MUST conform for unset/empty, tilde, absolute-root rejection, dynamic reevaluation, filename validation, and containment semantics.
+6. Release graph: `tdt-core` → `agent-core` → `agent-docs-sync`/`agent-harness`; independent consumers follow after provider verification. Rollback is the reverse downstream order while provider compatibility exports remain installed.
+7. Deploy/restart migrated consumers and verify active versions plus `TDT_ENV_PROFILE=production` for production launchd/Compose processes before any live path switch.
+8. Live `~/.tdt`: quiescence, dry-run, backup, journaled apply/recovery, strict doctor, Compose/launchd smoke, and consumer smoke verification only after all migrated consumers are active.
 
 Every implementation repository uses its own feature worktree. No two writers own the same repository concurrently.
 
@@ -128,8 +142,8 @@ Every implementation repository uses its own feature worktree. No two writers ow
 - Provider RED/GREEN unit tests for resolution, tilde/empty values, runtime reevaluation, profiles, precedence, redaction, permission findings, symlink containment, and rollback.
 - Cross-repo AST audit for direct `~/.tdt` construction; explicit approved exceptions only.
 - Full `uv run pytest`, Ruff, and strict mypy in every changed repo.
-- Build/publish verification for `tdt-core` 0.3.0 and clean installs of every consumer from the configured distribution channel so editable siblings cannot mask version-floor or metadata errors.
-- Release rollback rehearsal: install pre-change consumer metadata/wheels against the retained legacy path behavior, then reinstall migrated consumers; published provider helpers remain available throughout.
+- Build verification for `tdt-core` 0.3.0 and clean local-wheelhouse installs of every consumer so editable siblings cannot mask version-floor or metadata errors; Nexus publication is verified separately when its preflight is available.
+- Release rollback rehearsal: install pre-change consumer metadata/wheels against retained legacy behavior, then reinstall migrated consumers; the verified provider artifact/helpers remain available throughout.
 - Temporary-home end-to-end test: generate a representative legacy tree, dry-run, apply, run strict doctor, run consumer smoke commands, then rollback and compare hashes/modes.
 - Live-home migration only after the synthetic end-to-end test passes twice.
 
@@ -137,12 +151,13 @@ Every implementation repository uses its own feature worktree. No two writers ow
 
 - Import cycles from making low-level packages depend on `tdt-core`: inspect dependency metadata first; keep the provider module dependency-free within `tdt-core`, and add explicit dependencies only where architecture permits.
 - Python compatibility break in `tdt-observability`: raise its declared/runtime/type-check floor to 3.14, document it in release notes, test metadata rejection on 3.12/3.13, and retain the pre-change wheel as the rollback artifact.
+- Python floor choice: `tdt-core` already declares `>=3.14,<3.15`, and the workspace standard is Python 3.14. This change intentionally aligns `tdt-observability` rather than creating a second compatibility provider. Supporting 3.12 would require a separately versioned low-level package and is outside this capability; the breaking floor remains explicit and reversible through the prior observability wheel.
 - Production behavior change from local `.env`: default remains compatible; production-safe profile is explicit and covered by tests.
 - Permission changes break launchd/container users: doctor reports ownership and process identity before apply; migration refuses foreign-owned paths.
 - Broken credential repair points at the wrong key: migration never guesses among multiple credentials; an explicit operator-selected source is required if the canonical target is absent.
 - Secret values leak in diagnostics/tests: golden tests scan stdout, stderr, JSON, logs, and exceptions for seeded canary values.
 - Editable dependencies mask release floors: clean wheel/install checks are mandatory before consumer rollout.
-- No configured package distribution channel: implementation stops after building/signing the provider wheel and requests the missing release authority; consumers and live config are not migrated.
+- Unavailable Nexus: record the conditional external-release blocker and continue in-workspace migration/verification from the hashed offline-complete wheelhouse; no claim of Nexus publication is made.
 
 ## Rejected Alternatives
 

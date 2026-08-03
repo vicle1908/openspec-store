@@ -19,10 +19,10 @@ The live `~/.tdt` audit found:
 - Make `tdt-core` the provider of dynamically evaluated paths for config, credentials, schedules, logs, state, and per-application runtime files.
 - Define explicit precedence profiles: unset or `development` keeps repo-local `.env` above process environment for backward compatibility; explicit `production` disables repo-local loading so process environment wins over `$TDT_HOME/.env`, typed non-secret config, and defaults.
 - Separate secrets from non-secret config. General YAML/TOML files may contain secret references or environment variable names, never secret values.
-- Add a redacting `tdt config doctor` audit for runtime layout, duplicate keys, broken links, and permissions.
+- Add a `tdt` console entrypoint owned by the base `tdt-core` package, with a redacting `tdt config doctor` audit for runtime layout, duplicate keys, broken links, and effective access.
 - Add a separate workspace-bound `tdt config source-audit --workspace-root <path>` for repository conformance; runtime doctor remains usable from an installed wheel without sibling checkouts.
 - Migrate consumers provider-first, with isolated worktrees and focused tests in each repository.
-- Release `tdt-core` 0.3.x as the first version containing the provider contract, then set consumer dependency floors and regenerate lockfiles before import migration.
+- Build `tdt-core` 0.3.x as the first version containing the provider contract, verify every consumer from a local isolated wheelhouse, and publish to Nexus only when DNS, credentials, and release authority are independently available.
 - Raise `tdt-observability` from Python 3.12+ to Python 3.14.x rather than adding a second path provider; treat this as an explicit compatibility break with release notes and rollback evidence.
 - Repair the live `~/.tdt` layout only after backup, dry-run, and successful compatibility checks.
 
@@ -37,18 +37,19 @@ None. This change extends the existing capability that already owns `TDT_HOME` a
 ## Ownership Boundaries
 
 - `tdt-core`: path/config API, precedence, diagnostics, migration utility, contract tests.
-- `agent-core`, `agent-docs-sync`, `agent-harness`, `tdt-observability`, `tdt-sheets`: replace private path construction with the provider API.
+- Source-migration owners: `agent-core`, `agent-docs-sync`, `agent-harness`, `browser-cli`, `code-daily-scan`, `jira-daily-reports`, `jira-kanban-from-spreadsheet`, `jira-skill`, `tdt-observability`, `tdt-sheets`, and `webhook-receiver` replace executable private path construction with the provider API or an approved compatibility adapter.
+- Verification-only or classification consumers: `ai-review` and `jira-epic-report` are inventoried and smoke-tested; any executable bypass found by the AST audit promotes that repository to a source-migration owner.
 - `ai-harness-skills`: retain standalone runtime isolation while using the same root-resolution contract; it must not share agent-core or agent-harness state directories.
 - `~/.tdt`: operator-owned runtime surface; never committed to a repository.
 - `openspec-store`: normative capability and implementation plan only.
 
 ## Compatibility and Rollout
 
-The default remains `~/.tdt`. Existing filenames remain readable during one compatibility window. `tdt-core` 0.3.x ships first; consumers migrate only after that version is available from the configured distribution channel and their metadata/locks require `>=0.3,<0.4`. `tdt-observability` moves to Python `>=3.14,<3.15` in the same reviewed rollout. The live migration is copy/verify/switch, not destructive move.
+The default remains `~/.tdt`. Existing filenames remain readable during one compatibility window. `tdt-core` 0.3.x is built first; consumer source migration begins only after its wheel passes an isolated local-wheelhouse install with no sibling checkout. Nexus publication at `nexus.tdt.internal` is a separate conditional release gate because this host currently lacks DNS resolution and credentials. In-workspace editable sources remain a development convenience, but release verification temporarily excludes them. `tdt-observability` moves to Python `>=3.14,<3.15`. Live migration is quiesce/journal/copy/verify/switch/recover, not a destructive move.
 
 ## Rollback
 
-Restore consumer imports and dependency metadata/locks before rolling back `tdt-core`. Already published 0.3.x provider helpers remain compatibility exports; they are not removed during routine rollback. Reinstall pre-change consumer wheels in a clean environment to prove rollback. Restore the timestamped permission/config backup if the live doctor or smoke checks fail; do not delete legacy files during this change.
+Restore consumer imports and dependency metadata/locks before rolling back `tdt-core`. The verified 0.3.x provider artifact and its helpers remain available as compatibility exports; they are not removed during routine rollback. Reinstall pre-change consumer wheels in a clean environment to prove rollback. Restore the journaled permission/config generation if live doctor or smoke checks fail; do not delete legacy files during this change.
 
 ## Non-Goals
 

@@ -38,6 +38,8 @@ The function `tdt_core.env.load_tdt_env()` SHALL resolve the environment file at
 
 The canonical root resolver SHALL apply user expansion to a non-empty `TDT_HOME` value before constructing any descendant path.
 
+The expanded root SHALL be absolute. Relative roots SHALL be rejected before file I/O. Helper namespace components SHALL be validated identifiers, and filenames SHALL be validated single basenames rather than arbitrary path fragments. Dedicated helpers MAY own fixed hidden filenames such as `.env`.
+
 #### Scenario: Tilde-prefixed `TDT_HOME`
 
 - **GIVEN** `TDT_HOME=~/.tdt` and `$HOME=/Users/operator`
@@ -46,9 +48,24 @@ The canonical root resolver SHALL apply user expansion to a non-empty `TDT_HOME`
 - **AND** the function SHALL NOT raise, whether or not the optional file exists
 - **AND** the selected environment-file path SHALL contain no literal `~` segment
 
+#### Scenario: Relative `TDT_HOME`
+
+- **GIVEN** `TDT_HOME` is a relative path
+- **WHEN** the canonical resolver is called
+- **THEN** it SHALL reject the root before reading or creating files
+
+#### Scenario: Runtime filename with extension
+
+- **GIVEN** a valid namespace and filename such as `config.yaml`, `state.sqlite`, or `worker.pid`
+- **WHEN** a runtime path helper validates the request
+- **THEN** it SHALL accept the single basename and preserve its extension
+- **AND** it SHALL reject separators, NUL, empty names, `.`/`..`, and unowned leading-dot names
+
 ### Requirement: Local `.env` override behaviour is preserved
 
 An unset environment profile SHALL default to development behavior and preserve the existing repo-local `.env` override. Explicit development profile SHALL behave identically. Explicit production profile SHALL disable repo-local `.env` loading. Unknown non-empty profile values SHALL fail closed.
+
+`TDT_ENV_PROFILE` SHALL be read only from the inherited process environment before any `.env` file is opened. File-based values SHALL NOT select or change the profile.
 
 #### Scenario: Environment profile is unset
 
@@ -89,7 +106,7 @@ An unset environment profile SHALL default to development behavior and preserve 
 
 ### Requirement: Idempotency is preserved
 
-The default loader SHALL run at most once per process. A documented isolation API MAY reset or scope loader state for tests, but production consumers SHALL NOT mutate private module state.
+The default loader SHALL complete at most once per process under concurrent calls. It SHALL publish initialized state only after a complete successful load. A documented lock-scoped isolation API MAY scope loader/environment state for tests, but production consumers SHALL NOT mutate private module state.
 
 #### Scenario: Repeated calls
 
@@ -105,11 +122,19 @@ The default loader SHALL run at most once per process. A documented isolation AP
 - **THEN** loading SHALL be isolated to that context
 - **AND** original environment and loader state SHALL be restored on exit
 
+#### Scenario: Concurrent first load
+
+- **GIVEN** multiple threads call `load_tdt_env()` before initialization completes
+- **WHEN** the calls execute concurrently
+- **THEN** exactly one complete file-loading sequence SHALL occur
+- **AND** all callers SHALL observe the same terminal success or failure
+- **AND** a failed load SHALL NOT leave partial initialized state
+
 ## ADDED Requirements
 
 ### Requirement: Canonical TDT_HOME layout and path containment
 
-`tdt-core` SHALL provide dynamically evaluated helpers for config, credentials, schedules, logs, state, and app runtime paths. Generated paths MUST remain within the resolved `TDT_HOME`, and participating consumers SHALL use these helpers or pass an explicit injected path.
+`tdt-core` SHALL provide dynamically evaluated helpers for config, credentials, schedules, logs, state, and app runtime paths. Generated paths MUST remain within the resolved `TDT_HOME`. Participating consumers SHALL use these helpers or pass an explicit injected path; a formally standalone repository MAY instead use a dependency-free compatibility adapter only when it passes the same committed contract vectors and preserves its declared isolation boundary.
 
 #### Scenario: Consumer requests a runtime path
 
@@ -128,6 +153,7 @@ The default loader SHALL run at most once per process. A documented isolation AP
 - **WHEN** `ai-harness-skills` resolves durable runtime state
 - **THEN** it SHALL remain below `$TDT_HOME/ai-harness`
 - **AND** it SHALL NOT read or write agent-core or agent-harness state directories
+- **AND** if it does not depend on `tdt-core`, its compatibility adapter SHALL pass the same root/path contract vectors as the provider
 
 ### Requirement: Typed config ownership and precedence
 
@@ -140,12 +166,27 @@ Shared settings SHALL have one declared owning config surface. Effective values 
 - **THEN** it SHALL report both source paths and the key name
 - **AND** it SHALL not silently select one value
 
+#### Scenario: Scheduler duplicate migration
+
+- **GIVEN** a scheduler key exists in both legacy TOML and canonical YAML
+- **WHEN** migration evaluates it
+- **THEN** equal normalized non-secret values SHALL retain YAML and remove the TOML duplicate from the staged generation
+- **AND** unequal values SHALL block apply for an explicit operator choice
+- **AND** literal DSNs SHALL be rewritten only to a validated `${SCHEDULER_POSTGRES_DSN}` reference whose selected environment value is present and non-conflicting
+
 #### Scenario: Missing typed value uses default
 
 - **GIVEN** a non-secret optional key is absent from environment and owned config
 - **WHEN** typed configuration is constructed
 - **THEN** the documented default SHALL be used
 - **AND** provenance SHALL identify the source as `default`
+
+#### Scenario: Environment reference grammar
+
+- **GIVEN** a secret-shaped config scalar
+- **WHEN** typed config parses it
+- **THEN** only a full scalar `${VAR_NAME}` with `VAR_NAME` matching `[A-Z][A-Z0-9_]*` SHALL be accepted
+- **AND** concatenation, defaults, nested expansion, `$VAR`, and malformed references SHALL fail without disclosing values
 
 ### Requirement: Secret values are excluded from general config and diagnostics
 
@@ -171,15 +212,23 @@ Secret values SHALL come from the process environment, `$TDT_HOME/.env`, or a fu
 - **WHEN** loader, config parser, doctor, source audit, and migration success/failure paths are exercised
 - **THEN** the canaries SHALL be absent from every output sink produced by those components
 
-### Requirement: Private filesystem policy
+### Requirement: Effective-access filesystem policy
 
-The canonical root and security-sensitive subtrees SHALL default to owner-only access. Credential symlinks SHALL resolve to existing regular files within approved locations whose targets satisfy the same permission policy.
+The canonical root and security-sensitive subtrees SHALL grant access only to declared host, launchd, and container principals that require it. Numeric modes or ACLs SHALL be derived from verified effective access rather than applied blindly. Credential symlinks SHALL resolve safely to approved regular files whose targets satisfy their declared policy.
 
 #### Scenario: Private tree creation
 
 - **WHEN** the provider creates root, credentials, schedules, state, logs, or backup paths
-- **THEN** directories SHALL be mode `0700`
-- **AND** created files SHALL be mode `0600` subject to platform-equivalent ACL semantics
+- **THEN** single-principal directories/files SHOULD use `0700`/`0600`
+- **AND** shared host/container paths SHALL use the narrowest verified group/ACL policy that preserves required traversal and read/write access
+- **AND** unknown runtime principals SHALL block migration apply
+
+#### Scenario: Bind-mounted container access
+
+- **GIVEN** `$TDT_HOME` is bind-mounted into a service running under a different container principal
+- **WHEN** doctor or migration evaluates access
+- **THEN** it SHALL prove required traversal and file operations for that principal before tightening access
+- **AND** a failed proof SHALL leave modes unchanged and fail strict apply
 
 #### Scenario: Broken credential symlink
 
@@ -198,6 +247,8 @@ The canonical root and security-sensitive subtrees SHALL default to owner-only a
 
 The ecosystem SHALL provide a deterministic, workspace-independent doctor command with human and JSON output that checks runtime root resolution, ownership, permissions, links, parse validity, config ambiguity, and secret placement. Repository conformance SHALL be checked only by a separate source-audit command with an explicit workspace root.
 
+The base `tdt-core` distribution SHALL expose these commands through a `tdt` console entrypoint without requiring scheduler extras or a source checkout.
+
 #### Scenario: Healthy alternate root
 
 - **GIVEN** a valid temporary `TDT_HOME`
@@ -215,7 +266,7 @@ The ecosystem SHALL provide a deterministic, workspace-independent doctor comman
 
 ### Requirement: Reversible live migration
 
-Migration from the legacy layout SHALL support dry-run, exclusive locking, value-free backup manifests, atomic destination replacement, verification, idempotent rerun, and rollback. It SHALL NOT delete legacy source files in this change.
+Migration from the legacy layout SHALL support writer quiescence, dry-run, exclusive locking, a durable generation journal, value-free backup manifests, per-path atomic replacement with parent-directory fsync, restart recovery, verification, idempotent rerun, and rollback. It SHALL NOT claim tree-wide atomic rename and SHALL NOT delete legacy source files in this change.
 
 #### Scenario: Dry run
 
@@ -230,6 +281,21 @@ Migration from the legacy layout SHALL support dry-run, exclusive locking, value
 - **THEN** active paths SHALL remain or be restored to their pre-run hashes, links, and modes
 - **AND** the lock SHALL be released
 
+#### Scenario: Process termination during switch
+
+- **GIVEN** the migration process terminates after any individual path replacement
+- **WHEN** `tdt config recover` starts
+- **THEN** `prepared` or `staged` SHALL discard staging without active changes
+- **AND** `switching` or `rolling_back` SHALL restore every intended path in reverse order from backup copies
+- **AND** `switched` SHALL verify and commit only on success, otherwise restore
+- **AND** repeated recovery SHALL be idempotent
+
+#### Scenario: Active writer is not quiescent
+
+- **GIVEN** a registered launchd, Compose, scheduler, observability, or report writer remains active and does not honor the shared lock
+- **WHEN** migration apply begins
+- **THEN** apply SHALL fail before switching any path
+
 #### Scenario: Successful migration and rerun
 
 - **WHEN** migration succeeds and strict doctor passes
@@ -241,6 +307,10 @@ Migration from the legacy layout SHALL support dry-run, exclusive locking, value
 A committed manifest and AST-based verifier SHALL govern participating repositories. Direct home literals, private `TDT_HOME` parsing, and import-time root snapshots SHALL be rejected unless an exception has an owner, reason, and unexpired date.
 
 The verifier SHALL require an explicit workspace root. Missing registered repositories SHALL fail strict source audit but SHALL NOT affect runtime doctor.
+
+The manifest SHALL enumerate every classified ecosystem repository and executable path family. Omission of a discovered repository SHALL fail audit; comments and diagnostic messages MAY be classified separately from executable defaults.
+
+Audit SHALL NOT follow repository symlinks or inspect `.env`, credential/key files, runtime databases/logs, dependency/vendor directories, virtual environments, caches, generated artifacts, or `$TDT_HOME`. Failures SHALL report no source excerpts or values.
 
 #### Scenario: New hard-coded consumer path
 
@@ -264,13 +334,15 @@ The verifier SHALL require an explicit workspace root. Missing registered reposi
 
 ### Requirement: Provider-first compatible release
 
-The first provider release containing this contract SHALL be versioned and distributable before consumers adopt it. Consumers SHALL declare a dependency floor that resolves to that release, and published provider helpers SHALL remain compatibility exports during consumer rollback.
+The first provider artifact containing this contract SHALL be versioned, built, and installable from an isolated local wheelhouse before consumers adopt it. Nexus publication MAY follow only after its independent preflight. Consumers SHALL declare a dependency floor that resolves to the verified artifact, and provider helpers SHALL remain compatibility exports during consumer rollback.
 
 #### Scenario: Clean consumer install
 
 - **GIVEN** no editable sibling checkout is importable
 - **WHEN** a migrated consumer is installed from its declared dependencies
 - **THEN** it SHALL resolve a `tdt-core` version containing the canonical helpers
+- **AND** the hashed wheelhouse SHALL contain the complete locked runtime/transitive dependency closure
+- **AND** installation SHALL require no index, ambient cache, checkout, or `PYTHONPATH`
 - **AND** its import and configuration smoke tests SHALL pass
 
 #### Scenario: Consumer-first rollback
@@ -278,7 +350,7 @@ The first provider release containing this contract SHALL be versioned and distr
 - **GIVEN** migrated consumers and the provider release have been deployed
 - **WHEN** the rollout is rolled back
 - **THEN** consumer imports, dependency metadata, and lockfiles SHALL be restored before provider rollback
-- **AND** already-published provider helpers SHALL remain available
+- **AND** the verified provider artifact and helpers SHALL remain available
 - **AND** a clean installation of the rolled-back consumer SHALL pass
 
 ### Requirement: Participating consumers have compatible Python metadata
