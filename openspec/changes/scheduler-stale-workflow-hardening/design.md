@@ -133,18 +133,17 @@ exception classes remain in the default tuple.
   programmer errors (`TypeError`, `KeyError`, etc.) that operators want
   to see, not silently cancel.
 
-### Decision 4: Surface stderr in `WorktreeManager._default_command_runner`
+### Decision 4: Surface stderr at the worktree creation error boundary
 
-**Chosen approach**: Update `_default_command_runner` to capture stderr
-(via `capture_output=True`, which it already does) and include the
-captured text in the raised `CalledProcessError` message. The function
-signature is unchanged.
+**Chosen approach**: Keep `_default_command_runner`'s captured stderr and
+include the captured text at `WorktreeManager.create()`'s existing
+`RuntimeError` boundary. The command-runner signature is unchanged.
 
 **Rationale**: `subprocess.run(check=True, capture_output=True, text=True)`
 already captures `stderr` into the result object's `.stderr` attribute;
 Python's default `CalledProcessError` does not include it in `str(exc)`.
-We re-raise with stderr prepended so the operator's log line shows the
-git error directly.
+The creation boundary appends the captured text so the operator's log line
+shows the git error directly while preserving the public `RuntimeError` path.
 
 **Alternative rejected**:
 - *Define a new exception class* (`WorktreeError`): Overkill for a

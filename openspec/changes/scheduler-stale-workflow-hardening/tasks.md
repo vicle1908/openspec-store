@@ -87,7 +87,7 @@
 
 ## 3. Surface stderr from `git worktree add` in `code-daily-scan`
 
-- [x] 3.1 In `code-daily-scan/src/code_daily_scan/scanners/worktree.py`, update `_default_command_runner` (line 59) to wrap any `CalledProcessError` and include `stderr` in the message. The runner already calls `subprocess.run(check=True, capture_output=True, text=True)`, so the captured stderr is available on the exception's `.stderr` attribute. **Suggested implementation:**
+- [x] 3.1 In `code-daily-scan/src/code_daily_scan/scanners/worktree.py`, preserve `_default_command_runner`'s captured stderr and surface it at the `WorktreeManager.create()` error boundary. The runner already calls `subprocess.run(check=True, capture_output=True, text=True)`, so the captured stderr is available on the exception's `.stderr` attribute. **Suggested implementation:**
   ```python
   try:
       return subprocess.run(

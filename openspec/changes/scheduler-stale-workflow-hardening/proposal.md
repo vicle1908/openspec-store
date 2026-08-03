@@ -49,12 +49,11 @@ requiring operator intervention**.
 
 ### 1. Capture and surface stderr from `git worktree add` failures
 `WorktreeManager._default_command_runner` in
-`code-daily-scan/src/code_daily_scan/scanners/worktree.py` will capture
-`stderr` and include it in the `CalledProcessError` message so operators
-see the actual git error (`fatal: invalid reference`, `fatal: cannot
-use as worktree`, etc.) instead of a bare exit code. The downstream
-`create()` exception chain remains a `RuntimeError` so the outer CLI
-behaviour is unchanged.
+`code-daily-scan/src/code_daily_scan/scanners/worktree.py` already captures
+`stderr`; the `create()` error boundary will include that text in the
+existing `RuntimeError` wrapper so operators see the actual git error
+(`fatal: invalid reference`, `fatal: cannot use as worktree`, etc.) instead of
+a bare exit code. The outer CLI behaviour remains unchanged.
 
 ### 2. Extend default `error_class_names` filter
 `tdt_core.scheduler.cli._cancel_stale_error_workflows` will default its
@@ -140,9 +139,9 @@ intent.
 - **agent-core**: register `_stale_workflow_cleaner` decorator in
   `scheduler_setup.py`, import the now-public cleanup functions from
   `tdt_core.scheduler.cli`.
-- **code-daily-scan**: update `WorktreeManager._default_command_runner`
-  to surface stderr; add a unit test asserting stderr appears in the
-  raised `CalledProcessError` message.
+- **code-daily-scan**: preserve captured stderr at the `WorktreeManager.create()`
+  error boundary; add a unit test asserting stderr appears in the raised
+  `RuntimeError` message.
 - **no changes** to `webhook-receiver`, `ai-review`, `tdt-meta`, or any
   deployed service beyond the scheduler container restart.
 - **Database**: Reads `dbos.workflow_status`; updates `status` to
