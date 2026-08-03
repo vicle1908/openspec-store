@@ -1,2 +1,8 @@
 schema: spec-driven
 created: 2026-08-04
+owners:
+  - tdt-core
+  - agent-ecosystem
+rollout: provider-first
+depends: govern-tdt-home-config-and-environment
+description: Consumer manifests, source audit, and repository-owned exceptions

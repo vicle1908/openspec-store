@@ -1,2 +1,8 @@
 schema: spec-driven
 created: 2026-08-04
+owners:
+  - tdt-core
+  - agent-ecosystem
+rollout: provider-first
+depends: release-and-roll-out-tdt-home-provider
+description: Operator plan for live ~/.tdt migration

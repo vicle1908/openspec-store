@@ -1,2 +1,8 @@
 schema: spec-driven
 created: 2026-08-04
+owners:
+  - tdt-core
+  - agent-ecosystem
+rollout: provider-first
+depends: govern-tdt-home-source-conformance
+description: Typed migration plans, journaled apply/recovery, interruption testing
