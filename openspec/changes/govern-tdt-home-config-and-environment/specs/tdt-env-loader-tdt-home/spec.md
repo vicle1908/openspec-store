@@ -7,23 +7,24 @@ The function `tdt_core.env.load_tdt_env()` SHALL resolve the environment file at
 #### Scenario: `TDT_HOME` set
 
 - **GIVEN** `TDT_HOME=/home/agent/.tdt`
-- **WHEN** the loader or a public path helper is called
-- **THEN** it SHALL resolve below `/home/agent/.tdt`
-- **AND** the loader SHALL NOT read another home environment file
+- **WHEN** `load_tdt_env()` is called for the first time in a process
+- **THEN** it SHALL read `/home/agent/.tdt/.env` via python-dotenv
+- **AND** the initial home-environment load SHALL NOT read any other `.env` location
 - **AND** subsequent loader calls in the same process SHALL remain no-ops unless the explicit test isolation API is used
 
 #### Scenario: `TDT_HOME` unset
 
 - **GIVEN** `TDT_HOME` is not set
-- **WHEN** the loader or a public path helper is called
-- **THEN** it SHALL resolve below `Path.home() / ".tdt"`
-- **AND** it SHALL NOT raise solely because the optional environment file is absent
+- **WHEN** `load_tdt_env()` is called
+- **THEN** it SHALL read `Path.home() / ".tdt" / ".env"` via python-dotenv when the file exists
+- **AND** the function SHALL NOT raise, whether or not the optional file exists
 
 #### Scenario: `TDT_HOME` set to empty string
 
 - **GIVEN** `TDT_HOME=""`
-- **WHEN** the loader or a public path helper is called
-- **THEN** it SHALL treat the value as unset and use `Path.home() / ".tdt"`
+- **WHEN** `load_tdt_env()` is called
+- **THEN** it SHALL treat the value as unset and read `Path.home() / ".tdt" / ".env"` via python-dotenv when the file exists
+- **AND** the function SHALL NOT raise, whether or not the optional file exists
 - **AND** it SHALL NOT create or resolve paths below the current working directory
 
 #### Scenario: Environment changes after module import
@@ -40,9 +41,10 @@ The canonical root resolver SHALL apply user expansion to a non-empty `TDT_HOME`
 #### Scenario: Tilde-prefixed `TDT_HOME`
 
 - **GIVEN** `TDT_HOME=~/.tdt` and `$HOME=/Users/operator`
-- **WHEN** a loader or path helper is called
-- **THEN** it SHALL resolve below `/Users/operator/.tdt`
-- **AND** the returned path SHALL contain no literal `~` segment
+- **WHEN** `load_tdt_env()` is called
+- **THEN** it SHALL read `/Users/operator/.tdt/.env` via python-dotenv when the file exists
+- **AND** the function SHALL NOT raise, whether or not the optional file exists
+- **AND** the selected environment-file path SHALL contain no literal `~` segment
 
 ### Requirement: Local `.env` override behaviour is preserved
 
@@ -54,8 +56,9 @@ Development profile SHALL preserve the existing repo-local `.env` override. Prod
 - **AND** the current repository contains `.env`
 - **AND** the environment profile is `development`
 - **WHEN** `load_tdt_env()` is called
-- **THEN** both files SHALL be loaded
-- **AND** repo-local values SHALL override process and `$TDT_HOME/.env` values for compatibility
+- **THEN** `$TDT_HOME/.env` SHALL be loaded without overriding values already in the process environment
+- **AND** the repo-local file SHALL be loaded with python-dotenv `override=True`
+- **AND** repo-local values SHALL therefore override process and `$TDT_HOME/.env` values for compatibility
 - **AND** diagnostics SHALL identify overridden key names without values
 
 #### Scenario: Local .env exists in production
@@ -135,7 +138,7 @@ Shared settings SHALL have one declared owning config surface. Effective values 
 
 ### Requirement: Secret values are excluded from general config and diagnostics
 
-Secret values SHALL come from the process environment, `$TDT_HOME/.env`, or a future approved secret provider. YAML/TOML config MAY contain environment references but SHALL NOT contain literal secret values. Values SHALL NOT appear in diagnostics, logs, prompts, artifacts, exceptions, or migration manifests.
+Secret values SHALL come from the process environment, `$TDT_HOME/.env`, or a future approved secret provider. YAML/TOML config MAY contain environment references but SHALL NOT contain literal secret values. Values SHALL NOT appear in outputs produced by the governed loader, config parser, doctor, source audit, or migration, including their diagnostics, logs, exceptions, JSON, and manifests.
 
 #### Scenario: Literal DSN in general config
 
@@ -154,8 +157,8 @@ Secret values SHALL come from the process environment, `$TDT_HOME/.env`, or a fu
 #### Scenario: Canary secret audit
 
 - **GIVEN** test fixtures contain unique canary secrets
-- **WHEN** doctor, migration, and config failures are exercised
-- **THEN** the canaries SHALL be absent from stdout, stderr, JSON, logs, exceptions, and manifests
+- **WHEN** loader, config parser, doctor, source audit, and migration success/failure paths are exercised
+- **THEN** the canaries SHALL be absent from every output sink produced by those components
 
 ### Requirement: Private filesystem policy
 
@@ -182,18 +185,19 @@ The canonical root and security-sensitive subtrees SHALL default to owner-only a
 
 ### Requirement: Redacting configuration doctor
 
-The ecosystem SHALL provide a deterministic doctor command with human and JSON output that checks root resolution, ownership, permissions, links, parse validity, config ambiguity, secret placement, and registered consumer conformance.
+The ecosystem SHALL provide a deterministic, workspace-independent doctor command with human and JSON output that checks runtime root resolution, ownership, permissions, links, parse validity, config ambiguity, and secret placement. Repository conformance SHALL be checked only by a separate source-audit command with an explicit workspace root.
 
 #### Scenario: Healthy alternate root
 
 - **GIVEN** a valid temporary `TDT_HOME`
+- **AND** no repository workspace is available
 - **WHEN** strict doctor runs
 - **THEN** it SHALL exit zero
 - **AND** JSON output SHALL contain only paths, key names, source classes, modes, and reason codes
 
 #### Scenario: Multiple findings
 
-- **GIVEN** permission, broken-link, duplicate-key, and consumer-bypass findings coexist
+- **GIVEN** permission, broken-link, duplicate-key, and literal-secret findings coexist
 - **WHEN** strict doctor runs
 - **THEN** it SHALL report every finding in a stable machine-readable schema
 - **AND** exit non-zero
@@ -225,6 +229,8 @@ Migration from the legacy layout SHALL support dry-run, exclusive locking, value
 
 A committed manifest and AST-based verifier SHALL govern participating repositories. Direct home literals, private `TDT_HOME` parsing, and import-time root snapshots SHALL be rejected unless an exception has an owner, reason, and unexpired date.
 
+The verifier SHALL require an explicit workspace root. Missing registered repositories SHALL fail strict source audit but SHALL NOT affect runtime doctor.
+
 #### Scenario: New hard-coded consumer path
 
 - **GIVEN** a registered consumer adds direct `Path.home()/".tdt"` construction
@@ -237,3 +243,46 @@ A committed manifest and AST-based verifier SHALL govern participating repositor
 - **WHEN** the verifier runs
 - **THEN** the exception SHALL not suppress the finding
 - **AND** verification SHALL fail
+
+#### Scenario: Installed runtime outside a workspace
+
+- **GIVEN** `tdt-core` is installed without sibling repository checkouts
+- **WHEN** runtime doctor runs
+- **THEN** it SHALL complete without repository discovery
+- **AND** source audit SHALL require an explicit workspace root before scanning
+
+### Requirement: Provider-first compatible release
+
+The first provider release containing this contract SHALL be versioned and distributable before consumers adopt it. Consumers SHALL declare a dependency floor that resolves to that release, and published provider helpers SHALL remain compatibility exports during consumer rollback.
+
+#### Scenario: Clean consumer install
+
+- **GIVEN** no editable sibling checkout is importable
+- **WHEN** a migrated consumer is installed from its declared dependencies
+- **THEN** it SHALL resolve a `tdt-core` version containing the canonical helpers
+- **AND** its import and configuration smoke tests SHALL pass
+
+#### Scenario: Consumer-first rollback
+
+- **GIVEN** migrated consumers and the provider release have been deployed
+- **WHEN** the rollout is rolled back
+- **THEN** consumer imports, dependency metadata, and lockfiles SHALL be restored before provider rollback
+- **AND** already-published provider helpers SHALL remain available
+- **AND** a clean installation of the rolled-back consumer SHALL pass
+
+### Requirement: Participating consumers have compatible Python metadata
+
+Consumers that require the canonical provider SHALL declare a Python range compatible with the provider. This change SHALL raise `tdt-observability` to Python `>=3.14,<3.15` rather than shipping a second resolver.
+
+#### Scenario: Observability installation on unsupported Python
+
+- **GIVEN** Python 3.12 or 3.13
+- **WHEN** the migrated `tdt-observability` package is resolved
+- **THEN** package metadata SHALL reject the installation with an interpreter-version error
+
+#### Scenario: Observability installation on Python 3.14
+
+- **GIVEN** Python 3.14 and access to the provider distribution channel
+- **WHEN** the migrated `tdt-observability` package is installed cleanly
+- **THEN** `tdt-core>=0.3,<0.4` SHALL resolve
+- **AND** observability path smoke tests SHALL pass

@@ -19,8 +19,11 @@ The live `~/.tdt` audit found:
 - Make `tdt-core` the provider of dynamically evaluated paths for config, credentials, schedules, logs, state, and per-application runtime files.
 - Define explicit precedence profiles: development keeps repo-local `.env` above process environment for compatibility; production disables repo-local loading so process environment wins over `$TDT_HOME/.env`, typed non-secret config, and defaults.
 - Separate secrets from non-secret config. General YAML/TOML files may contain secret references or environment variable names, never secret values.
-- Add a redacting `tdt config doctor` audit for layout, duplicate keys, broken links, permissions, and consumer bypasses.
+- Add a redacting `tdt config doctor` audit for runtime layout, duplicate keys, broken links, and permissions.
+- Add a separate workspace-bound `tdt config source-audit --workspace-root <path>` for repository conformance; runtime doctor remains usable from an installed wheel without sibling checkouts.
 - Migrate consumers provider-first, with isolated worktrees and focused tests in each repository.
+- Release `tdt-core` 0.3.x as the first version containing the provider contract, then set consumer dependency floors and regenerate lockfiles before import migration.
+- Raise `tdt-observability` from Python 3.12+ to Python 3.14.x rather than adding a second path provider; treat this as an explicit compatibility break with release notes and rollback evidence.
 - Repair the live `~/.tdt` layout only after backup, dry-run, and successful compatibility checks.
 
 ## Modified Capabilities
@@ -41,11 +44,11 @@ None. This change extends the existing capability that already owns `TDT_HOME` a
 
 ## Compatibility and Rollout
 
-The default remains `~/.tdt`. Existing filenames remain readable during one compatibility window. `tdt-core` ships first; consumers migrate only after the provider contract passes and is available through their declared dependency. The live migration is copy/verify/switch, not destructive move.
+The default remains `~/.tdt`. Existing filenames remain readable during one compatibility window. `tdt-core` 0.3.x ships first; consumers migrate only after that version is available from the configured distribution channel and their metadata/locks require `>=0.3,<0.4`. `tdt-observability` moves to Python `>=3.14,<3.15` in the same reviewed rollout. The live migration is copy/verify/switch, not destructive move.
 
 ## Rollback
 
-Restore consumer imports before rolling back `tdt-core`. Keep compatibility helpers and legacy reads until all consumers are verified. Restore the timestamped permission/config backup if the live doctor or smoke checks fail; do not delete legacy files during this change.
+Restore consumer imports and dependency metadata/locks before rolling back `tdt-core`. Already published 0.3.x provider helpers remain compatibility exports; they are not removed during routine rollback. Reinstall pre-change consumer wheels in a clean environment to prove rollback. Restore the timestamped permission/config backup if the live doctor or smoke checks fail; do not delete legacy files during this change.
 
 ## Non-Goals
 

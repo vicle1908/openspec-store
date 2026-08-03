@@ -4,7 +4,7 @@
 
 1. Every participating process resolves the same root at call time.
 2. Operators can explain the source and precedence of every effective setting without revealing values.
-3. Secrets are not stored in general YAML/TOML config, logs, diagnostics, prompts, or artifacts.
+3. Secrets are not stored in general YAML/TOML config or emitted by the governed loader, parser, doctor, source-audit, or migration outputs.
 4. Runtime subtrees have explicit ownership, permissions, and migration behavior.
 5. Adoption is provider-first, reversible, and testable across repositories.
 
@@ -82,19 +82,18 @@ Why: logs, state, and config can contain operational identifiers or payloads eve
 
 ## Decision 5: Redacting Doctor and Manifest
 
-`tdt config doctor [--json] [--strict]` checks:
+`tdt config doctor [--json] [--strict]` is a runtime/configuration check that requires no source checkout. It checks:
 
 - root existence, ownership, and permissions;
 - expected directories and file permissions;
 - broken or escaping symlinks;
 - parse validity for known YAML/TOML/.env files;
 - duplicate logical config keys and secret literals in general config;
-- effective source/key provenance with values redacted;
-- known source-code bypasses through a committed cross-repo audit manifest.
+- effective source/key provenance with values redacted.
 
 JSON output contains paths, key names, source classes, modes, and reason codes—never values or file contents. `--strict` exits non-zero on security, ambiguity, or broken-link findings.
 
-The manifest names repositories and allowed legacy exceptions with owner and expiry. This makes the cross-repo requirement deterministic rather than relying on an unbounded grep.
+`tdt config source-audit --workspace-root <path> [--json] [--strict]` is the separate source-governance command. The explicit workspace root contains the registered repositories. Missing repositories are failures in strict source-audit mode, while runtime doctor neither discovers nor requires repositories. The manifest names relative repository paths and allowed legacy exceptions with owner, reason, and expiry. Tests cover a complete workspace, a missing repository, an installed-wheel invocation outside a workspace, and an expired exception.
 
 ## Decision 6: Migration and Transaction Boundaries
 
@@ -116,9 +115,9 @@ A failure before step 6 leaves active paths unchanged. A failure afterward resto
 
 ## Repository Rollout
 
-1. `tdt-core`: add contract tests, helpers, doctor, migration, and docs; release/provider verification first.
-2. Direct dependents already using editable `tdt-core`: `agent-core`, `agent-docs-sync`, `agent-harness`.
-3. Libraries requiring an explicit dependency decision: `tdt-observability`, `tdt-sheets`. Add `tdt-core` as a declared dependency if absent; do not use optional-import fallback for a required path contract.
+1. `tdt-core`: add contract tests, helpers, doctor, migration, and docs; bump to the first containing version `0.3.0`; build and publish its wheel to the configured internal distribution channel; verify installation from that channel without sibling source paths.
+2. Direct dependents currently using editable `tdt-core`: `agent-core`, `agent-docs-sync`, `agent-harness`. Add runtime floor `tdt-core>=0.3,<0.4`, retain the editable source only for local development, regenerate locks, and prove clean installs resolve the published wheel.
+3. `tdt-observability`: explicitly raise Python support from `>=3.12` to `>=3.14,<3.15`, add `tdt-core>=0.3,<0.4`, regenerate its lock, and document the breaking floor change. `tdt-sheets` already targets 3.14 and adds the same provider floor. Optional-import fallback is forbidden for the required path contract.
 4. `ai-harness-skills`: either adopt a tiny public provider dependency or retain its local resolver behind conformance tests. Because it is standalone, it must continue using `$TDT_HOME/ai-harness` and never agent runtime state paths.
 5. Live `~/.tdt`: dry-run, backup, apply, strict doctor, and smoke verification only after all code changes pass.
 
@@ -129,18 +128,21 @@ Every implementation repository uses its own feature worktree. No two writers ow
 - Provider RED/GREEN unit tests for resolution, tilde/empty values, runtime reevaluation, profiles, precedence, redaction, permission findings, symlink containment, and rollback.
 - Cross-repo AST audit for direct `~/.tdt` construction; explicit approved exceptions only.
 - Full `uv run pytest`, Ruff, and strict mypy in every changed repo.
-- Clean-install verification for consumers that add a `tdt-core` dependency so editable siblings cannot mask metadata errors.
+- Build/publish verification for `tdt-core` 0.3.0 and clean installs of every consumer from the configured distribution channel so editable siblings cannot mask version-floor or metadata errors.
+- Release rollback rehearsal: install pre-change consumer metadata/wheels against the retained legacy path behavior, then reinstall migrated consumers; published provider helpers remain available throughout.
 - Temporary-home end-to-end test: generate a representative legacy tree, dry-run, apply, run strict doctor, run consumer smoke commands, then rollback and compare hashes/modes.
 - Live-home migration only after the synthetic end-to-end test passes twice.
 
 ## Risks and Mitigations
 
-- Import cycles from making low-level packages depend on `tdt-core`: inspect dependency metadata first; use a small dependency-free provider module in `tdt-core`, and add explicit dependencies only where architecture permits.
+- Import cycles from making low-level packages depend on `tdt-core`: inspect dependency metadata first; keep the provider module dependency-free within `tdt-core`, and add explicit dependencies only where architecture permits.
+- Python compatibility break in `tdt-observability`: raise its declared/runtime/type-check floor to 3.14, document it in release notes, test metadata rejection on 3.12/3.13, and retain the pre-change wheel as the rollback artifact.
 - Production behavior change from local `.env`: default remains compatible; production-safe profile is explicit and covered by tests.
 - Permission changes break launchd/container users: doctor reports ownership and process identity before apply; migration refuses foreign-owned paths.
 - Broken credential repair points at the wrong key: migration never guesses among multiple credentials; an explicit operator-selected source is required if the canonical target is absent.
 - Secret values leak in diagnostics/tests: golden tests scan stdout, stderr, JSON, logs, and exceptions for seeded canary values.
 - Editable dependencies mask release floors: clean wheel/install checks are mandatory before consumer rollout.
+- No configured package distribution channel: implementation stops after building/signing the provider wheel and requests the missing release authority; consumers and live config are not migrated.
 
 ## Rejected Alternatives
 
