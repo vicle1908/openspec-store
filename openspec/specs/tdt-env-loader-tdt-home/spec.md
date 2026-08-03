@@ -1,8 +1,22 @@
 # tdt-env-loader-tdt-home Specification
 
 ## Purpose
-TBD - created by archiving change deployment-and-scheduling-hygiene. Update Purpose after archive.
+
+Define the canonical `TDT_HOME` configuration and environment loading contract for the TDT ecosystem. This capability provides:
+
+1. **Single root resolver** — `tdt_root()` dynamically evaluates `TDT_HOME` at call time; no import-time snapshots.
+2. **Typed path helpers** — `tdt_config_path()`, `tdt_credentials_path()`, `tdt_schedules_dir()`, `tdt_logs_dir()`, `tdt_state_path()`, `tdt_runtime_path()` — all backed by `tdt_root()` with component validation.
+3. **Governed environment loading** — `load_tdt_env()` with thread-safe one-time initialization, `TDT_ENV_PROFILE` precedence (development/production), and test isolation.
+4. **Secret separation** — YAML/TOML config MAY contain environment references (`${VAR_NAME}`) but SHALL NOT contain literal secret values.
+5. **Descriptor-relative security kernel** — filesystem operations use `dir_fd` + `O_NOFOLLOW` semantics; no pathname-based fallback.
+6. **Journaled migration** — plan/apply/recover/rollback with hash-chained journal, typed attestations, and idempotent recovery.
+7. **Runtime diagnostics** — `tdt config doctor` checks layout, permissions, links, config ambiguity, and secret placement.
+8. **Cross-repo conformance** — AST-based source audit rejects hard-coded `~/.tdt` construction outside approved sites.
+
+This capability is owned by `tdt-core` and enforced across 15 participating repositories.
+
 ## Requirements
+
 ### Requirement: `load_tdt_env()` honours `TDT_HOME` when set
 
 The function `tdt_core.env.load_tdt_env()` SHALL resolve the credentials
@@ -72,4 +86,3 @@ The existing `_loaded` module-level flag SHALL continue to ensure that
 - **WHEN** it is called again from the same process
 - **THEN** the second call SHALL be a no-op (no file I/O)
 - **AND** no exception SHALL be raised
-
