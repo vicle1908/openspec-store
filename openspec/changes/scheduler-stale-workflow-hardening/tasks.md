@@ -1,5 +1,19 @@
 # scheduler-stale-workflow-hardening — Tasks
 
+> **Implementation evidence status (2026-08-04):** Tasks 1.1–3.3 are
+> implemented and verified in their owned repositories. Tasks 4.1–4.5 remain
+> intentionally unchecked because they mutate or observe Docker, database,
+> workflow, or deployed runtime state and require separate explicit approval.
+> Task 5.1 remains unchecked because the referenced `tdt-meta` repository is
+> not present in this workspace and documentation ownership has not been
+> established.
+>
+> Evidence: `tdt-core` implementation commit `6fe4712` with focused scheduler
+> tests passing and the canonical provider suite at 437 passed/14 skipped;
+> `agent-core` commit `6a417b5` with 686 passed/1 skipped; and
+> `code-daily-scan` commit `5cb4e16` with 13 focused tests passing and the
+> unrelated missing-checkout full-suite failure recorded by its owner.
+
 > **Validation status (2026-07-07, pre-execution):** All 21 tasks validated against
 > current source state. Findings:
 >
@@ -37,20 +51,20 @@
 
 ## 1. Extend default `error_class_names` filter in `tdt-core`
 
-- [ ] 1.1 In `tdt-core/src/tdt_core/scheduler/cli.py`, rename `_cancel_stale_error_workflows` → `cancel_stale_error_workflows` (public, module-level). Keep the original name as a thin wrapper that delegates to the new public function so the CLI subcommand `tdt-scheduler cancel-stale-errors` and any internal callers continue to work.
-- [ ] 1.2 In `tdt-core/src/tdt_core/scheduler/cli.py`, rename `_cancel_stale_enqueued_workflows` → `cancel_stale_enqueued_workflows` (public, module-level). Same wrapper pattern. **Note:** `_cancel_stale_pending_workflows` is NOT renamed — it remains underscore-prefixed and is only called from `_serve()` in the same module, so no cross-module import is needed.
-- [ ] 1.3 Extend the default `error_class_names` tuple (in `cancel_stale_error_workflows`, line 309 area) to include `"FileNotFoundError"`, `"OSError"`, `"subprocess.CalledProcessError"`, `"subprocess.SubprocessError"` while keeping the existing 4 entries.
-- [ ] 1.4 Update internal callers in `tdt-core/src/tdt_core/scheduler/cli.py` — at minimum, the `cancel_stale_errors` CLI subcommand (line 1032) — to call the public `cancel_stale_error_workflows` and `cancel_stale_enqueued_workflows` names. Also add a NEW usage at `_serve()` line 781 where `_cancel_stale_enqueued_workflows` is called for startup cleanup.
-- [ ] 1.5 In `tdt-core/tests/scheduler/test_cli.py`, add a test asserting the new exception classes are matched by default. Use the existing `_make_engine` / `fake_sa` fixture pattern at line 320-328. Recommended cases:
+- [x] 1.1 In `tdt-core/src/tdt_core/scheduler/cli.py`, rename `_cancel_stale_error_workflows` → `cancel_stale_error_workflows` (public, module-level). Keep the original name as a thin wrapper that delegates to the new public function so the CLI subcommand `tdt-scheduler cancel-stale-errors` and any internal callers continue to work.
+- [x] 1.2 In `tdt-core/src/tdt_core/scheduler/cli.py`, rename `_cancel_stale_enqueued_workflows` → `cancel_stale_enqueued_workflows` (public, module-level). Same wrapper pattern. **Note:** `_cancel_stale_pending_workflows` is NOT renamed — it remains underscore-prefixed and is only called from `_serve()` in the same module, so no cross-module import is needed.
+- [x] 1.3 Extend the default `error_class_names` tuple (in `cancel_stale_error_workflows`, line 309 area) to include `"FileNotFoundError"`, `"OSError"`, `"subprocess.CalledProcessError"`, `"subprocess.SubprocessError"` while keeping the existing 4 entries.
+- [x] 1.4 Update internal callers in `tdt-core/src/tdt_core/scheduler/cli.py` — at minimum, the `cancel_stale_errors` CLI subcommand (line 1032) — to call the public `cancel_stale_error_workflows` and `cancel_stale_enqueued_workflows` names. Also add a NEW usage at `_serve()` line 781 where `_cancel_stale_enqueued_workflows` is called for startup cleanup.
+- [x] 1.5 In `tdt-core/tests/scheduler/test_cli.py`, add a test asserting the new exception classes are matched by default. Use the existing `_make_engine` / `fake_sa` fixture pattern at line 320-328. Recommended cases:
   - `decoded = CalledProcessError(128, ["git", "worktree", "add"], stderr=b"fatal: bad ref")` → `class_name in default_error_class_names == True`
   - `decoded = FileNotFoundError(2, "No such file")` → matches
   - `decoded = OSError(28, "No space")` → matches
-- [ ] 1.6 Run `ruff check . --fix && ruff format .` and `mypy tdt-core/ --strict`.
+- [x] 1.6 Run `ruff check . --fix && ruff format .` and `mypy tdt-core/ --strict`.
 
 ## 2. Register `stale_workflow_cleaner` scheduled workflow in `agent-core`
 
-- [ ] 2.1 In `agent-core/src/agent_core/scheduler_setup.py`, import the now-public `cancel_stale_error_workflows` and `cancel_stale_enqueued_workflows` from `tdt_core.scheduler.cli`. Add the imports near the top of the module (after line 52 where `_ENGINE = get_engine()` is defined).
-- [ ] 2.2 Add a `@_ENGINE.scheduled_workflow(cron="*/30 * * * *", cron_timezone="UTC", name="stale_workflow_cleaner")` decorated function `stale_workflow_cleaner` that calls both cleanup functions. **Placement:** after the existing `daily_android_scan` / `daily_ios_scan` definitions (after line 284). **Engine verification:** the `_ENGINE` object is the same singleton the YAML registry loader pushes schedules through — `apply_schedules()` (called from `tdt_core/scheduler/cli.py:783`) picks up the registered spec automatically. **Body pattern:**
+- [x] 2.1 In `agent-core/src/agent_core/scheduler_setup.py`, import the now-public `cancel_stale_error_workflows` and `cancel_stale_enqueued_workflows` from `tdt_core.scheduler.cli`. Add the imports near the top of the module (after line 52 where `_ENGINE = get_engine()` is defined).
+- [x] 2.2 Add a `@_ENGINE.scheduled_workflow(cron="*/30 * * * *", cron_timezone="UTC", name="stale_workflow_cleaner")` decorated function `stale_workflow_cleaner` that calls both cleanup functions. **Placement:** after the existing `daily_android_scan` / `daily_ios_scan` definitions (after line 284). **Engine verification:** the `_ENGINE` object is the same singleton the YAML registry loader pushes schedules through — `apply_schedules()` (called from `tdt_core/scheduler/cli.py:783`) picks up the registered spec automatically. **Body pattern:**
   ```python
   @_ENGINE.scheduled_workflow(cron="*/30 * * * *", cron_timezone="UTC", name="stale_workflow_cleaner")
   async def stale_workflow_cleaner(*args: object, **kwargs: object) -> None:
@@ -60,19 +74,19 @@
       logger.info("stale_workflow_cleaner.run", cancelled_error=err_count, cancelled_enqueued=enq_count)
   ```
   Where `_current_application_version_for_cleanup()` is a small helper that queries `dbos.application_versions` for the latest version (same logic as `tdt_core/scheduler/cli.py:56`). Alternative: import `_current_application_version` directly from `tdt_core.scheduler.cli` and call it (acceptable since the helper has no side-effects).
-- [ ] 2.3 Add `structlog` entries for the cleanup run: log `cancelled_error=N`, `cancelled_enqueued=M` at INFO level. Use `logger = structlog.get_logger(__name__)` if not already imported.
-- [ ] 2.4 In `agent-core/tests/test_scheduler_setup.py`, add a test that verifies `stale_workflow_cleaner` calls both public cleanup functions with correct parameters. Pattern:
+- [x] 2.3 Add `structlog` entries for the cleanup run: log `cancelled_error=N`, `cancelled_enqueued=M` at INFO level. Use `logger = structlog.get_logger(__name__)` if not already imported.
+- [x] 2.4 In `agent-core/tests/test_scheduler_setup.py`, add a test that verifies `stale_workflow_cleaner` calls both public cleanup functions with correct parameters. Pattern:
   1. Monkeypatch `tdt_core.scheduler.get_engine` → returns `MagicMock` whose `_ENGINE.scheduled_workflow` is the passthrough identity decorator
   2. Monkeypatch `cancel_stale_error_workflows` and `cancel_stale_enqueued_workflows` to spy on calls
   3. Reimport `agent_core.scheduler_setup`
   4. Invoke the registered workflow function directly
   5. Assert spies were called once each with the engine + current_version
-- [ ] 2.5 Add a test that verifies the cron schedule is `*/30 * * * *` and the registered name is `stale_workflow_cleaner`. The test inspects `fake_engine.schedule_registry.list()` (already returning `[]` in the existing test mock at line 23) OR asserts via a side effect on `fake_engine.scheduled_workflow.assert_called_with(...)`.
-- [ ] 2.6 Run `ruff check . --fix && ruff format .` and `mypy agent-core/ --strict`.
+- [x] 2.5 Add a test that verifies the cron schedule is `*/30 * * * *` and the registered name is `stale_workflow_cleaner`. The test inspects `fake_engine.schedule_registry.list()` (already returning `[]` in the existing test mock at line 23) OR asserts via a side effect on `fake_engine.scheduled_workflow.assert_called_with(...)`.
+- [x] 2.6 Run `ruff check . --fix && ruff format .` and `mypy agent-core/ --strict`.
 
 ## 3. Surface stderr from `git worktree add` in `code-daily-scan`
 
-- [ ] 3.1 In `code-daily-scan/src/code_daily_scan/scanners/worktree.py`, update `_default_command_runner` (line 59) to wrap any `CalledProcessError` and include `stderr` in the message. The runner already calls `subprocess.run(check=True, capture_output=True, text=True)`, so the captured stderr is available on the exception's `.stderr` attribute. **Suggested implementation:**
+- [x] 3.1 In `code-daily-scan/src/code_daily_scan/scanners/worktree.py`, update `_default_command_runner` (line 59) to wrap any `CalledProcessError` and include `stderr` in the message. The runner already calls `subprocess.run(check=True, capture_output=True, text=True)`, so the captured stderr is available on the exception's `.stderr` attribute. **Suggested implementation:**
   ```python
   try:
       return subprocess.run(
@@ -100,8 +114,8 @@
   raise RuntimeError(f"worktree creation failed: {detail}") from exc
   ```
   This satisfies the spec (stderr appears in the message string) without introducing a new exception class.
-- [ ] 3.2 In `code-daily-scan/tests/test_worktree_manager.py`, add a `FakeRunner` variant (extending the existing `FakeRunner` at line 19) that returns a `CompletedProcess` with `returncode=128` and `stderr="fatal: invalid reference: main"`. Add a test asserting the raised `RuntimeError`'s message string contains both `"exit 128"` (or equivalent) AND `"fatal: invalid reference"`. Suggested test name: `test_create_worktree_add_failure_surfaces_stderr`.
-- [ ] 3.3 Run `ruff check . --fix && ruff format .` and `mypy code-daily-scan/ --strict`.
+- [x] 3.2 In `code-daily-scan/tests/test_worktree_manager.py`, add a `FakeRunner` variant (extending the existing `FakeRunner` at line 19) that returns a `CompletedProcess` with `returncode=128` and `stderr="fatal: invalid reference: main"`. Add a test asserting the raised `RuntimeError`'s message string contains both `"exit 128"` (or equivalent) AND `"fatal: invalid reference"`. Suggested test name: `test_create_worktree_add_failure_surfaces_stderr`.
+- [x] 3.3 Run `ruff check . --fix && ruff format .` and `mypy code-daily-scan/ --strict`.
 
 ## 4. Deploy and smoke test
 

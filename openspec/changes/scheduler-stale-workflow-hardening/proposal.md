@@ -174,7 +174,7 @@ ready for execution. The 21 tasks map cleanly to existing code paths:
 | 2.4-2.5 new tests | `agent-core` | `tests/test_scheduler_setup.py` | ✅ `MagicMock` engine stub at line 21-24 |
 | 3.1 stderr surfacing | `code-daily-scan` | `src/code_daily_scan/scanners/worktree.py:280` | ✅ existing `raise RuntimeError(...)` at the `git worktree add` site is the wrapper location |
 | 3.2 new test | `code-daily-scan` | `tests/test_worktree_manager.py` | ✅ `FakeRunner` base class at line 19 with `fail_on_add` already wired |
-| 4.1-4.5 deploy + smoke | host | Docker scheduler | ✅ container running healthy, scheduler `/health` endpoint accessible at `:9100` |
+| 4.1-4.5 deploy + smoke | host | Docker scheduler | ⏸ intentionally unexecuted; requires explicit approval for Docker restart, schedule observation, database/workflow mutation, and runtime scan |
 
 **Backward compatibility:** Tasks 1.1 and 1.2 keep the underscore-prefixed
 names as thin wrappers, so:
@@ -187,3 +187,14 @@ names as thin wrappers, so:
 workflow + better error message). The only renames are internal helpers
 that have no third-party consumers (verified by grep across the
 multirepo).
+
+## Current execution boundary (2026-08-04)
+
+The provider and scheduler code changes are implemented and verified in their
+owned repositories. Runtime tasks remain separate from code readiness: this
+workspace has not restarted Docker, queried or mutated the scheduler database,
+triggered a workflow, or run a deployed scan. Those actions are intentionally
+left unchecked in `tasks.md` because they change or observe external runtime
+state and require explicit operational approval. The referenced `tdt-meta`
+predecessor documentation path is not present in this workspace, so task 5.1
+also remains unchecked pending an identified owner.
