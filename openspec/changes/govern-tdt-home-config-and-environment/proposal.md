@@ -25,6 +25,9 @@ The live `~/.tdt` audit found:
 - Build `tdt-core` 0.3.x as the first version containing the provider contract, verify every consumer from a local isolated wheelhouse, and publish to Nexus only when DNS, credentials, and release authority are independently available.
 - Raise `tdt-observability` from Python 3.12+ to Python 3.14.x rather than adding a second path provider; treat this as an explicit compatibility break with release notes and rollback evidence.
 - Repair the live `~/.tdt` layout only after backup, dry-run, and successful compatibility checks.
+- Replace the draft's guessed path map and caller-asserted quiescence with consumer-owned, versioned deployment manifests. `tdt-core` validates and compiles those manifests into one canonical, digest-bound migration plan; apply accepts only that plan and fresh adapter-produced writer/principal evidence.
+- Implement filesystem mutation as a small descriptor-relative security kernel. The validated root is opened once, every descendant component is walked with `dir_fd` plus no-follow semantics, and creation/replacement/recovery never falls back to pathname-based `shutil` operations.
+- Treat the first failed implementation/review cycles as design evidence: provider packaging is blocked until journal tampering, rollback durability, credential access, mandatory manifest loading, governed scheduler config, and source-audit precision all have executable RED/GREEN tests and independent approval.
 
 ## Modified Capabilities
 
@@ -36,16 +39,17 @@ None. This change extends the existing capability that already owns `TDT_HOME` a
 
 ## Ownership Boundaries
 
-- `tdt-core`: path/config API, precedence, diagnostics, migration utility, contract tests.
+- `tdt-core`: path/config API, precedence, diagnostics, descriptor-relative filesystem kernel, typed plan compiler/executor, source-audit engine, and contract tests. It owns schemas and validation, not consumer deployment facts.
 - Source-migration owners: `agent-core`, `agent-docs-sync`, `agent-harness`, `browser-cli`, `code-daily-scan`, `jira-daily-reports`, `jira-kanban-from-spreadsheet`, `jira-skill`, `tdt-observability`, `tdt-sheets`, and `webhook-receiver` replace executable private path construction with the provider API or an approved compatibility adapter.
 - Verification-only or classification consumers: `ai-review` and `jira-epic-report` are inventoried and smoke-tested; any executable bypass found by the AST audit promotes that repository to a source-migration owner.
 - `ai-harness-skills`: retain standalone runtime isolation while using the same root-resolution contract; it must not share agent-core or agent-harness state directories.
 - `~/.tdt`: operator-owned runtime surface; never committed to a repository.
 - `openspec-store`: normative capability and implementation plan only.
+- Each source-migration owner: a versioned manifest of its concrete legacy/canonical paths, reader/writer principals, launch mechanism, quiescence adapter, and value-free smoke probes. Placeholder or wildcard path-map rows are forbidden.
 
 ## Compatibility and Rollout
 
-The default remains `~/.tdt`. Existing filenames remain readable during one compatibility window. `tdt-core` 0.3.x is built first; consumer source migration begins only after its wheel passes an isolated local-wheelhouse install with no sibling checkout. Nexus publication at `nexus.tdt.internal` is a separate conditional release gate because this host currently lacks DNS resolution and credentials. In-workspace editable sources remain a development convenience, but release verification temporarily excludes them. `tdt-observability` moves to Python `>=3.14,<3.15`. Live migration is quiesce/journal/copy/verify/switch/recover, not a destructive move.
+The default remains `~/.tdt`. Existing filenames remain readable during one compatibility window. `tdt-core` 0.3.x is built first with the security kernel, schemas, diagnostics, and synthetic plan executor; consumer source migration begins only after its wheel passes an isolated local-wheelhouse install with no sibling checkout. Consumers then contribute concrete manifests, after which a complete plan is compiled and exercised twice. Nexus publication at `nexus.tdt.internal` is a separate conditional release gate because this host currently lacks DNS resolution and credentials. In-workspace editable sources remain a development convenience, but release verification temporarily excludes them. `tdt-observability` moves to Python `>=3.14,<3.15`. Live migration is plan/attest/quiesce/journal/copy/verify/switch/recover, not a destructive move.
 
 ## Rollback
 
@@ -67,3 +71,6 @@ Restore consumer imports and dependency metadata/locks before rolling back `tdt-
 - [The Twelve-Factor App: Config](https://12factor.net/config) — deploy-varying configuration belongs outside code and should be orthogonal.
 - [python-dotenv](https://bbc2.github.io/python-dotenv/) — documents `override` precedence and parsing behavior.
 - [OWASP Secrets Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html) — standardization, least privilege, auditing, and lifecycle controls.
+- [Python 3.14 `os` documentation](https://docs.python.org/3.14/library/os.html) — documents `dir_fd`, `follow_symlinks`, descriptor-capability sets, `fsync`, and filesystem operations used by the security kernel.
+- [Python 3.14 `importlib.resources` documentation](https://docs.python.org/3.14/library/importlib.resources.html) — package resources are not guaranteed to be physical files and must be consumed through the resource API.
+- macOS `open(2)`/`rename(2)` manuals on the implementation host — define `openat`, `O_NOFOLLOW`, `O_DIRECTORY`, descriptor-relative rename, and per-path rename guarantees; Python-exposed primitives are measured by executable platform-capability tests rather than assumed from OS constants.
