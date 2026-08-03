@@ -7,8 +7,8 @@ Date: 2026-08-03
 - Kimi Code CLI: `0.31.1`
 - Binary: `/opt/homebrew/bin/kimi`
 - Skill: `/Users/androidteam/.hermes/skills/autonomous-ai-agents/kimi-code/SKILL.md`
-- Skill version: `1.0.0`
-- Skill file size: `7183` bytes
+- Skill version: `1.0.1`
+- Skill file size: `7344` bytes
 
 ## Kimi CLI checks
 
@@ -30,7 +30,33 @@ Observed:
 - `kimi acp --help` confirmed ACP server mode over stdio.
 - `kimi doctor config` returned `OK config.toml /Users/androidteam/.kimi-code/config.toml` and `All checked config files are valid.`
 
-No model execution or authentication mutation was attempted. Version/help/config validity proves installation and local configuration validity, not account authorization.
+No authentication mutation was attempted. Version/help/config validity proves installation and local configuration validity, not account authorization.
+
+## Real skill-backed execution
+
+Command executed from a disposable empty directory:
+
+```bash
+kimi --skills-dir /Users/androidteam/.hermes/skills/autonomous-ai-agents/kimi-code \\
+  -p 'Perform a read-only verification of this workspace. Report exactly: (1) current working directory, (2) whether the directory is a Git repository, (3) the first five entries in the directory, and (4) confirm that you did not modify any files. Do not write files, run destructive commands, or access credentials.' \\
+  --output-format stream-json
+```
+
+Observed:
+
+- Exit code: `0`.
+- Kimi emitted structured assistant/tool JSONL events, including `Bash` calls for `pwd`, Git repository detection, and directory listing.
+- Reported working directory: `/private/tmp/kimi-code-skill-verification`.
+- Reported Git repository: `No`.
+- Reported directory contents: empty.
+- Reported file modification status: `No files were modified.`
+- Session ID: `session_73b942af-8133-4258-9e29-b77fa6762273`.
+
+A second smoke run after the documentation correction used the same skill path and exited `0`, reported `/private/tmp/kimi-code-skill-verification`, and confirmed no files or credentials were accessed. Its session ID was `session_668b05e4-c888-43ed-b22d-8055ea7e838f`.
+
+The installed CLI emitted the absolute working directory as a plain first line before the JSONL events in both runs. The skill now explicitly requires tolerant parsing of that preamble.
+
+This is real model/tool execution through the new skill's prescribed `--skills-dir`, `-p`, and `--output-format stream-json` path. No files were written by either Kimi task.
 
 ## Skill checks
 
