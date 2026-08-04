@@ -1,5 +1,6 @@
 change: harden-ci-supply-chain
 review_type: plan
+review_round: 3
 review_target:
   repository: /Users/androidteam/Developer/go-microservices
   base_ref: origin/main
@@ -9,10 +10,22 @@ artifacts:
   - design.md
   - tasks.md
   - .openspec.yaml
+  - review-round-2.md
 implementation_scope:
   - .github/workflows/
+  - services/order-service/.github/workflows/
   - .github/dependabot.yml
-  - docs/runbooks/
+  - tools/actionpin/
+  - scripts/verify-go-modules.sh
+  - verification/github-actions-lock.json
+  - verification/go-module-roots.txt
+  - verification/documentation-currency.json
+  - .gitleaksignore
+  - verification/gitleaks-waivers.yaml
+  - docs/runbooks/ci-cd-operations.md
+aligned_external_scope:
+  - /Users/androidteam/.hermes/skills/software-development/github-actions-ci/
+  - /Users/androidteam/.hermes/skills/software-development/github-actions-supply-chain/
 review_edges:
   - spec-code
   - code-docs
@@ -25,6 +38,7 @@ review_edges:
 security_lens: cross-cutting
 constraints:
   - read-only provider review
-  - no repository edits
+  - no repository edits by providers
   - no secret output
-  - config-only change with skip_specs true
+  - tooling/configuration/documentation-only change with skip_specs true
+  - every phase has executable acceptance criteria and safe independent rollback
