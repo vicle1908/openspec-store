@@ -7,7 +7,7 @@ operator approval. Depends on ALL prior changes being complete and archived.
 
 - [ ] 1.0 Verify all 3 predecessor OpenSpec changes are archived and green (`openspec validate --all`, `openspec store doctor`).
 - [ ] 1.1 Operator reviews and approves the migration plan for the specific ~/.tdt tree.
-- [x] 1.2 After approval, run the installed provider's read-only doctor against
+- [ ] 1.2 After approval, run the installed provider's read-only doctor against
   the live root and record redacted baseline findings.
 - [ ] 1.3 Back up the live tree to protected operator-owned storage using the
   `BackupMetadata` schema and the approved scope; do not copy secret values
@@ -66,10 +66,10 @@ and 24-hour monitoring period passes without anomalies.
 
 ## Evidence boundary
 
-The retained cutover evidence contains only completed records for task 1.2
-(read-only doctor baseline) and task 6.4 (OpenSpec validation/store doctor).
-Predecessor readiness, operator approval, backup/restore, maintenance-window
-quiescence, live apply, post-migration verification, rollback execution, and
-operator sign-off remain unproven. The pending-approval and documented-only
-records do not authorize or prove live `~/.tdt` mutation; this runbook remains
-open and must not be archived.
+The retained cutover evidence contains a recorded doctor invocation and a
+completed OpenSpec validation/store-doctor record, but no recorded operator
+approval for task 1.1 or task 1.2. Predecessor readiness, approval,
+backup/restore, maintenance-window quiescence, live apply, post-migration
+verification, rollback execution, and operator sign-off remain unproven. The
+pending-approval and documented-only records do not authorize or prove live
+`~/.tdt` mutation; this runbook remains open and must not be archived.

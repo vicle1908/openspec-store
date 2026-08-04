@@ -8,7 +8,7 @@ complete: provider foundation, source conformance, and migration engine.
 - [x] 1.1 Build provider wheel and locked dependency closure into a fresh local wheelhouse (no checkout, no PYTHONPATH).
 - [x] 1.2 Install provider from wheelhouse into a clean virtual environment.
 - [x] 1.3 Verify version equality between distribution metadata and runtime `__version__`.
-- [x] 1.4 Verify `tdt --help` and `tdt config doctor` run without scheduler extras.
+- [ ] 1.4 Verify `tdt --help` and `tdt config doctor` run without scheduler extras.
 - [ ] 1.5 Verify package resources load correctly (source-registry.json, schemas).
 - [ ] 1.6 Run provider-only contract tests in the clean environment.
 
@@ -61,8 +61,12 @@ rehearsal passes, and documentation is final.
 
 ## Evidence boundary
 
-The retained evidence proves provider build/install/CLI checks and the OpenSpec
-validation gate. Publication was not executed because no approved internal
+The retained evidence proves provider build/install/version checks (tasks 1.1–1.3),
+participant-scope recording, publication-process documentation, and the OpenSpec
+validation gate. The combined CLI/doctor task 1.4 is not complete because the
+retained doctor invocation used the default live root rather than an isolated
+qualification root; package-resource and provider-contract evidence for tasks
+1.5–1.6 is absent. Publication was not executed because no approved internal
 registry coordinate or operator authorization is present. Registry availability,
 target selection, consumer installation/tests/behavior, rollback rehearsal, and
 release gates 5.1–5.3 are explicitly blocked or pending execution. The
