@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-08-04T06:00:47.677319+00:00",
+  "timestamp": "2026-08-04T06:03:06.432485+00:00",
   "status": "blocked",
   "tdt_core_revision": "165f3be",
   "openspec_validate": "356/356 passed",
   "store_doctor": "no structural issues; unrelated harden-ci-supply-chain work remains uncommitted",
   "task_status": {
     "govern-tdt-home-source-conformance": "13/16; owner-supplied manifest gates open; audit 14 FAIL / 78 errors",
-    "build-tdt-home-synthetic-migration-engine": "8/29; typed plan, durable journal, and backup/staging slices pass focused tests; apply transition/recovery/rollback remain incomplete",
+    "build-tdt-home-synthetic-migration-engine": "8/29; typed plan, durable journal, and backup/staging slices; focused typed-slice tests 19 passed; apply switching/recovery/rollback remain incomplete",
     "release-and-roll-out-tdt-home-provider": "6/24; registry/consumer/rollback gates blocked",
     "cut-over-live-tdt-home": "1/26; predecessor gates block live cutover"
   },
@@ -14,7 +14,7 @@
     "tdt_core_tests": "500 passed, 16 skipped, 2 warnings",
     "ruff": "passed",
     "mypy_strict": "passed",
-    "migration_plan_journal_backup_tests": "23 passed",
+    "migration_plan_journal_backup_tests": "19 passed",
     "clean_wheel": "tdt-core 0.2.0 installed in clean CPython 3.14.5",
     "package_resource": "source-registry.json present",
     "full_suite": "500 passed, 16 skipped, 2 warnings; Ruff and strict mypy passed"
