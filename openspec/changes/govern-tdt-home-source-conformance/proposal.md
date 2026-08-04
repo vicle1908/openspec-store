@@ -8,7 +8,7 @@ This change adds a read-only governance layer that identifies those conditions b
 
 ## What Changes
 
-- Require every participating consumer repository to maintain a versioned `.tdt/governance-manifest.json` at its repository root.
+- Require every registered participant repository to maintain a versioned `.tdt/governance-manifest.json` at its repository root.
 - Define and validate the manifest contract for repository identity, provider-boundary status, deployment and launch-surface owners, approved source sites, repository-owned exceptions, and conformance evidence.
 - Add a deterministic AST-based source audit that inspects source without importing or executing consumer code and rejects hard-coded construction of `~/.tdt` outside approved provider or exception sites.
 - Recognize semantically equivalent construction patterns, including direct literals and common path-building or home-expansion forms, rather than relying on a text-only search.
@@ -62,7 +62,7 @@ Audit findings, manifest ownership records, and bounded exceptions produced by t
 
 ## Impact
 
-- Participating consumer repositories gain one governed file at `.tdt/governance-manifest.json` plus repository-local validation evidence where required.
+- Participating repositories gain one governed file at `.tdt/governance-manifest.json` plus repository-local validation evidence where required.
 - Cross-repository verification gains deterministic schema validation and AST source auditing for hard-coded `~/.tdt` construction.
 - Existing hard-coded sites without an approved location or valid repository-owned exception become explicit conformance failures. This may reveal adoption blockers but does not remediate them in this change.
 - Deployment and launch surfaces without an accountable owner become manifest validation failures, preventing ownerless consumers from being treated as rollout-ready.

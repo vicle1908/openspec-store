@@ -4,10 +4,17 @@
 
 The provider-foundation change establishes `tdt-core` as the owner of call-time `TDT_HOME` resolution, bounded path helpers, packaged contract data, and redacted diagnostics. It deliberately does not claim facts about downstream source trees or deployments. The next boundary is therefore governance: every participating repository must declare its identity and ownership, and a reproducible audit must distinguish provider-compliant source from explicitly approved legacy construction.
 
-The ecosystem currently contains 15 consumer repositories. Their source layouts, launch mechanisms, deployment owners, and remaining legacy `~/.tdt` sites are repository-owned facts. Encoding those facts only in a central `tdt-core` registry would make the provider guess about downstream state; leaving them undocumented would make cross-repository readiness unverifiable. This change joins the two views without collapsing their ownership boundaries:
+The ecosystem currently contains 15 registered participant repositories: the
+`tdt-core` provider, 12 consumers, and two verification repositories. Their
+source layouts, launch mechanisms, deployment owners, and remaining legacy
+`~/.tdt` sites are repository-owned facts. Encoding those facts only in a
+central `tdt-core` registry would make the provider guess about downstream
+state; leaving them undocumented would make cross-repository readiness
+unverifiable. This change joins the two views without collapsing their
+ownership boundaries:
 
-- the packaged `tdt-core` participant registry identifies the expected consumer set and contract version;
-- each consumer repository supplies a versioned `.tdt/governance-manifest.json` at its root;
+- the packaged `tdt-core` participant registry identifies the expected participant set and contract version;
+- each registered participant repository supplies a versioned `.tdt/governance-manifest.json` at its root;
 - the `tdt-core` CLI validates manifests and performs parser-based source audits;
 - exact legacy sites may be accepted only through repository-owned, time-bounded exception records; and
 - aggregate readiness is computed from evidence tied to specific repository revisions.
@@ -18,7 +25,7 @@ This is a control-plane change. It records and audits source/deployment facts bu
 
 ### Goals
 
-- Add a schema-valid `.tdt/governance-manifest.json` to each of the 15 registered consumer repositories.
+- Add a schema-valid `.tdt/governance-manifest.json` to each of the 15 registered participant repositories.
 - Bind every manifest to one unique participant identity in the packaged `tdt-core` registry so omissions, duplicates, and unregistered consumers fail visibly.
 - Record stable repository ownership and, where applicable, deployment owner, launch mechanism, deployment-definition paths, and reader/writer principal identifiers without storing credentials or machine-local secrets.
 - Add `tdt-core` CLI tooling that audits source using syntax trees rather than substring matching and reports stable rule IDs, source locations, and machine-readable evidence.
@@ -65,7 +72,7 @@ The logical manifest sections are:
 
 The JSON schema is packaged with `tdt-core` and validated before semantic checks run. Arbitrary source exclusions are not permitted. Generated, vendored, cache, and fixture exclusions come from the versioned central rule bundle; a repository cannot obtain a green result by declaring its production directory excluded.
 
-**Alternative rejected:** maintain all 15 consumer facts in one provider-owned file. That would turn stale provider guesses into apparent downstream truth and require a provider release for routine ownership changes.
+**Alternative rejected:** maintain all 15 participant facts in one provider-owned file. That would turn stale provider guesses into apparent downstream truth and require a provider release for routine ownership changes.
 
 **Alternative rejected:** let every repository define its own rules. That would make cross-repository results incomparable and allow a consumer to weaken the audit locally.
 
@@ -154,9 +161,9 @@ This declaration proves that the repository recorded an accountable owner at a p
 
 The CLI can validate one repository independently and can aggregate previously produced JSON envelopes against the packaged participant registry. Aggregation requires exactly one current envelope for each of the 15 expected participant IDs. Missing, duplicate, wrong-contract, stale-schema, dirty-tree, or mismatched-revision envelopes fail the aggregate.
 
-The aggregate reports counts and identities for `PASS`, `PASS_WITH_EXCEPTIONS`, and `FAIL`, plus ownership and exception-expiry summaries. It never upgrades partial evidence to ecosystem readiness. Per-repository CI remains owned by each consumer; cross-repository orchestration may collect those immutable artifacts, but `tdt-core` does not discover arbitrary sibling directories or clone repositories.
+The aggregate reports counts and identities for `PASS`, `PASS_WITH_EXCEPTIONS`, and `FAIL`, plus ownership and exception-expiry summaries. It never upgrades partial evidence to ecosystem readiness. Per-repository CI remains owned by each participating repository; cross-repository orchestration may collect those immutable artifacts, but `tdt-core` does not discover arbitrary sibling directories or clone repositories.
 
-The aggregate is eligible for downstream adoption planning only when all 15 repositories are either `PASS` or `PASS_WITH_EXCEPTIONS`, all manifests have complete ownership, and every exception is valid under the same rule bundle. Adoption and rollout changes may impose the stronger requirement that selected consumers reach `PASS` before deployment.
+The aggregate is eligible for downstream adoption planning only when all 15 participants are either `PASS` or `PASS_WITH_EXCEPTIONS`, all manifests have complete ownership, and every exception is valid under the same rule bundle. Adoption and rollout changes may impose the stronger requirement that selected consumers reach `PASS` before deployment.
 
 ### Decision 7: Governance tooling is read-only with respect to consumers and runtime data
 
@@ -204,7 +211,7 @@ Evidence is always scoped to its repository revision and tool/rule version. A cl
 - **Exact fingerprints may create review churn after harmless refactors.** The churn is intentional when the governed expression changes; symbol/path plus normalized AST minimizes invalidation from whitespace and line movement.
 - **Repository-owned declarations can conflict with central registry metadata.** Treat identity/role conflicts as failures and resolve them through coordinated registry and manifest reviews rather than choosing one silently.
 - **Deployment ownership may be mistaken for live proof.** Label it as declared evidence in every output and reserve live principal/artifact claims for successor attestations.
-- **A `tdt-core` rule update can fail many repositories at once.** Version rules, retain digest-addressable result history, test rules against representative fixtures and the 15-repository baseline, and roll out rule changes through an explicit compatibility window.
+- **A `tdt-core` rule update can fail many repositories at once.** Version rules, retain digest-addressable result history, test rules against representative fixtures and the 15-participant baseline, and roll out rule changes through an explicit compatibility window.
 - **Cross-repository aggregation can consume stale artifacts.** Require immutable revisions, matching contract/rule digests, and one envelope per participant; never infer readiness from the most recent available file alone.
 - **Central exclusions can hide meaningful code if too broad.** Keep exclusions narrow, versioned, tested, and based on object class (generated/vendor/fixture), not consumer-provided arbitrary globs.
 
@@ -213,7 +220,7 @@ Evidence is always scoped to its repository revision and tool/rule version. A cl
 1. **Finalize the governance contract in `tdt-core`.** Package the manifest schema, participant registry identity, rule bundle, and parser-adapter interfaces. Add positive, negative, aliasing, parse-failure, scope, redaction, and deterministic-output tests.
 2. **Inventory the participant set.** Resolve the exact 15 registry IDs and repository roles from packaged provider data. Record any repository or language that cannot yet be audited; do not invent a replacement ID or mark it clean.
 3. **Run a non-blocking baseline audit.** Generate informational findings for each immutable checkout to identify manifest fields, parser coverage gaps, deployment definitions, owners, and legacy sites. Baseline output is discovery evidence only.
-4. **Add repository manifests.** In each consumer repository, add `.tdt/governance-manifest.json` with the matching participant identity, source scope, repository owner, deployment classification, deployment owners/principals where applicable, and no secrets.
+4. **Add repository manifests.** In each registered participant repository, add `.tdt/governance-manifest.json` with the matching participant identity, source scope, repository owner, deployment classification, deployment owners/principals where applicable, and no secrets.
 5. **Classify every legacy finding.** Provider-compliant sites need no record. A legacy site either receives an exact, approved, expiring exception with a migration issue or remains an unsuppressed failure. This change does not silently rewrite the site.
 6. **Enable per-repository CI.** Pin a compatible `tdt-core` audit artifact, run the manifest/source audit on an immutable checkout, and retain the canonical JSON envelope. Fail on `FAIL`; surface `PASS_WITH_EXCEPTIONS` and upcoming expiries prominently.
 7. **Aggregate all 15 envelopes.** Verify exact registry membership, revisions, rule/schema consistency, ownership completeness, and exception status. Publish the first ecosystem baseline with separate clean, excepted, and failed counts.
