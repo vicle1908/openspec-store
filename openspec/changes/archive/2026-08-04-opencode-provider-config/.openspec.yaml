@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-08-04
+skip_specs: true
+description: Update Anthropic to direct API, add OpenAI localhost provider, set default model to fable-5
