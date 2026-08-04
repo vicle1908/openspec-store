@@ -14,8 +14,8 @@ Each task is one focused work session with a verification gate. Depends on
 ## 2. Journaled apply
 
 - [ ] 2.1 Implement journal lifecycle: `prepared → staged → switching → intent → completed → switched → committed` using existing `JournalHeader`, `JournalRecord` schemas from `control_plane_schema.py`.
-- [ ] 2.2 Implement `prepared → staged`: backup each source file with `BackupMetadata`, record backup paths in journal.
-- [ ] 2.3 Implement `staged → switching`: create staging copies under TDT_HOME, verify identity hashes match plan.
+- [ ] 2.2 Implement `prepared → staged`: snapshot each DESTINATION target with `BackupMetadata` before mutation, record backup paths in journal.
+- [ ] 2.3 Implement staging: create staging copies under TDT_HOME, verify identity hashes match plan, verify BOTH backups and staged payloads BEFORE writing the `staged` journal record.
 - [ ] 2.4 Implement `switching → intent`: atomically rename staging copies to final locations using descriptor-relative operations from `fs_kernel.py`.
 - [ ] 2.5 Implement `intent → completed`: verify all final locations, write completion marker.
 - [ ] 2.6 Implement `completed → switched → committed`: update symlinks/pointers, persist journal to durable storage.

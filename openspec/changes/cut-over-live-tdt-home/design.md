@@ -64,7 +64,36 @@ decision, monitoring, and final sign-off around that engine.
 - Automatically deleting backup, journal, or incident evidence after success or
   rollback.
 
-## Roles and Decision Authority
+## Core Safety Invariants
+
+1. **No approval by implication.** Passing prerequisites makes a plan eligible;
+   only a separate in-window execution approval authorizes live mutation.
+2. **One root, plan, and generation.** Every action is bound to the approved
+   root identity, canonical plan digest, and generation UUID. A mismatch stops
+   execution.
+3. **Complete backup before mutation.** Every object the plan may change has
+   valid `BackupMetadata` and any required verified payload before the journal
+   enters `switching`.
+4. **Quiescence is observed, not asserted.** A caller-provided Boolean or a
+   successful lock acquisition does not prove undeclared writers are stopped.
+5. **Only descriptor-relative engine operations mutate the root.** There is no
+   unsafe pathname fallback and no opportunistic cleanup.
+6. **Durable intent precedes effect.** The engine's journal remains the authority
+   for apply, recovery, and rollback state.
+7. **Unknown is failure.** Missing, stale, contradictory, unsupported, or
+   unowned evidence cannot be treated as pass.
+8. **Scope-specific evidence.** Provider, filesystem, consumer, deployment,
+   scheduler, and database checks do not substitute for one another.
+9. **Rollback does not guess.** Restore accepts only the exact backed-up state,
+   the exact approved applied state, or explicit prior absence. A third state is
+   external interference and stops automated mutation.
+10. **Evidence is redacted and retained.** Control-plane records may contain
+    bounded relative identifiers and digests; protected payloads remain in the
+    backup store and are never attached to tickets, chat, or OpenSpec.
+
+## Decisions
+
+### Decision 1: Assign Explicit Roles and Decision Authority
 
 One person may hold more than one role only when the execution record states
 that fact and policy permits it. The operator and rollback authority must be
@@ -86,7 +115,15 @@ The per-run record names the primary and backup contact for every required role,
 the communication channel, the incident channel, and the decision deadline. An
 unreachable required authority is a no-go, not implicit delegation.
 
-## Per-Run Control Record
+**Alternatives rejected:**
+
+- *Let the migration operator approve and execute the run alone:* this collapses
+  ownership, execution, and incident authority and permits unsafe scope expansion
+  under outage pressure.
+- *Allow implicit delegation when an authority is unreachable:* no-go conditions
+  would become unreviewed approvals without an accountable decision maker.
+
+### Decision 2: Bind Each Cutover to an Immutable Per-Run Control Record
 
 The live cutover is represented by one immutable, reviewable control record. It
 contains references and digests, not secret values or backup contents:
@@ -122,36 +159,17 @@ changes that do not affect execution still receive a recorded review. Runtime
 payloads, raw environment values, DSNs, tokens, file contents, or sensitive
 symlink text must never appear in this record.
 
-## Core Safety Invariants
+**Alternatives rejected:**
 
-1. **No approval by implication.** Passing prerequisites makes a plan eligible;
-   only a separate in-window execution approval authorizes live mutation.
-2. **One root, plan, and generation.** Every action is bound to the approved
-   root identity, canonical plan digest, and generation UUID. A mismatch stops
-   execution.
-3. **Complete backup before mutation.** Every object the plan may change has
-   valid `BackupMetadata` and any required verified payload before the journal
-   enters `switching`.
-4. **Quiescence is observed, not asserted.** A caller-provided Boolean or a
-   successful lock acquisition does not prove undeclared writers are stopped.
-5. **Only descriptor-relative engine operations mutate the root.** There is no
-   unsafe pathname fallback and no opportunistic cleanup.
-6. **Durable intent precedes effect.** The engine's journal remains the authority
-   for apply, recovery, and rollback state.
-7. **Unknown is failure.** Missing, stale, contradictory, unsupported, or
-   unowned evidence cannot be treated as pass.
-8. **Scope-specific evidence.** Provider, filesystem, consumer, deployment,
-   scheduler, and database checks do not substitute for one another.
-9. **Rollback does not guess.** Restore accepts only the exact backed-up state,
-   the exact approved applied state, or explicit prior absence. A third state is
-   external interference and stops automated mutation.
-10. **Evidence is redacted and retained.** Control-plane records may contain
-    bounded relative identifiers and digests; protected payloads remain in the
-    backup store and are never attached to tickets, chat, or OpenSpec.
+- *Use a mutable checklist or chat transcript as the execution record:* edits and
+  partial context cannot reliably bind approval to one root, plan, artifact,
+  backup, principal set, and window.
+- *Record runtime payloads to make the run self-contained:* that unnecessarily
+  exposes secrets and live data outside the protected backup boundary.
 
-## Approval Workflow
+### Decision 3: Require a Four-Gate Approval Workflow
 
-### Gate A: Eligibility review
+#### Gate A: Eligibility review
 
 The change owner assembles the complete evidence packet before the maintenance
 window. The authorizing operator reviews the packet and records `ELIGIBLE` or
@@ -175,7 +193,7 @@ is unknown, the plan contains secret-bearing control-plane data, exact restore
 cannot be represented, the backup lacks capacity, or a required approver is
 unavailable.
 
-### Gate B: In-window execution approval
+#### Gate B: In-window execution approval
 
 At the start of the window, before quiescence or live mutation, the migration
 operator reads back the run identifier, root identity, plan digest, provider
@@ -192,7 +210,7 @@ withdrawal stops forward work at the next safe journal boundary; the rollback
 authority then chooses tested forward recovery or rollback according to the
 journal state and health impact.
 
-### Gate C: Maintenance-release decision
+#### Gate C: Maintenance-release decision
 
 After apply and every required post-migration gate, the authorizing operator
 records `RELEASE`, `CONTINUE_MAINTENANCE`, or `ROLLBACK`. `RELEASE` is forbidden
@@ -201,13 +219,23 @@ only if the control record identifies its owner, scope, impact, expiry, monitori
 measure, and approval authority. Backup integrity, root identity, journal
 integrity, provider contract, and security/principal gates are non-waivable.
 
-### Gate D: Final sign-off
+#### Gate D: Final sign-off
 
 Cutover remains provisional throughout heightened monitoring. At the end, the
 authorizing operator and each affected service owner confirm monitoring results,
 open exceptions/incidents, backup retention, and ownership handoff. Only then is
 the run recorded as `SIGNED_OFF`. Absence of sign-off leaves the change open; it
 does not silently become successful.
+
+**Alternatives rejected:**
+
+- *Use one approval before the maintenance window:* evidence or bound runtime facts
+  can drift before mutation begins, so eligibility cannot substitute for an
+  in-window execution decision.
+- *Automatically release maintenance after journal commit:* engine success does
+  not prove consumer, deployment, scheduler, database, or security health.
+- *Treat monitoring completion as implicit sign-off:* unresolved incidents,
+  exceptions, or retention ownership would be hidden by the passage of time.
 
 ## Pre-Migration Live-Tree Backup
 

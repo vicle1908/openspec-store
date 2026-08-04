@@ -30,11 +30,11 @@ Each task is one focused work session with a verification gate. Dependency on
   `PASS`, `PASS_WITH_EXCEPTIONS`, and `FAIL` scopes plus redacted rule findings.
 - [ ] 3.4 Add strict mode that exits non-zero on any error-level finding.
 
-## 4. Drift allowlist
+## 4. Repository-owned exceptions
 
-- [ ] 4.1 Define an allowlist format for approved legacy sites (file path, pattern, reason, expiry date).
-- [ ] 4.2 Integrate allowlist evaluation into the source audit pipeline so approved patterns are reported as info rather than error.
-- [ ] 4.3 Verify allowlist entries cannot bypass new approved-site checks.
+- [ ] 4.1 Define the exception format for repository-owned legacy sites (file path, pattern, reason, expiry date) inside `.tdt/governance-manifest.json`.
+- [ ] 4.2 Integrate exception evaluation into the source audit pipeline so approved patterns are reported as info rather than error.
+- [ ] 4.3 Verify exception entries cannot bypass new approved-site checks.
 
 ## 5. Verification and documentation
 

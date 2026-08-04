@@ -20,43 +20,6 @@ This change builds that engine and validates it only against synthetic source
 and destination trees. Consumer adoption, process quiescence, service rollout,
 and live operator cutover remain separate approval gates.
 
-## Goals / Non-Goals
-
-### Goals
-
-- Compile an explicit source inventory and governed migration rules into one
-  immutable, typed, deterministic migration plan.
-- Bind each apply generation to the target root identity and canonical plan
-  digest.
-- Snapshot every destination object that the plan may mutate before the first
-  destination mutation, using `BackupMetadata` and verified backup payloads.
-- Apply the plan through the durable state sequence
-  `prepared → staged → switching → intent → completed → switched → committed`.
-- Resume safely and idempotently from every valid journal state, including a
-  crash after a mutation but before its `completed` record.
-- Roll back by reversing the journaled plan and restoring exact prior object
-  state, including explicit prior absence.
-- Exercise real `SIGTERM` interruption at every journal boundary in child
-  processes, then prove recovery or rollback in a new process.
-- Prove that all tests operate beneath an isolated temporary TDT_HOME root and
-  do not inspect or mutate the operator's real root.
-
-### Non-Goals
-
-- Migrating the real `~/.tdt` tree or any production-selected `TDT_HOME`.
-- Discovering consumer paths by convention, source grep, or a guessed map.
-- Changing consumers, launchd jobs, Compose services, credentials, or scheduler
-  deployment configuration.
-- Treating a caller-provided Boolean as proof that writers are quiesced.
-- Coordinating concurrent writers that do not participate in the migration
-  lock. Writer discovery and quiescence are future rollout responsibilities.
-- Supporting arbitrary directory replacement, hard-linked objects, devices,
-  sockets, FIFOs, or unregistered filesystem metadata formats.
-- Automatically deleting committed generation evidence or backups. Retention
-  policy is a later operational concern.
-
-## Architecture
-
 The engine is divided into five components with narrow responsibilities:
 
 1. **Inventory reader** — reads only explicitly declared source roots, anchors
@@ -93,43 +56,46 @@ Names are illustrative; the implementation may use equivalent provider-owned
 relative components. It may not store generation artifacts outside the anchored
 target root or accept an arbitrary journal path from the caller.
 
-## Core Invariants
+## Goals / Non-Goals
 
-The following invariants apply to compilation, apply, recovery, and rollback:
+### Goals
 
-1. **Explicit scope:** every source and destination object is declared by typed
-   relative components. Absolute paths, `..`, globbing, empty components, and
-   unregistered object kinds are rejected.
-2. **Stable binding:** the `JournalHeader` binds a generation UUID, anchored
-   target `RootIdentity`, canonical plan digest, and aware creation timestamp.
-   The root identity and digest are revalidated before recovery or mutation.
-3. **Deterministic order:** plan steps have a canonical total order. The nth
-   `intent`/`completed` pair always refers to the nth plan step, so journal
-   records contain no values or secret material.
-4. **Durable-before-effect:** a state or intent record is atomically written and
-   synchronized before the side effect it authorizes begins.
-5. **Verified-after-effect:** `completed`, `switched`, or `committed` is recorded
-   only after the corresponding postcondition is reopened and verified.
-6. **Backup-before-mutation:** all `BackupMetadata` entries and required backup
-   payloads are complete, synchronized, and verified before `switching`.
-7. **Descriptor-relative mutation:** destination traversal and replacement use
-   the provider security kernel with retained directory descriptors,
-   no-follow checks, identity validation, file synchronization, rename, and
-   parent-directory synchronization.
-8. **Fail closed:** malformed schemas, a broken hash chain, an illegal state
-   transition, root or plan mismatch, missing backup data, an unsupported object
-   kind, or ambiguous destination state stops recovery without further mutation.
-9. **Idempotent convergence:** retrying an authorized operation either verifies
-   the already-achieved postcondition or recreates the same postcondition. It
-   does not infer success merely from a file's presence.
-10. **Value-free control plane:** journals, diagnostics, and plan metadata store
-    object identities, relative paths, operation kinds, sizes, and digests—not
-    file contents, resolved secret values, raw DSNs, or credentials. Payloads
-    remain confined to protected staging and backup files.
+- Compile an explicit source inventory and governed migration rules into one
+  immutable, typed, deterministic migration plan.
+- Bind each apply generation to the target root identity and canonical plan
+  digest.
+- Snapshot every destination object that the plan may mutate before the first
+  destination mutation, using `BackupMetadata` and verified backup payloads.
+- Apply the plan through the durable state sequence
+  `prepared → staged → switching → intent → completed → switched → committed`.
+- Resume safely and idempotently from every valid journal state, including a
+  crash after a mutation but before its `completed` record.
+- Roll back by reversing the journaled plan and restoring exact prior object
+  state, including explicit prior absence.
+- Exercise real `SIGTERM` interruption at every journal boundary in child
+  processes, then prove recovery or rollback in a new process.
+- Prove that all tests operate beneath an isolated temporary TDT_HOME root and
+  do not inspect or mutate the operator's real root.
 
-## Decision 1: Compile inventory into a typed canonical plan
+### Non-Goals
 
-### Source inventory
+- Migrating the real `~/.tdt` tree or any production-selected `TDT_HOME`.
+- Discovering consumer paths by convention, source grep, or a guessed map.
+- Changing consumers, launchd jobs, Compose services, credentials, or scheduler
+  deployment configuration.
+- Treating a caller-provided Boolean as proof that writers are quiesced.
+- Coordinating concurrent writers that do not participate in the migration
+  lock. Writer discovery and quiescence are future rollout responsibilities.
+- Supporting arbitrary directory replacement, hard-linked objects, devices,
+  sockets, FIFOs, or unregistered filesystem metadata formats.
+- Automatically deleting committed generation evidence or backups. Retention
+  policy is a later operational concern.
+
+## Decisions
+
+### Decision 1: Compile inventory into a typed canonical plan
+
+#### Source inventory
 
 The compiler does not crawl arbitrary home directories. It accepts a validated
 set of source roots and governed mapping rules. Inventory entries capture only
@@ -148,7 +114,7 @@ Inventory uses descriptor-relative, no-follow reads. A source object that change
 identity or digest between inventory and staging invalidates the plan rather than
 silently changing its meaning.
 
-### Typed plan
+#### Typed plan
 
 The plan compiler validates the whole inventory before publishing a plan. Each
 plan step contains a stable sequence number, operation kind, typed source and
@@ -183,7 +149,7 @@ state; it uses the exact plan bound into the generation header.
 - *Embed source contents in plan JSON:* increases secret exposure and makes
   diagnostics/control-plane data unsafe to retain.
 
-## Decision 2: Use a root-bound, hash-chained journal
+### Decision 2: Use a root-bound, hash-chained journal
 
 A generation is created while holding the target migration lock. The engine
 anchors the target root, writes the canonical plan, and writes a `JournalHeader`
@@ -207,7 +173,15 @@ Only one apply/recover/rollback process may own the provider migration lock for 
 target root. Lock acquisition is rooted in the same verified filesystem object;
 a path-only lock in `/tmp` is not sufficient.
 
-## Decision 3: Make journal states explicit durability boundaries
+**Alternatives rejected:**
+
+- *Use a mutable in-place journal:* an interrupted append or rewrite makes the
+  publication boundary ambiguous and weakens chain verification.
+- *Bind only to a caller-supplied path or external lock:* path rebinding can target
+  a different filesystem object and an unrelated lock cannot serialize work for
+  the anchored root.
+
+### Decision 3: Make journal states explicit durability boundaries
 
 The forward state machine is:
 
@@ -233,7 +207,7 @@ The implementation invokes a test observer only after each state record and its
 parent directory are durable. No success state is logged or reported before that
 boundary.
 
-### Per-step switching protocol
+#### Per-step switching protocol
 
 For each deterministic plan step, the engine:
 
@@ -252,7 +226,14 @@ A destination that matches neither the expected precondition nor the desired
 postcondition is ambiguous external interference. Recovery stops fail closed and
 requires operator disposition; it never overwrites the object speculatively.
 
-## Decision 4: Snapshot the complete pre-migration state
+**Alternatives rejected:**
+
+- *Record only a final success marker:* recovery could not distinguish which
+  operation was authorized or durably verified before interruption.
+- *Perform effects before durable intent:* a crash could leave an unaccounted
+  mutation that neither forward recovery nor rollback can identify safely.
+
+### Decision 4: Snapshot the complete pre-migration state
 
 Before `staged` is recorded, the engine snapshots every destination object that
 any plan step may change. Each snapshot has a strict `BackupMetadata` record:
@@ -284,7 +265,7 @@ and preserves evidence.
 objects are authorized, captures unrelated secrets, cannot represent prior
 absence precisely, and makes exact reverse verification difficult.
 
-## Decision 5: Recover by replaying state, not by guessing intent
+### Decision 5: Recover by replaying state, not by guessing intent
 
 Recovery requires the caller to select a canonical generation UUID. It acquires
 the root migration lock, anchors the explicit root, validates the header against
@@ -309,7 +290,14 @@ missing backup needed for rollback, or a plan/root binding mismatch is a hard
 error. Diagnostics identify the generation, relative object path, expected fact
 class, and state without rendering payload values.
 
-## Decision 6: Roll back by reversing journaled effects
+**Alternatives rejected:**
+
+- *Recompile from current inventory during recovery:* mutable source state could
+  change the reviewed transaction and its deterministic operation order.
+- *Retry the whole plan blindly:* already-completed steps and external interference
+  would be indistinguishable from work that is safe to repeat.
+
+### Decision 6: Roll back by reversing journaled effects
 
 Rollback is explicit; a failed forward recovery does not silently choose
 rollback. Once requested, the engine appends `rolling_back` at the first legal
@@ -348,7 +336,14 @@ post-commit rollback, it must be a separately approved generation with a new
 plan using the retained snapshots; this synthetic engine treats `committed` as
 terminal.
 
-## Decision 7: Test real process interruption at every boundary
+**Alternatives rejected:**
+
+- *Choose rollback automatically after any failure:* some journal states can safely
+  recover forward, and policy—not a low-level error—must select the outcome.
+- *Generate inverse shell commands:* untyped inverse operations cannot prove exact
+  prior absence, metadata restoration, or safe handling of interrupted effects.
+
+### Decision 7: Test real process interruption at every boundary
 
 The interruption harness runs migration commands in child processes. A private
 test-only boundary observer reports `(generation, state, occurrence, sequence)`
@@ -386,6 +381,57 @@ The harness additionally corrupts one fact at a time—root identity binding, pl
 digest, record hash/link, record sequence, stage digest, backup digest, and
 unexpected destination state—and proves that recovery fails before any new
 mutation.
+
+**Alternatives rejected:**
+
+- *Simulate interruption with exceptions or cleanup hooks:* those tests preserve
+  process memory and do not exercise actual signal termination between durable
+  filesystem boundaries.
+- *Sample only one interruption point:* it leaves untested ambiguity at other
+  journal occurrences and during reverse restoration.
+
+### Decision 8: Enforce Cross-Cutting Migration Invariants
+
+The following invariants apply to compilation, apply, recovery, and rollback:
+
+1. **Explicit scope:** every source and destination object is declared by typed
+   relative components. Absolute paths, `..`, globbing, empty components, and
+   unregistered object kinds are rejected.
+2. **Stable binding:** the `JournalHeader` binds a generation UUID, anchored
+   target `RootIdentity`, canonical plan digest, and aware creation timestamp.
+   The root identity and digest are revalidated before recovery or mutation.
+3. **Deterministic order:** plan steps have a canonical total order. The nth
+   `intent`/`completed` pair always refers to the nth plan step, so journal
+   records contain no values or secret material.
+4. **Durable-before-effect:** a state or intent record is atomically written and
+   synchronized before the side effect it authorizes begins.
+5. **Verified-after-effect:** `completed`, `switched`, or `committed` is recorded
+   only after the corresponding postcondition is reopened and verified.
+6. **Backup-before-mutation:** all `BackupMetadata` entries and required backup
+   payloads are complete, synchronized, and verified before `switching`.
+7. **Descriptor-relative mutation:** destination traversal and replacement use
+   the provider security kernel with retained directory descriptors,
+   no-follow checks, identity validation, file synchronization, rename, and
+   parent-directory synchronization.
+8. **Fail closed:** malformed schemas, a broken hash chain, an illegal state
+   transition, root or plan mismatch, missing backup data, an unsupported object
+   kind, or ambiguous destination state stops recovery without further mutation.
+9. **Idempotent convergence:** retrying an authorized operation either verifies
+   the already-achieved postcondition or recreates the same postcondition. It
+   does not infer success merely from a file's presence.
+10. **Value-free control plane:** journals, diagnostics, and plan metadata store
+    object identities, relative paths, operation kinds, sizes, and digests—not
+    file contents, resolved secret values, raw DSNs, or credentials. Payloads
+    remain confined to protected staging and backup files.
+
+**Alternatives rejected:**
+
+- *Treat these invariants as implementation guidance:* optional interpretation
+  would allow compile, apply, recovery, and rollback paths to enforce different
+  containment or durability rules.
+- *Validate binding and scope only at generation creation:* root replacement,
+  plan drift, or journal corruption after creation could otherwise authorize a
+  mutation against unreviewed state.
 
 ## Isolated Test Root Verification
 

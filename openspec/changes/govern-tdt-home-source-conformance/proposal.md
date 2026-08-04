@@ -21,11 +21,11 @@ This change adds a read-only governance layer that identifies those conditions b
 
 ### New Capabilities
 
-- None. This change extends the existing `tdt-env-loader-tdt-home` capability.
+- `tdt-home-source-conformance`: make cross-repository source conformance enforceable through consumer governance manifests, AST-based detection of hard-coded `~/.tdt` construction, explicit deployment ownership, and repository-owned exceptions.
 
 ### Modified Capabilities
 
-- `tdt-env-loader-tdt-home`: make cross-repository source conformance enforceable through consumer governance manifests, AST-based detection of hard-coded `~/.tdt` construction, explicit deployment ownership, and repository-owned exceptions.
+- None.
 
 ## Ownership Boundaries
 

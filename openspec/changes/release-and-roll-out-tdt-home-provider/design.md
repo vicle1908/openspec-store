@@ -41,47 +41,6 @@ credentials, update consumer source, restart a service, or touch the operator's
 real `~/.tdt`. Those effects occur only when an authorized release operator
 executes the approved procedure.
 
-## Goals / Non-Goals
-
-### Goals
-
-- Build a complete, locked wheelhouse from one clean `tdt-core` source revision.
-- Bind the release candidate to its source revision, distribution version,
-  wheel hash, lockfile identity, build-tool identity, supported runtime, and
-  value-free artifact inventory.
-- Prove the candidate from a fresh, checkout-free environment with no
-  `PYTHONPATH`, editable install, package index, or ambient wheel cache.
-- Verify version identity, the base CLI, `tdt config doctor`, packaged resources,
-  and provider contracts from the installed artifact.
-- Publish the exact qualified wheel to the approved internal registry without
-  rebuilding it, then repeat clean installation and qualification from the
-  registry copy.
-- Roll out the pinned provider to one consumer at a time, with consumer-owned
-  compatibility, health, observation, and approval gates before advancing.
-- Rehearse reverse rollback by restoring the exact pre-change provider artifact
-  and proving that the consumer returns to its recorded baseline behavior.
-- Define fail-closed release criteria, monitoring signals, rollback triggers,
-  ownership, and redacted evidence retention.
-- Keep provider, publication, consumer, deployment, and live-root readiness as
-  distinct claims.
-
-### Non-Goals
-
-- Migrating consumer source from legacy path construction to provider APIs.
-- Cutting over, repairing, or mutating the live `~/.tdt` tree.
-- Changing databases, application schemas, credentials, service configuration,
-  launch definitions, or runtime principals as part of the provider release.
-- Choosing or configuring the internal registry product, creating credentials,
-  rotating tokens, or changing repository retention policy.
-- Treating local source tests, a successful upload, or a passing provider doctor
-  as proof that every consumer is ready.
-- Rolling out multiple consumers concurrently.
-- Automatically promoting a failed or unknown gate through an operator override.
-- Deleting the pre-change artifact or release evidence immediately after a
-  successful rollout.
-
-## Architecture and Promotion Flow
-
 The release is an immutable promotion pipeline:
 
 ```text
@@ -133,6 +92,45 @@ logical: a principal allowed to upload a package need not be able to deploy a
 consumer, and a consumer operator need not receive package-publishing
 credentials.
 
+## Goals / Non-Goals
+
+### Goals
+
+- Build a complete, locked wheelhouse from one clean `tdt-core` source revision.
+- Bind the release candidate to its source revision, distribution version,
+  wheel hash, lockfile identity, build-tool identity, supported runtime, and
+  value-free artifact inventory.
+- Prove the candidate from a fresh, checkout-free environment with no
+  `PYTHONPATH`, editable install, package index, or ambient wheel cache.
+- Verify version identity, the base CLI, `tdt config doctor`, packaged resources,
+  and provider contracts from the installed artifact.
+- Publish the exact qualified wheel to the approved internal registry without
+  rebuilding it, then repeat clean installation and qualification from the
+  registry copy.
+- Roll out the pinned provider to one consumer at a time, with consumer-owned
+  compatibility, health, observation, and approval gates before advancing.
+- Rehearse reverse rollback by restoring the exact pre-change provider artifact
+  and proving that the consumer returns to its recorded baseline behavior.
+- Define fail-closed release criteria, monitoring signals, rollback triggers,
+  ownership, and redacted evidence retention.
+- Keep provider, publication, consumer, deployment, and live-root readiness as
+  distinct claims.
+
+### Non-Goals
+
+- Migrating consumer source from legacy path construction to provider APIs.
+- Cutting over, repairing, or mutating the live `~/.tdt` tree.
+- Changing databases, application schemas, credentials, service configuration,
+  launch definitions, or runtime principals as part of the provider release.
+- Choosing or configuring the internal registry product, creating credentials,
+  rotating tokens, or changing repository retention policy.
+- Treating local source tests, a successful upload, or a passing provider doctor
+  as proof that every consumer is ready.
+- Rolling out multiple consumers concurrently.
+- Automatically promoting a failed or unknown gate through an operator override.
+- Deleting the pre-change artifact or release evidence immediately after a
+  successful rollout.
+
 ## Release Identity and Evidence Envelope
 
 A release ID identifies one candidate and is never reused. The canonical release
@@ -164,9 +162,11 @@ configuration, DSN, secret-bearing doctor output, or consumer payload. Command
 output is redacted before retention. Evidence files are written atomically and
 considered complete only after their schema and referenced hashes validate.
 
-## Decision 1: Build One Immutable Candidate from a Locked Wheelhouse
+## Decisions
 
-### Source and version preconditions
+### Decision 1: Build One Immutable Candidate from a Locked Wheelhouse
+
+#### Source and version preconditions
 
 The builder operates on an immutable checkout of the approved revision. Before
 building, it verifies:
@@ -186,7 +186,7 @@ A dirty source tree or version mismatch blocks the build. The pipeline does not
 repair metadata, regenerate the lock silently, or infer which source value is
 authoritative during a release run.
 
-### Wheelhouse construction
+#### Wheelhouse construction
 
 The wheelhouse is a release unit, not merely a directory containing the provider
 wheel. It contains:
@@ -214,7 +214,7 @@ lock, build-tool, or package-data fix invalidates the candidate; the pipeline
 assigns a new candidate execution, rebuilds the wheelhouse, and reruns every
 artifact gate.
 
-### Reproducibility
+#### Reproducibility
 
 Where the build backend and wheel metadata permit byte-for-byte reproducibility,
 an independent rebuild from the same revision and declared build environment
@@ -234,7 +234,7 @@ the independently rebuilt wheel for the originally qualified bytes.
 - *Treat the lockfile alone as the artifact:* a lock does not prove that every
   required wheel is downloadable or installable for the target runtime.
 
-## Decision 2: Qualification Runs in a Checkout-Free Clean Environment
+### Decision 2: Qualification Runs in a Checkout-Free Clean Environment
 
 Each qualification lane starts with a newly created virtual environment or
 container/VM that has only the supported Python runtime and the approved
@@ -251,7 +251,7 @@ not rely on the runner's real home and must prove, using an outside-root canary 
 equivalent audit, that the operator's real `~/.tdt` was neither opened for
 mutation nor changed.
 
-### Verification matrix
+#### Verification matrix
 
 Every supported release lane executes the following checks against the installed
 candidate. A skipped, unavailable, contradictory, or indeterminate result is not
@@ -284,7 +284,7 @@ validation, and secret scanning run before artifact qualification. They remain
 required release evidence, but they do not substitute for any installed-wheel
 matrix row.
 
-### Contract-test isolation
+#### Contract-test isolation
 
 The contract suite used after installation is versioned independently from the
 source checkout and included in the evidence envelope by digest. It may be
@@ -292,7 +292,14 @@ provided as a release-test bundle or installed test package, but must not import
 fixtures, helpers, or modules from the candidate's source tree. A test that
 passes only when executed from the `tdt-core` checkout fails isolation.
 
-## Decision 3: Publish by Promotion, Then Re-qualify the Registry Copy
+**Alternatives rejected:**
+
+- *Qualify from the source checkout:* it can mask missing package data, entry
+  points, and dependency closure by importing local files.
+- *Reuse a warm environment or ambient cache:* residual artifacts make the
+  candidate's installability and module origins indeterminate.
+
+### Decision 3: Publish by Promotion, Then Re-qualify the Registry Copy
 
 Publication is allowed only after all source and offline clean-environment gates
 pass. The publisher uploads the exact qualified provider wheel to the approved
@@ -332,9 +339,9 @@ audit requirements.
 support investigation or rollback retention, but it does not verify the package
 index and permission path consumers will use.
 
-## Decision 4: Roll Out to One Consumer at a Time
+### Decision 4: Roll Out to One Consumer at a Time
 
-### Rollout inventory and ordering
+#### Rollout inventory and ordering
 
 Before the first consumer change, the rollout controller snapshots the exact
 packaged `source-registry.json` and joins each `consumer` participant to its
@@ -357,7 +364,7 @@ the sequence. Changing the order requires a new approval record. There is one
 active consumer transaction at a time; queued consumers retain their current
 provider artifact.
 
-### Per-consumer preflight
+#### Per-consumer preflight
 
 For consumer `C`, preflight records:
 
@@ -382,7 +389,7 @@ consumer revision, missing ownership, missing health checks, unavailable
 rollback bytes, or inability to separate provider upgrade from unrelated package
 changes blocks the consumer.
 
-### Per-consumer transaction
+#### Per-consumer transaction
 
 Each consumer passes through these states:
 
@@ -429,7 +436,7 @@ A library/non-deployable consumer performs the same transaction in its clean CI
 or integration-test environment and uses its contract suite in place of a
 service restart. A provider-only pass cannot satisfy a consumer behavior check.
 
-### Advancement gate
+#### Advancement gate
 
 The release operator may advance to the next consumer only when:
 
@@ -446,7 +453,14 @@ The release operator may advance to the next consumer only when:
 must identify its exact bounded condition, owner, expiry, and why it cannot mask
 a version, resource, contract, health, or rollback failure.
 
-## Decision 5: Rehearse Reverse Rollback with the Real Artifacts
+**Alternatives rejected:**
+
+- *Roll out consumers in parallel:* it broadens blast radius and obscures which
+  consumer first exposed a shared-provider defect.
+- *Infer deployments from the central participant registry:* registry roles do
+  not provide repository-owned launch, principal, health, or ownership facts.
+
+### Decision 5: Rehearse Reverse Rollback with the Real Artifacts
 
 Rollback capability is proven before ecosystem advancement rather than inferred
 from the existence of an older version number. The rehearsal runs in the
@@ -492,6 +506,13 @@ non-deployable and an equivalent clean integration target proves install,
 behavior, restore, and re-verification. The release record names the bounded
 rationale and approver. A deployable consumer cannot waive rollback rehearsal
 merely because the provider passed elsewhere.
+
+**Alternatives rejected:**
+
+- *Treat an older version label as sufficient rollback evidence:* the same version
+  can resolve to different bytes or dependency closures.
+- *Rehearse on another consumer or deployment mechanism:* that does not prove the
+  target consumer can restore and verify its own recorded baseline.
 
 ## Release and Rollout Gate Criteria
 
