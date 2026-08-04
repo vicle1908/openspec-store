@@ -55,11 +55,14 @@ does not rewrite consumer source or dependency metadata.
 
 The provider-owned schema, scaffold, parser audit, deterministic report, and
 exception policy are implemented and verified in canonical `tdt-core` commits
-`45f59bb..fd8c97f`. Tasks 2.2, 2.3, and 5.1 intentionally remain open. The
-current workspace contains 14 untracked participant manifest files: two pass
-standalone `RepositoryManifest` validation, twelve fail the required deployment
-fields, and the `tdt-core` provider manifest is missing. No participant has a
-Git-committed manifest or immutable revision-bound evidence envelope. The
-strict workspace audit therefore fails closed during registry discovery with a
-sanitized `REGISTRY_ERROR` and cannot produce the required 15-participant
-result. The provider must not invent those facts or mark the aggregate ready.
+`45f59bb..8410ab5`. Tasks 2.2, 2.3, and 5.1 intentionally remain open. All 15
+registered repositories now have tracked, schema-valid manifests, including
+the provider manifest at `tdt-core` commit `d0cda4d` and owner-repository
+manifest commits for the 14 participants. The declarations still use
+`unverified` owning/deployment owners and `unknown` principals, so accountable
+ownership invariants are not proven. No immutable revision-bound audit evidence
+envelopes have been retained. The current strict workspace audit evaluates all
+15 repositories and reports 13 `FAIL`, 2 `PASS`, and 76 error findings after
+the provider-boundary allowlist; dirty checkouts remain diagnostic evidence,
+not an ecosystem-ready aggregate. The provider must not invent ownership or
+promote this result to conformance readiness.
