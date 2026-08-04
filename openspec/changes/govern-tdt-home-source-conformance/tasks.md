@@ -13,10 +13,10 @@ Each task is one focused work session with a verification gate. Dependency on
 
 - [x] 2.1 Publish the manifest schema, scaffold, and per-participant checklist;
   do not write consumer repository files from the provider-owned change.
-- [x] 2.2 Review owner-supplied manifests for each of the 15 registered
+- [ ] 2.2 Review owner-supplied manifests for each of the 15 registered
   participants and verify repository, role, identity marker, scope, deployment
   ownership, and exception invariants against the provider registry.
-- [x] 2.3 Require each participant repository to commit its own manifest and
+- [ ] 2.3 Require each participant repository to commit its own manifest and
   retain an immutable revision-bound evidence envelope; aggregate only those
   owner-supplied artifacts.
 
