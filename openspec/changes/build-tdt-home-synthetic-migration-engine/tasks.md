@@ -13,7 +13,7 @@ Each task is one focused work session with a verification gate. Depends on
 
 ## 2. Journaled apply
 
-- [ ] 2.1 Implement journal lifecycle: `prepared → staged → switching → intent → completed → switched → committed` using existing `JournalHeader`, `JournalRecord` schemas from `control_plane_schema.py`.
+- [x] 2.1 Implement journal lifecycle: `prepared → staged → switching → intent → completed → switched → committed` using existing `JournalHeader`, `JournalRecord` schemas from `control_plane_schema.py`.
 - [ ] 2.2 Implement `prepared → staged`: snapshot each DESTINATION target with `BackupMetadata` before mutation, record backup paths in journal.
 - [ ] 2.3 Implement staging: create staging copies under TDT_HOME, verify identity hashes match plan, verify BOTH backups and staged payloads BEFORE writing the `staged` journal record.
 - [ ] 2.4 Implement `switching → intent`: atomically rename staging copies to final locations using descriptor-relative operations from `fs_kernel.py`.
@@ -77,11 +77,17 @@ for journal binding. The compatibility `compile_plan` surface is read-only;
 its apply, backup, rollback, and journal persistence entry points fail closed
 until their successor tasks are implemented. Focused planner coverage is 19
 passed; full provider pytest reports 487 passed and 16 skipped, with Ruff,
-formatting, and strict mypy gates passed. GitNexus MCP could not
+formatting, and strict mypy gates passed. Task 2.1 is implemented in canonical
+`tdt-core` commit `200c4c5`: `JournalStore` durably publishes canonical plan,
+header, and hash-chained `prepared`, `staged`, `switching`, `intent`,
+`completed`, `switched`, and `committed` records through the provider private
+filesystem primitives, and its focused lifecycle/tamper suite passes 4 tests.
+The combined provider suite after this slice reports 491 passed and 16 skipped,
+with Ruff, formatting, and strict mypy still passing. GitNexus MCP could not
 index `tdt-core` in this session, so no live impact/detect evidence is claimed;
 manual scope review was performed and `graphify update .` refreshed the local
-code graph. Tasks 2.1–7.2 remain open: the canonical checkout still has no
+code graph. Tasks 2.2–7.2 remain open: the canonical checkout still has no
 journal executor, backup/apply/recovery/rollback implementation, interruption
-harness, or isolated end-to-end migration evidence. Task 7.3 remains the only
-other completed task. This predecessor is not green and cannot satisfy rollout
+harness, or isolated end-to-end migration evidence. Task 7.3 is also complete;
+the predecessor is not green and cannot satisfy rollout
 or live-cutover gates.
