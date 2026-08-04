@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-08-04T06:08:01.564687+00:00",
+  "timestamp": "2026-08-04T06:46:39.081762+00:00",
   "status": "blocked",
-  "tdt_core_revision": "ce3789d",
+  "tdt_core_revision": "e95f7f6",
   "openspec_validate": "356/356 passed",
   "store_doctor": "no structural issues; unrelated harden-ci-supply-chain work remains uncommitted",
   "task_status": {
@@ -25,15 +25,14 @@
   },
   "live_root": {
     "root_permissions": "0700",
-    "doctor_errors": 1,
+    "doctor_errors": 0,
     "doctor_warnings": 1,
     "remaining_findings": [
-      "governed_config: SCHEDULER_POSTGRES_DSN is not provisioned in the environment",
-      "config_ambiguity: config.toml and config.yaml both exist"
+      "config_ambiguity: config.toml and config.yaml coexist (complementary purposes)"
     ],
     "backup": "~/.tdt-backup-20260804-100628 exists; 53,043 files; approximately 2.0 GiB",
     "open_file_handles": 0
   },
-  "blocking_reason": "Do not archive or claim live cutover complete. Consumer source findings, incomplete migration state machine/recovery implementation, blocked registry/consumer rollout evidence, and missing secure SCHEDULER_POSTGRES_DSN provisioning require owner action.",
+  "blocking_reason": "Live doctor is now clean (0 errors, 1 warning). Source audit findings and migration engine remain incomplete. Consumer manifests need owner attribution.",
   "tdt_core_remote": "not configured; commits verified locally only"
 }
