@@ -3,30 +3,10 @@
 ## Purpose
 
 Hermes skills for OpenSpec workflow integration, including multi-provider review capabilities.
+
 ## Requirements
+
 ### Requirement: Plan Review Skill
-
-The system SHALL provide a plan review skill that orchestrates 5-provider review of OpenSpec change artifacts for alignment across specs, code, documentation, skills, and tests.
-
-#### Scenario: Alignment review after propose
-
-- GIVEN a change with completed artifacts
-- WHEN the user invokes plan review
-- THEN 5 providers review in parallel
-- AND alignment matrix is produced
-
-### Requirement: Code Review Skill
-
-The system SHALL provide a code review skill that orchestrates 5-provider review of implementation code for alignment across specs, code, documentation, skills, and tests.
-
-#### Scenario: Alignment review after apply
-
-- GIVEN a change with implemented code
-- WHEN the user invokes code review
-- THEN 5 providers review in parallel
-- AND alignment matrix is produced
-
-### Requirement: Plan Review Skill (Alignment, Revised v2)
 
 The system SHALL provide a plan review skill that orchestrates 5-provider review of OpenSpec change artifacts for alignment across specs, code, documentation, skills, and tests.
 
@@ -48,7 +28,7 @@ The system SHALL provide a plan review skill that orchestrates 5-provider review
 - AND consolidates feedback into `review-plan.md` with 8-edge alignment matrix
 - AND reports summary with ALL statuses: PASS/PARTIAL/FAIL/N/A/UNKNOWN/NOT_REVIEWED
 
-#### Scenario: Trust boundary enforcement (capability-enforced)
+#### Scenario: Trust boundary enforcement
 
 - GIVEN 5 reviewers spawned for review
 - WHEN each reviewer executes
@@ -100,7 +80,7 @@ The system SHALL provide a plan review skill that orchestrates 5-provider review
 - AND evidence includes output artifact path
 - AND evidence includes status: collected, skipped, blocked, unavailable
 
-### Requirement: Code Review Skill (Alignment, Revised v2)
+### Requirement: Code Review Skill
 
 The system SHALL provide a code review skill that orchestrates 5-provider review of implementation code for alignment across specs, code, documentation, skills, and tests.
 
@@ -172,4 +152,3 @@ The system SHALL provide a code review skill that orchestrates 5-provider review
 - AND security findings are marked FAIL until disproved
 - AND security evidence includes file paths, line numbers, threat models
 - AND security is reported as a lens, not a separate edge
-
