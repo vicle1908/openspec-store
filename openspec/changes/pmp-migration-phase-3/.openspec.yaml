@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-08-04
+owners:
+  - pmp-migration
+description: Migrate 13 remaining PMP fragments to PMPViewModel
