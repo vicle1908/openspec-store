@@ -77,7 +77,7 @@ rollback, interruption, and isolated-root verification.
 - **THEN** integration may be proposed as a separate reviewed implementation
   step with revision-bound evidence
 
-### Requirement: Apply SHALL use a hash-chained journal and provider kernel
+### Requirement: Strict apply SHALL publish durable per-step effects
 
 The engine SHALL execute only descriptor-relative provider operations and SHALL
 publish a contiguous hash-chained record for each legal state transition. The
