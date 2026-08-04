@@ -1,0 +1,30 @@
+change: harden-ci-supply-chain
+review_type: plan
+review_target:
+  repository: /Users/androidteam/Developer/go-microservices
+  base_ref: origin/main
+  frozen_commit: abdc7c12369bbc6b2ff3f10267793912832457ca
+artifacts:
+  - proposal.md
+  - design.md
+  - tasks.md
+  - .openspec.yaml
+implementation_scope:
+  - .github/workflows/
+  - .github/dependabot.yml
+  - docs/runbooks/
+review_edges:
+  - spec-code
+  - code-docs
+  - docs-skills
+  - skills-specs
+  - spec-docs
+  - code-skills
+  - spec-tests
+  - code-tests
+security_lens: cross-cutting
+constraints:
+  - read-only provider review
+  - no repository edits
+  - no secret output
+  - config-only change with skip_specs true

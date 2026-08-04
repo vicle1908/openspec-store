@@ -41,15 +41,15 @@ Each task is one focused work session with a verification gate. Depends on
 ## 5. Synthetic interruption testing
 
 - [x] 5.1 Implement interruption harness: run apply in a subprocess, send SIGTERM at each journal state boundary, verify recovery.
-- [ ] 5.2 Add tests for interruption at: after prepared, after staged, during switching, after intent, after completed, after switched.
-- [ ] 5.3 Verify no partial mutations survive after recovery from each interruption point.
+- [x] 5.2 Add tests for interruption at: after prepared, after staged, during switching, after intent, after completed, after switched.
+- [x] 5.3 Verify no partial mutations survive after recovery from each interruption point.
 
 ## 6. Isolated test root verification
 
 - [x] 6.1 Create isolated test root fixtures (value-free, no real credentials).
 - [x] 6.2 Run full apply → verify → rollback cycle against isolated test root.
-- [ ] 6.3 Run `tdt config doctor` against migrated test root and verify healthy.
-- [ ] 6.4 Run provider contract tests against migrated test root.
+- [x] 6.3 Run `tdt config doctor` against migrated test root and verify healthy.
+- [x] 6.4 Run provider contract tests against migrated test root.
 
 ## 7. Verification and documentation
 

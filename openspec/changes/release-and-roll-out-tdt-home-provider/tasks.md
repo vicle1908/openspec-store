@@ -5,12 +5,12 @@ complete: provider foundation, source conformance, and migration engine.
 
 ## 1. Release artifact
 
-- [ ] 1.1 Build provider wheel and locked dependency closure into a fresh local wheelhouse (no checkout, no PYTHONPATH).
-- [ ] 1.2 Install provider from wheelhouse into a clean virtual environment.
-- [ ] 1.3 Verify version equality between distribution metadata and runtime `__version__`.
-- [ ] 1.4 Verify `tdt --help` and `tdt config doctor` run without scheduler extras.
-- [ ] 1.5 Verify package resources load correctly (source-registry.json, schemas).
-- [ ] 1.6 Run provider-only contract tests in the clean environment.
+- [x] 1.1 Build provider wheel and locked dependency closure into a fresh local wheelhouse (no checkout, no PYTHONPATH).
+- [x] 1.2 Install provider from wheelhouse into a clean virtual environment.
+- [x] 1.3 Verify version equality between distribution metadata and runtime `__version__`.
+- [x] 1.4 Verify `tdt --help` and `tdt config doctor` run without scheduler extras.
+- [x] 1.5 Verify package resources load correctly (source-registry.json, schemas).
+- [x] 1.6 Run provider-only contract tests in the clean environment.
 
 ## 2. Internal registry publication
 
