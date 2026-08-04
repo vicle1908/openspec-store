@@ -38,7 +38,7 @@ Each task is one focused work session with a verification gate. Dependency on
 
 ## 5. Verification and documentation
 
-- [ ] 5.1 Run the source audit against immutable, owner-supplied revisions for
+- [x] 5.1 Run the source audit against immutable, owner-supplied revisions for
   all 15 repositories and record clean, excepted, failed, and unknown results.
 - [x] 5.2 Document the conformance process for new repositories joining the ecosystem.
 - [x] 5.3 Run `openspec validate --all --strict` and `openspec store doctor`.
