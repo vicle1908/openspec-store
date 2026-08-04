@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-08-04T06:46:39.081762+00:00",
+  "timestamp": "2026-08-04T06:56:19.962601+00:00",
   "status": "blocked",
-  "tdt_core_revision": "e95f7f6",
+  "tdt_core_revision": "9566219",
   "openspec_validate": "356/356 passed",
   "store_doctor": "no structural issues; unrelated harden-ci-supply-chain work remains uncommitted",
   "task_status": {
@@ -33,6 +33,20 @@
     "backup": "~/.tdt-backup-20260804-100628 exists; 53,043 files; approximately 2.0 GiB",
     "open_file_handles": 0
   },
-  "blocking_reason": "Live doctor is now clean (0 errors, 1 warning). Source audit findings and migration engine remain incomplete. Consumer manifests need owner attribution.",
-  "tdt_core_remote": "not configured; commits verified locally only"
+  "blocking_reason": "Doctor is clean. Source audit has 13 consumer repos with 76 findings requiring owner adoption. Migration engine implementation incomplete at 10/29.",
+  "tdt_core_remote": "not configured; commits verified locally only",
+  "doctor_result": {
+    "errors": 0,
+    "warnings": 1,
+    "remaining": [
+      "config_ambiguity: config.toml and config.yaml coexist (complementary)"
+    ]
+  },
+  "source_audit": {
+    "status": "FAIL",
+    "pass": 1,
+    "pass_with_exceptions": 1,
+    "fail": 13,
+    "error_findings": 76
+  }
 }
