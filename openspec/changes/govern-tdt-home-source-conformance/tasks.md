@@ -11,15 +11,23 @@ Each task is one focused work session with a verification gate. Dependency on
 
 ## 2. Consumer manifests
 
-- [ ] 2.1 Create `.tdt/governance-manifest.json` for each of the 15 registered consumer repositories (excluding `tdt-core` which is the provider).
-- [ ] 2.2 Verify each manifest matches the provider registry participant entry (repository name, role, identity_marker).
-- [ ] 2.3 Commit all manifests as a single atomic change per repository or as a coordinated workspace commit.
+- [ ] 2.1 Publish the manifest schema, scaffold, and per-participant checklist;
+  do not write consumer repository files from the provider-owned change.
+- [ ] 2.2 Review owner-supplied manifests for each of the 15 registered
+  consumer repositories and verify repository, role, identity marker, scope,
+  deployment ownership, and exception invariants against the provider registry.
+- [ ] 2.3 Require each consumer repository to commit its own manifest and
+  retain an immutable revision-bound evidence envelope; aggregate only those
+  owner-supplied artifacts.
 
 ## 3. Source audit tooling
 
 - [ ] 3.1 Implement `tdt config source-audit <workspace-root>` that scans registered repositories for hard-coded `~/.tdt` construction outside approved sites.
-- [ ] 3.2 Support both AST-based (Python `ast.parse`) and regex-based detection for non-Python files.
-- [ ] 3.3 Output findings as structured JSON or human-readable text with severity levels (error for approved-site violations, warning for legacy patterns).
+- [ ] 3.2 Add structure-aware parser adapters for each supported executable
+  language; unsupported executable surfaces produce unresolved findings and
+  cannot receive verified-green status from regex matching.
+- [ ] 3.3 Output deterministic structured JSON and human-readable text with
+  `PASS`, `PASS_WITH_EXCEPTIONS`, and `FAIL` scopes plus redacted rule findings.
 - [ ] 3.4 Add strict mode that exits non-zero on any error-level finding.
 
 ## 4. Drift allowlist
@@ -30,11 +38,14 @@ Each task is one focused work session with a verification gate. Dependency on
 
 ## 5. Verification and documentation
 
-- [ ] 5.1 Run source audit across all 15 repositories and record baseline findings.
+- [ ] 5.1 Run the source audit against immutable, owner-supplied revisions for
+  all 15 repositories and record clean, excepted, failed, and unknown results.
 - [ ] 5.2 Document the conformance process for new repositories joining the ecosystem.
 - [ ] 5.3 Run `openspec validate --all --strict` and `openspec store doctor`.
 
 ## Archive gate
 
-Do not archive until all consumer manifests are committed, source audit produces
-clean baseline, allowlist is documented, and all verification passes.
+Do not archive until every consumer-owned manifest and evidence envelope is
+reviewed, supported executable surfaces are parsed or explicitly unresolved,
+exceptions are bounded and expiring, and all verification passes. This change
+does not rewrite consumer source or dependency metadata.

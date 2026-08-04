@@ -24,7 +24,10 @@ Each task is one focused work session with a verification gate. Depends on
 ## 3. Recovery and rollback
 
 - [ ] 3.1 Implement crash recovery: read journal, determine last committed state, resume from next valid transition.
-- [ ] 3.2 Implement rollback: reverse journal from any state back to `rolled_back`, restoring from backup.
+- [ ] 3.2 Implement rollback from each supported recoverable journal state back
+  to `rolled_back`, restoring from verified backup metadata; a committed
+  generation requires a separately approved plan rather than implicit reverse
+  mutation.
 - [ ] 3.3 Implement idempotent retry: same journal replay produces identical result.
 - [ ] 3.4 Add tests for recovery from each journal state boundary.
 

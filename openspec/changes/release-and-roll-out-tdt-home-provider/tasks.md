@@ -20,23 +20,32 @@ complete: provider foundation, source conformance, and migration engine.
 
 ## 3. Staged consumer rollout
 
-- [ ] 3.1 Select first consumer for rollout (recommend: `agent-core` — low fanout, good test coverage).
-- [ ] 3.2 Update consumer dependency to use published provider wheel.
-- [ ] 3.3 Run consumer test suite with provider loaded from installed package.
+- [ ] 3.1 Select a target only after its deployment owner, runtime principal,
+  configuration owner, compatibility evidence, maintenance window, and
+  approval are recorded.
+- [ ] 3.2 Install the immutable published provider artifact in the selected
+  target; any consumer dependency-metadata change belongs to that consumer's
+  provider-gated adoption change.
+- [ ] 3.3 Run the consumer test suite and smoke checks with the provider loaded
+  from the qualified installed artifact.
 - [ ] 3.4 Verify consumer behavior unchanged (smoke tests, existing test suite).
-- [ ] 3.5 Repeat for each remaining consumer, one at a time with verification gates.
-- [ ] 3.6 Record rollout status for all 15 repositories.
+- [ ] 3.5 Repeat for each approved target one at a time, stopping on any failed
+  gate or withdrawn approval; do not promote automatically.
+- [ ] 3.6 Record provider, staging, consumer, deployment, and live-root scopes
+  separately for all 15 participants, including unverified and blocked states.
 
 ## 4. Reverse rollback rehearsal
 
-- [ ] 4.1 Simulate provider rejection: restore pre-change tdt-core artifact in a test environment.
+- [ ] 4.1 Simulate provider rejection by restoring the exact pre-change
+  artifact and closure in a disposable or staging target.
 - [ ] 4.2 Verify consumer behavior remains available after rollback.
 - [ ] 4.3 Document the rollback procedure and time estimate.
 - [ ] 4.4 Verify no live ~/.tdt data was modified during rehearsal.
 
 ## 5. Release gates
 
-- [ ] 5.1 All consumer rollout verifications pass.
+- [ ] 5.1 All provider, registry, staging, and explicitly approved consumer
+  rollout gates pass; missing consumer evidence remains blocked.
 - [ ] 5.2 Rollback rehearsal successful.
 - [ ] 5.3 Documentation updated with release notes and consumer migration guide.
 - [ ] 5.4 Run `openspec validate --all --strict` and `openspec store doctor`.
