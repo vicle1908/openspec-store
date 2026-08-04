@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-08-04T06:06:57.043735+00:00",
+  "timestamp": "2026-08-04T06:08:01.564687+00:00",
   "status": "blocked",
-  "tdt_core_revision": "165f3be",
+  "tdt_core_revision": "ce3789d",
   "openspec_validate": "356/356 passed",
   "store_doctor": "no structural issues; unrelated harden-ci-supply-chain work remains uncommitted",
   "task_status": {
