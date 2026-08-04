@@ -55,9 +55,9 @@ executor is the only API allowed to perform a typed, root-bound migration.
 
 ### Requirement: The strict executor SHALL remain separately reviewable
 
-The strict executor MUST accept only the typed migration plan, `JournalStore`,
-and explicit source-root mapping. It MUST remain separate from the
-compatibility facade, use the provider descriptor kernel for all target
+The strict executor MUST accept only the typed `migration_plan`,
+`JournalStore`, and explicit source-root mapping. It MUST remain separate from
+the compatibility facade, use the provider descriptor kernel for all target
 mutation, and retain revision-bound evidence for switching, recovery,
 rollback, interruption, and isolated-root verification.
 
@@ -81,17 +81,12 @@ rollback, interruption, and isolated-root verification.
 
 The engine SHALL execute only descriptor-relative provider operations and SHALL
 publish a contiguous hash-chained record for each legal state transition. The
-strict executor SHALL publish `switching`, then one durable `intent` and
-`completed` pair for each deterministic plan operation. It MUST reopen each
+strict executor MUST publish `switching`, then one durable `intent` and
+`completed` pair for each deterministic plan operation, and MUST reopen the
 destination to verify kind, digest, size, mode, ownership, link target, and
-root identity before publishing `completed` or `committed`.
-
-#### Scenario: An operation commits
-
-- **GIVEN** the plan and capability snapshot remain valid
-- **WHEN** apply stages, synchronizes, replaces, and verifies one operation
-- **THEN** the journal records the transition and the final object identity
-- **AND** the parent directory synchronization completes before commit
+root identity before publishing `completed` or `committed`. Descriptor-relative
+no-follow staging, rename, and parent synchronization are required;
+pathname-based fallbacks are forbidden.
 
 #### Scenario: A regular destination is replaced
 
@@ -118,6 +113,13 @@ root identity before publishing `completed` or `committed`.
 - **THEN** the executor raises a redacted error and performs no speculative
   replacement
 
+#### Scenario: An operation commits
+
+- **GIVEN** the plan and capability snapshot remain valid
+- **WHEN** apply stages, synchronizes, replaces, and verifies one operation
+- **THEN** the journal records the transition and the final object identity
+- **AND** the parent directory synchronization completes before commit
+
 #### Scenario: A required capability disappears
 
 - **GIVEN** a required no-follow, descriptor-relative, identity, or
@@ -128,21 +130,13 @@ root identity before publishing `completed` or `committed`.
 
 ### Requirement: Recovery and rollback SHALL be root-bound and idempotent
 
-Recovery SHALL validate the complete journal and legal state transitions before
-resuming, including the plan digest, hash-chain state, verified generation
-manifests, staged payloads, and target root identity. Explicit rollback MUST
-restore only the verified affected prefix, including regular-file metadata,
-symlink text, and prior absence. Repeated recovery or rollback after a
-terminal state MUST be a no-op, while a committed generation MUST require a
-separately approved inverse plan.
-
-#### Scenario: Recovery resumes after interruption
-
-- **GIVEN** a synthetic interruption leaves a valid journal in an intermediate
-  state
-- **WHEN** recovery is run against the same root identities
-- **THEN** it completes or safely rolls back the approved operation
-- **AND** a second recovery run is a no-op with the same terminal result
+Recovery SHALL validate and reload the complete journal and legal state
+transitions before resuming, including the plan digest, hash-chain state,
+verified generation manifests, staged payloads, and target root identity.
+Explicit rollback MUST restore only the verified affected prefix, including
+regular-file metadata, symlink text, and prior absence. Repeated recovery or
+rollback after a terminal state MUST be a no-op, while a committed generation
+MUST require a separately approved inverse plan.
 
 #### Scenario: Fresh-process recovery follows SIGTERM
 
@@ -161,6 +155,14 @@ separately approved inverse plan.
 - **THEN** the destination returns to its prior regular, symlink, or absent
   state and a second rollback is a no-op
 
+#### Scenario: Recovery resumes after interruption
+
+- **GIVEN** a synthetic interruption leaves a valid journal in an intermediate
+  state
+- **WHEN** recovery is run against the same root identities
+- **THEN** it completes or safely rolls back the approved operation
+- **AND** a second recovery run is a no-op with the same terminal result
+
 #### Scenario: Journal integrity fails
 
 - **GIVEN** a journal record is missing, reordered, truncated, or hash-modified
@@ -173,14 +175,9 @@ separately approved inverse plan.
 The test harness SHALL use temporary approved roots, value-free fixtures, and
 real child-process `SIGTERM` delivery. It SHALL inject deterministic failures
 at every migration transaction boundary and prove fixture containment and
-cleanup. It MUST NOT inspect or mutate the operator's live `~/.tdt` tree.
-
-#### Scenario: Boundary faults are exercised
-
-- **GIVEN** a temporary approved test anchor and a value-free legacy fixture
-- **WHEN** the harness injects a fault before and after each boundary
-- **THEN** every run reaches a classified recoverable or rolled-back state
-- **AND** no test opens or mutates the real `~/.tdt`
+cleanup. The interruption harness MUST prove that recovery and rollback leave
+no unowned migration staging object and do not inspect or mutate the
+operator's live `~/.tdt` tree.
 
 #### Scenario: Every durable boundary is exercised
 
@@ -189,6 +186,13 @@ cleanup. It MUST NOT inspect or mutate the operator's live `~/.tdt` tree.
 - **WHEN** a subprocess is stopped at each boundary and then terminated
 - **THEN** fresh-process recovery reaches `committed` for every isolated run
   and the test records only synthetic, value-free evidence
+
+#### Scenario: Boundary faults are exercised
+
+- **GIVEN** a temporary approved test anchor and a value-free legacy fixture
+- **WHEN** the harness injects a fault before and after each boundary
+- **THEN** every run reaches a classified recoverable or rolled-back state
+- **AND** no test opens or mutates the real `~/.tdt`
 
 #### Scenario: Staging cleanup is verified
 
