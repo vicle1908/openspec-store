@@ -81,6 +81,21 @@ fallbacks are forbidden.
 - **THEN** the executor raises a redacted error and performs no speculative
   replacement
 
+#### Scenario: An operation commits
+
+- **GIVEN** the plan and capability snapshot remain valid
+- **WHEN** apply stages, synchronizes, replaces, and verifies one operation
+- **THEN** the journal records the transition and the final object identity
+- **AND** the parent directory synchronization completes before commit
+
+#### Scenario: A required capability disappears
+
+- **GIVEN** a required no-follow, descriptor-relative, identity, or
+  synchronization primitive is unavailable
+- **WHEN** apply begins or reaches the affected boundary
+- **THEN** it fails closed without a pathname-based fallback
+- **AND** any private staging object is removed or recorded for recovery
+
 ### Requirement: Recovery and rollback SHALL be root-bound and idempotent
 
 Recovery MUST reload and validate the complete generation, plan digest,
@@ -107,6 +122,21 @@ committed generation MUST require a separately approved inverse plan.
 - **THEN** the destination returns to its prior regular, symlink, or absent
   state and a second rollback is a no-op
 
+#### Scenario: Recovery resumes after interruption
+
+- **GIVEN** a synthetic interruption leaves a valid journal in an intermediate
+  state
+- **WHEN** recovery is run against the same root identities
+- **THEN** it completes or safely rolls back the approved operation
+- **AND** a second recovery run is a no-op with the same terminal result
+
+#### Scenario: Journal integrity fails
+
+- **GIVEN** a journal record is missing, reordered, truncated, or hash-modified
+- **WHEN** recovery or rollback starts
+- **THEN** the engine refuses to mutate either root
+- **AND** it reports only the journal identity and failing sequence metadata
+
 ### Requirement: Interruption evidence SHALL remain synthetic and contained
 
 The interruption harness MUST use temporary approved roots and real child
@@ -121,3 +151,17 @@ live `~/.tdt` tree.
 - **WHEN** a subprocess is stopped at each boundary and then terminated
 - **THEN** fresh-process recovery reaches `committed` for every isolated run
   and the test records only synthetic, value-free evidence
+
+#### Scenario: Boundary faults are exercised
+
+- **GIVEN** a temporary approved test anchor and a value-free legacy fixture
+- **WHEN** the harness injects a fault before and after each boundary
+- **THEN** every run reaches a classified recoverable or rolled-back state
+- **AND** no test opens or mutates the real `~/.tdt`
+
+#### Scenario: Staging cleanup is verified
+
+- **GIVEN** a fault occurs during staging or replacement
+- **WHEN** the synthetic run terminates
+- **THEN** no unowned staging file, descriptor, or out-of-root object remains
+- **AND** the failure evidence contains no secret-shaped value

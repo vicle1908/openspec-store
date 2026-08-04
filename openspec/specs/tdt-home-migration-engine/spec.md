@@ -168,7 +168,7 @@ separately approved inverse plan.
 - **THEN** the engine refuses to mutate either root
 - **AND** it reports only the journal identity and failing sequence metadata
 
-### Requirement: Synthetic interruption testing SHALL be isolated from live roots
+### Requirement: Interruption evidence SHALL remain synthetic and contained
 
 The test harness SHALL use temporary approved roots, value-free fixtures, and
 real child-process `SIGTERM` delivery. It SHALL inject deterministic failures
