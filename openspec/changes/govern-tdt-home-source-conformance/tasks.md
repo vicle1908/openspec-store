@@ -13,10 +13,10 @@ Each task is one focused work session with a verification gate. Dependency on
 
 - [x] 2.1 Publish the manifest schema, scaffold, and per-participant checklist;
   do not write consumer repository files from the provider-owned change.
-- [x] 2.2 Review owner-supplied manifests for each of the 15 registered
+- [ ] 2.2 Review owner-supplied manifests for each of the 15 registered
   participants and verify repository, role, identity marker, scope, deployment
   ownership, and exception invariants against the provider registry.
-- [x] 2.3 Require each participant repository to commit its own manifest and
+- [ ] 2.3 Require each participant repository to commit its own manifest and
   retain an immutable revision-bound evidence envelope; aggregate only those
   owner-supplied artifacts.
 
@@ -38,7 +38,7 @@ Each task is one focused work session with a verification gate. Dependency on
 
 ## 5. Verification and documentation
 
-- [x] 5.1 Run the source audit against immutable, owner-supplied revisions for
+- [ ] 5.1 Run the source audit against immutable, owner-supplied revisions for
   all 15 registered participants and record clean, excepted, failed, and
   unknown results.
 - [x] 5.2 Document the conformance process for new repositories joining the ecosystem.
@@ -55,9 +55,11 @@ does not rewrite consumer source or dependency metadata.
 
 The provider-owned schema, scaffold, parser audit, deterministic report, and
 exception policy are implemented and verified in canonical `tdt-core` commits
-`45f59bb..fd8c97f`. Tasks 2.2, 2.3, and 5.1 intentionally remain open: no
-owner-supplied participant manifests or immutable evidence envelopes are
-present in the current workspace, so the provider must not invent those facts
-or mark the aggregate ready. The live workspace audit reports all 15
-registered participants as missing manifests until each participant repository
-contributes its own governed file and revision-bound report.
+`45f59bb..fd8c97f`. Tasks 2.2, 2.3, and 5.1 intentionally remain open. The
+current workspace contains 14 untracked participant manifest files: two pass
+standalone `RepositoryManifest` validation, twelve fail the required deployment
+fields, and the `tdt-core` provider manifest is missing. No participant has a
+Git-committed manifest or immutable revision-bound evidence envelope. The
+strict workspace audit therefore fails closed during registry discovery with a
+sanitized `REGISTRY_ERROR` and cannot produce the required 15-participant
+result. The provider must not invent those facts or mark the aggregate ready.
