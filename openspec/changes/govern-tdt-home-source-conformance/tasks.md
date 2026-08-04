@@ -46,7 +46,7 @@ Each task is one focused work session with a verification gate. Dependency on
 
 ## Archive gate
 
-Do not archive until every consumer-owned manifest and evidence envelope is
+Do not archive until every participant-owned manifest and evidence envelope is
 reviewed, supported executable surfaces are parsed or explicitly unresolved,
 exceptions are bounded and expiring, and all verification passes. This change
 does not rewrite consumer source or dependency metadata.
