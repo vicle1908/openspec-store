@@ -1,24 +1,25 @@
 {
-  "timestamp": "2026-08-04T04:47:17.658868+00:00",
+  "timestamp": "2026-08-04T05:48:45.298365+00:00",
   "status": "blocked",
   "openspec_validate": "356/356 passed",
   "store_doctor": "no structural issues; unrelated harden-ci-supply-chain work remains uncommitted",
   "task_status": {
-    "govern-tdt-home-source-conformance": "15/16; source audit open with 13 FAIL repositories and 76 findings",
-    "build-tdt-home-synthetic-migration-engine": "1/29; migration engine modules are not present on tdt-core/main",
+    "govern-tdt-home-source-conformance": "13/16; owner-supplied manifest gates remain open; audit 14 FAIL / 78 errors",
+    "build-tdt-home-synthetic-migration-engine": "8/29; plan, journal, and backup/staging slices are present on tdt-core/main; apply/recovery/rollback remain incomplete",
     "release-and-roll-out-tdt-home-provider": "6/24; registry/consumer/rollback gates blocked",
-    "cut-over-live-tdt-home": "1/26; live cutover blocked by predecessor gates"
+    "cut-over-live-tdt-home": "1/26; predecessor gates block live cutover"
   },
   "provider_verification": {
-    "tdt_core_tests": "473 passed, 16 skipped, 2 warnings",
+    "tdt_core_tests": "500 passed, 16 skipped, 2 warnings",
     "ruff": "passed",
     "mypy_strict": "passed",
+    "focused_migration_tests": "23 passed",
     "wheel_install": "tdt-core 0.2.0 installed in clean CPython 3.14.5 environment",
     "package_resource": "source-registry.json present"
   },
   "source_conformance": {
-    "manifests": "15/15 schema-valid, committed in owning repositories",
-    "audit": "FAIL: 13 repositories, 76 findings, 2 PASS"
+    "manifests": "15/15 schema-valid and committed in owning repositories",
+    "audit": "FAIL: 14 repositories, 78 error findings, 1 PASS"
   },
   "live_root": {
     "root_permissions": "0700",
@@ -31,5 +32,5 @@
     "backup": "~/.tdt-backup-20260804-100628 exists; 53,043 files; approximately 2.0 GiB",
     "open_file_handles": 0
   },
-  "blocking_reason": "Do not archive or claim live cutover complete. Consumer source findings, absent migration-engine integration on main, blocked registry/consumer rollout evidence, and missing secure SCHEDULER_POSTGRES_DSN provisioning require owner action."
+  "blocking_reason": "Do not archive or claim live cutover complete. Consumer source findings, incomplete migration state machine/recovery implementation, blocked registry/consumer rollout evidence, and missing secure SCHEDULER_POSTGRES_DSN provisioning require owner action."
 }
