@@ -17,9 +17,10 @@ existing callers do not break, but all mutating compatibility functions raise
 `ApplyError`. They must not create a backup directory, write a JSONL journal,
 copy a source, replace a destination, or recursively remove staging data.
 
-The strict implementation surface remains in `migration_plan.py`,
-`migration_journal.py`, and `migration_backup.py`. A future executor must accept
-their typed plan and `JournalStore`, not bypass them with compatibility paths.
+The strict implementation surface is in `migration_plan.py`,
+`migration_journal.py`, `migration_backup.py`, and the separate
+`migration_executor.py`. It accepts their typed plan and `JournalStore`; the
+compatibility facade is never a pathname-based delegation path.
 
 ### Decision 2: Test the negative boundary directly
 

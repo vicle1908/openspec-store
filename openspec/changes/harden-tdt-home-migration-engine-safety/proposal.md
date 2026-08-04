@@ -9,8 +9,9 @@ against synthetic roots.
 
 ## What Changes
 
-- Restore the compatibility `tdt_core.migration_engine` mutators to a
-  fail-closed surface until they can delegate to a verified strict executor.
+- Keep the compatibility `tdt_core.migration_engine` mutators permanently
+  fail-closed for arbitrary paths; the strict executor remains a separate
+  typed entry point.
 - Add regression tests proving that compatibility backup, apply, rollback, and
   journal persistence calls cannot mutate arbitrary paths or create staging
   artifacts.
@@ -31,8 +32,8 @@ None.
 ### Modified Capabilities
 
 - `tdt-home-migration-engine`: compatibility entry points SHALL remain
-  fail-closed until a strict root-bound executor satisfies the archived
-  capability contract.
+  fail-closed, while the strict root-bound executor satisfies the archived
+  capability contract only through its typed API.
 
 ## Impact
 
