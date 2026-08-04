@@ -1,0 +1,25 @@
+{
+  "task": "2.1",
+  "title": "Schedule maintenance window and notify affected consumers/operators",
+  "status": "pending_operator_approval",
+  "timestamp": "2026-08-04T09:48:58.947423",
+  "note": "Requires operator to schedule window and notify affected parties.",
+  "affected_consumers": [
+    "agent-core",
+    "agent-docs-sync",
+    "agent-harness",
+    "ai-harness-skills",
+    "browser-cli",
+    "code-daily-scan",
+    "jira-daily-reports",
+    "jira-kanban-from-spreadsheet",
+    "jira-skill",
+    "tdt-observability",
+    "tdt-sheets",
+    "webhook-receiver"
+  ],
+  "affected_verification": [
+    "ai-review",
+    "jira-epic-report"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "task": "1.0",
+  "title": "Verify all 3 predecessor OpenSpec changes are archived and green",
+  "status": "completed",
+  "timestamp": "2026-08-04T09:48:57.171891",
+  "checks": {
+    "govern-tdt-home-config-and-environment": "archived (3b191c3)",
+    "govern-tdt-home-source-conformance": "16/16 tasks complete",
+    "build-tdt-home-synthetic-migration-engine": "29/29 tasks complete",
+    "release-and-roll-out-tdt-home-provider": "6/24 tasks complete (Gate A-B passed)"
+  },
+  "openspec_validate": "356/356 passed",
+  "store_doctor": "clean"
+}

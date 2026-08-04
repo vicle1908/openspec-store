@@ -1,0 +1,16 @@
+{
+  "task": "1.3",
+  "title": "Back up live tree to protected storage",
+  "status": "pending_operator_approval",
+  "timestamp": "2026-08-04T09:48:58.381914",
+  "note": "Requires operator approval and execution. Backup location must be operator-owned.",
+  "schema": "BackupMetadata from control_plane_schema.py",
+  "required_fields": [
+    "scope",
+    "timestamp",
+    "root_identity",
+    "plan_digest",
+    "storage_location",
+    "verification_result"
+  ]
+}

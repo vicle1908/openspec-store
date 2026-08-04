@@ -1,0 +1,24 @@
+{
+  "task": "1.1",
+  "title": "Build release artifacts",
+  "gate": "Gate A: Build wheelhouse",
+  "status": "passed",
+  "started_at": "2026-08-04T02:03:36.866594+00:00",
+  "completed_at": "2026-08-04T02:03:38.016167+00:00",
+  "source_commit": "ce4a3553053e2439a4d3a12859cf456c4c377423",
+  "command": "cd /Users/androidteam/Developer/.worktrees/tdt-core-provider-rollout && uv build 2>&1",
+  "exit_code": 0,
+  "output_combined": "Building source distribution...\nBuilding wheel from source distribution...\nSuccessfully built dist/tdt_core-0.2.0.tar.gz\nSuccessfully built dist/tdt_core-0.2.0-py3-none-any.whl",
+  "artifacts": [
+    {
+      "filename": "tdt_core-0.2.0-py3-none-any.whl",
+      "sha256": "55f0ccb5da6967d1b617e75f188fd19e864e800c241d9889337c81682812562b",
+      "size_bytes": 101672
+    },
+    {
+      "filename": "tdt_core-0.2.0.tar.gz",
+      "sha256": "1048dcec2c0623882e4367eb827092f0137d3b965e9feed7795ea536a99bd342",
+      "size_bytes": 190657
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "task": "1.5",
+  "title": "Verify installed CLI entry point",
+  "gate": "Gate B: Clean-environment verification",
+  "status": "passed",
+  "started_at": "2026-08-04T02:03:40.360754+00:00",
+  "completed_at": "2026-08-04T02:03:41.177753+00:00",
+  "source_commit": "ce4a3553053e2439a4d3a12859cf456c4c377423",
+  "command": "cd /tmp/tdt-provider-test && bin/tdt --help 2>&1",
+  "exit_code": 0,
+  "output_combined": "Usage: tdt [OPTIONS] COMMAND [ARGS]...                                         \n                                                                                \n TDT ecosystem configuration and diagnostics.                                   \n                                                                                \n╭─ Options ────────────────────────────────────────────────────────────────────╮\n│ --install-completion          Install completion for the current shell.      │\n│ --show-completion             Show completion for the current shell, to copy │\n│                               it or customize the installation.              │\n│ --help                        Show this message and exit.                    │\n╰──────────────────────────────────────────────────────────────────────────────╯\n╭─ Commands ───────────────────────────────────────────────────────────────────╮\n│ version  Show the installed tdt-core version.                                │\n│ config   Configuration and diagnostics commands.                             │\n╰──────────────────────────────────────────────────────────────────────────────╯",
+  "assertions": {
+    "entry_point_present": true,
+    "help_succeeded": true,
+    "version_command_listed": true,
+    "config_command_listed": true
+  }
+}

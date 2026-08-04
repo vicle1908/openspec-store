@@ -1,0 +1,18 @@
+{
+  "task": "1.4",
+  "title": "Verify installed provider version",
+  "gate": "Gate B: Clean-environment verification",
+  "status": "passed",
+  "started_at": "2026-08-04T02:03:39.357419+00:00",
+  "completed_at": "2026-08-04T02:03:40.160186+00:00",
+  "source_commit": "ce4a3553053e2439a4d3a12859cf456c4c377423",
+  "command": "cd /tmp/tdt-provider-test && bin/python -c \"import tdt_core; print(tdt_core.__version__)\" 2>&1",
+  "exit_code": 0,
+  "output_combined": "0.2.0",
+  "assertions": {
+    "import_succeeded": true,
+    "runtime_version": "0.2.0",
+    "expected_version": "0.2.0",
+    "version_matches": true
+  }
+}

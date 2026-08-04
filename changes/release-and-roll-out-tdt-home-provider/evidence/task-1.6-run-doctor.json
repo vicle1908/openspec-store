@@ -1,0 +1,84 @@
+{
+  "task": "1.6",
+  "title": "Run installed provider doctor command",
+  "gate": "Gate B: Clean-environment verification",
+  "status": "completed_with_findings",
+  "started_at": "2026-08-04T02:03:41.540019+00:00",
+  "completed_at": "2026-08-04T02:03:42.071343+00:00",
+  "source_commit": "ce4a3553053e2439a4d3a12859cf456c4c377423",
+  "command": "cd /tmp/tdt-provider-test && bin/tdt config doctor --json 2>&1",
+  "exit_code": 0,
+  "output_combined": "{\n  \"error_count\": 3,\n  \"findings\": [\n    {\n      \"class\": \"permission\",\n      \"expected\": \"0o700\",\n      \"mode\": \"0o755\",\n      \"path\": \"/Users/androidteam/.tdt\",\n      \"reason\": \"root directory mode is not 0700\",\n      \"severity\": \"warning\"\n    },\n    {\n      \"class\": \"permission\",\n      \"expected\": \"0o700\",\n      \"mode\": \"0o755\",\n      \"path\": \"/Users/androidteam/.tdt/state\",\n      \"reason\": \"state/ directory mode is not 0700\",\n      \"severity\": \"warning\"\n    },\n    {\n      \"class\": \"permission\",\n      \"expected\": \"0o700\",\n      \"mode\": \"0o755\",\n      \"path\": \"/Users/androidteam/.tdt/schedules\",\n      \"reason\": \"schedules/ directory mode is not 0700\",\n      \"severity\": \"warning\"\n    },\n    {\n      \"class\": \"permission\",\n      \"expected\": \"0o700\",\n      \"mode\": \"0o755\",\n      \"path\": \"/Users/androidteam/.tdt/logs\",\n      \"reason\": \"logs/ directory mode is not 0700\",\n      \"severity\": \"warning\"\n    },\n    {\n      \"class\": \"broken_symlink\",\n      \"path\": \"/Users/androidteam/.tdt/google-service-account.json\",\n      \"reason\": \"symlink in root is broken\",\n      \"severity\": \"error\"\n    },\n    {\n      \"class\": \"broken_symlink\",\n      \"path\": \"/Users/androidteam/.tdt/skills\",\n      \"reason\": \"symlink in root is broken\",\n      \"severity\": \"error\"\n    },\n    {\n      \"class\": \"config_ambiguity\",\n      \"reason\": \"both config.yaml and config.toml exist; scheduler settings should migrate to config.yaml\",\n      \"severity\": \"warning\",\n      \"toml\": \"/Users/androidteam/.tdt/config.toml\",\n      \"yaml\": \"/Users/androidteam/.tdt/config.yaml\"\n    },\n    {\n      \"class\": \"governed_config\",\n      \"path\": \"config.toml/config.yaml\",\n      \"reason\": \"scheduler.postgres_dsn: secret must be a full environment reference\",\n      \"severity\": \"error\"\n    }\n  ],\n  \"root\": \"/Users/androidteam/.tdt\",\n  \"root_exists\": true,\n  \"warning_count\": 5\n}",
+  "parsed_output": {
+    "error_count": 3,
+    "findings": [
+      {
+        "class": "permission",
+        "expected": "0o700",
+        "mode": "0o755",
+        "path": "/Users/androidteam/.tdt",
+        "reason": "root directory mode is not 0700",
+        "severity": "warning"
+      },
+      {
+        "class": "permission",
+        "expected": "0o700",
+        "mode": "0o755",
+        "path": "/Users/androidteam/.tdt/state",
+        "reason": "state/ directory mode is not 0700",
+        "severity": "warning"
+      },
+      {
+        "class": "permission",
+        "expected": "0o700",
+        "mode": "0o755",
+        "path": "/Users/androidteam/.tdt/schedules",
+        "reason": "schedules/ directory mode is not 0700",
+        "severity": "warning"
+      },
+      {
+        "class": "permission",
+        "expected": "0o700",
+        "mode": "0o755",
+        "path": "/Users/androidteam/.tdt/logs",
+        "reason": "logs/ directory mode is not 0700",
+        "severity": "warning"
+      },
+      {
+        "class": "broken_symlink",
+        "path": "/Users/androidteam/.tdt/google-service-account.json",
+        "reason": "symlink in root is broken",
+        "severity": "error"
+      },
+      {
+        "class": "broken_symlink",
+        "path": "/Users/androidteam/.tdt/skills",
+        "reason": "symlink in root is broken",
+        "severity": "error"
+      },
+      {
+        "class": "config_ambiguity",
+        "reason": "both config.yaml and config.toml exist; scheduler settings should migrate to config.yaml",
+        "severity": "warning",
+        "toml": "/Users/androidteam/.tdt/config.toml",
+        "yaml": "/Users/androidteam/.tdt/config.yaml"
+      },
+      {
+        "class": "governed_config",
+        "path": "config.toml/config.yaml",
+        "reason": "scheduler.postgres_dsn: secret must be a full environment reference",
+        "severity": "error"
+      }
+    ],
+    "root": "/Users/androidteam/.tdt",
+    "root_exists": true,
+    "warning_count": 5
+  },
+  "assertions": {
+    "command_succeeded": true,
+    "output_is_json": true,
+    "doctor_error_count": 3,
+    "doctor_warning_count": 5
+  },
+  "note": "The installed doctor command executed successfully and returned valid JSON. Findings describe the current user TDT home and were not modified as part of artifact verification."
+}

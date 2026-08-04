@@ -1,0 +1,15 @@
+{
+  "task": "5.1-5.5",
+  "title": "Rollback procedure",
+  "status": "documented",
+  "timestamp": "2026-08-04T09:48:59.286757",
+  "steps": [
+    "5.1: Stop all services",
+    "5.2: Invoke tested engine rollback or approved snapshot restore",
+    "5.3: Verify restore integrity",
+    "5.4: Restart services and verify function",
+    "5.5: Document rollback reason and schedule retry"
+  ],
+  "rollback_path": "Use migration engine rollback from migration_recovery.py",
+  "backup_restore": "Use BackupRestorer class with verified BackupMetadata"
+}

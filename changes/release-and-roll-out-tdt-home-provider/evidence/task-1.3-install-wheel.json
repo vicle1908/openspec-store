@@ -1,0 +1,16 @@
+{
+  "task": "1.3",
+  "title": "Install release wheel in clean environment",
+  "gate": "Gate B: Clean-environment verification",
+  "status": "passed",
+  "started_at": "2026-08-04T02:03:38.748856+00:00",
+  "completed_at": "2026-08-04T02:03:39.028090+00:00",
+  "source_commit": "ce4a3553053e2439a4d3a12859cf456c4c377423",
+  "command": "cd /Users/androidteam/Developer/.worktrees/tdt-core-provider-rollout && uv pip install --python /tmp/tdt-provider-test/bin/python dist/*.whl 2>&1",
+  "exit_code": 0,
+  "output_combined": "Using Python 3.14.5 environment at: /tmp/tdt-provider-test\nResolved 20 packages in 25ms\nPrepared 1 package in 9ms\nInstalled 20 packages in 70ms\n + annotated-doc==0.0.5\n + annotated-types==0.8.0\n + certifi==2026.7.22\n + charset-normalizer==3.4.9\n + idna==3.18\n + markdown-it-py==4.2.0\n + mdurl==0.1.2\n + pydantic==2.13.4\n + pydantic-core==2.46.4\n + pygments==2.20.0\n + python-dotenv==1.2.2\n + pyyaml==6.0.3\n + requests==2.34.2\n + rich==15.0.0\n + shellingham==1.5.4\n + tdt-core==0.2.0 (from file:///Users/androidteam/Developer/.worktrees/tdt-core-provider-rollout/dist/tdt_core-0.2.0-py3-none-any.whl)\n + typer==0.27.1\n + typing-extensions==4.16.0\n + typing-inspection==0.4.2\n + urllib3==2.7.0",
+  "installed_distribution": {
+    "name": "tdt-core",
+    "version": "0.2.0"
+  }
+}
