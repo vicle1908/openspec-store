@@ -34,13 +34,17 @@ complete: provider foundation, source conformance, and migration engine.
 - [ ] 3.6 Record provider, staging, consumer, deployment, and live-root scopes
   separately for all 15 participants, including unverified and blocked states.
 
-## 4. Reverse rollback rehearsal
+## 4. Reverse rollback rehearsal (integrated per consumer)
 
+For each consumer promoted in Task 3:
 - [ ] 4.1 Simulate provider rejection by restoring the exact pre-change
   artifact and closure in a disposable or staging target.
-- [ ] 4.2 Verify consumer behavior remains available after rollback.
-- [ ] 4.3 Document the rollback procedure and time estimate.
-- [ ] 4.4 Verify no live ~/.tdt data was modified during rehearsal.
+- [ ] 4.2 Verify the promoted consumer's behavior remains available after rollback.
+- [ ] 4.3 Record rollback evidence (exit code, test output, timing) per consumer.
+
+After all consumers are promoted and rehearsed:
+- [ ] 4.4 Document the consolidated rollback procedure and time estimate.
+- [ ] 4.5 Verify no live ~/.tdt data was modified during any rehearsal.
 
 ## 5. Release gates
 
