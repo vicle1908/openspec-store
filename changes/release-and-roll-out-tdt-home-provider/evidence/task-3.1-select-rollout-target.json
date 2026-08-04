@@ -1,0 +1,34 @@
+{
+  "task": "3.1",
+  "title": "Select a staged rollout target after required approvals are recorded",
+  "gate": "Gate D: Staged consumer rollout",
+  "status": "blocked",
+  "started_at": "2026-08-04T02:54:44Z",
+  "completed_at": "2026-08-04T02:54:44Z",
+  "source_commit": "fd8c97ff2cff9f8b26e1d5e94cf121812a169868",
+  "evidence_type": "verification",
+  "commands": [
+    {
+      "command": "Participant registry join/inventory inspection across /Users/androidteam/Developer/<participant>",
+      "exit_code": 0,
+      "output_summary": "All 15 participant directories exist; 14 repository governance manifests exist; provider manifest is absent."
+    }
+  ],
+  "required_preflight_fields": [
+    "deployment_owner",
+    "runtime_principal",
+    "configuration_owner",
+    "compatibility_evidence",
+    "maintenance_window",
+    "approval",
+    "immutable_consumer_revision",
+    "current_provider_hash",
+    "candidate_registry_coordinate",
+    "health_probe",
+    "baseline",
+    "rollback_artifact"
+  ],
+  "selected_target": null,
+  "approval_record": null,
+  "finding": "No target has a complete owner/runtime/configuration/compatibility/window/approval record. The design requires fail-closed selection; no consumer was selected."
+}

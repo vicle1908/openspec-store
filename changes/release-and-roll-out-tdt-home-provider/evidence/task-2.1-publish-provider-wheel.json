@@ -1,0 +1,46 @@
+{
+  "task": "2.1",
+  "title": "Publish provider wheel to internal package registry",
+  "gate": "Gate C: Internal registry publication",
+  "status": "not_executed_documented",
+  "started_at": "2026-08-04T02:54:44Z",
+  "completed_at": "2026-08-04T02:54:44Z",
+  "source_commit": "fd8c97ff2cff9f8b26e1d5e94cf121812a169868",
+  "evidence_type": "process_documentation",
+  "publication_performed": false,
+  "reason": "The Phase 3 request explicitly scopes registry publication as documentation/process work; no registry upload was authorized or required.",
+  "qualified_candidate": {
+    "filename": "tdt_core-0.2.0-py3-none-any.whl",
+    "sha256": "812924194fdedde5ae0c839f514dfd1bb4f774a84f3dfff4de18c4892476ac60",
+    "size_bytes": 114346,
+    "version": "0.2.0"
+  },
+  "build_command": "cd /Users/androidteam/Developer/tdt-core && uv build 2>&1",
+  "build_result": {
+    "exit_code": 0,
+    "artifacts": [
+      "tdt_core-0.2.0-py3-none-any.whl",
+      "tdt_core-0.2.0.tar.gz"
+    ]
+  },
+  "publication_procedure": [
+    "Confirm Gate A and Gate B are PASS and bind the release to the immutable source commit, version, wheel digest, lockfile digest, and wheelhouse manifest.",
+    "Authenticate the least-privilege CI publisher through the secret mechanism; never place credentials in evidence or command transcripts.",
+    "Upload exactly the qualified wheel bytes to the approved internal hosted Python repository; do not rebuild, overwrite, delete-and-reupload, or use latest semantics.",
+    "Record the immutable package coordinate, registry response, returned digest, timestamp, release operator, and audit/run identity.",
+    "Download the package into a new empty directory using a consumer-like principal and independently SHA-256 the bytes.",
+    "Compare the download digest to the qualified digest, then run the complete clean-environment matrix from the registry copy before allowing rollout."
+  ],
+  "immutable_release_identity": {
+    "package": "tdt-core",
+    "version": "0.2.0",
+    "wheel_sha256": "812924194fdedde5ae0c839f514dfd1bb4f774a84f3dfff4de18c4892476ac60",
+    "source_commit": "fd8c97ff2cff9f8b26e1d5e94cf121812a169868",
+    "lockfile_sha256": "684680a7bf4c2f2a616d89c244e4753248ef0d7b9953705045cde6fcfe43758d"
+  },
+  "security_constraints": [
+    "No token, DSN, environment value, or secret-bearing doctor output may enter retained evidence.",
+    "A same-name/version digest mismatch is a hard failure."
+  ],
+  "finding": "No registry coordinate or publication receipt exists in this workspace."
+}

@@ -1,0 +1,54 @@
+{
+  "task": "5.1",
+  "title": "Verify provider, registry, staging, and approved consumer rollout gates",
+  "gate": "Release gates",
+  "status": "blocked",
+  "started_at": "2026-08-04T02:54:44Z",
+  "completed_at": "2026-08-04T02:54:44Z",
+  "source_commit": "fd8c97ff2cff9f8b26e1d5e94cf121812a169868",
+  "evidence_type": "verification",
+  "gate_results": {
+    "gate_a_source_build": {
+      "status": "blocked_with_findings",
+      "evidence": "uv build exited 0; current tdt-core tree has untracked graphify-out/ and tdt-core entries, so clean-tree precondition is not proven."
+    },
+    "gate_b_artifact": {
+      "status": "blocked_with_findings",
+      "evidence": "Installed environment matched distribution/runtime 0.2.0 and registry counts 1/12/2; tdt --help and doctor help passed, but tdt --version exited 2 because the canonical option is not implemented; doctor on real ~/.tdt reports findings."
+    },
+    "gate_c_publication": {
+      "status": "blocked",
+      "evidence": "No approved registry coordinate, publication receipt, registry download, or digest comparison."
+    },
+    "gate_d_consumer": {
+      "status": "blocked",
+      "evidence": "No approved target or consumer candidate install; all 12 consumers remain blocked preflight."
+    },
+    "gate_e_ecosystem": {
+      "status": "blocked",
+      "evidence": "Zero consumers promoted and zero reverse rollback rehearsals completed; participant scope record exists but is not completion evidence."
+    }
+  },
+  "candidate_artifact": {
+    "filename": "tdt_core-0.2.0-py3-none-any.whl",
+    "sha256": "812924194fdedde5ae0c839f514dfd1bb4f774a84f3dfff4de18c4892476ac60",
+    "size_bytes": 114346,
+    "version": "0.2.0"
+  },
+  "lockfile": {
+    "path": "/Users/androidteam/Developer/tdt-core/uv.lock",
+    "sha256": "684680a7bf4c2f2a616d89c244e4753248ef0d7b9953705045cde6fcfe43758d"
+  },
+  "registry_snapshot": {
+    "path": "src/tdt_core/data/source-registry.json",
+    "sha256": "2f1ea27771aad83b7b9b1802316ccd25ecd4db687b51a2fd4c453c2fccc3ab51",
+    "schema_version": 1,
+    "participants": 15,
+    "roles": {
+      "provider": 1,
+      "consumer": 12,
+      "verification": 2
+    }
+  },
+  "finding": "Release gates fail closed. The local build and selected installed checks do not establish publication, consumer readiness, or ecosystem completion."
+}

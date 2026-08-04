@@ -1,0 +1,181 @@
+{
+  "task": "3.6",
+  "title": "Record provider, staging, consumer, deployment, and live-root scopes for all participants",
+  "gate": "Gate D: Staged consumer rollout",
+  "status": "completed_with_findings",
+  "started_at": "2026-08-04T02:54:44Z",
+  "completed_at": "2026-08-04T02:54:44Z",
+  "source_commit": "fd8c97ff2cff9f8b26e1d5e94cf121812a169868",
+  "evidence_type": "verification",
+  "registry_snapshot": {
+    "path": "src/tdt_core/data/source-registry.json",
+    "sha256": "2f1ea27771aad83b7b9b1802316ccd25ecd4db687b51a2fd4c453c2fccc3ab51",
+    "schema_version": 1,
+    "participants": 15,
+    "roles": {
+      "provider": 1,
+      "consumer": 12,
+      "verification": 2
+    }
+  },
+  "scope_definitions": {
+    "provider": "tdt-core artifact/build scope",
+    "staging": "disposable or staging target where exact artifact is installed",
+    "consumer": "repository-owned test/integration or runtime surface",
+    "deployment": "launch/restart/runtime-principal scope",
+    "live_root": "operator TDT_HOME; never implicitly changed by this release"
+  },
+  "participants": [
+    {
+      "repository": "tdt-core",
+      "role": "provider",
+      "repo_exists": true,
+      "manifest_exists": false,
+      "provider_ref": true,
+      "editable_ref": false,
+      "rollout_state": "provider_scope_only"
+    },
+    {
+      "repository": "agent-core",
+      "role": "consumer",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": true,
+      "editable_ref": true,
+      "rollout_state": "blocked_preflight"
+    },
+    {
+      "repository": "agent-docs-sync",
+      "role": "consumer",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": false,
+      "editable_ref": false,
+      "rollout_state": "blocked_preflight"
+    },
+    {
+      "repository": "agent-harness",
+      "role": "consumer",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": true,
+      "editable_ref": true,
+      "rollout_state": "blocked_preflight"
+    },
+    {
+      "repository": "ai-harness-skills",
+      "role": "consumer",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": false,
+      "editable_ref": false,
+      "rollout_state": "blocked_preflight"
+    },
+    {
+      "repository": "ai-review",
+      "role": "verification",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": true,
+      "editable_ref": true,
+      "rollout_state": "blocked_verification_scope"
+    },
+    {
+      "repository": "browser-cli",
+      "role": "consumer",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": false,
+      "editable_ref": false,
+      "rollout_state": "blocked_preflight"
+    },
+    {
+      "repository": "code-daily-scan",
+      "role": "consumer",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": true,
+      "editable_ref": true,
+      "rollout_state": "blocked_preflight"
+    },
+    {
+      "repository": "jira-daily-reports",
+      "role": "consumer",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": true,
+      "editable_ref": true,
+      "rollout_state": "blocked_preflight"
+    },
+    {
+      "repository": "jira-epic-report",
+      "role": "verification",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": true,
+      "editable_ref": true,
+      "rollout_state": "blocked_verification_scope"
+    },
+    {
+      "repository": "jira-kanban-from-spreadsheet",
+      "role": "consumer",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": true,
+      "editable_ref": true,
+      "rollout_state": "blocked_preflight"
+    },
+    {
+      "repository": "jira-skill",
+      "role": "consumer",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": true,
+      "editable_ref": true,
+      "rollout_state": "blocked_preflight"
+    },
+    {
+      "repository": "tdt-observability",
+      "role": "consumer",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": false,
+      "editable_ref": false,
+      "rollout_state": "blocked_preflight"
+    },
+    {
+      "repository": "tdt-sheets",
+      "role": "consumer",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": false,
+      "editable_ref": false,
+      "rollout_state": "blocked_preflight"
+    },
+    {
+      "repository": "webhook-receiver",
+      "role": "consumer",
+      "repo_exists": true,
+      "manifest_exists": true,
+      "provider_ref": true,
+      "editable_ref": true,
+      "rollout_state": "blocked_preflight"
+    }
+  ],
+  "aggregate_counts": {
+    "total": 15,
+    "provider": 1,
+    "consumers": 12,
+    "verification": 2,
+    "selected_consumers": 0,
+    "approved_consumers": 0,
+    "blocked_consumers": 12,
+    "blocked_verification_participants": 2
+  },
+  "live_root_scope": {
+    "path": "~/.tdt",
+    "deployment_or_rollout_mutation_attempted": false,
+    "claim": "No live-root cutover or consumer deployment was attempted."
+  },
+  "finding": "Participant scopes are recorded separately. Repository presence and governance-manifest presence do not establish deployment ownership, runtime principal, compatibility, approval, or live deployment."
+}

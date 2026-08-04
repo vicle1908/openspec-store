@@ -1,0 +1,22 @@
+{
+  "task": "4.1",
+  "title": "Restore exact pre-change artifact and closure in disposable/staging target",
+  "gate": "Gate E: Reverse rollback rehearsal",
+  "status": "blocked_not_applicable",
+  "started_at": "2026-08-04T02:54:44Z",
+  "completed_at": "2026-08-04T02:54:44Z",
+  "source_commit": "fd8c97ff2cff9f8b26e1d5e94cf121812a169868",
+  "evidence_type": "verification",
+  "promoted_consumers": 0,
+  "rollback_execution": "not_started",
+  "exact_prechange_artifact_available": false,
+  "finding": "No consumer was promoted and no consumer-owned exact pre-change wheel/closure is available for a target rehearsal.",
+  "required_sequence": [
+    "Install and hash-verify retained pre-change wheelhouse.",
+    "Install candidate by immutable coordinate and hash.",
+    "Run candidate consumer checks.",
+    "Restore exact pre-change bytes without rebuilding/cache reuse.",
+    "Run the same health, contract, smoke, monitoring, and mutation probes.",
+    "Record exit codes, outputs (redacted), and elapsed times."
+  ]
+}

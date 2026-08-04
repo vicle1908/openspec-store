@@ -1,0 +1,37 @@
+{
+  "task": "5.3",
+  "title": "Update documentation with release notes and consumer migration guide",
+  "gate": "Release gates",
+  "status": "documented_pending_release",
+  "started_at": "2026-08-04T02:54:44Z",
+  "completed_at": "2026-08-04T02:54:44Z",
+  "source_commit": "fd8c97ff2cff9f8b26e1d5e94cf121812a169868",
+  "evidence_type": "process_documentation",
+  "release_notes_draft": {
+    "package": "tdt-core",
+    "version": "0.2.0",
+    "artifact": {
+      "filename": "tdt_core-0.2.0-py3-none-any.whl",
+      "sha256": "812924194fdedde5ae0c839f514dfd1bb4f774a84f3dfff4de18c4892476ac60",
+      "size_bytes": 114346,
+      "version": "0.2.0"
+    },
+    "scope": "TDT_HOME provider distribution and diagnostics; no live ~/.tdt migration or consumer source migration.",
+    "release_gate_state": "blocked pending internal registry publication and staged consumer evidence."
+  },
+  "consumer_migration_guide_sections": [
+    "Pin tdt-core to the approved immutable version and wheel digest.",
+    "Resolve and review the consumer lock closure without unrelated upgrades.",
+    "Install from the approved internal registry using a consumer-like principal.",
+    "Run consumer-specific provider/CLI/doctor checks against approved isolated roots.",
+    "Run startup/health/business smoke and observe approved thresholds.",
+    "Retain the exact pre-change artifact and execute reverse rollback rehearsal before promotion.",
+    "Do not modify live ~/.tdt as part of provider rollout; handle cutover in its separate change."
+  ],
+  "documentation_sources": [
+    "openspec/changes/release-and-roll-out-tdt-home-provider/proposal.md",
+    "openspec/changes/release-and-roll-out-tdt-home-provider/design.md",
+    "openspec/changes/release-and-roll-out-tdt-home-provider/tasks.md"
+  ],
+  "finding": "Release-note and migration-guide content is captured as an evidence draft. Final consumer-specific documentation cannot be marked complete until the registry coordinate, rollout order, owners, target details, and observed results exist."
+}

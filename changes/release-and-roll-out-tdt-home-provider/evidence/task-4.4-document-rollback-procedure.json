@@ -1,0 +1,34 @@
+{
+  "task": "4.4",
+  "title": "Document consolidated rollback procedure and time estimate",
+  "gate": "Gate E: Reverse rollback rehearsal",
+  "status": "documented_pending_execution",
+  "started_at": "2026-08-04T02:54:44Z",
+  "completed_at": "2026-08-04T02:54:44Z",
+  "source_commit": "fd8c97ff2cff9f8b26e1d5e94cf121812a169868",
+  "evidence_type": "process_documentation",
+  "procedure": [
+    "Freeze the serialized queue and identify the current consumer transaction.",
+    "Quiesce/restart the target through its owner-approved deployment path.",
+    "Clear/bypass installer cache; select retained pre-change coordinate and closure.",
+    "Restore exact bytes and verify package metadata, imported module origins, CLI/version, and installed-file inventory.",
+    "Run the recorded consumer contract, startup/health/business smoke, monitoring, and redaction probes.",
+    "Compare against the pre-change baseline and verify no source, credential, database, configuration, or live TDT_HOME mutation.",
+    "Mark rolled_back only after all checks pass; otherwise mark rollback_failed and escalate.",
+    "If the target must remain on candidate, reinstall the same candidate bytes and rerun candidate health/observation gates."
+  ],
+  "time_estimate": {
+    "per_consumer": "15-30 minutes for a non-deployable/CI or simple disposable target; 30-60 minutes for a service requiring quiesce/restart and observation.",
+    "ecosystem": "Serial sum of per-consumer target windows plus owner approvals; no fixed total is claimed without target-specific windows.",
+    "basis": "Estimate includes artifact restore, identity verification, consumer probes, and evidence capture; it excludes incident remediation."
+  },
+  "rollback_trigger_examples": [
+    "candidate hash/version drift",
+    "startup/health/provider or consumer contract failure",
+    "new path/permission/configuration/dependency/redaction finding",
+    "consumer SLI threshold breach",
+    "monitoring unavailable",
+    "rollback artifact unavailable or hash mismatch"
+  ],
+  "finding": "Consolidated procedure and bounded estimate are documented. It has not been exercised because no consumer was promoted."
+}

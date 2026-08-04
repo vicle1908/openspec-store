@@ -1,0 +1,37 @@
+{
+  "task": "2.2",
+  "title": "Verify registry availability from a clean environment",
+  "gate": "Gate C: Internal registry publication",
+  "status": "blocked",
+  "started_at": "2026-08-04T02:54:44Z",
+  "completed_at": "2026-08-04T02:54:44Z",
+  "source_commit": "fd8c97ff2cff9f8b26e1d5e94cf121812a169868",
+  "evidence_type": "verification",
+  "commands": [
+    {
+      "command": "env | cut -d= -f1 | grep -Ei '(^|_)(NEXUS|PYPI|REGISTRY|PACKAGE|INDEX)(_|$)' | sort",
+      "exit_code": 0,
+      "output": "No matching registry/index environment variable names."
+    },
+    {
+      "command": "find . -maxdepth 3 -type f ... | xargs grep -ilE 'nexus|internal.*(pypi|python).*registr|upload.*wheel|package.*registr'",
+      "exit_code": 0,
+      "output": "No executable registry configuration found; only documentation/reference matches."
+    }
+  ],
+  "required_clean_install": {
+    "package": "tdt-core",
+    "version": "0.2.0",
+    "coordinate": null,
+    "expected_wheel_sha256": "812924194fdedde5ae0c839f514dfd1bb4f774a84f3dfff4de18c4892476ac60",
+    "index": null
+  },
+  "assertions": {
+    "registry_coordinate_known": false,
+    "consumer_like_credentials_available": false,
+    "clean_registry_download_attempted": false,
+    "hash_comparison_possible": false
+  },
+  "finding": "The approved internal registry, immutable coordinate, and consumer-like access path are not configured in this workspace. Per design, availability is UNKNOWN/BLOCKED, not PASS; upload success cannot be inferred from the local wheel build.",
+  "next_action": "Release operator must provide the approved registry coordinate and execute a fresh checkout-free exact-version download/hash/matrix qualification."
+}

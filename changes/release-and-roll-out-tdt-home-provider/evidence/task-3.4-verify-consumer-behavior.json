@@ -1,0 +1,41 @@
+{
+  "task": "3.4",
+  "title": "Verify consumer behavior unchanged",
+  "gate": "Gate D: Staged consumer rollout",
+  "status": "blocked",
+  "started_at": "2026-08-04T02:54:44Z",
+  "completed_at": "2026-08-04T02:54:44Z",
+  "source_commit": "fd8c97ff2cff9f8b26e1d5e94cf121812a169868",
+  "evidence_type": "verification",
+  "verification_commands": [
+    {
+      "command": "cd /Users/androidteam/Developer/tdt-core && uv build 2>&1",
+      "exit_code": 0,
+      "output_summary": "Built tdt_core-0.2.0-py3-none-any.whl and tdt_core-0.2.0.tar.gz."
+    },
+    {
+      "command": "cd /Users/androidteam/Developer/tdt-core && .venv/bin/tdt version",
+      "exit_code": 0,
+      "output": "tdt-core 0.2.0"
+    },
+    {
+      "command": "cd /Users/androidteam/Developer/tdt-core && .venv/bin/tdt --version",
+      "exit_code": 2,
+      "output_summary": "CLI reports No such option: --version; canonical design probe is unavailable in this build."
+    }
+  ],
+  "candidate_artifact": {
+    "filename": "tdt_core-0.2.0-py3-none-any.whl",
+    "sha256": "812924194fdedde5ae0c839f514dfd1bb4f774a84f3dfff4de18c4892476ac60",
+    "size_bytes": 114346,
+    "version": "0.2.0"
+  },
+  "selected_target": null,
+  "consumer_execution": "not_started",
+  "finding": "No consumer baseline, target, candidate deployment, or observation window was approved.",
+  "required_follow_up": [
+    "Complete Gate C registry publication/download qualification.",
+    "Record a single target approval and all preflight fields.",
+    "Install the exact wheel and digest in that target only, then capture consumer-owned test/smoke/observation evidence."
+  ]
+}

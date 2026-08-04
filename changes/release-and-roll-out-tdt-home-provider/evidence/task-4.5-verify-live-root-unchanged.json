@@ -1,0 +1,26 @@
+{
+  "task": "4.5",
+  "title": "Verify no live ~/.tdt data was modified during rehearsal",
+  "gate": "Gate E: Reverse rollback rehearsal",
+  "status": "completed_with_findings",
+  "started_at": "2026-08-04T02:54:44Z",
+  "completed_at": "2026-08-04T02:54:44Z",
+  "source_commit": "fd8c97ff2cff9f8b26e1d5e94cf121812a169868",
+  "evidence_type": "verification",
+  "commands": [
+    {
+      "command": "python3 -c \"import pathlib; p=pathlib.Path('/Users/androidteam/.tdt'); print('live_tdt_home_exists='+str(p.exists()).lower()); print('live_tdt_home_mtime_ns='+str(p.stat().st_mtime_ns))\"",
+      "exit_code": 0,
+      "output": "live_tdt_home_exists=true; live_tdt_home_mtime_ns=1785745740564487100"
+    }
+  ],
+  "rehearsal_executed": false,
+  "consumer_deployment_mutation_attempted": false,
+  "live_root_mutation_commands_issued": false,
+  "claim": "No live-root mutation was performed by this verification session. Because no rollback rehearsal ran, this is a read-only safety check rather than proof of a completed rehearsal.",
+  "required_rehearsal_proof": [
+    "Capture pre/post root metadata and redacted file inventory around each target rehearsal.",
+    "Run rehearsal only against disposable/staging target roots.",
+    "Compare approved canaries and show consumer source, credentials, databases, config, and live-root contents unchanged."
+  ]
+}

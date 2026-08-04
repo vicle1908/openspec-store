@@ -1,0 +1,26 @@
+{
+  "task": "5.2",
+  "title": "Verify rollback rehearsal successful",
+  "gate": "Release gates",
+  "status": "blocked",
+  "started_at": "2026-08-04T02:54:44Z",
+  "completed_at": "2026-08-04T02:54:44Z",
+  "source_commit": "fd8c97ff2cff9f8b26e1d5e94cf121812a169868",
+  "evidence_type": "verification",
+  "rollback_results": {
+    "promoted_consumers": 0,
+    "rehearsals_started": 0,
+    "rehearsals_passed": 0,
+    "rehearsals_failed": 0,
+    "rehearsals_unknown": 0
+  },
+  "required_evidence": [
+    "exact pre-change artifact and closure digest",
+    "candidate install and behavior result",
+    "restore exit code and elapsed time",
+    "post-restore identity/file-origin checks",
+    "same consumer smoke/health/contract results",
+    "mutation audit and owner approval"
+  ],
+  "finding": "Rollback gate cannot pass because staged consumer rollout did not start and exact consumer pre-change artifacts/targets were not supplied."
+}

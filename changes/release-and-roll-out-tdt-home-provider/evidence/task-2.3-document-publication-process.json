@@ -1,0 +1,42 @@
+{
+  "task": "2.3",
+  "title": "Document publication process and version tagging convention",
+  "gate": "Gate C: Internal registry publication",
+  "status": "documented",
+  "started_at": "2026-08-04T02:54:44Z",
+  "completed_at": "2026-08-04T02:54:44Z",
+  "source_commit": "fd8c97ff2cff9f8b26e1d5e94cf121812a169868",
+  "evidence_type": "process_documentation",
+  "version_convention": {
+    "distribution": "tdt-core",
+    "normalized_artifact_prefix": "tdt_core",
+    "current_version": "0.2.0",
+    "tagging_rule": "Publish only an immutable public version from the approved source commit; never reuse a name/version for different bytes."
+  },
+  "required_identity": [
+    "source commit and clean-tree result",
+    "public distribution version",
+    "wheel filename/tags/size/SHA-256",
+    "uv.lock SHA-256 and selected runtime subset",
+    "dependency wheelhouse inventory and digests",
+    "registry repository and immutable coordinate",
+    "registry-copy digest",
+    "publisher/consumer-like principal identities without secrets",
+    "approval and audit references"
+  ],
+  "process": [
+    "Build and qualify once from the approved immutable revision.",
+    "Publish the exact qualified wheel without rebuilding.",
+    "Reject a pre-existing coordinate if its digest differs.",
+    "Download by exact version into an empty clean environment.",
+    "Compare SHA-256 to the qualified wheel.",
+    "Re-run the installed-wheel matrix and retain redacted evidence before rollout."
+  ],
+  "prohibited": [
+    "latest/unbounded resolution",
+    "overwrite or delete-and-reupload",
+    "credentials in evidence",
+    "consumer rollout after upload acknowledgement alone"
+  ],
+  "finding": "Process and tagging convention are recorded; actual publication remains pending the registry decision and operator approval."
+}
