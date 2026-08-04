@@ -37,7 +37,8 @@ The compatibility correction is implemented in canonical `tdt-core` commit
 postcondition recheck and compatibility/documentation follow-up in `97f83e2`,
 plus staging-cleanup regression coverage in `6934182` and direct-constructor
 root invariant coverage in `c657aad`. Focused migration, backup, journal,
-plan, and safety tests pass;
+plan, and safety tests pass; the final executor-test formatting revision is
+`7c686ee`.
 the full provider suite reports 508 passed and 16 skipped. Ruff lint, strict
 mypy, and `git diff --check` pass. The subprocess matrix reaches and recovers
 from all six durable boundaries in fresh processes, and regular-file,
