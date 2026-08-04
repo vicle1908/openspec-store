@@ -10,7 +10,7 @@
 
 ## 2. Implement the strict executor safely
 
-- [ ] 2.1 Define an executor API that accepts only the typed
+- [x] 2.1 Define an executor API that accepts only the typed
   `tdt_core.migration_plan.MigrationPlan`, `JournalStore`, and explicit source
   roots; reject compatibility-path plans.
 - [ ] 2.2 Implement descriptor-relative destination switching with durable
@@ -33,8 +33,10 @@
 ## Evidence boundary
 
 The compatibility correction is implemented in canonical `tdt-core` commit
-`88746e7`. Focused migration-engine and safety tests pass, and the full provider
-suite reports 503 passed and 16 skipped with Ruff lint and strict mypy green.
+`88746e7`; the strict executor boundary and prepare/stage wiring are in
+`cf7ff14`. Focused migration-engine, safety, and executor tests pass, and the
+full provider suite reports 508 passed and 16 skipped with Ruff lint and strict
+mypy green.
 The repository-wide format check still reports only the protected concurrent
 `migration_journal.py` syntax edit. This evidence does not claim the strict
 executor tasks in section 2 are complete. The archived migration-engine change
