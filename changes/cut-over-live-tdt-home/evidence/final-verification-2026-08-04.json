@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-08-04T05:51:46.138271+00:00",
+  "timestamp": "2026-08-04T06:00:47.677319+00:00",
   "status": "blocked",
-  "tdt_core_revision": "b2c2a56",
+  "tdt_core_revision": "165f3be",
   "openspec_validate": "356/356 passed",
   "store_doctor": "no structural issues; unrelated harden-ci-supply-chain work remains uncommitted",
   "task_status": {
@@ -16,7 +16,8 @@
     "mypy_strict": "passed",
     "migration_plan_journal_backup_tests": "23 passed",
     "clean_wheel": "tdt-core 0.2.0 installed in clean CPython 3.14.5",
-    "package_resource": "source-registry.json present"
+    "package_resource": "source-registry.json present",
+    "full_suite": "500 passed, 16 skipped, 2 warnings; Ruff and strict mypy passed"
   },
   "source_conformance": {
     "manifests": "15/15 schema-valid and committed in owning repositories",
@@ -33,5 +34,6 @@
     "backup": "~/.tdt-backup-20260804-100628 exists; 53,043 files; approximately 2.0 GiB",
     "open_file_handles": 0
   },
-  "blocking_reason": "Do not archive or claim live cutover complete. Consumer source findings, incomplete migration state machine/recovery implementation, blocked registry/consumer rollout evidence, and missing secure SCHEDULER_POSTGRES_DSN provisioning require owner action."
+  "blocking_reason": "Do not archive or claim live cutover complete. Consumer source findings, incomplete migration state machine/recovery implementation, blocked registry/consumer rollout evidence, and missing secure SCHEDULER_POSTGRES_DSN provisioning require owner action.",
+  "tdt_core_remote": "not configured; commits verified locally only"
 }
