@@ -1,0 +1,82 @@
+{
+  "task": "5.1",
+  "status": "blocked_findings",
+  "timestamp": "2026-08-04T04:34:34.930135+00:00",
+  "command": "cd ~/Developer/tdt-core && uv run tdt config source-audit ~/Developer --json",
+  "exit_code": 0,
+  "overall_status": "FAIL",
+  "summary": {
+    "FAIL": 13,
+    "PASS": 2,
+    "PASS_WITH_EXCEPTIONS": 0,
+    "error_findings": 76,
+    "fail": 13,
+    "info_findings": 0,
+    "pass": 2,
+    "pass_with_exceptions": 0,
+    "warning_findings": 0
+  },
+  "repositories": [
+    {
+      "repository": "agent-core",
+      "status": "FAIL"
+    },
+    {
+      "repository": "agent-docs-sync",
+      "status": "FAIL"
+    },
+    {
+      "repository": "agent-harness",
+      "status": "FAIL"
+    },
+    {
+      "repository": "ai-harness-skills",
+      "status": "FAIL"
+    },
+    {
+      "repository": "ai-review",
+      "status": "PASS"
+    },
+    {
+      "repository": "browser-cli",
+      "status": "FAIL"
+    },
+    {
+      "repository": "code-daily-scan",
+      "status": "FAIL"
+    },
+    {
+      "repository": "jira-daily-reports",
+      "status": "FAIL"
+    },
+    {
+      "repository": "jira-epic-report",
+      "status": "FAIL"
+    },
+    {
+      "repository": "jira-kanban-from-spreadsheet",
+      "status": "FAIL"
+    },
+    {
+      "repository": "jira-skill",
+      "status": "FAIL"
+    },
+    {
+      "repository": "tdt-core",
+      "status": "PASS"
+    },
+    {
+      "repository": "tdt-observability",
+      "status": "FAIL"
+    },
+    {
+      "repository": "tdt-sheets",
+      "status": "FAIL"
+    },
+    {
+      "repository": "webhook-receiver",
+      "status": "FAIL"
+    }
+  ],
+  "note": "Audit command completed, but conformance is not green; 13 repositories have 76 hard-coded/provider-boundary findings. Task remains open until consumer-owned adoption changes remediate or explicitly govern each finding."
+}
