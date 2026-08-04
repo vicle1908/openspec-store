@@ -13,32 +13,39 @@
 - [x] 2.1 Define an executor API that accepts only the typed
   `tdt_core.migration_plan.MigrationPlan`, `JournalStore`, and explicit source
   roots; reject compatibility-path plans.
-- [ ] 2.2 Implement descriptor-relative destination switching with durable
+- [x] 2.2 Implement descriptor-relative destination switching with durable
   per-step `intent`/`completed` records and reopened postcondition checks.
-- [ ] 2.3 Implement root-bound recovery and rollback using verified generation
+- [x] 2.3 Implement root-bound recovery and rollback using verified generation
   manifests, prior absence, symlinks, metadata, and external-interference
   rejection.
-- [ ] 2.4 Add real subprocess/SIGTERM interruption coverage at every durable
+- [x] 2.4 Add real subprocess/SIGTERM interruption coverage at every durable
   boundary and prove fresh-process idempotent recovery.
-- [ ] 2.5 Add isolated apply → verify → rollback and provider contract evidence.
+- [x] 2.5 Add isolated apply → verify → rollback and provider contract evidence.
 
 ## 3. Verification and documentation
 
 - [ ] 3.1 Run full quality gates with the protected worktree state resolved.
-- [ ] 3.2 Document the strict executor API, failure semantics, and operator
+- [x] 3.2 Document the strict executor API, failure semantics, and operator
   boundary without exposing live-root values.
-- [ ] 3.3 Run strict OpenSpec validation and store doctor, then review before
+- [x] 3.3 Run strict OpenSpec validation and store doctor, then review before
   archival.
 
 ## Evidence boundary
 
 The compatibility correction is implemented in canonical `tdt-core` commit
-`88746e7`; the strict executor boundary and prepare/stage wiring are in
-`cf7ff14`. Focused migration-engine, safety, and executor tests pass, and the
-full provider suite reports 508 passed and 16 skipped with Ruff lint and strict
-mypy green.
-The repository-wide format check still reports only the protected concurrent
-`migration_journal.py` syntax edit. This evidence does not claim the strict
-executor tasks in section 2 are complete. The archived migration-engine change
+`88746e7`; the strict executor implementation is in `6d266fe`, with a terminal
+postcondition recheck and compatibility/documentation follow-up in the current
+review delta. Focused migration, backup, journal, plan, and safety tests pass;
+the full provider suite reports 508 passed and 16 skipped. Ruff lint, strict
+mypy, and `git diff --check` pass. The subprocess matrix reaches and recovers
+from all six durable boundaries in fresh processes, and regular-file,
+symlink, prior-absence, rollback, and interference tests pass against
+temporary roots.
+
+Task 3.1 remains open because repository-wide Ruff format still reports the
+protected concurrent `migration_journal.py` syntax edit. `cli.py` and
+`source_audit.py` formatter drift from landed agent commits was corrected
+without touching that protected file. The archived migration-engine change
 remains historical; this active change is the authoritative safety correction
-and follow-up plan.
+and follow-up plan. Strict OpenSpec validation reports 357 passed and 0 failed;
+`openspec store doctor openspec-store` reports no structural issues.

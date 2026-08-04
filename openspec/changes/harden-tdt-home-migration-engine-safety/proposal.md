@@ -3,8 +3,9 @@
 The archived migration-engine change was marked complete after a compatibility
 implementation reintroduced pathname-based filesystem mutation, despite the
 provider contract requiring descriptor-relative, root-bound, fail-closed
-behavior. This correction restores the safety boundary immediately and keeps
-the still-unimplemented strict executor explicitly tracked.
+behavior. This correction restores the compatibility safety boundary and
+finishes the strict executor as a separately reviewable, typed implementation
+against synthetic roots.
 
 ## What Changes
 
@@ -15,9 +16,11 @@ the still-unimplemented strict executor explicitly tracked.
   artifacts.
 - Preserve the strict planner, generation journal, and verified backup/staging
   modules as the implementation foundation for the next executor slice.
-- Add a follow-up task ledger for descriptor-relative switching, recovery,
-  rollback, interruption, and isolated-root evidence; do not claim those tasks
-  complete from superficial compatibility tests.
+- Add a strict executor that uses the typed plan and journal to perform
+  descriptor-relative switching, root-bound recovery, explicit rollback, and
+  fresh-process SIGTERM recovery only under isolated roots.
+- Keep a revision-bound task ledger and evidence report; compatibility tests
+  alone never authorize migration completion.
 
 ## Capabilities
 
@@ -33,8 +36,10 @@ None.
 
 ## Impact
 
-- Affected implementation: `/Users/androidteam/Developer/tdt-core/src/tdt_core/migration_engine.py`.
-- Affected tests: migration-engine compatibility and safety regression suites.
+- Affected implementation: `migration_engine.py`, `migration_executor.py`, and
+  the provider descriptor-relative migration helpers.
+- Affected tests and docs: migration-engine safety, executor interruption and
+  rollback suites, and `docs/migration-executor.md`.
 - Affected planning surface: this corrective OpenSpec change only; archived
   changes remain immutable.
 - No consumer repository, deployment configuration, live `~/.tdt`, or

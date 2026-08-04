@@ -29,13 +29,26 @@ source-inspection test rejects the forbidden pathname fallback imports and
 operations. These tests are synthetic and do not resolve, inspect, or mutate
 the real operator root.
 
-### Decision 3: Track the real executor separately
+### Decision 3: Keep strict execution separate and evidence-backed
 
-Descriptor-relative switching, recovery, rollback, signal interruption, and
-isolated end-to-end verification remain open tasks. They require a strict
-executor with explicit root identity, per-step intent/completion records,
-verified postconditions, and durable backup metadata. The correction does not
-mark those tasks complete merely because a compatibility test can copy a file.
+The strict executor is now implemented as a separate, typed surface in
+`migration_executor.py`; the compatibility facade remains fail-closed and is
+not silently delegated to it. The executor accepts only `MigrationPlan`,
+`JournalStore`, and explicit source roots. It derives the current operation
+from the validated journal history, publishes durable `intent`/`completed`
+pairs, and reopens every final object before `completed` or `committed`.
+
+All target mutation is below a retained `RootAnchor`/`DirectoryHandle` using
+no-follow inspection, exclusive staging, descriptor-relative `os.rename` or
+`os.symlink`, `os.unlink` only for an authorized leaf, file synchronization,
+and parent synchronization. A destination that is neither verified backup
+state nor desired staged state is external interference and fails closed.
+
+Recovery reloads the generation and uses the same deterministic operation
+prefix in a fresh process. Rollback reverses only the affected prefix and
+reopens the restored object against `BackupMetadata`; prior absence is an
+explicit state. The optional boundary observer exists only for synthetic
+subprocess tests and is called after the journal durability boundary.
 
 ## Non-Goals
 
@@ -43,8 +56,7 @@ mark those tasks complete merely because a compatibility test can copy a file.
 - Reading or mutating `/Users/androidteam/.tdt`.
 - Modifying consumer repositories or deployment configuration.
 - Adding a pathname-based compatibility fallback.
-- Claiming strict switching, recovery, rollback, or SIGTERM evidence before it
-  exists.
+- Reading or mutating a live operator root; strict evidence remains synthetic.
 
 ## Rollback
 
