@@ -5,7 +5,7 @@ operator approval. Depends on ALL prior changes being complete and archived.
 
 ## 1. Pre-migration
 
-- [ ] 1.0 Verify all 3 predecessor OpenSpec changes are archived and green (`openspec validate --all`, `openspec store doctor`).
+- [x] 1.0 Verify all 3 predecessor OpenSpec changes are archived and green (`openspec validate --all`, `openspec store doctor`).
 - [ ] 1.1 Operator reviews and approves the migration plan for the specific ~/.tdt tree.
 - [ ] 1.2 After approval, run the installed provider's read-only doctor against
   the live root and record redacted baseline findings.
