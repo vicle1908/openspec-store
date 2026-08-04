@@ -14,8 +14,8 @@ Each task is one focused work session with a verification gate. Depends on
 ## 2. Journaled apply
 
 - [x] 2.1 Implement journal lifecycle: `prepared → staged → switching → intent → completed → switched → committed` using existing `JournalHeader`, `JournalRecord` schemas from `control_plane_schema.py`.
-- [ ] 2.2 Implement `prepared → staged`: snapshot each DESTINATION target with `BackupMetadata` before mutation, record backup paths in journal.
-- [ ] 2.3 Implement staging: create staging copies under TDT_HOME, verify identity hashes match plan, verify BOTH backups and staged payloads BEFORE writing the `staged` journal record.
+- [x] 2.2 Implement `prepared → staged`: snapshot each DESTINATION target with `BackupMetadata` before mutation, record backup paths in journal.
+- [x] 2.3 Implement staging: create staging copies under TDT_HOME, verify identity hashes match plan, verify BOTH backups and staged payloads BEFORE writing the `staged` journal record.
 - [ ] 2.4 Implement `switching → intent`: atomically rename staging copies to final locations using descriptor-relative operations from `fs_kernel.py`.
 - [ ] 2.5 Implement `intent → completed`: verify all final locations, write completion marker.
 - [ ] 2.6 Implement `completed → switched → committed`: update symlinks/pointers, persist journal to durable storage.
@@ -82,12 +82,22 @@ formatting, and strict mypy gates passed. Task 2.1 is implemented in canonical
 header, and hash-chained `prepared`, `staged`, `switching`, `intent`,
 `completed`, `switched`, and `committed` records through the provider private
 filesystem primitives, and its focused lifecycle/tamper suite passes 4 tests.
-The combined provider suite after this slice reports 491 passed and 16 skipped,
-with Ruff, formatting, and strict mypy still passing. GitNexus MCP could not
-index `tdt-core` in this session, so no live impact/detect evidence is claimed;
-manual scope review was performed and `graphify update .` refreshed the local
-code graph. Tasks 2.2–7.2 remain open: the canonical checkout still has no
-journal executor, backup/apply/recovery/rollback implementation, interruption
-harness, or isolated end-to-end migration evidence. Task 7.3 is also complete;
-the predecessor is not green and cannot satisfy rollout
-or live-cutover gates.
+The backup/staging slice is implemented and verified in canonical `tdt-core`
+commit `065f7fc`. `migration_backup.py` snapshots regular destinations,
+no-follow symlinks, and prior absence using `BackupMetadata`; publishes
+generation-relative private backup and stage payloads; reopens canonical
+manifests; rejects changed sources, hard links, unsupported destination kinds,
+payload/hash tampering, manifest drift, and orphan payloads; and appends the
+`staged` record only after both artifact sets pass verification. Its focused
+suite has 9 passing tests, and the combined planner/journal/backup suite has 32
+passing tests. The full provider suite reports 500 passed and 16 skipped;
+Ruff lint and strict mypy pass, while the repository-wide format check remains
+blocked only by the protected concurrent `migration_journal.py` edit (Ruff
+0.15 reformats its Python 3.14 multi-exception syntax differently). GitNexus
+MCP could not index `tdt-core` in this session, so no live impact/detect
+evidence is claimed; bounded manual scope review was performed and
+`graphify update .` refreshed the local code graph. Tasks 2.4–7.2 remain open:
+the canonical checkout still has no descriptor-relative switching executor,
+recovery/rollback implementation, interruption harness, isolated end-to-end
+migration evidence, or operator documentation. Task 7.3 is complete; the
+predecessor is not green and cannot satisfy rollout or live-cutover gates.
