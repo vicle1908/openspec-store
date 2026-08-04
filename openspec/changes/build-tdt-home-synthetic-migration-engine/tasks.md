@@ -6,10 +6,10 @@ Each task is one focused work session with a verification gate. Depends on
 
 ## 1. Plan compilation
 
-- [ ] 1.1 Implement source inventory scanner that reads provider manifests and produces a typed migration plan (source path, target path, kind, hash, backup flag).
-- [ ] 1.2 Implement plan validation: verify all source paths exist, all target paths are contained under TDT_HOME, and no conflicts exist.
-- [ ] 1.3 Implement plan digest computation (SHA-256 of canonical JSON) for journal binding.
-- [ ] 1.4 Add tests for plan compilation with fixtures covering: clean migration, missing sources, conflicting targets, unsafe paths.
+- [x] 1.1 Implement source inventory scanner that reads provider manifests and produces a typed migration plan (source path, target path, kind, hash, backup flag).
+- [x] 1.2 Implement plan validation: verify all source paths exist, all target paths are contained under TDT_HOME, and no conflicts exist.
+- [x] 1.3 Implement plan digest computation (SHA-256 of canonical JSON) for journal binding.
+- [x] 1.4 Add tests for plan compilation with fixtures covering: clean migration, missing sources, conflicting targets, unsafe paths.
 
 ## 2. Journaled apply
 
@@ -64,10 +64,24 @@ isolated root verification passes, and documentation is complete.
 
 ## Evidence boundary
 
-Only task 7.3 has current execution evidence: the shared store validates and its
-doctor reports no structural issues. The canonical `tdt-core` checkout has
-`JournalHeader`, `JournalRecord`, and `BackupMetadata` schemas, but no migration
-engine implementation, plan compiler, apply/recovery/rollback modules, or
-synthetic interruption tests. The 29/29 completion claim came from planning
-documentation rather than implementation evidence. Tasks 1.1–7.2 remain open;
-this predecessor is not green and cannot satisfy rollout or live-cutover gates.
+Tasks 1.1–1.4 are implemented and verified in canonical `tdt-core` commit
+`3db6623` and the safe compatibility facade in `tdt-core` commit `ebc545c`.
+`ManifestMapping` requires an explicit absolute repository root,
+manifest-declared source scope, and relative target prefix; the scanner uses
+the provider no-follow descriptor kernel and emits only relative paths, object
+kinds, metadata facts, hashes, and backup flags. Preflight reopens and
+identity/digest-checks every source, rejects root overlap, unsafe or missing
+sources, hard links, unsupported objects, duplicate targets, and overlapping
+targets. Canonical JSON is deterministic and its SHA-256 digest is available
+for journal binding. The compatibility `compile_plan` surface is read-only;
+its apply, backup, rollback, and journal persistence entry points fail closed
+until their successor tasks are implemented. Focused planner coverage is 19
+passed; full provider pytest reports 487 passed and 16 skipped, with Ruff,
+formatting, and strict mypy gates passed. GitNexus MCP could not
+index `tdt-core` in this session, so no live impact/detect evidence is claimed;
+manual scope review was performed and `graphify update .` refreshed the local
+code graph. Tasks 2.1–7.2 remain open: the canonical checkout still has no
+journal executor, backup/apply/recovery/rollback implementation, interruption
+harness, or isolated end-to-end migration evidence. Task 7.3 remains the only
+other completed task. This predecessor is not green and cannot satisfy rollout
+or live-cutover gates.
