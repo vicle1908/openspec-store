@@ -53,6 +53,17 @@ points, and deployment-attestation status.
 - **THEN** it returns a deterministic failure for that participant
 - **AND** it does not infer compliance from source files or directory names
 
+#### Scenario: A manifest scaffold is requested
+
+- **GIVEN** an operator requests the provider-owned scaffold command for a
+  repository
+- **WHEN** `tdt config create-manifest` runs without an output path
+- **THEN** it emits a value-free `.tdt/governance-manifest.json` scaffold to
+  standard output without changing the repository
+- **AND** an explicitly requested output path is created only when it does not
+  already exist
+- **AND** the command never overwrites or silently writes a consumer manifest
+
 ### Requirement: Exceptions SHALL be repository-owned, scoped, and expiring
 
 An exception SHALL include a rule, bounded file/symbol scope, reason, owner,

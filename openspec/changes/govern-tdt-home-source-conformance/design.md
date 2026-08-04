@@ -71,7 +71,7 @@ The JSON schema is packaged with `tdt-core` and validated before semantic checks
 
 ### Decision 2: Use a parser-adapter audit engine with AST semantics
 
-The CLI exposes a repository audit command under the provider's configuration/governance surface (for example, `tdt config audit-source`). The command accepts an explicit repository root; it does not infer sibling checkouts or depend on the operator's current directory layout.
+The CLI exposes the repository audit command as `tdt config source-audit <workspace-root>` under the provider's configuration/governance surface. The command accepts an explicit workspace root; it does not infer sibling checkouts or depend on the operator's current directory layout. The companion `tdt config create-manifest` command emits a value-free `.tdt/governance-manifest.json` scaffold to stdout by default, or to an explicitly requested path that does not already exist. It never writes a consumer repository implicitly and fails closed when the requested output path exists.
 
 Python source is parsed with the standard-library AST. The Python adapter normalizes imports, aliases, calls, attributes, binary joins, f-strings, and simple local constant propagation sufficiently to recognize legacy path construction rather than just literal occurrence. Rules operate on normalized semantic forms and emit stable rule IDs. Initial rule families cover at least:
 

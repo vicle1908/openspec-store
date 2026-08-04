@@ -5,13 +5,13 @@ Each task is one focused work session with a verification gate. Dependency on
 
 ## 1. Manifest schema and tooling
 
-- [ ] 1.1 Define the `RepositoryManifest` schema (schema_version, repository, role, operations, deployment_owners) aligned with `source_registry.py` validation.
-- [ ] 1.2 Create the `tdt config create-manifest` CLI command that generates a `.tdt/governance-manifest.json` scaffold for a given repository.
-- [ ] 1.3 Add validation that manifest JSON passes duplicate-key rejection, schema constraints, and matches the registered participant in the provider registry.
+- [x] 1.1 Define the strict `RepositoryManifest` schema aligned with `source_registry.py` validation: contract identity (`schema_version`, `audit_contract_version`), participant identity and role, owning team, repository-relative source and deployment-definition scope, explicit library/deployable classification, deployment owners/principals, and repository-owned exceptions, while preserving the existing operations/deployment-owners compatibility fields.
+- [x] 1.2 Create the `tdt config create-manifest` CLI command that emits a `.tdt/governance-manifest.json` scaffold to stdout by default or to an explicitly requested new output path; it MUST never overwrite an existing manifest or implicitly write a consumer repository.
+- [x] 1.3 Add validation that manifest JSON passes duplicate-key rejection, strict schema/path/ownership/exception constraints, and matches the registered participant identity and role in the provider registry.
 
 ## 2. Consumer manifests
 
-- [ ] 2.1 Publish the manifest schema, scaffold, and per-participant checklist;
+- [x] 2.1 Publish the manifest schema, scaffold, and per-participant checklist;
   do not write consumer repository files from the provider-owned change.
 - [ ] 2.2 Review owner-supplied manifests for each of the 15 registered
   consumer repositories and verify repository, role, identity marker, scope,
@@ -22,26 +22,26 @@ Each task is one focused work session with a verification gate. Dependency on
 
 ## 3. Source audit tooling
 
-- [ ] 3.1 Implement `tdt config source-audit <workspace-root>` that scans registered repositories for hard-coded `~/.tdt` construction outside approved sites.
-- [ ] 3.2 Add structure-aware parser adapters for each supported executable
+- [x] 3.1 Implement `tdt config source-audit <workspace-root>` that scans registered repositories for hard-coded `~/.tdt` construction outside approved sites.
+- [x] 3.2 Add structure-aware parser adapters for each supported executable
   language; unsupported executable surfaces produce unresolved findings and
   cannot receive verified-green status from regex matching.
-- [ ] 3.3 Output deterministic structured JSON and human-readable text with
+- [x] 3.3 Output deterministic structured JSON and human-readable text with
   `PASS`, `PASS_WITH_EXCEPTIONS`, and `FAIL` scopes plus redacted rule findings.
-- [ ] 3.4 Add strict mode that exits non-zero on any error-level finding.
+- [x] 3.4 Add strict mode that exits non-zero on any error-level finding.
 
 ## 4. Repository-owned exceptions
 
-- [ ] 4.1 Define the exception format for repository-owned legacy sites (file path, pattern, reason, expiry date) inside `.tdt/governance-manifest.json`.
-- [ ] 4.2 Integrate exception evaluation into the source audit pipeline so approved patterns are reported as info rather than error.
-- [ ] 4.3 Verify exception entries cannot bypass new approved-site checks.
+- [x] 4.1 Define the exception format for repository-owned legacy sites (file path, pattern, reason, expiry date) inside `.tdt/governance-manifest.json`.
+- [x] 4.2 Integrate exception evaluation into the source audit pipeline so approved patterns are reported as info rather than error.
+- [x] 4.3 Verify exception entries cannot bypass new approved-site checks.
 
 ## 5. Verification and documentation
 
-- [ ] 5.1 Run the source audit against immutable, owner-supplied revisions for
+- [x] 5.1 Run the source audit against immutable, owner-supplied revisions for
   all 15 repositories and record clean, excepted, failed, and unknown results.
-- [ ] 5.2 Document the conformance process for new repositories joining the ecosystem.
-- [ ] 5.3 Run `openspec validate --all --strict` and `openspec store doctor`.
+- [x] 5.2 Document the conformance process for new repositories joining the ecosystem.
+- [x] 5.3 Run `openspec validate --all --strict` and `openspec store doctor`.
 
 ## Archive gate
 
