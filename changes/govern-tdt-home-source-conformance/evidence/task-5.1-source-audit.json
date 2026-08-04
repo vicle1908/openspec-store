@@ -1,7 +1,7 @@
 {
   "task": "5.1",
   "status": "blocked_findings",
-  "timestamp": "2026-08-04T05:48:45.298365+00:00",
+  "timestamp": "2026-08-04T05:51:46.138271+00:00",
   "command": "cd ~/Developer/tdt-core && env -u SCHEDULER_POSTGRES_DSN uv run tdt config source-audit ~/Developer --json",
   "exit_code": 0,
   "overall_status": "FAIL",
@@ -78,5 +78,5 @@
       "status": "FAIL"
     }
   ],
-  "note": "The audit executed successfully but conformance is not green: 14 repositories have 78 error findings. Task remains open."
+  "note": "Audit completed on current tdt-core/main, but conformance remains red: 14 repositories have 78 error findings."
 }

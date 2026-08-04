@@ -1,11 +1,12 @@
 {
-  "timestamp": "2026-08-04T05:48:45.298365+00:00",
+  "timestamp": "2026-08-04T05:51:46.138271+00:00",
   "status": "blocked",
+  "tdt_core_revision": "b2c2a56",
   "openspec_validate": "356/356 passed",
   "store_doctor": "no structural issues; unrelated harden-ci-supply-chain work remains uncommitted",
   "task_status": {
-    "govern-tdt-home-source-conformance": "13/16; owner-supplied manifest gates remain open; audit 14 FAIL / 78 errors",
-    "build-tdt-home-synthetic-migration-engine": "8/29; plan, journal, and backup/staging slices are present on tdt-core/main; apply/recovery/rollback remain incomplete",
+    "govern-tdt-home-source-conformance": "13/16; owner-supplied manifest gates open; audit 14 FAIL / 78 errors",
+    "build-tdt-home-synthetic-migration-engine": "8/29; typed plan, durable journal, and backup/staging slices pass focused tests; apply transition/recovery/rollback remain incomplete",
     "release-and-roll-out-tdt-home-provider": "6/24; registry/consumer/rollback gates blocked",
     "cut-over-live-tdt-home": "1/26; predecessor gates block live cutover"
   },
@@ -13,8 +14,8 @@
     "tdt_core_tests": "500 passed, 16 skipped, 2 warnings",
     "ruff": "passed",
     "mypy_strict": "passed",
-    "focused_migration_tests": "23 passed",
-    "wheel_install": "tdt-core 0.2.0 installed in clean CPython 3.14.5 environment",
+    "migration_plan_journal_backup_tests": "23 passed",
+    "clean_wheel": "tdt-core 0.2.0 installed in clean CPython 3.14.5",
     "package_resource": "source-registry.json present"
   },
   "source_conformance": {
