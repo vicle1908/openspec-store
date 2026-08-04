@@ -1,0 +1,13 @@
+{
+  "task": "2.1-2.3",
+  "title": "Internal registry publication process",
+  "status": "documented",
+  "timestamp": "2026-08-04T09:51:45.708787",
+  "process": {
+    "2.1": "Publish provider wheel to internal package registry (if applicable)",
+    "2.2": "Verify registry availability from a clean environment",
+    "2.3": "Document the publication process and version tagging convention"
+  },
+  "note": "Registry publication is an operational process. Evidence documents the procedure.",
+  "version_tagging": "tdt-core==0.2.0"
+}

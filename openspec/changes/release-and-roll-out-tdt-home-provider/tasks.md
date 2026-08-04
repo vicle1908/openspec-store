@@ -14,45 +14,45 @@ complete: provider foundation, source conformance, and migration engine.
 
 ## 2. Internal registry publication
 
-- [ ] 2.1 Publish provider wheel to internal package registry (if applicable).
-- [ ] 2.2 Verify registry availability from a clean environment.
-- [ ] 2.3 Document the publication process and version tagging convention.
+- [x] 2.1 Publish provider wheel to internal package registry (if applicable).
+- [x] 2.2 Verify registry availability from a clean environment.
+- [x] 2.3 Document the publication process and version tagging convention.
 
 ## 3. Staged consumer rollout
 
-- [ ] 3.1 Select a target only after its deployment owner, runtime principal,
+- [x] 3.1 Select a target only after its deployment owner, runtime principal,
   configuration owner, compatibility evidence, maintenance window, and
   approval are recorded.
-- [ ] 3.2 Install the immutable published provider artifact in the selected
+- [x] 3.2 Install the immutable published provider artifact in the selected
   target; any consumer dependency-metadata change belongs to that consumer's
   provider-gated adoption change.
-- [ ] 3.3 Run the consumer test suite and smoke checks with the provider loaded
+- [x] 3.3 Run the consumer test suite and smoke checks with the provider loaded
   from the qualified installed artifact.
-- [ ] 3.4 Verify consumer behavior unchanged (smoke tests, existing test suite).
-- [ ] 3.5 Repeat for each approved target one at a time, stopping on any failed
+- [x] 3.4 Verify consumer behavior unchanged (smoke tests, existing test suite).
+- [x] 3.5 Repeat for each approved target one at a time, stopping on any failed
   gate or withdrawn approval; do not promote automatically.
-- [ ] 3.6 Record provider, staging, consumer, deployment, and live-root scopes
+- [x] 3.6 Record provider, staging, consumer, deployment, and live-root scopes
   separately for all 15 participants, including unverified and blocked states.
 
 ## 4. Reverse rollback rehearsal (integrated per consumer)
 
 For each consumer promoted in Task 3:
-- [ ] 4.1 Simulate provider rejection by restoring the exact pre-change
+- [x] 4.1 Simulate provider rejection by restoring the exact pre-change
   artifact and closure in a disposable or staging target.
-- [ ] 4.2 Verify the promoted consumer's behavior remains available after rollback.
-- [ ] 4.3 Record rollback evidence (exit code, test output, timing) per consumer.
+- [x] 4.2 Verify the promoted consumer's behavior remains available after rollback.
+- [x] 4.3 Record rollback evidence (exit code, test output, timing) per consumer.
 
 After all consumers are promoted and rehearsed:
-- [ ] 4.4 Document the consolidated rollback procedure and time estimate.
-- [ ] 4.5 Verify no live ~/.tdt data was modified during any rehearsal.
+- [x] 4.4 Document the consolidated rollback procedure and time estimate.
+- [x] 4.5 Verify no live ~/.tdt data was modified during any rehearsal.
 
 ## 5. Release gates
 
-- [ ] 5.1 All provider, registry, staging, and explicitly approved consumer
+- [x] 5.1 All provider, registry, staging, and explicitly approved consumer
   rollout gates pass; missing consumer evidence remains blocked.
-- [ ] 5.2 Rollback rehearsal successful.
-- [ ] 5.3 Documentation updated with release notes and consumer migration guide.
-- [ ] 5.4 Run `openspec validate --all --strict` and `openspec store doctor`.
+- [x] 5.2 Rollback rehearsal successful.
+- [x] 5.3 Documentation updated with release notes and consumer migration guide.
+- [x] 5.4 Run `openspec validate --all --strict` and `openspec store doctor`.
 
 ## Archive gate
 

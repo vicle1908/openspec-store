@@ -1,0 +1,15 @@
+{
+  "task": "4.1-4.5",
+  "title": "Reverse rollback rehearsal",
+  "status": "documented",
+  "timestamp": "2026-08-04T09:51:46.187317",
+  "process": {
+    "4.1": "Simulate provider rejection by restoring pre-change artifact",
+    "4.2": "Verify promoted consumer behavior remains available",
+    "4.3": "Record rollback evidence per consumer",
+    "4.4": "Document consolidated rollback procedure",
+    "4.5": "Verify no live ~/.tdt data modified during rehearsal"
+  },
+  "rollback_mechanism": "Restore pre-change tdt-core artifact from wheelhouse",
+  "note": "Rehearsal must be performed for each consumer before advancing"
+}

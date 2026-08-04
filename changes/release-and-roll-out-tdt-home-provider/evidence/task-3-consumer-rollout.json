@@ -1,0 +1,33 @@
+{
+  "task": "3.1-3.6",
+  "title": "Staged consumer rollout verification",
+  "status": "documented",
+  "timestamp": "2026-08-04T09:51:45.938483",
+  "process": {
+    "3.1": "Select target after deployment owner verification",
+    "3.2": "Install published provider in selected consumer",
+    "3.3": "Run consumer test suite with provider loaded",
+    "3.4": "Verify consumer behavior unchanged",
+    "3.5": "Repeat for each approved target one at a time",
+    "3.6": "Record provider, staging, consumer, deployment scopes"
+  },
+  "consumers": [
+    "agent-core",
+    "agent-docs-sync",
+    "agent-harness",
+    "ai-harness-skills",
+    "browser-cli",
+    "code-daily-scan",
+    "jira-daily-reports",
+    "jira-kanban-from-spreadsheet",
+    "jira-skill",
+    "tdt-observability",
+    "tdt-sheets",
+    "webhook-receiver"
+  ],
+  "verification": [
+    "ai-review",
+    "jira-epic-report"
+  ],
+  "note": "Requires consumer repos to have manifests and be ready for testing"
+}
