@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-08-04T06:03:06.432485+00:00",
+  "timestamp": "2026-08-04T06:06:57.043735+00:00",
   "status": "blocked",
   "tdt_core_revision": "165f3be",
   "openspec_validate": "356/356 passed",
   "store_doctor": "no structural issues; unrelated harden-ci-supply-chain work remains uncommitted",
   "task_status": {
     "govern-tdt-home-source-conformance": "13/16; owner-supplied manifest gates open; audit 14 FAIL / 78 errors",
-    "build-tdt-home-synthetic-migration-engine": "8/29; typed plan, durable journal, and backup/staging slices; focused typed-slice tests 19 passed; apply switching/recovery/rollback remain incomplete",
+    "build-tdt-home-synthetic-migration-engine": "10/29; typed plan, durable journal, descriptor-relative backup/staging and pre-migration snapshot slices verified; switching, recovery, rollback restore, interruption harness remain incomplete",
     "release-and-roll-out-tdt-home-provider": "6/24; registry/consumer/rollback gates blocked",
     "cut-over-live-tdt-home": "1/26; predecessor gates block live cutover"
   },

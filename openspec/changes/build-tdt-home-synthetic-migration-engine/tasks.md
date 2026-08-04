@@ -16,15 +16,15 @@ Each task is one focused work session with a verification gate. Depends on
 - [x] 2.1 Implement journal lifecycle: `prepared → staged → switching → intent → completed → switched → committed` using existing `JournalHeader`, `JournalRecord` schemas from `control_plane_schema.py`.
 - [x] 2.2 Implement `prepared → staged`: snapshot each DESTINATION target with `BackupMetadata` before mutation, record backup paths in journal.
 - [x] 2.3 Implement staging: create staging copies under TDT_HOME, verify identity hashes match plan, verify BOTH backups and staged payloads BEFORE writing the `staged` journal record.
-- [x] 2.4 Implement `switching → intent`: atomically rename staging copies to final locations using descriptor-relative operations from `fs_kernel.py`.
-- [x] 2.5 Implement `intent → completed`: verify all final locations, write completion marker.
-- [x] 2.6 Implement `completed → switched → committed`: update symlinks/pointers, persist journal to durable storage.
-- [x] 2.7 Add tests for each state transition including partial apply scenarios.
+- [ ] 2.4 Implement `switching → intent`: atomically rename staging copies to final locations using descriptor-relative operations from `fs_kernel.py`.
+- [ ] 2.5 Implement `intent → completed`: verify all final locations, write completion marker.
+- [ ] 2.6 Implement `completed → switched → committed`: update symlinks/pointers, persist journal to durable storage.
+- [ ] 2.7 Add tests for each state transition including partial apply scenarios.
 
 ## 3. Recovery and rollback
 
-- [x] 3.1 Implement crash recovery: read journal, determine last committed state, resume from next valid transition.
-- [x] 3.2 Implement rollback from each supported recoverable journal state back
+- [ ] 3.1 Implement crash recovery: read journal, determine last committed state, resume from next valid transition.
+- [ ] 3.2 Implement rollback from each supported recoverable journal state back
   to `rolled_back`, restoring from verified backup metadata; a committed
   generation requires a separately approved plan rather than implicit reverse
   mutation.
@@ -35,7 +35,7 @@ Each task is one focused work session with a verification gate. Depends on
 
 - [x] 4.1 Implement pre-migration snapshot using `BackupMetadata` schema (hash, mode, ownership, link count).
 - [ ] 4.2 Implement backup verification: re-read backed-up file, compare hash and metadata.
-- [x] 4.3 Implement backup restore for rollback path.
+- [ ] 4.3 Implement backup restore for rollback path.
 - [ ] 4.4 Add tests for backup integrity under normal and adversarial conditions.
 
 ## 5. Synthetic interruption testing
