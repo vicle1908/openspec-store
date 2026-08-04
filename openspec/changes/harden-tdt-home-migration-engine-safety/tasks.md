@@ -34,8 +34,9 @@
 
 The compatibility correction is implemented in canonical `tdt-core` commit
 `88746e7`; the strict executor implementation is in `6d266fe`, with a terminal
-postcondition recheck and compatibility/documentation follow-up in the current
-review delta. Focused migration, backup, journal, plan, and safety tests pass;
+postcondition recheck and compatibility/documentation follow-up in `97f83e2`,
+plus staging-cleanup regression coverage in `6934182`. Focused migration,
+backup, journal, plan, and safety tests pass;
 the full provider suite reports 508 passed and 16 skipped. Ruff lint, strict
 mypy, and `git diff --check` pass. The subprocess matrix reaches and recovers
 from all six durable boundaries in fresh processes, and regular-file,
