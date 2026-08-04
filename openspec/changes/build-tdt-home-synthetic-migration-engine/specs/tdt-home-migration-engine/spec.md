@@ -11,7 +11,7 @@ before any operator cutover.
 ### Requirement: Migration plans SHALL be typed, bounded, and value-free
 
 The migration engine SHALL validate one source/destination root binding,
-generation, provider version, and allowlisted relative operations before any
+generation, provider version, and approved typed relative operations before any
 filesystem mutation.
 
 #### Scenario: A valid plan is prepared
