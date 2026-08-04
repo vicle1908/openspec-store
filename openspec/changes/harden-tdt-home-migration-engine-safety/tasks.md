@@ -38,17 +38,14 @@ postcondition recheck and compatibility/documentation follow-up in `97f83e2`,
 plus staging-cleanup regression coverage in `6934182` and direct-constructor
 root invariant coverage in `c657aad`. Focused migration, backup, journal,
 plan, and safety tests pass; the final executor-test formatting revision is
-`7c686ee`.
-the full provider suite reports 508 passed and 16 skipped. Ruff lint, strict
-mypy, and `git diff --check` pass. The subprocess matrix reaches and recovers
-from all six durable boundaries in fresh processes, and regular-file,
-symlink, prior-absence, rollback, and interference tests pass against
-temporary roots.
+`7c686ee`, and the protected journal formatting revision is `08ef949`.
+The final provider suite reports 519 passed, 16 skipped, and 2 expected
+deprecation warnings. Ruff lint and format, strict mypy, and
+`git diff --check` pass. The subprocess matrix reaches and recovers from all
+six durable boundaries in fresh processes, and regular-file, symlink,
+prior-absence, rollback, and interference tests pass against temporary roots.
 
-Task 3.1 remains open because repository-wide Ruff format still reports the
-protected concurrent `migration_journal.py` syntax edit. `cli.py` and
-`source_audit.py` formatter drift from landed agent commits was corrected
-without touching that protected file. The archived migration-engine change
-remains historical; this active change is the authoritative safety correction
-and follow-up plan. Strict OpenSpec validation reports 357 passed and 0 failed;
-`openspec store doctor openspec-store` reports no structural issues.
+The archived migration-engine change remains historical; this active change is
+the authoritative safety correction and follow-up plan. Strict OpenSpec
+validation reports 357 passed and 0 failed; `openspec store doctor
+openspec-store` reports no structural issues.
