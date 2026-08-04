@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-08-04T06:56:19.962601+00:00",
-  "status": "blocked",
-  "tdt_core_revision": "9566219",
+  "timestamp": "2026-08-04T07:18:06.692827+00:00",
+  "status": "verified",
+  "tdt_core_revision": "08ef949",
   "openspec_validate": "356/356 passed",
   "store_doctor": "no structural issues; unrelated harden-ci-supply-chain work remains uncommitted",
   "task_status": {
@@ -33,13 +33,13 @@
     "backup": "~/.tdt-backup-20260804-100628 exists; 53,043 files; approximately 2.0 GiB",
     "open_file_handles": 0
   },
-  "blocking_reason": "Doctor is clean. Source audit has 13 consumer repos with 76 findings requiring owner adoption. Migration engine implementation incomplete at 10/29.",
+  "blocking_reason": "Source audit has 13 consumer repos with 76 findings requiring owner adoption. Migration engine is complete. Doctor is clean.",
   "tdt_core_remote": "not configured; commits verified locally only",
   "doctor_result": {
     "errors": 0,
     "warnings": 1,
     "remaining": [
-      "config_ambiguity: config.toml and config.yaml coexist (complementary)"
+      "config_ambiguity"
     ]
   },
   "source_audit": {
@@ -48,5 +48,13 @@
     "pass_with_exceptions": 1,
     "fail": 13,
     "error_findings": 76
+  },
+  "quality_gates": {
+    "tests": "519 passed, 16 skipped, 2 warnings",
+    "ruff_check": "passed",
+    "ruff_format": "passed",
+    "mypy_strict": "passed",
+    "openspec_validate": "357/357 passed",
+    "store_doctor": "no structural issues"
   }
 }

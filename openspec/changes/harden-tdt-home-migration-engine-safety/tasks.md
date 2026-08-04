@@ -24,7 +24,7 @@
 
 ## 3. Verification and documentation
 
-- [ ] 3.1 Run full quality gates with the protected worktree state resolved.
+- [x] 3.1 Run full quality gates with the protected worktree state resolved.
 - [x] 3.2 Document the strict executor API, failure semantics, and operator
   boundary without exposing live-root values.
 - [x] 3.3 Run strict OpenSpec validation and store doctor, then review before
