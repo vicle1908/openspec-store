@@ -38,7 +38,7 @@ Each task is one focused work session with a verification gate. Dependency on
 
 ## 5. Verification and documentation
 
-- [x] 5.1 Run the source audit against immutable, owner-supplied revisions for
+- [ ] 5.1 Run the source audit against immutable, owner-supplied revisions for
   all 15 repositories and record clean, excepted, failed, and unknown results.
 - [x] 5.2 Document the conformance process for new repositories joining the ecosystem.
 - [x] 5.3 Run `openspec validate --all --strict` and `openspec store doctor`.
@@ -49,3 +49,14 @@ Do not archive until every consumer-owned manifest and evidence envelope is
 reviewed, supported executable surfaces are parsed or explicitly unresolved,
 exceptions are bounded and expiring, and all verification passes. This change
 does not rewrite consumer source or dependency metadata.
+
+## Evidence boundary
+
+The provider-owned schema, scaffold, parser audit, deterministic report, and
+exception policy are implemented and verified in the dedicated `tdt-core`
+worktree. Tasks 2.2, 2.3, and 5.1 intentionally remain open: no owner-supplied
+consumer manifests or immutable evidence envelopes are present in the current
+workspace, so the provider must not invent those facts or mark the aggregate
+ready. The live workspace audit reports the 15 registered participants as
+missing manifests until each consumer repository contributes its own governed
+file and revision-bound report.
