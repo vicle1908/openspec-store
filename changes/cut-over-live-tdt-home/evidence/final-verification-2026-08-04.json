@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-08-04T04:47:17.658868+00:00",
+  "status": "blocked",
+  "openspec_validate": "356/356 passed",
+  "store_doctor": "no structural issues; unrelated harden-ci-supply-chain work remains uncommitted",
+  "task_status": {
+    "govern-tdt-home-source-conformance": "15/16; source audit open with 13 FAIL repositories and 76 findings",
+    "build-tdt-home-synthetic-migration-engine": "1/29; migration engine modules are not present on tdt-core/main",
+    "release-and-roll-out-tdt-home-provider": "6/24; registry/consumer/rollback gates blocked",
+    "cut-over-live-tdt-home": "1/26; live cutover blocked by predecessor gates"
+  },
+  "provider_verification": {
+    "tdt_core_tests": "473 passed, 16 skipped, 2 warnings",
+    "ruff": "passed",
+    "mypy_strict": "passed",
+    "wheel_install": "tdt-core 0.2.0 installed in clean CPython 3.14.5 environment",
+    "package_resource": "source-registry.json present"
+  },
+  "source_conformance": {
+    "manifests": "15/15 schema-valid, committed in owning repositories",
+    "audit": "FAIL: 13 repositories, 76 findings, 2 PASS"
+  },
+  "live_root": {
+    "root_permissions": "0700",
+    "doctor_errors": 1,
+    "doctor_warnings": 1,
+    "remaining_findings": [
+      "governed_config: SCHEDULER_POSTGRES_DSN is not provisioned in the environment",
+      "config_ambiguity: config.toml and config.yaml both exist"
+    ],
+    "backup": "~/.tdt-backup-20260804-100628 exists; 53,043 files; approximately 2.0 GiB",
+    "open_file_handles": 0
+  },
+  "blocking_reason": "Do not archive or claim live cutover complete. Consumer source findings, absent migration-engine integration on main, blocked registry/consumer rollout evidence, and missing secure SCHEDULER_POSTGRES_DSN provisioning require owner action."
+}
