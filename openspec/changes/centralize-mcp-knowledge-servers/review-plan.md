@@ -1,0 +1,67 @@
+# Plan Review: centralize-mcp-knowledge-servers
+
+**Reviewed:** 2026-08-04 Asia/Ho_Chi_Minh
+**Status:** REVISED FOR LATEST-STABLE UPGRADE — pending final provider re-review
+**Scope:** OpenSpec planning artifacts plus bounded registry/upstream and `go-microservices` evidence. No package installation, live configuration, router database, provider index, memory store, or process was mutated.
+
+## Latest-stable registry evidence
+
+| Provider | Canonical package/version | Registry evidence | Runtime/migration consequence |
+|---|---|---|---|
+| GitNexus | `gitnexus@1.6.9` | npm `latest=1.6.9`; RC `1.6.10-rc.153` and `aptos` tags excluded | Already current; retain Node.js 22+, source/digest and license gates. |
+| Graphify | `@sentropic/graphify@0.17.1` | npm `latest=0.17.1`; `graphifyy@0.10.0` is only a compatibility forwarder; npm has no `graphifyy@0.9.26` | Breaking migration from captured legacy command/path/hash identity, Node.js 20+, `.graphify/graph.json`, native single-graph `serve`, no legacy PR tools. |
+| AgentMemory | `@agentmemory/agentmemory@0.9.28` and `@agentmemory/mcp@0.9.28` | both npm `latest=0.9.28` | Upgrade engine and shim together; verify store/API/hooks/MCP compatibility and retain fail-closed boundary. |
+
+Exact npm SRI and shasum values were captured during planning but are not repeated here; task 2.1a requires immutable retained registry evidence and rejects dist-tag drift before implementation.
+
+## Structural and semantic gates
+
+| Gate | Status | Evidence |
+|---|---|---|
+| Focused strict OpenSpec validation | PENDING AFTER VERSION REVISION | Must rerun after this amendment. |
+| Full strict store validation | PASS BEFORE VERSION REVISION | 357 passed, 0 failed. |
+| Baseline scenario preservation | PENDING AFTER VERSION REVISION | Exact audit must include newly MODIFIED Graphify extraction contract. |
+| Durable scenario/test traceability | REVISED | Stable IDs, migration fixtures, router-only memory verification, and package provenance tasks are specified. |
+| Archive readiness | NOT READY | Implementation and approval tasks remain incomplete. |
+| Implementation | NOT REVIEWED | Current source/installations remain unchanged and form the RED/migration baseline. |
+
+## Critical provider findings and disposition
+
+### Hermes spec review
+
+The initial delegated review found version conflict, missing Graphify enforcement, and pre-approval mutation. The latest-stable revision supersedes the earlier temporary `0.9.26` resolution:
+
+- Canonical Graphify target is now maintained `@sentropic/graphify@0.17.1`.
+- Published package source was inspected: native `serve` is single-graph, has no `project_path`, and lacks legacy `list_prs`, `get_pr_impact`, and `triage_prs`.
+- One repository-owned adapter process therefore owns multi-project selection and a bounded compatibility PR-analysis surface based on native `review_delta`/`review_analysis` plus mapped repository metadata.
+- Graphify migration preserves legacy `graphify-out/`, builds `.graphify/`, compares behavior, and blocks cutover if parity is not demonstrated.
+- Eligibility remains read-only; package installs, graph rebuilds, engine upgrades/startup, and schema migrations require separately approved prerequisite generations.
+
+Final provider re-review is required.
+
+### Claude Code security
+
+Previously approved with warnings and no critical findings. Existing quiescence, redaction, digest, SQLite integrity, authorization, and bounded recall controls remain. Version upgrades add package-integrity and data/schema migration rollback gates.
+
+### Codex provider behavior
+
+Earlier findings remain applicable: fail-closed AgentMemory transport, filtered GitNexus registry exposure, runtime Graphify path validation, server-derived memory identity, and canonical project-to-repository mapping. The Graphify adapter is now explicitly required because current native source lacks the legacy multiplexing and PR surfaces.
+
+### Antigravity architecture
+
+Earlier approval-with-warnings is no longer sufficient after the Graphify runtime/package migration; architecture must be re-reviewed. The hard `optimize-hermes-agent-configuration` dependency remains.
+
+### fable-5/Kimi product scope
+
+UNKNOWN. A valid fifth-provider result or explicit operator acceptance of UNKNOWN remains required.
+
+## Required final gates
+
+1. Rerun focused/full strict OpenSpec validation and exact baseline scenario preservation.
+2. Re-run five-provider plan review against the new package/runtime migration.
+3. Reconcile the active Hermes optimization change.
+4. Integrate the reviewed change into the clean shared store.
+5. During implementation, re-resolve registry dist-tags and stop on drift rather than floating versions.
+6. Keep all installs, Graphify rebuild/migration, AgentMemory schema/startup work, and live cutover behind their separately bound approvals.
+
+No credentials, memory payloads, or live configuration values are included in this artifact.

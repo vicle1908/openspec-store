@@ -1,0 +1,119 @@
+change_name: centralize-mcp-knowledge-servers
+
+planning:
+  repository: /Users/androidteam/Developer/.worktrees/openspec-centralize-mcp-knowledge-servers
+  base: main
+  head: chore/centralize-mcp-knowledge-servers
+
+repositories:
+  - path: /Users/androidteam/Developer/go-microservices
+    ownership: sole implementation repository; future isolated worktree required
+    base: main
+    head: planned dedicated worktree
+    focused_test_command: make knowledge-test
+    shell_check_command: bash -n scripts/knowledge-tools.sh scripts/agentmemory-bootstrap.sh
+    guidance_command: make validate-agent-guidance
+    documentation_command: make validate-documentation
+
+runtime_surfaces:
+  authorization: separate operator GO required after source implementation and synthetic rehearsal
+  includes:
+    - redacted MCP Router server registry and database identity
+    - supported client MCP configuration entries
+    - provider and bridge process-family inventory
+    - canonical GitNexus, Graphify, and AgentMemory health metadata
+  excludes_from_plan_review:
+    - credential values and authorization headers
+    - memory payloads and session content
+    - generated index payloads
+    - live mutations, restarts, or process termination
+
+specs:
+  - developer-code-intelligence/spec.md
+  - developer-memory/spec.md
+  - operational-readiness/spec.md
+
+docs:
+  - /Users/androidteam/Developer/go-microservices/docs/adr/0007-developer-knowledge-graphs.md
+  - /Users/androidteam/Developer/go-microservices/docs/runbooks/knowledge-graphs.md
+  - /Users/androidteam/Developer/go-microservices/docs/agentmemory.md
+  - /Users/androidteam/Developer/go-microservices/AGENTS.md
+
+skills:
+  - openspec-workflow
+  - openspec-plan-review
+  - mcp-integration-debugging
+  - multi-repo-ecosystem-review
+  - hermes-agent
+  - systematic-debugging
+  - test-driven-development
+
+excluded:
+  - .env
+  - .git/
+  - .gitnexus/
+  - graphify-out/
+  - .agentmemory/
+  - node_modules/
+  - .venv/
+  - credentials
+  - tokens
+  - memory payloads
+  - unrelated repositories
+  - pre-existing dirty or untracked files outside this change
+
+status_semantics:
+  - PASS
+  - PARTIAL
+  - FAIL
+  - N/A
+  - UNKNOWN
+  - NOT_REVIEWED
+
+supported_client_matrix:
+  source_of_truth: tasks.md section 3
+  clients:
+    - name: Claude Code
+      config_formats: [json]
+      topology: mcp-router bridge plus AgentMemory lifecycle hooks
+      fixture: claude-settings.json
+    - name: Cursor
+      config_formats: [json]
+      topology: mcp-router bridge
+      fixture: cursor-mcp.json
+    - name: Codex CLI/Desktop
+      config_formats: [toml, json]
+      topology: mcp-router bridge plus mirrored lifecycle hooks
+      fixture: codex-config.toml, codex-hooks.json
+    - name: KiloCode
+      config_formats: [json, yaml]
+      topology: mcp-router bridge
+      fixture: kilocode-config.json
+    - name: Kiro
+      config_formats: [json]
+      topology: mcp-router bridge
+      fixture: kiro-config.json
+    - name: Factory
+      config_formats: [json, yaml]
+      topology: mcp-router bridge
+      fixture: factory-config.json
+    - name: OpenCode
+      config_formats: [jsonc]
+      topology: mcp-router bridge plus AgentMemory lifecycle hooks
+      fixture: opencode.jsonc
+    - name: Zed
+      config_formats: [json]
+      topology: mcp-router ACP/MCP bridge
+      fixture: zed-settings.json
+    - name: Kimi
+      config_formats: [json, yaml]
+      topology: mcp-router ACP/MCP bridge
+      fixture: kimi-config.json
+    - name: Antigravity
+      config_formats: [json]
+      topology: mcp-router bridge
+      fixture: antigravity-config.json
+    - name: Hermes
+      config_formats: [yaml, json]
+      topology: mcp-router bridge only; native Hermes memory remains separate
+      fixture: hermes-mcp.yaml
