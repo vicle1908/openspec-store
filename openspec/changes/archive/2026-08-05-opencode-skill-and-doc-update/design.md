@@ -8,6 +8,8 @@
 - Ruff 0.16.1 installed at `/opt/homebrew/bin/ruff`.
 - Basedpyright 1.39.9 and `basedpyright-langserver` installed through Homebrew at `/opt/homebrew/bin`; redundant pip/npm installations removed.
 - OpenCode LSP maps built-in `pyright` to `basedpyright-langserver --stdio`.
+- Real Basedpyright check detected an intentional return-type error and unused-parameter warning in a temporary Python file.
+- Real Ruff check reported the file as unformatted, reformatted it, then passed `ruff format --check`.
 - MCP Router listens on port 3282; agentmemory is not listening and remains disabled.
 - Google proxy port 8045 is down; frontend and docwriter agent models remain unavailable until that external service is restored.
 
