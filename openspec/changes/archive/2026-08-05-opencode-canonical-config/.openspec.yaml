@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-08-05
+skip_specs: true
+description: "Consolidate duplicate global OpenCode configuration into canonical opencode.json"
