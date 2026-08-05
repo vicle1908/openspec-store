@@ -33,8 +33,8 @@ The system SHALL generate an architecture-level knowledge graph for agent-docs-s
 
 #### Scenario: Graph generation
 - **WHEN** `graphify update .` is run from the agent-docs-sync root
-- **THEN** the system SHALL create `graphify-out/graph.json` and `graphify-out/manifest.json`
-- **AND** it SHALL create `graphify-out/cache/` for analysis caching
+- **THEN** the system SHALL create `.graphify/graph.json` and `.graphify/manifest.json`
+- **AND** it SHALL create `.graphify/cache/` for analysis caching
 - **AND** the graph SHALL contain nodes for all modules, classes, and key functions
 
 #### Scenario: Pipeline flow visible in graph
@@ -60,7 +60,7 @@ Both gitnexus and graphify tools SHALL be queryable for agent-docs-sync after se
 - **AND** results SHALL include the generation agent and related tools
 
 #### Scenario: Graphify query
-- **WHEN** `graphify query "documentation" --graph graphify-out/graph.json` is run
+- **WHEN** `graphify query "documentation" --graph .graphify/graph.json` is run
 - **THEN** it SHALL return nodes related to documentation sync functionality
 - **AND** results SHALL include workflow nodes and tool nodes
 
@@ -92,7 +92,7 @@ The system SHALL refresh gitnexus and graphify indexes automatically after each 
 - **AND** re-running SHALL produce the same result as first install
 
 #### Scenario: Hook does not commit generated files
-- **WHEN** the hook generates .gitnexus/ and graphify-out/ artifacts
+- **WHEN** the hook generates .gitnexus/ and .graphify/ artifacts
 - **THEN** these artifacts SHALL be in .gitignore
 - **AND** the hook SHALL NOT run `git add` on generated files
 - **AND** the working tree SHALL remain clean after hook completes

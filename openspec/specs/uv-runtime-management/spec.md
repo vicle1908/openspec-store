@@ -150,7 +150,7 @@ Any path-bound cache, index, or editable install SHALL be regenerated whenever t
 
 #### Scenario: Workspace graph
 - **WHEN** the workspace root changes
-- **THEN** Graphify output (`graphify-out/`) SHALL be regenerated from the new root
+- **THEN** Graphify output (`.graphify/`) SHALL be regenerated from the new root
 - **AND** `manifest.json` SHALL contain no path strings from the previous root.
 
 #### Scenario: Editable installs

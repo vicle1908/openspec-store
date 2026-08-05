@@ -21,7 +21,7 @@ Every TDT ecosystem repository's `.gitignore` SHALL list `.graphify/` (or `.grap
 - **THEN** the operator SHALL add `.graphify/` to `.gitignore` BEFORE running the analyzer
 - **AND** this rule SHALL be enforced by the GitNexus pre-edit hook `config/codex/scripts/pre-edit-check.sh`
 
-#### Scenario: Cross-repo audit finds zero tracked graphify-out files
+#### Scenario: Cross-repo audit finds zero tracked .graphify files
 
 - **WHEN** `openspec validate --strict tdt-artifact-hygiene` is run
 - **THEN** a sweep across `~/Developer/tdt/*/.graphify/` SHALL report 0 paths from `git ls-files` for every Python and TypeScript repo in the workspace inventory
