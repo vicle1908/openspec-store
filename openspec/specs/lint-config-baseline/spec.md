@@ -5,7 +5,7 @@ Enforces a canonical ruff rule set and strict mypy configuration across all Pyth
 ## Requirements
 ### Requirement: Every Python repo's `[tool.ruff.lint] select` SHALL be a fixed canonical set
 
-The `[tool.ruff.lint] select` array in every Python repo's `pyproject.toml` SHALL equal `["E", "W", "F", "I", "N", "UP", "B", "A", "C4", "SIM", "TCH", "RUF"]`. The set is closed: any rule addition SHALL be made through a new OpenSpec change that revises this requirement.
+The `[tool.ruff.lint] select` array in every Python repo's `pyproject.toml` SHALL equal `["E", "W", "F", "I", "N", "UP", "B", "A", "C4", "SIM", "TCH", "TC", "RUF", "S", "PTH", "PIE", "PT", "ARG", "SLF"]`. The set is closed: any rule addition SHALL be made through a new OpenSpec change that revises this requirement.
 
 #### Scenario: A repo's ruff select matches the canonical set
 
@@ -89,7 +89,7 @@ A single validator script at `tdt-meta/scripts/lint-config-baseline-check.sh` (o
 
 ### Requirement: Ruff `lint.per-file-ignores` MAY be used for tests
 
-A repo MAY use `[tool.ruff.lint.per-file-ignores]` to relax rule N802, N803, or N806 inside `tests/` directories. Such per-file ignores SHALL NOT be used to relax rules in production source (`src/`, `*/__init__.py`, etc.).
+A repo MAY use `[tool.ruff.lint.per-file-ignores]` to relax rules inside `tests/` directories. The canonical test ignore set is `["F841", "B007", "E402", "S101", "S108", "ARG001", "ARG002", "SLF001"]`. Repos MAY add additional ignores for repo-specific patterns (e.g. `S105`, `S106`, `S603`, `S607`). Per-file ignores SHALL NOT be used to suppress violations in production source code without a documented justification.
 
 #### Scenario: Tests relax naming rules
 
