@@ -1,0 +1,15 @@
+schema: spec-driven
+created: 2026-08-05
+skip_specs: false
+description: "Migrate ecosystem config loading to pydantic-settings BaseSettings"
+repos:
+  - tdt-core
+  - ai-review
+  - webhook-receiver
+  - jira-skill
+  - jira-epic-report
+  - jira-daily-reports
+  - jira-kanban-from-spreadsheet
+  - tdt-sheets
+  - code-daily-scan
+  - agent-harness
