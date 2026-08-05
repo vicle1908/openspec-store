@@ -42,7 +42,7 @@
 - [x] 6.3 All changes safe/reversible where applicable
 
 ## Pending User Decision
-- [ ] 7.1 Remove `jenkins_home` (1.8 GB) — local Jenkins not in use?
-- [ ] 7.2 Remove `~/.Genymobile` (2.0 GB) — Genymotion emulator images?
-- [ ] 7.3 Remove `Downloads/project/` (8.9 GB) — ghtk + ghtk-ios projects?
-- [ ] 7.4 Chrome stale profiles (Profile 2-21) — ~850 MB
+- [x] 7.1 Remove `jenkins_home` — not found (already removed)
+- [x] 7.2 Remove `~/.Genymobile` — 2.0 GB recovered
+- [x] 7.3 Remove `Downloads/project/` — 8.9 GB recovered
+- [x] 7.4 Chrome stale profiles — 16 profiles removed

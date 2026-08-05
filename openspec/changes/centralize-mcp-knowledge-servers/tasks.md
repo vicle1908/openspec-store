@@ -5,7 +5,7 @@
   owner, `go-microservices` as provider/client-config owner, `mcp-router` as sole
   router server/token-access writer, live user config as approval-gated runtime,
   and explicit credential/generated/unrelated/dirty exclusions.
-- [ ] 1.3 Run the five-provider plan review with Hermes, Claude Code, Codex, Antigravity, and fable-5 through their native routes; record actual versions/models, sanitize the evidence bundle, write `review-plan.md`, and resolve every evidence-backed CRITICAL finding before implementation.
+- [x] 1.3 Run the five-provider plan review with Hermes, Claude Code, Codex, Antigravity, and fable-5 through their native routes; record actual versions/models, sanitize the evidence bundle, write `review-plan.md`, and resolve every evidence-backed CRITICAL finding before implementation.
 - [x] 1.3a Re-run focused show/strict validation and semantic amendment audit;
   record the current full-store aggregate separately (including unrelated named
   failures), refresh `review-plan.md` for the MCP Router app amendment, and
