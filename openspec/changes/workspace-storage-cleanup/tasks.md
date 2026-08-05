@@ -23,15 +23,26 @@
 ## Phase 4: Application Cleanup ✅
 - [x] 4.1 Remove TabNine (`~/.tabnine` + App Support) — ~460 MB
 - [x] 4.2 Enable macOS Photos iCloud storage optimization
-- [x] 4.3 Remove installed setup DMGs from Downloads (Ofable-5, MCP Router, Zalo, CodexUse, Google Drive, InstantView, Lark, AnyViewer, Xermius, Hermes, Tailscale) — ~1.5 GB
+- [x] 4.3 Remove installed setup DMGs from Downloads — ~1.5 GB
 - [x] 4.4 Remove stale debug zips and empty setup dir
+- [x] 4.5 Remove Chrome OptGuideOnDeviceModel (AI model) — 4.0 GB
+- [x] 4.6 Remove Chrome Snapshots — 682 MB
+- [x] 4.7 Remove GoogleUpdater crx_cache — 706 MB
 
-## Phase 5: Validation ✅
-- [x] 5.1 Verify free space: 30 GB → 63 GB (+33 GB recovered)
-- [x] 5.2 Docker images pruned, active services unaffected
-- [x] 5.3 Development workflows unaffected (caches auto-rebuild)
+## Phase 5: Extended Safe Cleanup ✅
+- [x] 5.1 Remove Go module cache (`~/go/pkg`) — 4.1 GB
+- [x] 5.2 Remove OmniRoute `node_modules` — 3.7 GB
+- [x] 5.3 Remove Codex runtimes cache — 1.5 GB
+- [x] 5.4 Remove all stale developer worktrees — 8.2 GB
+- [x] 5.5 Remove Hermes state-snapshots — 259 MB
 
-## Deferred (Requires User Decision)
-- [ ] 6.1 Audit `Downloads/project/` — 8.9 GB (ghtk 6.9G, ghtk-ios 1.8G, others 120M)
-- [ ] 6.2 Ofable-5 models (`~/.ollama`) — 4.4 GB (remove if not using local models)
-- [ ] 6.3 Stale developer worktrees (`~/.worktrees`) — 8.2 GB
+## Phase 6: Validation ✅
+- [x] 6.1 Free space: 30 GB → 82 GB (+52 GB recovered)
+- [x] 6.2 Capacity: 94% → 84%
+- [x] 6.3 All changes safe/reversible where applicable
+
+## Pending User Decision
+- [ ] 7.1 Remove `jenkins_home` (1.8 GB) — local Jenkins not in use?
+- [ ] 7.2 Remove `~/.Genymobile` (2.0 GB) — Genymotion emulator images?
+- [ ] 7.3 Remove `Downloads/project/` (8.9 GB) — ghtk + ghtk-ios projects?
+- [ ] 7.4 Chrome stale profiles (Profile 2-21) — ~850 MB
