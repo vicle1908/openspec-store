@@ -102,9 +102,17 @@ reconciliation passed the final exact-tree narrow review.
   cycles, provider/router/client scope evidence, no-process-kill behavior, and
   compensation after injected later-target publication errors pass. This does
   not claim cross-file atomicity under SIGKILL or power loss.
-- **Tasks 7.3–7.5 — PARTIAL:** focused source gates and delegated fail-closed
-  reviews pass. Documentation validation lacks ignored coverage/local-smoke
-  artifacts; full five-provider implementation review remains outstanding.
+- **Tasks 4.0–4.0f — COMPLETE:** latest-stable evidence, isolated MCP Router
+  worktree, observed RED/GREEN fixtures, app-native service/command/secure-state
+  transaction, provider-side app-owned refusal, GREEN gates, and distinct arm64
+  package qualification are committed. MCP Router source commit: `1be46aa`;
+  provider boundary commit: `6a2629f`; package executable SHA-256:
+  `ea8f1fc3eae0d003a11edadfaa63ab20f3b447a7a724fe600c4a00d8677d4d4f`.
+- **Tasks 7.3–7.5 — PARTIAL:** provider transaction 20/20, shared 12/12,
+  Electron adapter 19/19, Electron typecheck, arm64 packaging, and diff/static
+  gates pass. Required independent five-provider code review could not run because
+  the host hit `EMFILE` (process-wide too-many-open-files); it is not claimed as
+  approved. Documentation validation lacks ignored coverage/local-smoke artifacts.
 - **Task 1.5 — COMPLETE:** the independently reviewed dependency amendment is
   integrated in the shared store. It preserves every Hermes MCP Router bridge
   field except the separately approved parallel-call declaration and limits

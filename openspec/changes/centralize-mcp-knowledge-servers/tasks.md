@@ -47,34 +47,34 @@
 
 ## 4. Router-owned GitNexus and Graphify source behavior
 
-- [ ] 4.0 Record latest-stable evidence without installing: upstream desktop
+- [x] 4.0 Record latest-stable evidence without installing: upstream desktop
   release identity; installed bundle version/identifier/signing/executable hash
   and running executable identity; CLI npm dist-tag/SRI/shasum/engine/source and
   exact selector; provider pins/integrities; prerelease/floating exclusions.
-- [ ] 4.0a Create the isolated `mcp-router` worktree, read nearest guidance,
+- [x] 4.0a Create the isolated `mcp-router` worktree, read nearest guidance,
   record base/head/dirty state plus Node/pnpm/lock versions, and retain baseline
   shared tests, Electron typecheck/format/build results.
-- [ ] 4.0b Add and execute failing shared/Electron/disposable tests before
+- [x] 4.0b Add and execute failing shared/Electron/disposable tests before
   production changes. Retain named RED evidence for exact pins, duplicate child
   names, alias ambiguity, token delta preservation, missing/duplicate/expired
   tokens, third-state/replay, command-file owner/mode/symlink/digest rejection,
   lock conflict, safeStorage unavailable, post-step failure injection, cache and
   runtime restoration, and secret disclosure.
-- [ ] 4.0c Implement the app-native declarative preview/apply/restore transaction
+- [x] 4.0c Implement the app-native declarative preview/apply/restore transaction
   for bounded knowledge children and existing-token access maps. Use app
   services/repositories, an authenticated single-instance command boundary,
   durable encrypted recovery journal, all-target preflight, exact commit point,
   compensation/manual-recovery state, runtime quiescence/cache refresh/restart,
   and app-owned online backup/restore. Direct external SQLite/shared-config
   writes and raw token lifecycle/value handling are forbidden.
-- [ ] 4.0d Remove `go-microservices` router SQLite/shared-config apply/restore
+- [x] 4.0d Remove `go-microservices` router SQLite/shared-config apply/restore
   authority while retaining client-config fixture planning; add a cross-repo
   source gate proving only MCP Router app code writes router server/token state.
-- [ ] 4.0e Run GREEN shared tests and disposable real app repository/service
+- [x] 4.0e Run GREEN shared tests and disposable real app repository/service
   integration, including two apply/restore cycles, failure injection after every
   server/token/runtime step, exact logical/metadata identities, safeStorage,
   lifecycle/name-map updates, unrelated-state preservation, and redaction.
-- [ ] 4.0f Package the transaction-bearing app with a distinct source/build
+- [x] 4.0f Package the transaction-bearing app with a distinct source/build
   identity based on upstream `0.6.3`; retain source commit, lock provenance,
   artifact digest/signature/notarization decision, ASAR integrity, Electron
   fuses, disposable install/start/command smoke, prior-app backup, and rollback
@@ -122,7 +122,7 @@
 
 - [ ] 8.1 **REQUIRES: Sections 1–7 complete and the Hermes dependency in task 1.5 reconciled.** Capture the final redacted live client/router/process inventory, SHA-256 config fingerprints, router database identity, provider versions, token-access shape, per-client MCP Router authorization and stale-token status, owner/principal/writer list, backup/restore references, current graph/index freshness, and AgentMemory engine health without mutation.
 - [x] 8.2 Perform read-only provider eligibility probes only: verify the approved package versions/digests, GitNexus freshness, canonical `.graphify/graph.json` metadata, preserved legacy Graphify canaries, and AgentMemory `0.9.28` engine health without installing packages, refreshing indexes, writing memory data, restoring `.env`, starting processes, or changing hooks/configuration; record `BLOCKED` for drift/stale/unhealthy providers.
-- [ ] 8.3 Mark `prereq-e8d79b8d0a27b45a` superseded and prohibit execution.
+- [x] 8.3 Mark `prereq-e8d79b8d0a27b45a` superseded and prohibit execution.
   Author an immutable replacement bound to exact MCP Router source commit,
   packaged artifact digest/signature, installed app identity, CLI/provider pins
   and integrity, app/database/shared-config pre/post identities, provider

@@ -1,7 +1,7 @@
 # Plan Review: centralize-mcp-knowledge-servers
 
 **Reviewed:** 2026-08-05 Asia/Ho_Chi_Minh
-**Status:** MCP ROUTER APP AMENDMENT — APPROVED FOR SOURCE IMPLEMENTATION
+**Status:** MCP ROUTER APP AMENDMENT — SOURCE IMPLEMENTED; CODE REVIEW BLOCKED BY EMFILE
 **Scope:** OpenSpec planning artifacts plus bounded registry/upstream,
 `go-microservices`, and `mcp-router` source evidence. No package installation,
 installed-app replacement, live configuration, router database, shared token
@@ -51,7 +51,7 @@ Exact npm SRI and shasum values were captured during planning but are not repeat
 | Delegated five-lens amendment review | APPROVED FOR SOURCE IMPLEMENTATION | First-round blockers were incorporated and final exact-tree narrow review approved. |
 | Named native five-provider task 1.3 | PENDING | Do not infer completion from delegated lenses. |
 | Archive readiness | NOT READY | Implementation and approval tasks remain incomplete. |
-| Implementation | NOT STARTED | Worktree setup/frozen lock only; no source or live state changed. |
+| Implementation | SOURCE COMMITTED; REVIEW BLOCKED | Source commits and gates are complete; independent code review could not run under host EMFILE. |
 
 ## Critical provider findings and disposition
 
@@ -65,7 +65,7 @@ The initial delegated review found version conflict, missing Graphify enforcemen
 - Graphify migration preserves legacy `graphify-out/`, builds `.graphify/`, compares behavior, and blocks cutover if parity is not demonstrated.
 - Eligibility remains read-only; package installs, graph rebuilds, engine upgrades/startup, and schema migrations require separately approved prerequisite generations.
 
-The delegated amendment exact-tree re-review approved source implementation; named native five-provider completion remains required before task 1.3 is checked.
+The delegated amendment exact-tree re-review approved source implementation. The required native five-provider code review is still unresolved because the host-wide `EMFILE` condition prevented reviewers from running.
 
 ### Claude Code security
 

@@ -1,0 +1,52 @@
+{
+  "approval_state": "NOT_APPROVED",
+  "exclusions": [
+    "do not replace the running MCP Router app",
+    "do not mutate MCP Router database/shared config/client configs",
+    "do not create or rotate/delete/export raw tokens",
+    "do not kill processes or restart clients",
+    "do not execute cutover"
+  ],
+  "generation": "prereq-implementation-1be46aa-6a2629f-f4279cf21164e5ad",
+  "implementation_commits": {
+    "go_microservices": "6a2629f",
+    "mcp_router": "1be46aa",
+    "openspec_store_integration": "6013b85"
+  },
+  "operator_gate": "requires explicit approval bound to this digest; approval does not authorize cutover",
+  "package_artifact": {
+    "executable_sha256": "ea8f1fc3eae0d003a11edadfaa63ab20f3b447a7a724fe600c4a00d8677d4d4f",
+    "identity": "com.github.Electron",
+    "signature": "adhoc",
+    "target": "MCP Router arm64 macOS package",
+    "team_identifier": "not set"
+  },
+  "review_status": "independent code review NOT COMPLETED: host EMFILE prevented all delegated reviewers from executing",
+  "schema": "centralize-mcp-prerequisite-generation/v2",
+  "scope": [
+    "install exact pinned provider packages in isolated/provider-owned locations",
+    "refresh GitNexus indexes after separate approval",
+    "build canonical Graphify artifacts after separate approval",
+    "restore AgentMemory environment/store and start engine after separate approval",
+    "verify post-prerequisite provider eligibility"
+  ],
+  "source_gates": {
+    "electron_adapter_tests": "PASS: 19/19",
+    "electron_arm64_package": "PASS",
+    "electron_typecheck": "PASS",
+    "openspec_full_store": "PASS: 351/351",
+    "provider_transaction_tests": "PASS: 20/20",
+    "shared_tests": "PASS: 12/12"
+  },
+  "stable_versions": {
+    "agentmemory": "0.9.28",
+    "agentmemory_mcp": "0.9.28",
+    "gitnexus": "1.6.9",
+    "graphify": "0.17.1",
+    "mcp_router_cli": "0.2.0",
+    "mcp_router_desktop": "0.6.3"
+  },
+  "supersedes": [
+    "prereq-e8d79b8d0a27b45a"
+  ]
+}
