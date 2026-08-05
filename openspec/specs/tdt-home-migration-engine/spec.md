@@ -2,9 +2,8 @@
 
 ## Purpose
 
-Define the value-free, journaled migration contract that consumes the
-`tdt-core` provider kernel while keeping planning and recovery safe to test
-before any operator cutover.
+Define the value-free migration contract that consumes the `tdt-core` provider
+kernel for planning and executing filesystem mutations under `$TDT_HOME`.
 
 ## Requirements
 
@@ -30,50 +29,18 @@ filesystem mutation.
 - **THEN** preparation fails before opening a destination for mutation
 - **AND** the diagnostic identifies the logical operation without the value
 
-### Requirement: Compatibility migration entry points SHALL fail closed
+### Requirement: The executor SHALL remain separately reviewable
 
-Compatibility backup, apply, rollback, recovery persistence, and
-journal-loading entry points MUST remain fail-closed and MUST NOT delegate
-authority to arbitrary caller-supplied paths. The separately reviewable strict
-executor is the only API allowed to perform a typed, root-bound migration.
-
-#### Scenario: A compatibility mutator is called
-
-- **GIVEN** a caller supplies an explicit synthetic source, target, backup, or
-  journal path to the compatibility API
-- **WHEN** the caller invokes backup, apply, rollback, save, or load
-- **THEN** the API fails closed with a redacted `ApplyError`
-- **AND** it does not create, replace, remove, or copy any filesystem object
-
-#### Scenario: The compatibility module is inspected for fallback behavior
-
-- **GIVEN** the provider security contract requires descriptor-relative
-  mutation
-- **WHEN** the migration compatibility module is loaded or reviewed
-- **THEN** it contains no `shutil`, pathname `os.replace`, recursive pathname
-  deletion, or implicit private-directory creation fallback
-
-### Requirement: The strict executor SHALL remain separately reviewable
-
-The strict executor MUST accept only the typed `migration_plan`,
-`JournalStore`, and explicit source-root mapping. It MUST remain separate from
-the compatibility facade, use the provider descriptor kernel for all target
-mutation, and retain revision-bound evidence for switching, recovery,
-rollback, interruption, and isolated-root verification.
-
-#### Scenario: Partial implementation is present
-
-- **GIVEN** planning, journaling, or backup/staging is implemented but strict
-  switching or recovery is not
-- **WHEN** the compatibility API is used
-- **THEN** it remains read-only or fail-closed
-- **AND** the incomplete executor is not represented as an archived completion
+The executor MUST accept only the typed `migration_plan`,
+`JournalStore`, and explicit source-root mapping. It MUST use the provider
+descriptor kernel for all target mutation and retain revision-bound evidence
+for each step.
 
 #### Scenario: A strict executor is ready for integration
 
 - **GIVEN** all destination mutations use retained descriptors, no-follow
   checks, synchronization, and root identity verification
-- **WHEN** focused interruption and rollback tests pass against isolated roots
+- **WHEN** focused execution tests pass against isolated roots
 - **THEN** integration may be proposed as a separate reviewed implementation
   step with revision-bound evidence
 
@@ -81,8 +48,8 @@ rollback, interruption, and isolated-root verification.
 
 The engine SHALL execute only descriptor-relative provider operations and SHALL
 publish a contiguous hash-chained record for each legal state transition. The
-strict executor MUST publish `switching`, then one durable `intent` and
-`completed` pair for each deterministic plan operation, and MUST reopen the
+executor MUST publish `switching`, then one durable `intent` and `completed`
+pair for each deterministic plan operation, and MUST reopen the
 destination to verify kind, digest, size, mode, ownership, link target, and
 root identity before publishing `completed` or `committed`. Descriptor-relative
 no-follow staging, rename, and parent synchronization are required;
@@ -101,7 +68,7 @@ pathname-based fallbacks are forbidden.
 
 - **GIVEN** a staged operation whose desired object is a relative symlink or
   whose verified backup records prior absence
-- **WHEN** apply or rollback handles the operation
+- **WHEN** apply handles the operation
 - **THEN** it uses no-follow inspection and exact link/absence semantics
   without following an external target or deleting a directory
 
@@ -126,77 +93,4 @@ pathname-based fallbacks are forbidden.
   synchronization primitive is unavailable
 - **WHEN** apply begins or reaches the affected boundary
 - **THEN** it fails closed without a pathname-based fallback
-- **AND** any private staging object is removed or recorded for recovery
-
-### Requirement: Recovery and rollback SHALL be root-bound and idempotent
-
-Recovery SHALL validate and reload the complete journal and legal state
-transitions before resuming, including the plan digest, hash-chain state,
-verified generation manifests, staged payloads, and target root identity.
-Explicit rollback MUST restore only the verified affected prefix, including
-regular-file metadata, symlink text, and prior absence. Repeated recovery or
-rollback after a terminal state MUST be a no-op, while a committed generation
-MUST require a separately approved inverse plan.
-
-#### Scenario: Fresh-process recovery follows SIGTERM
-
-- **GIVEN** a child process is terminated after any durable boundary from
-  `prepared` through `switched`
-- **WHEN** a fresh executor calls `recover` with the same generation and
-  explicit source root
-- **THEN** it converges to one verified `committed` state without duplicating
-  completed effects or journal records
-
-#### Scenario: Rollback restores the captured state
-
-- **GIVEN** an interrupted nonterminal generation with verified backup
-  metadata
-- **WHEN** explicit rollback is requested
-- **THEN** the destination returns to its prior regular, symlink, or absent
-  state and a second rollback is a no-op
-
-#### Scenario: Recovery resumes after interruption
-
-- **GIVEN** a synthetic interruption leaves a valid journal in an intermediate
-  state
-- **WHEN** recovery is run against the same root identities
-- **THEN** it completes or safely rolls back the approved operation
-- **AND** a second recovery run is a no-op with the same terminal result
-
-#### Scenario: Journal integrity fails
-
-- **GIVEN** a journal record is missing, reordered, truncated, or hash-modified
-- **WHEN** recovery or rollback starts
-- **THEN** the engine refuses to mutate either root
-- **AND** it reports only the journal identity and failing sequence metadata
-
-### Requirement: Interruption evidence SHALL remain synthetic and contained
-
-The test harness SHALL use temporary approved roots, value-free fixtures, and
-real child-process `SIGTERM` delivery. It SHALL inject deterministic failures
-at every migration transaction boundary and prove fixture containment and
-cleanup. The interruption harness MUST prove that recovery and rollback leave
-no unowned migration staging object and do not inspect or mutate the
-operator's live `~/.tdt` tree.
-
-#### Scenario: Every durable boundary is exercised
-
-- **GIVEN** the six durable boundaries `prepared`, `staged`, `switching`,
-  `intent`, `completed`, and `switched`
-- **WHEN** a subprocess is stopped at each boundary and then terminated
-- **THEN** fresh-process recovery reaches `committed` for every isolated run
-  and the test records only synthetic, value-free evidence
-
-#### Scenario: Boundary faults are exercised
-
-- **GIVEN** a temporary approved test anchor and a value-free legacy fixture
-- **WHEN** the harness injects a fault before and after each boundary
-- **THEN** every run reaches a classified recoverable or rolled-back state
-- **AND** no test opens or mutates the real `~/.tdt`
-
-#### Scenario: Staging cleanup is verified
-
-- **GIVEN** a fault occurs during staging or replacement
-- **WHEN** the synthetic run terminates
-- **THEN** no unowned staging file, descriptor, or out-of-root object remains
-- **AND** the failure evidence contains no secret-shaped value
+- **AND** any private staging object is removed or recorded

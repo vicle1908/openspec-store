@@ -7,9 +7,9 @@ Define the canonical `TDT_HOME` configuration and environment loading contract f
 1. **Single root resolver** — `tdt_root()` dynamically evaluates `TDT_HOME` at call time; no import-time snapshots.
 2. **Typed path helpers** — `tdt_config_path()`, `tdt_credentials_path()`, `tdt_schedules_dir()`, `tdt_logs_dir()`, `tdt_state_path()`, `tdt_runtime_path()` — all backed by `tdt_root()` with component validation.
 3. **Governed environment loading** — `load_tdt_env()` with thread-safe one-time initialization, `TDT_ENV_PROFILE` precedence (development/production), and test isolation.
-4. **Secret separation** — YAML/TOML config MAY contain environment references (`${VAR_NAME}`) but SHALL NOT contain literal secret values.
-5. **Descriptor-relative security kernel** — filesystem operations use `dir_fd` + `O_NOFOLLOW` semantics; no pathname-based fallback.
-6. **Journaled migration** — plan/apply/recover/rollback with hash-chained journal, typed attestations, and idempotent recovery.
+4. **Authoritative config injection** — `config.toml` values are written directly to `os.environ`; no backward-compatibility bridge.
+5. **Secret separation** — YAML/TOML config MAY contain environment references (`${VAR_NAME}`) but SHALL NOT contain literal secret values.
+6. **Descriptor-relative security kernel** — filesystem operations use `dir_fd` + `O_NOFOLLOW` semantics; no pathname-based fallback.
 7. **Runtime diagnostics** — `tdt config doctor` checks layout, permissions, links, config ambiguity, and secret placement.
 8. **Cross-repo conformance** — AST-based source audit rejects hard-coded `~/.tdt` construction outside approved sites.
 
@@ -240,9 +240,3 @@ The provider SHALL expose a base `tdt` command whose installed distribution meta
 - **GIVEN** distribution metadata and the imported runtime report different versions
 - **WHEN** the installed provider is checked
 - **THEN** the release gate fails before the artifact is eligible for consumers
-
-#### Scenario: Provider rollback remains available
-
-- **GIVEN** the provider is rejected by a clean-install or contract check
-- **WHEN** the pre-change artifact is restored
-- **THEN** existing consumer behavior remains available because this change has not modified consumer repositories or the live root
