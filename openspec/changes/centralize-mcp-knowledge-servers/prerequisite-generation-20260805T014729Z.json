@@ -1,0 +1,95 @@
+{
+  "approval_state": "NOT_APPROVED",
+  "canaries": [
+    "legacy Graphify executable path/version/hash",
+    "legacy graphify-out graph hash",
+    "current GitNexus registry/index identities",
+    "AgentMemory store schema/integrity/generation identity",
+    "unrelated MCP Router child rows",
+    "client config hashes and modes"
+  ],
+  "created_at_utc": "2026-08-05T01:47:29Z",
+  "credentials_or_memory_payloads_retained": false,
+  "eligibility_evidence": "live-eligibility-20260805T014729Z.json",
+  "explicit_exclusions": [
+    "MCP Router database or shared-config mutation",
+    "client configuration mutation",
+    "Mem0 enable/disable mutation",
+    "termination or restart of existing clients/provider processes",
+    "replacement of router child definitions",
+    "live cutover",
+    "real project memory payload creation"
+  ],
+  "failure_policy": "stop on first failed precondition or canary; execute provider-specific rollback; do not proceed to cutover planning",
+  "generation": "prereq-e8d79b8d0a27b45a",
+  "implementation_commit": "2edd362a1f0bf154a7d60be0ebe9b650154ed29d",
+  "owner": "operator:androidteam",
+  "package_lock_sha256": "0b9c3ca472b8685bbd8aa2e381618272eaa78e244f337e6a7713be4126a1f7f3",
+  "plan_sha256": "e8d79b8d0a27b45a29127a4de657af921f82d6aa91813ae0970346d868bf947f",
+  "postconditions": [
+    "GitNexus indexes are current for both approved projects",
+    "both canonical Graphify graph files exist and pass isolation/freshness checks",
+    "AgentMemory canonical engine is healthy with stable generation/store identity",
+    "read-only task 8.2 is rerun and returns eligible before any cutover plan is authored"
+  ],
+  "preconditions": [
+    "exact implementation and store commits remain unchanged",
+    "package lock and registry evidence still match",
+    "all target identities and canaries are recaptured immediately before mutation",
+    "no unexpected writer or bootstrap job owns a target",
+    "operator approval exactly matches this generation digest"
+  ],
+  "rollback": {
+    "agentmemory": "stop only the newly started engine, restore exact environment/store backup and prior schema identity",
+    "cutover_state": "not applicable; router/client state is excluded",
+    "gitnexus": "restore prior index directories/registry metadata from protected backup and verify prior identities",
+    "graphify": "remove only newly generated .graphify state and exact package install; preserve and reselect legacy executable/graphify-out state"
+  },
+  "schema": "centralize-mcp-prerequisite-generation/v1",
+  "scope": {
+    "agentmemory": {
+      "actions": [
+        "restore or author the operator-owned environment using existing secret sources without retaining values",
+        "back up and integrity-check the existing store before schema migration",
+        "start the canonical loopback engine on port 3111",
+        "verify status=ok and stable generation/store identity",
+        "run test-data-only tagged save/recall and remove test data if the native contract supports exact deletion"
+      ],
+      "engine_package": "@agentmemory/agentmemory@0.9.28",
+      "mcp_package": "@agentmemory/mcp@0.9.28"
+    },
+    "gitnexus": {
+      "actions": [
+        "refresh exact approved project indexes under existing single-writer controls",
+        "verify repository roots and current commit identities",
+        "run read-only list/scoped-query canaries"
+      ],
+      "projects": [
+        "/Users/androidteam/Developer/.worktrees/centralize-mcp-knowledge-servers",
+        "/Users/androidteam/Developer/mcp-router"
+      ],
+      "version": "1.6.9"
+    },
+    "graphify": {
+      "actions": [
+        "install exact approved package from committed lock",
+        "preserve legacy Graphify executable and graphify-out canaries",
+        "migrate/copy legacy state without deletion",
+        "build canonical .graphify/graph.json for both projects",
+        "run graph/query/path and adapter isolation canaries"
+      ],
+      "package": "@sentropic/graphify@0.17.1",
+      "projects": [
+        "/Users/androidteam/Developer/.worktrees/centralize-mcp-knowledge-servers",
+        "/Users/androidteam/Developer/mcp-router"
+      ]
+    }
+  },
+  "separate_cutover_go_required": true,
+  "store_commit": "104da6b95ec2af1fb50351a0048a92fcb3edfade",
+  "test_data_policy": {
+    "agentmemory": "unique prerequisite-generation tag only; no existing memory modification or automatic dual-write",
+    "graphify": "fixture/canary queries only",
+    "repositories": "read-only queries only"
+  }
+}

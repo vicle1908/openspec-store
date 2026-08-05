@@ -1,0 +1,65 @@
+{
+  "schema": "centralize-mcp-live-eligibility/v1",
+  "captured_at_utc": "2026-08-05T01:47:29Z",
+  "mode": "read-only",
+  "implementation_commit": "2edd362a1f0bf154a7d60be0ebe9b650154ed29d",
+  "store_commit": "104da6b95ec2af1fb50351a0048a92fcb3edfade",
+  "readiness": "BLOCKED",
+  "router": {
+    "listener": "127.0.0.1:3282",
+    "database_integrity": "ok",
+    "database_sha256": "32ba44f785f2348bc872233a85e379bab7454aca7daf5f0cac44d49088f08517",
+    "shared_config_sha256": "e003aa26890e1671f27cc741d158c769e3bc5e3ad6c75f9d0e72eeccbd593e6f",
+    "tokens": {"count": 20, "expired": 0, "values_retained": false},
+    "knowledge_children": [
+      {"name":"gitnexus","enabled":true,"selector":"gitnexus@latest"},
+      {"name":"agentmemory","enabled":true,"selector":"@agentmemory/mcp"},
+      {"name":"mem0-memory","enabled":true,"selector":"unapproved overlapping memory provider"}
+    ]
+  },
+  "providers": {
+    "gitnexus": {
+      "installed_version": "1.6.9",
+      "approved_version": "1.6.9",
+      "router_selector_exact": false,
+      "microservices_index_commit": "078c488",
+      "mcp_router_index_commit": "ad38966",
+      "fresh_for_implementation_commit": false,
+      "status": "BLOCKED"
+    },
+    "graphify": {
+      "installed_legacy_version": "0.9.31",
+      "approved_package": "@sentropic/graphify@0.17.1",
+      "approved_package_installed": false,
+      "microservices_current_graph": "absent",
+      "microservices_legacy_graph_sha256": "be84bf8ac8f84eaa66e0741da007e07b7b4a48db65a7a418b2a808aec00ff655",
+      "mcp_router_current_graph": "absent",
+      "status": "BLOCKED"
+    },
+    "agentmemory": {
+      "approved_version": "0.9.28",
+      "engine_listener_3111": false,
+      "environment_file": "missing",
+      "canonical_health": "unavailable",
+      "shim_processes_present": true,
+      "status": "BLOCKED"
+    }
+  },
+  "topology": {
+    "legacy_graphify_processes_present": true,
+    "duplicate_agentmemory_shim_processes_present": true,
+    "client_config_values_retained": false,
+    "client_config_hashes_captured": true,
+    "supported_client_alias_review_required": ["codex/codex-cli/codex-desktop", "kiro-dev/kiro"]
+  },
+  "blockers": [
+    "Sections 1-7 are not all complete.",
+    "GitNexus router child is floating and indexes are stale for the approved implementation.",
+    "Approved Graphify package and both current graph stores are absent.",
+    "AgentMemory environment and canonical engine health are absent.",
+    "Mem0 is enabled despite the approved non-overlapping ownership contract.",
+    "Duplicate legacy provider process families remain active.",
+    "Live cutover generation cannot be produced from the current ineligible provider state."
+  ],
+  "credentials_or_memory_payloads_retained": false
+}

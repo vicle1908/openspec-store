@@ -108,9 +108,15 @@ reconciliation passed the final exact-tree narrow review.
   integrated in the shared store. It preserves every Hermes MCP Router bridge
   field except the separately approved parallel-call declaration and limits
   this change to the named provider-child state.
+- **Task 8.2 — COMPLETE / BLOCKED outcome:** read-only eligibility found stale
+  GitNexus indexes and a floating router selector, absent current Graphify
+  graphs plus legacy processes, unavailable AgentMemory engine/environment,
+  enabled Mem0, and duplicate shim/process families. No mutation occurred.
+- **Task 8.3 — PARTIAL:** immutable prerequisite generation
+  `prereq-e8d79b8d0a27b45a` is committed but not approved or executed.
 - **Sections 8–9 — BLOCKED:** dependency reconciliation does not authorize live
-  MCP Router/client/provider/config/process mutation. The separately bound
-  prerequisite/cutover plan and operator `GO` have not been requested or granted.
+  MCP Router/client/provider/config/process mutation. Prerequisite approval and
+  the later, separately bound cutover `GO` have not been granted.
 
 ## Safety statement
 
