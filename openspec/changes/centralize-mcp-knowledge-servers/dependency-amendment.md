@@ -4,9 +4,8 @@
 
 The original provider-child boundary was independently reviewed and integrated
 at shared-store revision `104da6b`; that completed historical task 1.5 but did
-not authorize live mutation. The access-map-only MCP Router app extension was
-independently approved and integrated at shared-store revision `6013b85`,
-completing task 1.5a without authorizing live mutation.
+not authorize live mutation. The current access-map-only MCP Router app extension
+is pending exact-tree review and store integration under task 1.5a.
 
 ## Existing constraint
 
@@ -49,9 +48,10 @@ rollback, and readiness evidence pass.
 
 ## Dependency reconciliation condition
 
-The original provider-child boundary was integrated at `104da6b`, and the
-existing-token access-map extension was integrated at `6013b85`. Neither
-reconciliation releases live mutation. Separate immutable prerequisite and cutover generations,
+The original provider-child boundary was integrated at `104da6b`. The current
+existing-token access-map extension remains blocked under task 1.5a until this
+exact amendment is independently approved and integrated. Neither reconciliation
+releases live mutation. Separate immutable prerequisite and cutover generations,
 the app-minted in-UI capability, and the corresponding operator approvals remain
 required for package/app installation, native refresh, engine restoration,
 client/router configuration, process restart, or cutover.
