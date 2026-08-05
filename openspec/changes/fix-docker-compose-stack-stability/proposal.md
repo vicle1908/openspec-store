@@ -24,6 +24,8 @@ effective job permission was already `packages: write`.
 - Preserve OTel exporter retry behavior for startup ordering instead of requiring
   an undeclared service in every focused topology.
 - Add regression validation and operator documentation for the startup contract.
+- Upgrade the local Kubernetes validation toolchain to the latest upstream
+  releases verified on 2026-08-05.
 - Record the real GitHub CI evidence and the known GHCR limitation.
 
 ## Out of Scope
@@ -42,3 +44,6 @@ effective job permission was already `packages: write`.
   topology.
 - Full LGTM smoke verification passes on GitHub Actions.
 - All required GitHub checks pass on the PR.
+- Repository preflight passes with kind v0.32.0, kubectl/Kubernetes v1.36.3,
+  kubeconform v0.8.0, External Secrets v2.8.0, and kind's newest published
+  Kubernetes node image.

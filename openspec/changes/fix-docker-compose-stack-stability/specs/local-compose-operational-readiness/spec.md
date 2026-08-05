@@ -65,3 +65,24 @@ dependencies.
 - **WHEN** `make compose-validate` runs
 - **THEN** base, application, LGTM, tools, full, and arm64 models SHALL validate
 - **AND** the command SHALL exit zero.
+
+### Requirement: Local Kubernetes validation uses the latest verified toolchain
+
+The repository SHALL pin the latest upstream kind, kubectl/Kubernetes,
+kubeconform, and External Secrets releases verified at update time. Kind node
+images and external CRD content SHALL be immutable-digest or immutable-commit
+pinned, and installers SHALL verify upstream checksums before activation.
+
+#### Scenario: Latest toolchain preflight passes
+
+- **GIVEN** the repository installer has installed the versions declared in
+`deploy/kind/tool-versions.env`
+- **WHEN** preflight runs with that tool directory first in `PATH`
+- **THEN** the supported-toolchain check SHALL pass
+- **AND** the manifest SHALL record the exact versions and binary paths.
+
+#### Scenario: Installed tool drifts from the latest verified pin
+
+- **WHEN** an operator runs preflight with a different kind or kubectl version
+- **THEN** preflight SHALL fail before creating containers or clusters
+- **AND** diagnostics SHALL identify the mismatched tools.

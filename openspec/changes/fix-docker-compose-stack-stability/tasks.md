@@ -15,6 +15,14 @@
 - [ ] 10. Verify the merged main branch with a fresh full stack and update the
        operational evidence manifest.
 - [ ] 11. Archive this OpenSpec change and validate the complete store.
+- [x] 12. Resolve current kind, Kubernetes/kubectl, kubeconform, and External
+       Secrets releases from upstream APIs.
+- [x] 13. Update tool pins, kind node digest, External Secrets immutable CRD URL
+       and checksum, validator fixture, and operator documentation.
+- [x] 14. Install the updated toolchain with the checksum-verifying repository
+       installer and pass preflight using the repo-local tool directory.
+- [ ] 15. Create the toolchain upgrade PR and require every executed PR check to
+       pass before merge.
 
 ## Evidence
 

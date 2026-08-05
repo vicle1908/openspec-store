@@ -55,3 +55,18 @@ GHCR diagnostic evidence remains operational documentation: the effective
 build-job permission is `packages: write`, authentication succeeds, and a
 selective 403 may still occur from package-level visibility/association or
 registry propagation.
+
+### Latest-only local Kubernetes toolchain
+
+`deploy/kind/tool-versions.env` is the authoritative local validation contract.
+The repository SHALL pin current upstream releases rather than require operators
+to downgrade to superseded binaries. The 2026-08-05 baseline is kind v0.32.0,
+kubectl/Kubernetes v1.36.3, kubeconform v0.8.0, External Secrets v2.8.0, and
+kindest/node v1.36.1 with the digest published by kind v0.32.0. The node patch
+level differs from kubectl only because v1.36.1 is the newest node artifact
+published by the latest kind release.
+
+The repository installer SHALL verify upstream checksums, and the External
+Secrets CRD bundle SHALL be pinned by immutable commit plus repository-recorded
+SHA-256. Preflight SHALL fail on version drift and pass when invoked with the
+repo-installed tool directory first in `PATH`.
