@@ -16,7 +16,7 @@ than changed: `temporal-admin-tools` is an intentional one-shot initializer with
 `restart: "no"`, and the GHCR 403 was selective/transient while the workflow's
 effective job permission was already `packages: write`.
 
-## Scope
+## What Changes
 
 - Remove fixed host publication from the catalog Redis service (keep the
   container-network address `redis:6379`).

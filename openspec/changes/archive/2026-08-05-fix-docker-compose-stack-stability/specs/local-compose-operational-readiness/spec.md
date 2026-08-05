@@ -9,6 +9,21 @@ Kafka operations, and write a machine-readable manifest containing image
 identities, health state, workflow results, replay results, side-effect counts,
 connector/task state, topic metadata, and failure diagnostics.
 
+#### Scenario: Full local gate passes
+
+- **WHEN** all required services converge and representative real operations complete within their thresholds
+- **THEN** the gate exits zero, marks the manifest passed, and retains the exact project and image evidence
+
+#### Scenario: Health-only stack is incomplete
+
+- **WHEN** a required role is absent, a one-shot initializer exits non-zero, or a real operation cannot be observed end to end
+- **THEN** the gate exits non-zero and records the failed role, operation, and diagnostics
+
+#### Scenario: Cleanup is scoped
+
+- **WHEN** the operator runs normal shutdown after verification
+- **THEN** only the isolated project is stopped and unrelated Compose projects, images, and volumes remain untouched
+
 #### Scenario: Concurrent Compose projects do not collide on application Redis
 
 - **GIVEN** the canonical application stack and another Compose project run on
@@ -33,6 +48,8 @@ shipping, and Nexus-local Compose files
 - **THEN** exporter retry/backoff SHALL tolerate collector startup
 - **AND** the LGTM smoke operation SHALL complete or record actionable collector
 failure diagnostics.
+
+## ADDED Requirements
 
 ### Requirement: One-shot infrastructure initialization is explicit
 
