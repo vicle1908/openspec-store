@@ -1,213 +1,198 @@
 # workspace-knowledge-integration — Design
 
-## Architecture Overview
+## Verified Current State
 
-Four knowledge modalities, one transport hub (mcp-router):
+| Tool | Version | Latest | Status | Gap |
+|------|---------|--------|--------|-----|
+| graphify | 0.9.31 | **0.9.33** | Skills: Claude Codex only. graph.json: 1/18 repos. No hooks, global graph, memory, tree, check-update. | 2 versions behind with critical data-integrity bugs. |
+| GitNexus | 1.6.9 | 1.6.9 | All 17 repos indexed. 9 MCP tools in mcp-router. No wiki generated. | Wiki generation unused. |
+| agentmemory | 0.9.27 | 0.9.27 | 6 MCP tools in mcp-router. Codex connected. 0 sessions, 1 memory. | Tools available, not invoked. |
+| LLM Wiki | N/A | N/A | Does not exist. | Full creation needed. |
+
+### Why Upgrade Matters (0.9.31 -> 0.9.33)
+
+- **v0.9.32**: Incremental rebuilds no longer drop cross-file call edges. Tier-aware merge (AST re-extract keeps semantic layer). Directed flag preserved. `graphify update` writes manifest.json to correct directory.
+- **v0.9.33**: C# partial-class regression fixed. Worker crash recovery (extract no longer silently loses files). Incremental edge preservation verified.
+- **Impact without upgrade**: `graphify update` produces graphs missing cross-module relationships, directed graphs silently become undirected, partial worker failures go undetected.
+
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                      AGENTS                                     │
-│  Hermes · Claude Code · Codex · Pi · fable-5 · OpenCode         │
-│                                                                 │
-│  Each agent connects to mcp-router CLI (stdio bridge)           │
-│  → gets ALL tools from ALL registered MCP servers               │
-├─────────────────────────────────────────────────────────────────┤
-│                   mcp-router (localhost:3282)                    │
-│                   Transport Hub & Aggregator                     │
-│                                                                 │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────────┐   │
-│  │ GitNexus  │ │Brave/Tavily│ │agentmemory│ │   Wiki MCP      │   │
-│  │ (indexed) │ │(web search) │ │(episodic) │ │   (new)         │   │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────────────┘   │
-│                                                                 │
-│  All tools aggregated as mcp__mcp_router__*                     │
-│  Single connection per agent, all tools available                │
-├─────────────────────────────────────────────────────────────────┤
-│                   KNOWLEDGE SOURCES                              │
-│                                                                 │
-│  graphify (AST)     → CLI tool, AGENTS.md integration           │
-│  GitNexus (KG)      → MCP via mcp-router                        │
-│  agentmemory (episodic) → MCP via mcp-router                    │
-│  LLM Wiki (curated) → MCP via mcp-router + ~/wiki/ markdown    │
-└─────────────────────────────────────────────────────────────────┘
+Agents (Hermes, Claude, Codex, Pi, fable-5, OpenCode)
+  |
+  +-- graphify CLI --------> graphify-out/graph.json (per-repo, via Bash)
+  |                          ~/.graphify/global-graph.json (cross-repo)
+  |
+  +-- mcp-router CLI bridge (stdio -> HTTP localhost:3282)
+       |
+       +-- GitNexus MCP ----> query, context, impact, trace, cypher,
+       |                       detect_changes, rename, explain, check
+       |
+       +-- agentmemory MCP -> memory_recall, memory_save,
+       |                       memory_smart_search, memory_audit,
+       |                       memory_export, memory_sessions
+       |
+       +-- Wiki MCP (NEW) --> wiki_search, wiki_read, wiki_index,
+                               wiki_ingest, wiki_links, wiki_stale
 ```
 
-## Key Design Decision: mcp-router as Single Transport Hub
+## Phase 1: Upgrade and Activate graphify
 
-**All MCP-based knowledge tools MUST route through mcp-router.** No new MCP server entries should be added to Hermes config.yaml, Claude's MCP config, or any agent's direct MCP configuration.
+### 1a. Upgrade to 0.9.33
 
-**Why:**
-- mcp-router already aggregates GitNexus, Brave, Tavily, Exa, and agentmemory tools
-- The CLI `connect` command bridges HTTP→stdio for all agents
-- Agents already have one connection (`npx @mcp_router/cli@latest connect`)
-- Adding direct MCP connections per agent defeats the purpose of a central hub
-- mcp-router manages server lifecycle (start/stop/restart, health checks)
+```bash
+uv tool install "graphifyy[all,postgres]" --upgrade
+# Verify: graphify --version -> 0.9.33
+```
 
-**Exception:** graphify is a CLI tool (not an MCP server), so it integrates via AGENTS.md/skills that tell agents to run `graphify query/path/explain` through Bash. This is correct — graphify's output format doesn't fit the MCP tool model well (it returns structured text, not tool-callable results).
+Backward-compatible. Existing graphify-out/ and skill files preserved.
 
-## Phase 1: Agent Wiring — Detailed Design
+### 1b. Build graph.json for All Repos
 
-### graphify Integration
+Run `graphify update .` in each repo. For Python repos, local AST extraction (no API key). For Go, `--code-only`. Skip openspec-store (no meaningful code).
 
-**Current state:** graphify v0.9.31 binary installed. `graphify install <platform>` writes platform-specific integration. Zero agents currently have it installed.
+**Order**: Small repos first (browser-cli, ops-automation-suite) to validate, then batch.
 
-**Approach:** Run `graphify install` for each platform:
+Repos to process (17 repos, tdt-core already has graph.json):
+- Python (16): agent-core, agent-docs-sync, agent-harness, ai-harness-skills, ai-review, browser-cli, code-daily-scan, jira-daily-reports, jira-epic-report, jira-kanban-from-spreadsheet, jira-skill, ops-automation-suite, tdt-observability, tdt-sheets, webhook-receiver
+- Go (1): go-microservices
+- Node.js (1): mcp-router (has graphify-out/ but no graph.json)
 
-| Platform | Command | Integration Type |
-|----------|---------|-----------------|
-| Hermes | `graphify install hermes` | Skill file at `~/.hermes/skills/graphify/` |
-| Claude Code | `graphify install claude` | AGENTS.md section + skill in workspace `.claude/` |
-| Codex | `graphify install codex` | AGENTS.md section in workspace `.codex/` |
-| Pi | `graphify install pi` | Skill at `~/.pi/agent/skills/graphify/` |
-| OpenCode | `graphify install opencode` | AGENTS.md section + plugin in workspace `.opencode/` |
+### 1c. Build Global Cross-Repo Graph
 
-**Why CLI, not MCP:** graphify operates on local `graph.json` files. Its commands (`query`, `path`, `explain`) read pre-computed JSON artifacts. Wrapping this in MCP would add latency and complexity for no benefit — the agent can call `graphify query "..."` directly via Bash.
+```bash
+for repo in ~/Developer/*/; do
+  [ -f "$repo/graphify-out/graph.json" ] && \
+    graphify global add "$repo/graphify-out/graph.json" --as "$(basename $repo)"
+done
+# Result: ~/.graphify/global-graph.json
+```
 
-**Cross-reference pattern:** graphify queries complement GitNexus queries:
-- `graphify query "order processing"` → structural AST relationships (fast, no API cost)
-- `gitnexus query "order processing"` → semantic execution flows (deeper, indexed)
-- Agents should try graphify first (free), GitNexus for deeper analysis
+Enables cross-repo queries via the global graph.
 
-### agentmemory Integration
+### 1d. Install Git Hooks
 
-**Current state:** agentmemory v0.9.27 running at localhost:3111, 0 sessions, 1 memory. Not connected to any agent.
+```bash
+for repo in ~/Developer/*/; do
+  [ -d "$repo/.git" ] && (cd "$repo" && graphify hook install)
+done
+```
 
-**Approach:** Two integration paths:
+Post-commit: auto-rebuild graph (AST-only, fast). Post-checkout: ensure freshness.
 
-1. **MCP path (preferred):** Register agentmemory as an MCP server in mcp-router. Its MCP shim (`agentmemory mcp`) exposes tools: `memory_recall`, `memory_save`, `memory_smart_search`, `memory_audit`, `memory_export`. Once registered, all agents get these tools via mcp-router.
+### 1e. Generate Tree Visualizations
 
-2. **Direct connect (fallback):** `agentmemory connect --all` wires agents directly. Use only if mcp-router registration fails.
+For each repo with valid graph.json:
+```bash
+cd <repo> && graphify tree --label "<repo-name>"
+```
 
-**Scope:** `AGENTMEMORY_AGENT_SCOPE=shared` means all agents share the same memory store. This is intentional — cross-agent context sharing is the goal.
+Output: `graphify-out/GRAPH_TREE.html` (D3 v7 collapsible-tree).
 
-### Cross-Reference Additions
+### 1f. Install Remaining Agent Skills
 
-Add brief cross-references to workspace AGENTS.md. Current count is 1876 words (limit 550) — the graphify section (lines 294-305) already exists and is sufficient. No additional AGENTS.md changes needed for graphify.
+| Agent | Command | Target |
+|-------|---------|--------|
+| Pi | `graphify install pi` | `~/.pi/agent/skills/graphify/` |
+| Hermes | `graphify install hermes` | `~/.hermes/skills/graphify/` |
+| OpenCode | `graphify install opencode` | `.opencode/` workspace |
 
-## Phase 2: LLM Wiki — Detailed Design
+### 1g. Memory Feedback Loop
+
+Agents can save query outcomes for institutional memory:
+```bash
+graphify save-result --question "..." --answer "..." --type query \
+  --nodes "NodeA" "NodeB" --outcome useful
+```
+
+Periodic aggregation:
+```bash
+graphify reflect --graph ~/.graphify/global-graph.json
+```
+
+## Phase 2: Initialize LLM Wiki
 
 ### Directory Structure
 
 ```
 ~/Developer/wiki/
-├── SCHEMA.md           # Domain, conventions, tag taxonomy
-├── index.md            # Sectioned content catalog
-├── log.md              # Chronological action log
-├── raw/                # Immutable source material
-│   ├── articles/       # Web articles, PR descriptions
-│   ├── papers/         # Research (Karpathy patterns, etc.)
-│   └── transcripts/    # Session insights
-├── entities/           # Per-service pages (order-service, inventory-service, etc.)
-├── concepts/           # Patterns (CQRS, saga, event-sourcing, agent coordination)
-├── comparisons/        # Agent capabilities, tool trade-offs
-├── queries/            # Filed answers to architectural questions
-└── _archive/           # Superseded content
+  SCHEMA.md, index.md, log.md
+  raw/articles/, raw/papers/, raw/transcripts/
+  entities/, concepts/, comparisons/, queries/
+  _archive/
 ```
 
-### SCHEMA.md Design
+### SCHEMA.md
 
-Domain: **Workspace intelligence** — Go microservices architecture, Python agent ecosystem, cross-repo patterns, debugging playbooks, tool configurations, agent coordination patterns.
+Domain: Workspace intelligence.
+Tags: service, pattern, decision, dataflow, api-contract, debugging, playbook, incident, deployment, monitoring, agent, tool, mcp, skill, configuration.
 
-Tag taxonomy (15 tags):
-- **Architecture:** `service`, `pattern`, `decision`, `dataflow`, `api-contract`
-- **Operations:** `debugging`, `playbook`, `incident`, `deployment`, `monitoring`
-- **Ecosystem:** `agent`, `tool`, `mcp`, `skill`, `configuration`
+### Seeding
 
-Page thresholds:
-- Create a page when an entity/concept appears in 2+ sources OR is central to one source.
-- Never create pages for passing mentions.
-- Split pages over 200 lines into sub-topics with cross-links.
+1. GitNexus repo metadata -> entity pages (one per indexed repo)
+2. go-microservices/docs/ -> raw/articles/ -> concept pages
+3. Agent-harness workflow -> concept page
+4. Graphify global graph stats -> concept page
 
-### Seeding Strategy
+## Phase 3: Wiki MCP Server + mcp-router
 
-Seed from existing workspace knowledge rather than starting empty:
+### Server
 
-1. **From GitNexus indexed repos:** Each indexed repo gets an entity page summarizing purpose, key modules, and cross-repo dependencies. Use `gitnexus context` output as source material.
-2. **From graphify-out/wiki/ (go-microservices):** Extract concept pages and feed as raw sources.
-3. **From go-microservices/docs/:** Ingest architecture decision records and operational runbooks.
-4. **From agent-harness workflow:** Document the 12-stage LangGraph workflow as a concept page.
-5. **From workspace AGENTS.md:** Extract cross-repo dependencies and conventions.
+`~/Developer/wiki-mcp-server/wiki_mcp_server.py` (~200 LOC Python). stdio transport. Stateless.
 
-**Trade-off:** Seeding from existing sources is faster than starting blank but risks importing stale content. Mitigation: feed raw sources into `raw/`, then curate entity/concept pages from them.
-
-## Phase 3: Wiki MCP Server — Detailed Design
-
-### Architecture
-
-A stateless Python MCP server that reads/writes the wiki directory. Registered as a local MCP server in mcp-router's server manager.
-
-**Server location:** `~/Developer/wiki-mcp-server/wiki_mcp_server.py`
-
-**Why a separate directory (not under ~/.hermes/skills/):** The wiki MCP server is a standalone tool that happens to serve the wiki. It's not a Hermes skill — it's a mcp-router backend. Keeping it at `~/Developer/wiki-mcp-server/` makes it visible, testable, and maintainable independently.
-
-**Transport:** stdio (launched by mcp-router as a child process). No HTTP endpoint needed — mcp-router handles the HTTP→stdio bridge.
-
-### Tools
-
-| Tool | Description | Parameters |
-|------|-------------|------------|
-| `wiki_search` | Search wiki pages by content/tags | `query: str`, `section: str (optional)` |
-| `wiki_read` | Read a specific wiki page | `page_path: str` |
-| `wiki_index` | Get the content catalog | `section: str (optional)` |
-| `wiki_ingest` | Suggest a new page or update | `content: str`, `type: entity\|concept\|comparison` |
-| `wiki_links` | Get cross-references for a page | `page_path: str` |
-| `wiki_stale` | Find pages needing refresh | `days: int = 90` |
+Tools: wiki_search, wiki_read, wiki_index, wiki_ingest, wiki_links, wiki_stale.
 
 ### mcp-router Registration
 
-Register the wiki server in mcp-router through the Electron UI:
+Add Server via UI or API: command python3, args with server path, auto-start enabled.
 
-1. Open mcp-router → Add Server → Local
-2. Command: `python3`
-3. Args: `["/Users/androidteam/Developer/wiki-mcp-server/wiki_mcp_server.py"]`
-4. Auto-start: enabled
-5. Name: `wiki`
+All agents get `mcp__mcp_router__wiki_*` via existing mcp-router connection.
 
-Or programmatically via the SQLite database at mcp-router's app data directory.
+## Phase 4: Hermes Orchestration
 
-Once registered, mcp-router:
-- Starts the server on launch (auto-start)
-- Discovers its tools
-- Aggregates them alongside GitNexus, agentmemory, Brave, etc.
-- Routes tool calls to the wiki server
-- All agents connected to mcp-router get `mcp__mcp_router__wiki_*` tools
+### Cron Jobs
 
-### Why Not a Unified "Super-Query" Server
-
-A server that wraps graphify + GitNexus + agentmemory + wiki behind one `ask_workspace()` tool was considered but rejected:
-
-- **Complexity:** Four backends with different output formats and error patterns. Wrapping them increases surface area.
-- **Agent tool preference:** Agents already have per-tool patterns (graphify for structure, GitNexus for impact). A unified tool would obscure which backend answered.
-- **Incremental value:** Wiring existing tools + wiki MCP gives 90% of the value at 30% of the build cost.
-
-## Phase 4: Hermes Orchestration — Detailed Design
-
-### Weekly Wiki Maintenance Cron
-
-```
-Schedule: 0 9 * * 1  (Monday 9:00 AM)
-Prompt: |
-  Run LLM Wiki lint on ~/Developer/wiki/.
-  Check: orphan pages, broken wikilinks, index completeness, 
-  frontmatter validation, stale pages (>90 days), source drift.
-  Report issues grouped by severity.
-  Append summary to wiki log.md.
-```
+1. **Weekly graphify freshness** (Monday 8:00 AM): `graphify check-update .` across all repos.
+2. **Weekly wiki lint** (Monday 9:00 AM): orphans, broken links, stale pages.
 
 ### Post-Task Wiki Capture
 
-Add a pattern to Hermes delegation workflows:
+After complex agent tasks, Hermes extracts insights and ingests into wiki.
 
-1. After a coding agent completes a complex task (5+ tool calls), Hermes inspects the session.
-2. If the task involved novel debugging, architecture decisions, or cross-repo patterns, Hermes extracts insights.
-3. Hermes ingests insights into the wiki as entity or concept pages.
-4. This is triggered by Hermes memory patterns, not by agent output parsing.
+## Phase 5: Documentation and Agent Guide Updates
 
-**Trade-off:** Automated capture risks ingesting noise. Mitigation: only capture when explicitly flagged by the task completion pattern.
+### Files to Update
 
-### Graphify Post-Commit Awareness
+| File | Changes |
+|------|---------|
+| `~/Developer/AGENTS.md` (lines 294-305) | Expand graphify section: global graph, tree, memory, check-update, wiki reference |
+| Per-repo `AGENTS.md` files | Add graphify hook/freshness instructions where graph.json exists |
+| `~/.hermes/skills/graphify/SKILL.md` | Add global graph, tree, memory, check-update commands |
+| Wiki SCHEMA.md | Create (new) |
+| Wiki index.md | Create (new) |
 
-Repos with `graphify-out/` should refresh their graph after significant code changes. Rather than a mandatory hook, add awareness to agent workflows:
+### Workspace AGENTS.md Graphify Section (Replacement for lines 294-305)
 
-- When Hermes delegates a code change to an agent, include: "After committing, run `graphify update .` if graphify-out/ exists in the target repo."
-- This is advisory, not enforced.
+```
+## graphify
+
+Knowledge graph at graphify-out/ with community structure and cross-file
+relationships. Global cross-repo graph at ~/.graphify/global-graph.json.
+
+Per-repo: query, path, explain, affected, god-nodes, update, tree,
+check-update. Cross-repo: global path/add/remove/list.
+Memory: save-result, reflect. Hooks: hook install/status.
+
+After modifying code, run graphify update . to keep graph fresh.
+```
+
+### Per-Repo AGENTS.md Additions
+
+For repos with graph.json, add:
+```
+## graphify
+
+Run graphify hook install once to enable auto-rebuild on commit.
+After code changes, graphify update . refreshes the graph.
+graphify check-update . detects staleness (cron-safe).
+```
