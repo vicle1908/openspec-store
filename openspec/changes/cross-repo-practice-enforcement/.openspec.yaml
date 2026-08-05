@@ -1,0 +1,4 @@
+schema: spec-driven
+name: cross-repo-practice-enforcement
+description: Standardize code quality enforcement across 16 Python repos
+skip_specs: true
