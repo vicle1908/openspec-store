@@ -116,11 +116,11 @@
   authority scan, `git diff --check`, and applicable broader gates; retain exact
   exit codes and separate unrelated aggregate failures before completion.
 - [x] 7.4 Run `graphify update .` after source changes, remove any generated GitNexus instruction block that violates agent guidance, run GitNexus change detection/impact on changed shared symbols, and classify unavailable or stale indexes as UNKNOWN rather than LOW.
-- [ ] 7.5 Run the required five-provider code review against committed/staged/unstaged/untracked implementation evidence and executed test outputs; fix evidence-backed blockers in at most two review/fix rounds, rebuild evidence after each fix, and commit the implementation only after independent fail-closed approval.
+- [x] 7.5 Run the required five-provider code review against committed/staged/unstaged/untracked implementation evidence and executed test outputs; fix evidence-backed blockers in at most two review/fix rounds, rebuild evidence after each fix, and commit the implementation only after independent fail-closed approval.
 
 ## 8. Live eligibility and explicit execution approval
 
-- [ ] 8.1 **REQUIRES: Sections 1–7 complete and the Hermes dependency in task 1.5 reconciled.** Capture the final redacted live client/router/process inventory, SHA-256 config fingerprints, router database identity, provider versions, token-access shape, per-client MCP Router authorization and stale-token status, owner/principal/writer list, backup/restore references, current graph/index freshness, and AgentMemory engine health without mutation.
+- [x] 8.1 **REQUIRES: Sections 1–7 complete and the Hermes dependency in task 1.5 reconciled.** Capture the final redacted live client/router/process inventory, SHA-256 config fingerprints, router database identity, provider versions, token-access shape, per-client MCP Router authorization and stale-token status, owner/principal/writer list, backup/restore references, current graph/index freshness, and AgentMemory engine health without mutation.
 - [x] 8.2 Perform read-only provider eligibility probes only: verify the approved package versions/digests, GitNexus freshness, canonical `.graphify/graph.json` metadata, preserved legacy Graphify canaries, and AgentMemory `0.9.28` engine health without installing packages, refreshing indexes, writing memory data, restoring `.env`, starting processes, or changing hooks/configuration; record `BLOCKED` for drift/stale/unhealthy providers.
 - [x] 8.3 Mark `prereq-e8d79b8d0a27b45a` superseded and prohibit execution.
   Author an immutable replacement bound to exact MCP Router source commit,
@@ -130,7 +130,7 @@
   access-map rollback, test-data policy, and owner. Complete disposable
   install/apply/restore rehearsal, obtain separate digest-bound prerequisite
   `GO`, execute only that generation, then rerun 8.1/8.2. Drift invalidates GO.
-- [ ] 8.4 Produce the immutable live cutover and committed-state restore generations from the approved post-prerequisite state, run a final preview against live identities, and request separate operator `GO` bound to the plan digest, backup manifest, affected clients, principals, maintenance window, and latest safe rollback start. Do not infer approval from implementation or prerequisite authorization.
+- [x] 8.4 Produce the immutable live cutover and committed-state restore generations from the approved post-prerequisite state, run a final preview against live identities, and request separate operator `GO` bound to the plan digest, backup manifest, affected clients, principals, maintenance window, and latest safe rollback start. Do not infer approval from implementation or prerequisite authorization.
 
 ## 9. Approval-gated live cutover and acceptance
 

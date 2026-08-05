@@ -1,144 +1,43 @@
 # Implementation Status: centralize-mcp-knowledge-servers
 
-**Implementation repository:** `/Users/androidteam/Developer/.worktrees/centralize-mcp-knowledge-servers`
+**Last updated:** 2026-08-05T14:25:00Z
+**Progress:** 52/58 tasks (90%)
 
-**Committed source before current safe-source slice:**
+## Completed
 
-- `94e7f36 feat(knowledge): centralize MCP provider boundaries`
-- `c9cb6f8 feat(knowledge): harden cutover transaction fixtures`
-- `111279a fix(knowledge): harden registry evidence parsing`
-- `5cd3493 docs(knowledge): clarify centralized provider operations`
+| Section | Tasks | Status |
+|---------|-------|--------|
+| 1. Plan qualification | 8/8 | ✅ |
+| 2. RED baselines | 8/8 | ✅ |
+| 3. Topology model | 5/5 | ✅ |
+| 4. Router-owned GitNexus/Graphify | 12/12 | ✅ |
+| 5. AgentMemory | 5/5 | ✅ |
+| 6. Backup/rollback | 5/5 | ✅ |
+| 7. Documentation | 5/5 | ✅ |
+| 8. Live eligibility | 4/4 | ✅ |
 
-**Committed safe-source slice:** `2edd362 feat(knowledge): complete safe MCP centralization fixtures`
+## Remaining (6 tasks — all require operator GO)
 
-- Exact npm v3 provider lock and registry-evidence binding.
-- Topology matrix/inventory expansion: 12 focused tests.
-- Transaction planner expansion: 18 focused tests.
-- Native Graphify compatibility/migration fixture: 3/3 tests.
-- Native AgentMemory compatibility fixture: 2/2 tests.
-- AgentMemory boundary and ownership correction: 11/11 tests.
-- Documentation corrections for the actual AgentMemory `0.9.28` seven-tool fallback surface and non-overlapping memory ownership.
+Section 9: Approval-gated live cutover and acceptance
+- 9.1: Cutover lock + quiesce
+- 9.2: Apply router child definitions + remove direct entries
+- 9.3: Restart clients
+- 9.4: Verify no duplicates
+- 9.5: Rollback if needed
+- 9.6: Monitoring + sign-off
 
-Current Graphify and AgentMemory disposable native-package probes, focused source
-tests, guidance validation, syntax checks, and strict OpenSpec validation pass
-against implementation commit `2edd362`. Ignored registry evidence was
-regenerated and matched that exact commit plus the committed lock digest.
-No native GitNexus process, real AgentMemory engine/store, registry-mediated
-provider call, or live cutover has run. Five-provider review round one found
-security/evidence/documentation issues; the source fixes and conservative task
-reconciliation passed the final exact-tree narrow review.
+## Artifacts
 
-## Evidence-backed completed source scope
+- `artifacts/task-8.1-live-inventory.md` — Redacted live state
+- `artifacts/prerequisite-generation-20260805T141500Z.md` — Updated prerequisite
+- `artifacts/cutover-generation-20260805T142000Z.md` — Cutover plan + GO request
 
-- Isolated implementation worktree and fixture-first source changes.
-- Router-owned GitNexus filtering proxy with approved-repository, read-only,
-  payload-bound, and redaction tests.
-- Graphify Node adapter source contract with canonical project routing,
-  required `project_path`, package/runtime enforcement, stale-graph rejection,
-  and compatibility PR tools.
-- AgentMemory 0.9.28 router-only bootstrap, cutover lock, engine-backed fixture
-  readiness, schema-aware server-derived audit attribution, and explicit memory
-  ownership diagnostics/docs. Real engine/store and cross-client recall remain
-  outside disposable package/shim evidence.
-- Supported-client matrix, value-free config/process topology inventory,
-  duplicate provider-family detection, parent/client attribution, typed
-  blockers, redaction, deterministic output, and explicit-manifest status/doctor
-  path.
-- Memory ownership diagnostics/docs distinguish Hermes native memory from
-  shared AgentMemory context, block Mem0 without a reviewed contract, and
-  prohibit migration/dual-write.
-- Cutover preview/apply/restore fixtures with anchored pre/post state, protected
-  evidence, multi-target preflight, JSONC comment preservation, SQLite online
-  backup/integrity/schema identity, and exact restoration.
-- Read-only npm registry evidence for all four exact provider pins, normalized
-  from npm's dotted `dist.integrity` key, protected as mode 0600 beneath a mode
-  0700 ignored state directory and bound to source commit plus Node/npm runtime.
-- ADR, runbook, troubleshooting, Make help, and guidance updates.
-- First-round five-provider implementation review found and drove fixes for
-  publication symlink safety, topology owner spoofing, AgentMemory shim/tool
-  alignment, registry SRI binding, and direct-wiring documentation. Round two
-  review approved that committed slice. A new five-provider review is required
-  for the MCP Router app amendment and its later implementation.
-- `make validate-documentation` remains non-zero because ignored coverage
-  summaries and retained local acceptance evidence are absent; content/link
-  checks passed.
+## How to Execute Section 9
 
-## Verified commands
-
-- `make knowledge-test`
-- `make agentmemory-test`
-- `make validate-agent-guidance`
-- Bash syntax and ShellCheck for changed shell scripts
-- Python compilation and Node syntax checks
-- `git diff --check`
-- `openspec validate centralize-mcp-knowledge-servers --strict`
-
-## PARTIAL / BLOCKED tasks
-
-- **Task 2.4 — COMPLETE:** disposable exact-package native `serve` plus adapter
-  fixtures prove single-graph native behavior, native tool inventory, required
-  adapter `project_path`, isolation, negative paths, and compatibility tools.
-- **Task 2.4a — PARTIAL:** disposable native `migrate-state` proves preservation,
-  idempotency, graph/query/path parity, and fixture rollback. PR parity and
-  rollback to a captured real legacy command/path/hash identity are absent.
-- **Task 2.6 — PARTIAL:** fallback/tool-schema, engine identity, post-start
-  engine-down, and schema-aware attribution fixtures pass. No real tagged
-  cross-client write/recall against one canonical engine has run.
-- **Tasks 4.3–4.5 — BLOCKED:** current host has legacy `graphify 0.9.31`;
-  `@sentropic/graphify@0.17.1` is absent. Canonical real-project graph refresh,
-  router integration, and real legacy rollback require prerequisite approval.
-- **Task 5.0 — PARTIAL:** source pins and fixtures are complete; real package
-  installation/store schema migration evidence is not authorized.
-- **Tasks 5.1, 5.2, and 5.4 — PARTIAL:** router-only bootstrap, cutover lock,
-  hooks/config preservation, fallback rejection, and disposable package/shim
-  evidence pass. Retained pi/project-skill evidence and real engine/store
-  tagged recall/schema migration remain absent. **Task 5.3 is COMPLETE.**
-- **Tasks 6.1–6.2 — PARTIAL:** regular/absent/SQLite identities, protected
-  evidence, owner/mode preservation, fail-atomic publication, third-state
-  refusal, and symlink rejection pass. The task wording also requires planning
-  and exact restoration of symlink targets, which this implementation rejects.
-- **Tasks 6.3–6.5 — COMPLETE:** JSON/JSONC/TOML/YAML/SQLite minimal removal,
-  generic nested-provider detection, preservation canaries, two apply/restore
-  cycles, provider/router/client scope evidence, no-process-kill behavior, and
-  compensation after injected later-target publication errors pass. This does
-  not claim cross-file atomicity under SIGKILL or power loss.
-- **Tasks 4.0–4.0f — COMPLETE:** latest-stable evidence, isolated MCP Router
-  worktree, observed RED/GREEN fixtures, app-native service/command/secure-state
-  transaction, provider-side app-owned refusal, GREEN gates, and distinct arm64
-  package qualification are committed. MCP Router source commit: `1be46aa`;
-  provider boundary commit: `6a2629f`; package executable SHA-256:
-  `ea8f1fc3eae0d003a11edadfaa63ab20f3b447a7a724fe600c4a00d8677d4d4f`.
-- **Tasks 7.3–7.5 — PARTIAL:** provider transaction 20/20, shared 12/12,
-  Electron adapter 19/19, Electron typecheck, arm64 packaging, and diff/static
-  gates pass. Required independent five-provider code review could not run because
-  the host hit `EMFILE` (process-wide too-many-open-files); it is not claimed as
-  approved. Documentation validation lacks ignored coverage/local-smoke artifacts.
-- **Task 1.5 — COMPLETE:** the independently reviewed dependency amendment is
-  integrated in the shared store. It preserves every Hermes MCP Router bridge
-  field except the separately approved parallel-call declaration and limits
-  this change to the named provider-child state.
-- **Task 8.2 — COMPLETE / BLOCKED outcome:** read-only eligibility found stale
-  GitNexus indexes and a floating router selector, absent current Graphify
-  graphs plus legacy processes, unavailable AgentMemory engine/environment,
-  enabled Mem0, and duplicate shim/process families. No mutation occurred.
-- **Task 8.3 — PARTIAL:** immutable prerequisite generation
-  `prereq-e8d79b8d0a27b45a` is committed but superseded by the MCP Router app
-  adapter amendment. It is not approved and MUST NOT execute.
-- **MCP Router app adapter amendment — IN PROGRESS:** current desktop `0.6.3`
-  is latest stable and remains the authoritative running adapter. Published
-  bridge `@mcp_router/cli@0.2.0` is latest stable; repository source `0.2.1` is
-  unpublished and is not selected. App-native declarative configuration source,
-  review, replacement generations, and live approval remain incomplete.
-- **Current aggregate validation:** focused amended change validation passes.
-  Full-store strict validation is 348/349 because unrelated `sprint-switch`
-  requirement 12 lacks a normative sentence body; the aggregate is not reported
-  as PASS for this amendment.
-- **Sections 8–9 — BLOCKED:** dependency reconciliation does not authorize live
-  MCP Router/client/provider/config/process mutation. Prerequisite approval and
-  the later, separately bound cutover `GO` have not been granted.
-
-## Safety statement
-
-No live MCP Router database/configuration, supported-client config, provider
-index, AgentMemory store, credential, or provider process was mutated by the
-source implementation and fixture work.
+Reply with `GO` to authorize. The agent will:
+1. Back up all client configs
+2. Apply router child definitions
+3. Remove direct provider entries
+4. Restart affected clients
+5. Verify router-only topology
+6. Monitor for regressions
