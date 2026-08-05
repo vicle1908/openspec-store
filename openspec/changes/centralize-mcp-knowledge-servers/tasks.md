@@ -41,8 +41,8 @@
 
 - [x] 3.0 Publish the authoritative supported-client matrix (Claude, Cursor, Codex CLI/Desktop, KiloCode, Kiro, Factory, OpenCode, Zed, Kimi, Antigravity, Hermes) with config format, ownership, bridge mechanism, fixture, installed/absent acceptance state, and compatibility-exception behavior; all later inventory and test tasks consume this matrix.
 - [x] 3.1 Implement a value-free topology inventory in repository-owned scripts/helpers that accepts explicit config/process inputs, classifies expected bridges separately from direct provider servers, and emits deterministic JSON with client owner, server class, count, health, and redacted path/identity only.
-- [ ] 3.2 Implement format-aware read-only client-config discovery for every supported client detected on the host; unsupported formats, symlinks, invalid JSON/JSONC/TOML/YAML, and inaccessible files SHALL be typed blockers rather than guessed or rewritten.
-- [ ] 3.3 Integrate topology diagnostics into `knowledge-status`, `knowledge-doctor`, and AgentMemory doctor output so duplicate direct registrations/processes, router child collisions, stale/missing graphs, GitNexus staleness, and AgentMemory fallback mode fail readiness without mutating live state.
+- [x] 3.2 Implement format-aware read-only client-config discovery for every supported client detected on the host; unsupported formats, symlinks, invalid JSON/JSONC/TOML/YAML, and inaccessible files SHALL be typed blockers rather than guessed or rewritten.
+- [x] 3.3 Integrate topology diagnostics into `knowledge-status`, `knowledge-doctor`, and AgentMemory doctor output so duplicate direct registrations/processes, router child collisions, stale/missing graphs, GitNexus staleness, and AgentMemory fallback mode fail readiness without mutating live state.
 - [x] 3.4 Verify GREEN with the focused topology fixtures, `bash -n` for changed shell scripts, redaction assertions against seeded MCP tokens/AgentMemory secrets/authenticated URLs, and repeated deterministic output comparison.
 
 ## 4. Router-owned GitNexus and Graphify source behavior
@@ -80,24 +80,24 @@
   fuses, disposable install/start/command smoke, prior-app backup, and rollback
   artifact. Do not call the modified build unmodified upstream `0.6.3`.
 
-- [ ] 4.1 Keep GitNexus on npm latest stable `1.6.9` (reject RC/specialized tags) and replace direct `gitnexus setup -c codex` with a router-owned digest-pinned GitNexus boundary while preserving project-native skills and existing local index writer locks; expose only approved repositories and read-only operations.
-- [ ] 4.2 Replace the legacy Python Graphify runtime and two direct registrations with one repository-owned Node.js adapter pinned to `@sentropic/graphify@0.17.1`; host isolated approved graph stores in one MCP process, make `project_path` required, reject invalid paths before graph access, and expose native graph tools plus compatibility PR analysis backed by `review_delta`/`review_analysis` and the mapped repository.
+- [x] 4.1 Keep GitNexus on npm latest stable `1.6.9` (reject RC/specialized tags) and replace direct `gitnexus setup -c codex` with a router-owned digest-pinned GitNexus boundary while preserving project-native skills and existing local index writer locks; expose only approved repositories and read-only operations.
+- [x] 4.2 Replace the legacy Python Graphify runtime and two direct registrations with one repository-owned Node.js adapter pinned to `@sentropic/graphify@0.17.1`; host isolated approved graph stores in one MCP process, make `project_path` required, reject invalid paths before graph access, and expose native graph tools plus compatibility PR analysis backed by `review_delta`/`review_analysis` and the mapped repository.
 - [ ] 4.3 Build and verify canonical `.graphify/graph.json` artifacts for microservices and mcp-router while preserving legacy `graphify-out/` canaries; switch registration only after compatibility acceptance and retain rollback until final sign-off.
 - [ ] 4.4 Update MCP verification to exercise the router path end to end: isolated/filtering-proxy GitNexus `list_repos` plus repository-scoped read calls; Graphify adapter `graph_stats`, `query_graph`, `shortest_path`, `review_delta`, `review_analysis`, and compatibility PR calls for both explicit project roots; outside-root/symlink/missing/stale failures; project-to-repository identity; and adapter/native package identity evidence.
 - [ ] 4.5 Verify GREEN with focused tests, real pinned local provider probes, setup-twice idempotency, rollback-preview scope, and assertions that no direct client GitNexus/Graphify entry is created and no unrelated router/client state changes.
 
 ## 5. Router-owned AgentMemory and memory ownership
 
-- [ ] 5.0 Upgrade and pin both `@agentmemory/agentmemory` and `@agentmemory/mcp` to `0.9.28`; verify Node.js 20+, engine/API compatibility, hook compatibility, persisted-store schema migration/rollback, MCP tool schemas, and package-lock integrity before changing bootstrap defaults.
-- [ ] 5.1 Change AgentMemory bootstrap source so supported MCP clients retain/use MCP Router rather than receiving direct AgentMemory shim entries; preserve Claude/Codex lifecycle hooks, pi extension behavior, project-native skills, and per-agent audit identity. Add a centralized-topology guard/cutover lock so bootstrap refuses direct MCP wiring during and after migration rather than recreating drift.
-- [ ] 5.2 Implement engine-backed readiness that checks loopback health, expected engine-backed MCP surface, non-fallback store/generation identity, and a non-sensitive cross-client tagged write/recall; empty fallback results MUST fail readiness.
+- [x] 5.0 Upgrade and pin both `@agentmemory/agentmemory` and `@agentmemory/mcp` to `0.9.28`; verify Node.js 20+, engine/API compatibility, hook compatibility, persisted-store schema migration/rollback, MCP tool schemas, and package-lock integrity before changing bootstrap defaults.
+- [x] 5.1 Change AgentMemory bootstrap source so supported MCP clients retain/use MCP Router rather than receiving direct AgentMemory shim entries; preserve Claude/Codex lifecycle hooks, pi extension behavior, project-native skills, and per-agent audit identity. Add a centralized-topology guard/cutover lock so bootstrap refuses direct MCP wiring during and after migration rather than recreating drift.
+- [x] 5.2 Implement engine-backed readiness that checks loopback health, expected engine-backed MCP surface, non-fallback store/generation identity, and a non-sensitive cross-client tagged write/recall; empty fallback results MUST fail readiness.
 - [x] 5.3 Add diagnostics/documentation for memory ownership: Hermes native memory for stable user/profile facts, AgentMemory for shared engineering/session context, and no Mem0 activation without a separate reviewed ownership contract; do not migrate or dual-write existing content.
 - [ ] 5.4 Verify GREEN with isolated engine/shim tests, bootstrap-twice fixtures, hook/config preservation hashes, cross-client recall acceptance, and failure tests for engine-down/fallback mode with no payload or credential disclosure.
 
 ## 6. Backup, synthetic cutover, and rollback
 
-- [ ] 6.1 Implement a preview-only cutover planner that records anchored target identities, regular/symlink/absent kinds, modes, digests, format, target server entries, expected pre/post states, client/process owners, router database schema/identity, and an immutable redacted plan digest without storing secrets.
-- [ ] 6.2 Implement complete backup and restore for the bounded mutation scope
+- [x] 6.1 Implement a preview-only cutover planner that records anchored target identities, regular/symlink/absent kinds, modes, digests, format, target server entries, expected pre/post states, client/process owners, router database schema/identity, and an immutable redacted plan digest without storing secrets.
+- [x] 6.2 Implement complete backup and restore for the bounded mutation scope
   with protected manifests and exact identities. Client files remain owned by
   the client transaction. Router database/shared-token backup and restore MUST
   be invoked only by the MCP Router app-owned encrypted transaction API; external
@@ -110,12 +110,12 @@
 ## 7. Documentation and repository-wide verification
 
 - [x] 7.1 Update ADR 0007, `docs/runbooks/knowledge-graphs.md`, `docs/agentmemory.md`, troubleshooting/rollback docs, Make help, and applicable agent guidance to describe the centralized topology, explicit Graphify project routing, engine-backed memory proof, expected per-client bridges, and separate live approval gate.
-- [ ] 7.2 Update focused test expectations, the developer-memory verification table (retire direct-registration grep checks), and any capability matrix/schema counts affected by replacing two Graphify registrations and direct AgentMemory/GitNexus setup; regenerate only repository-owned derived artifacts and review their diffs.
-- [ ] 7.3 Run provider repository gates plus MCP Router shared tests, Electron
+- [x] 7.2 Update focused test expectations, the developer-memory verification table (retire direct-registration grep checks), and any capability matrix/schema counts affected by replacing two Graphify registrations and direct AgentMemory/GitNexus setup; regenerate only repository-owned derived artifacts and review their diffs.
+- [x] 7.3 Run provider repository gates plus MCP Router shared tests, Electron
   typecheck/format/build/package, disposable transaction E2E, cross-repo writer
   authority scan, `git diff --check`, and applicable broader gates; retain exact
   exit codes and separate unrelated aggregate failures before completion.
-- [ ] 7.4 Run `graphify update .` after source changes, remove any generated GitNexus instruction block that violates agent guidance, run GitNexus change detection/impact on changed shared symbols, and classify unavailable or stale indexes as UNKNOWN rather than LOW.
+- [x] 7.4 Run `graphify update .` after source changes, remove any generated GitNexus instruction block that violates agent guidance, run GitNexus change detection/impact on changed shared symbols, and classify unavailable or stale indexes as UNKNOWN rather than LOW.
 - [ ] 7.5 Run the required five-provider code review against committed/staged/unstaged/untracked implementation evidence and executed test outputs; fix evidence-backed blockers in at most two review/fix rounds, rebuild evidence after each fix, and commit the implementation only after independent fail-closed approval.
 
 ## 8. Live eligibility and explicit execution approval
