@@ -105,7 +105,7 @@ The system SHALL provide a GraphifyLoaderTool that loads graphify manifest.json 
 
 #### Scenario: GraphifyLoaderTool loads manifest
 - **WHEN** GraphifyLoaderTool.execute() is called with GraphifyLoaderArgs(repo_root="/path/to/repo")
-- **THEN** the tool reads graphify-out/manifest.json
+- **THEN** the tool reads .graphify/graph.json
 - **AND** returns ToolResult(success=True, output={stats: dict, god_nodes: list})
 
 ### Requirement: Implement ClassifierTool following BaseTool interface

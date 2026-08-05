@@ -5,26 +5,26 @@ TBD - created by archiving change tdt-workspace-cleanup-2026-06-29. Update Purpo
 ## Requirements
 ### Requirement: GitNexus / Graphify output directories SHALL NOT be tracked in git
 
-Every TDT ecosystem repository's `.gitignore` SHALL list `graphify-out/` (or `graphify-out/cache/`) so that the GitNexus toolchain never has a chance to commit a generated artifact. A file under `*/graphify-out/` SHALL NOT appear in `git ls-files` for any repo in the workspace.
+Every TDT ecosystem repository's `.gitignore` SHALL list `.graphify/` (or `.graphify/cache/`) so that the GitNexus toolchain never has a chance to commit a generated artifact. A file under `*/.graphify/` SHALL NOT appear in `git ls-files` for any repo in the workspace.
 
 #### Scenario: Generated `.graphify_root` is not tracked
 
 - **GIVEN** a developer runs `npx gitnexus analyze` against `tdt-core` or `webhook-receiver`
-- **WHEN** the command writes files into `<repo>/graphify-out/`
-- **THEN** `git -C <repo> ls-files graphify-out/` SHALL return an empty list
-- **AND** `<repo>/.gitignore` SHALL contain the line `graphify-out/`
+- **WHEN** the command writes files into `<repo>/.graphify/`
+- **THEN** `git -C <repo> ls-files .graphify/` SHALL return an empty list
+- **AND** `<repo>/.gitignore` SHALL contain the line `.graphify/`
 
 #### Scenario: A repo that runs Graphify SHALL have a .gitignore entry before regeneration
 
-- **GIVEN** a repo's `.gitignore` is missing `graphify-out/`
+- **GIVEN** a repo's `.gitignore` is missing `.graphify/`
 - **WHEN** Graphify is invoked against the repo
-- **THEN** the operator SHALL add `graphify-out/` to `.gitignore` BEFORE running the analyzer
+- **THEN** the operator SHALL add `.graphify/` to `.gitignore` BEFORE running the analyzer
 - **AND** this rule SHALL be enforced by the GitNexus pre-edit hook `config/codex/scripts/pre-edit-check.sh`
 
 #### Scenario: Cross-repo audit finds zero tracked graphify-out files
 
 - **WHEN** `openspec validate --strict tdt-artifact-hygiene` is run
-- **THEN** a sweep across `~/Developer/tdt/*/graphify-out/` SHALL report 0 paths from `git ls-files` for every Python and TypeScript repo in the workspace inventory
+- **THEN** a sweep across `~/Developer/tdt/*/.graphify/` SHALL report 0 paths from `git ls-files` for every Python and TypeScript repo in the workspace inventory
 
 ### Requirement: Lockfile backups SHALL NOT be committed
 
@@ -46,18 +46,18 @@ Every TDT ecosystem repository's `.gitignore` SHALL list `graphify-out/` (or `gr
 
 ### Requirement: Generated caches SHALL live in canonical runtime directories only
 
-Generated caches such as `graphify-out/`, `reports-out/`, `htmlcov/`, `.pytest_cache/`, `.ruff_cache/`, and `.mypy_cache/` SHALL be referenced through canonical `$TDT_HOME/state/` paths when their lifetime exceeds one session. In-repo `graphify-out/` directories are session-scoped regeneration artifacts, not durable state.
+Generated caches such as `.graphify/`, `reports-out/`, `htmlcov/`, `.pytest_cache/`, `.ruff_cache/`, and `.mypy_cache/` SHALL be referenced through canonical `$TDT_HOME/state/` paths when their lifetime exceeds one session. In-repo `.graphify/` directories are session-scoped regeneration artifacts, not durable state.
 
 #### Scenario: Cross-session state is delegated to `~/.tdt/state/`
 
 - **GIVEN** a tool needs to persist output across sessions (e.g., a graph or coverage report)
 - **WHEN** the tool writes its output
 - **THEN** it SHALL write under `$TDT_HOME/state/<tool>/` (e.g., `$TDT_HOME/state/gitnexus/`)
-- **AND** the in-repo path `graphify-out/` SHALL be treated as transient and re-creatable on demand
+- **AND** the in-repo path `.graphify/` SHALL be treated as transient and re-creatable on demand
 
 ### Requirement: A repo's `.gitignore` SHALL list every generated artifact pattern the repo's tooling can emit
 
-Each Python repo's `.gitignore` SHALL include at least: `graphify-out/`, `reports-out/`, `htmlcov/`, `.pytest_cache/`, `.ruff_cache/`, `.mypy_cache/`, `.venv/`, `__pycache__/`, `*.egg-info/`, `dist/`, `build/`, `.coverage`. A repo SHALL be considered compliant only when every pattern above is present.
+Each Python repo's `.gitignore` SHALL include at least: `.graphify/`, `reports-out/`, `htmlcov/`, `.pytest_cache/`, `.ruff_cache/`, `.mypy_cache/`, `.venv/`, `__pycache__/`, `*.egg-info/`, `dist/`, `build/`, `.coverage`. A repo SHALL be considered compliant only when every pattern above is present.
 
 #### Scenario: Repo audit verifies all standard patterns
 
@@ -67,12 +67,12 @@ Each Python repo's `.gitignore` SHALL include at least: `graphify-out/`, `report
 
 ### Requirement: Cleanup MUST be reversible through git history
 
-`graphify-out/` deletion and lockfile backup deletion MUST keep the prior state reachable via `git log --diff-filter=D -- graphify-out/` for at least 30 days after the change is archived, so a future contributor can recover a generated report from the historical tree if the underlying index is needed.
+`.graphify/` deletion and lockfile backup deletion MUST keep the prior state reachable via `git log --diff-filter=D -- .graphify/` for at least 30 days after the change is archived, so a future contributor can recover a generated report from the historical tree if the underlying index is needed.
 
 #### Scenario: Historical `GRAPH_REPORT.md` remains recoverable
 
-- **GIVEN** `agent-core/graphify-out/GRAPH_REPORT.md` was tracked at SHA `abc123`
+- **GIVEN** `agent-core/.graphify/GRAPH_REPORT.md` was tracked at SHA `abc123`
 - **WHEN** the cleanup is archived
-- **THEN** `git -C agent-core log --diff-filter=D -- graphify-out/GRAPH_REPORT.md` SHALL still list a deletion commit referencing the prior tree
-- **AND** `git -C agent-core show <sha>:graphify-out/GRAPH_REPORT.md` SHALL return the prior report content
+- **THEN** `git -C agent-core log --diff-filter=D -- .graphify/GRAPH_REPORT.md` SHALL still list a deletion commit referencing the prior tree
+- **AND** `git -C agent-core show <sha>:.graphify/GRAPH_REPORT.md` SHALL return the prior report content
 
