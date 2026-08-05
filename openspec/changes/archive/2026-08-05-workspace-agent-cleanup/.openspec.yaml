@@ -1,0 +1,4 @@
+change: workspace-agent-cleanup
+schema: spec-driven
+description: "Clean up agent dot-folders, remove duplicated skills, fix stale references, and consolidate repo-level agent config"
+skip_specs: true
