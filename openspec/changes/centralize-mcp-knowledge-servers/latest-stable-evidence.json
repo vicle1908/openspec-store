@@ -1,0 +1,73 @@
+{
+  "captured_at": "2026-08-05",
+  "components": {
+    "agentmemory_engine": {
+      "node": ">=20.0.0",
+      "npm_latest": "0.9.28",
+      "package": "@agentmemory/agentmemory",
+      "selected": "0.9.28"
+    },
+    "agentmemory_mcp": {
+      "node": ">=20.0.0",
+      "npm_latest": "0.9.28",
+      "package": "@agentmemory/mcp",
+      "selected": "0.9.28"
+    },
+    "gitnexus": {
+      "excluded_dist_tags": [
+        "rc:1.6.10-rc.162",
+        "aptos:1.6.10-aptos.2"
+      ],
+      "node": ">=22.0.0",
+      "npm_latest": "1.6.9",
+      "selected": "1.6.9"
+    },
+    "graphify": {
+      "node": ">=20",
+      "npm_latest": "0.17.1",
+      "package": "@sentropic/graphify",
+      "selected": "0.17.1"
+    },
+    "mcp_router_cli": {
+      "beta_dist_tag": "0.1.10-beta.0",
+      "node": ">=18.0.0",
+      "npm_latest": "0.2.0",
+      "package": "@mcp_router/cli",
+      "published_git_head": null,
+      "published_git_head_status": "NOT_PUBLISHED",
+      "repository_source_published": false,
+      "repository_source_version": "0.2.1",
+      "selected": "0.2.0",
+      "selection_reason": "0.2.0 is the latest installable stable npm release; unpublished repository source is not a release target",
+      "shasum": "51f29272507bd2a2686663c8d917a2ce97cfcbce",
+      "source": "https://www.npmjs.com/package/@mcp_router/cli",
+      "sri": "sha512-r/ztNqaiV6ug+nkoM+s97R6+zBfhV3h0TtQrFR7iHAj+XqN4zOjj0f2h2sgXkAAPdWYad7YeT70teqDhsAsHYQ==",
+      "tarball": "https://registry.npmjs.org/@mcp_router/cli/-/cli-0.2.0.tgz",
+      "upgrade_required": "replace floating/unversioned client bridge selectors with exact 0.2.0"
+    },
+    "mcp_router_desktop": {
+      "implementation_base_commit": "ad389663d31cfddad246dd0d2d43a86175b08774",
+      "implementation_base_relation": "upstream v0.6.3 plus post-release auth/structured-result fixes and AGENTS guidance; transaction build requires distinct source/build identity",
+      "installed": "0.6.3",
+      "installed_bundle_identifier": "com.electron.mcp-router",
+      "installed_cdhash": "aac02b3139c32a04171af8f581b4d0732ab9ed59",
+      "installed_executable_sha256": "24fc753431095c56b106a64402c3f7c3711d3428ca7e41aae95de41a3d644dc4",
+      "installed_signature": "adhoc",
+      "installed_team_identifier": null,
+      "latest_release": "v0.6.3",
+      "running_executable_matches_installed_path": true,
+      "running_pid": 667,
+      "selected": "0.6.3",
+      "source": "https://github.com/mcp-router/mcp-router/releases/tag/v0.6.3",
+      "trust_decision": "Existing app is ad-hoc signed; replacement build must retain an explicit reviewed signature/notarization decision and exact rollback artifact.",
+      "upgrade_required": false,
+      "upstream_darwin_arm64_zip_sha256": "48e6b7ed6fc0890525bbb34ae5d747758d75162d843798f723582c6f6c52f189",
+      "upstream_dmg_sha256": "2282c9b9ada119eb9fb396d4835a6c78ce465e6b407f3c87b1de25eafd447087",
+      "upstream_release_prerelease": false,
+      "upstream_tag_commit": "62ef49c646b75776cd0c873b30bae115bdf85948"
+    }
+  },
+  "live_mutation_authorized": false,
+  "policy": "Select the latest stable release only; exclude prerelease, specialized, compatibility-forwarder, and floating selectors.",
+  "schema": "centralize-mcp-latest-stable-evidence/v1"
+}

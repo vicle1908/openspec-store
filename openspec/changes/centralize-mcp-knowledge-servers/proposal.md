@@ -5,6 +5,13 @@ The workstation currently launches duplicate GitNexus, Graphify, AgentMemory, an
 ## What Changes
 
 - **BREAKING**: Make MCP Router the single client-facing gateway for GitNexus, Graphify, and AgentMemory across supported agents; direct client registrations for those servers are removed after compatibility and rollback gates pass.
+- Keep the currently running MCP Router desktop app on latest stable `0.6.3` as
+  the authoritative live adapter for coding agents, and pin its published
+  stdio bridge to latest stable `@mcp_router/cli@0.2.0` rather than floating.
+- Add an app-native declarative preview/apply/restore interface for the bounded
+  knowledge-child definitions and coding-agent token access. Automation MUST
+  use MCP Router's repository/service layer and MUST NOT edit `mcprouter.db` or
+  `shared-config.json` directly.
 - Upgrade and pin the three knowledge providers to their latest stable registry releases verified during planning: GitNexus `1.6.9`, `@sentropic/graphify` `0.17.1`, and AgentMemory engine/MCP `0.9.28`. Release candidates and compatibility forwarding packages are not selected as canonical providers.
 - **BREAKING**: Migrate Graphify from the preserved legacy runtime/command and `graphify-out/` layout to the maintained Node.js `@sentropic/graphify@0.17.1` runtime and `.graphify/` layout, with compatibility/rebuild evidence before old artifacts are retired. Registry research found no npm `graphifyy@0.9.26` release, so rollback binds to captured command/path/hash identity rather than an impossible package pin.
 - Replace the two same-tool-name Graphify MCP registrations with one multi-project Graphify server that routes by an explicit canonical `project_path` and reports unavailable or stale graphs without falling through to another repository.
@@ -13,11 +20,13 @@ The workstation currently launches duplicate GitNexus, Graphify, AgentMemory, an
 - Separate Hermes personal/profile memory from shared project/session memory and disable or leave unconfigured overlapping memory providers unless a distinct ownership contract is documented.
 - Add source-of-truth bootstrap, status, doctor, rollback, and acceptance behavior that detects duplicate direct registrations and repeated server process families without printing credential values.
 - Stage live client cleanup behind an immutable redacted inventory, backup, synthetic rehearsal, explicit execution approval, client restart, cross-client smoke tests, and bounded rollback.
-- Reconcile this change with the active `optimize-hermes-agent-configuration` change before mutating Hermes or MCP Router state; that change currently treats the router definition as immutable.
+- Preserve the reviewed Hermes bridge fingerprint while configuring the MCP
+  Router app's provider-child and token-access surfaces through its supported
+  app-owned transaction path.
 
 ### Non-goals
 
-- Reimplement GitNexus, Graphify, AgentMemory, or MCP Router.
+- Reimplement GitNexus, Graphify, AgentMemory, or replace MCP Router.
 - Merge GitNexus and Graphify data models or generated index artifacts.
 - Delete local `.gitnexus/`, legacy `graphify-out/`, new `.graphify/`, AgentMemory data, Hermes memory, skills, hooks, sessions, or credentials without an approved migration/retention decision.
 - Expose MCP Router, Graphify, AgentMemory, or GitNexus beyond loopback.
@@ -39,7 +48,10 @@ None.
 
 ## Impact
 
-- **Owning implementation repository:** `~/Developer/go-microservices`, primarily `scripts/knowledge-tools.sh`, `scripts/agentmemory-bootstrap.sh`, focused shell fixtures, Make targets, developer-memory documentation, the knowledge-graph runbook, and ADR 0007.
+- **Provider implementation repository:** `~/Developer/go-microservices`, primarily `scripts/knowledge-tools.sh`, `scripts/agentmemory-bootstrap.sh`, focused shell fixtures, Make targets, developer-memory documentation, the knowledge-graph runbook, and ADR 0007.
+- **Adapter implementation repository:** `~/Developer/mcp-router`, limited to
+  an app-native declarative configuration transaction that reuses server/token
+  repositories, secret storage, lifecycle events, and protected backup/restore.
 - **Shared planning repository:** `~/Developer/openspec-store`; this change modifies three existing capability contracts and remains active until live acceptance completes.
 - **Live local configuration:** MCP Router database/configuration plus supported clients such as Hermes, Codex/ChatGPT Desktop, Cursor, Claude Code, OpenCode, Zed, Kimi, and Antigravity. Each client is inventoried and changed only during the separately approved cutover phase.
 - **Generated local state:** GitNexus registry/index metadata, Graphify root graphs, AgentMemory runtime state, and ignored verification evidence are inspected and preserved; generated indexes are refreshed only through their existing single-writer controls.

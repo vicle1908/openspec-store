@@ -2,7 +2,10 @@
 
 ## Status
 
-Independently reviewed as a compatible boundary; not yet integrated into the shared store and not a live-mutation authorization. Task 1.5 remains blocked until this artifact is committed and integrated with its invariant preserved.
+The original provider-child boundary was independently reviewed and integrated
+at shared-store revision `104da6b`; that completed historical task 1.5 but did
+not authorize live mutation. The current access-map-only MCP Router app extension
+is pending exact-tree review and store integration under task 1.5a.
 
 ## Existing constraint
 
@@ -17,13 +20,16 @@ other Hermes Router field may change.
 
 ## Compatible boundary
 
-`centralize-mcp-knowledge-servers` owns mutation only for the named GitNexus,
-Graphify, and AgentMemory router-child definitions and their provider-specific
-registry/proxy/adapter/engine state. The exact package lock, read-only client
-bridge inventory, and fixture-safe transactions are verification evidence, not
-router mutation ownership. This change does not own or mutate the MCP Router
-core, bridge or authentication/token state, transport/listener, router-wide
-policy, unrelated child providers, or any Hermes-side bridge field.
+`centralize-mcp-knowledge-servers` owns the named GitNexus, Graphify, and
+AgentMemory router-child definitions, their provider-specific
+registry/proxy/adapter/engine state, and only the existing coding-agent tokens'
+server-access maps through the bounded MCP Router app transaction. It does not
+own raw token values or token creation, rotation, deletion, export, or restore.
+The exact package lock, read-only client bridge inventory, and fixture-safe
+transactions are verification evidence, not router mutation ownership. This
+change does not own or mutate the MCP Router core, client bridge,
+transport/listener, router-wide policy, unrelated child providers, or any
+Hermes-side bridge field.
 
 `optimize-hermes-agent-configuration` owns Hermes-side configuration and may
 change only its explicitly approved parallel-call declaration. Neither change
@@ -40,14 +46,15 @@ A valid combined plan SHALL preserve the Hermes bridge fingerprint while
 changing only router-owned provider-child inputs after provider eligibility,
 rollback, and readiness evidence pass.
 
-## Release condition
+## Dependency reconciliation condition
 
-Task 1.5 remains blocked until the active Hermes change is either completed and
-archived with its MCP Router invariant preserved, or an explicitly reviewed
-amendment records this compatible boundary in the shared store. This artifact
-alone does not release live mutation. A separate immutable prerequisite plan and
-operator `GO` remain required for package installation, native refresh, engine
-restoration, client/router configuration, process restart, or cutover.
+The original provider-child boundary was integrated at `104da6b`. The current
+existing-token access-map extension remains blocked under task 1.5a until this
+exact amendment is independently approved and integrated. Neither reconciliation
+releases live mutation. Separate immutable prerequisite and cutover generations,
+the app-minted in-UI capability, and the corresponding operator approvals remain
+required for package/app installation, native refresh, engine restoration,
+client/router configuration, process restart, or cutover.
 
 ## Verification
 
