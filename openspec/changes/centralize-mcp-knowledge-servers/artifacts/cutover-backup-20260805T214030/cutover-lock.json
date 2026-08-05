@@ -1,0 +1,8 @@
+{
+  "schema": "centralize-mcp-cutover-lock/v1",
+  "locked_at": "2026-08-05T14:41:58Z",
+  "authorized_by": "operator-GO",
+  "change": "centralize-mcp-knowledge-servers",
+  "scope": "client-configs + router-children",
+  "rollback_available": true
+}

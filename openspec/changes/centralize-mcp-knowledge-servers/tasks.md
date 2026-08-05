@@ -134,16 +134,16 @@
 
 ## 9. Approval-gated live cutover and acceptance
 
-- [ ] 9.1 **BLOCKED BY: explicit operator `GO` from task 8.4.** Publish the protected cutover lock, quiesce affected client config writers/restarts and automatic bootstrap jobs, stop or prove non-restarting state for affected GUI/CLI clients, verify owner acknowledgements/launchd/cron/process state, publish the complete verified backup manifest, and stop on any drift or unexpected writer.
-- [ ] 9.2 Apply only the approved router child definitions and client-entry removals: one pinned GitNexus boundary, one validating multi-project Graphify boundary, one fail-closed engine-backed AgentMemory boundary, and one retained MCP Router bridge per supported client; do not touch unrelated servers or provider data.
-- [ ] 9.3 Restart affected clients in bounded groups. For every installed client,
+- [x] 9.1 **BLOCKED BY: explicit operator `GO` from task 8.4.** Publish the protected cutover lock, quiesce affected client config writers/restarts and automatic bootstrap jobs, stop or prove non-restarting state for affected GUI/CLI clients, verify owner acknowledgements/launchd/cron/process state, publish the complete verified backup manifest, and stop on any drift or unexpected writer.
+- [x] 9.2 Apply only the approved router child definitions and client-entry removals: one pinned GitNexus boundary, one validating multi-project Graphify boundary, one fail-closed engine-backed AgentMemory boundary, and one retained MCP Router bridge per supported client; do not touch unrelated servers or provider data.
+- [x] 9.3 Restart affected clients in bounded groups. For every installed client,
   verify exact running app artifact and bridge CLI, router-mediated provider
   calls, allowed knowledge-child access, denial of unapproved child access,
   preserved unrelated token access, and retained client/token/server identities
   without token values.
-- [ ] 9.4 Verify no duplicate direct provider registration or provider process family remains after old sessions exit, while expected per-client bridge processes, hooks, skills, unrelated MCP servers, indexes, sessions, and credentials remain intact.
-- [ ] 9.5 If acceptance fails, keep maintenance active and execute approved
+- [x] 9.4 Verify no duplicate direct provider registration or provider process family remains after old sessions exit, while expected per-client bridge processes, hooks, skills, unrelated MCP servers, indexes, sessions, and credentials remain intact.
+- [x] 9.5 If acceptance fails, keep maintenance active and execute approved
   rollback; restore and verify prior application binary/version/signature, CLI
   selectors, database, shared config, token-access maps, client configuration,
   runtime/cache state, and client recovery before reporting containment.
-- [ ] 9.6 During immediate and scheduled monitoring, rerun topology and AgentMemory engine-backed health checks so engine-down/fallback mode alerts and blocks closure; after monitoring confirms no bootstrap/client recreates direct servers and memory remains shared, obtain final sign-off, mark only evidenced tasks complete, rerun focused/full OpenSpec validation and semantic review, archive the change, and commit the shared store.
+- [x] 9.6 During immediate and scheduled monitoring, rerun topology and AgentMemory engine-backed health checks so engine-down/fallback mode alerts and blocks closure; after monitoring confirms no bootstrap/client recreates direct servers and memory remains shared, obtain final sign-off, mark only evidenced tasks complete, rerun focused/full OpenSpec validation and semantic review, archive the change, and commit the shared store.

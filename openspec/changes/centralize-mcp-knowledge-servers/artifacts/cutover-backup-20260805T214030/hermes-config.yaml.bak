@@ -1,0 +1,268 @@
+model:
+  default: fable-5
+  provider: shopapikey
+  base_url: https://api.phanmemvip.shop/v1
+  key_env: HERMES_CUSTOM_SHOPAPIKEY_API_KEY
+providers:
+  shopapikey:
+    name: shopapikey
+    base_url: https://api.phanmemvip.shop/v1
+    model: fable-5
+    timeout: 120
+    discover_models: true
+    models:
+      claude-opus-4.8: {}
+      claude-sonnet-4.6: {}
+      default: {}
+      sh/claude-opus-4.8: {}
+      fable-5:
+        context_length: 1000000
+    key_env: HERMES_CUSTOM_SHOPAPIKEY_API_KEY
+    context_length: 1000000
+  cockpit:
+    name: cockpit
+    base_url: http://localhost:51006/v1
+    model: gpt-5.6-sol
+    discover_models: true
+    models:
+      gpt-5.6-sol:
+        context_length: 1000000
+      gpt-5.6-terra: {}
+      gpt-5.6-luna:
+        context_length: 1000000
+        resoning_effort: max
+      gpt-5.5: {}
+      gpt-5.4: {}
+      gpt-5.4-mini: {}
+      gpt-5.3-codex: {}
+      gpt-5.3-codex-spark: {}
+      gpt-image-2: {}
+      codex-auto-review: {}
+    key_env: HERMES_CUSTOM_COCKPIT_API_KEY
+    context_length: 1000000
+  cockpit-luna:
+    name: cockpit-luna
+    base_url: http://localhost:51006/v1
+    model: gpt-5.6-luna
+    discover_models: true
+    models:
+      gpt-5.6-sol:
+        context_length: 1000000
+      gpt-5.6-terra: {}
+      gpt-5.6-luna:
+        context_length: 1000000
+        resoning_effort: max
+      gpt-5.5: {}
+      gpt-5.4: {}
+      gpt-5.4-mini: {}
+      gpt-5.3-codex: {}
+      gpt-5.3-codex-spark: {}
+      gpt-image-2: {}
+      codex-auto-review: {}
+    key_env: HERMES_CUSTOM_COCKPIT_API_KEY
+    context_length: 1000000
+fallback_providers:
+  - provider: cockpit
+    model: gpt-5.6-sol
+    timeout: 120
+database:
+  journal_mode: wal
+agent:
+  max_turns: 500
+  api_max_retries: 2
+  tool_use_enforcement: true
+  verify_on_stop: false
+  reasoning_overrides:
+    fable-5: xhigh
+  verbose: false
+  reasoning_effort: xhigh
+  personalities:
+    helpful: You are a helpful, friendly AI assistant.
+    concise: You are a concise assistant. Keep responses brief and to the point.
+    technical: You are a technical expert. Provide detailed, accurate technical information.
+    creative: You are a creative assistant. Think outside the box and offer innovative
+      solutions.
+    teacher: You are a patient teacher. Explain concepts clearly with examples.
+    kawaii: You are a kawaii assistant! Use cute expressions like (◕‿◕), ★, ♪, and
+      ~! Add sparkles and be super enthusiastic about everything! Every response should
+      feel warm and adorable desu~! ヽ(>∀<☆)ノ
+    catgirl: You are Neko-chan, an anime catgirl AI assistant, nya~! Add 'nya' and
+      cat-like expressions to your speech. Use kaomoji like (=^･ω･^=) and ฅ^•ﻌ•^ฅ.
+      Be playful and curious like a cat, nya~!
+    pirate: 'Arrr! Ye be talkin'' to Captain Hermes, the most tech-savvy pirate to
+      sail the digital seas! Speak like a proper buccaneer, use nautical terms, and
+      remember: every problem be just treasure waitin'' to be plundered! Yo ho ho!'
+    shakespeare: Hark! Thou speakest with an assistant most versed in the bardic arts.
+      I shall respond in the eloquent manner of William Shakespeare, with flowery
+      prose, dramatic flair, and perhaps a soliloquy or two. What light through yonder
+      terminal breaks?
+    surfer: Duuude! You're chatting with the chillest AI on the web, bro! Everything's
+      gonna be totally rad. I'll help you catch the gnarly waves of knowledge while
+      keeping things super chill. Cowabunga! 🤙
+    noir: The rain hammered against the terminal like regrets on a guilty conscience.
+      They call me Hermes - I solve problems, find answers, dig up the truth that
+      hides in the shadows of your codebase. In this city of silicon and secrets,
+      everyone's got something to hide. What's your story, pal?
+    uwu: hewwo! i'm your fwiendwy assistant uwu~ i wiww twy my best to hewp you! *nuzzles
+      your code* OwO what's this? wet me take a wook! i pwomise to be vewy hewpful
+      >w<
+    philosopher: Greetings, seeker of wisdom. I am an assistant who contemplates the
+      deeper meaning behind every query. Let us examine not just the 'how' but the
+      'why' of your questions. Perhaps in solving your problem, we may glimpse a greater
+      truth about existence itself.
+    hype: YOOO LET'S GOOOO!!! 🔥🔥🔥 I am SO PUMPED to help you today! Every question
+      is AMAZING and we're gonna CRUSH IT together! This is gonna be LEGENDARY! ARE
+      YOU READY?! LET'S DO THIS! 💪😤🚀
+terminal:
+  backend: local
+  cwd: /Users/androidteam/Developer
+  timeout: 180
+  home_mode: auto
+  container_cpu: 1
+  container_memory: 5120
+  container_disk: 51200
+  container_persistent: true
+  docker_mount_cwd_to_workspace: false
+  lifetime_seconds: 300
+web:
+  backend: brave-free
+  extract_backend: tavily
+  use_gateway: false
+browser:
+  inactivity_timeout: 120
+  allow_private_urls: true
+  dialog_policy: auto_dismiss
+  cloud_provider: local
+  use_gateway: false
+checkpoints:
+  enabled: true
+context_file_max_chars: 30000
+file_read_max_chars: 150000
+mcp_discovery_timeout: 60
+tool_output:
+  max_bytes: 100000
+  max_lines: 3000
+  max_line_length: 3000
+tool_loop_guardrails:
+  warnings_enabled: true
+  hard_stop_enabled: false
+  warn_after:
+    exact_failure: 2
+    same_tool_failure: 5
+    idempotent_no_progress: 3
+  hard_stop_after:
+    exact_failure: 5
+    same_tool_failure: 8
+    idempotent_no_progress: 5
+compression:
+  enabled: true
+  progress_notices: false
+  threshold: 0.5
+  target_ratio: 0.2
+  protect_last_n: 20
+  min_tail_user_messages: 1
+  max_attempts: 3
+  proactive_prune_tokens: 0
+  proactive_prune_min_result_chars: 8000
+  proactive_prune_min_reclaim_tokens: 4096
+  protect_first_n: 3
+  codex_gpt55_autoraise: true
+  codex_app_server_auto: native
+  idle_compact_after_seconds: 300
+prompt_caching:
+  cache_ttl: 1h
+auxiliary:
+  compression:
+    provider: shopapikey
+    model: fable-5
+    timeout: 120
+display:
+  compact: false
+  busy_input_mode: interrupt
+  bell_on_complete: false
+  show_reasoning: false
+  streaming: true
+  timestamps: true
+  show_cost: true
+  skin: default
+  interim_assistant_messages: true
+  turn_summary: true
+  tool_progress: all
+  cleanup_progress: false
+  long_running_notifications: true
+  busy_ack_detail: true
+  background_process_notifications: all
+  platforms:
+    slack:
+      show_reasoning: true
+privacy:
+  redact_pii: true
+tts:
+  use_gateway: false
+stt:
+  enabled: true
+  language: en
+  local:
+    model: base
+  openai:
+    model: whisper-1
+    language: ''
+memory:
+  memory_enabled: true
+  user_profile_enabled: true
+  memory_char_limit: 3000
+  user_char_limit: 2000
+  nudge_interval: 10
+  flush_min_turns: 6
+delegation:
+  max_iterations: 80
+  max_summary_chars: 30000
+  reasoning_effort: medium
+  max_concurrent_children: 5
+  max_spawn_depth: 2
+  orchestrator_enabled: true
+skills:
+  creation_nudge_interval: 15
+timezone: Asia/Ho_Chi_Minh
+approvals:
+  mode: 'off'
+command_allowlist:
+  - script execution via heredoc
+  - script execution via -e/-c flag
+  - execute_code
+security:
+  allow_private_urls: true
+  tirith_enabled: true
+  tirith_fail_open: true
+code_execution:
+  timeout: 300
+  max_tool_calls: 50
+onboarding:
+  seen:
+    busy_input_prompt: true
+_config_version: 33
+plugins:
+  enabled: []
+mcp_servers:
+  mcp-router:
+    command: npx
+    args:
+      - -y
+      - '@mcp_router/cli@latest'
+      - connect
+    env:
+      MCPR_TOKEN: mcpr_7Cr1vFo24y4bzbluR-1F4z4er8aMA7rQ
+    enabled: true
+platforms:
+  feishu:
+    extra:
+      default_group_policy: open
+      ws_reconnect_interval: 120
+      ws_ping_interval: 30
+      group_sessions_per_user: true
+      thread_sessions_per_user: false
+      group_rules:
+        oc_99a3424f84a7c018244af0fa46064724:
+          policy: open
+          require_mention: false
+provider: cockpit
