@@ -14,14 +14,14 @@
   the clean main store without overwriting concurrent changes; focused/full
   validation and store commits were retained. The current MCP Router app
   amendment requires a new review and integration task 1.4a.
-- [ ] 1.4a Commit this exact reviewed app amendment in its isolated worktree,
+- [x] 1.4a Commit this exact reviewed app amendment in its isolated worktree,
   integrate it into current main without overwriting concurrent/untracked
   changes, rerun focused validation and the named full-store aggregate, commit
   the store, and record the resulting revision before implementation apply.
 - [x] 1.5 The original provider-child dependency amendment preserving Hermes
   bridge immutability was reviewed and integrated at store revision `104da6b`;
   it did not release live mutation.
-- [ ] 1.5a Review and integrate this amendment's bounded existing-token
+- [x] 1.5a Review and integrate this amendment's bounded existing-token
   access-map ownership while preserving raw-token lifecycle, client bridge,
   transport/listener, router-wide policy, and all Hermes-side immutability.
   No MCP Router token-access mutation is authorized before integration.
@@ -30,12 +30,12 @@
 
 - [x] 2.1 Create one dedicated `go-microservices` worktree from the approved base, read its nearest guidance, record base/head/toolchain and focused gates, verify the original checkout's dirty state remains untouched, and run `openspec instructions apply --change centralize-mcp-knowledge-servers` from the integrated store.
 - [x] 2.1a Capture immutable registry evidence for GitNexus `1.6.9`, `@sentropic/graphify@0.17.1`, `@agentmemory/agentmemory@0.9.28`, and `@agentmemory/mcp@0.9.28`: npm dist-tag, tarball integrity/digest, upstream repository, license, engine constraints, package name, and dependency lock; fail if `latest` changes before implementation approval rather than silently floating.
-- [ ] 2.2 Add a fixture-first topology test that models supported JSON, JSONC, TOML, YAML, and MCP Router SQLite server entries; prove RED because current setup accepts direct GitNexus/Graphify/AgentMemory entries alongside the router, while preserving seeded unrelated entries and comments.
-- [ ] 2.3 Add a fixture process-inventory test that proves RED when repeated provider process families exist but permits one MCP Router bridge per active client; include parent/client attribution and seeded secret-bearing command arguments that MUST be redacted.
+- [x] 2.2 Add a fixture-first topology test that models supported JSON, JSONC, TOML, YAML, and MCP Router SQLite server entries; prove RED because current setup accepts direct GitNexus/Graphify/AgentMemory entries alongside the router, while preserving seeded unrelated entries and comments.
+- [x] 2.3 Add a fixture process-inventory test that proves RED when repeated provider process families exist but permits one MCP Router bridge per active client; include parent/client attribution and seeded secret-bearing command arguments that MUST be redacted.
 - [x] 2.4 Add a real pinned `@sentropic/graphify@0.17.1` Node.js adapter fixture with two distinct `.graphify/graph.json` project graphs; prove native `serve` is single-graph/no-`project_path` and lacks legacy PR tools, then assert adapter-owned omitted-selector, unknown/missing graph, stale graph, relative/outside-root/symlink-escape, no cross-project fallback, canonical project-to-repository mapping, and compatibility PR-tool routing cases.
 - [ ] 2.4a Add a legacy-to-current Graphify migration fixture that preserves `graphify-out/`, builds `.graphify/`, compares graph/query/path/PR behavior, rejects destructive cleanup, and proves exact rollback to the captured legacy command/path/hash identity; do not claim nonexistent npm `graphifyy@0.9.26`.
-- [ ] 2.5 Add a GitNexus multi-repository boundary fixture/probe that proves one process can serve an isolated approved registry or filtering proxy, rejects extra/unapproved repositories and stale/ambiguous selections, and proves credential-bearing remote userinfo is absent from client-visible/evidence output.
-- [ ] 2.6 Add an isolated AgentMemory boundary fixture that proves RED when the engine is unavailable but a fallback shim returns an empty successful result; define assertions for fail-closed transport, engine identity, expected tool class, two distinct authenticated client identities mapped to server-derived audit attribution (`agentId` where the pinned schema supports it and a reserved concept for `memory_save`), and cross-client tagged write/recall.
+- [x] 2.5 Add a GitNexus multi-repository boundary fixture/probe that proves one process can serve an isolated approved registry or filtering proxy, rejects extra/unapproved repositories and stale/ambiguous selections, and proves credential-bearing remote userinfo is absent from client-visible/evidence output.
+- [x] 2.6 Add an isolated AgentMemory boundary fixture that proves RED when the engine is unavailable but a fallback shim returns an empty successful result; define assertions for fail-closed transport, engine identity, expected tool class, two distinct authenticated client identities mapped to server-derived audit attribution (`agentId` where the pinned schema supports it and a reserved concept for `memory_save`), and cross-client tagged write/recall.
 
 ## 3. Topology model and redacted diagnostics
 
