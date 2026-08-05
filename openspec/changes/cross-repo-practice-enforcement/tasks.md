@@ -2,22 +2,22 @@
 
 ## Phase 0: Pilot on 3 Repos (4 tasks)
 
-- [ ] 0.1 Apply full enforcement to **agent-core** (69 tests, GitHub Actions, Pattern A)
+- [x] 0.1 Apply full enforcement to **agent-core** (69 tests, GitHub Actions, Pattern A)
   - Update dependency-group versions: ruff>=0.16.1, mypy>=2.3.0, pytest>=9.1.1
   - Update pre-commit revs: ruff-pre-commit v0.15.15→v0.16.1, gitleaks v8.30.1
   - Add uv-pre-commit hook for lockfile sync
   - Run `uv lock` to regenerate lockfile
   - Verify: `uv run ruff check .`, `uv run ruff format --check .`, `uv run mypy .`, `uv run pytest -q`
-- [ ] 0.2 Apply full enforcement to **tdt-core** (20 tests, GitLab CI, hub dependency)
+- [x] 0.2 Apply full enforcement to **tdt-core** (20 tests, GitLab CI, hub dependency)
   - Same gates as 0.1
   - Critical: any break here cascades to 12 consumers
   - Update pre-commit revs to match canonical
-- [ ] 0.3 Apply full enforcement to **jira-skill** (90 tests, GitLab CI, most cross-deps)
+- [x] 0.3 Apply full enforcement to **jira-skill** (90 tests, GitLab CI, most cross-deps)
   - Same gates as 0.1
   - Fix missing version pins on tdt-core[all] and tdt-sheets (HIGH finding from review)
   - Update pre-commit revs: gitleaks v8.30.0→v8.30.1, ruff-pre-commit v0.16.0→v0.16.1
   - Keep shellcheck/shfmt/actionlint (Pattern C)
-- [ ] 0.4 Evaluate pilot results
+- [x] 0.4 Evaluate pilot results
   - Document violations found per repo (especially S rule violations)
   - Document time to fix
   - Document any rule adjustments needed for the canonical set
