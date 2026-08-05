@@ -1,13 +1,13 @@
 # Plan Review: centralize-mcp-knowledge-servers
 
-**Reviewed:** 2026-08-05 Asia/Ho_Chi_Minh  
-**Status:** FIVE-PROVIDER NATIVE REVIEW — AMENDMENT APPROVED; NATIVE FIVE-PROVIDER REVIEW COMPLETED  
+**Reviewed:** 2026-08-05 Asia/Ho_Chi_Minh
+**Status:** MCP ROUTER APP AMENDMENT — APPROVED FOR SOURCE IMPLEMENTATION
 **Scope:** OpenSpec planning artifacts plus bounded registry/upstream,
 `go-microservices`, and `mcp-router` source evidence. No package installation,
 installed-app replacement, live configuration, router database, shared token
 config, provider index, memory store, or process mutation occurred.
 
-## MCP Router app amendment review (prior)
+## MCP Router app amendment review
 
 First amendment review returned NO-GO. Evidence-backed blockers were incorporated:
 
@@ -49,109 +49,47 @@ Exact npm SRI and shasum values were captured during planning but are not repeat
 | MCP Router app semantic audit | PASS | Exact current operational-readiness SHA/scenarios/normative count retained in `mcp-router-app-amendment-audit.json`. |
 | Durable scenario/test traceability | REVISED | `ROUTER-APP-001..003`, provider migrations, access-map-only token handling, and package provenance tasks are specified. |
 | Delegated five-lens amendment review | APPROVED FOR SOURCE IMPLEMENTATION | First-round blockers were incorporated and final exact-tree narrow review approved. |
-| Named native five-provider task 1.3 | **COMPLETED** | All 5 providers dispatched and reviewed; findings below. |
+| Named native five-provider task 1.3 | PENDING | Do not infer completion from delegated lenses. |
 | Archive readiness | NOT READY | Implementation and approval tasks remain incomplete. |
-| Implementation | SOURCE COMMITTED; REVIEW COMPLETE | Source commits and gates complete; five-provider native review completed. |
-
-## Five-provider native review results
-
-### Alignment Summary
-
-| Edge | Status | Provider | Evidence |
-|---|---|---|---|
-| Spec ↔ Code | **PASS** | Hermes (Spec Compliance) | All 7 baseline developer-memory scenarios preserved verbatim in delta. Both baseline operational-readiness scenarios preserved. Graphify version pin updated from 0.9.26 to @sentropic/graphify@0.17.1 consistently across proposal, design, tasks, and delta specs. Normative SHALL/MUST requirements are testable with concrete scenarios. |
-| Code ↔ Docs | **PASS** | Hermes | AGENTS.md, ADR 0007, runbooks, and troubleshooting docs updated per task 7.1. Knowledge-tools.sh, agentmemory-doctor.sh, and mcp-topology-inventory.py source evidence matches documented behavior. |
-| Docs ↔ Skills | **PASS** | Antigravity (Architecture) | Skills reference patterns match centralized topology. No skill references will break with router-owned servers. |
-| Skills ↔ Specs | **PASS** | fable-5 (Product Scope) | OpenSpec skills (openspec-apply-change, openspec-explore) updated to use router-mediated knowledge tools. Skill distribution spec delta preserves canonical shared surface. |
-| Spec ↔ Docs | **PASS** | Claude Code (Security) | Documentation requirements match spec requirements. Agent memory ownership boundary documented in both spec and ADR. |
-| Code ↔ Tests | **PARTIAL** | Codex (Quality) | go-microservices: 46+ focused tests committed (topology 12, transaction 18, Graphify adapter 3, AgentMemory boundary 11). mcp-router: 7 test files covering all transaction surfaces. Gap: real provider tests (tasks 4.3-4.5, 5.0-5.4) not yet run. |
-| Spec ↔ Tests | **PARTIAL** | Codex | 17 verification matrix scenarios mapped to tests. TOPO-001/002, PROC-001, CFG-001, ROL-001, ROUTER-APP-001/002/003 covered. Gap: GRAPH-001/002/003/004, GIT-001/002, MEM-001/002 require real provider processes. |
-| Code ↔ Skills | **PASS** | Antigravity | No skill references will break. Router-owned servers maintain same tool names. |
-
-### Security Lens (Claude Code)
-
-| Edge | Status | Finding |
-|---|---|---|
-| Credential leakage | **PASS** | Redacted diagnostics, no credential values in evidence, mode 0600/0700 evidence dirs. |
-| Path validation | **PASS** | Graphify adapter rejects omitted/unknown/relative/outside-root/symlink-escape selectors before graph access (tested in fixture). |
-| Fail-closed AgentMemory | **PASS** | Proxy rejects empty fallback results, tests prove engine-down returns typed unavailable. |
-| Token protection | **PASS** | One-way fingerprints only, no raw token handling, access-map-only ownership. |
-| SQLite guard | **PASS** | External automation MUST NOT open/write SQLite; app-owned restore through audited boundary. |
-| TOCTOU | **PARTIAL** | Cutover sequence has multi-step gates but some steps rely on process state that could change between check and mutation. Mitigated by cutover lock and quiescence requirements. |
-| Replay protection | **PASS** | Single-use challenge + MACed capability, short-lived, consumed on use, rejected on replay. |
-| Concurrent access | **PASS** | App-wide lock rejects concurrent writers, one generation lock, compensation on failure. |
-
-### Provider Findings
-
-#### Hermes — Spec Compliance
-**PASS** with notes:
-- Version pins consistent across all artifacts (proposal, design, tasks, delta specs, implementation evidence)
-- All baseline scenarios preserved verbatim in MODIFIED deltas
-- Graphify migration from legacy Python to @sentropic/graphify@0.17.1 properly covered in delta spec
-- AgentMemory fail-closed behavior properly specified with concrete scenarios (engine-down, cross-client recall, memory ownership)
-- Note: developer-memory delta spec adds 5 new scenarios (engine-down, cross-client recall, memory ownership x3) on top of preserved 7 — this is correct per MODIFIED semantics
-
-#### Claude Code — Security
-**PASS** with warnings:
-- Previous approval maintained; no new critical findings
-- TOCTOU risk in cutover sequence is low severity (mitigated by lock + quiescence)
-- Quiescence, redaction, digest, SQLite integrity, authorization controls remain
-- Version upgrades add package-integrity and data/schema migration rollback gates
-
-#### Codex — Quality & Tests
-**PARTIAL**:
-- Fixture tests comprehensive: topology 12, transaction 18, Graphify adapter 3, AgentMemory boundary 11
-- mcp-router tests thorough: 7 test files covering all transaction surfaces
-- RED→GREEN methodology followed for committed slices
-- **Gap 1:** Real provider tests for Graphify 0.17.1 migration (task 4.3-4.5) — blocked by package not installed
-- **Gap 2:** Real AgentMemory engine/store tests (task 5.0-5.4) — blocked by engine not running
-- **Gap 3:** GitNexus multi-repository boundary fixture (task 2.5) — not yet written
-- **Gap 4:** Full end-to-end router-mediated provider call test (task 4.4) — not yet written
-
-#### Antigravity — Architecture
-**PASS** with notes:
-- Single-gateway pattern appropriate for 11 agents; eliminates duplicate processes and tool-name collisions
-- Graphify adapter design sound: owns multi-project dispatch that native 0.17.1 lacks, with compatibility PR surface
-- Ownership boundaries clear: go-microservices owns provider topology/fixtures, mcp-router owns app-native transaction
-- Fail-closed AgentMemory is the right trade-off: shared memory integrity > individual agent convenience
-- Format-aware backup/rollback sustainable for current client set; new formats need explicit addition
-- Single point of failure (MCP Router) mitigated by loopback supervision, health diagnostics, exact backups, and client fallback to no knowledge tools
-- 5-phase migration plan sound: source → rehearsal → eligibility → cutover → acceptance
-
-#### fable-5 — Product Scope
-**PASS** with notes:
-- Scope well-bounded; non-goals properly exclusionary
-- Client matrix verified against actual installed clients on this workstation
-- fable-5 is a Hermes subagent, not a standalone CLI — matrix correctly lists it as a supported client
-- Modified capabilities (developer-code-intelligence, developer-memory, operational-readiness) are the right ones
-- No scope creep detected; all features trace to proposal
-- Breaking change properly gated behind sections 8-9 with explicit operator GO
-- Dependency on optimize-hermes-agent-configuration properly scoped in dependency-amendment.md
+| Implementation | NOT STARTED | Worktree setup/frozen lock only; no source or live state changed. |
 
 ## Critical provider findings and disposition
 
-### No CRITICAL findings
+### Hermes spec review
 
-All providers returned PASS or PARTIAL. No CRITICAL findings that block progression.
+The initial delegated review found version conflict, missing Graphify enforcement, and pre-approval mutation. The latest-stable revision supersedes the earlier temporary `0.9.26` resolution:
 
-### Resolution required before implementation apply
+- Canonical Graphify target is now maintained `@sentropic/graphify@0.17.1`.
+- Published package source was inspected: native `serve` is single-graph, has no `project_path`, and lacks legacy `list_prs`, `get_pr_impact`, and `triage_prs`.
+- One repository-owned adapter process therefore owns multi-project selection and a bounded compatibility PR-analysis surface based on native `review_delta`/`review_analysis` plus mapped repository metadata.
+- Graphify migration preserves legacy `graphify-out/`, builds `.graphify/`, compares behavior, and blocks cutover if parity is not demonstrated.
+- Eligibility remains read-only; package installs, graph rebuilds, engine upgrades/startup, and schema migrations require separately approved prerequisite generations.
 
-1. **Task 1.3 — COMPLETE.** Five-provider native review completed. No CRITICAL findings.
-2. **Task 1.4a — PENDING.** Commit reviewed app amendment in isolated worktree, integrate into current main, rerun validation, commit store.
-3. **Task 1.5a — PENDING.** Review and integrate bounded existing-token access-map ownership.
-4. **Tasks 2.2-2.6 — PENDING.** RED fixture tests for topology, process, GitNexus, AgentMemory boundaries.
-5. **Tasks 4.1-4.5 — PENDING.** Router-owned GitNexus/Graphify source behavior (requires @sentropic/graphify@0.17.1 installation).
-6. **Tasks 5.0-5.4 — PENDING.** AgentMemory router-only bootstrap (requires engine running).
+The delegated amendment exact-tree re-review approved source implementation; named native five-provider completion remains required before task 1.3 is checked.
 
-### Approved for next phase
+### Claude Code security
 
-The five-provider review approves progression to:
-- Task 1.4a: Store integration of reviewed amendment
-- Task 1.5a: Dependency reconciliation
-- Tasks 2.2-2.6: RED fixture tests (no external dependencies)
+Previously approved with warnings and no critical findings. Existing quiescence, redaction, digest, SQLite integrity, authorization, and bounded recall controls remain. Version upgrades add package-integrity and data/schema migration rollback gates.
 
-Implementation of sections 4-5 remains blocked by prerequisite package installation (separately approved generation).
+### Codex provider behavior
 
-## Archive readiness
+Earlier findings remain applicable: fail-closed AgentMemory transport, filtered GitNexus registry exposure, runtime Graphify path validation, server-derived memory identity, and canonical project-to-repository mapping. The Graphify adapter is now explicitly required because current native source lacks the legacy multiplexing and PR surfaces.
 
-NOT READY. Tasks 1.3a, 1.4a, 1.5a, 2.2-2.6, 3.2-3.3, 4.1-4.5, 5.0-5.4, 6.1-6.2, 7.2-7.5, 8-9 remain incomplete.
+### Antigravity architecture
+
+Earlier approval-with-warnings is no longer sufficient after the Graphify runtime/package migration; architecture must be re-reviewed. The hard `optimize-hermes-agent-configuration` dependency remains.
+
+### Fifth delegated product-scope lens
+
+The first amendment review completed this lens and its version/scope findings were incorporated. This does not satisfy the separate named native provider evidence required by task 1.3.
+
+## Required final gates
+
+1. Rerun focused/full strict OpenSpec validation and exact baseline scenario preservation.
+2. Re-run five-provider plan review against the new package/runtime migration.
+3. Reconcile the active Hermes optimization change.
+4. Integrate the reviewed change into the clean shared store.
+5. During implementation, re-resolve registry dist-tags and stop on drift rather than floating versions.
+6. Keep all installs, Graphify rebuild/migration, AgentMemory schema/startup work, and live cutover behind their separately bound approvals.
+
+No credentials, memory payloads, or live configuration values are included in this artifact.
