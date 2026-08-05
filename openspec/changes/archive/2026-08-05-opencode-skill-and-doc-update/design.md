@@ -6,7 +6,7 @@
 - `shopapikey/fable-5`, `cockpit/gpt-5.6-sol`, `cockpit/gpt-5.6-luna`, and `opencode/big-pickle` all return `SMOKE_OK` through `opencode run`.
 - Cockpit `/v1/responses` returns HTTP 200 for GPT-5.6 Sol.
 - Ruff 0.16.1 installed at `/opt/homebrew/bin/ruff`.
-- Basedpyright 1.39.9 and `basedpyright-langserver` installed via npm global path.
+- Basedpyright 1.39.9 and `basedpyright-langserver` installed through Homebrew at `/opt/homebrew/bin`; redundant pip/npm installations removed.
 - OpenCode LSP maps built-in `pyright` to `basedpyright-langserver --stdio`.
 - MCP Router listens on port 3282; agentmemory is not listening and remains disabled.
 - Google proxy port 8045 is down; frontend and docwriter agent models remain unavailable until that external service is restored.
