@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-08-05
+skip_specs: true
+description: "Optimize OpenCode config - enable LSP, formatters, workspace instructions, compaction, watcher ignores"
