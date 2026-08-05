@@ -14,14 +14,14 @@
   the clean main store without overwriting concurrent changes; focused/full
   validation and store commits were retained. The current MCP Router app
   amendment requires a new review and integration task 1.4a.
-- [ ] 1.4a Commit this exact reviewed app amendment in its isolated worktree,
+- [x] 1.4a Commit this exact reviewed app amendment in its isolated worktree,
   integrate it into current main without overwriting concurrent/untracked
   changes, rerun focused validation and the named full-store aggregate, commit
   the store, and record the resulting revision before implementation apply.
 - [x] 1.5 The original provider-child dependency amendment preserving Hermes
   bridge immutability was reviewed and integrated at store revision `104da6b`;
   it did not release live mutation.
-- [ ] 1.5a Review and integrate this amendment's bounded existing-token
+- [x] 1.5a Review and integrate this amendment's bounded existing-token
   access-map ownership while preserving raw-token lifecycle, client bridge,
   transport/listener, router-wide policy, and all Hermes-side immutability.
   No MCP Router token-access mutation is authorized before integration.

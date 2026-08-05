@@ -109,6 +109,9 @@ reconciliation passed the final exact-tree narrow review.
   integrated in the shared store. It preserves every Hermes MCP Router bridge
   field except the separately approved parallel-call declaration and limits
   this change to the named provider-child state.
+- **Tasks 1.4a/1.5a — COMPLETE:** the MCP Router app adapter amendment and
+  access-map-only ownership extension were approved and integrated at shared
+  store revision `6013b85`; no live mutation was authorized.
 - **Task 8.2 — COMPLETE / BLOCKED outcome:** read-only eligibility found stale
   GitNexus indexes and a floating router selector, absent current Graphify
   graphs plus legacy processes, unavailable AgentMemory engine/environment,
