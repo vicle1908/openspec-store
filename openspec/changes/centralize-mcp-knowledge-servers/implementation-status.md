@@ -104,10 +104,13 @@ reconciliation passed the final exact-tree narrow review.
 - **Tasks 7.3–7.5 — PARTIAL:** focused source gates and delegated fail-closed
   reviews pass. Documentation validation lacks ignored coverage/local-smoke
   artifacts; full five-provider implementation review remains outstanding.
-- **Task 1.5 / Sections 8–9 — BLOCKED:**
-  `optimize-hermes-agent-configuration` tasks 4.3–4.6, 4.9, and 4.10 remain
-  incomplete. No live MCP Router/client/provider/config/process mutation is
-  authorized. Operator-bound cutover `GO` has not been requested or granted.
+- **Task 1.5 — COMPLETE:** the independently reviewed dependency amendment is
+  integrated in the shared store. It preserves every Hermes MCP Router bridge
+  field except the separately approved parallel-call declaration and limits
+  this change to the named provider-child state.
+- **Sections 8–9 — BLOCKED:** dependency reconciliation does not authorize live
+  MCP Router/client/provider/config/process mutation. The separately bound
+  prerequisite/cutover plan and operator `GO` have not been requested or granted.
 
 ## Safety statement
 

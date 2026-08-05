@@ -1,0 +1,20 @@
+{
+  "schema": "knowledge-registry-evidence/v1",
+  "source_commit": "2edd362a1f0bf154a7d60be0ebe9b650154ed29d",
+  "runtime": {"node": "v26.6.0", "npm": "11.18.0"},
+  "dependency_lock": {
+    "path": "scripts/config/knowledge-provider-lock/package-lock.json",
+    "sha256": "0b9c3ca472b8685bbd8aa2e381618272eaa78e244f337e6a7713be4126a1f7f3"
+  },
+  "packages": [
+    {"package":"gitnexus","version":"1.6.9","latest":"1.6.9","integrity":"sha512-Rq5LXFygx7jjMp/YFsIAcnnzuKvvCsb4rxHFILnu05ZOqk7xNXTUSMRa968EOCbxcKFxnhKYaGXoabOUeGZX6A==","repository":"git+https://github.com/abhigyanpatwari/GitNexus.git","license":"PolyForm-Noncommercial-1.0.0","engines":{"node":">=22.0.0"}},
+    {"package":"@sentropic/graphify","version":"0.17.1","latest":"0.17.1","integrity":"sha512-23XISSOZUApSusD/YCkgDrhUkemRtGYSpNdssBhRl5x+iZSVnDKcwWWfTkkXBjELZjXLnA1o63Sp1EmMA7Efww==","repository":"git+https://github.com/rhanka/graphify.git","license":"MIT","engines":{"node":">=20"}},
+    {"package":"@agentmemory/agentmemory","version":"0.9.28","latest":"0.9.28","integrity":"sha512-DOiqZR7GKBedUCLAV2xW0rzaU2GUztvxLxesLNcjdzF1sFPxhMk8nrnKd79X9J9cOt2qvQIhGSJ/BcegnVo0Hw==","repository":"git+https://github.com/rohitg00/agentmemory.git","license":"Apache-2.0","engines":{"node":">=20.0.0"}},
+    {"package":"@agentmemory/mcp","version":"0.9.28","latest":"0.9.28","integrity":"sha512-yFcfvzJH6TM+f8nVjX5SVvNyicsB8nuODRdA8S/ua/LELwXu461m4H0usgVV77OIp5dmeCE4i8r06ZvFSkrvwg==","repository":"git+https://github.com/rohitg00/agentmemory.git","license":"Apache-2.0","engines":{"node":">=20.0.0"}}
+  ],
+  "verification": {
+    "registry_sri_and_tarball_bound_to_lock": true,
+    "latest_drift_fails_closed": true,
+    "credentials_present": false
+  }
+}

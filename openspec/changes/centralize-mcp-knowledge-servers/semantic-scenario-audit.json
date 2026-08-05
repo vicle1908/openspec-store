@@ -1,0 +1,42 @@
+{
+  "schema": "centralize-mcp-semantic-audit/v1",
+  "change": "centralize-mcp-knowledge-servers",
+  "structural_validation": {
+    "focused": "PASS",
+    "full": "PASS: 357/357"
+  },
+  "delta_specs": [
+    {
+      "spec": "developer-code-intelligence",
+      "requirements": 5,
+      "scenarios": 38,
+      "normative_keywords": 21,
+      "sha256": "96e8b85e612e55012bc1d71799640d65664e89bd2b927a99a7fa44f078ab5dcd"
+    },
+    {
+      "spec": "developer-memory",
+      "requirements": 3,
+      "scenarios": 12,
+      "normative_keywords": 13,
+      "sha256": "b5897b6afc5ca1eb37b5cb3185898b6d4b3fec2a2980e23cfc56e7aa9940135f"
+    },
+    {
+      "spec": "operational-readiness",
+      "requirements": 1,
+      "scenarios": 7,
+      "normative_keywords": 6,
+      "sha256": "e25db719a1d0ff4104b1ddc1ddbfff5941befffaf5e23b8c66269fb7bdb8d0f7"
+    }
+  ],
+  "totals": {
+    "specs": 3,
+    "requirements": 9,
+    "scenarios": 57,
+    "normative_keywords": 40
+  },
+  "semantic_review": {
+    "status": "PASS",
+    "method": "Enumerated every Requirement and Scenario header after the reviewed amendments; verified every requirement retains at least one scenario and normative SHALL/MUST language; final exact-tree review approved the reconciled source/spec/documentation boundary.",
+    "engineering_approval_separate_from_structural_validation": true
+  }
+}
