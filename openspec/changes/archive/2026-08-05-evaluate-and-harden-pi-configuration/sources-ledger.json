@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": 1,
+      "url": "https://pi.dev/docs/latest/usage",
+      "title": "Pi Usage",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 2,
+      "url": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/settings.md",
+      "title": "Pi Settings",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 3,
+      "url": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/security.md",
+      "title": "Pi Security",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 4,
+      "url": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/packages.md",
+      "title": "Pi Packages",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 5,
+      "url": "https://pi.dev/docs/latest/extensions",
+      "title": "Pi Extensions",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 6,
+      "url": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md",
+      "title": "Pi Skills",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 7,
+      "url": "https://pi.dev/docs/latest/sdk",
+      "title": "Pi SDK",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 8,
+      "url": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/rpc.md",
+      "title": "Pi RPC",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 9,
+      "url": "https://pi.dev/news/releases",
+      "title": "Pi Releases",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 10,
+      "url": "https://github.com/nicobailon/pi-mcp-adapter",
+      "title": "pi-mcp-adapter",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 11,
+      "url": "https://github.com/nicobailon/pi-subagents",
+      "title": "pi-subagents",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 12,
+      "url": "https://github.com/nicobailon/pi-web-access",
+      "title": "pi-web-access",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 13,
+      "url": "https://github.com/apmantza/pi-lens",
+      "title": "pi-lens",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 14,
+      "url": "https://github.com/tintinweb/pi-gitnexus",
+      "title": "pi-gitnexus",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 15,
+      "url": "https://github.com/nicobailon/pi-intercom",
+      "title": "pi-intercom",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 16,
+      "url": "https://pi.dev/packages",
+      "title": "Pi Package Catalog",
+      "accessed": "2026-08-05"
+    },
+    {
+      "id": 17,
+      "url": "https://rywalker.com/research/pi",
+      "title": "Independent Pi Evaluation",
+      "accessed": "2026-08-05"
+    }
+  ]
+}
