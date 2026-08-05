@@ -23,6 +23,13 @@
        installer and pass preflight using the repo-local tool directory.
 - [ ] 15. Create the toolchain upgrade PR and require every executed PR check to
        pass before merge.
+- [x] 16. Diagnose the toolchain PR Gitleaks failure as an immutable CRD checksum
+       false positive and add a narrow expiring fingerprint waiver.
+- [x] 17. Diagnose shipping-focused evidence showing two concurrent `201`
+       responses and no in-progress code.
+- [x] 18. Add a bounded focused stub delay and unit regression test.
+- [ ] 19. Pass the real focused Shipping cohort and all remaining PR checks on
+       the corrected commit.
 
 ## Evidence
 

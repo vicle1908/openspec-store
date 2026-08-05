@@ -70,3 +70,20 @@ The repository installer SHALL verify upstream checksums, and the External
 Secrets CRD bundle SHALL be pinned by immutable commit plus repository-recorded
 SHA-256. Preflight SHALL fail on version drift and pass when invoked with the
 repo-installed tool directory first in `PATH`.
+
+### Deterministic focused Shipping concurrency
+
+The focused Shipping pilot requires two concurrent calls to prove exactly one
+provider side effect, retained replay, conflict behavior, and an explicit
+`operation_in_progress` response. A zero-delay stub may complete before the
+second caller observes the in-progress state, yielding two `201` responses and
+making the evidence timing-dependent. The focused cohort SHALL set a bounded
+one-second stub dispatch delay. Unit tests SHALL constrain the delay to 500 ms
+through 5 seconds so it exposes concurrency without materially extending the
+cohort.
+
+The External Secrets CRD checksum is immutable integrity data, not a credential.
+When the generic-api-key detector flags a changed checksum, the repository MAY
+add only the exact commit/file/rule/line fingerprint to `.gitleaksignore`, with
+owner, review date, expiry, and false-positive classification in the waiver
+manifest. Broad path or rule suppression is prohibited.

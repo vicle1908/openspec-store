@@ -86,3 +86,22 @@ pinned, and installers SHALL verify upstream checksums before activation.
 - **WHEN** an operator runs preflight with a different kind or kubectl version
 - **THEN** preflight SHALL fail before creating containers or clusters
 - **AND** diagnostics SHALL identify the mismatched tools.
+
+### Requirement: Focused Shipping concurrency evidence is deterministic
+
+The focused Shipping cohort SHALL use a bounded stub dispatch delay sufficient
+for concurrent callers to observe an in-progress operation while preserving
+exactly one provider side effect.
+
+#### Scenario: Concurrent HTTP dispatch exposes in-progress state
+
+- **WHEN** two callers submit the same focused Shipping operation concurrently
+- **THEN** one operation SHALL be created and retained
+- **AND** the competing caller SHALL observe `operation_in_progress`
+- **AND** replay SHALL return the retained result without a duplicate side effect.
+
+#### Scenario: Focused delay remains bounded
+
+- **WHEN** the focused environment is constructed
+- **THEN** its stub dispatch delay SHALL be at least 500 milliseconds
+- **AND** SHALL not exceed 5 seconds.

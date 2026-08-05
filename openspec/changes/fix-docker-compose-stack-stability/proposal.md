@@ -26,6 +26,8 @@ effective job permission was already `packages: write`.
 - Add regression validation and operator documentation for the startup contract.
 - Upgrade the local Kubernetes validation toolchain to the latest upstream
   releases verified on 2026-08-05.
+- Make the focused Shipping concurrency probe deterministic so it reliably
+  observes the required in-progress response before stub completion.
 - Record the real GitHub CI evidence and the known GHCR limitation.
 
 ## Out of Scope
