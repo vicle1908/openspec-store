@@ -75,21 +75,23 @@
 
 ## Phase 5: Standardize Existing Pre-Commit Configs (3 tasks)
 
-- [ ] 5.1 Update Pattern A repos (agent-core, docs-sync, harness) — update revs and normalize hook IDs:
-  - **Normalize hook ID**: `ruff-check` → `ruff` (agent-core, docs-sync, harness all use `ruff-check`)
+- [ ] 5.1 Update Pattern A repos (agent-core, docs-sync, harness) — update revs to canonical:
   - ruff-pre-commit v0.15.15 → v0.16.1
   - Add uv-pre-commit hook
   - Add pre-commit-hooks v6.0.0
   - Keep local mypy/pytest hooks with `uv run --frozen`
+  - Hook ID already correct (`ruff-check`) — no change needed
 - [ ] 5.2 Update Pattern B repos (ai-review, tdt-core, webhook-receiver) — add local mypy/pytest hooks:
   - Add uv run --frozen mypy + pytest local hooks
   - Add uv-pre-commit hook
   - Update ruff-pre-commit to v0.16.1
+  - **Normalize hook ID**: `ruff` (legacy) → `ruff-check` (official current ID per astral-sh/ruff-pre-commit)
   - **ai-review**: update pre-commit-hooks v5.0.0 → v6.0.0
 - [ ] 5.3 Update Pattern C repos (jira-\*, browser-cli, ops-auto) — update revs:
   - Update gitleaks v8.30.0 → v8.30.1
   - Update ruff-pre-commit v0.16.0 → v0.16.1
   - Add uv-pre-commit hook
+  - **Normalize hook ID**: `ruff` (legacy) → `ruff-check` (official current ID)
   - Keep shellcheck/shfmt/actionlint
 
 ## Phase 6: Cross-Repo Dependency Contracts (2 tasks)

@@ -31,10 +31,11 @@
 ### HIGH (4)
 
 **H1: Hook ID discrepancy across repos**
-- agent-core, agent-docs-sync, agent-harness use hook ID `ruff-check`
-- All other repos use hook ID `ruff`
-- Canonical template uses `ruff`
-- **Resolution**: Task 5.1 must normalize agent-* repos from `ruff-check` → `ruff`
+- Official astral-sh/ruff-pre-commit defines: `ruff-check` (current), `ruff-format` (current), `ruff` (legacy alias)
+- agent-core, agent-docs-sync, agent-harness use correct `ruff-check`
+- All other repos use legacy `ruff`
+- Canonical template uses `ruff-check` ✓
+- **Resolution**: Tasks 5.2/5.3 normalize legacy `ruff` → `ruff-check`
 
 **H2: Unpinned cross-repo dependencies (more repos than initially identified)**
 - agent-harness: agent-core (no version), tdt-core[scheduler,jira] (no version)
@@ -86,10 +87,21 @@
 - Some repos use different formatting (spaces, quotes)
 - **Resolution**: Task 7.1 should verify the script works across all formatting variants
 
+## Official Source Validation (Round 2)
+
+| Source | Finding | Impact |
+|--------|---------|--------|
+| **astral-sh/ruff-pre-commit** `.pre-commit-hooks.yaml` | `ruff-check` = current, `ruff` = legacy alias | Fixed canonical template to use `ruff-check` |
+| **astral-sh/uv-pre-commit** `.pre-commit-hooks.yaml` | `uv-lock` hook runs `uv lock` on pyproject.toml/uv.lock changes | Confirmed uv-pre-commit design is correct |
+| **astral.sh/ruff/rules** | Default rules: E, F, B, UP, RUF. Over 900 rules total. TCH + TC are compatible | Canonical 19-rule set verified compatible |
+| **astral.sh/ruff/configuration** | `target-version = "py314"` officially supported; infers from `requires-python` if not set | tdt-observability needs `target-version = "py314"` |
+| **uv workspaces docs** | "Not suited for cases where members desire separate venv" — path deps preferred for independent repos | Confirms our template-based approach is correct for 16 independent repos |
+| **pre-commit docs** | `pre-commit autoupdate` for version management; local hooks use `language: system` | `uv run --frozen` in local hooks confirmed correct |
+
 ## Recommended Actions
 
 1. **Before execution**: Create a S violation triage plan — decide which violations to fix vs ignore
 2. **Phase 0 pilot**: Include tdt-observability as a 4th edge-case repo (not just agent-core, tdt-core, jira-skill)
 3. **Task 6.1**: Expand scope to cover ALL 7 unpinned repos (agent-harness, ai-review, code-daily-scan, jira-daily-reports, webhook-receiver + jira-skill)
-4. **Task 5.1**: Normalize hook IDs from `ruff-check` → `ruff` in agent-* repos
+4. **Tasks 5.2/5.3**: Normalize hook IDs from legacy `ruff` → `ruff-check` (official current ID)
 5. **Task 3.3**: Add S violation triage step after `ruff --fix`
