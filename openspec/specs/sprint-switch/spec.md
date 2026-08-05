@@ -202,9 +202,10 @@ The following stale backup files SHALL be deleted:
 
 ### Requirement: Legacy state migration code SHALL be removed
 
-The `migrate_legacy_state_file` and `migrate_legacy_state_dir` calls in
-`tdt_sheet.py` and `webhook-receiver/settings.py` were dead code (migration
-completed). They have been removed as part of the
+The runtime SHALL NOT contain or execute the obsolete
+`migrate_legacy_state_file` and `migrate_legacy_state_dir` calls in
+`tdt_sheet.py` and `webhook-receiver/settings.py`. The migration is complete,
+and those dead-code paths were removed by the
 `simplify-tdt-home-config-loading` change.
 
 #### Scenario: After removal
