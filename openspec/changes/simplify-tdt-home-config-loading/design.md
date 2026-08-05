@@ -98,4 +98,28 @@ diagnostics, profile selection.
   behavior; update test_paths.py tests that reference migration shims
 - `jira-daily-reports` tests: update any test that mocks migration calls
 - `webhook-receiver` tests: update any test that mocks migration calls
-- Run full test suites for all 3 affected repos
+- Run full test suites for all affected repos
+
+## Gap Analysis & Resolutions
+
+### Resolved by design (no code changes needed)
+
+| Gap | Resolution |
+|-----|-----------|
+| **YAML `${SCHEDULER_POSTGRES_DSN}` resolution** | `config_ownership.py` validates all `${VAR}` references via `classify_secret_key` + `validate_env_reference`. `postgres_dsn` matches the `dsn` pattern, so the YAML reference IS validated and resolved against `os.environ` after `.env` loading. No code change needed. |
+| **config.toml secrets injected as plain env vars** | Current config.toml keys (sprint IDs, filter IDs, board IDs, timezone) do not match `classify_secret_key` patterns (`secret`, `password`, `token`, `api_key`, `dsn`, `credential`). No secret-shaped keys exist. Documented as a guardrail: if future keys are secret-shaped, `load_sprint_config` should validate via `config_loader.classify_secret_key`. |
+| **Two config formats without cross-section validation** | `config_ownership.py` validates the `scheduler` section across both TOML and YAML. Other sections (sprint, Jira, person capacity) are TOML-only. No cross-section conflict is possible by design. |
+
+### Fixed in this change
+
+| Issue | Resolution |
+|-------|-----------|
+| **webhook-receiver missing `utils` package** | Created `src/webhook_receiver/utils/` with `logging.py` (get_logger, setup_logging, rotate_log_if_needed) and `health.py` (HealthChecker). These were dead imports from a deleted module. |
+| **webhook-receiver ruff import sorting** | Fixed via `ruff check --fix` in `api/app.py`. |
+| **jira-skill `ensure_env_loaded` import** | Replaced with `load_tdt_env` in `env.py` and `config.py`. |
+
+### Documented as future improvement
+
+| Gap | Notes |
+|-----|-------|
+| **Startup env var inventory validation** | `tdt config doctor` could verify that all env vars required by enabled services are present in the resolved environment. Currently missing vars fail at point-of-use. Not critical — credentials are validated by `config_loader` when accessed. |
