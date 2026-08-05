@@ -25,13 +25,14 @@
 ## Phase 4: Consumer Migration ✅
 - [x] Backward-compat shims keep all consumers working
 - [x] Verify jira-daily-reports tests (642 pass)
-- [x] Verify jira-skill tests (1742 pass)
-- [x] Verify jira-epic-report tests (631 pass)
-- [x] Verify code-daily-scan tests (492 pass)
-- [x] Verify tdt-sheets tests (236 pass)
+- [x] Verify jira-skill tests (1737 pass, 5 pre-existing Redis errors)
+- [x] Verify jira-epic-report tests (631 pass, 5 pre-existing failures)
+- [x] Verify code-daily-scan tests (493 pass, 1 pre-existing failure)
+- [x] Verify tdt-sheets tests (236 pass, 5 pre-existing failures)
 
 ## Phase 5: Cleanup ✅
 - [x] Update OpenSpec change status
 - [x] Commit tdt-core changes
 - [x] Verify all repos pass tests
 - [x] Document migration guide
+- [x] Archive change in openspec-store
