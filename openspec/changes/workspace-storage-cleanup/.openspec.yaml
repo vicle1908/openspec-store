@@ -1,5 +1,3 @@
-change:
-  name: workspace-storage-cleanup
-  description: "Disk cleanup: remove caches, stale data, optimize storage"
-  skip_specs: true
-  status: in-progress
+schema: spec-driven
+created: 2026-08-05
+skip_specs: true
