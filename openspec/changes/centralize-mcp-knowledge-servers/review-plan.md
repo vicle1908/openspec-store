@@ -1,8 +1,34 @@
 # Plan Review: centralize-mcp-knowledge-servers
 
-**Reviewed:** 2026-08-04 Asia/Ho_Chi_Minh
-**Status:** REVISED FOR LATEST-STABLE UPGRADE — pending final provider re-review
-**Scope:** OpenSpec planning artifacts plus bounded registry/upstream and `go-microservices` evidence. No package installation, live configuration, router database, provider index, memory store, or process was mutated.
+**Reviewed:** 2026-08-05 Asia/Ho_Chi_Minh
+**Status:** MCP ROUTER APP AMENDMENT — APPROVED FOR SOURCE IMPLEMENTATION
+**Scope:** OpenSpec planning artifacts plus bounded registry/upstream,
+`go-microservices`, and `mcp-router` source evidence. No package installation,
+installed-app replacement, live configuration, router database, shared token
+config, provider index, memory store, or process mutation occurred.
+
+## MCP Router app amendment review
+
+First amendment review returned NO-GO. Evidence-backed blockers were incorporated:
+
+- split writer ownership between provider/client config and MCP Router app state;
+- prohibit external router SQLite/shared-config writes and supersede the old
+  provider-only generation;
+- limit token ownership to existing-token access maps with no token lifecycle or
+  raw-value handling;
+- require safeStorage fail-closed encrypted recovery, durable journaling,
+  all-target preflight, commit point, compensation, runtime/cache restoration,
+  and authenticated single-instance command files;
+- enforce true RED→GREEN order, disposable packaged-app rehearsal, distinct
+  transaction-bearing build identity, release/rollback artifact qualification,
+  full per-client access acceptance, and complete app rollback;
+- retain exact latest-stable release evidence for desktop `0.6.3`, published CLI
+  `0.2.0`, GitNexus `1.6.9`, Graphify `0.17.1`, and AgentMemory `0.9.28`.
+
+Focused strict validation passes. Current full-store strict validation is
+348/349 because unrelated `sprint-switch` requirement 12 is invalid; the
+aggregate gate is not reported as PASS. Exact-tree re-review is required before
+source implementation.
 
 ## Latest-stable registry evidence
 
@@ -18,12 +44,14 @@ Exact npm SRI and shasum values were captured during planning but are not repeat
 
 | Gate | Status | Evidence |
 |---|---|---|
-| Focused strict OpenSpec validation | PENDING AFTER VERSION REVISION | Must rerun after this amendment. |
-| Full strict store validation | PASS BEFORE VERSION REVISION | 357 passed, 0 failed. |
-| Baseline scenario preservation | PENDING AFTER VERSION REVISION | Exact audit must include newly MODIFIED Graphify extraction contract. |
-| Durable scenario/test traceability | REVISED | Stable IDs, migration fixtures, router-only memory verification, and package provenance tasks are specified. |
+| Focused strict OpenSpec validation | PASS | Exact amended change validates. |
+| Full strict store validation | NONZERO: 348/349 | Only unrelated `sprint-switch` requirement 12 fails; aggregate is not PASS. |
+| MCP Router app semantic audit | PASS | Exact current operational-readiness SHA/scenarios/normative count retained in `mcp-router-app-amendment-audit.json`. |
+| Durable scenario/test traceability | REVISED | `ROUTER-APP-001..003`, provider migrations, access-map-only token handling, and package provenance tasks are specified. |
+| Delegated five-lens amendment review | APPROVED FOR SOURCE IMPLEMENTATION | First-round blockers were incorporated and final exact-tree narrow review approved. |
+| Named native five-provider task 1.3 | PENDING | Do not infer completion from delegated lenses. |
 | Archive readiness | NOT READY | Implementation and approval tasks remain incomplete. |
-| Implementation | NOT REVIEWED | Current source/installations remain unchanged and form the RED/migration baseline. |
+| Implementation | NOT STARTED | Worktree setup/frozen lock only; no source or live state changed. |
 
 ## Critical provider findings and disposition
 
@@ -37,7 +65,7 @@ The initial delegated review found version conflict, missing Graphify enforcemen
 - Graphify migration preserves legacy `graphify-out/`, builds `.graphify/`, compares behavior, and blocks cutover if parity is not demonstrated.
 - Eligibility remains read-only; package installs, graph rebuilds, engine upgrades/startup, and schema migrations require separately approved prerequisite generations.
 
-Final provider re-review is required.
+The delegated amendment exact-tree re-review approved source implementation; named native five-provider completion remains required before task 1.3 is checked.
 
 ### Claude Code security
 
@@ -51,9 +79,9 @@ Earlier findings remain applicable: fail-closed AgentMemory transport, filtered 
 
 Earlier approval-with-warnings is no longer sufficient after the Graphify runtime/package migration; architecture must be re-reviewed. The hard `optimize-hermes-agent-configuration` dependency remains.
 
-### fable-5/Kimi product scope
+### Fifth delegated product-scope lens
 
-UNKNOWN. A valid fifth-provider result or explicit operator acceptance of UNKNOWN remains required.
+The first amendment review completed this lens and its version/scope findings were incorporated. This does not satisfy the separate named native provider evidence required by task 1.3.
 
 ## Required final gates
 

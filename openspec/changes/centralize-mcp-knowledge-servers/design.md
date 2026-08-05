@@ -10,7 +10,12 @@ The providers have different native sharing models:
 - Pinned `0.9.28` schema inspection shows `memory_save` does not accept or forward `agentId`; the boundary therefore appends a reserved server-derived audit concept for saves and injects `agentId` only for native tools whose input schema declares it. Caller-supplied reserved attribution is rejected.
 - Hermes native memory is a separate profile/personal-memory facility and is not an AgentMemory transport.
 
-The canonical implementation owner is `go-microservices`: `scripts/knowledge-tools.sh` owns knowledge-tool setup and verification, while `scripts/agentmemory-bootstrap.sh` owns AgentMemory installation and client wiring. The live MCP Router database and user-level client configs are runtime surfaces, not repository source.
+Implementation ownership is split without overlap. `go-microservices` owns
+provider boundaries, read-only topology, provider prerequisites, and
+client-config planning/transactions; it MUST NOT write or restore MCP Router's
+database or shared token config. `mcp-router` owns the app-native server and
+token-access transaction, running-app synchronization, protected router backup,
+and restore. User-level client configs remain approval-gated runtime surfaces.
 
 The active `optimize-hermes-agent-configuration` change treats the existing MCP Router definition as immutable except for a parallel-call flag. This change therefore cannot mutate Hermes or MCP Router live state until that invariant is reconciled through sequential OpenSpec review.
 
@@ -31,13 +36,71 @@ The active `optimize-hermes-agent-configuration` change treats the existing MCP 
 - Replace MCP Router with a new service or expose it beyond loopback.
 - Remove AgentMemory hooks/skills, Hermes native memory, or project-native Graphify/GitNexus skills.
 - Purge local indexes, memory data, sessions, or generated evidence.
-- Modify `mcp-router` source unless repository-native investigation proves a router defect must be fixed rather than avoided by supported topology. The initial design avoids a source change there.
+- Replace MCP Router or broaden its source changes beyond the bounded app-native
+  server/token-access transaction and its security/release verification.
 
 ## Decisions
 
 ### D1. MCP Router is the sole client-facing gateway
 
 Each supported MCP client retains exactly one authorized MCP Router connection. MCP Router owns one GitNexus child, one Graphify child, and one AgentMemory shim. A bridge process per active client is expected; provider subprocesses per active client are not.
+
+The already running MCP Router desktop app is the authoritative adapter and
+live configuration owner. The selected stable versions are desktop app `0.6.3`
+and published stdio bridge `@mcp_router/cli@0.2.0`; both are latest stable at
+the amendment review point. Coding-agent configs pin the bridge version or use
+an app-supported native integration. Floating `@latest` selectors are rejected.
+
+MCP Router gains one app-native declarative transaction surface for this
+bounded topology. Preview validates exact app/database/shared-config identity,
+server-name uniqueness, child commands/env placeholders, token client aliases,
+least-privilege access, and expected pre/post state without mutation. Apply and
+restore execute through `MCPServerManager`, `McpServerManagerRepository`,
+`TokenManager`, and `SharedConfigManager`, preserving safeStorage handling,
+in-memory name maps, lifecycle events, and token cleanup. External automation
+MUST NOT write `mcprouter.db` or `shared-config.json` directly.
+
+The established single-instance command channel carries only canonical paths
+and digests. Preview accepts a current-UID mode-0600 regular plan file and may
+run without approval. Apply/restore additionally require a separate
+current-UID mode-0600 capability bound to generation and digest. The app mints
+a random single-use challenge, displays the exact operation/generation/digest in
+its trusted BrowserWindow, validates the confirming renderer origin/webContents,
+and issues a short-lived MACed capability. The MAC key remains encrypted under
+`safeStorage`; challenge/capability expiry, consumption, replay rejection, and
+recovery after app restart are explicit. A Slack/chat `GO` is necessary
+governance evidence but cannot substitute for the in-app capability. The
+already running main process handles the request only after initialization,
+holds one generation lock, invokes app services, and publishes a mode-0600
+redacted result to a canonical caller-supplied path. No network administration
+endpoint or token-bearing command-line argument is introduced.
+
+This change owns only per-token server-access booleans for existing approved
+coding-agent tokens. It does not create, rotate, delete, export, or restore raw
+token values. Plans and evidence identify tokens by client alias plus a stable
+one-way fingerprint computed inside the app; no token value appears in command
+arguments, IPC results, logs, exceptions, journals, or manifests. Exact
+access-map deltas preserve unrelated true/false/absent entries, reject unknown
+server IDs and ambiguous aliases, and fail on missing, duplicate, or expired
+tokens. Existing expired-token acceptance is corrected for this admin boundary.
+Rollback snapshots only the access-map booleans, client aliases, and one-way
+token fingerprints. Raw tokens remain in place. Restore requires the same token
+fingerprint; token creation/rotation/deletion is third-state drift and blocks
+automation rather than restoring secret material.
+
+All targets are preflighted before mutation. The app atomically publishes a
+durable redacted recovery journal before the first write, revalidates identities
+before every publication and compensation step, defines one commit point, and
+compensates in reverse order. Secret-bearing backup material is encrypted by
+`safeStorage`; unavailability is a blocker. Compensation failure produces a
+contained manual-recovery state and leaves the app mutation lock held.
+
+The app-wide lock rejects concurrent server/token/workspace writers. Affected
+children are quiesced after recording their running state. Commit refreshes
+repository caches/name maps and restarts only previously running children;
+lifecycle events publish only after commit. Compensation restores persisted and
+runtime state. Workspace switching or unexpected writes cause third-state
+refusal.
 
 Alternative: retain direct providers and use MCP Router only for other tools. Rejected because it preserves repeated processes, tool duplication, and fallback-store fragmentation.
 
@@ -90,6 +153,12 @@ No automatic dual-write is introduced. Existing content is not migrated or dedup
 
 `go-microservices` gains one topology model and redacted diagnostics used by setup, doctor, status, tests, and cutover planning. Source functions operate against explicit fixture roots/config paths so regression tests never touch real user config.
 
+Its transaction may parse router SQLite fixtures for read-only discovery and
+plan identity only. Production apply/restore MUST reject router database or
+shared-config targets with a typed `app-owned` result and emit the bounded MCP
+Router app generation reference. Only client configuration files remain writable
+through the provider repository transaction.
+
 The implementation follows vertical RED→GREEN slices:
 
 1. duplicate configuration/process detection;
@@ -111,13 +180,28 @@ The source implementation and plan-review approval do not authorize live mutatio
 
 Transaction scope is configuration entries only. Provider data/index directories are canaries and must remain unchanged except for separately approved freshness refreshes completed before the cutover transaction.
 
+The previously committed provider-only generation
+`prereq-e8d79b8d0a27b45a` is superseded because it excludes MCP Router app and
+bridge configuration. It MUST NOT be executed. A replacement generation binds
+the current app/CLI/provider latest-stable evidence and app-native transaction
+artifact, while live apply remains subject to a later digest-bound `GO`.
+
 ### D8. Backup and rollback are format-aware
 
 Before mutation, the cutover tool records each target config as regular file, symlink, or absent; preserves mode, digest, and protected payload reference; and records the relevant MCP Router database backup and schema/version. Backups are stored under an ignored mode-0700 evidence root with payload files mode 0600.
 
 JSON, JSONC, TOML, YAML, and SQLite are not rewritten through one generic serializer. Each client uses its native CLI where that CLI can remove only the targeted server safely; otherwise a format-aware editor performs a minimal structural edit and validates the format. JSONC comments must be preserved. Unknown formats or unsupported symlinks fail eligibility.
 
-Rollback restores exact bytes and metadata for files and the router database only when current state matches either the approved pre-state or approved post-state. State identity uses SHA-256 content digest plus object kind, mode, owner/group policy, and symlink text; mtime alone is non-authoritative. Third-state drift stops automated rollback. The SQLite backup uses the SQLite online backup API or a verified quiesced file copy, records database integrity and schema/user version, and refuses restore across an unapproved schema version.
+Rollback restores exact bytes and metadata for files and the router database only when current state matches either the approved pre-state or approved post-state. State identity uses SHA-256 content digest plus object kind, mode, owner/group policy, and symlink text; mtime alone is non-authoritative. Third-state drift stops automated rollback. The MCP Router app transaction alone invokes SQLite online backup, integrity,
+schema/user-version verification, and restore. External automation MUST NOT
+open an SQLite write connection, issue SQL, replace the database file, or write
+`shared-config.json`. App-owned restore quiesces and closes affected connections,
+restores through its audited boundary, reopens storage, resets repositories and
+managers, reloads caches, and verifies logical plus promised exact identity
+before restarting prior children. Shared-config rollback is access-map-only via
+app services and preserves token values in place; no full shared-config payload
+is backed up or replaced. Any internal secret-bearing journal field is
+safeStorage-encrypted; mode 0600 alone is insufficient.
 
 ## Risks / Trade-offs
 
@@ -196,6 +280,9 @@ Rollback restores exact bytes and metadata for files and the router database onl
 | MEM-002 | Cross-client shared recall is verified | `agentmemory-boundary-test --two-clients --identity-proof --timeout-policy` | distinct server-derived IDs, same engine identity, bounded cross-client recall | `artifacts/verification/memory-cross-client.out` |
 | CFG-001 | Setup is repeated | `knowledge-setup-test --repeat 2` | no duplicate router/provider/bridge entries; unrelated state unchanged | `artifacts/verification/setup-idempotency.json` |
 | ROL-001 | Backup/restore is exercised | `knowledge-cutover-test --synthetic --apply 2 --restore 2` | exact bytes/modes/hashes, JSONC comments, SQLite integrity/schema, third-state refusal | `artifacts/verification/rollback-cycles.json` |
+| ROUTER-APP-001 | App configuration is previewed | shared package plan tests plus packaged-app command E2E | exact pins/identities/aliases/access delta; no mutation or secrets | `artifacts/verification/router-app-preview.json` |
+| ROUTER-APP-002 | App configuration is applied | packaged-app approved-generation E2E | service-owned server/token updates, preserved unrelated state, compensated failure | `artifacts/verification/router-app-apply.json` |
+| ROUTER-APP-003 | App configuration is restored | packaged-app post-state restore E2E | exact approved pre-state restored through app services; replay/drift refused | `artifacts/verification/router-app-restore.json` |
 | LIVE-001 | Client cutover succeeds | approval-gated live acceptance | router-mediated read-only calls pass; no duplicate providers remain; hooks/skills/indexes preserved | `artifacts/verification/live-acceptance.json` |
 
 Every modified or added specification scenario is mapped by exact scenario name to one of these IDs or to the DM verification table in the developer-memory delta. The semantic audit stores its machine-readable scenario-name comparison alongside this matrix.

@@ -1,0 +1,68 @@
+{
+  "focused_validation": "PASS",
+  "full_store_validation": {
+    "failed": 1,
+    "passed": 348,
+    "status": "NONZERO",
+    "unrelated_failure": "sprint-switch requirement 12 normative body"
+  },
+  "new_scenarios": [
+    "MCP Router app configuration is previewed",
+    "MCP Router app configuration is applied",
+    "MCP Router app configuration is restored"
+  ],
+  "normative_count": 31,
+  "normative_line_counts": {
+    "11": 1,
+    "12": 1,
+    "13": 1,
+    "18": 1,
+    "19": 1,
+    "22": 1,
+    "23": 1,
+    "24": 1,
+    "27": 1,
+    "28": 1,
+    "29": 1,
+    "3": 1,
+    "31": 1,
+    "33": 1,
+    "34": 1,
+    "35": 1,
+    "36": 1,
+    "38": 1,
+    "40": 2,
+    "43": 1,
+    "44": 1,
+    "48": 1,
+    "5": 5,
+    "7": 1,
+    "8": 1,
+    "9": 1
+  },
+  "normative_metric": "count of exact whole-word SHALL or MUST tokens, including requirement headers",
+  "requirements": [
+    "Agent configs SHALL be wired for all supported agents"
+  ],
+  "scenario_count": 10,
+  "scenarios": [
+    "MCP Router app configuration is previewed",
+    "MCP Router app configuration is applied",
+    "MCP Router app configuration is restored",
+    "Claude settings reference correct MCP servers",
+    "Cursor MCP config includes all required tools",
+    "Effective client topology is audited",
+    "Duplicate direct knowledge server is detected",
+    "Live client cutover is authorized",
+    "Client cutover succeeds",
+    "Client cutover fails"
+  ],
+  "schema": "centralize-mcp-router-app-amendment-audit/v2",
+  "sha256": "39eaf3975aa02d1fc0ffc2d2b5ac202110baa2be230bcf3e20dfd4aafd4865d6",
+  "spec": "operational-readiness",
+  "verification_ids": {
+    "MCP Router app configuration is applied": "ROUTER-APP-002",
+    "MCP Router app configuration is previewed": "ROUTER-APP-001",
+    "MCP Router app configuration is restored": "ROUTER-APP-003"
+  }
+}

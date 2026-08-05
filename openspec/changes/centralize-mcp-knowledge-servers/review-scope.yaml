@@ -1,24 +1,33 @@
 change_name: centralize-mcp-knowledge-servers
 
 planning:
-  repository: /Users/androidteam/Developer/.worktrees/openspec-centralize-mcp-knowledge-servers
+  repository: /Users/androidteam/Developer/.worktrees/openspec-centralize-mcp-router-app-adapter
   base: main
-  head: chore/centralize-mcp-knowledge-servers
+  head: chore/centralize-mcp-router-app-adapter
 
 repositories:
   - path: /Users/androidteam/Developer/go-microservices
-    ownership: sole implementation repository; future isolated worktree required
+    ownership: provider boundaries, topology, provider prerequisite and client transaction fixtures
     base: main
     head: planned dedicated worktree
     focused_test_command: make knowledge-test
     shell_check_command: bash -n scripts/knowledge-tools.sh scripts/agentmemory-bootstrap.sh
     guidance_command: make validate-agent-guidance
     documentation_command: make validate-documentation
+  - path: /Users/androidteam/Developer/.worktrees/mcp-router-coding-agent-adapter
+    ownership: MCP Router app-native declarative server/token configuration transaction only
+    base: ad389663d31cfddad246dd0d2d43a86175b08774
+    head: feat/coding-agent-mcp-adapter
+    focused_test_command: npx pnpm@10.22.0 --filter @mcp_router/shared test
+    typecheck_command: npx pnpm@10.22.0 --filter @mcp_router/electron typecheck
+    format_command: npx pnpm@10.22.0 --filter @mcp_router/electron format:check
+    packaged_e2e_command: npx pnpm@10.22.0 --filter @mcp_router/electron test:e2e
 
 runtime_surfaces:
   authorization: separate operator GO required after source implementation and synthetic rehearsal
   includes:
     - redacted MCP Router server registry and database identity
+    - MCP Router app version, app-owned server definitions, and token access shape
     - supported client MCP configuration entries
     - provider and bridge process-family inventory
     - canonical GitNexus, Graphify, and AgentMemory health metadata
@@ -27,6 +36,7 @@ runtime_surfaces:
     - memory payloads and session content
     - generated index payloads
     - live mutations, restarts, or process termination
+    - direct SQLite/shared-config writes outside MCP Router repository services
 
 specs:
   - developer-code-intelligence/spec.md

@@ -57,7 +57,8 @@ reconciliation passed the final exact-tree narrow review.
 - First-round five-provider implementation review found and drove fixes for
   publication symlink safety, topology owner spoofing, AgentMemory shim/tool
   alignment, registry SRI binding, and direct-wiring documentation. Round two
-  review is required before this slice is committed.
+  review approved that committed slice. A new five-provider review is required
+  for the MCP Router app amendment and its later implementation.
 - `make validate-documentation` remains non-zero because ignored coverage
   summaries and retained local acceptance evidence are absent; content/link
   checks passed.
@@ -113,7 +114,17 @@ reconciliation passed the final exact-tree narrow review.
   graphs plus legacy processes, unavailable AgentMemory engine/environment,
   enabled Mem0, and duplicate shim/process families. No mutation occurred.
 - **Task 8.3 — PARTIAL:** immutable prerequisite generation
-  `prereq-e8d79b8d0a27b45a` is committed but not approved or executed.
+  `prereq-e8d79b8d0a27b45a` is committed but superseded by the MCP Router app
+  adapter amendment. It is not approved and MUST NOT execute.
+- **MCP Router app adapter amendment — IN PROGRESS:** current desktop `0.6.3`
+  is latest stable and remains the authoritative running adapter. Published
+  bridge `@mcp_router/cli@0.2.0` is latest stable; repository source `0.2.1` is
+  unpublished and is not selected. App-native declarative configuration source,
+  review, replacement generations, and live approval remain incomplete.
+- **Current aggregate validation:** focused amended change validation passes.
+  Full-store strict validation is 348/349 because unrelated `sprint-switch`
+  requirement 12 lacks a normative sentence body; the aggregate is not reported
+  as PASS for this amendment.
 - **Sections 8–9 — BLOCKED:** dependency reconciliation does not authorize live
   MCP Router/client/provider/config/process mutation. Prerequisite approval and
   the later, separately bound cutover `GO` have not been granted.
