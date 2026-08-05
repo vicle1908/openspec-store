@@ -22,6 +22,7 @@ The workspace contains 16 Python repositories with significant drift in code qua
 - **tdt-sheets** (5 consumers), **jira-skill** (3 consumers), **agent-core** (3 consumers)
 - No dependency version contracts or minimum-version enforcement between repos
 - A breaking change in tdt-core can silently break 12 downstream repos
+- **Missing version pins**: jira-skill (`tdt-core[all]`, `tdt-sheets`), jira-daily-reports (`jira-skill`), jira-epic-report (`jira-skill`), jira-kanban (`tdt-core`, `tdt-sheets`) have NO version constraints
 
 ### Business Impact
 - Developers can't trust that passing quality checks in one repo means equivalent quality in another
@@ -32,11 +33,15 @@ The workspace contains 16 Python repositories with significant drift in code qua
 ## What Changes
 
 ### 1. Shared Tooling Config Template
-Create a canonical `pyproject.toml` tooling configuration template that all 16 Python repos adopt. This defines:
-- **Ruff**: Target rule set, line length, target version, ignore rules
-- **mypy**: Strict mode config, override patterns
+Create a canonical `pyproject.toml` tooling configuration template that all 16 Python repos adopt. Based on 5-provider review findings, this includes:
+- **Ruff**: Target rule set (17 rules including S for security), line length, target version, ignore rules, per-file-ignores for tests
+- **mypy**: `strict = true` + `warn_unused_configs` (strict already enables 8 of 10 flags)
 - **pytest**: Coverage thresholds, async mode, markers
 - **dependency-group versions**: Pinned minimum versions for ruff, mypy, pytest across all repos
+
+### 2a. Pilot Phase (NEW — from review H3)
+Apply enforcement to 3 representative repos first (agent-core, tdt-core, jira-skill) to validate
+the canonical config doesn't surface overwhelming violations before rolling out to all 16 repos.
 
 ### 2. Standardized Pre-Commit Hooks
 All 16 repos get identical pre-commit enforcement:
