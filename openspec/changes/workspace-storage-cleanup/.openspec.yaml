@@ -1,0 +1,5 @@
+change:
+  name: workspace-storage-cleanup
+  description: "Disk cleanup: remove caches, stale data, optimize storage"
+  skip_specs: true
+  status: in-progress
