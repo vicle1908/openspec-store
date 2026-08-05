@@ -18,7 +18,7 @@ compat bridge, no migration, no rollback.
 ### 1. `tdt-core/src/tdt_core/paths.py`
 
 **Remove entirely:**
-- Module docstring paragraph about migration shims (lines 19-25)
+- Module docstring paragraph about migration shims
 - `_unsafe_legacy_migration()` function
 - `legacy_xdg_share_path()` function
 - `legacy_top_level_state_path()` function
@@ -48,7 +48,9 @@ diagnostics, profile selection.
 
 **Update:**
 - `_load_toml()`: remove Python < 3.11 `tomli` fallback (Python 3.14 only)
-- `load_sprint_config()`: change all `os.environ.setdefault()` to `os.environ[key] = value`
+- `load_sprint_config()`: change all `os.environ.setdefault()` to `_inject_env()`
+- Add `_inject_env()` helper: validates keys against `classify_secret_key()` before
+  injecting into `os.environ`; rejects secret-shaped keys
 - Module docstring: remove "so existing os.getenv() calls work unchanged"
 - `load_sprint_config()` docstring: remove migration period note
 
@@ -79,6 +81,38 @@ diagnostics, profile selection.
 - Comment about JSONL merge
 - `migrate_legacy_state_file` import (also used in this file)
 
+### 7. `webhook-receiver/src/webhook_receiver/selftest.py`
+
+**Remove:**
+- `from tdt_core.paths import migrate_legacy_top_level_jsonl, tdt_state_path` →
+  `from tdt_core.paths import tdt_state_path`
+- `_migrated = migrate_legacy_top_level_jsonl(...)` call and comments
+
+### 8. `webhook-receiver/src/webhook_receiver/tailscale_health.py`
+
+**Remove:**
+- `from tdt_core.paths import migrate_legacy_state_file, tdt_state_path` →
+  `from tdt_core.paths import tdt_state_path`
+- Two `migrate_legacy_state_file(...)` calls
+
+### 9. `webhook-receiver/src/webhook_receiver/utils/` (NEW)
+
+**Create:**
+- `utils/__init__.py`
+- `utils/logging.py` — `get_logger()`, `setup_logging()`, `rotate_log_if_needed()`
+- `utils/health.py` — `HealthChecker` class
+
+### 10. `jira-skill/src/jira_skill/env.py`
+
+**Remove:**
+- `ensure_env_loaded` from import and `__all__`
+
+### 11. `jira-skill/src/jira_skill/config.py`
+
+**Update:**
+- `from .env import ensure_env_loaded` → `from .env import load_tdt_env`
+- `ensure_env_loaded()` → `load_tdt_env()`
+
 ## OpenSpec Changes
 
 ### Delete specs:
@@ -91,6 +125,7 @@ diagnostics, profile selection.
   authoritative config.toml injection requirement
 - `tdt-home-migration-engine` — simplify to plan+execute only (no recovery,
   no rollback, no journal chaining)
+- `sprint-switch` — mark migration requirement as fulfilled
 
 ## Testing
 
@@ -107,7 +142,7 @@ diagnostics, profile selection.
 | Gap | Resolution |
 |-----|-----------|
 | **YAML `${SCHEDULER_POSTGRES_DSN}` resolution** | `config_ownership.py` validates all `${VAR}` references via `classify_secret_key` + `validate_env_reference`. `postgres_dsn` matches the `dsn` pattern, so the YAML reference IS validated and resolved against `os.environ` after `.env` loading. No code change needed. |
-| **config.toml secrets injected as plain env vars** | Current config.toml keys (sprint IDs, filter IDs, board IDs, timezone) do not match `classify_secret_key` patterns (`secret`, `password`, `token`, `api_key`, `dsn`, `credential`). No secret-shaped keys exist. Documented as a guardrail: if future keys are secret-shaped, `load_sprint_config` should validate via `config_loader.classify_secret_key`. |
+| **config.toml secrets injected as plain env vars** | `_inject_env()` validates all destination environment-variable names against `classify_secret_key()`. Secret-shaped keys are rejected with a warning. Current config.toml keys do not match secret patterns, so this is a guardrail for future safety. |
 | **Two config formats without cross-section validation** | `config_ownership.py` validates the `scheduler` section across both TOML and YAML. Other sections (sprint, Jira, person capacity) are TOML-only. No cross-section conflict is possible by design. |
 
 ### Fixed in this change
@@ -115,8 +150,9 @@ diagnostics, profile selection.
 | Issue | Resolution |
 |-------|-----------|
 | **webhook-receiver missing `utils` package** | Created `src/webhook_receiver/utils/` with `logging.py` (get_logger, setup_logging, rotate_log_if_needed) and `health.py` (HealthChecker). These were dead imports from a deleted module. |
-| **webhook-receiver ruff import sorting** | Fixed via `ruff check --fix` in `api/app.py`. |
+| **webhook-receiver ruff import sorting** | Verified sorted correctly in `api/app.py`. |
 | **jira-skill `ensure_env_loaded` import** | Replaced with `load_tdt_env` in `env.py` and `config.py`. |
+| **Secret guardrail for config.toml injection** | Added `_inject_env()` to `config.py` — rejects secret-shaped keys from config.toml injection. |
 
 ### Documented as future improvement
 
