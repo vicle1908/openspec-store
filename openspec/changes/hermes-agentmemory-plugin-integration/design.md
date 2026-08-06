@@ -3,46 +3,46 @@
 ## Architecture Overview
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                    Hermes Agent Session                       │
-│                                                               │
-│  ┌─────────────┐    ┌──────────────────┐                     │
-│  │ Built-in     │    │ AgentMemory      │                     │
-│  │ Memory       │    │ Plugin           │                     │
-│  │ (MEMORY.md,  │    │ (~/.hermes/      │                     │
-│  │  USER.md,    │    │  plugins/        │                     │
-│  │  SQLite)     │    │  agentmemory/)   │                     │
-│  └─────────────┘    └────────┬─────────┘                     │
-│                              │ 6 hooks + 3 tools              │
-│                              │                                │
-│  ┌───────────────────────────▼─────────────────────────────┐ │
-│  │              Hermes Agent Loop                           │ │
-│  │  1. system_prompt_block → inject project profile         │ │
-│  │  2. prefetch → inject relevant memories before LLM       │ │
-│  │  3. sync_turn → capture conversation in background       │ │
-│  │  4. on_pre_compress → re-inject before compaction        │ │
-│  │  5. on_memory_write → mirror MEMORY.md to agentmemory    │ │
-│  │  6. on_session_end → mark session complete               │ │
-│  └──────────────────────┬──────────────────────────────────┘ │
-└─────────────────────────┼────────────────────────────────────┘
-                          │ HTTP REST (localhost:3111)
-                          ▼
-┌──────────────────────────────────────────────────────────────┐
-│              agentmemory Server (v0.9.28)                     │
-│  Port 3111: REST API + MCP Server                             │
-│  Port 3113: Real-time Viewer                                  │
-│  Engine: iii v0.11.2 (pinned binary)                          │
-│  Storage: ~/.agentmemory/data/                                │
-│  Embeddings: local (ollama fable-5.5-coder:7b)                  │
-│  Search: BM25 + vector + knowledge graph                      │
-└──────────────────────────────────────────────────────────────┘
-                          │
-┌─────────────────────────▼────────────────────────────────────┐
-│              mcp-router (transport hub)                       │
-│  Registered: agentmemory server (auto_start=1)                │
-│  Tools: mcp__mcp_router__memory_* (54 tools)                 │
-│  Available to: Hermes, Claude Code, Codex, OpenCode, Pi       │
-└──────────────────────────────────────────────────────────────┘
++--------------------------------------------------------------+
+|                    Hermes Agent Session                       |
+|                                                               |
+|  +-------------+    +------------------+                     |
+|  | Built-in     |    | AgentMemory      |                     |
+|  | Memory       |    | Plugin           |                     |
+|  | (MEMORY.md,  |    | (~/.hermes/      |                     |
+|  |  USER.md,    |    |  plugins/        |                     |
+|  |  SQLite)     |    |  agentmemory/)   |                     |
+|  +-------------+    +--------+---------+                     |
+|                              | 6 hooks + 3 tools              |
+|                              |                                |
+|  +---------------------------v-----------------------------+ |
+|  |              Hermes Agent Loop                           | |
+|  |  1. system_prompt_block -> inject project profile        | |
+|  |  2. prefetch -> inject relevant memories before LLM      | |
+|  |  3. sync_turn -> capture conversation in background      | |
+|  |  4. on_pre_compress -> re-inject before compaction       | |
+|  |  5. on_memory_write -> mirror MEMORY.md to agentmemory   | |
+|  |  6. on_session_end -> mark session complete              | |
+|  +------------------------------+--------------------------+ |
++---------------------------------+----------------------------+
+                                  | HTTP REST (localhost:3111)
+                                  v
++--------------------------------------------------------------+
+|              agentmemory Server (v0.9.28)                     |
+|  Port 3111: REST API + MCP Server                             |
+|  Port 3113: Real-time Viewer                                  |
+|  Engine: iii v0.11.2 (pinned binary)                          |
+|  Storage: ~/.agentmemory/data/                                |
+|  Embeddings: local (ollama fable-5.5-coder:7b)                |
+|  Search: BM25 + vector + knowledge graph                      |
++--------------------------------------------------------------+
+                                  |
++---------------------------------v----------------------------+
+|              mcp-router (transport hub)                       |
+|  Registered: agentmemory server (auto_start=1)                |
+|  Tools: mcp__mcp_router__memory_* (54 tools)                 |
+|  Available to: Hermes, Claude Code, Codex, OpenCode, Pi       |
++--------------------------------------------------------------+
 ```
 
 ## Two Integration Layers
@@ -54,7 +54,7 @@
 - **Status**: Registration complete, server not running
 
 ### Layer 2: Hermes Plugin (deep integration)
-- **Not yet installed** — needs copy from agentmemory repo
+- **Not yet installed** -- needs copy from agentmemory repo
 - Provides 6 lifecycle hooks + 3 simplified tools
 - Hooks into Hermes agent loop transparently
 - Adds prefetch, auto-capture, compaction protection
@@ -66,14 +66,14 @@ The MCP server provides breadth (54 tools, cross-agent). The plugin provides dep
 
 | Capability | MCP Server | Plugin |
 |-----------|-----------|--------|
-| Tool access (54 tools) | ✅ | ❌ (only3 tools) |
-| Cross-agent shared memory | ✅ | ❌ (Hermes-only) |
-| Pre-LLM context injection | ❌ | ✅ (prefetch) |
-| Auto turn capture | ❌ | ✅ (sync_turn) |
-| Compaction protection | ❌ | ✅ (on_pre_compress) |
-| System prompt enrichment | ❌ | ✅ (system_prompt_block) |
-| MEMORY.md mirroring | ❌ | ✅ (on_memory_write) |
-| Session lifecycle tracking | ❌ | ✅ (on_session_end) |
+| Tool access (54 tools) | YES | NO (only 3 tools) |
+| Cross-agent shared memory | YES | NO (Hermes-only) |
+| Pre-LLM context injection | NO | YES (prefetch) |
+| Auto turn capture | NO | YES (sync_turn) |
+| Compaction protection | NO | YES (on_pre_compress) |
+| System prompt enrichment | NO | YES (system_prompt_block) |
+| MEMORY.md mirroring | NO | YES (on_memory_write) |
+| Session lifecycle tracking | NO | YES (on_session_end) |
 
 ## Plugin Implementation Details
 
@@ -88,7 +88,7 @@ class AgentMemoryProvider(MemoryProvider):
         return "agentmemory"
 
     def is_available(self) -> bool:
-        # No network calls — just validate URL format
+        # No network calls -- just validate URL format
         base = os.environ.get("AGENTMEMORY_URL", "http://localhost:3111")
         return _validate_url(base)
 
@@ -139,25 +139,37 @@ class AgentMemoryProvider(MemoryProvider):
 | AGENTMEMORY_URL | http://localhost:3111 | Server URL |
 | AGENTMEMORY_SECRET | (none) | Auth token |
 | AGENTMEMORY_REQUIRE_HTTPS | (off) | Enforce HTTPS for bearer auth |
+| AGENTMEMORY_HOST | 127.0.0.1 | Server bind address |
+| AGENTMEMORY_PORT | 3111 | REST API port |
+| AGENTMEMORY_VIEWER_PORT | 3113 | Real-time viewer port |
 
 Plugin reads `~/.agentmemory/.env` at import time via `os.environ.setdefault`.
+
+## Dependencies
+
+- **Node.js >= 20**: Required for `npx @agentmemory/agentmemory`
+- **Ofable-5**: Running locally with `fable-5.5-coder:7b` model pulled for local embeddings
+- **iii engine v0.11.2**: Auto-downloaded to `~/.agentmemory/bin/` on first agentmemory server start (~50MB)
+- **agentmemory v0.9.28**: Already installed globally via npm
 
 ## Trade-offs
 
 ### Pro
 - **95.2% retrieval accuracy** on LongMemEval-S benchmark
-- **Cross-agent shared memory** — memories from all agents in one store
-- **Zero cloud** — local embeddings, no API key needed
-- **Lifecycle hooks** — transparent integration, no agent behavior changes needed
-- **Compaction protection** — context preserved across compressions
+- **Cross-agent shared memory** -- memories from all agents in one store
+- **Zero cloud** -- local embeddings via ofable-5, no API key needed
+- **Ofable-5 embeddings** -- uses ofable-5 with fable-5.5-coder:7b model for local vector search
+- **Lifecycle hooks** -- transparent integration, no agent behavior changes needed
+- **Compaction protection** -- context preserved across compressions
 - **Real-time viewer** at localhost:3113
 
 ### Con
-- **Server dependency** — agentmemory server must be running
-- **Port usage** — 4 ports occupied (3111, 3112, 3113, 49134)
-- **Resource overhead** — iii engine binary + ofable-5 embeddings
-- **Plugin maintenance** — pinned to agentmemory repo version (currently v0.8.0 plugin.yaml)
-- **Dual memory systems** — built-in memory + agentmemory (intentional, complementary)
+- **Server dependency** -- agentmemory server must be running
+- **Ofable-5 dependency** -- requires ollama running with fable-5.5-coder:7b pulled
+- **iii engine** -- auto-downloaded to ~/.agentmemory/bin/ on first run (~50MB)
+- **Port usage** -- 4 ports occupied (3111, 3112, 3113, 49134)
+- **Plugin maintenance** -- pinned to agentmemory repo version (currently v0.8.0 plugin.yaml, independent of server v0.9.28)
+- **Dual memory systems** -- built-in memory + agentmemory (intentional, complementary)
 
 ### Mitigations
 - mcp-router auto_start=1 handles server lifecycle

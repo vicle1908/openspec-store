@@ -1,10 +1,18 @@
 # Tasks: hermes-agentmemory-plugin-integration
 
+## Phase 0: Prerequisites
+- [ ] Verify Node.js >= 20 (`node -v`)
+- [ ] Verify ofable-5 is running (`curl http://localhost:11434/api/tags`)
+- [ ] Verify fable-5.5-coder:7b model is pulled (`ollama list | grep fable-5.5-coder`)
+- [ ] Verify ports 3111, 3112, 3113, 49134 are free
+- [ ] Verify agentmemory v0.9.28 installed (`agentmemory --version`)
+
 ## Phase 1: Start agentmemory server
-- [ ] Verify agentmemory v0.9.28 is installed (`agentmemory --version`)
+- [ ] Verify iii engine is available (auto-downloaded to ~/.agentmemory/bin/ on first run)
 - [ ] Start agentmemory server in background (`agentmemory &` or `npx -y @agentmemory/agentmemory`)
-- [ ] Verify health endpoint (`curl http://localhost:3111/agentmemory/health`)
+- [ ] Wait for health endpoint (`curl http://localhost:3111/agentmemory/health`)
 - [ ] Verify MCP tools reachable through mcp-router (test `memory_smart_search`)
+- [ ] If mcp-router tools don't appear, restart MCP Router.app to pick up the running server
 
 ## Phase 2: Install Hermes plugin
 - [ ] Fetch `integrations/hermes/` from agentmemory repo (curl raw GitHub files)
@@ -34,3 +42,7 @@
 - [ ] Update workspace-knowledge-tools skill with plugin installation status
 - [ ] Update wiki agentmemory entity page with Hermes integration status
 - [ ] Commit all changes to openspec-store
+
+## Archive
+- [ ] Run `openspec archive hermes-agentmemory-plugin-integration --store openspec-store --yes`
+- [ ] Commit store: `cd ~/Developer/openspec-store && git add openspec/ && git commit -m "archive: hermes-agentmemory-plugin-integration"`

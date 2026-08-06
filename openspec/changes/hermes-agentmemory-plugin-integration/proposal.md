@@ -13,10 +13,17 @@ The `developer-memory` OpenSpec spec already defines agentmemory as the shared d
 ## What Changes
 
 ### Phase 1: Start agentmemory server
+### Prerequisites
+- Node.js >= 20 (verified: node -v)
+- Ofable-5 running with fable-5.5-coder:7b model pulled (`ollama pull fable-5.5-coder:7b`)
+- Ports 3111, 3112, 3113, 49134 free
+### Phase 1: Start agentmemory server
 - Verify agentmemory v0.9.28 is installed and healthy
+- Verify iii engine is available (auto-downloaded to ~/.agentmemory/bin/ on first run)
 - Start the agentmemory server on localhost:3111
 - Verify health endpoint responds
 - Verify MCP tools are reachable through mcp-router (auto_start=1 already configured)
+- If mcp-router tools don't appear, restart MCP Router.app to pick up the running server
 
 ### Phase 2: Install Hermes memory provider plugin
 - Copy `integrations/hermes/` from the agentmemory repo to `~/.hermes/plugins/agentmemory/`
@@ -48,6 +55,12 @@ The `developer-memory` OpenSpec spec already defines agentmemory as the shared d
 - Update workspace-knowledge-tools skill to reflect plugin status
 - Update wiki agentmemory entity page
 - Commit all changes
+
+## Archive
+
+This is a skip_specs change with no delta specs. Archive is trivial:
+run `openspec archive hermes-agentmemory-plugin-integration --store openspec-store --yes`
+and commit the store. No spec merging needed.
 
 ## Compatibility
 
