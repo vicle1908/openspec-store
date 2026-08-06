@@ -1,0 +1,6 @@
+schema: spec-driven
+created: 2026-08-06
+skip_specs: true
+description: "Rename module path from victory1908/microservices to victory1908/go-microservices, add assessment infrastructure, and fix GitNexus naming consistency"
+repos:
+  - go-microservices
