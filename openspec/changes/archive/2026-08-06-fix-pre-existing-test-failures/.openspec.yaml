@@ -1,0 +1,9 @@
+schema: spec-driven
+created: 2026-08-06
+description: "Fix hardcoded paths, platform-specific tests, and infrastructure-dependent tests"
+skip_specs: false
+repos:
+  - code-daily-scan
+  - tdt-core
+  - jira-skill
+  - jira-daily-reports
