@@ -1,56 +1,56 @@
 # Tasks: hermes-agentmemory-plugin-integration
 
 ## Phase 0: Fix prerequisites
-- [ ] Kill stale agentmemory process (PID 93422, stuck in 1489+ reconnect attempts)
-- [ ] Kill stale agentmemory-mcp process (PID 90932, 7-tool shim fallback mode)
-- [ ] Copy iii-config.yaml to ~/.agentmemory/iii-config.yaml (use bundled config with absolute paths)
-- [ ] Verify ~/.agentmemory/data/ directory exists (for state_store.db and stream_store)
-- [ ] Configure .env:
+- [x] Kill stale agentmemory process (PID 93422, stuck in 1489+ reconnect attempts)
+- [x] Kill stale agentmemory-mcp process (PID 90932, 7-tool shim fallback mode)
+- [x] Copy iii-config.yaml to ~/.agentmemory/iii-config.yaml (use bundled config with absolute paths)
+- [x] Verify ~/.agentmemory/data/ directory exists (for state_store.db and stream_store)
+- [x] Configure .env:
   - LLM: `OPENAI_API_KEY` (from HERMES_CUSTOM_SHOPAPIKEY_API_KEY), `OPENAI_BASE_URL=https://api.phanmemvip.shop/v1`, `OPENAI_MODEL=fable-5`
   - Embeddings: `EMBEDDING_PROVIDER=openai`, `OPENAI_EMBEDDING_API_KEY=ollama`, `OPENAI_EMBEDDING_BASE_URL=http://localhost:11434/v1`, `OPENAI_EMBEDDING_MODEL=nomic-embed-text`, `OPENAI_EMBEDDING_DIMENSIONS=768`
-- [ ] Set AGENTMEMORY_DROP_STALE_INDEX=true (handle 384→768 dimension migration)
-- [ ] Verify Ofable-5 is running and nomic-embed-text is loaded
-- [ ] Verify ports 3111, 3112, 3113, 49134 are free
+- [x] Set AGENTMEMORY_DROP_STALE_INDEX=true (handle 384→768 dimension migration)
+- [x] Verify Ofable-5 is running and nomic-embed-text is loaded
+- [x] Verify ports 3111, 3112, 3113, 49134 are free
 
 ## Phase 1: Start agentmemory server
-- [ ] Start agentmemory server in background (`agentmemory` or `npx -y @agentmemory/agentmemory`)
-- [ ] Wait for health endpoint (`curl http://localhost:3111/agentmemory/health`)
-- [ ] Verify iii engine is running as separate process (`ps aux | grep iii`)
-- [ ] Verify port 3111 is open (`lsof -i :3111`)
-- [ ] Verify port 3112 is open (`lsof -i :3112`)
-- [ ] Verify port 3113 is open (`lsof -i :3113`)
-- [ ] Verify MCP tools reachable through mcp-router (54 tools, not 7-tool shim)
-- [ ] If mcp-router tools don't appear, restart MCP Router.app to pick up the running server
+- [x] Start agentmemory server in background (`agentmemory` or `npx -y @agentmemory/agentmemory`)
+- [x] Wait for health endpoint (`curl http://localhost:3111/agentmemory/health`)
+- [x] Verify iii engine is running as separate process (`ps aux | grep iii`)
+- [x] Verify port 3111 is open (`lsof -i :3111`)
+- [x] Verify port 3112 is open (`lsof -i :3112`)
+- [x] Verify port 3113 is open (`lsof -i :3113`)
+- [x] Verify MCP tools reachable through mcp-router (54 tools, not 7-tool shim)
+- [x] If mcp-router tools don't appear, restart MCP Router.app to pick up the running server
 
 ## Phase 2: Install Hermes plugin
-- [ ] Fetch integrations/hermes/ from agentmemory repo (curl raw GitHub files)
-- [ ] Create ~/.hermes/plugins/agentmemory/ directory
-- [ ] Write __init__.py (AgentMemoryProvider class, 6 hooks)
-- [ ] Write plugin.yaml (name, version, hooks list)
-- [ ] Write README.md (installation docs)
-- [ ] Verify plugin files are in place
+- [x] Fetch integrations/hermes/ from agentmemory repo (curl raw GitHub files)
+- [x] Create ~/.hermes/plugins/agentmemory/ directory
+- [x] Write __init__.py (AgentMemoryProvider class, 6 hooks)
+- [x] Write plugin.yaml (name, version, hooks list)
+- [x] Write README.md (installation docs)
+- [x] Verify plugin files are in place
 
 ## Phase 3: Configure Hermes
-- [ ] Add memory.provider: agentmemory to ~/.hermes/config.yaml
-- [ ] Verify AGENTMEMORY_URL defaults to http://localhost:3111
-- [ ] Verify ~/.agentmemory/.env exists and is readable
-- [ ] Confirm no port conflicts (3111, 3112, 3113)
+- [x] Add memory.provider: agentmemory to ~/.hermes/config.yaml
+- [x] Verify AGENTMEMORY_URL defaults to http://localhost:3111
+- [x] Verify ~/.agentmemory/.env exists and is readable
+- [x] Confirm no port conflicts (3111, 3112, 3113)
 
 ## Phase 4: Verify end-to-end
-- [ ] `hermes memory status` shows agentmemory as available
-- [ ] Save a test memory via plugin tool (`memory_save`)
-- [ ] Recall the test memory (`memory_recall`)
-- [ ] Verify prefetch injects context before LLM calls
-- [ ] Verify sync_turn captures conversation in background
-- [ ] Verify on_pre_compress preserves context during compaction
-- [ ] Verify MCP tools work through mcp-router
-- [ ] Open viewer at http://localhost:3113 and confirm memories visible
-- [ ] Verify nomic-embed-text embeddings (768-dim vectors in vector index)
+- [x] `hermes memory status` shows agentmemory as available
+- [x] Save a test memory via plugin tool (`memory_save`)
+- [x] Recall the test memory (`memory_recall`)
+- [x] Verify prefetch injects context before LLM calls
+- [x] Verify sync_turn captures conversation in background
+- [x] Verify on_pre_compress preserves context during compaction
+- [x] Verify MCP tools work through mcp-router
+- [x] Open viewer at http://localhost:3113 and confirm memories visible
+- [x] Verify nomic-embed-text embeddings (768-dim vectors in vector index)
 
 ## Phase 5: Documentation & cleanup
-- [ ] Update workspace-knowledge-tools skill with plugin installation status
-- [ ] Update wiki agentmemory entity page with Hermes integration status
-- [ ] Commit all changes to openspec-store
+- [x] Update workspace-knowledge-tools skill with plugin installation status
+- [x] Update wiki agentmemory entity page with Hermes integration status
+- [x] Commit all changes to openspec-store
 
 ## Archive
 - [ ] Run `openspec archive hermes-agentmemory-plugin-integration --store openspec-store --yes`
@@ -71,12 +71,13 @@
 - nomic-embed-text: 261MB, 137M params, 768 dims, F16 quantization ✅
 
 ### Running Processes
-- agentmemory (PID 93422): DEGRADED — port 3113 only, port 3111 closed
-- agentmemory-mcp (PID 90932): SHIM FALLBACK — 7 tools only
+- agentmemory (PID 21846): HEALTHY — all ports open
+- iii engine (PID 21935): RUNNING — port 3111 listening
 - Ofable-5 (PID 88072/88084): RUNNING — nomic-embed-text loaded
 
 ### Root Cause
 - iii engine not starting because ~/.agentmemory/iii-config.yaml is missing
+- Fixed: iii-config.yaml copied to ~/.agentmemory/ with absolute paths
 
 ### .env Target Configuration
 ```
