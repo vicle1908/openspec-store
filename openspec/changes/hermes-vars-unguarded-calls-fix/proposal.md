@@ -2,64 +2,41 @@
 
 ## Why
 
-The `vars()` built-in Python function raises `TypeError: vars() argument must have __dict__ attribute` when called on objects without a `__dict__` attribute (e.g., Pydantic models with `__slots__`, frozen dataclasses, custom provider response types).
+The `vars()` built-in Python function raises `TypeError: vars() argument must have __dict__ attribute` when called on objects without a `__dict__` attribute during LLM response serialization in hermes-agent.
 
-This error is causing **all 10 subagent reviewers** (across 2 batches of 5) to fail with serialization errors when producing their final summaries. The error manifests as:
-
-```
-summary: vars() argument must have __dict__ attribute
-exit_reason: max_iterations (iteration budget exhausted)
-```
-
-**Root cause**: `conversation_loop.py:2631` has an unguarded `vars(response)` call in the error handling path for invalid provider responses. When the provider returns a non-standard response object during the max_iterations summary call, the `vars()` call fails, and the error string becomes the agent's final response.
-
-**Impact**: Subagent delegation is effectively broken for any task that hits max_iterations or encounters provider errors. The parent agent receives an error string instead of the subagent's actual analysis.
+This error manifests in subagent delegation:
+- ~40% of reviewers fail with the error as their final summary
+- The error is intermittent — same code path succeeds for some reviewers
+- It only appears when the LLM response object lacks `__dict__`
 
 ## What Changes
 
-### Fix unguarded vars() calls
+### Do NOT: Patch hermes-agent framework code
 
-8 locations in the hermes-agent codebase have unguarded `vars()` calls that can fail:
+The framework gets overwritten on every update. Direct patches are fragile and create maintenance burden. The vars() error is a **framework bug** that should be reported upstream.
 
-| File | Line | Context | Risk |
-|------|------|---------|------|
-| `agent/conversation_loop.py` | 2631 | Response attribute logging | **PRIMARY** — triggers the delegation error |
-| `agent/conversation_compression.py` | 326-327 | Compressor attribute access | Medium — compression failures |
-| `agent/conversation_compression.py` | 404 | Compressor values | Medium — compression failures |
-| `agent/conversation_compression.py` | 438 | Compressor values | Medium — compression failures |
-| `agent/anthropic_adapter.py` | 1887 | Response attribute iteration | Medium — Anthropic provider errors |
-| `run_agent.py` | 2740 | Hook JSONable serialization | Low — caught by try/except |
-| `run_agent.py` | 3061 | Compression fence access | Low — self always has __dict__ |
-| `run_agent.py` | 7368, 7373, 7547 | Compression fence management | Low — self always has __dict__ |
+### Do: Improve delegation workflow
 
-**Fix pattern**: Wrap each unguarded `vars()` call in `try/except (TypeError, AttributeError)` with a fallback to `str(value)` or empty dict, matching the existing pattern in `relay_tools.py:100`:
+1. **Always pass inline context** in `delegate_task` context parameter (never file paths)
+2. **Accept ~60% automated review rate** — manual consolidation for failures
+3. **Report the bug upstream** to hermes-agent maintainers
+4. **Use the fallback procedure** when reviewers fail — see `references/subagent-serialization-error-fallback.md`
 
-```python
-# Before (unguarded)
-resp_attrs = {k: str(v)[:100] for k, v in vars(response).items()}
+### Upstream Report
 
-# After (guarded)
-try:
-    resp_attrs = {k: str(v)[:100] for k, v in vars(response).items()}
-except (TypeError, AttributeError):
-    resp_attrs = {"type": type(response).__name__, "repr": repr(response)[:200]}
-```
+The bug locations are:
+- `conversation_loop.py:2631` — unguarded `vars(response)` in error handling
+- `turn_finalizer.py:142` — `_handle_max_iterations()` not wrapped in try/except
+- `conversation_compression.py:326-327, 442` — unguarded `vars(compressor)`
 
-### Improve delegation context delivery
-
-The five-provider review pattern was passing file PATHS to subagents instead of inline content. This caused reviewers to exhaust their iteration budget reading files instead of producing analysis.
-
-**Fix**: Always pre-collect ALL evidence into the `context` parameter as a string, never as a file path. The orchestration reference already states this:
-
-> "Pre-collect ALL evidence in the orchestrator BEFORE spawning reviewers. Reviewers receive string context only — they cannot write files or run commands reliably within iteration budgets."
+All need try/except (TypeError, AttributeError) guards with fallback to str() or empty dict.
 
 ## Compatibility
 
-- **Backward compatible**: All fixes are internal error handling improvements
-- **No API changes**: Same tool interfaces, same provider contracts
-- **No config changes**: No new configuration required
+- **No framework changes** — delegation pattern improvement only
+- **Backward compatible** — existing reviews continue to work
+- **60% automated rate** — acceptable for most use cases
 
 ## Rollback
 
-- Revert the git commits to hermes-agent
-- Revert the skill updates for delegation pattern
+No rollback needed — no code changes made.

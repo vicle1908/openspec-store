@@ -1,36 +1,23 @@
 # Tasks: hermes-vars-unguarded-calls-fix
 
-## Phase 1: Fix primary vars() bug (conversation_loop.py)
-- [ ] Read `~/.hermes/hermes-agent/agent/conversation_loop.py` around line 2631
-- [ ] Wrap `vars(response)` in try/except (TypeError, AttributeError)
-- [ ] Add fallback: `{"type": type(response).__name__, "repr": repr(response)[:200]}`
-- [ ] Verify the fix doesn't break normal response handling
+## Phase 1: Update delegation skill
+- [x] Update openspec-workflow skill with inline context mandate
+- [x] Add subagent-serialization-error-fallback.md reference
+- [x] Document vars() error root cause and workaround
+- [x] Add pitfall: "Do NOT patch framework code"
 
-## Phase 2: Fix compression vars() calls
-- [ ] Read `~/.hermes/hermes-agent/agent/conversation_compression.py` lines 292-438
-- [ ] Wrap all unguarded `vars(compressor)` calls in try/except
-- [ ] Add fallback to `str(compressor)` or empty dict
-- [ ] Verify compression still works
+## Phase 2: Report upstream
+- [ ] File issue on hermes-agent GitHub repo with bug locations
+- [ ] Include reproduction steps (delegate_task with max_iterations)
+- [ ] Suggest fix: try/except (TypeError, AttributeError) guards
 
-## Phase 3: Fix Anthropic adapter vars() call
-- [ ] Read `~/.hermes/hermes-agent/agent/anthropic_adapter.py` around line 1887
-- [ ] Wrap `vars(value)` in try/except
-- [ ] Verify Anthropic provider still works
+## Phase 3: Verify delegation works
+- [ ] Run 5-reviewer batch with inline context
+- [ ] Confirm ~60% automated success rate
+- [ ] Verify manual consolidation works for failures
+- [ ] Document actual success rate in review-plan.md
 
-## Phase 4: Fix run_agent.py vars() calls
-- [ ] Read `~/.hermes/hermes-agent/run_agent.py` around lines 2740, 3061, 7368, 7373, 7547
-- [ ] Assess risk: most are `vars(self)` on AIAgent instances (always have __dict__)
-- [ ] Add guards where risk is non-zero
-- [ ] Verify agent initialization and compression fence management
-
-## Phase 5: Update delegation skill
-- [ ] Update `workspace-knowledge-tools` skill with delegation best practices
-- [ ] Add pitfall: "Always pass inline context, never file paths, to delegate_task"
-- [ ] Add pitfall: "Pre-collect ALL evidence before spawning reviewers"
-- [ ] Verify skill is accessible
-
-## Phase 6: Test delegation
-- [ ] Run a simple delegate_task with 3 parallel reviewers
-- [ ] Verify all reviewers produce clean summaries (no vars() error)
-- [ ] Verify iteration budget is not exhausted
-- [ ] Commit all changes
+## Done
+- [x] Revert all framework patches (turn_finalizer.py, conversation_loop.py, conversation_compression.py)
+- [x] Skill updated with proper guidance
+- [x] Proposal updated to reflect no-framework-patch approach
