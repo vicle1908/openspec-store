@@ -25,7 +25,7 @@ The system SHALL provide a plan review skill that orchestrates 5-provider review
 - AND validates no secrets in bundle
 - AND spawns 5 parallel review subagents with string data
 - AND each subagent checks assigned alignment edges
-- AND consolidates feedback into `review-plan.md` with 8-edge alignment matrix
+- AND consolidates feedback into `review-plan.md` with 9-edge alignment matrix
 - AND reports summary with ALL statuses: PASS/PARTIAL/FAIL/N/A/UNKNOWN/NOT_REVIEWED
 
 #### Scenario: Trust boundary enforcement
@@ -62,6 +62,7 @@ The system SHALL provide a plan review skill that orchestrates 5-provider review
   - Code ↔ Skills
   - Spec ↔ Tests
   - Code ↔ Tests
+  - Knowledge ↔ Code
 - AND Security is reported as a lens across all edges (not a separate edge)
 - AND each edge has status: PASS, PARTIAL, FAIL, N/A, UNKNOWN, NOT_REVIEWED
 - AND each edge has evidence: repository, command, exit code, timestamp, tool version
@@ -99,7 +100,7 @@ The system SHALL provide a code review skill that orchestrates 5-provider review
 - AND validates no secrets in bundle
 - AND spawns 5 parallel review subagents with string data
 - AND each subagent checks assigned alignment edges
-- AND consolidates feedback into `review-code.md` with 8-edge alignment matrix
+- AND consolidates feedback into `review-code.md` with 9-edge alignment matrix
 - AND reports summary with ALL statuses: PASS/PARTIAL/FAIL/N/A/UNKNOWN/NOT_REVIEWED
 
 #### Scenario: Code-specs alignment check
