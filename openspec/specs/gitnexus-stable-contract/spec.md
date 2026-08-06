@@ -38,7 +38,7 @@ Every GitNexus result SHALL identify the canonical installed CLI version, upstre
 The stable contract SHALL expose only documented bounded query, exact-symbol
 resolution, context, impact, detect-changes, status, and source-identity reads.
 Repository identity SHALL be explicit even when the provider currently reports
-one indexed repository. Setup, refresh, analyze, rename, delete, clean, group
+multiple indexed repositories. Setup, refresh, analyze, rename, delete, clean, group
 management/synchronization, shell, and code-execution operations SHALL remain
 unavailable. Any bounded cross-repository read SHALL require a separately
 approved contract and SHALL NOT be inferred from group membership. Provider
