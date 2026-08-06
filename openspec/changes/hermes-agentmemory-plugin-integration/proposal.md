@@ -4,25 +4,30 @@
 
 Hermes Agent currently has two independent memory systems:
 1. **Built-in memory** — flat MEMORY.md/USER.md files + SQLite FTS5 session search
-2. **agentmemory** — installed globally (v0.9.28), registered in mcp-router, but server not running and no Hermes plugin installed
+2. **agentmemory** — installed globally (v0.9.28), registered in mcp-router, but server running in degraded state (iii engine not started) and no Hermes plugin installed
 
-The result: Hermes has no episodic cross-session memory, no pre-LLM context injection, no automatic turn-level capture, and no session compaction protection. Every new session starts from scratch. The agentmemory ecosystem (95.2% retrieval accuracy, hybrid BM25+vector+graph search, cross-agent shared memory) is available but not wired into Hermes.
+The result: Hermes has no episodic cross-session memory, no pre-LLM context injection, no automatic turn-level capture, and no session compaction protection. Every new session starts from scratch. The agentmemory ecosystem (95.2% retrieval accuracy, hybrid BM25+vector+graph search, cross-agent shared memory) is available but not properly wired into Hermes.
 
-The `developer-memory` OpenSpec spec already defines agentmemory as the shared developer-memory layer. The MCP server is registered in mcp-router with auto_start=1. The missing piece is the Hermes plugin that provides deep lifecycle integration — 6 hooks that make agentmemory transparent to the agent, not just another tool.
+The `developer-memory` OpenSpec spec already defines agentmemory as the shared developer-memory layer. The MCP server is registered in mcp-router with auto_start=1. The missing pieces are:
+1. **Fix the iii engine startup** — the server is stuck in a reconnect loop (1489+ attempts) because `iii-config.yaml` is missing from `~/.agentmemory/`
+2. **Pull an LLM model** — Ollama is running but has no models for compression/summarization
+3. **Install the Hermes plugin** — provides deep lifecycle integration via 6 hooks
 
 ## What Changes
 
+### Phase 0: Fix prerequisites
+- Kill stale agentmemory process (PID 93422, stuck in reconnect loop)
+- Copy `iii-config.yaml` to `~/.agentmemory/iii-config.yaml` with absolute data paths
+- Pull `llama3.2:3b` model via Ofable-5 (~2GB) for LLM compression
+- Verify `@xenova/transformers` is installed (already present: v2.17.2)
+- Verify agentmemory server starts cleanly and port 3111 opens
+- Verify iii engine runs as separate process
+
 ### Phase 1: Start agentmemory server
-### Prerequisites
-- Node.js >= 20 (verified: node -v)
-- Ofable-5 running with fable-5.5-coder:7b model pulled (`ollama pull fable-5.5-coder:7b`)
-- Ports 3111, 3112, 3113, 49134 free
-### Phase 1: Start agentmemory server
-- Verify agentmemory v0.9.28 is installed and healthy
-- Verify iii engine is available (auto-downloaded to ~/.agentmemory/bin/ on first run)
 - Start the agentmemory server on localhost:3111
 - Verify health endpoint responds
-- Verify MCP tools are reachable through mcp-router (auto_start=1 already configured)
+- Verify iii engine is running (separate process, port 49134)
+- Verify MCP tools are reachable through mcp-router (54 tools, not 7-tool shim)
 - If mcp-router tools don't appear, restart MCP Router.app to pick up the running server
 
 ### Phase 2: Install Hermes memory provider plugin
@@ -50,29 +55,39 @@ The `developer-memory` OpenSpec spec already defines agentmemory as the shared d
 - Verify sync_turn captures conversation in background
 - Verify on_pre_compress preserves context during compaction
 - Verify MCP tools work through mcp-router (memory_save, memory_smart_search, etc.)
+- Open viewer at http://localhost:3113 and confirm memories visible
 
 ### Phase 5: Documentation
 - Update workspace-knowledge-tools skill to reflect plugin status
 - Update wiki agentmemory entity page
 - Commit all changes
 
-## Archive
+## Embedding & LLM Strategy
 
-This is a skip_specs change with no delta specs. Archive is trivial:
-run `openspec archive hermes-agentmemory-plugin-integration --store openspec-store --yes`
-and commit the store. No spec merging needed.
+### Embeddings: `all-MiniLM-L6-v2` via `@xenova/transformers` (local, free)
+- **22M params, ~90MB** — negligible on M1 16GB
+- **100% offline** — no API keys, no cloud dependency
+- **agentmemory's recommended default** — `EMBEDDING_PROVIDER=local` (already configured)
+- **Already installed** — `@xenova/transformers@2.17.2` in agentmemory's node_modules
+- First-run downloads ~90MB model to `~/.cache/xenova/`
+
+### LLM: Ofable-5 `fable-5.2:3b` (local, free)
+- **~2GB RAM** — leaves 14GB for other processes on M1 16GB
+- **Adequate quality** — compression tasks are short (<2K tokens in, <500 out)
+- **Zero cost** — runs entirely on local hardware
+- **Alternative: OpenRouter** `fable-5` at ~$0.40/month if local quality insufficient
 
 ## Compatibility
 
 - **Backward compatible**: Hermes built-in memory (MEMORY.md/USER.md + SQLite FTS5) continues to work alongside agentmemory
 - **agentmemory supplements**: Does not replace Hermes built-in memory — adds structured episodic memory on top
 - **Cross-agent**: Memories saved from Hermes are visible to Claude Code, Codex, OpenCode, and vice versa via shared agentmemory store
-- **Zero cloud**: Runs fully local with local embeddings (ollama fable-5.5-coder:7b), no API key required
-- **Port conflict**: agentmemory uses ports 3111 (REST), 3112 (streams), 3113 (viewer), 49134 (engine) — verify no conflicts
+- **Zero cloud**: Runs fully local with local embeddings (@xenova/transformers) and local LLM (Ofable-5)
+- **Port usage**: 3 ports (3111 REST, 3112 streams, 3113 viewer) — no conflicts with existing services
 
 ## Rollout
 
-1. Start server → verify health → verify MCP tools
+1. Fix iii engine + pull LLM model → verify server health → verify MCP tools (54 tools)
 2. Install plugin → configure provider → restart Hermes session
 3. Verify all 6 hooks fire correctly
 4. Monitor for 24 hours — check viewer at localhost:3113
@@ -83,3 +98,9 @@ and commit the store. No spec merging needed.
 2. Remove `~/.hermes/plugins/agentmemory/`
 3. Stop agentmemory server
 4. Hermes reverts to built-in memory only — no data loss (agentmemory store preserved at ~/.agentmemory/)
+
+## Archive
+
+This is a skip_specs change with no delta specs. Archive is trivial:
+run `openspec archive hermes-agentmemory-plugin-integration --store openspec-store --yes`
+and commit the store. No spec merging needed.

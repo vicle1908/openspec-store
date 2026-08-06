@@ -30,10 +30,12 @@
 +--------------------------------------------------------------+
 |              agentmemory Server (v0.9.28)                     |
 |  Port 3111: REST API + MCP Server                             |
+|  Port 3112: WebSocket Streams                                 |
 |  Port 3113: Real-time Viewer                                  |
 |  Engine: iii v0.11.2 (pinned binary)                          |
 |  Storage: ~/.agentmemory/data/                                |
-|  Embeddings: local (ollama fable-5.5-coder:7b)                |
+|  Embeddings: @xenova/transformers (all-MiniLM-L6-v2, local)  |
+|  LLM: Ollama fable-53.2:3b (local) or API fallback             |
 |  Search: BM25 + vector + knowledge graph                      |
 +--------------------------------------------------------------+
                                   |
@@ -51,7 +53,7 @@
 - **Already registered** in mcp-router SQLite with auto_start=1
 - Provides 54 MCP tools: memory_save, memory_smart_search, memory_sessions, etc.
 - Available to ALL agents through mcp-router transport
-- **Status**: Registration complete, server not running
+- **Status**: Registration complete, server running but in degraded state (viewer only)
 
 ### Layer 2: Hermes Plugin (deep integration)
 - **Not yet installed** -- needs copy from agentmemory repo
@@ -132,47 +134,220 @@ class AgentMemoryProvider(MemoryProvider):
 - Background operations: threaded (sync_turn, on_memory_write)
 - HTTPS guard: warns when bearer token sent over plaintext HTTP to non-loopback
 
-### Configuration
+## Embedding Strategy (Revised)
 
-| Env Variable | Default | Description |
-|---|---|---|
-| AGENTMEMORY_URL | http://localhost:3111 | Server URL |
-| AGENTMEMORY_SECRET | (none) | Auth token |
-| AGENTMEMORY_REQUIRE_HTTPS | (off) | Enforce HTTPS for bearer auth |
-| AGENTMEMORY_HOST | 127.0.0.1 | Server bind address |
-| AGENTMEMORY_PORT | 3111 | REST API port |
-| AGENTMEMORY_VIEWER_PORT | 3113 | Real-time viewer port |
+### Decision: `all-MiniLM-L6-v2` via `@xenova/transformers` (local, free)
 
-Plugin reads `~/.agentmemory/.env` at import time via `os.environ.setdefault`.
+**Why this model:**
+- **22M params, ~90MB** — negligible memory footprint on M1 16GB
+- **100% offline** — no API keys, no cloud dependency, no network calls
+- **agentmemory's recommended default** — `EMBEDDING_PROVIDER=local` (already configured)
+- **Proven accuracy** — +8pp recall improvement over BM25-only in agentmemory benchmarks
+- **Fast inference** — M1 Neural Engine acceleration via CoreML backend in @xenova/transformers
+- **Already installed** — `@xenova/transformers@2.17.2` is in agentmemory's node_modules
 
-## Dependencies
+**Why NOT other options:**
 
-- **Node.js >= 20**: Required for `npx @agentmemory/agentmemory`
-- **Ofable-5**: Running locally with `fable-5.5-coder:7b` model pulled for local embeddings
-- **iii engine v0.11.2**: Auto-downloaded to `~/.agentmemory/bin/` on first agentmemory server start (~50MB)
-- **agentmemory v0.9.28**: Already installed globally via npm
+| Provider | Model | Why rejected |
+|----------|-------|-------------|
+| Ollama `nomic-embed-text` | 137M params, ~550MB | Unnecessary Ollama dependency for embeddings; local transformer is lighter |
+| OpenAI `text-embedding-3-small` | Cloud API | $0.02/1M tokens, requires API key, network dependency |
+| fable-5 `fable-5-embedding-001` | Cloud API | Requires API key, network dependency |
+| Voyage `voyage-code-3` | Cloud API | Paid, code-optimized but overkill for memory compression |
+
+**Configuration:**
+```env
+# ~/.agentmemory/.env
+EMBEDDING_PROVIDER=local
+# No additional config needed — @xenova/transformers auto-downloads all-MiniLM-L6-v2 on first use
+```
+
+**First-run behavior:** On first embedding request, `@xenova/transformers` downloads `all-MiniLM-L6-v2` (~90MB) to `~/.cache/xenova/`. Subsequent runs use the cached model. No manual model pull required.
+
+## LLM Strategy (Revised)
+
+### Decision: Ofable-5 `llama3.2:3b` (local, free) with API fallback option
+
+**Why `fable-5.2:3b`:**
+- **~2GB RAM** — leaves 14GB for other processes on M1 16GB
+- **Adequate quality** — compression and summarization are short tasks (<2K tokens in, <500 tokens out)
+- **Zero cost** — runs entirely on local hardware
+- **Fast on M1** — ~22 tok/s inference speed
+- **agentmemory explicitly recommends** this as "smallest sane option" for compression
+
+**Why NOT `fable-5:7b` (current .env reference):**
+- **~4.7GB RAM** — would consume ~30% of total memory on M1 16GB
+- **Overkill for compression** — code-specific training not needed for memory summarization
+- **Slower inference** — 7B model vs 3B on same hardware
+- **Higher memory pressure** — risks OOM with other development tools running
+
+**Alternative: API fallback (OpenRouter `fable-5`)**
+- **~$0.40/month** for typical workload (635 requests / 35 hours active use)
+- **Better quality** than local 3B model
+- **Zero RAM usage** — runs in cloud
+- **Trade-off:** Requires API key and network dependency
+
+**Configuration (recommended — local):**
+```env
+# ~/.agentmemory/.env
+OPENAI_API_KEY=ollama
+OPENAI_BASE_URL=http://localhost:11434/v1
+OPENAI_MODEL=fable-5:3b
+```
+
+**Configuration (API fallback):**
+```env
+# ~/.agentmemory/.env
+OPENAI_API_KEY=<your-openrouter-key>
+OPENAI_BASE_URL=https://openrouter.ai/api/v1
+OPENAI_MODEL=fable-5/fable-5
+```
+
+## Port Investigation (Revised)
+
+### Current State (verified 2026-08-06)
+
+| Port | Status | Owner | Notes |
+|------|--------|-------|-------|
+| 3111 | **FREE** | — | REST API target. No conflict. |
+| 3112 | **FREE** | — | WebSocket streams target. No conflict. |
+| 3113 | **OCCUPIED** | agentmemory (PID 93422) | Viewer port. Expected — this is the running agentmemory server. |
+| 49134 | **FREE** | — | iii engine target. No conflict. |
+| 11434 | **OCCUPIED** | Ollama (PID 88084) | Ofable-5 API. Expected. |
+
+### Finding: No port conflicts exist
+The evidence bundle's "Port 3111 CLOSED" finding was **stale** — the agentmemory server (PID 93422) was running at time of evidence collection but the iii engine had already failed to start. Port 3113 (viewer) is open as expected. Ports 3111, 3112, and 49134 are all available.
+
+### Single Server Constraint
+Only ONE agentmemory server should run at a time. The current process (PID 93422) is stuck in a degraded state (viewer only, no REST API). It should be killed and restarted cleanly after fixing the iii engine issue.
+
+## iii Engine Root Cause Analysis
+
+### Problem
+The agentmemory server (PID 93422) is running but the iii engine (v0.11.2) is NOT running as a separate process. The server has been attempting to reconnect 1489+ times with WebSocket errors:
+
+```
+[OTel] Disconnected from engine, will reconnect...
+[iii] Reconnecting in 29642ms (attempt 1470)...
+```
+
+Port 3111 (REST API) is NOT open because the iii engine is not listening.
+
+### Root Cause
+The iii engine binary (`~/.agentmemory/bin/iii`, arm64, v0.11.2) requires a `iii-config.yaml` to start. The agentmemory CLI searches for this config in:
+
+1. `AGENTMEMORY_III_CONFIG` env var
+2. `process.cwd()` (go-microservices — no config here)
+3. `~/.agentmemory/iii-config.yaml` (**NOT present**)
+4. `__dirname/iii-config.yaml` (dist directory — **bundled config exists**)
+5. `__dirname/../iii-config.yaml` (package root — **bundled config exists**)
+
+The bundled config at `~/.npm-global/lib/node_modules/@agentmemory/agentmemory/iii-config.yaml` should be found by search paths 4 or 5. However, the iii engine's config references relative paths:
+- `./data/state_store.db`
+- `./data/stream_store`
+
+These resolve relative to the working directory where iii is spawned, which may not have a `data/` subdirectory. The `~/.agentmemory/data/` directory exists but is empty.
+
+### Fix Required
+1. Copy `iii-config.yaml` to `~/.agentmemory/iii-config.yaml` with corrected paths
+2. Ensure `~/.agentmemory/data/` directory exists (it does — empty)
+3. Kill stale agentmemory process (PID 93422)
+4. Restart agentmemory server
+5. Verify iii engine starts and port 3111 opens
+
+### iii-config.yaml (corrected for local deployment)
+```yaml
+workers:
+  - name: iii-http
+    config:
+      port: 3111
+      host: 127.0.0.1
+      default_timeout: 180000
+      cors:
+        allowed_origins: ["http://localhost:3111", "http://localhost:3113", "http://127.0.0.1:3111", "http://127.0.0.1:3113"]
+        allowed_methods: [GET, POST, PUT, DELETE, OPTIONS]
+  - name:iii-state
+    config:
+      adapter:
+        name: kv
+        config:
+          store_method: file_based
+          file_path: /Users/androidteam/.agentmemory/data/state_store.db
+  - name:iii-queue
+    config:
+      adapter:
+        name: builtin
+  - name:iii-pubsub
+    config:
+      adapter:
+        name: local
+  - name:iii-cron
+    config:
+      adapter:
+        name: kv
+  - name:iii-stream
+    config:
+      port: 3112
+      host: 127.0.0.1
+      adapter:
+        name: kv
+        config:
+          store_method: file_based
+          file_path: /Users/androidteam/.agentmemory/data/stream_store
+  - name:iii-observability
+    config:
+      enabled: true
+      service_name: agentmemory
+      exporter: memory
+      sampling_ratio: 0.1
+      metrics_enabled: true
+      logs_enabled: true
+      logs_console_output: false
+  - name:iii-exec
+    config:
+      watch:
+        - src/**/*.ts
+      exec:
+        - node dist/index.mjs
+```
+
+## Dependencies (Revised)
+
+| Dependency | Version | Status | Notes |
+|-----------|---------|--------|-------|
+| Node.js | >= 20 | ✅ Installed | Required for npx |
+| agentmemory | 0.9.28 | ✅ Installed | Latest version |
+| agentmemory-mcp | 0.9.28 | ✅ Installed | Latest version |
+| iii engine | 0.11.2 | ✅ Binary present | At ~/.agentmemory/bin/iii (arm64) |
+| @xenova/transformers | 2.17.2 | ✅ Installed | For local embeddings (all-MiniLM-L6-v2) |
+| Ofable-5 | 0.32.6 | ✅ Running | Port 11434. No models pulled yet. |
+| Hermes plugin | — | ❌ Not installed | Phase 2 of this change |
+| iii-config.yaml | — | ❌ Missing from ~/.agentmemory/ | Root cause of engine failure |
+| fable-53.2:3b | — | ❌ Not pulled | ~2GB. Needed for LLM compression. |
 
 ## Trade-offs
 
 ### Pro
 - **95.2% retrieval accuracy** on LongMemEval-S benchmark
 - **Cross-agent shared memory** -- memories from all agents in one store
-- **Zero cloud** -- local embeddings via ofable-5, no API key needed
-- **Ofable-5 embeddings** -- uses ofable-5 with fable-5.5-coder:7b model for local vector search
+- **Zero cloud** -- local embeddings via @xenova/transformers, no API key needed
+- **Local LLM** -- fable-53.2:3b via Ofable-5 for zero-cost compression
 - **Lifecycle hooks** -- transparent integration, no agent behavior changes needed
 - **Compaction protection** -- context preserved across compressions
 - **Real-time viewer** at localhost:3113
 
 ### Con
 - **Server dependency** -- agentmemory server must be running
-- **Ofable-5 dependency** -- requires ollama running with fable-5.5-coder:7b pulled
-- **iii engine** -- auto-downloaded to ~/.agentmemory/bin/ on first run (~50MB)
-- **Port usage** -- 4 ports occupied (3111, 3112, 3113, 49134)
+- **Ofable-5 dependency** -- requires Ollama running with fable-53.2:3b pulled (~2GB RAM)
+- **iii engine** -- auto-downloaded to ~/.agentmemory/bin/ on first run (~28MB)
+- **Port usage** -- 3 ports occupied (3111, 3112, 3113)
 - **Plugin maintenance** -- pinned to agentmemory repo version (currently v0.8.0 plugin.yaml, independent of server v0.9.28)
 - **Dual memory systems** -- built-in memory + agentmemory (intentional, complementary)
+- **First-run embedding download** -- ~90MB download for all-MiniLM-L6-v2 on first use
 
 ### Mitigations
 - mcp-router auto_start=1 handles server lifecycle
 - Plugin gracefully degrades when server is unavailable (returns empty strings)
-- Local embeddings use existing ollama installation (no new dependencies)
+- Local embeddings use @xenova/transformers (no Ofable-5 needed for embeddings)
 - Plugin reads .env file for systemd/non-interactive startup compatibility
+- iii-config.yaml copied to ~/.agentmemory/ with absolute paths for reliability

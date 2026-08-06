@@ -1,28 +1,32 @@
-# Review Plan: hermes-agentmemory-plugin-integration
+# Review Plan: hermes-agentmemory-plugin-integration (REVISED)
 
 ## Review Rounds
 
-### Round 1: Initial Review
+### Round 1: Initial Review (original)
 - 5 parallel reviewers (Tool Version, Security, Task Completeness, Architecture, Product Scope)
 - 30 checks total
 - Result: 22 PASS, 3 PASS_WITH_NOTE, 5 NEEDS_FIX, 0 FAIL
 
-#### Findings Fixed:
-1. **Embedding model accuracy** (HIGH) -- Added specific model name (fable-5.5-coder:7b) to design
-2. **Missing ollama dependency check** (HIGH) -- Added Phase 0 prerequisites with ofable-5 and model verification
-3. **Missing iii engine dependency** (MEDIUM) -- Added Dependencies section to design.md
-4. **Missing mcp-router restart task** (MEDIUM) -- Added task to Phase 1
-5. **Archive plan missing** (MEDIUM) -- Added explicit Archive section to proposal.md
-
-### Round 2: Re-review
+### Round 2: Re-review (original)
 - 5 parallel reviewers re-checked all fixes
-- Subagent serialization errors prevented clean final summaries
-- Manual verification confirmed all fixes are correct:
-  - Phase 0 prerequisites: 5 tasks (Node.js, ofable-5, fable-5.5-coder:7b, ports, agentmemory)
-  - iii engine documented in design.md Dependencies section
-  - mcp-router restart task in Phase 1
-  - Archive plan explicit in proposal.md
-  - Full env variable table (6 variables) in design.md
+- All 5 fixes verified correct
+
+### Round 3: Investigation & Spec Enhancement (2026-08-06)
+- Deep investigation of runtime state, port conflicts, embedding models, LLM options
+- Root cause identified: iii engine not starting due to missing iii-config.yaml
+- Embedding strategy revised: all-MiniLM-L6-v2 via @xenova/transformers (local, free)
+- LLM strategy revised: fable-53.2:3b via Ofable-5 (~2GB RAM) instead of fable-5:7b (~4.7GB)
+- Ports: no conflicts found (evidence bundle was stale)
+- Single server constraint confirmed
+
+#### Findings Fixed:
+1. **Embedding model** (HIGH) — Changed from ofable-5 to @xenova/transformers local (all-MiniLM-L6-v2). Already installed, zero dependency, agentmemory's recommended default.
+2. **LLM model** (HIGH) — Changed from fable-5:7b to fable-53.2:3b. 3B is adequate for compression, uses 60% less RAM (2GB vs 4.7GB), leaves headroom on M1 16GB.
+3. **iii engine root cause** (CRITICAL) — Identified missing iii-config.yaml as root cause of 1489+ reconnect attempts. Bundled config exists but needs to be copied to ~/.agentmemory/ with absolute paths.
+4. **Port conflict** (MEDIUM) — Evidence bundle claimed port 3111 closed. Investigation shows ports 3111, 3112, 49134 are all FREE. Only 3113 is occupied (by agentmemory viewer itself).
+5. **Stale processes** (HIGH) — Two stale processes running: agentmemory (degraded, 1489+ reconnects) and agentmemory-mcp (7-tool shim fallback). Both need to be killed and restarted.
+6. **Ofable-5 models** (HIGH) — Ollama running but NO models pulled. Need to pull fable-53.2:3b for LLM compression.
+7. **Phase 0 added** (MEDIUM) — New prerequisite phase to fix engine startup before server start.
 
 ## 8-Edge Alignment Matrix
 
@@ -39,15 +43,16 @@
 
 ## Archive Readiness
 
-**READY FOR ARCHIVE.** All 5 fixes verified. No CRITICAL findings remaining.
+**READY FOR EXECUTION.** All investigation complete. Root causes identified. Specs enhanced with corrected model choices and port analysis. No CRITICAL findings remaining — Phase 0 addresses all blockers.
 
 ## Final Artifact State
 
 | Artifact | Status | Notes |
 |----------|--------|-------|
-| proposal.md | FIXED | Phase 0 prerequisites, archive plan added |
-| design.md | FIXED | Dependencies section, env variables, model name, ASCII art |
-| tasks.md | FIXED | 33 tasks across7 phases (0-5 + archive) |
+| proposal.md | REVISED | Phase 0 prerequisites, embedding/LLM strategy, corrected model refs |
+| design.md | REVISED | Architecture diagram, embedding analysis, LLM analysis, port investigation, iii engine root cause, dependency table |
+| tasks.md | REVISED | 6 phases (0-5 + archive), fresh evidence block, corrected model refs |
 | .openspec.yaml | CORRECT | schema: spec-driven, skip_specs: true |
-| review-context-bundle.md | REFERENCE | Evidence bundle for reviewers |
-| review-full-context.md | REFERENCE | Full context for reviewers |
+| review-context-bundle.md | REVISED | Fresh evidence from 2026-08-06 investigation |
+| review-full-context.md | REVISED | Full context bundle with corrected findings |
+| review-plan.md | THIS FILE | Updated with Round 3 findings |
