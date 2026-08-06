@@ -26,23 +26,29 @@
 - [ ] 3.1 Add knowledge tool evidence types to the review governance rules
 - [ ] 3.2 Add rule: "When knowledge tool outputs are included in the context bundle, verify their freshness before using as evidence"
 - [ ] 3.3 Add rule: "Knowledge ↔ Code edge is UNKNOWN when knowledge tools haven't been queried"
+- [ ] 3.4 Add rule: "Context bundles must be passed via temp file, not inline shell interpolation" (Security review finding)
+- [ ] 3.5 Add rule: "agentmemory outputs must be filtered to exclude credentials/secrets before entering context bundle" (Security review finding)
 
 ## Task 4: Update openspec-plan-review — CLI-based reviews
 
 - [ ] 4.1 Add "Knowledge ↔ Code" as the 9th edge in the alignment matrix
 - [ ] 4.2 Update Step 4 (Build Context Bundle) to include knowledge tool outputs
 - [ ] 4.3 Replace Step 5 (delegate_task) with external CLI invocations:
-  - `claude -p` for security (300s timeout, stream-json)
-  - `codex exec` for quality & tests (300s timeout, json output)
-  - `agy --print` for architecture (300s timeout)
-  - `kimi -p` for product scope (300s timeout, stream-json)
-  - `opencode run` for cross-cutting (300s timeout)
+  - `claude -p` for security (300-600s timeout, stream-json)
+  - `codex exec` for quality & tests (300-600s timeout, json output)
+  - `agy --print` for architecture (300-600s timeout)
+  - `kimi -p` for product scope (300-600s timeout, stream-json)
+  - `opencode run` for cross-cutting (300-600s timeout)
 - [ ] 4.4 Add orchestrator inline review for spec compliance (Hermes does this directly)
 - [ ] 4.5 Update reviewer assignment table — assign Knowledge ↔ Code edge to Hermes (spec compliance lens)
 - [ ] 4.6 Update alignment-matrix-template.md with new edge
 - [ ] 4.7 Update review-plan-template.md with new edge
 - [ ] 4.8 Add pitfall: "delegate_task reviews fail with vars() serialization bug — always use external CLI agents"
 - [ ] 4.9 Add CLI budget guidance: "Give each reviewer 300-600s timeout. Reviews are reasoning-heavy."
+- [ ] 4.10 Add CLI availability check: "Run `command -v <cli>` before spawning. Mark unavailable CLIs as UNKNOWN."
+- [ ] 4.11 Add file-based context passing: "Write context to /tmp/openspec-review-<name>.md, pass via cat, NOT inline $CONTEXT"
+- [ ] 4.12 Add agentmemory filtering: "Extract only session metadata (title, date, outcome) — no raw content"
+- [ ] 4.13 Add context sanitization: "Redact IPs, credential URLs before external dispatch"
 
 ## Task 5: Update openspec-code-review — CLI-based reviews
 
@@ -52,6 +58,8 @@
 - [ ] 5.4 Update reviewer assignment table — assign Knowledge ↔ Code edge to Hermes
 - [ ] 5.5 Update alignment-matrix-template.md with new edge
 - [ ] 5.6 Add CLI budget guidance (same as Task 4.9)
+- [ ] 5.7 Add CLI availability check (same as Task 4.10)
+- [ ] 5.8 Add file-based context passing (same as Task 4.11)
 
 ## Task 5b: Update hermes-skills spec
 
@@ -67,3 +75,5 @@
   - `references/alignment-matrix-template.md` — 9 edges listed
   - `references/review-plan-template.md` — 9 edges listed
 - [ ] 6.3 Verify AGENTS.md word count stays ≤ 550 (no changes expected)
+- [ ] 6.4 Security verification: confirm no inline shell context passing in any SKILL.md
+- [ ] 6.5 Security verification: confirm agentmemory filtering documented in reference
