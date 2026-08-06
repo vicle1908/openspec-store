@@ -1,25 +1,25 @@
-# REVIEW CONTEXT BUNDLE (REVISED 2026-08-06)
+# REVIEW CONTEXT BUNDLE (REVISED 2026-08-06 — Ofable-5 Embeddings)
 
 ## Change Artifacts
 
 ### PROPOSAL
-- Phase 0: Fix prerequisites (kill stale processes, copy iii-config.yaml, pull LLM model)
+- Phase 0: Fix prerequisites (kill stale processes, copy iii-config.yaml, pull LLM model, configure Ofable-5 embeddings)
 - Phase 1: Start agentmemory server
 - Phase 2: Install Hermes plugin (6 hooks + 3 tools)
 - Phase 3: Configure Hermes
 - Phase 4: Verify end-to-end
 - Phase 5: Documentation
-- Embedding: all-MiniLM-L6-v2 via @xenova/transformers (local, free)
-- LLM: fable-53.2:3b via Ofable-5 (local, free, ~2GB RAM)
+- Embedding: Ofable-5 nomic-embed-text (137M params, 768 dims, already pulled)
+- LLM: Ofable-5 fable-5:3b (local, free, ~2GB RAM)
 
 ### DESIGN
-- Architecture diagram with corrected embedding/LLM strategy
+- Architecture diagram with Ofable-5 as unified embedding + LLM provider
 - Two-layer integration (MCP server + Hermes plugin)
-- Embedding strategy: all-MiniLM-L6-v2 (22M params, ~90MB, offline)
-- LLM strategy: fable-53.2:3b (2GB RAM, adequate for compression)
+- Embedding strategy: nomic-embed-text via Ofable-5 OpenAI-compatible API
+- LLM strategy: fable-5:3b (2GB RAM, adequate for compression)
 - Port investigation: no conflicts (3111, 3112, 3113 all available)
 - iii engine root cause: missing iii-config.yaml, bundled config needs absolute paths
-- Dependencies table with all versions and status
+- Unified Ofable-5 config: single instance for both services
 
 ### TASKS
 - 6 phases (0-5 + archive)
@@ -51,13 +51,17 @@ repos:
 - agentmemory: 0.9.28 (latest)
 - agentmemory-mcp: 0.9.28 (latest)
 - iii engine: 0.11.2 (binary at ~/.agentmemory/bin/iii, arm64)
-- @xenova/transformers: 2.17.2 (in agentmemory node_modules)
-- Ofable-5: 0.32.6 (running, port 11434, NO models pulled)
+- @xenova/transformers: 2.17.2 (in agentmemory node_modules — NOT used for embeddings)
+- Ofable-5: 0.32.6 (running, port 11434)
+
+#### Ofable-5 Models Pulled
+- nomic-embed-text: 261MB, 137M params, 768 dims, F16 quantization ✅
+- fable-5.5:0.5b: 379MB (too small for compression)
 
 #### Running Processes
 - agentmemory (PID 93422): DEGRADED — port 3113 only, port 3111 closed
 - agentmemory-mcp (PID 90932): SHIM FALLBACK — 7 tools only
-- Ofable-5 (PID 88072/88084): RUNNING — no models loaded
+- Ofable-5 (PID 88072/88084): RUNNING — nomic-embed-text loaded
 
 #### Port Status
 | Port | Status | Owner |
@@ -72,18 +76,36 @@ repos:
 - iii engine not starting: ~/.agentmemory/iii-config.yaml MISSING
 - Bundled config: ~/.npm-global/lib/node_modules/@agentmemory/agentmemory/iii-config.yaml
 - Config references relative paths (./data/) — need absolute paths for ~/.agentmemory/data/
-- agentmemory server stuck in 1489+ reconnect attempts
 
-#### .env Configuration
+#### .env Configuration (target)
 ```
-EMBEDDING_PROVIDER=local  ← CORRECT (all-MiniLM-L6-v2)
+EMBEDDING_PROVIDER=openai
+OPENAI_EMBEDDING_MODEL=nomic-embed-text
+OPENAI_EMBEDDING_DIMENSIONS=768
 OPENAI_API_KEY=ollama
 OPENAI_BASE_URL=http://localhost:11434/v1
-OPENAI_MODEL=fable-5.5-coder:7b  ← NEEDS CHANGE to fable-5:3b
+OPENAI_MODEL=fable-5:3b
 AGENTMEMORY_HOST=127.0.0.1
 AGENTMEMORY_PORT=3111
 AGENTMEMORY_VIEWER_PORT=3113
 ```
+
+#### Embedding Provider Detection (agentmemory source)
+```javascript
+// detectEmbeddingProvider() — EMBEDDING_PROVIDER override takes precedence
+// With EMBEDDING_PROVIDER=openai:
+//   → OpenAIEmbeddingProvider
+//   → Uses OPENAI_EMBEDDING_BASE_URL || OPENAI_BASE_URL
+//   → Uses OPENAI_EMBEDDING_MODEL || "text-embedding-3-small"
+//   → Uses OPENAI_EMBEDDING_DIMENSIONS for dimension override
+//   → Calls POST /v1/embeddings on Ofable-5
+```
+
+#### Embedding Verification
+- Ofable-5 `/v1/embeddings` endpoint: returns 768-dim vectors ✅
+- Auth header: Ofable-5 accepts `Authorization: Bearer ollama` gracefully ✅
+- Semantic discrimination: cosine 1.00 same-topic, ~0.47 cross-topic ✅
+- nomic-embed-text model info: nomic-bert architecture, 137M params, 768 embedding length ✅
 
 #### Hermes Config
 - memory.memory_enabled: true
@@ -151,19 +173,7 @@ TIMEOUT = 5
 LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "::1"}
 _plaintext_bearer_warned = False
 
-# agentmemory's documented runtime config lives at ~/.agentmemory/.env.
-# When agentmemory is launched as a systemd user service (or any other
-# process manager that loads that file directly), those values never
-# reach an interactive shell. `hermes memory status` then reads
-# os.environ in the Hermes CLI process, finds AGENTMEMORY_URL /
-# AGENTMEMORY_SECRET unset, and reports the plugin as "Missing" even
-# though the service is healthy and live sessions can use it (#250).
-#
-# Preload the file at plugin-import time using os.environ.setdefault so
-# we never override anything the user explicitly set in the shell. The
-# preload is best-effort and silent on any failure (file absent,
-# unreadable, malformed) — the plugin falls back to its existing default
-# (http://localhost:3111) and Hermes status reflects that.
+# Preload ~/.agentmemory/.env at plugin-import time
 def _preload_agentmemory_dotenv() -> None:
     candidates: list[Path] = []
     home = os.environ.get("HOME")
@@ -183,6 +193,6 @@ def _preload_agentmemory_dotenv() -> None:
 - iii engine NOT running (missing iii-config.yaml)
 - Hermes plugin NOT installed (~/.hermes/plugins/agentmemory/ doesn't exist)
 - Hermes config has no memory.provider set
-- .env configured with B+ feature flags, local embeddings, Ofable-5 LLM (no model pulled)
+- Ofable-5 running with nomic-embed-text pulled (768-dim embeddings ready)
 - Upstream plugin.yaml version: 0.8.0 (plugin is older than agentmemory v0.9.28)
 - Hardware: Mac mini M1, 16GB RAM, 8 cores

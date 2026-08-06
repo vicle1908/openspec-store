@@ -34,9 +34,16 @@
 |  Port 3113: Real-time Viewer                                  |
 |  Engine: iii v0.11.2 (pinned binary)                          |
 |  Storage: ~/.agentmemory/data/                                |
-|  Embeddings: @xenova/transformers (all-MiniLM-L6-v2, local)  |
-|  LLM: Ollama fable-53.2:3b (local) or API fallback             |
+|  Embeddings: Ofable-5 nomic-embed-text (768-dim, OpenAI API) |
+|  LLM: Ofable-5 fable-5:3b (local) or API fallback            |
 |  Search: BM25 + vector + knowledge graph                      |
++--------------------------------------------------------------+
+                                  |
++---------------------------------v----------------------------+
+|              Ofable-5 (localhost:11434)                       |
+|  Embedding model: nomic-embed-text (137M params, 768 dims)   |
+|  LLM model: fable-5:3b (~2GB) for compression/summarization  |
+|  OpenAI-compatible API: /v1/embeddings + /v1/chat/completions |
 +--------------------------------------------------------------+
                                   |
 +---------------------------------v----------------------------+
@@ -136,39 +143,52 @@ class AgentMemoryProvider(MemoryProvider):
 
 ## Embedding Strategy (Revised)
 
-### Decision: `all-MiniLM-L6-v2` via `@xenova/transformers` (local, free)
+### Decision: Ofable-5 `nomic-embed-text` (OpenAI-compatible API, local, free)
 
-**Why this model:**
-- **22M params, ~90MB** — negligible memory footprint on M1 16GB
-- **100% offline** — no API keys, no cloud dependency, no network calls
-- **agentmemory's recommended default** — `EMBEDDING_PROVIDER=local` (already configured)
-- **Proven accuracy** — +8pp recall improvement over BM25-only in agentmemory benchmarks
-- **Fast inference** — M1 Neural Engine acceleration via CoreML backend in @xenova/transformers
-- **Already installed** — `@xenova/transformers@2.17.2` is in agentmemory's node_modules
+**Why Ofable-5 for embeddings:**
+- **Already pulled** — `nomic-embed-text` is installed and working on Ofable-5
+- **137M params, 768 dimensions** — 3.4x more parameters and 2x richer representation than all-MiniLM-L6-v2 (22M, 384 dims)
+- **GPU-accelerated** — runs on M1 Neural Engine via Ofable-5, faster inference than CPU-bound @xenova/transformers
+- **OpenAI-compatible API** — agentmemory's `EMBEDDING_PROVIDER=openai` uses `/v1/embeddings` endpoint natively
+- **Single dependency** — Ofable-5 handles both LLM (compression) and embeddings (vector search)
+- **Already verified** — tested `nomic-embed-text` embedding API returns 768-dim vectors with good semantic discrimination (cosine 1.00 same-topic, ~0.47 cross-topic)
+- **No first-run download** — model is already local, no network dependency on first use
 
 **Why NOT other options:**
 
 | Provider | Model | Why rejected |
 |----------|-------|-------------|
-| Ollama `nomic-embed-text` | 137M params, ~550MB | Unnecessary Ollama dependency for embeddings; local transformer is lighter |
+| @xenova/transformers `all-MiniLM-L6-v2` | 22M params, 384 dims | Lower quality (3.4x fewer params, 2x fewer dims), requires separate dependency, CPU-only |
 | OpenAI `text-embedding-3-small` | Cloud API | $0.02/1M tokens, requires API key, network dependency |
-| fable-5 `fable-5-embedding-001` | Cloud API | Requires API key, network dependency |
+| fable-5 `gemini-embedding-001` | Cloud API | Requires API key, network dependency |
 | Voyage `voyage-code-3` | Cloud API | Paid, code-optimized but overkill for memory compression |
 
 **Configuration:**
 ```env
 # ~/.agentmemory/.env
-EMBEDDING_PROVIDER=local
-# No additional config needed — @xenova/transformers auto-downloads all-MiniLM-L6-v2 on first use
+EMBEDDING_PROVIDER=openai
+OPENAI_API_KEY=ollama
+OPENAI_BASE_URL=http://localhost:11434/v1
+OPENAI_EMBEDDING_MODEL=nomic-embed-text
+OPENAI_EMBEDDING_DIMENSIONS=768
 ```
 
-**First-run behavior:** On first embedding request, `@xenova/transformers` downloads `all-MiniLM-L6-v2` (~90MB) to `~/.cache/xenova/`. Subsequent runs use the cached model. No manual model pull required.
+**How it works:**
+1. `EMBEDDING_PROVIDER=openai` tells agentmemory to use the OpenAI-compatible embedding provider
+2. `OPENAI_EMBEDDING_BASE_URL` defaults to `OPENAI_BASE_URL` (http://localhost:11434/v1)
+3. Agentmemory calls `POST /v1/embeddings` on Ofable-5 with model `nomic-embed-text`
+4. Ofable-5 returns 768-dim vectors (F16 quantization, ~261MB model)
+5. Vectors are indexed in agentmemory's triple-stream search (BM25 + Vector + Graph)
+
+**Dimension note:** `nomic-embed-text` (768 dims) is not in agentmemory's built-in model table, so `OPENAI_EMBEDDING_DIMENSIONS=768` must be set explicitly. Without this, agentmemory defaults to 1536 dims and rejects the mismatched vectors.
+
+**Existing vector index warning:** If switching from `all-MiniLM-L6-v2` (384 dims) to `nomic-embed-text` (768 dims), the persisted vector index will have dimension mismatches. Set `AGENTMEMORY_DROP_STALE_INDEX=true` once to discard stale vectors and rebuild from live observations.
 
 ## LLM Strategy (Revised)
 
-### Decision: Ofable-5 `llama3.2:3b` (local, free) with API fallback option
+### Decision: Ofable-5 `fable-5:3b` (local, free) with API fallback option
 
-**Why `fable-5.2:3b`:**
+**Why `fable-5:3b`:**
 - **~2GB RAM** — leaves 14GB for other processes on M1 16GB
 - **Adequate quality** — compression and summarization are short tasks (<2K tokens in, <500 tokens out)
 - **Zero cost** — runs entirely on local hardware
@@ -203,6 +223,31 @@ OPENAI_BASE_URL=https://openrouter.ai/api/v1
 OPENAI_MODEL=fable-5/fable-5
 ```
 
+**Note:** The current .env has `OPENAI_MODEL=fable-5.5-coder:7b` which is NOT pulled. Must change to `fable-5:3b` and pull the model.
+
+## Unified Ofable-5 Configuration
+
+Both embeddings and LLM use the same Ofable-5 instance. The complete .env section:
+
+```env
+# ── Embeddings (Ofable-5 nomic-embed-text) ───────────────────────
+EMBEDDING_PROVIDER=openai
+OPENAI_EMBEDDING_MODEL=nomic-embed-text
+OPENAI_EMBEDDING_DIMENSIONS=768
+
+# ── LLM Provider (Ofable-5 fable-5:3b) ─────────────────────────
+OPENAI_API_KEY=ollama
+OPENAI_BASE_URL=http://localhost:11434/v1
+OPENAI_MODEL=fable-5:3b
+
+# ── Server binding ──────────────────────────────────────────────
+AGENTMEMORY_HOST=127.0.0.1
+AGENTMEMORY_PORT=3111
+AGENTMEMORY_VIEWER_PORT=3113
+```
+
+This uses a single Ofable-5 instance for both services, minimizing resource usage and simplifying the dependency chain.
+
 ## Port Investigation (Revised)
 
 ### Current State (verified 2026-08-06)
@@ -213,7 +258,7 @@ OPENAI_MODEL=fable-5/fable-5
 | 3112 | **FREE** | — | WebSocket streams target. No conflict. |
 | 3113 | **OCCUPIED** | agentmemory (PID 93422) | Viewer port. Expected — this is the running agentmemory server. |
 | 49134 | **FREE** | — | iii engine target. No conflict. |
-| 11434 | **OCCUPIED** | Ollama (PID 88084) | Ofable-5 API. Expected. |
+| 11434 | **OCCUPIED** | Ofable-5 (PID 88084) | Ofable-5 API. Expected. |
 
 ### Finding: No port conflicts exist
 The evidence bundle's "Port 3111 CLOSED" finding was **stale** — the agentmemory server (PID 93422) was running at time of evidence collection but the iii engine had already failed to start. Port 3113 (viewer) is open as expected. Ports 3111, 3112, and 49134 are all available.
@@ -266,26 +311,26 @@ workers:
       cors:
         allowed_origins: ["http://localhost:3111", "http://localhost:3113", "http://127.0.0.1:3111", "http://127.0.0.1:3113"]
         allowed_methods: [GET, POST, PUT, DELETE, OPTIONS]
-  - name:iii-state
+  - name: iii-state
     config:
       adapter:
         name: kv
         config:
           store_method: file_based
           file_path: /Users/androidteam/.agentmemory/data/state_store.db
-  - name:iii-queue
+  - name: iii-queue
     config:
       adapter:
         name: builtin
-  - name:iii-pubsub
+  - name: iii-pubsub
     config:
       adapter:
         name: local
-  - name:iii-cron
+  - name: iii-cron
     config:
       adapter:
         name: kv
-  - name:iii-stream
+  - name: iii-stream
     config:
       port: 3112
       host: 127.0.0.1
@@ -294,7 +339,7 @@ workers:
         config:
           store_method: file_based
           file_path: /Users/androidteam/.agentmemory/data/stream_store
-  - name:iii-observability
+  - name: iii-observability
     config:
       enabled: true
       service_name: agentmemory
@@ -303,7 +348,7 @@ workers:
       metrics_enabled: true
       logs_enabled: true
       logs_console_output: false
-  - name:iii-exec
+  - name: iii-exec
     config:
       watch:
         - src/**/*.ts
@@ -319,35 +364,37 @@ workers:
 | agentmemory | 0.9.28 | ✅ Installed | Latest version |
 | agentmemory-mcp | 0.9.28 | ✅ Installed | Latest version |
 | iii engine | 0.11.2 | ✅ Binary present | At ~/.agentmemory/bin/iii (arm64) |
-| @xenova/transformers | 2.17.2 | ✅ Installed | For local embeddings (all-MiniLM-L6-v2) |
-| Ofable-5 | 0.32.6 | ✅ Running | Port 11434. No models pulled yet. |
+| Ofable-5 | 0.32.6 | ✅ Running | Port 11434. 2 models pulled. |
+| nomic-embed-text | latest | ✅ Pulled | 137M params, 768 dims, 261MB |
 | Hermes plugin | — | ❌ Not installed | Phase 2 of this change |
 | iii-config.yaml | — | ❌ Missing from ~/.agentmemory/ | Root cause of engine failure |
-| fable-53.2:3b | — | ❌ Not pulled | ~2GB. Needed for LLM compression. |
+| fable-5:3b | — | ❌ Not pulled | ~2GB. Needed for LLM compression. |
 
 ## Trade-offs
 
 ### Pro
 - **95.2% retrieval accuracy** on LongMemEval-S benchmark
 - **Cross-agent shared memory** -- memories from all agents in one store
-- **Zero cloud** -- local embeddings via @xenova/transformers, no API key needed
-- **Local LLM** -- fable-53.2:3b via Ofable-5 for zero-cost compression
+- **Unified local stack** -- Ofable-5 handles both embeddings (nomic-embed-text) and LLM (fable-5:3b)
+- **Higher quality embeddings** -- 137M params / 768 dims vs 22M / 384 dims (local transformer)
+- **GPU-accelerated** -- M1 Neural Engine for both embedding and LLM inference
+- **No first-run download** -- nomic-embed-text already pulled, no network dependency
 - **Lifecycle hooks** -- transparent integration, no agent behavior changes needed
 - **Compaction protection** -- context preserved across compressions
 - **Real-time viewer** at localhost:3113
 
 ### Con
 - **Server dependency** -- agentmemory server must be running
-- **Ofable-5 dependency** -- requires Ollama running with fable-53.2:3b pulled (~2GB RAM)
+- **Ofable-5 dependency** -- requires Ofable-5 running with nomic-embed-text + fable-5:3b pulled (~2.3GB total)
 - **iii engine** -- auto-downloaded to ~/.agentmemory/bin/ on first run (~28MB)
 - **Port usage** -- 3 ports occupied (3111, 3112, 3113)
 - **Plugin maintenance** -- pinned to agentmemory repo version (currently v0.8.0 plugin.yaml, independent of server v0.9.28)
 - **Dual memory systems** -- built-in memory + agentmemory (intentional, complementary)
-- **First-run embedding download** -- ~90MB download for all-MiniLM-L6-v2 on first use
 
 ### Mitigations
 - mcp-router auto_start=1 handles server lifecycle
 - Plugin gracefully degrades when server is unavailable (returns empty strings)
-- Local embeddings use @xenova/transformers (no Ofable-5 needed for embeddings)
+- Single Ofable-5 instance for both services (minimal resource usage)
 - Plugin reads .env file for systemd/non-interactive startup compatibility
 - iii-config.yaml copied to ~/.agentmemory/ with absolute paths for reliability
+- `AGENTMEMORY_DROP_STALE_INDEX=true` handles vector dimension migration

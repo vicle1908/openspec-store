@@ -10,16 +10,19 @@ The result: Hermes has no episodic cross-session memory, no pre-LLM context inje
 
 The `developer-memory` OpenSpec spec already defines agentmemory as the shared developer-memory layer. The MCP server is registered in mcp-router with auto_start=1. The missing pieces are:
 1. **Fix the iii engine startup** — the server is stuck in a reconnect loop (1489+ attempts) because `iii-config.yaml` is missing from `~/.agentmemory/`
-2. **Pull an LLM model** — Ollama is running but has no models for compression/summarization
-3. **Install the Hermes plugin** — provides deep lifecycle integration via 6 hooks
+2. **Pull an LLM model** — Ofable-5 is running but needs `fable-5:3b` for compression/summarization
+3. **Configure embeddings** — switch from `@xenova/transformers` to Ofable-5's `nomic-embed-text` (already pulled, higher quality)
+4. **Install the Hermes plugin** — provides deep lifecycle integration via 6 hooks
 
 ## What Changes
 
 ### Phase 0: Fix prerequisites
 - Kill stale agentmemory process (PID 93422, stuck in reconnect loop)
+- Kill stale agentmemory-mcp process (PID 90932, 7-tool shim fallback mode)
 - Copy `iii-config.yaml` to `~/.agentmemory/iii-config.yaml` with absolute data paths
-- Pull `llama3.2:3b` model via Ofable-5 (~2GB) for LLM compression
-- Verify `@xenova/transformers` is installed (already present: v2.17.2)
+- Pull `fable-5:3b` model via Ofable-5 (~2GB) for LLM compression
+- Configure `.env` for Ofable-5 embeddings: `EMBEDDING_PROVIDER=openai`, `OPENAI_EMBEDDING_MODEL=nomic-embed-text`, `OPENAI_EMBEDDING_DIMENSIONS=768`
+- Set `AGENTMEMORY_DROP_STALE_INDEX=true` to handle vector dimension migration (384→768)
 - Verify agentmemory server starts cleanly and port 3111 opens
 - Verify iii engine runs as separate process
 
@@ -56,6 +59,7 @@ The `developer-memory` OpenSpec spec already defines agentmemory as the shared d
 - Verify on_pre_compress preserves context during compaction
 - Verify MCP tools work through mcp-router (memory_save, memory_smart_search, etc.)
 - Open viewer at http://localhost:3113 and confirm memories visible
+- Verify nomic-embed-text embeddings are being used (768-dim vectors)
 
 ### Phase 5: Documentation
 - Update workspace-knowledge-tools skill to reflect plugin status
@@ -64,14 +68,15 @@ The `developer-memory` OpenSpec spec already defines agentmemory as the shared d
 
 ## Embedding & LLM Strategy
 
-### Embeddings: `all-MiniLM-L6-v2` via `@xenova/transformers` (local, free)
-- **22M params, ~90MB** — negligible on M1 16GB
-- **100% offline** — no API keys, no cloud dependency
-- **agentmemory's recommended default** — `EMBEDDING_PROVIDER=local` (already configured)
-- **Already installed** — `@xenova/transformers@2.17.2` in agentmemory's node_modules
-- First-run downloads ~90MB model to `~/.cache/xenova/`
+### Embeddings: Ofable-5 `nomic-embed-text` (OpenAI-compatible API, local, free)
+- **137M params, 768 dimensions** — 3.4x more parameters than all-MiniLM-L6-v2 (22M)
+- **Already pulled** — 261MB, ready to use, no first-run download
+- **GPU-accelerated** — M1 Neural Engine via Ofable-5
+- **Single dependency** — Ofable-5 handles both LLM and embeddings
+- **Verified** — tested with good semantic discrimination (cosine 1.00 same-topic, ~0.47 cross-topic)
+- Config: `EMBEDDING_PROVIDER=openai`, `OPENAI_EMBEDDING_MODEL=nomic-embed-text`, `OPENAI_EMBEDDING_DIMENSIONS=768`
 
-### LLM: Ofable-5 `fable-5.2:3b` (local, free)
+### LLM: Ofable-5 `fable-5:3b` (local, free)
 - **~2GB RAM** — leaves 14GB for other processes on M1 16GB
 - **Adequate quality** — compression tasks are short (<2K tokens in, <500 out)
 - **Zero cost** — runs entirely on local hardware
@@ -82,12 +87,12 @@ The `developer-memory` OpenSpec spec already defines agentmemory as the shared d
 - **Backward compatible**: Hermes built-in memory (MEMORY.md/USER.md + SQLite FTS5) continues to work alongside agentmemory
 - **agentmemory supplements**: Does not replace Hermes built-in memory — adds structured episodic memory on top
 - **Cross-agent**: Memories saved from Hermes are visible to Claude Code, Codex, OpenCode, and vice versa via shared agentmemory store
-- **Zero cloud**: Runs fully local with local embeddings (@xenova/transformers) and local LLM (Ofable-5)
+- **Zero cloud**: Runs fully local with Ofable-5 handling both embeddings (nomic-embed-text) and LLM (fable-5:3b)
 - **Port usage**: 3 ports (3111 REST, 3112 streams, 3113 viewer) — no conflicts with existing services
 
 ## Rollout
 
-1. Fix iii engine + pull LLM model → verify server health → verify MCP tools (54 tools)
+1. Fix iii engine + pull LLM model + configure Ofable-5 embeddings → verify server health → verify MCP tools (54 tools)
 2. Install plugin → configure provider → restart Hermes session
 3. Verify all 6 hooks fire correctly
 4. Monitor for 24 hours — check viewer at localhost:3113
