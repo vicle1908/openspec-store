@@ -1,0 +1,7 @@
+schema: spec-driven
+created: 2026-08-06
+skip_specs: true
+change: hermes-agentmemory-plugin-integration
+description: "Deep integration of agentmemory into Hermes via memory provider plugin (6 lifecycle hooks) + MCP server tools via mcp-router"
+repos:
+  - openspec-store
