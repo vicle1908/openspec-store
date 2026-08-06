@@ -34,17 +34,20 @@
 |  Port 3113: Real-time Viewer                                  |
 |  Engine: iii v0.11.2 (pinned binary)                          |
 |  Storage: ~/.agentmemory/data/                                |
-|  Embeddings: Ofable-5 nomic-embed-text (768-dim, OpenAI API) |
-|  LLM: Ofable-5 fable-5:3b (local) or API fallback            |
+|  Embeddings: Ofable-5 nomic-embed-text (768-dim, local)      |
+|  LLM: fable-5 via shopapikey (same model as Hermes)           |
 |  Search: BM25 + vector + knowledge graph                      |
 +--------------------------------------------------------------+
                                   |
-+---------------------------------v----------------------------+
-|              Ofable-5 (localhost:11434)                       |
-|  Embedding model: nomic-embed-text (137M params, 768 dims)   |
-|  LLM model: fable-5:3b (~2GB) for compression/summarization  |
-|  OpenAI-compatible API: /v1/embeddings + /v1/chat/completions |
-+--------------------------------------------------------------+
+                +-----------------+-----------------+
+                |                                   |
+                v                                   v
++----------------------------+  +-----------------------------------+
+| Ofable-5 (localhost:11434) |  | shopapikey (api.phanmemvip.shop)  |
+| Embeddings only            |  | LLM only                          |
+| nomic-embed-text (768-dim) |  | fable-5 (same as Hermes)          |
+| /v1/embeddings             |  | /v1/chat/completions              |
++----------------------------+  +-----------------------------------+
                                   |
 +---------------------------------v----------------------------+
 |              mcp-router (transport hub)                       |
@@ -141,16 +144,15 @@ class AgentMemoryProvider(MemoryProvider):
 - Background operations: threaded (sync_turn, on_memory_write)
 - HTTPS guard: warns when bearer token sent over plaintext HTTP to non-loopback
 
-## Embedding Strategy (Revised)
+## Embedding Strategy
 
-### Decision: Ofable-5 `nomic-embed-text` (OpenAI-compatible API, local, free)
+### Decision: Ofable-5 `nomic-embed-text` (local, free)
 
 **Why Ofable-5 for embeddings:**
 - **Already pulled** — `nomic-embed-text` is installed and working on Ofable-5
 - **137M params, 768 dimensions** — 3.4x more parameters and 2x richer representation than all-MiniLM-L6-v2 (22M, 384 dims)
 - **GPU-accelerated** — runs on M1 Neural Engine via Ofable-5, faster inference than CPU-bound @xenova/transformers
 - **OpenAI-compatible API** — agentmemory's `EMBEDDING_PROVIDER=openai` uses `/v1/embeddings` endpoint natively
-- **Single dependency** — Ofable-5 handles both LLM (compression) and embeddings (vector search)
 - **Already verified** — tested `nomic-embed-text` embedding API returns 768-dim vectors with good semantic discrimination (cosine 1.00 same-topic, ~0.47 cross-topic)
 - **No first-run download** — model is already local, no network dependency on first use
 
@@ -160,85 +162,63 @@ class AgentMemoryProvider(MemoryProvider):
 |----------|-------|-------------|
 | @xenova/transformers `all-MiniLM-L6-v2` | 22M params, 384 dims | Lower quality (3.4x fewer params, 2x fewer dims), requires separate dependency, CPU-only |
 | OpenAI `text-embedding-3-small` | Cloud API | $0.02/1M tokens, requires API key, network dependency |
-| fable-5 `gemini-embedding-001` | Cloud API | Requires API key, network dependency |
 | Voyage `voyage-code-3` | Cloud API | Paid, code-optimized but overkill for memory compression |
-
-**Configuration:**
-```env
-# ~/.agentmemory/.env
-EMBEDDING_PROVIDER=openai
-OPENAI_API_KEY=ollama
-OPENAI_BASE_URL=http://localhost:11434/v1
-OPENAI_EMBEDDING_MODEL=nomic-embed-text
-OPENAI_EMBEDDING_DIMENSIONS=768
-```
 
 **How it works:**
 1. `EMBEDDING_PROVIDER=openai` tells agentmemory to use the OpenAI-compatible embedding provider
-2. `OPENAI_EMBEDDING_BASE_URL` defaults to `OPENAI_BASE_URL` (http://localhost:11434/v1)
-3. Agentmemory calls `POST /v1/embeddings` on Ofable-5 with model `nomic-embed-text`
-4. Ofable-5 returns 768-dim vectors (F16 quantization, ~261MB model)
-5. Vectors are indexed in agentmemory's triple-stream search (BM25 + Vector + Graph)
+2. `OPENAI_EMBEDDING_BASE_URL=http://localhost:11434/v1` routes to Ofable-5
+3. `OPENAI_EMBEDDING_API_KEY=ollama` — dummy key (Ofable-5 ignores auth)
+4. Agentmemory calls `POST /v1/embeddings` on Ofable-5 with model `nomic-embed-text`
+5. Ofable-5 returns 768-dim vectors (F16 quantization, ~261MB model)
+6. Vectors are indexed in agentmemory's triple-stream search (BM25 + Vector + Graph)
 
 **Dimension note:** `nomic-embed-text` (768 dims) is not in agentmemory's built-in model table, so `OPENAI_EMBEDDING_DIMENSIONS=768` must be set explicitly. Without this, agentmemory defaults to 1536 dims and rejects the mismatched vectors.
 
 **Existing vector index warning:** If switching from `all-MiniLM-L6-v2` (384 dims) to `nomic-embed-text` (768 dims), the persisted vector index will have dimension mismatches. Set `AGENTMEMORY_DROP_STALE_INDEX=true` once to discard stale vectors and rebuild from live observations.
 
-## LLM Strategy (Revised)
+## LLM Strategy
 
-### Decision: Ofable-5 `fable-5:3b` (local, free) with API fallback option
+### Decision: `fable-5` via shopapikey (same model as Hermes)
 
-**Why `fable-5:3b`:**
-- **~2GB RAM** — leaves 14GB for other processes on M1 16GB
-- **Adequate quality** — compression and summarization are short tasks (<2K tokens in, <500 tokens out)
-- **Zero cost** — runs entirely on local hardware
-- **Fast on M1** — ~22 tok/s inference speed
-- **agentmemory explicitly recommends** this as "smallest sane option" for compression
+**Why `fable-5` via shopapikey:**
+- **Same model as Hermes** — consistent quality and behavior across agentmemory compression and Hermes conversations
+- **Already configured** — shopapikey provider at `https://api.phanmemvip.shop/v1` with `HERMES_CUSTOM_SHOPAPIKEY_API_KEY`
+- **Verified available** — `fable-5` confirmed in shopapikey model list
+- **No local RAM usage** — runs in cloud, leaves M1 16GB memory for other processes
+- **No model pull needed** — no Ofable-5 LLM model to download (~2GB saved)
+- **Consistent with workspace** — all agents (Hermes, delegation, compression) use the same model
 
-**Why NOT `fable-5:7b` (current .env reference):**
-- **~4.7GB RAM** — would consume ~30% of total memory on M1 16GB
-- **Overkill for compression** — code-specific training not needed for memory summarization
-- **Slower inference** — 7B model vs 3B on same hardware
-- **Higher memory pressure** — risks OOM with other development tools running
+**Why NOT local Ofable-5 `fable-5:3b`:**
+- **Requires model pull** — ~2GB download and RAM usage on M1 16GB
+- **Lower quality** — 3B local model vs full `fable-5` via API
+- **Inconsistent** — different model than Hermes uses for conversations
+- **Resource pressure** — 2GB RAM for background compression competes with development tools
 
-**Alternative: API fallback (OpenRouter `fable-5`)**
-- **~$0.40/month** for typical workload (635 requests / 35 hours active use)
-- **Better quality** than local 3B model
-- **Zero RAM usage** — runs in cloud
-- **Trade-off:** Requires API key and network dependency
-
-**Configuration (recommended — local):**
+**Alternative: Local Ofable-5 `fable-5:3b`**
+If API costs become a concern, pull `fable-5:3b` on Ofable-5 and switch:
 ```env
-# ~/.agentmemory/.env
 OPENAI_API_KEY=ollama
 OPENAI_BASE_URL=http://localhost:11434/v1
 OPENAI_MODEL=fable-5:3b
 ```
+This uses ~2GB RAM but eliminates API costs entirely.
 
-**Configuration (API fallback):**
-```env
-# ~/.agentmemory/.env
-OPENAI_API_KEY=<your-openrouter-key>
-OPENAI_BASE_URL=https://openrouter.ai/api/v1
-OPENAI_MODEL=fable-5/fable-5
-```
+## Unified Configuration
 
-**Note:** The current .env has `OPENAI_MODEL=fable-5.5-coder:7b` which is NOT pulled. Must change to `fable-5:3b` and pull the model.
-
-## Unified Ofable-5 Configuration
-
-Both embeddings and LLM use the same Ofable-5 instance. The complete .env section:
+The final `.env` splits responsibilities: shopapikey for LLM, Ofable-5 for embeddings.
 
 ```env
-# ── Embeddings (Ofable-5 nomic-embed-text) ───────────────────────
+# ── LLM Provider (shopapikey — same as Hermes) ──────────────────
+OPENAI_API_KEY=<value from HERMES_CUSTOM_SHOPAPIKEY_API_KEY>
+OPENAI_BASE_URL=https://api.phanmemvip.shop/v1
+OPENAI_MODEL=fable-5
+
+# ── Embeddings (Ofable-5 nomic-embed-text, local) ──────────────
 EMBEDDING_PROVIDER=openai
+OPENAI_EMBEDDING_API_KEY=ollama
+OPENAI_EMBEDDING_BASE_URL=http://localhost:11434/v1
 OPENAI_EMBEDDING_MODEL=nomic-embed-text
 OPENAI_EMBEDDING_DIMENSIONS=768
-
-# ── LLM Provider (Ofable-5 fable-5:3b) ─────────────────────────
-OPENAI_API_KEY=ollama
-OPENAI_BASE_URL=http://localhost:11434/v1
-OPENAI_MODEL=fable-5:3b
 
 # ── Server binding ──────────────────────────────────────────────
 AGENTMEMORY_HOST=127.0.0.1
@@ -246,9 +226,12 @@ AGENTMEMORY_PORT=3111
 AGENTMEMORY_VIEWER_PORT=3113
 ```
 
-This uses a single Ofable-5 instance for both services, minimizing resource usage and simplifying the dependency chain.
+**Split rationale:**
+- LLM (compression/summarization) → shopapikey `fable-5` — consistent with Hermes, no local RAM
+- Embeddings (vector search) → Ofable-5 `nomic-embed-text` — local, free, GPU-accelerated
+- No Ofable-5 LLM model needed — saves ~2GB RAM on M1 16GB
 
-## Port Investigation (Revised)
+## Port Investigation
 
 ### Current State (verified 2026-08-06)
 
@@ -356,7 +339,7 @@ workers:
         - node dist/index.mjs
 ```
 
-## Dependencies (Revised)
+## Dependencies
 
 | Dependency | Version | Status | Notes |
 |-----------|---------|--------|-------|
@@ -364,37 +347,39 @@ workers:
 | agentmemory | 0.9.28 | ✅ Installed | Latest version |
 | agentmemory-mcp | 0.9.28 | ✅ Installed | Latest version |
 | iii engine | 0.11.2 | ✅ Binary present | At ~/.agentmemory/bin/iii (arm64) |
-| Ofable-5 | 0.32.6 | ✅ Running | Port 11434. 2 models pulled. |
+| Ofable-5 | 0.32.6 | ✅ Running | Port 11434. nomic-embed-text pulled. |
 | nomic-embed-text | latest | ✅ Pulled | 137M params, 768 dims, 261MB |
+| shopapikey `fable-5` | — | ✅ Available | Same model as Hermes, no local pull needed |
 | Hermes plugin | — | ❌ Not installed | Phase 2 of this change |
 | iii-config.yaml | — | ❌ Missing from ~/.agentmemory/ | Root cause of engine failure |
-| fable-5:3b | — | ❌ Not pulled | ~2GB. Needed for LLM compression. |
 
 ## Trade-offs
 
 ### Pro
 - **95.2% retrieval accuracy** on LongMemEval-S benchmark
-- **Cross-agent shared memory** -- memories from all agents in one store
-- **Unified local stack** -- Ofable-5 handles both embeddings (nomic-embed-text) and LLM (fable-5:3b)
-- **Higher quality embeddings** -- 137M params / 768 dims vs 22M / 384 dims (local transformer)
-- **GPU-accelerated** -- M1 Neural Engine for both embedding and LLM inference
-- **No first-run download** -- nomic-embed-text already pulled, no network dependency
-- **Lifecycle hooks** -- transparent integration, no agent behavior changes needed
-- **Compaction protection** -- context preserved across compressions
+- **Cross-agent shared memory** — memories from all agents in one store
+- **Same LLM as Hermes** — fable-5 via shopapikey, consistent quality across compression and conversations
+- **Higher quality embeddings** — 137M params / 768 dims via Ofable-5 nomic-embed-text
+- **GPU-accelerated embeddings** — M1 Neural Engine via Ofable-5
+- **No local RAM for LLM** — compression runs in cloud, M1 16GB free for development
+- **No model pull needed** — nomic-embed-text already pulled, fable-5 is API-only
+- **Lifecycle hooks** — transparent integration, no agent behavior changes needed
+- **Compaction protection** — context preserved across compressions
 - **Real-time viewer** at localhost:3113
 
 ### Con
-- **Server dependency** -- agentmemory server must be running
-- **Ofable-5 dependency** -- requires Ofable-5 running with nomic-embed-text + fable-5:3b pulled (~2.3GB total)
-- **iii engine** -- auto-downloaded to ~/.agentmemory/bin/ on first run (~28MB)
-- **Port usage** -- 3 ports occupied (3111, 3112, 3113)
-- **Plugin maintenance** -- pinned to agentmemory repo version (currently v0.8.0 plugin.yaml, independent of server v0.9.28)
-- **Dual memory systems** -- built-in memory + agentmemory (intentional, complementary)
+- **Server dependency** — agentmemory server must be running
+- **Network dependency for LLM** — shopapikey API required for compression/summarization
+- **iii engine** — auto-downloaded to ~/.agentmemory/bin/ on first run (~28MB)
+- **Port usage** — 3 ports occupied (3111, 3112, 3113)
+- **Plugin maintenance** — pinned to agentmemory repo version (currently v0.8.0 plugin.yaml, independent of server v0.9.28)
+- **Dual memory systems** — built-in memory + agentmemory (intentional, complementary)
 
 ### Mitigations
 - mcp-router auto_start=1 handles server lifecycle
 - Plugin gracefully degrades when server is unavailable (returns empty strings)
-- Single Ofable-5 instance for both services (minimal resource usage)
+- Ofable-5 handles embeddings locally (no network needed for vector search)
+- Local Ofable-5 `fable-5:3b` available as fallback if API costs become a concern
 - Plugin reads .env file for systemd/non-interactive startup compatibility
 - iii-config.yaml copied to ~/.agentmemory/ with absolute paths for reliability
 - `AGENTMEMORY_DROP_STALE_INDEX=true` handles vector dimension migration

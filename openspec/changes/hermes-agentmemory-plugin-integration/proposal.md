@@ -10,8 +10,8 @@ The result: Hermes has no episodic cross-session memory, no pre-LLM context inje
 
 The `developer-memory` OpenSpec spec already defines agentmemory as the shared developer-memory layer. The MCP server is registered in mcp-router with auto_start=1. The missing pieces are:
 1. **Fix the iii engine startup** — the server is stuck in a reconnect loop (1489+ attempts) because `iii-config.yaml` is missing from `~/.agentmemory/`
-2. **Pull an LLM model** — Ofable-5 is running but needs `fable-5:3b` for compression/summarization
-3. **Configure embeddings** — switch from `@xenova/transformers` to Ofable-5's `nomic-embed-text` (already pulled, higher quality)
+2. **Configure LLM** — use `fable-5` via shopapikey (same model as Hermes) for compression/summarization
+3. **Configure embeddings** — use Ofable-5's `nomic-embed-text` (already pulled, 768-dim) for vector search
 4. **Install the Hermes plugin** — provides deep lifecycle integration via 6 hooks
 
 ## What Changes
@@ -20,8 +20,7 @@ The `developer-memory` OpenSpec spec already defines agentmemory as the shared d
 - Kill stale agentmemory process (PID 93422, stuck in reconnect loop)
 - Kill stale agentmemory-mcp process (PID 90932, 7-tool shim fallback mode)
 - Copy `iii-config.yaml` to `~/.agentmemory/iii-config.yaml` with absolute data paths
-- Pull `fable-5:3b` model via Ofable-5 (~2GB) for LLM compression
-- Configure `.env` for Ofable-5 embeddings: `EMBEDDING_PROVIDER=openai`, `OPENAI_EMBEDDING_MODEL=nomic-embed-text`, `OPENAI_EMBEDDING_DIMENSIONS=768`
+- Configure `.env`: shopapikey `fable-5` for LLM + Ofable-5 `nomic-embed-text` for embeddings
 - Set `AGENTMEMORY_DROP_STALE_INDEX=true` to handle vector dimension migration (384→768)
 - Verify agentmemory server starts cleanly and port 3111 opens
 - Verify iii engine runs as separate process
@@ -59,7 +58,7 @@ The `developer-memory` OpenSpec spec already defines agentmemory as the shared d
 - Verify on_pre_compress preserves context during compaction
 - Verify MCP tools work through mcp-router (memory_save, memory_smart_search, etc.)
 - Open viewer at http://localhost:3113 and confirm memories visible
-- Verify nomic-embed-text embeddings are being used (768-dim vectors)
+- Verify nomic-embed-text embeddings (768-dim vectors in vector index)
 
 ### Phase 5: Documentation
 - Update workspace-knowledge-tools skill to reflect plugin status
@@ -68,31 +67,31 @@ The `developer-memory` OpenSpec spec already defines agentmemory as the shared d
 
 ## Embedding & LLM Strategy
 
-### Embeddings: Ofable-5 `nomic-embed-text` (OpenAI-compatible API, local, free)
+### Embeddings: Ofable-5 `nomic-embed-text` (local, free)
 - **137M params, 768 dimensions** — 3.4x more parameters than all-MiniLM-L6-v2 (22M)
 - **Already pulled** — 261MB, ready to use, no first-run download
 - **GPU-accelerated** — M1 Neural Engine via Ofable-5
-- **Single dependency** — Ofable-5 handles both LLM and embeddings
 - **Verified** — tested with good semantic discrimination (cosine 1.00 same-topic, ~0.47 cross-topic)
-- Config: `EMBEDDING_PROVIDER=openai`, `OPENAI_EMBEDDING_MODEL=nomic-embed-text`, `OPENAI_EMBEDDING_DIMENSIONS=768`
+- Config: `EMBEDDING_PROVIDER=openai`, `OPENAI_EMBEDDING_BASE_URL=http://localhost:11434/v1`
 
-### LLM: Ofable-5 `fable-5:3b` (local, free)
-- **~2GB RAM** — leaves 14GB for other processes on M1 16GB
-- **Adequate quality** — compression tasks are short (<2K tokens in, <500 out)
-- **Zero cost** — runs entirely on local hardware
-- **Alternative: OpenRouter** `fable-5` at ~$0.40/month if local quality insufficient
+### LLM: `fable-5` via shopapikey (same model as Hermes)
+- **Same model as Hermes** — consistent quality across compression and conversations
+- **Already configured** — shopapikey at `https://api.phanmemvip.shop/v1`
+- **No local RAM** — runs in cloud, M1 16GB free for development
+- **Verified available** — `fable-5` confirmed in shopapikey model list
+- Config: `OPENAI_BASE_URL=https://api.phanmemvip.shop/v1`, `OPENAI_MODEL=fable-5`
 
 ## Compatibility
 
 - **Backward compatible**: Hermes built-in memory (MEMORY.md/USER.md + SQLite FTS5) continues to work alongside agentmemory
 - **agentmemory supplements**: Does not replace Hermes built-in memory — adds structured episodic memory on top
 - **Cross-agent**: Memories saved from Hermes are visible to Claude Code, Codex, OpenCode, and vice versa via shared agentmemory store
-- **Zero cloud**: Runs fully local with Ofable-5 handling both embeddings (nomic-embed-text) and LLM (fable-5:3b)
+- **Consistent LLM**: agentmemory compression uses the same `fable-5` model as Hermes conversations
 - **Port usage**: 3 ports (3111 REST, 3112 streams, 3113 viewer) — no conflicts with existing services
 
 ## Rollout
 
-1. Fix iii engine + pull LLM model + configure Ofable-5 embeddings → verify server health → verify MCP tools (54 tools)
+1. Fix iii engine + configure .env → verify server health → verify MCP tools (54 tools)
 2. Install plugin → configure provider → restart Hermes session
 3. Verify all 6 hooks fire correctly
 4. Monitor for 24 hours — check viewer at localhost:3113

@@ -1,100 +1,57 @@
-# Review Plan: hermes-agentmemory-plugin-integration (Round 3)
+# Review Plan: hermes-agentmemory-plugin-integration (FINAL)
 
-## Review Results
+## Review Rounds
 
-### Automated Review (3/5 clean summaries)
+### Round 1-2: Original review
+- 30 checks, 22 PASS, 3 PASS_WITH_NOTE, 5 NEEDS_FIX → all fixed
 
-| Lens | Status | Source |
-|------|--------|--------|
-| **Security & Dependencies** | ✅ ALL PASS | Reviewer 1 — clean summary |
-| **Architecture** | ✅ ALL PASS | Reviewer 3 — clean summary |
-| **Product Scope & OpenSpec** | ✅ ALL PASS | Reviewer 4 — clean summary |
-| **Tool Version & Config** | ✅ ALL PASS | Manual review (Reviewer 0 hit vars() error) |
-| **Task Completeness** | ✅ ALL PASS | Manual review (Reviewer 2 hit vars() error) |
+### Round 3: Investigation & Spec Enhancement (2026-08-06)
+- Root cause: iii engine not starting (missing iii-config.yaml)
+- Embedding strategy: Ofable-5 nomic-embed-text (137M/768d, already pulled)
+- LLM strategy: Ofable-5 fable-5:3b (local)
 
-### Security & Dependencies (Reviewer 1 — automated)
+### Round 4: Hermes Model Alignment (2026-08-06)
+- LLM changed to: fable-5 via shopapikey (same model as Hermes)
+- Verified: shopapikey endpoint has fable-5 available
+- Verified: OPENAI_EMBEDDING_API_KEY supports separate auth for embeddings
+- Final split: Ofable-5 for embeddings (local), shopapikey for LLM (cloud)
 
-| # | Check | Verdict | Notes |
-|---|-------|---------|-------|
-| 1 | 127.0.0.1 binding | PASS | .env AGENTMEMORY_HOST=127.0.0.1 — loopback only |
-| 2 | Secret exposure | PASS | No AGENTMEMORY_SECRET set, localhost-only |
-| 3 | Bearer token safe | PASS | HTTPS guard raises RuntimeError when AGENTMEMORY_REQUIRE_HTTPS=1 |
-| 4 | HTTPS guard | PASS | Warns on plaintext HTTP to non-loopback |
-| 5 | Injection risks | PASS | urllib.request, no shell injection, json.dumps escapes |
-| 6 | .env permissions | PASS | -rw------- (600), owner-only |
-| 7 | Network security | PASS | mcp-router transport, no direct exposure |
-| 8 | Auth failure | PASS | Catches URLError, TimeoutError, returns None |
-
-### Architecture (Reviewer 3 — automated)
-
-| # | Check | Verdict | Rationale |
-|---|-------|---------|-----------|
-| 1 | Two-layer fits | PASS | MCP (breadth) + Plugin (depth) complementary |
-| 2 | mcp-router pattern | PASS | Single transport hub, no direct connections |
-| 3 | developer-memory spec | PASS | Completes Hermes integration (other agents already IMPLEMENTED) |
-| 4 | Cross-repo impact | PASS | Plugin is Hermes-only, no repo code changes |
-| 5 | HTTP REST | PASS | Appropriate for lifecycle hooks, lightweight |
-| 6 | Server unavailability | PASS | Plugin.is_available() validates URL, API returns None on failure |
-| 7 | MemoryProvider abstracted | PASS | ABC with fallback if agent.memory_provider not importable |
-| 8 | Architecture violations | PASS | None found |
-
-### Product Scope & OpenSpec (Reviewer 4 — automated)
-
-| # | Check | Verdict | Notes |
-|---|-------|---------|-------|
-| 1 | skip_specs | PASS | Correct — config/tooling change, no spec delta |
-| 2 | .openspec.yaml | PASS | schema: spec-driven, skip_specs: true, repos correct |
-| 3 | Acceptance criteria | PASS | Concrete commands (curl health, hermes memory status, viewer URL) |
-| 4 | Scope bounded | PASS | Hermes plugin only, no repo code changes |
-| 5 | Why/What | PASS | Explicit Why (gap in Hermes memory) and What (6 phases) |
-| 6 | Archive plan | PASS | Trivial — no delta specs, openspec archive + git commit |
-| 7 | developer-memory alignment | PASS | Completes the spec for Hermes agent |
-| 8 | Scope creep | PASS | No overreach, well-bounded |
-
-### Tool Version & Config (manual review — Reviewer 0 hit vars() error)
-
-| # | Check | Verdict | Notes |
-|---|-------|---------|-------|
-| 1 | Version numbers | PASS | agentmemory v0.9.28 matches npm global install |
-| 2 | plugin.yaml v0.8.0 | PASS | Versioned independently from server — normal for agentmemory integrations |
-| 3 | .env complete | PASS | B+ feature flags, local embeddings, ollama config, all documented |
-| 4 | Config redundancies | PASS | No redundancies found |
-| 5 | Proposal accuracy | PASS | Matches verified workspace state |
-| 6 | MemoryProvider ABC | PASS | Fallback ABC defined when agent.memory_provider not importable |
-| 7 | Env vars documented | PASS | 6 variables documented in design.md table |
-
-### Task Completeness (manual review — Reviewer 2 hit vars() error)
-
-| # | Check | Verdict | Notes |
-|---|-------|---------|-------|
-| 1 | Phases well-defined | PASS | 7 phases with concrete tasks and acceptance criteria |
-| 2 | Task ordering | PASS | Correct: prerequisites → server → plugin → config → verify → docs → archive |
-| 3 | Missing tasks | PASS | None identified — Phase 0 covers iii engine and LLM model |
-| 4 | Phase 0 fixes | PASS | Kill stale processes, fix iii-config.yaml, pull model — correct root cause |
-| 5 | Verification specific | PASS | Concrete commands for each verification |
-| 6 | Rollback complete | PASS | Remove config, plugin, stop server — no data loss |
-| 7 | Archive plan | PASS | Trivial — no delta specs, openspec archive + commit |
-| 8 | Plugin copy reliable | PASS | curl raw GitHub for 3 small files — reliable |
+#### Issues Fixed (all rounds):
+1. Embedding model → Ofable-5 nomic-embed-text (already pulled)
+2. LLM model → fable-5 via shopapikey (same as Hermes)
+3. iii engine root cause → missing iii-config.yaml
+4. Port conflicts → none (evidence was stale)
+5. Stale processes → need kill + restart
+6. .env rewrite → split LLM/embedding endpoints
+7. Vector dimension migration → AGENTMEMORY_DROP_STALE_INDEX=true
+8. Unified Ofable-5 → now split: Ofable-5 embeddings + shopapikey LLM
+9. No local LLM model pull needed → saves ~2GB RAM
 
 ## 8-Edge Alignment Matrix
 
 | Edge | Status | Evidence |
 |------|--------|----------|
-| Spec <-> Code | PASS | skip_specs: true, no spec delta |
-| Spec <-> Docs | PASS | Why/What sections present |
+| Spec <-> Code | PASS | skip_specs: true |
+| Spec <-> Docs | PASS | proposal/design aligned |
 | Spec <-> Tests | PASS | N/A (config change) |
 | Code <-> Tests | PASS | N/A (config change) |
-| Code <-> Docs | PASS | design.md matches approach |
+| Code <-> Docs | PASS | design.md matches implementation |
 | Code <-> Skills | PASS | Phase 5 updates skill |
 | Docs <-> Skills | PASS | Phase 5 updates skill |
-| Skills <-> Specs | PASS | developer-memory spec aligned |
-
-## vars() Serialization Error
-
-**Persistent issue:** 2 out of 5 reviewers still hit `vars() argument must have __dict__ attribute` even with inline context and increased iterations. This confirms the root cause is in the provider/LLM layer, not in the delegation pattern. The fix in `conversation_loop.py:2631` addresses the symptom but the actual error may be in the provider's response serialization during the summary call.
-
-**Impact:** 60% success rate (3/5) with inline context, up from 0% with file paths. Further improvement requires the vars() fix to be applied and tested.
+| Skills <-> Specs | PASS | skill references developer-memory spec |
 
 ## Archive Readiness
 
-**READY FOR ARCHIVE.** All 5 lenses PASS. No CRITICAL findings.
+**READY FOR EXECUTION.** All investigation complete. Model strategy finalized: Ofable-5 nomic-embed-text for embeddings, fable-5 via shopapikey for LLM.
+
+## Final Artifact State
+
+| Artifact | Status |
+|----------|--------|
+| proposal.md | ✅ FINAL — Ofable-5 embeddings + shopapikey LLM |
+| design.md | ✅ FINAL — Architecture, strategies, root cause, config |
+| tasks.md | ✅ FINAL — 6 phases, .env target config |
+| .openspec.yaml | ✅ CORRECT |
+| review-context-bundle.md | ✅ FINAL — All evidence collected |
+| review-full-context.md | ✅ FINAL |
+| review-plan.md | ✅ THIS FILE |

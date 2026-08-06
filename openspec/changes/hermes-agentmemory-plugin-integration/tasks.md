@@ -5,17 +5,11 @@
 - [ ] Kill stale agentmemory-mcp process (PID 90932, 7-tool shim fallback mode)
 - [ ] Copy iii-config.yaml to ~/.agentmemory/iii-config.yaml (use bundled config with absolute paths)
 - [ ] Verify ~/.agentmemory/data/ directory exists (for state_store.db and stream_store)
-- [ ] Verify Ofable-5 is running (curl http://localhost:11434/api/tags)
-- [ ] Verify nomic-embed-text is pulled (should be in Ofable-5 model list)
-- [ ] Pull Ofable-5 `fable-5:3b` model (~2GB) for LLM compression
-- [ ] Configure .env for Ofable-5 embeddings:
-  - EMBEDDING_PROVIDER=openai
-  - OPENAI_EMBEDDING_MODEL=nomic-embed-text
-  - OPENAI_EMBEDDING_DIMENSIONS=768
-  - OPENAI_API_KEY=ollama
-  - OPENAI_BASE_URL=http://localhost:11434/v1
-  - OPENAI_MODEL=fable-5:3b
+- [ ] Configure .env:
+  - LLM: `OPENAI_API_KEY` (from HERMES_CUSTOM_SHOPAPIKEY_API_KEY), `OPENAI_BASE_URL=https://api.phanmemvip.shop/v1`, `OPENAI_MODEL=fable-5`
+  - Embeddings: `EMBEDDING_PROVIDER=openai`, `OPENAI_EMBEDDING_API_KEY=ollama`, `OPENAI_EMBEDDING_BASE_URL=http://localhost:11434/v1`, `OPENAI_EMBEDDING_MODEL=nomic-embed-text`, `OPENAI_EMBEDDING_DIMENSIONS=768`
 - [ ] Set AGENTMEMORY_DROP_STALE_INDEX=true (handle 384→768 dimension migration)
+- [ ] Verify Ofable-5 is running and nomic-embed-text is loaded
 - [ ] Verify ports 3111, 3112, 3113, 49134 are free
 
 ## Phase 1: Start agentmemory server
@@ -71,37 +65,34 @@
 - agentmemory: 0.9.28 (latest)
 - agentmemory-mcp: 0.9.28 (latest)
 - iii engine: 0.11.2 (binary at ~/.agentmemory/bin/iii, arm64)
-- @xenova/transformers: 2.17.2 (in agentmemory node_modules — NOT used for embeddings)
 - Ofable-5: 0.32.6 (running, port 11434)
 
 ### Ofable-5 Models Pulled
-- nomic-embed-text: 261MB, 137M params, 768 dims, F16 quantization
-- fable-5.5:0.5b: 379MB (NOT suitable for compression — too small)
+- nomic-embed-text: 261MB, 137M params, 768 dims, F16 quantization ✅
 
 ### Running Processes
-- agentmemory (PID 93422): DEGRADED — port 3113 only, port 3111 closed, 1489+ reconnect attempts
+- agentmemory (PID 93422): DEGRADED — port 3113 only, port 3111 closed
 - agentmemory-mcp (PID 90932): SHIM FALLBACK — 7 tools only
 - Ofable-5 (PID 88072/88084): RUNNING — nomic-embed-text loaded
 
 ### Root Cause
 - iii engine not starting because ~/.agentmemory/iii-config.yaml is missing
-- Bundled config exists at ~/.npm-global/lib/node_modules/@agentmemory/agentmemory/iii-config.yaml
-- Config references relative paths (./data/) that need to be absolute
 
-### Embedding Model Comparison
-| Model | Params | Dims | Size | Source | Status |
-|-------|--------|------|------|--------|--------|
-| all-MiniLM-L6-v2 | 22M | 384 | ~90MB | @xenova/transformers | NOT used |
-| nomic-embed-text | 137M | 768 | 261MB | Ofable-5 | ✅ PULLed |
-
-### .env Configuration (target state)
+### .env Target Configuration
 ```
+# LLM — same model as Hermes
+OPENAI_API_KEY=<from HERMES_CUSTOM_SHOPAPIKEY_API_KEY>
+OPENAI_BASE_URL=https://api.phanmemvip.shop/v1
+OPENAI_MODEL=fable-5
+
+# Embeddings — Ofable-5 local
 EMBEDDING_PROVIDER=openai
+OPENAI_EMBEDDING_API_KEY=ollama
+OPENAI_EMBEDDING_BASE_URL=http://localhost:11434/v1
 OPENAI_EMBEDDING_MODEL=nomic-embed-text
 OPENAI_EMBEDDING_DIMENSIONS=768
-OPENAI_API_KEY=ollama
-OPENAI_BASE_URL=http://localhost:11434/v1
-OPENAI_MODEL=fable-5:3b
+
+# Server
 AGENTMEMORY_HOST=127.0.0.1
 AGENTMEMORY_PORT=3111
 AGENTMEMORY_VIEWER_PORT=3113
