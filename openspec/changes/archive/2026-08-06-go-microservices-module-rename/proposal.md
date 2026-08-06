@@ -4,9 +4,9 @@
 
 The Go microservices monorepo at `~/Developer/go-microservices` had inconsistent naming:
 - Directory name: `go-microservices`
-- Git remote URL: `victory1908/microservices.git` (missing `go-` prefix)
+- Git remote URL: `victory1908/go-microservices.git` (missing `go-` prefix)
 - GitNexus indexed as: `microservices` (derived from remote URL)
-- Go module paths: `github.com/victory1908/microservices` (inconsistent with directory)
+- Go module paths: `github.com/victory1908/go-microservices` (inconsistent with directory)
 
 This caused:
 - Pre-commit hook failures ("Repository not found") when GitNexus CLI used basename
@@ -20,7 +20,7 @@ health monitoring infrastructure.
 
 ### Module Rename (154 files)
 - Git remote: `microservices.git` → `go-microservices.git`
-- Go module paths: `victory1908/microservices` → `victory1908/go-microservices` (18 go.mod + 26 Go files)
+- Go module paths: `victory1908/go-microservices` → `victory1908/go-microservices` (18 go.mod + 26 Go files)
 - Scripts: Docker volumes, LaunchAgent labels, kind clusters, schema namespaces (17 files)
 - Deploy: K8s namespaces, ArgoCD project/apps, CDC schemas, kind labels (30+ files)
 - OpenSpec: Active specs updated, archived specs preserved as historical record
@@ -47,5 +47,5 @@ health monitoring infrastructure.
 - All Go builds pass (platform, order-service, ecosystem-verification)
 - GitNexus lists `go-microservices` correctly
 - Pre-commit hook works without "Repository not found" errors
-- Zero remaining `victory1908/microservices` in active Go/shell/mod files
+- Zero remaining `victory1908/go-microservices` in active Go/shell/mod files
 - Monthly assessment cron configured (1st of month, 9AM Vietnam time)
