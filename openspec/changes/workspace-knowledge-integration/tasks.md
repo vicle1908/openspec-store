@@ -18,7 +18,7 @@
 
 ## 3. Build global cross-repo graph
 
-- [x] 3.1 Run `graphify global add` for each repo — **VERIFIED 2026-08-06**: All 18 repos added. Global graph at `~/.graphify/global-graph.json`.
+- [x] 3.1 Run `graphify global add` for each repo — **VERIFIED 2026-08-06**: All 18 repos merged. Global graph: `~/.graphify/global-graph.json` (43,105 nodes, 92,788 edges).
 - [x] 3.2 Run `graphify global list` — **VERIFIED 2026-08-06**: 18 repos registered. Total ~48,000+ nodes across all repos.
 - [x] 3.3 Run `graphify global path` — **VERIFIED**: `/Users/androidteam/.graphify/global-graph.json`.
 - [x] 3.4 Test cross-repo query — **VERIFIED 2026-08-06**: `graphify query "tdt_core"` in agent-core returned BFS traversal results with 10 nodes across test_scheduler.py.
@@ -26,7 +26,7 @@
 
 ## 4. Install git hooks
 
-- [x] 4.1 Run `graphify hook install` in each repo — **VERIFIED 2026-08-06**: All 18 repos have merge driver registered (`graphify-out/graph.json merge=graphify`).
+- [x] 4.1 Run `graphify hook install` in each repo — **VERIFIED 2026-08-06**: All 18 repos have merge driver registered (`.graphify/graph.json merge=graphify`).
 - [x] 4.2 Run `graphify hook status` in 3 repos — **VERIFIED**: Merge driver already registered in all repos.
 - [x] 4.3 Test: make a small change, commit, verify graph rebuilds automatically — **VERIFIED 2026-08-06**: Post-commit and post-checkout hooks installed. Merge driver registered.
 - [x] 4.4 Record evidence: hook status output, auto-rebuild test result — **VERIFIED 2026-08-06**: `graphify hook status` shows post-commit: installed, post-checkout: installed, merge driver: registered.
