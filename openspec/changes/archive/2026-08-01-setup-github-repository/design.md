@@ -2,7 +2,7 @@
 
 ## Context
 
-The microservices repository exists on GitHub (`vicle1908/microservices`) but lacks essential configuration. The local repo has 20+ commits ahead of GitHub after workspace migration. The existing CI/CD workflows are sophisticated but need proper GitHub configuration to function.
+The microservices repository exists on GitHub (`vicle1908/go-microservices`) but lacks essential configuration. The local repo has 20+ commits ahead of GitHub after workspace migration. The existing CI/CD workflows are sophisticated but need proper GitHub configuration to function.
 
 ## Section 1: Git Configuration
 
@@ -15,7 +15,7 @@ The microservices repository exists on GitHub (`vicle1908/microservices`) but la
 ### Proposed
 
 ```bash
-git remote add origin https://github.com/vicle1908/microservices.git
+git remote add origin https://github.com/vicle1908/go-go-microservices.git
 git config user.name "Vinh Le"
 git config user.email "victory1908@gmail.com"
 ```

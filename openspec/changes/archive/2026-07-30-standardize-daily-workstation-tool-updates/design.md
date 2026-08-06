@@ -197,7 +197,7 @@ The LaunchAgent invokes the installed locked runner and uses the current
 user's home directory as `WorkingDirectory`; it never executes from or changes
 directory into the Google Drive/FileProvider checkout. Machine-readable
 reports remain under
-`~/.local/state/microservices-workstation-tool-update/runs/`.
+`~/.local/state/go-microservices-workstation-tool-update/runs/`.
 
 The service lifecycle uses current `launchctl` interfaces against the logged-in
 user's GUI domain: `bootstrap` to register the plist, `bootout` to remove it,

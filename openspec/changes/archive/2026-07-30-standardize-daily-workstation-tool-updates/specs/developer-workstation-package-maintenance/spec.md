@@ -190,7 +190,7 @@ resolve the same user-owned npm, Pi, Bun, and Oh My Posh tools as interactive
 maintenance. It MUST NOT execute from or set its working directory to a
 cloud-synced or FileProvider checkout. It SHALL set neither `RunAtLoad` nor
 `KeepAlive` true and SHALL retain machine-readable reports under
-`~/.local/state/microservices-workstation-tool-update/runs/`. Each run
+`~/.local/state/go-microservices-workstation-tool-update/runs/`. Each run
 SHALL report start and end times, per-stage status, final tool versions, npm
 blanket-policy status, eligible and deferred global npm package names, Pi
 extension coverage, vulnerability counts by severity, overlap status, and any

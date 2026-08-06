@@ -10,7 +10,7 @@ Preserve the dated deployment audit while defining the evidence boundary that pr
 
 ### Requirement: Current deployment readiness requires commit-bound validation evidence
 
-The platform MUST NOT use this historical audit as current readiness evidence. A current readiness claim SHALL reference a passing `microservices.deployment-validation/v1` manifest produced by `make validate-deployment` for the exact target commit.
+The platform MUST NOT use this historical audit as current readiness evidence. A current readiness claim SHALL reference a passing `go-microservices.deployment-validation/v1` manifest produced by `make validate-deployment` for the exact target commit.
 
 #### Scenario: Deployment artifact changes after the audit
 
@@ -20,7 +20,7 @@ The platform MUST NOT use this historical audit as current readiness evidence. A
 #### Scenario: Validation manifest is retained
 
 - **WHEN** `make validate-deployment` passes all required checks for the target commit
-- **THEN** the resulting manifest records that commit, uses schema `microservices.deployment-validation/v1`, and is retained with its referenced evidence artifacts
+- **THEN** the resulting manifest records that commit, uses schema `go-microservices.deployment-validation/v1`, and is retained with its referenced evidence artifacts
 
 ## Historical Report Metadata
 
@@ -36,7 +36,7 @@ The platform MUST NOT use this historical audit as current readiness evidence. A
 
 > **Evidence boundary:** The observations below describe the repository as inspected on 2026-07-16. File presence and static review do not establish deployability. A runtime-pin or deployment-artifact change invalidates any current-readiness inference from this report; generate a new deployment-validation manifest for the changed commit.
 >
-> **Current acceptance:** run `make validate-deployment`. Passing evidence uses schema `microservices.deployment-validation/v1` and defaults to `artifacts/deployment-validation/<run-id>/manifest.json` (the artifact root may be overridden).
+> **Current acceptance:** run `make validate-deployment`. Passing evidence uses schema `go-microservices.deployment-validation/v1` and defaults to `artifacts/deployment-validation/<run-id>/manifest.json` (the artifact root may be overridden).
 
 This report documents the validation of the current deployment architecture against **2026 Kubernetes and Docker best practices**. The platform demonstrates a solid foundation with multi-stage builds, health checks, and layered Compose patterns. Key gaps identified: missing K8s manifests, no resource limits in Compose, and no GitOps infrastructure.
 

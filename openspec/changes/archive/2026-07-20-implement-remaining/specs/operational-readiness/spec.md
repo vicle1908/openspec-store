@@ -14,7 +14,7 @@ This delta updates the operational-readiness spec to add ArgoCD repoURL configur
 
 ### Requirement: ArgoCD repoURL SHALL point to the actual repository
 
-> **Status**: NOT IMPLEMENTED. ArgoCD Application manifests currently use a placeholder repository URL (`https://github.com/org/microservices`). GitOps sync will fail until this is resolved.
+> **Status**: NOT IMPLEMENTED. ArgoCD Application manifests currently use a placeholder repository URL (`https://github.com/org/go-microservices`). GitOps sync will fail until this is resolved.
 
 The platform's ArgoCD Application manifests SHALL configure `spec.source.repoURL` to the actual Git repository URL that contains the Kubernetes manifests and Kustomize overlays. The repoURL SHALL be a valid, reachable Git HTTPS URL that ArgoCD can clone. The repoURL MUST NOT be a placeholder value, empty string, or localhost reference. The repoURL SHALL be consistent across all ArgoCD Application manifests for the platform's services.
 

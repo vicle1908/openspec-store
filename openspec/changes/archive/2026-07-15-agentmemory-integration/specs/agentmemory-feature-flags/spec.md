@@ -32,7 +32,7 @@ The template SHALL default the LLM provider to a local Ollama server at `http://
 Each enabled B+ feature SHALL produce an observable effect on the agentmemory server's behavior. A `make agentmemory-doctor` run after bootstrap SHALL assert each effect is present and SHALL exit non-zero if any of the asserted behaviors is missing.
 
 #### Scenario: GRAPH_EXTRACTION_ENABLED produces a non-empty knowledge graph
-- **WHEN** the server is running with `GRAPH_EXTRACTION_ENABLED=true` and at least 3 observations are recorded under `project=microservices-platform`
+- **WHEN** the server is running with `GRAPH_EXTRACTION_ENABLED=true` and at least 3 observations are recorded under `project=go-microservices-platform`
 - **THEN** `POST /agentmemory/graph/query` with `{"query":"<any>"}` returns at least 1 node and the response includes a `nodes` array of length ≥ 1
 
 #### Scenario: SNAPSHOT_ENABLED produces a commit

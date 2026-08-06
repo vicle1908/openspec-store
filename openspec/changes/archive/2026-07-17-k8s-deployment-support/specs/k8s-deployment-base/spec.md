@@ -57,7 +57,7 @@ The Deployment template SHALL use `RollingUpdate` strategy with `maxUnavailable:
 - **THEN** at least 75% of desired replicas remain available during the rollout
 
 ### Requirement: Kustomize configuration
-The base directory SHALL include a `kustomization.yaml` that references all base templates, sets common labels (`app.kubernetes.io/part-of: microservices-platform`), and configures namespace injection.
+The base directory SHALL include a `kustomization.yaml` that references all base templates, sets common labels (`app.kubernetes.io/part-of: go-microservices-platform`), and configures namespace injection.
 
 #### Scenario: Kustomize builds complete manifest
 - **WHEN** `kustomize build deploy/k8s/base` is executed

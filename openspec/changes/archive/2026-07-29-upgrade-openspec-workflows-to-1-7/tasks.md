@@ -1,6 +1,6 @@
 ## 1. Baseline and safety prerequisites
 
-- [x] 1.1 Run `make workstation-tool-update-preflight`, verify `~/.local/state/microservices-workstation-tool-update/active.lock` is absent, inspect the latest successful redacted maintenance report, and prove two consecutive `openspec --version` probes resolve the approved 1.7.0 CLI before any generated-file mutation.
+- [x] 1.1 Run `make workstation-tool-update-preflight`, verify `~/.local/state/go-microservices-workstation-tool-update/active.lock` is absent, inspect the latest successful redacted maintenance report, and prove two consecutive `openspec --version` probes resolve the approved 1.7.0 CLI before any generated-file mutation.
 - [x] 1.2 Reconfirm the approved OpenSpec version, Node.js `>=20.19.0` engine, package integrity, release notes, customization contract, and supported-tool paths through npm and current official documentation; retain the checked date and sources.
 - [x] 1.3 Inventory the exact eleven configured tools and twelve workflows, all 132 generator-managed skills, twelve canonical `.agents` copies, commands, prompts, workflows, legacy paths, generator versions, invocation forms, and manifest entries; separately record ambiguous or hand-authored files that migration MUST preserve.
 - [x] 1.4 Add failing fixture coverage for the observed 1.6 baseline: stale `generatedBy`, unsupported `AskUserQuestion`/`TodoWrite`, Codex `/opsx:*` references, background archive sync, legacy managed `.kimi/` files, an incomplete tool refresh, unpinned CI installation, and optional validation skips.

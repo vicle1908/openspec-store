@@ -77,7 +77,7 @@ Add `verification/github-actions-lock.json` with one entry per distinct remote a
 
 ```json
 {
-  "schema": "microservices.github-actions-lock/v1",
+  "schema": "go-microservices.github-actions-lock/v1",
   "actions": {
     "actions/checkout": {
       "version": "v7.0.1",

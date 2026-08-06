@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Redis 8.8 cluster deployment providing high availability, automatic failover, and horizontal scaling for the microservices platform.
+Redis 8.8 cluster deployment providing high availability, automatic failover, and horizontal scaling for the go-microservices platform.
 
 ## Current State
 

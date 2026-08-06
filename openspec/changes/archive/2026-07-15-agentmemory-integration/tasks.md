@@ -28,7 +28,7 @@
 - [ ] 2.5 Open Cursor in this very session and verify that 53 MCP tools are visible in the tool palette (`mcp0` server). **Requires manual verification**: restart Cursor to pick up the new MCP config, then check the tool palette.
 - [ ] 2.6 Open Claude Code and verify the same 53 tools are visible. **Requires manual verification**: restart Claude Code to pick up new hooks, then check MCP tool count.
 - [ ] 2.7 Issue a `/recall how do we enforce the platform-hexagonal-enforcement no-peer-imports rule` slash command in Claude Code; verify the response is grounded in the OpenSpec `platform-extensibility` spec. **Requires manual verification**.
-- [ ] 2.8 Issue a `memory_smart_search` call with `{"project":"microservices-platform","query":"<something we just discussed>"}`; verify the result returns a memory tagged with `agentId: "claude-code"`. **Requires manual verification**.
+- [ ] 2.8 Issue a `memory_smart_search` call with `{"project":"go-microservices-platform","query":"<something we just discussed>"}`; verify the result returns a memory tagged with `agentId: "claude-code"`. **Requires manual verification**.
 - [ ] 2.9 Commit the change as Phase 2 PR; verify `make verify-pr` is still green.
 
 ## 3. Phase 3 — Codex CLI + OpenCode wiring (Day 5–7)

@@ -10,7 +10,7 @@ Implements liveness, readiness, and startup probes with role-based check registr
 > readiness evidence is local-only; staging and production health remain
 > unverified.
 >
-> **Acceptance evidence:** `make dev-up`, `make dev-smoke`, and `make validate-deployment` must pass for the target commit. Retain the `microservices.deployment-validation/v1` manifest at `artifacts/deployment-validation/<run-id>/manifest.json` (or the configured artifact root) with referenced health and smoke results.
+> **Acceptance evidence:** `make dev-up`, `make dev-smoke`, and `make validate-deployment` must pass for the target commit. Retain the `go-microservices.deployment-validation/v1` manifest at `artifacts/deployment-validation/<run-id>/manifest.json` (or the configured artifact root) with referenced health and smoke results.
 
 ### Requirement: Liveness, readiness, and startup probes
 The platform SHALL expose `/health/live`, `/health/ready`, and

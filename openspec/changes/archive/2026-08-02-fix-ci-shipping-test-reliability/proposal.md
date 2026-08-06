@@ -39,7 +39,7 @@ None. CI tooling only.
 ## Outcome
 
 The change shipped in
-[vicle1908/microservices#12](https://github.com/vicle1908/microservices/pull/12)
+[vicle1908/go-microservices#12](https://github.com/vicle1908/go-microservices/pull/12)
 and was merged to `main` as commit
 `383e67269073493479533f84b52ad758b8b5bff5`.
 

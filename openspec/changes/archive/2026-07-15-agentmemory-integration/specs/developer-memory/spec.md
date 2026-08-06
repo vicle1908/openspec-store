@@ -17,12 +17,12 @@ The agentmemory REST + MCP server SHALL be reachable at `http://localhost:3111` 
 - **WHEN** the agentmemory server starts
 - **THEN** port 3113 is bound to `127.0.0.1` and a request to a non-loopback interface on `:3113` from another host on the LAN is refused at the TCP level
 
-### Requirement: All writes are scoped to the microservices-platform project
-Every write to the agentmemory server SHALL carry a `project` field with the value `microservices-platform`. The MCP shim, the agent wiring, and the bootstrap script SHALL inject this value automatically. A request that omits or overrides the `project` field SHALL be rejected with HTTP 400 and the canonical `invalid_project` error.
+### Requirement: All writes are scoped to the go-microservices-platform project
+Every write to the agentmemory server SHALL carry a `project` field with the value `go-microservices-platform`. The MCP shim, the agent wiring, and the bootstrap script SHALL inject this value automatically. A request that omits or overrides the `project` field SHALL be rejected with HTTP 400 and the canonical `invalid_project` error.
 
 #### Scenario: observe carries the project namespace
-- **WHEN** a hook issues `POST /agentmemory/observe` with `{"project":"microservices-platform","session_id":"<uuid>","tool":"Read","input":"<path>","output":"<body>"}`
-- **THEN** the server stores the observation under the `microservices-platform` project and a subsequent `POST /agentmemory/smart-search` with `{"project":"microservices-platform","query":"<q>"}` returns the observation
+- **WHEN** a hook issues `POST /agentmemory/observe` with `{"project":"go-microservices-platform","session_id":"<uuid>","tool":"Read","input":"<path>","output":"<body>"}`
+- **THEN** the server stores the observation under the `go-microservices-platform` project and a subsequent `POST /agentmemory/smart-search` with `{"project":"go-microservices-platform","query":"<q>"}` returns the observation
 
 #### Scenario: Observe without a project is rejected
 - **WHEN** a hook issues `POST /agentmemory/observe` with no `project` field

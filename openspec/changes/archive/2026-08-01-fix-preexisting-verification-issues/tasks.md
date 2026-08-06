@@ -12,7 +12,7 @@
   - **Verification**: `cd services/customer-service && go build ./cmd/customer-service/...`
 
 - [x] 1.4 Build and restart customer-worker container to verify no panic.
-  - **Verification**: `docker build -f services/customer-service/Dockerfile.customer-service --build-arg SERVICE_PATH=services/customer-service -t customer-service:local . && docker restart microservices-platform-customer-worker-1 && docker ps | grep customer-worker | grep -v Restarting`
+  - **Verification**: `docker build -f services/customer-service/Dockerfile.customer-service --build-arg SERVICE_PATH=services/customer-service -t customer-service:local . && docker restart go-microservices-platform-customer-worker-1 && docker ps | grep customer-worker | grep -v Restarting`
 
 ## Section 2: Inventory GenerateReservationID
 

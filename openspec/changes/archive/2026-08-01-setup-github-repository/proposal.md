@@ -2,7 +2,7 @@
 
 ## Why
 
-The microservices repository exists on GitHub (`vicle1908/microservices`) but lacks essential configuration for proper development workflow:
+The microservices repository exists on GitHub (`vicle1908/go-microservices`) but lacks essential configuration for proper development workflow:
 
 1. **No git remote configured locally** — workspace was migrated from Google Drive to `~/Developer/go-microservices` without re-configuring the remote
 2. **No branch protection** — no required reviews, status checks, or merge controls

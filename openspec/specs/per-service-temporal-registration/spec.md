@@ -10,7 +10,7 @@ This spec defines how each service registers its workflows and activities on its
 > queues plus direct execution of every advertised Workflow. This evidence does
 > not establish staging or production readiness.
 >
-> **Acceptance evidence:** `make dev-up`, `make dev-smoke`, and `make validate-deployment` must pass for the target commit. Retain the `microservices.deployment-validation/v1` manifest at `artifacts/deployment-validation/<run-id>/manifest.json` (or the configured artifact root) with namespace bootstrap and task-queue/worker readiness results.
+> **Acceptance evidence:** `make dev-up`, `make dev-smoke`, and `make validate-deployment` must pass for the target commit. Retain the `go-microservices.deployment-validation/v1` manifest at `artifacts/deployment-validation/<run-id>/manifest.json` (or the configured artifact root) with namespace bootstrap and task-queue/worker readiness results.
 
 ### Requirement: Every service has a runWorker role
 

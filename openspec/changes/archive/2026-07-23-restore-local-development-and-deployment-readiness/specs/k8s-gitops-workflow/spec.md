@@ -81,7 +81,7 @@ The platform SHALL support rollback by reverting the environment configuration o
 
 **Reason**: Service Applications must not create environment tenancy implicitly. Namespace lifecycle is a separately authorized platform prerequisite, and the constrained AppProject intentionally grants no Namespace resource ownership.
 
-**Migration**: Pre-create `microservices-local`, `microservices-staging`, and `microservices` through the platform bootstrap process, validate their existence before enabling the corresponding ApplicationSet, and remove `CreateNamespace=true` from service Application sync options.
+**Migration**: Pre-create `go-microservices-local`, `microservices-staging`, and `microservices` through the platform bootstrap process, validate their existence before enabling the corresponding ApplicationSet, and remove `CreateNamespace=true` from service Application sync options.
 
 ### Requirement: Image updater for automatic tag updates
 

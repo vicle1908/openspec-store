@@ -30,7 +30,7 @@
 - [x] 4.5 Extend preflight and fixture tests to detect the LaunchAgent label, installed-bundle hash drift, unsafe plist permissions, active Codex/cron conflicts, explicit installed execution paths, home working directory, 09:00 `StartCalendarInterval`, and exactly-one-scheduler state.
 - [x] 4.6 Pause or delete the superseded Codex heartbeat, verify it cannot schedule another run, install the plist under `~/Library/LaunchAgents`, and bootstrap exactly one service in the current user's GUI domain.
 - [x] 4.7 Exercise `launchctl kickstart` and verify non-overlap, all eight stage outcomes, final versions, policy state, audit counts, redaction, report retention, and actionable stdout/stderr.
-- [x] 4.8 Observe one naturally triggered 09:00 or wake-coalesced LaunchAgent run and verify the documented user-login and sleep/wake behavior. **Evidence:** `launchctl print gui/502/com.microservices.developer-workstation-tool-update` confirms registered LaunchAgent. `~/.local/state/microservices-workstation-tool-update/launchd/stdout.log` shows completed run through brew/bun/npm/pi/omp stages. npm timeout (7200s) matches documented expected behavior from task 3.7.
+- [x] 4.8 Observe one naturally triggered 09:00 or wake-coalesced LaunchAgent run and verify the documented user-login and sleep/wake behavior. **Evidence:** `launchctl print gui/502/com.microservices.developer-workstation-tool-update` confirms registered LaunchAgent. `~/.local/state/go-microservices-workstation-tool-update/launchd/stdout.log` shows completed run through brew/bun/npm/pi/omp stages. npm timeout (7200s) matches documented expected behavior from task 3.7.
 
 ## 5. Security, compatibility, and rollback
 

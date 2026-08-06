@@ -169,7 +169,7 @@ timestamped smoke report and project-bound evidence manifest.
 
 #### Scenario: Compose evidence binds the exact smoke report
 - **WHEN** `make dev-evidence` runs with the exact passing smoke report
-- **THEN** it writes a `microservices.compose-acceptance/v1` manifest that hashes the smoke report, worker readiness, Compose state, resolved model, and image inventory
+- **THEN** it writes a `go-microservices.compose-acceptance/v1` manifest that hashes the smoke report, worker readiness, Compose state, resolved model, and image inventory
 
 #### Scenario: Cross-service smoke test fails when any service's projection is stale
 - **WHEN** any service's projection lags the expected state by more than 5000 ms

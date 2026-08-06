@@ -93,7 +93,7 @@ invoking `openspec update --force`, the orchestrator performs these checks:
 
 1. Verify the approved pin and Node engine compatibility.
 2. Refuse to proceed while
-   `~/.local/state/microservices-workstation-tool-update/active.lock` exists or
+   `~/.local/state/go-microservices-workstation-tool-update/active.lock` exists or
    when two consecutive CLI version probes are inconsistent. The current lock
    is absent and the latest maintenance run succeeded; this remains a reusable
    precondition for future refreshes.

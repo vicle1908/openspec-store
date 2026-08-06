@@ -8,7 +8,7 @@ CI.
 Completed and archived on 2026-08-02.
 
 - Implementation: `go-microservices`
-- Pull request: [vicle1908/microservices#12](https://github.com/vicle1908/microservices/pull/12)
+- Pull request: [vicle1908/go-microservices#12](https://github.com/vicle1908/go-microservices/pull/12)
 - Merge commit: `383e67269073493479533f84b52ad758b8b5bff5`
 - OpenSpec mode: tooling-only change (`skip_specs: true`)
 - Verification: local build and tests passed; PR shipping CI and main-branch

@@ -7,7 +7,7 @@ This spec defines operational readiness requirements for the platform, covering 
 
 > **Status**: PARTIAL / UNVERIFIED. Source artifacts exist for several requirements, but current Compose, Kustomize, External Secrets, Argo CD, smoke, and telemetry paths have not passed clean-environment acceptance with retained evidence.
 >
-> **Status semantics and acceptance evidence:** Individual `IMPLEMENTED` annotations below describe source-level implementation only; they are not current deployment-readiness claims. Current readiness requires `make validate-deployment` and the relevant `make dev-smoke` or `make kind-smoke` acceptance to pass for the target commit. Retain the `microservices.deployment-validation/v1` manifest at `artifacts/deployment-validation/<run-id>/manifest.json` (or the configured artifact root) plus its referenced smoke and diagnostics artifacts.
+> **Status semantics and acceptance evidence:** Individual `IMPLEMENTED` annotations below describe source-level implementation only; they are not current deployment-readiness claims. Current readiness requires `make validate-deployment` and the relevant `make dev-smoke` or `make kind-smoke` acceptance to pass for the target commit. Retain the `go-microservices.deployment-validation/v1` manifest at `artifacts/deployment-validation/<run-id>/manifest.json` (or the configured artifact root) plus its referenced smoke and diagnostics artifacts.
 
 ### Requirement: Broker UI SHALL be available in tools overlay
 
@@ -283,7 +283,7 @@ The platform's Kustomize base and overlay kustomization.yaml files SHALL NOT con
 
 ### Requirement: ArgoCD repoURL SHALL point to the actual repository
 
-> **Status**: PARTIAL / UNVERIFIED. Current ApplicationSet sources use the canonical repository URL `https://github.com/victory1908/microservices`; clone, generation, and live reconciliation still require validation and retained evidence for the target revision.
+> **Status**: PARTIAL / UNVERIFIED. Current ApplicationSet sources use the canonical repository URL `https://github.com/victory1908/go-microservices`; clone, generation, and live reconciliation still require validation and retained evidence for the target revision.
 
 The platform's ArgoCD Application manifests SHALL configure `spec.source.repoURL` to the actual Git repository URL that contains the Kubernetes manifests and Kustomize overlays. The repoURL SHALL be a valid, reachable Git HTTPS URL that ArgoCD can clone. The repoURL MUST NOT be a placeholder value, empty string, or localhost reference. The repoURL SHALL be consistent across all ArgoCD Application manifests for the platform's services.
 

@@ -83,7 +83,7 @@ And external access shall be blocked
 #### Scenario: Kubernetes NetworkPolicy
 Given the Kubernetes deployment
 When the NetworkPolicy is applied
-Then ingress to Redis pods shall only be allowed from the `microservices` namespace
+Then ingress to Redis pods shall only be allowed from the `go-microservices` namespace
 And egress shall be restricted to cluster-internal traffic
 
 ### Requirement: RS-005: Credential Management

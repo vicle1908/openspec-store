@@ -42,11 +42,11 @@ The pilot script remains the single owner of threshold evaluation.
 - `go test ./cmd/test-shipping/...` passed from the same module root on
   2026-08-03.
 - Pull request
-  [vicle1908/microservices#12](https://github.com/vicle1908/microservices/pull/12)
+  [vicle1908/go-microservices#12](https://github.com/vicle1908/go-microservices/pull/12)
   merged both implementation commits.
 - The PR's `service-integration` and `shipping-focused` jobs completed
   successfully in workflow run
-  [30741051002](https://github.com/vicle1908/microservices/actions/runs/30741051002).
+  [30741051002](https://github.com/vicle1908/go-microservices/actions/runs/30741051002).
 - The merge commit's main-branch verify, deployment-validation, and eight image
   build checks completed successfully.
 - `openspec validate --strict --all --store openspec-store` passed 349/349

@@ -159,7 +159,7 @@ Maccy SHALL start for the current user after login, preserve the selected profil
 - **THEN** the operator records redacted measurements, reduces retention or image use for diagnosis, and does not declare the profile accepted until the regression is resolved or the rollout is rolled back
 
 ### Requirement: Redacted acceptance evidence
-The change SHALL retain a redacted manifest at `artifacts/workstation/maccy/<run-id>/manifest.json`, where `<run-id>` is UTC `YYYYMMDDTHHMMSSZ`, using schema `microservices.maccy-workstation-validation/v1`. It SHALL contain `runId`, timestamps, a host summary limited to OS/build/architecture/display count, cask version/URL/SHA-256/signer, redacted settings, checks with `id`/`status`/`exitCode`/`evidenceRef`, soak measurements, and rollback status. Evidence MUST NOT contain a username, clipboard database contents, copied payloads, OCR output, actual secrets, personal history, protected TCC database contents, notification bodies, or unrelated sensitive paths.
+The change SHALL retain a redacted manifest at `artifacts/workstation/maccy/<run-id>/manifest.json`, where `<run-id>` is UTC `YYYYMMDDTHHMMSSZ`, using schema `go-microservices.maccy-workstation-validation/v1`. It SHALL contain `runId`, timestamps, a host summary limited to OS/build/architecture/display count, cask version/URL/SHA-256/signer, redacted settings, checks with `id`/`status`/`exitCode`/`evidenceRef`, soak measurements, and rollback status. Evidence MUST NOT contain a username, clipboard database contents, copied payloads, OCR output, actual secrets, personal history, protected TCC database contents, notification bodies, or unrelated sensitive paths.
 
 #### Scenario: Complete redacted evidence is retained
 - **WHEN** all acceptance checks pass

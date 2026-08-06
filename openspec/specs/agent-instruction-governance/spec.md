@@ -3,7 +3,7 @@
 ## Purpose
 
 Define deterministic, scoped, safe, and verifiable repository guidance for
-agents working across the outer microservices workspace and the independent MCP
+agents working across the outer go-microservices workspace and the independent MCP
 Router repository.
 
 ## Requirements

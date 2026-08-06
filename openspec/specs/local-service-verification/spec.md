@@ -3,7 +3,7 @@
 ## Purpose
 
 Define fail-closed, reproducible local verification requirements for every
-service in the microservices repository.
+service in the go-microservices repository.
 
 ## Requirements
 

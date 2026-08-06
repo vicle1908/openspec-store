@@ -11,13 +11,13 @@ Define Git-owned, Argo CD-reconciled deployment generation, health, update, and 
 > Staging reconciliation, health, smoke, immutable published-image evidence,
 > and production promotion remain active cloud work.
 >
-> **Acceptance evidence:** `make validate-deployment` plus staging reconciliation and environment smoke at the promoted revision. The validation manifest uses schema `microservices.deployment-validation/v1` and defaults to `artifacts/deployment-validation/<run-id>/manifest.json`; live Argo CD health and smoke evidence must be retained with it.
+> **Acceptance evidence:** `make validate-deployment` plus staging reconciliation and environment smoke at the promoted revision. The validation manifest uses schema `go-microservices.deployment-validation/v1` and defaults to `artifacts/deployment-validation/<run-id>/manifest.json`; live Argo CD health and smoke evidence must be retained with it.
 
 ### Requirement: ArgoCD ApplicationSets for all services
 
 > **Status**: STATICALLY VERIFIED. Local, staging, and production ApplicationSets generate the expected service Applications; live reconciliation and smoke evidence remains required.
 
-The platform SHALL provide environment-specific ApplicationSets at `deploy/argocd/applications-{local,staging,production}.yaml` that generate Applications for all 8 microservices using matrix generators and the corresponding registered environment cluster.
+The platform SHALL provide environment-specific ApplicationSets at `deploy/argocd/applications-{local,staging,production}.yaml` that generate Applications for all 8 go-microservices using matrix generators and the corresponding registered environment cluster.
 
 #### Scenario: ApplicationSet creates Applications for all services
 - **WHEN** the ApplicationSet is applied to ArgoCD

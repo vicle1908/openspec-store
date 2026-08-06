@@ -133,7 +133,7 @@ ecosystem scenario.
 ### Requirement: Testcontainers evidence is exact and independently classified
 
 Every service integration and focused ecosystem run SHALL write a
-schema-versioned `microservices.testcontainers-ecosystem/v1` manifest. The
+schema-versioned `go-microservices.testcontainers-ecosystem/v1` manifest. The
 manifest MUST record source revision, dirty state, run identity, cohort,
 evidence class, host platform, declared and resolved images, selected topology,
 required checks, child artifacts and hashes, start and finish times, redacted

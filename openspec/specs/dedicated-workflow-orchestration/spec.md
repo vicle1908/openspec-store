@@ -8,7 +8,7 @@ This spec defines the per-domain service extraction for the `extract-business-do
 > contracts, full cross-service smoke, and direct Temporal execution pass in
 > retained local Compose and kind evidence. Cloud rollout remains separate.
 >
-> **Status semantics and acceptance evidence:** `IMPLEMENTED` annotations below describe source-level artifacts, not proof that the deployed system converges. Full orchestration readiness requires `make dev-up`, `make dev-smoke`, and `make validate-deployment` to pass for the target commit, with the `microservices.deployment-validation/v1` manifest and referenced smoke report retained under `artifacts/deployment-validation/<run-id>/` (or the configured artifact root).
+> **Status semantics and acceptance evidence:** `IMPLEMENTED` annotations below describe source-level artifacts, not proof that the deployed system converges. Full orchestration readiness requires `make dev-up`, `make dev-smoke`, and `make validate-deployment` to pass for the target commit, with the `go-microservices.deployment-validation/v1` manifest and referenced smoke report retained under `artifacts/deployment-validation/<run-id>/` (or the configured artifact root).
 
 ### Requirement: Each business domain is an independent Go service
 

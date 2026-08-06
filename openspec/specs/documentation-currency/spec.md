@@ -16,7 +16,7 @@ artifact and MUST NOT silently substitute a legacy command or path.
 
 #### Scenario: Coverage documentation matches retained summaries
 - **WHEN** the local verification guide publishes per-service coverage values
-- **THEN** every value and its date match a passing `microservices.service-coverage/v1` summary retained by the repository
+- **THEN** every value and its date match a passing `go-microservices.service-coverage/v1` summary retained by the repository
 
 #### Scenario: Legacy smoke reference is detected
 - **WHEN** documentation or a normative spec names a retired smoke command or artifact path as the readiness authority

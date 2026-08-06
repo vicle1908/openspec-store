@@ -58,7 +58,7 @@ The repo-root `buf.yaml` file SHALL include all `services/<service>/proto/**/*.p
 
 #### Scenario: buf lint passes on all contracts
 
-- **WHEN** `cd /Users/androidteam/Library/CloudStorage/GoogleDrive-victory1908@gmail.com/My Drive/project/microservices && buf lint` runs
+- **WHEN** `cd /Users/androidteam/Library/CloudStorage/GoogleDrive-victory1908@gmail.com/My Drive/project/go-microservices && buf lint` runs
 - **THEN** the command exits 0 with no lint errors
 - **AND** all new `services/<name>/proto/**/*.proto` files pass the lint check
 

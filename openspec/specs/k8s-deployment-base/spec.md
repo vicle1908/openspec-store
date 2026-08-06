@@ -13,7 +13,7 @@ Define the reusable Kubernetes base and environment overlay contract for secure,
 > digest, so it establishes local validation of that source snapshot only; it
 > is not staging or production deployment evidence.
 >
-> **Acceptance evidence:** `make validate-deployment`; schema `microservices.deployment-validation/v1`; default manifest `artifacts/deployment-validation/<run-id>/manifest.json`. A manifest containing a recorded skip for image checks or server-side dry-run cannot establish full Kubernetes readiness.
+> **Acceptance evidence:** `make validate-deployment`; schema `go-microservices.deployment-validation/v1`; default manifest `artifacts/deployment-validation/<run-id>/manifest.json`. A manifest containing a recorded skip for image checks or server-side dry-run cannot establish full Kubernetes readiness.
 
 ### Requirement: Base Deployment template with security context
 
@@ -91,7 +91,7 @@ The Deployment template SHALL use `RollingUpdate` strategy with `maxUnavailable:
 
 > **Status**: STATICALLY VERIFIED. All local, staging, and production service overlays rendered successfully and passed reference-completeness checks.
 
-The base directory SHALL include a `kustomization.yaml` that references all base templates, sets common labels (`app.kubernetes.io/part-of: microservices-platform`), and configures namespace injection.
+The base directory SHALL include a `kustomization.yaml` that references all base templates, sets common labels (`app.kubernetes.io/part-of: go-microservices-platform`), and configures namespace injection.
 
 #### Scenario: Kustomize builds complete manifest
 - **WHEN** `kustomize build deploy/k8s/base` is executed

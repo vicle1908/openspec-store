@@ -30,7 +30,7 @@ The platform needs a production-grade Kubernetes infrastructure supporting GitOp
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│              microservices-platform                           │
+│              go-microservices-platform                           │
 ├─────────────────┬─────────────────┬─────────────────────────┤
 │   local/kind    │     staging     │        production       │
 │   (development) │   (pre-prod)    │     (production)        │
@@ -96,7 +96,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 commonLabels:
-  app.kubernetes.io/part-of: microservices-platform
+  app.kubernetes.io/part-of: go-microservices-platform
   app.kubernetes.io/managed-by: kustomize
 
 resources:
@@ -163,7 +163,7 @@ spec:
     spec:
       project: microservices
       source:
-        repoURL: https://github.com/org/microservices
+        repoURL: https://github.com/org/go-microservices
         targetRevision: HEAD
         path: deploy/k8s/overlays/{{environment}}
       destination:
