@@ -1,0 +1,22 @@
+schema: spec-driven
+created: 2026-08-06
+skip_specs: true
+repos:
+  - agent-core
+  - agent-docs-sync
+  - agent-harness
+  - ai-harness-skills
+  - ai-review
+  - browser-cli
+  - code-daily-scan
+  - go-microservices
+  - jira-daily-reports
+  - jira-epic-report
+  - jira-kanban-from-spreadsheet
+  - jira-skill
+  - mcp-router
+  - ops-automation-suite
+  - tdt-core
+  - tdt-observability
+  - tdt-sheets
+  - webhook-receiver

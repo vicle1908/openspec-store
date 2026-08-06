@@ -1,0 +1,29 @@
+change_name: hermes-agentmemory-plugin-integration
+type: config-integration
+skip_specs: true
+
+repositories:
+  - path: ~/Developer/openspec-store
+    type: spec-store
+
+specs:
+  - developer-memory/spec.md
+
+docs:
+  - proposal.md
+  - design.md
+  - tasks.md
+
+skills:
+  - workspace-knowledge-tools
+
+runtime_surfaces:
+  - ~/.hermes/config.yaml
+  - ~/.agentmemory/.env
+  - ~/.hermes/plugins/agentmemory/
+  - ~/.agentmemory/iii-config.yaml
+
+excluded:
+  - .env
+  - "*.key"
+  - "*secret*"
