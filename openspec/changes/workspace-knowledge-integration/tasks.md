@@ -47,15 +47,15 @@
 
 ## 7. Initialize LLM Wiki
 
-- [ ] 7.1 Create directory structure at `~/Developer/wiki/`
-- [ ] 7.2 Write SCHEMA.md
-- [ ] 7.3 Write initial index.md
-- [ ] 7.4 Write initial log.md
-- [ ] 7.5 Seed entity pages from GitNexus indexed repos
-- [ ] 7.6 Seed concept pages
-- [ ] 7.7 Seed comparison page
-- [ ] 7.8 Update index.md with all seeded pages
-- [ ] 7.9 Record evidence
+- [x] 7.1 Create directory structure at `~/Developer/wiki/` — **VERIFIED 2026-08-06**: 10 directories (raw/articles, raw/papers, raw/transcripts, entities, concepts, comparisons, queries, _archive).
+- [x] 7.2 Write SCHEMA.md — **VERIFIED**: Domain, 15 tags, frontmatter format, conventions, update policy.
+- [x] 7.3 Write initial index.md — **VERIFIED**: Sectioned navigation with entities, concepts, comparisons.
+- [x] 7.4 Write initial log.md — **VERIFIED**: Creation entry dated 2026-08-06.
+- [x] 7.5 Seed entity pages from GitNexus indexed repos — **VERIFIED 2026-08-06**: 8 entity pages (agent-core, tdt-core, go-microservices, jira-skill, mcp-router, graphify, gitnexus, agentmemory).
+- [x] 7.6 Seed concept pages — **VERIFIED 2026-08-06**: 5 concept pages (go-platform-architecture, python-agent-ecosystem, mcp-transport-layer, openspec-change-lifecycle, knowledge-graph-system).
+- [x] 7.7 Seed comparison page — **VERIFIED 2026-08-06**: knowledge-tools comparison (graphify vs gitnexus vs agentmemory vs wiki).
+- [x] 7.8 Update index.md with all seeded pages — **VERIFIED**: 21 total pages (including parallel-created pages).
+- [x] 7.9 Record evidence: 21 markdown pages across entities/, concepts/, comparisons/, plus SCHEMA.md, index.md, log.md.
 
 ## 8. Build wiki MCP server + register in mcp-router
 
@@ -82,9 +82,9 @@
 
 ## 11. Documentation and agent guide updates
 
-- [ ] 11.1 Update workspace AGENTS.md graphify section
+- [x] 11.1 Update workspace AGENTS.md graphify section — **VERIFIED 2026-08-06**: Updated paths from `.graphify/` to `graphify-out/`.
 - [ ] 11.2 Update per-repo AGENTS.md for repos with graph.json
-- [ ] 11.3 Update Hermes graphify skill
+- [x] 11.3 Update Hermes graphify skill — **VERIFIED 2026-08-06**: `graphify hermes install` updated skill.
 - [ ] 11.4 Record evidence
 
 ## 12. Integration verification
