@@ -1,0 +1,11 @@
+schema: spec-driven
+created: 2026-08-06
+description: "Remove legacy wrapper functions and fix pre-existing test failures across ecosystem"
+skip_specs: false
+repos:
+  - tdt-core
+  - jira-skill
+  - jira-daily-reports
+  - webhook-receiver
+  - jira-kanban-from-spreadsheet
+  - code-daily-scan
