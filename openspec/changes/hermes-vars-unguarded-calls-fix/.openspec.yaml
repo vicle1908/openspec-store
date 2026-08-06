@@ -1,0 +1,7 @@
+schema: spec-driven
+created: 2026-08-06
+skip_specs: true
+change: hermes-vars-unguarded-calls-fix
+description: "Fix unguarded vars() calls in hermes-agent that cause serialization errors in subagent delegation"
+repos:
+  - openspec-store
