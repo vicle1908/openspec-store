@@ -2,15 +2,15 @@
 
 ## Architecture
 
-The integration adds a **Knowledge Context Layer** to each phase of the OpenSpec lifecycle. Each phase gets optional knowledge-tool steps that enrich the existing workflow without replacing it.
+The integration adds a **Knowledge Context Layer** to each phase of the OpenSpec lifecycle AND replaces `delegate_task` reviews with external CLI agents to avoid the vars() serialization bug.
 
 ```
 Phase 1: Create          Phase 2: Design & Review       Phase 3: Apply
 ┌─────────────────┐      ┌──────────────────────┐       ┌─────────────────┐
-│ 1a. Grep search │      │ 2a. 5-provider review │       │ (existing impl) │
+│ 1a. Grep search │      │ 2a. 6-CLI review     │ NEW   │ (existing impl) │
 │ 1b. graphify    │ NEW  │ 2b. Knowledge evidence│ NEW   │ 3b. graphify    │ NEW
-│ 1c. gitnexus    │ NEW  │     added to context  │       │     update per  │
-│ 1d. wiki search │ NEW  │                       │       │     commit      │
+│ 1c. gitnexus    │ NEW  │     (external CLIs)   │       │     post-apply  │
+│ 1d. wiki search │ NEW  │                       │       │     batch       │
 │ 1e. memory      │ NEW  │                       │       │                 │
 │     recall      │      │                       │       │                 │
 └─────────────────┘      └──────────────────────┘       └─────────────────┘
@@ -59,6 +59,32 @@ Phase 4: Validate        Phase 5: Archive
 - Past session context → `agentmemory memory_smart_search` (episodic)
 - Curated knowledge → `wiki_search` (compiled)
 
+### Decision 5: External CLI agents for reviews, NOT delegate_task
+
+**Rationale:** The Hermes `delegate_task` mechanism has a confirmed bug in `conversation_loop.py:2631` where `vars(response)` is called without try/except on Pydantic models with `__slots__`. This causes ALL delegated subagent reviews to crash with `vars() argument must have __dict__ attribute` when max_iterations is reached. External CLI agents run as independent processes with their own error handling, completely bypassing this bug.
+
+**Implementation:** Replace `delegate_task` reviewers with:
+| # | CLI Command | Provider | Lens |
+|---|------------|----------|------|
+| 1 | Hermes (orchestrator, inline) | hermes | Spec compliance |
+| 2 | `claude -p` | Anthropic | Security |
+| 3 | `codex exec` | OpenAI | Quality & tests |
+| 4 | `agy --print` | Google | Architecture |
+| 5 | `kimi -p` | Moonshot | Product scope |
+| 6 | `opencode run` | Cockpit/GPT | Cross-cutting |
+
+Each CLI gets:
+- **300-600s timeout** (generous — reviews are reasoning-heavy)
+- **Stream JSON output** (`--output-format stream-json` where supported)
+- **Provider's own model** (not delegation.model — each CLI uses its configured default)
+- **Pre-collected context bundle** passed inline in the prompt
+
+### Decision 6: Minimal path for small changes
+
+**Rationale:** Not every change needs all 4 knowledge tools consulted. A single-file config change doesn't need graphify analysis or gitnexus impact.
+
+**Implementation:** Skip knowledge steps when change touches ≤1 repo AND no documented services AND no core code. The "minimal path" is: grep search → proposal → design → tasks → implement → validate → archive.
+
 ## Integration Points
 
 ### Phase 1: Create — Knowledge Context Gathering
@@ -66,7 +92,7 @@ Phase 4: Validate        Phase 5: Archive
 After the existing "Broader cross-repo search" step, add:
 
 ```
-1f. Knowledge context gathering:
+1f. Knowledge context gathering (skip for minimal-path changes):
     For each repo in scope, collect:
     - graphify query "<change-topic>" — structural nodes + communities
     - gitnexus impact "<affected-symbol>" — blast radius + risk level
@@ -76,21 +102,40 @@ After the existing "Broader cross-repo search" step, add:
     Save results to: openspec/changes/<name>/knowledge-context.md
 ```
 
-### Phase 2: Design & Review — Knowledge Evidence
+### Phase 2: Design & Review — CLI-Based 6-Provider Review
 
-Extend the 5-provider review context bundle with:
-- graphify structural analysis (god-nodes, community membership)
-- gitnexus impact analysis (risk level, affected count)
-- wiki pages for affected services
-- agentmemory patterns (prior similar changes, lessons learned)
+Replace `delegate_task` with external CLI invocations:
+
+```bash
+# Orchestrator collects ALL evidence first, then spawns CLIs in parallel
+
+# Reviewer 1: Hermes (inline — orchestrator does spec compliance)
+# Reviewer 2: Claude Code (security)
+claude -p "Review this OpenSpec change for SECURITY. [context bundle]" \
+  --output-format stream-json --max-turns 20
+
+# Reviewer 3: Codex (quality & tests)
+codex exec "Review this OpenSpec change for QUALITY. [context bundle]" \
+  --json
+
+# Reviewer 4: Antigravity (architecture)
+agy --print "Review this OpenSpec change for ARCHITECTURE. [context bundle]"
+
+# Reviewer 5: Kimi Code (product scope)
+kimi -p "Review this OpenSpec change for PRODUCT SCOPE. [context bundle]" \
+  --output-format stream-json
+
+# Reviewer 6: OpenCode (cross-cutting)
+opencode run "Review this OpenSpec change. [context bundle]"
+```
 
 Add a 9th edge to the alignment matrix:
 - **Knowledge ↔ Code** — Does the existing knowledge (wiki, graph, memory) match the proposed changes?
 
-### Phase 3: Apply — Per-Commit Graph Updates
+### Phase 3: Apply — Post-Apply Knowledge Update
 
-After each vertical slice commit in a multi-commit change:
-- `graphify update .` on affected repos (keeps graphs current incrementally)
+After ALL vertical slices are complete (not per-commit — reduces friction):
+- `graphify update .` on affected repos (single batch update)
 
 ### Phase 4: Validate — Knowledge Freshness
 
@@ -107,7 +152,7 @@ After archiving:
    - Re-index with `gitnexus analyze` (if symbols changed)
 2. For each affected service/entity in wiki:
    - `wiki_search` to find related pages
-   - `wiki_ingest` to update if stale
+   - Update pages with `write_file` if stale (simpler than wiki_ingest)
 3. Significant architecture decisions → create/update wiki concept pages
 
 ## Edge Definition Update
@@ -120,11 +165,19 @@ Add to the 8-edge alignment matrix:
 
 This brings the matrix to **9 edges**.
 
+### Task 5b: Update hermes-skills spec
+
+The `openspec/specs/hermes-skills/spec.md` defines the 8-edge alignment matrix
+in its spec requirements (lines 28, 56, 102). This must be updated to 9 edges
+to match the new workflow. Without this, the spec and implementation diverge.
+
 ## Trade-offs
 
 | Trade-off | Chosen | Alternative | Why |
 |-----------|--------|-------------|-----|
 | Optional vs mandatory knowledge steps | Optional per phase | Mandatory for all | Config-only changes don't need graphify |
 | Evidence vs gatekeeper | Evidence only | Block on failures | Knowledge tools can be stale; shouldn't block valid changes |
-| Per-commit vs post-apply graph update | Per-commit (during apply) | Single post-apply update | Incremental updates are faster and catch issues earlier |
+| Per-commit vs post-apply graph update | Post-apply batch | Per-commit (during apply) | Per-commit is too aggressive; batch after all slices is faster and less friction |
 | Best-effort vs enforced post-archive | Best-effort with cron safety net | Enforced before archive | Slows workflow; crons catch misses |
+| delegate_task vs external CLIs | External CLIs | delegate_task | delegate_task has vars() bug; CLIs are proven reliable |
+| 5 vs 6 reviewers | 6 (add OpenCode) | 5 | More diverse perspectives; OpenCode cross-checks others |

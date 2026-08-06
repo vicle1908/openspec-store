@@ -2,6 +2,8 @@
 
 ## Why
 
+### Gap 1: Knowledge tools not integrated into OpenSpec lifecycle
+
 The workspace has four knowledge tools fully operational and registered in mcp-router:
 
 | Tool | Modality | Status | MCP |
@@ -23,6 +25,19 @@ This means:
 - **Knowledge freshness** isn't verified after code changes — graphs and wiki can go stale without detection
 - **agentmemory** is completely invisible to OpenSpec — past session context about similar changes is never consulted
 
+### Gap 2: delegate_task reviews fail with vars() serialization bug
+
+The current 5-provider review uses `delegate_task` to spawn subagents. Investigation reveals a confirmed bug in `conversation_loop.py:2631`:
+
+```python
+# BUG: No try/except around vars() — Pydantic models with __slots__ fail
+resp_attrs = {k: str(v)[:100] for k, v in vars(response).items() if not k.startswith('_')}
+```
+
+This causes all delegated subagent reviews to crash with `vars() argument must have __dict__ attribute` when the subagent hits max_iterations and the summary call fails. Meanwhile, `relay_tools.py:100` and `relay_llm.py:1203` DO have try/except around their `vars()` calls — only `conversation_loop.py:2631` is unguarded.
+
+**Proven workaround:** Use external CLI agents (`Advance -p`, `claude -p`, `codex exec`, `agy --print`, `opencode run`, `pi -p`) instead of `delegate_task`. Each runs as an independent process with its own iteration budget and error handling, completely bypassing the Hermes `turn_finalizer.py` path. This was validated in the current review where Advance Code CLI delivered a thorough review while all 5 `delegate_task` reviewers crashed.
+
 ## What Changes
 
 ### 1. Add knowledge-informed context gathering to change creation (Phase 1)
@@ -33,8 +48,6 @@ Before writing proposal.md, systematically query all four tools:
 - `wiki_search` — existing curated knowledge about the domain
 - `memory_smart_search` — past session context about similar changes
 
-This replaces the current ad-hoc "grep across repos" with a structured knowledge gathering step.
-
 ### 2. Add knowledge tool outputs as review evidence (Phase 2)
 
 The 5-provider review currently collects git diff, test results, and lint output. Add:
@@ -43,15 +56,23 @@ The 5-provider review currently collects git diff, test results, and lint output
 - wiki pages as documentation-alignment evidence
 - agentmemory patterns as prior-experience evidence
 
-### 3. Add post-archive knowledge capture (Phase 5)
+### 3. Switch review from delegate_task to external CLI agents
+
+Replace `delegate_task` with external CLI invocations (`kimi -p`, `claude -p`, `codex exec`, `agy --print`, `opencode run`, `pi -p`). Each reviewer runs as an independent process with:
+- Generous timeout (300-600s per reviewer)
+- Provider-specific model (user's configured default, not delegation.model)
+- Stream JSON output for structured parsing
+- No dependency on Hermes turn_finalizer (avoids vars() bug)
+
+### 4. Add post-archive knowledge capture (Phase 5) — simplified
 
 After archiving a change:
 - Update wiki entity/concept pages for affected services
-- Ingest architecture decisions into wiki if significant
+- Update architecture decisions in wiki if significant (use write_file, not wiki_ingest)
 - Verify graphify graphs are current (run `graphify update` on affected repos)
 - Verify gitnexus indexes are current (re-index affected repos)
 
-### 4. Add knowledge freshness verification to validation (Phase 4)
+### 5. Add knowledge freshness verification to validation (Phase 4)
 
 Before marking validation complete, verify knowledge tools reflect current state:
 - `graphify check-update .` on affected repos
@@ -65,9 +86,12 @@ Before marking validation complete, verify knowledge tools reflect current state
 - Create new reference: `references/knowledge-tools-integration.md`
 - Update `openspec-review-governance` to include knowledge tool evidence
 - Update `openspec-plan-review` and `openspec-code-review` edge definitions
+- Update `openspec/specs/hermes-skills/spec.md` alignment matrix (8→9 edges)
+- Add reference for CLI-based review workflow with generous budgets
 
 **Out of scope:**
 - Changes to graphify, gitnexus, agentmemory, or wiki tool internals
 - New MCP server registrations (all already registered)
 - Changes to mcp-router configuration
 - Auto-rebuild cron changes (already working: Mon 8AM graphify, Mon 9AM wiki lint)
+- Fixing the Hermes vars() bug (report upstream, don't patch framework)
