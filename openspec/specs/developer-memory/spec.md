@@ -1,12 +1,12 @@
 # developer-memory Specification
 
 ## Purpose
-Persistent cross-session memory for AI coding agents. All 7 supported agents
+Persistent cross-session memory for AI coding agents. All 8 supported agents
 remember platform decisions across sessions, eliminating the first-5-minutes
 re-derivation of architectural conventions, past resolutions, and team idioms.
 ## Requirements
 
-> **Status**: IMPLEMENTED. Agentmemory server installed and wired to Cursor, Claude Code, Codex, OpenCode, pi; Go deps unchanged.
+> **Status**: IMPLEMENTED. Agentmemory server installed and wired to Cursor, Claude Code, Codex, OpenCode, pi, Hermes; Go deps unchanged.
 
 ### Requirement: Agentmemory server as developer-memory layer
 
@@ -44,6 +44,15 @@ The project SHALL adopt `rohitg00/agentmemory` engine and `@agentmemory/mcp` ver
 - **THEN** the extension registers `memory_health`, `memory_search`, and `memory_save` tools
 - **AND** the `before_agent_start` hook injects relevant memories into the system prompt
 - **AND** the extension uses the canonical engine-backed store rather than an isolated fallback store
+
+#### Scenario: Agentmemory is wired to Hermes
+- **WHEN** Hermes starts with `memory.provider: agentmemory` in config and the agentmemory plugin enabled
+- **THEN** the plugin provides 6 lifecycle hooks: prefetch, sync_turn, on_session_end, on_pre_compress, on_memory_write, system_prompt_block
+- **AND** the plugin provides 3 tools: memory_recall, memory_save, memory_search
+- **AND** LLM compression uses `fable-5` via shopapikey (same model as Hermes conversations)
+- **AND** embeddings use Ofable-5 `nomic-embed-text` (768-dim, local, GPU-accelerated)
+- **AND** Hermes built-in memory (MEMORY.md/USER.md) remains operational alongside agentmemory
+- **AND** the plugin gracefully degrades when the agentmemory server is unavailable
 
 #### Scenario: Canonical AgentMemory engine is unavailable
 - **WHEN** the AgentMemory boundary cannot reach the canonical engine health endpoint on loopback port 3111, including after an established connection
@@ -95,7 +104,8 @@ The workstation SHALL assign distinct ownership to Hermes native memory and Agen
 | DM-001 | developer-memory | Agentmemory server is installed locally | e2e | scripts/agentmemory-doctor.sh | bash scripts/agentmemory-doctor.sh | artifacts/verification/doctor.out |
 | DM-002 | developer-memory | Agentmemory is wired to Cursor | e2e | .cursor/mcp.json | grep agentmemory ~/.cursor/mcp.json | artifacts/verification/cursor-mcp.out |
 | DM-003 | developer-memory | Agentmemory is wired to Claude Code | e2e | .claude/settings.json | grep agentmemory ~/.claude/settings.json | artifacts/verification/claude-code.out |
-| DM-004 | developer-memory | Agentmemory is wired to Codex CLI | e2e | .codex/config.toml | grep agentmemory ~/.codex/config.toml | artifacts/verification/codex.out |
+| DM-004 | developer-memory | Agentmemory is wired to Codex CLI | e2e | .codex/config.toml | grep agentmemory ~/.fable-5.toml | artifacts/verification/codex.out |
 | DM-005 | developer-memory | Agentmemory is wired to OpenCode | e2e | .config/opencode/opencode.jsonc | grep agentmemory ~/.config/opencode/opencode.jsonc | artifacts/verification/opencode.out |
 | DM-006 | developer-memory | Agentmemory is wired to pi | e2e | .pi/agent/extensions/agentmemory | test -f ~/.pi/agent/extensions/agentmemory/index.js | artifacts/verification/pi.out |
 | DM-007 | developer-memory | Go dependency graph is unchanged | unit | go.mod | go list -m all \| grep -i agentmemory | artifacts/verification/go-deps.out |
+| DM-008 | developer-memory | Agentmemory is wired to Hermes | e2e | ~/.hermes/config.yaml | grep "provider: agentmemory" ~/.hermes/config.yaml | E2E verified 2026-08-06 |
