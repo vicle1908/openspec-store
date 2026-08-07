@@ -22,6 +22,17 @@ context: |
   - Core Libraries: tdt_core SDK (JiraClientFactory, GitLabClientFactory)
   - Agent Framework: Pydantic AI v2, DBOS durable execution
 
+  ## OmniRoute (AI Gateway)
+  - OmniRoute v3.8.49 — AI gateway with 290+ providers, 90+ free tiers
+  - Location: ~/Omniroute (not a workspace repo — standalone deployment)
+  - Deployment: Docker Compose via Docker Hub image (`diegosouzapw/omniroute:latest`)
+  - Single port: 20128 (dashboard + API + WebSocket)
+  - Persistence: `~/Omniroute/data` bind mount (SQLite), `restart: unless-stopped`
+  - Docker Desktop AutoStart: True (survives macOS restarts)
+  - Override: `docker-compose.override.yml` overrides upstream `image:` to Docker Hub
+  - Update: `docker compose --profile base pull && up -d --no-build` (30s, not 15min build)
+  - Password: set in `.env` as `INITIAL_PASSWORD` (bcrypt-hashed in SQLite on boot)
+
   ## Agent Ecosystem (Python 3.14, uv)
   - agent-core: Shared agent runtime — foundation, tool registry, skill system,
     memory, LLM gateway, agent_base (ReAct), resilience, orchestration (LangGraph),
