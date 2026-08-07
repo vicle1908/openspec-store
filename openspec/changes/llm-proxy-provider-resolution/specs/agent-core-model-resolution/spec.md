@@ -12,23 +12,57 @@
 3. `OMNIROUTE_URL` + `OMNIROUTE_API_KEY` env vars
 
 #### Scenario: Config-based resolution
-- **GIVEN** `~/.tdt/config.yaml` has `model.base_url: https://api.example.com/v1`
-- **AND** `model.api_key_env: MY_API_KEY`
-- **AND** `MY_API_KEY=secret123` is set in environment
-- **WHEN** `create_model("openai-chat:gpt-4o")` is called
-- **THEN** the model SHALL be created using the proxy endpoint
+- **GIVEN** `~/.tdt/config.yaml` has `model.base_url: https://api.giaoduc.online/v1`
+- **AND** `model.api_key_env: HERMES_CUSTOM_GIAODUC_API_KEY`
+- **AND** `HERMES_CUSTOM_GIAODUC_API_KEY=pmv_...` is set in environment
+- **WHEN** `create_model("openai-chat:Advance")` is called
+- **THEN** the model SHALL be created using the proxy endpoint via OpenAI Chat Completions API
+
+#### Scenario: Anthropic Messages API
+- **GIVEN** `~/.tdt/config.yaml` has `model.base_url: https://api.giaoduc.online/v1`
+- **AND** `model.api_key_env: HERMES_CUSTOM_GIAODUC_API_KEY`
+- **WHEN** `create_model("anthropic:Advance")` is called
+- **THEN** the model SHALL be created using the proxy endpoint via Anthropic Messages API
 
 #### Scenario: Explicit kwargs override config
-- **GIVEN** `create_model("openai-chat:gpt-4o", base_url="https://other.com/v1", api_key="key")`
+- **GIVEN** `create_model("openai-chat:Advance", base_url="https://other.com/v1", api_key="key")`
 - **WHEN** the model is created
 - **THEN** the explicit kwargs SHALL be used instead of config
+
+### Requirement: Dual API Support
+
+**WHEN** a provider supports both OpenAI and Anthropic API formats
+**THEN** the system SHALL route to the correct endpoint based on model kind prefix:
+- `openai-chat:*` → `/v1/chat/completions` (OpenAI format)
+- `anthropic:*` → `/v1/messages` (Anthropic format)
+
+#### Scenario: OpenAI Chat Completions
+- **GIVEN** provider supports `/v1/chat/completions`
+- **WHEN** `create_model("openai-chat:Advance")` is called
+- **THEN** requests SHALL use OpenAI Chat Completions format
+
+#### Scenario: Anthropic Messages
+- **GIVEN** provider supports `/v1/messages`
+- **WHEN** `create_model("anthropic:Advance")` is called
+- **THEN** requests SHALL use Anthropic Messages format
 
 ### Requirement: Config Schema
 
 **WHEN** `~/.tdt/config.yaml` is loaded
 **THEN** the model section SHALL support:
-- `primary`: Default model identifier (e.g. "openai-chat:fable-5")
+- `primary`: Default model identifier (e.g. "openai-chat:Advance" or "anthropic:Advance")
 - `base_url`: Proxy endpoint URL
 - `api_key_env`: Environment variable name containing the API key
 - `fallback`: List of fallback model identifiers
 - `timeout_seconds`: Request timeout
+
+### Requirement: Verified Provider (giaoduc)
+
+**WHEN** using the giaoduc provider (`https://api.giaoduc.online/v1`)
+**THEN** the following features SHALL be supported:
+
+| API Format | Endpoint | Model Kind | Features |
+|------------|----------|------------|----------|
+| OpenAI Chat Completions | `/v1/chat/completions` | `openai-chat:Advance` | Streaming, tool calling, reasoning |
+| Anthropic Messages | `/v1/messages` | `anthropic:Advance` | Thinking blocks, tool use, system prompts |
+| OpenAI Responses | `/v1/responses` | `openai-responses:Advance` | ❌ Not supported |
