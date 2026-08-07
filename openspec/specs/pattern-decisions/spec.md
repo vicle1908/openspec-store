@@ -119,7 +119,7 @@ External service integrations SHALL use tools-based patterns.
           requires_approval=False,
       )
       async def execute(self, args: GitNexusQueryArgs) -> ToolResult:
-          # Implementation with @resilient_tool
+          # Implementation with native retry
   ```
 
 #### Scenario: Tool registration

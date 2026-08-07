@@ -45,7 +45,6 @@ The harness SHALL define and use consistent terminology across all documentation
 - **THEN** the following terms SHALL be used:
   - **FallbackModel**: pydantic-ai's built-in model fallback with automatic retry
   - **create_model**: Resolves provider:model_name strings to Model instances
-  - **@resilient_tool**: Decorator wrapping tools with error handling
 
 #### Scenario: Validation terms
 - **WHEN** referring to anti-hallucination
