@@ -120,6 +120,51 @@ These must be updated to catch pydantic-ai exceptions instead:
 
 **TASK**: Add explicit error mapping in each catch site.
 
+## Exception-to-RunReason Mapping
+
+The old code at `agent_base/agent.py:370` maps `GatewayError.code == "budget_exceeded"` to `RunReason.BUDGET_EXCEEDED`. The new catch sites must preserve this mapping:
+
+```python
+except UsageLimitExceeded:
+    reason = RunReason.BUDGET_EXCEEDED
+except ModelAPIError:
+    reason = RunReason.PROVIDER_ERROR
+except ConnectionError:
+    reason = RunReason.CONNECTIVITY_ERROR
+```
+
+Each mapping must have a corresponding test case.
+
+## FallbackModel API Verification (PREREQUISITE)
+
+Before implementation, verify that pydantic-ai v2's `FallbackModel` accepts a `fallback_on` parameter:
+
+```bash
+cd ~/Developer/agent-core
+uv run python -c "
+from pydantic_ai.models.fallback import FallbackModel
+import inspect
+sig = inspect.signature(FallbackModel)
+print('Has fallback_on:', 'fallback_on' in sig.parameters)
+"
+```
+
+If `fallback_on` is NOT supported, wrap FallbackModel with manual exception filtering.
+
+## create_model Error Handling
+
+The new `create_model()` must validate model ID format and wrap `infer_model()`:
+
+```python
+def create_model(model_id: str) -> Model:
+    import re
+    if not model_id or not re.match(r"^[a-z][a-z0-9_-]*:", model_id):
+        raise ValueError(f"Invalid model format: {model_id!r} (expected 'provider:model_name')")
+    return infer_model(model_id)
+```
+
+Test cases: empty string, malformed prefix, unknown provider, missing API key.
+
 ## File Changes
 
 ### Delete (agent-core)

@@ -50,10 +50,17 @@ print('api_key type:', type(s.gateway.api_key).__name__)
 - **Files**: All test files
 - **Verify**: Directory removed
 
+### Task 2.3b: Delete `tests/resilience/` directory
+- **Files**: `tests/resilience/test_engine.py` (22 tests, 373 lines), `tests/resilience/test_decorators.py`, `tests/resilience/__init__.py`
+- **Reason**: Source code (`resilience/`) is deleted in Task 2.2; these tests import from deleted modules
+- **Verify**: `ls tests/resilience/` returns "No such file or directory"
+
 ### Task 2.4: Delete `GatewayError` from `foundation/errors.py`
 - **Action**: Remove `GatewayError` class (L1 addressed)
+- **Action**: Remove re-export from `foundation/__init__.py` (line 10 and `__all__` line 53)
 - **Action**: Update 5 catch sites in `agent_base/agent.py` (1) and `cli/agent_cmd.py` (4)
 - **Replace with**: `except (ModelAPIError, UsageLimitExceeded, ConnectionError)`
+- **Exception mapping**: `UsageLimitExceeded` → `RunReason.BUDGET_EXCEEDED`, `ModelAPIError` → `RunReason.PROVIDER_ERROR`, `ConnectionError` → `RunReason.CONNECTIVITY_ERROR`
 - **Verify**: `grep -r "GatewayError" src/` returns 0 hits
 
 ### Task 2.5: Rewrite `_ai/models.py`
@@ -95,11 +102,30 @@ print('api_key type:', type(s.gateway.api_key).__name__)
 - **Action**: Remove `BifrostGateway.from_env()`, use `model=`
 
 ### Task 2.12: Update `_ai/hooks.py`
-- **Remove**: `BudgetTracker` import
-- **Keep**: USD cost estimation hook (simplified)
+- **Remove**: `from agent_core.llm_gateway.gateway import get_budget_tracker` (lines 16 and 35)
+- **Remove**: All `BudgetTracker` usage (`pre_check`, `check_and_record` calls)
+- **Replace with**: `UsageLimits` from pydantic-ai for token-based limits
+- **Keep**: USD cost estimation hook (simplified — log-only, no enforcement)
+- **Verify**: `grep -r "BudgetTracker\|get_budget_tracker" src/` returns 0 hits
 
 ### Task 2.13: Update `_ai/agent.py`
 - **Action**: Accept `Model` directly, remove `gateway.get_model()`
+
+### Task 2.14: Update `sdk/memory.py`
+- **File**: `sdk/memory.py` line 368
+- **Action**: Replace `_settings.gateway.litellm_url` / `_settings.gateway.bifrost_url` with `ModelSettings.primary`
+- **Reason**: sdk/memory.py reads GatewaySettings fields for LLM endpoint resolution
+- **Verify**: `grep -r "settings.gateway\|gateway\.litellm\|gateway\.bifrost" src/` returns 0 hits
+
+### Task 2.15: Update `cli/health_cmd.py`
+- **File**: `cli/health_cmd.py` lines 33-38
+- **Action**: Replace `settings.gateway.bifrost_url` / `settings.gateway.litellm_url` reads with `ModelSettings` fields
+- **Verify**: `grep -r "gateway\." src/cli/` returns 0 hits
+
+### Task 2.16: Update `cli/config_cmd.py`
+- **File**: `cli/config_cmd.py` line 23
+- **Action**: Replace hardcoded `"gateway"` config key with `"model"` (or new section name)
+- **Verify**: `grep -c '"gateway"' src/cli/config_cmd.py` returns 0
 
 ## Phase 3: agent-docs-sync
 
@@ -163,35 +189,75 @@ print('api_key type:', type(s.gateway.api_key).__name__)
 
 ## Phase 5: Tests
 
+**Coverage target**: Maintain ≥667 agent-core tests, ≥222 agent-docs-sync tests post-migration.
+
 ### Task 5.1: Delete `tests/llm_gateway/` (agent-core)
-- **Action**: Remove entire directory
+- **Action**: Remove entire directory (269 lines, 24 test functions)
+
+### Task 5.1b: Delete `tests/resilience/` (agent-core)
+- **Action**: Remove entire directory (373 lines, 22 test functions)
+- **Reason**: Source code deleted in Phase 2; tests import from deleted modules
+
+### Task 5.1c: Delete `agent-docs-sync/tests/test_resilience.py`
+- **Action**: Remove file (193 lines, 14 test functions)
+- **Reason**: Imports CircuitBreaker, FallbackChain etc from agent_core.resilience which is deleted
 
 ### Task 5.2: Update agent-core tests
 - `tests/_ai/test_native_approvals.py` — Remove `LLMGateway` mock
 - `tests/_ai/test_run_controls.py` — Remove `LLMGateway` mock
-- `tests/agent_base/test_agent.py` — Remove `LLMGateway` mock
+- `tests/agent_base/test_agent.py` — Remove `LLMGateway` mock, change `gateway=` to `model=`
+- `tests/sdk/test_agents.py` — Remove `LLMGateway` mock, change `gateway=` to `model=`
+- `tests/cli/test_cli.py` — Update 2 `GatewayError` monkeypatches to `ModelAPIError`
+- `tests/foundation/test_errors.py` — Remove `GatewayError` from parametrized hierarchy test
 
 ### Task 5.3: Create `tests/_ai/test_model_loading.py`
-- **New file**: Real LLM verification tests
-- **Tests**:
+- **New file**: 25+ tests (expanded from original 10 to maintain coverage)
+- **Real LLM verification tests**:
   - `test_infer_model_openai_chat()` — Real API call
   - `test_infer_model_anthropic()` — Real API call
   - `test_infer_model_google()` — Real API call
   - `test_fallback_model_failover()` — Real failover
   - `test_usage_limits_enforced()` — UsageLimitExceeded
   - `test_build_agent_model_param()` — End-to-end
-  - `test_invalid_model_string()` — Error raised
+- **Unit tests** (replacing deleted resilience/gateway tests):
+  - `test_invalid_model_string()` — Error raised for bad format
   - `test_missing_api_key()` — Clear error
   - `test_model_format_validation()` — Rejects invalid
-  - `test_secret_str_not_serialized()` — api_key excluded
+  - `test_secret_str_not_serialized()` — api_key excluded from model_dump
+  - `test_empty_fallback_list()` — No FallbackModel when fallback_ids is empty
+  - `test_fallback_on_connection_error()` — ConnectionError triggers fallback
+  - `test_fallback_on_auth_error_no_fallback()` — Auth errors do NOT trigger fallback
+  - `test_create_model_empty_string()` — Empty model ID raises ValueError
+  - `test_create_model_no_separator()` — Missing `:` raises ValueError
+  - `test_create_model_unknown_provider()` — Unknown provider raises error
+  - `test_model_settings_construction()` — ModelSettings builds correctly
+  - `test_model_settings_env_override()` — MODEL_PRIMARY env var overrides yaml
+  - `test_model_settings_api_key_from_env()` — MODEL_API_KEY read from env
+  - `test_model_settings_secret_excluded()` — api_key never in model_dump
+  - `test_exception_to_runreason_mapping()` — UsageLimitExceeded → BUDGET_EXCEEDED
 
-### Task 5.4: Update agent-docs-sync tests
-- Remove `gateway=` references
-- Update mocks to use `model=`
+### Task 5.4: Update agent-docs-sync tests (8 files)
+All define local gateway mocks that pass `gateway=` to `build_agent()`:
+- `tests/test_supported_feature_paths.py` — `GatewayError` import → new error type
+- `tests/test_canonical_pipeline.py` — `gateway=None` ValueError test
+- `tests/test_parity.py` — `mock_gateway` with `get_model → TestModel`
+- `tests/test_guardrails_integration.py` — `TestGateway` class → `TestModel`
+- `tests/test_subagents_integration.py` — `TestGateway` → `TestModel`
+- `tests/test_cli_canonical_commands.py` — monkeypatches `create_gateway` → `create_model`
+- `tests/test_state_lifecycle.py` — `Gateway` class → model mock
+- `tests/test_canonical_lifecycle_e2e.py` — `gateway=object()` → `model=TestModel()`
 
-### Task 5.5: Update agent-harness tests
-- Remove `gateway=` references
-- Update mocks to use `model=`
+### Task 5.5: Update agent-harness tests (5 files)
+All define `StubGateway(LLMGateway)` or mock gateways:
+- `tests/test_construction_regression.py` — `agent._gateway` → `agent._model`
+- `tests/test_convergence_contracts.py` — `StubGateway.get_model()` → `TestModel`
+- `tests/test_toolset_composition.py` — `RecordingGateway` → model mock
+- `tests/test_production_services.py` — `class StubGateway(LLMGateway)` → model mock
+- `tests/test_cli_lifecycle.py` — `class StubGateway(LLMGateway)` → model mock
+
+### Task 5.6: Verify FallbackModel API (PREREQUISITE)
+- **Action**: Run the verification script from design.md before writing tests
+- **Block**: If `fallback_on` is NOT supported, redesign fallback approach before proceeding
 
 ## Phase 6: Validation
 

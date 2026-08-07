@@ -11,7 +11,7 @@ The SDK SHALL expose a reviewed set of TDT-owned consumer symbols and compatibil
 | Area | Stable TDT-owned surface |
 |---|---|
 | Agent composition | `BaseAgent`, `AgentRequest`, `AgentResult`, `build_agent`, `ConsumerRuntimeProfile` |
-| Gateway | `LLMGateway` and the supported TDT gateway resolver/factory |
+| Model | `create_model`, `create_fallback_model`, `infer_model`, `FALLBACK_EXCEPTIONS` (pydantic-ai native) |
 | Tool policy | `BaseTool`, `ToolMetadata`, `ToolResult`, `ToolRegistry`, `build_toolkit`, and the official-toolset adapter |
 | TDT policy | budget, skills, authorization, audit, and observability inputs |
 | Workflow integration | TDT checkpointer provisioning/resource helpers and compatibility adapters |

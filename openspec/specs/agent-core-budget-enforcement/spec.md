@@ -1,36 +1,39 @@
 ## Purpose
 
-Define USD cost ceiling enforcement for LLM gateway calls via pydantic-ai model request hooks, including BudgetTracker lifecycle, cost estimation from tokens, and GatewayError propagation on budget exhaustion.
+REPLACED by pydantic-ai native `UsageLimits` for token/request budget enforcement. The custom `BudgetTracker` USD cost ceiling enforcement has been removed.
+
+## Migration Summary
+
+| Removed | Replacement |
+|---|---|
+| `BudgetTracker` | `pydantic_ai.UsageLimits` (token/request limits) |
+| `GatewayError(code="budget_exceeded")` | `pydantic_ai.exceptions.UsageLimitExceeded` |
+| USD cost estimation hook | Log-only cost estimation (no enforcement) |
 
 ## Requirements
 
-### Requirement: BudgetTracker hook enforcement
-BudgetTracker SHALL enforce USD cost ceilings via pydantic-ai model request hooks.
+### Requirement: Token-based budget enforcement
 
-#### Scenario: Budget set and enforced
-- **WHEN** `BaseAgent.run()` is called with `budget_usd=10.0`
-- **THEN** `BudgetTracker.set_budget(run_id, 10.0)` SHALL be called
-- **AND** before each LLM request, `BudgetTracker.pre_check(run_id)` SHALL be called
-- **AND** after each LLM request, `BudgetTracker.check_and_record(run_id, estimated_cost)` SHALL be called
-- **AND** `GatewayError(code="budget_exceeded")` SHALL be raised if budget is exceeded
+Budget enforcement SHALL use pydantic-ai's `UsageLimits` for token and request count limits.
 
-#### Scenario: Budget ID flows through deps
-- **WHEN** `BaseAgent.run()` constructs `AgentRuntimeDeps`
-- **THEN** `deps.extra["budget_id"]` SHALL contain the budget ID (or None if no budget)
-- **AND** the hook adapter SHALL flatten `deps.extra` into the hook context dict so hooks can access `budget_id`
+#### Scenario: Request limit enforced
 
-#### Scenario: Cost estimation from tokens
-- **WHEN** `after_model_request` hook fires
-- **THEN** cost_usd SHALL be estimated from token counts using a pricing table (pydantic-ai does not provide cost_usd directly)
-- **AND** the pricing table SHALL map model names to per-token costs (input/output)
-- **AND** `BudgetTracker.check_and_record(budget_id, estimated_cost)` SHALL be called with the estimated cost
+- **WHEN** `Agent.run()` is called with `usage_limits=UsageLimits(request_limit=100)`
+- **THEN** pydantic-ai SHALL enforce the request limit natively
+- **AND** `UsageLimitExceeded` SHALL be raised when exceeded
 
-#### Scenario: No budget = no enforcement
-- **WHEN** `budget_usd` is None
-- **THEN** `budget_id` SHALL be None
-- **AND** `pre_check()` and `check_and_record()` SHALL be no-ops
+#### Scenario: No custom budget tracker
 
-#### Scenario: GatewayError propagation
-- **WHEN** budget is exceeded
-- **THEN** `GatewayError(code="budget_exceeded")` SHALL propagate through the hook dispatch
-- **AND** `AgentRuntime.run()` SHALL catch it and map to `RunReason.BUDGET_EXCEEDED`
+- **WHEN** the budget enforcement system is inspected
+- **THEN** `BudgetTracker` class SHALL NOT exist
+- **AND** `get_budget_tracker` function SHALL NOT exist
+
+### Requirement: USD cost estimation retained
+
+A simplified cost estimation hook MAY be retained for logging/observability purposes, but SHALL NOT enforce budget limits.
+
+#### Scenario: Cost logged but not enforced
+
+- **WHEN** an LLM request completes
+- **THEN** the estimated USD cost MAY be logged for observability
+- **AND** no `GatewayError` SHALL be raised based on USD cost

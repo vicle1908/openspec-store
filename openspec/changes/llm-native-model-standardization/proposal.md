@@ -44,6 +44,10 @@ No deprecation warnings. Clean break to native pydantic-ai patterns.
 - `resilience/decorators.py` — `resilient_tool`
 - `resilience/__init__.py` — Package re-exports
 
+#### agent-core `foundation/errors.py` + `foundation/__init__.py`
+- Remove `GatewayError` class from `foundation/errors.py`
+- Remove re-export from `foundation/__init__.py` (line 10 and `__all__` line 53)
+
 #### agent-core `_ai/models.py` (109 lines rewritten)
 - `create_bifrost_model()`, `create_litellm_model()`, `create_openai_model()` — replaced with `infer_model()`
 - `create_model_from_env()` — simplified
@@ -196,9 +200,9 @@ OMNIROUTE_API_KEY=sk-343...b53d
 
 | Repo | Changes | Lines Affected |
 |---|---|---|
-| agent-core | Delete llm_gateway/, resilience/, rewrite _ai/models.py, sdk/ | ~1,432 removed, ~100 added |
-| agent-docs-sync | Delete llm/gateway.py, update all agents/workflows | ~200 affected |
-| agent-harness | Update services.py, factory.py, stages, workflow | ~100 affected |
+| agent-core | Delete llm_gateway/, resilience/, tests/resilience/, foundation/errors.py GatewayError, rewrite _ai/models.py, _ai/hooks.py, sdk/, cli/ | ~1,700 removed, ~150 added |
+| agent-docs-sync | Delete llm/, tests/test_resilience.py, update 9 source + 8 test files | ~300 affected |
+| agent-harness | Update services.py, factory.py, stages, workflow + 5 test files | ~150 affected |
 
 ## Verification
 
