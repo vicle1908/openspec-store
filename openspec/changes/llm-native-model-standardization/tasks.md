@@ -22,7 +22,13 @@
 - **Action**: Ensure `OMNIROUTE_URL` and `OMNIROUTE_API_KEY` are present
 - **Verify**: Env vars are readable by `GatewaySettings`
 
-### Task 0.3: Verify config loads correctly
+### Task 0.3: Verify `.gitignore` covers `.env`
+- **File**: `~/.tdt/.gitignore` or parent `.gitignore`
+- **Action**: Add `.env` to gitignore if not present
+- **Verify**: `git check-ignore ~/.tdt/.env` returns the path
+- **SECURITY**: Prevents accidental credential leaks during migration
+
+### Task 0.4: Verify config loads correctly
 - **Command**: 
   ```bash
   cd ~/Developer/agent-core
@@ -32,9 +38,10 @@
   print('gateway.model:', s.gateway.model)
   print('gateway.base_url:', s.gateway.base_url)
   print('gateway.fallback_models:', s.gateway.fallback_models)
+  print('api_key type:', type(s.gateway.api_key).__name__)
   "
   ```
-- **Expected**: All fields populated from config.yaml
+- **Expected**: All fields populated, api_key is SecretStr type
 
 ## Phase 1: Config & Model Factory (agent-core)
 
@@ -167,6 +174,10 @@
   - `test_usage_limits_enforced()` — UsageLimitExceeded raised at limit
   - `test_build_agent_model_param()` — `build_agent(model=...)` returns working agent
   - `test_backward_compat_gateway_param()` — `build_agent(gateway=...)` works with warning
+  - `test_invalid_model_string_raises()` — `infer_model("invalid")` raises appropriate error
+  - `test_missing_api_key_raises()` — Model creation fails with clear error when API key missing
+  - `test_model_format_validation()` — `GatewaySettings.model` rejects invalid formats
+  - `test_secret_str_not_serialized()` — `api_key` not in `model_dump()` output
 - **Mark**: `@pytest.mark.integration` for tests requiring API keys
 - **Skip**: Skip if `GATEWAY_API_KEY` not set
 

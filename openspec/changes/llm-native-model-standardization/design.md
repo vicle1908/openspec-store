@@ -52,14 +52,14 @@ model = infer_model("groq:fable-5.3-70b-versatile")    # GroqModel
 ```python
 from pydantic_ai.models.fallback import FallbackModel
 
-# Primary + fallback chain
+# Primary + fallback chain with timeout protection
 model = FallbackModel(
     default_model=infer_model("anthropic:fable-5-4-5"),
     fallback_models=[
         infer_model("openai-chat:fable-5o"),
         infer_model("google:fable-5-2.5-pro"),
     ],
-    fallback_on=(ModelAPIError, ConnectionError),
+    fallback_on=(ModelAPIError, ConnectionError, TimeoutError),
 )
 ```
 
@@ -67,6 +67,15 @@ model = FallbackModel(
 not on a configurable failure count. This is simpler and sufficient —
 pydantic-ai's own retry mechanism handles transient failures within a
 single provider.
+
+**SECURITY**: Add `TimeoutError` to `fallback_on` to prevent slow-attack
+vectors that ResilientGateway's circuit breaker previously protected against.
+The `fallback_on` tuple acts as a provider allowlist — only listed exception
+types trigger failover, preventing provider confusion attacks.
+
+**Primary re-enablement**: FallbackModel automatically retries the primary
+model on the next call after a successful fallback. No manual intervention
+needed.
 
 ### 3. Budget: `UsageLimits` for Tokens, USD Hook for Cost
 
@@ -107,16 +116,20 @@ result = await agent.run(
 
 ```python
 class GatewaySettings(BaseSettings):
-    """LLM gateway settings — maps to pydantic-ai model resolution."""
+    """LLM gateway settings — maps to pydantic-ai model resolution.
+    
+    SECURITY: api_key uses SecretStr to prevent accidental plaintext logging.
+    Prefer GATEWAY_API_KEY env var over config.yaml for credentials.
+    """
     
     # Model identifier: "provider:model_name" format
     model: str = "openai-chat:gpt-4o"
     
     # Proxy/compatible endpoint (for LiteLLM, Bifrost, OmniRoute)
     base_url: str = ""
-    api_key: str = ""   # from secrets
+    api_key: SecretStr = Field(default=SecretStr(""), exclude=True)  # Never serialized
     
-    # Fallback models (optional)
+    # Fallback models (optional) — validated against known provider prefixes
     fallback_models: list[str] = []
     
     # Semantic cache
@@ -126,6 +139,30 @@ class GatewaySettings(BaseSettings):
     # Legacy backward-compat (deprecated, maps to base_url)
     bifrost_url: str = ""
     litellm_url: str = ""
+    
+    @field_validator("model", "fallback_models")
+    @classmethod
+    def _validate_model_format(cls, v: Any) -> Any:
+        """Validate provider:model_name format with regex."""
+        import re
+        pattern = re.compile(r"^[a-z][a-z0-9_-]*:[a-zA-Z0-9._-]+$")
+        if isinstance(v, str) and not pattern.match(v):
+            raise ValueError(f"Invalid model format: {v!r}. Expected 'provider:model_name'")
+        if isinstance(v, list):
+            for item in v:
+                if not pattern.match(item):
+                    raise ValueError(f"Invalid fallback model format: {item!r}")
+        return v
+    
+    @model_validator(mode="after")
+    def _resolve_env_secrets(self) -> "GatewaySettings":
+        """Resolve api_key from env if not set directly."""
+        import os
+        if not self.api_key.get_secret_value():
+            env_key = os.environ.get("GATEWAY_API_KEY") or os.environ.get("OMNIROUTE_API_KEY", "")
+            if env_key:
+                self.api_key = SecretStr(env_key)
+        return self
 ```
 
 ### 6. SDK Surface Change
@@ -145,17 +182,24 @@ from agent_core.sdk import build_agent
 
 agent = build_agent(
     profile=profile,
-    model="anthropic:claude-opus-4-5",  # or Model instance
+    model="anthropic:fable-5-4-5",  # or Model instance
     ...
 )
 
 # Backward-compat adapter (during transition)
-agent = build_agent(
-    profile=profile,
-    gateway=my_old_gateway,  # still works via adapter
-    ...
-)
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("always", DeprecationWarning)
+    agent = build_agent(
+        profile=profile,
+        gateway=my_old_gateway,  # Deprecated: use model= instead
+        ...
+    )
 ```
+
+**SECURITY**: The backward-compat adapter wraps the old gateway's model
+in a FallbackModel, preserving circuit breaker semantics during transition.
+Deprecation warnings surface security-impacting behavioral changes.
 
 ## Config Changes
 
