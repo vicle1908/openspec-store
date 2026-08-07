@@ -1,20 +1,28 @@
-# CLI Configuration Fixes
+# CLI Configuration Fixes (Updated)
 
 ## Summary of Issues and Fixes
 
-### 1. Antigravity (agy) — Model-Level Issue
-**Problem**: agy treats every prompt as a question to answer, not a task to execute. Even with `--dangerously-skip-permissions`, it explains the flag instead of performing the review.
+### 1. Antigravity (agy) — FIXED ✅
+**Problem**: agy treated every prompt as a question to answer, not a task to execute.
 
-**Root Cause**: The model is in "question-answering" mode rather than "task execution" mode. This is a model-level issue that can't be fixed by prompt engineering.
+**Root Cause**: The prompt was passed as a separate argument, not directly after `-p`. The official docs say: "Pass a prompt with `-p` (or its aliases `--print` and `--prompt`) to run once and exit."
 
-**Fix**: Use other CLI agents for reviews. agy works for coding tasks but not for review/analysis tasks.
+**Fix**: Use `-p` with the prompt DIRECTLY after it, not as a separate argument.
 
-**Status**: ❌ Unfixable — use Claude Code or Pi instead.
+**Correct Syntax**:
+```bash
+agy -p "Read review-context.md and output APPROVED or REJECTED." \
+  --dangerously-skip-permissions \
+  --output-format json \
+  --print-timeout 2m
+```
+
+**Status**: ✅ Fixed and tested — returns valid review verdicts.
 
 ### 2. fable-5 Code — Binary Name
-**Problem**: User typed `fable-5` but the binary is `kimi`.
+**Problem**: User typed `fable-5` but the binary is `fable-5`.
 
-**Root Cause**: The skill is named "fable-5-code" but the executable is `kimi`. The user was confused by the naming.
+**Root Cause**: The skill is named "fable-5-code" but the executable is `fable-5`. The user was confused by the naming.
 
 **Fix**: Always use `fable-5 -p` for one-shot tasks, NOT `fable-5 -p`.
 
@@ -55,18 +63,14 @@ opencode run 'Review plan.md'
 
 ## Updated Skill Syntax
 
+### Antigravity (FIXED)
+```bash
+agy -p "task" --dangerously-skip-permissions --output-format json --print-timeout 5m
+```
+
 ### Claude Code (Working)
 ```bash
 claude -p "task" --permission-mode bypassPermissions --tools 'Read,Edit,Write,Bash' --max-turns 12 --output-format json
-```
-
-### Antigravity (Not Working for Reviews)
-```bash
-# Works for coding tasks
-agy --print --dangerously-skip-permissions --print-timeout 5m 'code task'
-
-# Does NOT work for review/analysis tasks
-agy --print --dangerously-skip-permissions --print-timeout 5m 'review task'
 ```
 
 ### fable-5 Code (Working)
@@ -94,10 +98,11 @@ codex exec -c 'approval_policy="never"' --sandbox workspace-write -o /tmp/out.tx
 
 ## Recommendation
 
-For OpenSpec reviews, use these 4 working CLI agents:
+For OpenSpec reviews, use these 5 working CLI agents:
 1. **Claude Code** — Best for security/architecture reviews
-2. **fable-5 Code** — Best for product scope reviews
-3. **OpenCode** — Best for cross-cutting reviews (use `-f` flag)
-4. **Pi** — Best for deployment/security reviews
+2. **Antigravity** — Best for code quality reviews (FIXED)
+3. **fable-5 Code** — Best for product scope reviews
+4. **OpenCode** — Best for cross-cutting reviews (use `-f` flag)
+5. **Pi** — Best for deployment/security reviews
 
-Skip Antigravity and Codex for reviews — they have model/provider issues.
+Skip Codex for reviews — it has a provider config issue.
