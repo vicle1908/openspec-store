@@ -43,10 +43,9 @@ The harness SHALL define and use consistent terminology across all documentation
 #### Scenario: Resilience terms
 - **WHEN** referring to fault tolerance
 - **THEN** the following terms SHALL be used:
-  - **CircuitBreaker**: Prevents cascading failures on repeated failures
-  - **FallbackChain**: Graceful degradation with alternative approaches
-  - **retry_with_jitter**: Exponential backoff with jitter for transient failures
-  - **@resilient_tool**: Decorator wrapping tools with circuit breaker + retry
+  - **FallbackModel**: pydantic-ai's built-in model fallback with automatic retry
+  - **create_model**: Resolves provider:model_name strings to Model instances
+  - **@resilient_tool**: Decorator wrapping tools with error handling
 
 #### Scenario: Validation terms
 - **WHEN** referring to anti-hallucination

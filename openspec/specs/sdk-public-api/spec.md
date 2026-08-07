@@ -60,16 +60,16 @@ agent-core SHALL provide an immutable runtime-profile value model that composes 
 
 ### Requirement: Agent construction helper
 
-agent-core SHALL provide `build_agent()` as a typed composition root requiring an explicit gateway or explicit TDT gateway resolver, a runtime profile, official capabilities/toolsets, and explicit TDT policy inputs. Legacy `hooks`, `harness_config`, and untyped memory inputs SHALL enter through isolated compatibility adapters only.
+agent-core SHALL provide `build_agent()` as a typed composition root requiring an explicit model or model configuration, a runtime profile, official capabilities/toolsets, and explicit TDT policy inputs. Legacy `hooks`, `harness_config`, and untyped memory inputs SHALL enter through isolated compatibility adapters only.
 
 #### Scenario: Typed agent construction
 
-- **WHEN** a consumer supplies a runtime profile, gateway, official capabilities/toolsets, and TDT policy inputs
+- **WHEN** a consumer supplies a runtime profile, model, official capabilities/toolsets, and TDT policy inputs
 - **THEN** `build_agent()` SHALL construct a `BaseAgent` without inspecting private upstream attributes or reconstructing supplied upstream values
 
-#### Scenario: Missing gateway
+#### Scenario: Missing model
 
-- **WHEN** no gateway or gateway resolver is supplied
+- **WHEN** no model configuration is available
 - **THEN** `build_agent()` SHALL fail before `BaseAgent` initialization
 
 #### Scenario: Legacy construction
@@ -146,24 +146,24 @@ The public composition API SHALL keep gateway/provider selection, budgets, skill
 - **THEN** translation SHALL fail with migration guidance
 - **AND** it SHALL not silently preserve the broader behavior
 
-### Requirement: Valid gateway before construction
+### Requirement: Valid model before construction
 
-The public SDK SHALL require either an explicit `LLMGateway` or an explicit TDT gateway resolver and SHALL NOT pass `None` into `BaseAgent`.
+The public SDK SHALL require either an explicit model string/instance or a default model configuration and SHALL NOT pass `None` into `BaseAgent`.
 
-#### Scenario: Explicit gateway
+#### Scenario: Explicit model
 
-- **WHEN** a consumer supplies a valid gateway
-- **THEN** the SDK SHALL preserve that gateway through agent construction
+- **WHEN** a consumer supplies a valid model string or Model instance
+- **THEN** the SDK SHALL preserve that model through agent construction
 
-#### Scenario: Resolved gateway
+#### Scenario: Default model
 
-- **WHEN** a consumer requests TDT gateway resolution
-- **THEN** the SDK SHALL use the supported TDT factory and centralized `TDT_HOME` configuration
-- **AND** it SHALL not instantiate a raw provider client in the consumer
+- **WHEN** no model is provided
+- **THEN** the SDK SHALL use the configured default model from `config.settings.agent.default_model`
+- **AND** it SHALL use `create_model()` to resolve the model string
 
-#### Scenario: Missing gateway
+#### Scenario: Invalid model
 
-- **WHEN** neither an explicit gateway nor a resolver can produce one
+- **WHEN** an invalid model string is provided
 - **THEN** construction SHALL fail before `BaseAgent` initialization with an actionable configuration error
 
 ### Requirement: Legacy SDK migration

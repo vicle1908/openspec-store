@@ -62,7 +62,7 @@ All proposed removals SHALL NOT break any external consumer of agent-core.
 
 #### Scenario: agent-docs-sync compatibility
 - **WHEN** the cleanup is applied
-- **THEN** `agent-docs-sync` SHALL continue to import `LLMGateway`, `LiteLLMGateway`, `BaseAgent`, `HookRegistry`, `Flavor`, `ToolRegistry`, `BaseTool`, `ToolMetadata`, `ToolResult`, `WorkflowBuilder`, `WorkflowEngine`, `EdgeDescriptor`, `NodeDescriptor`, `NodeKind`, `EdgeCondition`, `configure_logging`, and `GatewayError` without errors
+- **THEN** `agent-docs-sync` SHALL continue to import `BaseAgent`, `HookRegistry`, `Flavor`, `ToolRegistry`, `BaseTool`, `ToolMetadata`, `ToolResult`, `WorkflowBuilder`, `WorkflowEngine`, `EdgeDescriptor`, `NodeDescriptor`, `NodeKind`, `EdgeCondition`, `configure_logging`, `create_model`, `Model`, `TestModel`, `FallbackModel`, and `ModelConfigError` without errors
 - **AND** `agent-docs-sync` SHALL NOT need any code changes
 
 #### Scenario: No phantom imports introduced

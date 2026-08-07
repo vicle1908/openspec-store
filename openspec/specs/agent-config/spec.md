@@ -70,42 +70,30 @@ class MemoryConfig:
 - **WHEN** memory operations are performed
 - **THEN** it uses the configuration from the config object
 
-### Requirement: GatewayFactory class
+### Requirement: Model resolution via create_model
 
-The system SHALL define a `GatewayFactory` class in `agent_core/llm_gateway/factory.py`.
+The system SHALL provide a `create_model()` function in `agent_core/_ai/models.py` that resolves provider:model_name strings to pydantic-ai Model instances.
 
 ```python
-class GatewayFactory:
-    def __init__(self) -> None:
-        self._providers: dict[str, type[LLMGateway]] = {}
-    
-    def register(self, name: str, provider: type[LLMGateway]) -> None:
-        """Register a gateway provider."""
-        ...
-    
-    def create(self, name: str, **kwargs: Any) -> LLMGateway:
-        """Create a gateway instance."""
-        ...
-    
-    def list_providers(self) -> list[str]:
-        """List registered provider names."""
-        ...
+def create_model(model: str | Model) -> Model:
+    """Create a pydantic-ai Model from a provider:model_name string or pass through a Model instance."""
+    ...
 ```
 
-#### Scenario: GatewayFactory registers providers
-- **GIVEN** `factory = GatewayFactory()` is instantiated
-- **WHEN** `factory.register("bifrost", BifrostGateway)` is called
-- **THEN** the provider is registered and `list_providers()` includes "bifrost"
+#### Scenario: create_model resolves provider string
+- **GIVEN** `create_model("openai-chat:fable-5")` is called
+- **WHEN** the function executes
+- **THEN** a pydantic-ai Model instance is returned
 
-#### Scenario: GatewayFactory creates gateway
-- **GIVEN** `factory.register("bifrost", BifrostGateway)` is registered
-- **WHEN** `factory.create("bifrost", url="...", api_key="...")` is called
-- **THEN** a `BifrostGateway` instance is returned
+#### Scenario: create_model passes through Model instance
+- **GIVEN** `create_model(existing_model)` where `existing_model` is a Model instance
+- **WHEN** the function executes
+- **THEN** the same Model instance is returned unchanged
 
-#### Scenario: GatewayFactory raises on unknown provider
-- **GIVEN** `factory = GatewayFactory()` is instantiated
-- **WHEN** `factory.create("unknown", url="...")` is called
-- **THEN** a `ValueError` is raised with message "Unknown provider: unknown"
+#### Scenario: create_model raises on invalid format
+- **GIVEN** `create_model("invalid")` is called without provider prefix
+- **WHEN** the function executes
+- **THEN** a `ValueError` is raised with message indicating expected 'provider:model_name' format
 
 ### Requirement: Protocol for new backends
 

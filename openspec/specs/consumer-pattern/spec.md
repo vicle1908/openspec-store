@@ -42,7 +42,7 @@ The harness SHALL extend `ConsumerConfig` from agent-core's SDK for all configur
 - **THEN** the harness SHALL use `config.settings`:
   ```python
   model = config.settings.agent.default_model  # from ~/.tdt/config.yaml
-  gateway_url = config.settings.gateway.litellm_url
+  model_id = config.settings.agent.default_model
   ```
 
 ### Requirement: Agent Construction
@@ -189,26 +189,26 @@ The harness SHALL register hooks for observability and domain-specific behavior.
   - `HookPoint.OUTPUT_VALIDATE` — after output validation
   - `HookPoint.OUTPUT_PROCESS` — after output processing
 
-### Requirement: Gateway Configuration
+### Requirement: Model Configuration
 
-The harness SHALL use agent-core's LLM gateway for all LLM calls.
+The harness SHALL use agent-core's model resolution for all LLM calls.
 
-#### Scenario: Gateway from config
-- **WHEN** initializing the gateway
-- **THEN** the harness SHALL use `LiteLLMGateway`:
+#### Scenario: Model from config
+- **WHEN** initializing the LLM model
+- **THEN** the harness SHALL use `create_model`:
   ```python
-  from agent_core.sdk import LiteLLMGateway
+  from agent_core._ai.models import create_model
 
-  gateway = LiteLLMGateway.from_env()
+  model = create_model(config.settings.agent.default_model)
   ```
-- **THEN** the gateway SHALL be configured via:
-  - `GATEWAY_LITELLM_URL` env var
-  - Or `~/.tdt/config.yaml` gateway section
+- **THEN** the model SHALL be configured via:
+  - `default_model` setting in config
+  - Or `~/.tdt/config.yaml` agent section
 
-#### Scenario: Gateway fallback
+#### Scenario: Model fallback
 - **WHEN** primary LLM provider is unavailable
-- **THEN** the gateway SHALL fall back to secondary providers
-- **THEN** fallback behavior SHALL be configurable via `GatewayConfig`
+- **THEN** the harness SHALL use `FallbackModel` for secondary providers
+- **THEN** fallback behavior SHALL be configurable via model settings
 
 ### Requirement: Observability Initialization
 
@@ -282,9 +282,9 @@ The harness SHALL handle consumer-level errors gracefully.
 - **THEN** the harness SHALL raise `ConfigError` with clear message
 - **THEN** the harness SHALL NOT start
 
-#### Scenario: Gateway initialization error
-- **WHEN** gateway fails to initialize
-- **THEN** the harness SHALL raise `GatewayError` with clear message
+#### Scenario: Model initialization error
+- **WHEN** model fails to initialize
+- **THEN** the harness SHALL raise `ModelConfigError` with clear message
 - **THEN** the harness SHALL NOT start
 
 #### Scenario: Memory initialization error

@@ -11,7 +11,7 @@ This specification defines requirements for Flavor Composition Sdk.
 ```python
 def build_agent(
     config: ConsumerConfig,
-    gateway: LLMGateway,
+    model: str | Model = "openai-chat:fable-5",
     tools: list[Any] | None = None,
     name: str | None = None,
     instructions: str = "",
@@ -33,16 +33,16 @@ class Flavor:
 ```
 
 #### Scenario: Flavors provided
-- **WHEN** `build_agent(config, gateway, flavors=[my_flavor])` is called
+- **WHEN** `build_agent(config, model="openai-chat:fable-5", flavors=[my_flavor])` is called
 - **THEN** the provided flavors SHALL be passed directly to `BaseAgent(flavors=[my_flavor])`
 - **AND** the default Flavor from config SHALL NOT be created
 
 #### Scenario: Flavors not provided
-- **WHEN** `build_agent(config, gateway)` is called without flavors parameter
+- **WHEN** `build_agent(config, model="openai-chat:fable-5")` is called without flavors parameter
 - **THEN** a default Flavor SHALL be built from config (current behavior preserved)
 
 #### Scenario: Empty flavors list
-- **WHEN** `build_agent(config, gateway, flavors=[])` is called
+- **WHEN** `build_agent(config, model="openai-chat:fable-5", flavors=[])` is called
 - **THEN** an empty list SHALL be passed to BaseAgent (no flavors applied)
 
 ### Requirement: build_toolkit SHALL support include_builtins

@@ -22,9 +22,8 @@ The following symbols SHALL retain their current signatures and behavior and SHA
 - `agent_core.agent_base.structured_audit()`, `structured_audit.StructuredAuditState`, `structured_audit.AuditRecord`
 - `agent_core.agent_base.cost_tracker()`, `cost_tracker.CostTrackerState`
 - `agent_core.agent_base.register_pack()`
-- `agent_core.llm_gateway.LLMGateway`, `LLMResponse`, `LLMUsage`, `Message`, `ToolDefinition`, `ToolCall`, `LLMDelta`
-- `agent_core.llm_gateway.BifrostGateway`, `LiteLLMGateway`, `create_gateway()`
-- `agent_core.llm_gateway.BudgetTracker`, `get_budget_tracker()`
+- `agent_core._ai.models.create_model`, `Model`, `TestModel`, `FallbackModel`
+- `agent_core.agent_base.types.RunReason`, `ModelConfigError`
 - `agent_core.tool_registry.ToolRegistry`
 - `agent_core.tool_registry.BaseTool`
 - `agent_core.tool_registry.ToolMetadata`

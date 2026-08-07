@@ -6,23 +6,23 @@ Define resilience patterns for docs-sync: circuit breaker and retry around LLM c
 
 ## Requirements
 
-### Requirement: Circuit breaker around LLM calls
-The doc-sync LLM gateway wrapper SHALL use `agent_core.resilience.CircuitBreaker` per provider. The breaker SHALL open after 5 consecutive failures and recover after 30 seconds. When the breaker is open, LLM calls SHALL raise `CircuitBreakerOpenError` instead of making network requests.
+### Requirement: Fallback model with retry
+The doc-sync LLM model wrapper SHALL use pydantic-ai's `FallbackModel` with native retry for provider resilience. The fallback SHALL attempt the primary model first, then fall back to secondary providers. Transient errors SHALL be retried up to 3 times with exponential backoff.
 
-#### Scenario: Circuit opens after consecutive failures
-- **WHEN** the LLM provider returns 5 consecutive 5xx errors
-- **THEN** the circuit breaker state transitions to OPEN
+#### Scenario: Fallback to secondary model
+- **WHEN** the primary model (OmniRoute) is unavailable
+- **THEN** the fallback model is attempted via FallbackModel
 
-#### Scenario: Circuit rejects calls when open
-- **WHEN** the circuit breaker is OPEN and a new LLM call is attempted
-- **THEN** a `CircuitBreakerOpenError` is raised without making a network request
+#### Scenario: All models exhausted
+- **WHEN** all models in the fallback chain have failed
+- **THEN** an error is raised with details of all attempts
 
-#### Scenario: Circuit half-opens after recovery timeout
-- **WHEN** the circuit breaker has been OPEN for 30 seconds
-- **THEN** the state transitions to HALF_OPEN and the next call is allowed through
+#### Scenario: No fallback configured
+- **WHEN** only a single model is configured
+- **THEN** the error is raised directly when the model fails
 
-### Requirement: Retry with jitter on transient errors
-LLM calls SHALL be wrapped with `agent_core.resilience.retry_with_jitter`. Transient errors (5xx, timeouts, connection errors) SHALL be retried up to 3 times with exponential backoff (0.5s base, 30s max) plus random jitter. Non-transient errors (4xx, auth failures) SHALL NOT be retried.
+### Requirement: Retry with backoff on transient errors
+LLM calls SHALL use pydantic-ai's native retry mechanism. Transient errors (5xx, timeouts, connection errors) SHALL be retried up to 3 times with exponential backoff. Non-transient errors (4xx, auth failures) SHALL NOT be retried.
 
 #### Scenario: Transient error retried
 - **WHEN** an LLM call fails with a 500 error
@@ -32,20 +32,20 @@ LLM calls SHALL be wrapped with `agent_core.resilience.retry_with_jitter`. Trans
 - **WHEN** an LLM call fails with a 401 auth error
 - **THEN** the error is raised immediately without retry
 
-### Requirement: Fallback chain for provider failover
-The doc-sync gateway SHALL support optional fallback gateways via `agent_core.resilience.FallbackChain`. When `FALLBACK_LITELLM_URL` environment variable is set, a secondary provider is configured. If the primary provider's circuit is open, the next provider in the chain SHALL be attempted. If all providers fail, a `FallbackChainError` SHALL be raised.
+### Requirement: Fallback model for provider failover
+The doc-sync LLM model SHALL support optional fallback models via pydantic-ai's `FallbackModel`. When a fallback model ID is configured, a secondary provider is available. If the primary provider fails, the fallback model SHALL be attempted. If all providers fail, an error SHALL be raised.
 
-#### Scenario: Fallback to secondary provider
-- **WHEN** the primary provider (OmniRoute) circuit breaker is OPEN and FALLBACK_LITELLM_URL is configured
-- **THEN** the fallback provider is attempted
+#### Scenario: Fallback to secondary model
+- **WHEN** the primary model (OmniRoute) is unavailable
+- **THEN** the fallback model is attempted via FallbackModel
 
 #### Scenario: All providers exhausted
-- **WHEN** all providers in the fallback chain have failed or have open circuits
-- **THEN** a `FallbackChainError` is raised with details of all attempts
+- **WHEN** all models in the fallback chain have failed
+- **THEN** an error is raised with details of all attempts
 
 #### Scenario: No fallback configured
-- **WHEN** FALLBACK_LITELLM_URL is not set
-- **THEN** CircuitBreakerOpenError is raised directly when primary circuit opens
+- **WHEN** only a single model is configured
+- **THEN** the error is raised directly when the model fails
 
 ### Requirement: Degradation manager monitors system health
 A `DegradationManager` SHALL monitor CPU usage and error rate. When CPU exceeds 85% or error rate exceeds 50/minute, the degradation level SHALL transition to REDUCED, capping agent iterations at 5. Recovery requires 60 seconds of sustained healthy metrics.
