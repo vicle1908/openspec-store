@@ -63,7 +63,7 @@ The following modules SHALL NOT be modified as part of this migration:
 - `agent_core/skill_system/`
 - `agent_core/memory/`
 - `agent_core/orchestration/`
-- `agent_core/resilience/`
+- `agent_core._ai.models` (model resolution, FallbackModel)
 - `agent_core/foundation/`
 
 #### Scenario: Unchanged modules are untouched

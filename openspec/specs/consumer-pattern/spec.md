@@ -65,7 +65,7 @@ The harness SHALL use `build_agent` from agent-core's SDK for agent construction
   )
   ```
 - **THEN** `build_agent` SHALL handle:
-  - Gateway creation from config
+  - Model resolution from config
   - Tool registration
   - Hook auto-registration (otel_metrics, structured_audit)
   - MemoryCapability wiring

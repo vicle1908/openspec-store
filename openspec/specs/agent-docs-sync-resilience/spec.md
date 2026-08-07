@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define resilience patterns for docs-sync: circuit breaker and retry around LLM calls, degradation management for unavailable services, and graceful fallback when code intelligence sources are unreachable.
+Define resilience patterns for docs-sync: provider fallback and retry around LLM calls, graceful degradation when code intelligence sources are unreachable.
 
 ## Requirements
 

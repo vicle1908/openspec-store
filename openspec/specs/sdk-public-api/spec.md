@@ -127,7 +127,7 @@ agent-core SHALL provide an observability composition helper that configures TDT
 
 ### Requirement: TDT policy remains explicit
 
-The public composition API SHALL keep gateway/provider selection, budgets, skills, tool metadata, audit defaults, consumer authorization, model visibility, and execution authority as explicit TDT-owned inputs.
+The public composition API SHALL keep model/provider selection, budgets, skills, tool metadata, audit defaults, consumer authorization, model visibility, and execution authority as explicit TDT-owned inputs.
 
 #### Scenario: Official capability with TDT policy
 
