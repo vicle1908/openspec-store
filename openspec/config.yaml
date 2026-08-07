@@ -35,7 +35,7 @@ context: |
 
   ## Agent Ecosystem (Python 3.14, uv)
   - agent-core: Shared agent runtime — foundation, tool registry, skill system,
-    memory, LLM gateway, agent_base (ReAct), resilience, orchestration (LangGraph),
+    memory, pydantic-ai model resolution, agent_base (ReAct), orchestration (LangGraph),
     evaluation, observability, CLI, SDK. Depends on tdt-core.
   - agent-docs-sync: Documentation synchronization agent built on agent-core.
     Detects code changes, maps to docs, validates links, orchestrates multi-repo sync.
