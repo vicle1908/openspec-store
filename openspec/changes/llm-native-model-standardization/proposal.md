@@ -1,132 +1,221 @@
-# Proposal: Standardize on Native pydantic-ai Model Loading
+# Proposal: Complete LLM Model Loading Cleanup (No Backward Compat)
 
 ## Problem
 
 agent-core has built a custom LLM gateway abstraction layer (`llm_gateway/`)
 that duplicates features already provided natively by pydantic-ai v2:
 
-| agent-core Custom | pydantic-ai Native | Delta |
+| agent-core Custom | pydantic-ai Native | Lines |
 |---|---|---|
-| `BifrostGateway`, `LiteLLMGateway` | `infer_model("provider:model_name")` | Custom gateways add no value over `infer_model()` |
-| `ResilientGateway` (circuit breaker + fallback) | `FallbackModel(primary, fallbacks=[...])` | pydantic-ai handles failover natively |
-| `GatewayFactory` | `infer_provider()` + model constructors | Registry pattern unnecessary |
-| `create_gateway()` factory | `Agent(model="anthropic:claude-opus-4-5")` | Agent accepts model strings directly |
-| `BudgetTracker` (USD cost) | `UsageLimits(request_limit=N, tokens_limit=N)` | pydantic-ai tracks tokens natively; USD is the only unique part |
-| `retry_with_jitter` | `Agent.run(retries=N)` | Built-in retry with exponential backoff |
-| `CircuitBreaker` / `FallbackChain` | `FallbackModel` | Native provider failover |
-| `OpenAIChatModel(LiteLLMProvider)` only | 25+ model classes, 30+ providers | Currently locked to one format |
+| `BifrostGateway` | `infer_model("provider:model_name")` | 323 |
+| `LiteLLMGateway` | `infer_model("provider:model_name")` | 215 |
+| `ResilientGateway` | `FallbackModel(primary, fallbacks=[...])` | 92 |
+| `GatewayFactory` | `infer_provider()` | 64 |
+| `LLMGateway` ABC | `pydantic_ai.models.Model` | 46 |
+| `create_gateway()` | `infer_model()` | 34 |
+| `CircuitBreaker` + `Registry` | `FallbackModel` | 284 |
+| `FallbackChain` + `Entry` | `FallbackModel.fallback_models` | 100 |
+| `retry_with_jitter` | `Agent.run(retries=N)` | 80 |
+| `BudgetTracker` | `UsageLimits` (tokens) | 100 |
+| `resilient_tool` decorator | Native retry | 94 |
+| **Total** | | **~1,432 lines** |
 
-**Impact**: agent-core cannot use Anthropic native, Google native, OpenAI Responses API,
-or any of the 30+ providers pydantic-ai supports without routing through LiteLLM proxy.
+**Current state**: agent-core is locked to `OpenAIChatModel(LiteLLMProvider)` only.
+Cannot use Anthropic native, Google native, OpenAI Responses API, or 30+ other providers.
 
-## Current Config State
-
-```yaml
-# ~/.tdt/config.yaml — NO gateway section exists
-# ~/.tdt/.env — OMNIROUTE_URL=http://localhost:20128/v1 (proxy, not wired)
-```
-
-Gateway settings are **empty** — consumers rely on env vars that are never set.
+**Config state**: `~/.tdt/config.yaml` has NO gateway section. All settings empty.
 
 ## Solution
 
-Standardize on pydantic-ai's native model resolution and remove the custom gateway layer.
-Keep TDT-specific features (flavors, skills, authority, tool registry, USD budget tracking)
-that pydantic-ai does not provide.
+**Complete removal** of custom gateway/resilience/budget layers. No backward compatibility.
+No deprecation warnings. Clean break to native pydantic-ai patterns.
 
-### Target Config
+### What Gets Deleted
 
+#### agent-core `llm_gateway/` package (5 files, 559 lines)
+- `llm_gateway/types.py` — `LLMGateway` ABC
+- `llm_gateway/gateway.py` — `BifrostGateway`, `LiteLLMGateway`, `BudgetTracker`, `create_gateway()`
+- `llm_gateway/resilient.py` — `ResilientGateway`
+- `llm_gateway/factory.py` — `GatewayFactory`
+- `llm_gateway/__init__.py` — Package re-exports
+
+#### agent-core `resilience/` package (4 files, ~411 lines)
+- `resilience/engine.py` — `CircuitBreaker`, `CircuitBreakerRegistry`, `FallbackChain`, `FallbackEntry`, `retry_with_jitter`
+- `resilience/decorators.py` — `resilient_tool`
+- `resilience/__init__.py` — Package re-exports
+
+#### agent-core `_ai/models.py` (109 lines rewritten)
+- `create_bifrost_model()`, `create_litellm_model()`, `create_openai_model()` — replaced with `infer_model()`
+- `create_model_from_env()` — simplified
+
+#### agent-core SDK re-exports (sdk/__init__.py)
+- Remove `LLMGateway`, `BifrostGateway`, `LiteLLMGateway`, `ResilientGateway`
+- Remove `CircuitBreaker`, `CircuitBreakerRegistry`, `CircuitBreakerOpenError`
+- Remove `FallbackChain`, `FallbackEntry`, `FallbackChainError`
+- Remove `retry_with_jitter`, `resilient_tool`
+
+#### agent-core CLI (cli/utils.py)
+- Remove `create_gateway()` import and usage
+- Use `infer_model()` directly
+
+#### agent-core examples (3 files)
+- `examples/flavor_composition.py` — Remove `BifrostGateway.from_env()`
+- `examples/code_reviewer/` — Remove `LLMGateway` usage
+
+#### agent-docs-sync (entire `llm/` package + consumers)
+- `llm/gateway.py` — Delete (93 lines)
+- `llm/__init__.py` — Delete
+- `workflows/canonical.py` — Remove `gateway` parameter
+- `workflows/full_pipeline.py` — Remove `create_gateway()` call
+- `agents/generation.py` — Remove `gateway` parameter
+- `agents/discovery.py` — Remove `gateway` parameter
+- `agents/validation.py` — Remove `gateway` parameter
+- `agent.py` — Remove `gateway` parameter
+- `cli.py` — Remove `create_gateway()` usage
+- `config.py` — Remove `RuntimeConfigLike` protocol (gateway fields)
+
+#### agent-harness (consumers)
+- `agents/factory.py` — Remove `gateway` from `StageCompositionContext`
+- `services.py` — Remove `gateway` from `StageServices`, `HarnessServices`
+- `stages/classification.py` — Remove `gateway_required`
+- `stages/contracts.py` — Remove `gateway_required`
+- `workflow/graph.py` — Remove `gateway` resolution
+
+#### Tests (all repos)
+- `tests/llm_gateway/` — Delete entire directory (269 lines)
+- All test files referencing `LLMGateway`, `gateway=`, `ResilientGateway`
+
+### What Gets Added
+
+#### agent-core `_ai/models.py` (rewritten, ~50 lines)
+```python
+"""Model factory — native pydantic-ai model resolution."""
+
+from pydantic_ai.models import infer_model, Model
+
+def create_model(model_id: str) -> Model:
+    """Create a pydantic-ai Model from 'provider:model_name' string."""
+    return infer_model(model_id)
+
+def create_fallback_model(
+    primary_id: str,
+    fallback_ids: list[str],
+) -> Model:
+    """Create a FallbackModel with primary and fallback chains."""
+    from pydantic_ai.models.fallback import FallbackModel
+    return FallbackModel(
+        default_model=infer_model(primary_id),
+        fallback_models=[infer_model(fid) for fid in fallback_ids],
+        fallback_on=(Exception,),  # Failover on any error
+    )
+```
+
+#### agent-core `foundation/settings.py` (GatewaySettings updated)
+```python
+class GatewaySettings(BaseSettings):
+    """LLM gateway settings — native pydantic-ai model resolution."""
+    
+    model: str = "openai-chat:fable-5o"
+    base_url: str = ""
+    api_key: SecretStr = Field(default=SecretStr(""), exclude=True)
+    fallback_models: list[str] = []
+    semantic_cache_enabled: bool = False
+    semantic_cache_ttl_seconds: int = Field(default=3600, ge=0)
+```
+
+#### agent-core SDK (sdk/agents.py updated)
+```python
+def build_agent(
+    profile: ConsumerRuntimeProfile | None = None,
+    model: str | Model | None = None,  # NEW: replaces gateway=
+    tools: list[Any] | ToolRegistry | None = None,
+    ...
+) -> BaseAgent:
+    """Build a BaseAgent with typed composition."""
+    if model is None:
+        raise ValueError("build_agent requires model= parameter")
+    ...
+```
+
+#### agent-docs-sync `llm/model.py` (replaces gateway.py)
+```python
+"""Model factory for agent-docs-sync."""
+
+from pydantic_ai.models import infer_model, Model
+from pydantic_ai.models.fallback import FallbackModel
+
+def create_model(config: RuntimeConfigLike) -> Model:
+    """Create model from consumer config."""
+    settings = config.settings.gateway
+    model_id = config.model or settings.model or "openai-chat:gpt-4o"
+    
+    if settings.fallback_models:
+        return FallbackModel(
+            default_model=infer_model(model_id),
+            fallback_models=[infer_model(fid) for fid in settings.fallback_models],
+            fallback_on=(Exception,),
+        )
+    return infer_model(model_id)
+```
+
+#### agent-harness (services.py updated)
+```python
+@dataclass(frozen=True, slots=True)
+class StageServices:
+    stage: Stage
+    runtime: ConsumerRuntimeProfile | None
+    model: Model | None  # replaces gateway: LLMGateway | None
+    ...
+
+@dataclass(frozen=True, slots=True)
+class HarnessServices:
+    model: Model | None = None  # replaces gateway
+    ...
+```
+
+## Config Changes
+
+### `~/.tdt/config.yaml` — New Gateway Section
 ```yaml
-# ~/.tdt/config.yaml
 gateway:
-  # Primary model (pydantic-ai "provider:model_name" format)
   model: "openai-chat:gpt-4o"
-  # Proxy endpoint (for OmniRoute/LiteLLM/Bifrost)
   base_url: "http://localhost:20128/v1"
-  api_key: "${OMNIROUTE_API_KEY}"
-  # Fallback models
   fallback_models:
     - "openai-chat:fable-5o-mini"
-  # Semantic cache
   semantic_cache_enabled: false
   semantic_cache_ttl_seconds: 3600
 ```
 
+### `~/.tdt/.env` — Keep Existing Keys
 ```bash
-# ~/.tdt/.env
 OMNIROUTE_URL=http://localhost:20128/v1
 OMNIROUTE_API_KEY=sk-343...b53d
 ```
 
-### What Gets Removed
-
-1. **`llm_gateway/` package** (~600 lines)
-   - `BifrostGateway`, `LiteLLMGateway` → `infer_model()` or direct model creation
-   - `ResilientGateway` → `FallbackModel`
-   - `GatewayFactory` → removed (unused in practice)
-   - `create_gateway()` → `create_model_from_config()`
-   - `LLMGateway` ABC → `pydantic_ai.models.Model` directly
-
-2. **`_ai/models.py`** (109 lines)
-   - `create_bifrost_model()`, `create_litellm_model()`, `create_openai_model()` → `infer_model()`
-   - `create_model_from_env()` → simplified env resolution
-
-3. **`resilience/` custom circuit breaker & retry** (~400 lines)
-   - `CircuitBreaker`, `CircuitBreakerRegistry` → `FallbackModel` handles failover
-   - `retry_with_jitter` → `Agent.run(retries=N)` or `AgentRetries`
-   - `FallbackChain`, `FallbackEntry` → `FallbackModel.fallback_models`
-
-4. **`BudgetTracker`** → `UsageLimits` for token budgets; USD tracking via lightweight hook
-
-### What Gets Added
-
-1. **`_ai/models.py`** — simplified model factory using `infer_model()`
-2. **`GatewaySettings`** — extensible config for provider-native auth
-3. **`ConsumerRuntimeProfile.model`** — supports `provider:model_name` format
-4. **Real verification tests** — actual LLM API calls (not mocked)
-
-### What Stays (TDT-specific, no pydantic-ai equivalent)
-
-- `BaseAgent` — flavor composition, skill resolution
-- `AgentRuntime` — thin pydantic-ai Agent wrapper (simplified)
-- `ToolRegistry` + `BaseTool` — authority, approval, metadata lifecycle
-- `CapabilityAuthorityPolicy` — TDT security model
-- `ConsumerRuntimeProfile` — TDT config composition
-- `Flavor` system — agent personality/policy
-- `Skill` system — skill matching
-- USD cost tracking hook — pydantic-ai only tracks tokens
-
 ## Consumers
 
-| Repo | Impact | Change |
+| Repo | Changes | Lines Affected |
 |---|---|---|
-| agent-docs-sync | Gateway creation changes | `llm/gateway.py` uses new model factory |
-| agent-harness | Transparent | Receives `Model` via injection, format is invisible |
+| agent-core | Delete llm_gateway/, resilience/, rewrite _ai/models.py, sdk/ | ~1,432 removed, ~100 added |
+| agent-docs-sync | Delete llm/gateway.py, update all agents/workflows | ~200 affected |
+| agent-harness | Update services.py, factory.py, stages, workflow | ~100 affected |
 
-## Migration
+## Verification
 
-- `LLMGateway` replaced by `pydantic_ai.models.Model` in SDK surface
-- `build_agent(gateway=...)` becomes `build_agent(model=...)` or `build_agent(model_id="provider:model")`
-- Backward-compat adapter during transition window
-- OpenSpec change with `skip_specs: true` for initial config/tooling work
+Real LLM operations (not mocked):
+- `infer_model("openai-chat:gpt-4o")` → `OpenAIChatModel` + real API call
+- `infer_model("anthropic:claude-sonnet-4-5")` → `AnthropicModel` + real API call
+- `infer_model("google:fable-5-2.5-flash")` → `GoogleModel` + real API call
+- `FallbackModel` failover with real providers
+- `build_agent(model=...)` end-to-end with real API
 
-## Verification Strategy
+## Execution Order
 
-Real LLM operations (not mocked) for each provider format:
-
-| Test | Provider | Assertion |
-|---|---|---|
-| `test_infer_model_openai_chat` | `openai-chat:gpt-4o` | Model is `OpenAIChatModel`, `run()` returns non-empty output |
-| `test_infer_model_anthropic` | `anthropic:claude-sonnet-4-5` | Model is `AnthropicModel`, `run()` returns non-empty output |
-| `test_infer_model_google` | `google:fable-5-2.5-flash` | Model is `GoogleModel`, `run()` returns non-empty output |
-| `test_infer_model_openai_responses` | `openai:gpt-4o` | Model is `OpenAIResponsesModel`, `run()` returns non-empty output |
-| `test_fallback_model_failover` | Primary fails → Fallback | Fallback model used, output returned |
-| `test_usage_limits_enforced` | Any model | `UsageLimitExceeded` raised at limit |
-| `test_build_agent_model_param` | `build_agent(model=...)` | Agent runs and returns `AgentResult` |
-| `test_backward_compat_gateway_param` | `build_agent(gateway=...)` | Works with deprecation warning |
-
-## Risks
-
-- USD budget tracking loses granular per-request cost estimation (currently hooks into after_model_request)
-- ResilientGateway circuit breaker has different failure semantics than FallbackModel
-- agent-docs-sync's fallback endpoint pattern needs rework
+```
+Phase 1: Config (update ~/.tdt/config.yaml + .env)
+Phase 2: agent-core (delete packages, rewrite models, update SDK)
+Phase 3: agent-docs-sync (delete llm/, update consumers)
+Phase 4: agent-harness (update services, factory, stages)
+Phase 5: Tests (delete old, add new verification)
+Phase 6: Validation (ruff, mypy, pytest, import checks)
+```
