@@ -1,0 +1,6 @@
+schema: spec-driven
+created: 2026-08-07
+description: "Remove deprecated load_sprint_config bridge, config.toml references, and consolidate env helpers"
+skip_specs: false
+repos:
+  - tdt-core
