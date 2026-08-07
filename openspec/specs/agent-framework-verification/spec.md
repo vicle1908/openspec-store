@@ -100,7 +100,7 @@ entrypoints, and each repository's major deterministic feature paths.
 
 #### Scenario: Required environment is unavailable
 
-- **WHEN** PostgreSQL, gateway, or another required backend is unavailable
+- **WHEN** PostgreSQL, model provider, or another required backend is unavailable
 - **THEN** the affected check SHALL be classified as unavailable with its
   prerequisite
 - **AND** a required check SHALL fail while only an explicitly optional check
@@ -221,7 +221,7 @@ Three-repository readiness SHALL prove that supported major behavior is reachabl
 
 #### Scenario: Required backend is unavailable
 
-- **WHEN** a supported production claim requires PostgreSQL, a persistent step store, gateway behavior, or another backend that cannot be provisioned
+- **WHEN** a supported production claim requires PostgreSQL, a persistent step store, model provider behavior, or another backend that cannot be provisioned
 - **THEN** the corresponding gate SHALL fail as unavailable with its prerequisite
 - **AND** readiness SHALL remain incomplete rather than substituting an in-memory or mocked backend
 

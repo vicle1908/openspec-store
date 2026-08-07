@@ -65,7 +65,7 @@ The guide SHALL use shared TDT factories and centralized credentials.
 #### Scenario: Jira and LLM access
 
 - **WHEN** ticket or model access is configured
-- **THEN** Jira SHALL use `tdt_core.clients` factories and models SHALL use the agent-core gateway/composition API
+- **THEN** Jira SHALL use `tdt_core.clients` factories and models SHALL use the agent-core model/composition API
 - **AND** raw authenticated SDK clients SHALL not be introduced
 
 ### Requirement: Authority and artifact operations

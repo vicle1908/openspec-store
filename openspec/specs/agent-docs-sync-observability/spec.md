@@ -15,7 +15,7 @@ Each WorkflowBuilder node handler SHALL wrap its execution in an OTel span via `
 
 #### Scenario: Generate node emits span with LLM attributes
 - **WHEN** the generate node executes and calls the LLM
-- **THEN** the span contains `gen_ai.request.model`, `gen_ai.usage.total_tokens`, and `gen_ai.usage.cost_usd` attributes from the LLM gateway
+- **THEN** the span contains `gen_ai.request.model`, `gen_ai.usage.total_tokens`, and `gen_ai.usage.cost_usd` attributes from the model provider
 
 ### Requirement: Langfuse trace integration
 The doc-sync agent SHALL register `langfuse_hooks` from `agent_core.agent_base.hooks.builtins` in its HookRegistry. After each agent run, a Langfuse trace SHALL be recorded with `success` and `duration_ms` scores.

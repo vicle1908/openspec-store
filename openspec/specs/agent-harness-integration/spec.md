@@ -4,17 +4,17 @@ Defines the consumer-owned agent-harness composition and durable workflow bounda
 ## Requirements
 ### Requirement: Explicit harness agent composition
 
-`agent-harness` SHALL construct stage agents through the typed `agent_core.sdk` composition API with an explicit gateway, runtime profile, official toolsets/capabilities, and run-scoped instructions.
+`agent-harness` SHALL construct stage agents through the typed `agent_core.sdk` composition API with an explicit model, runtime profile, official toolsets/capabilities, and run-scoped instructions.
 
 #### Scenario: Stage agent construction
 
 - **WHEN** a harness stage agent is created
-- **THEN** a valid gateway SHALL be supplied before the agent can run
+- **THEN** a valid model SHALL be supplied before the agent can run
 - **AND** the stage SHALL not create a second tool registry or encode capabilities as strings
 
-#### Scenario: Missing gateway
+#### Scenario: Missing model
 
-- **WHEN** no gateway can be resolved through the TDT factory
+- **WHEN** no model can be resolved through the TDT factory
 - **THEN** construction SHALL fail before workflow execution with an actionable configuration error
 
 ### Requirement: Consumer-owned native graph
@@ -100,7 +100,7 @@ The consumer-owned production graph SHALL invoke stage nodes built from configur
 #### Scenario: Stage agent is required
 
 - **WHEN** a stage contract requires model reasoning or official toolsets
-- **THEN** the production graph SHALL construct a stage agent with the resolved gateway, immutable profile, bounded instructions, and stage-visible tools
+- **THEN** the production graph SHALL construct a stage agent with the resolved model, immutable profile, bounded instructions, and stage-visible tools
 - **AND** it SHALL not substitute a test factory or uncomposed handler
 
 #### Scenario: Public CLI production fixture

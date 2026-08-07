@@ -29,7 +29,7 @@ Provides step-level persistence for agent runs using ContinuableSnapshot objects
 #### Scenario: Persistent agent is reconstructed
 - **WHEN** the creating process terminates after a continuable snapshot
 - **THEN** a new process SHALL reconstruct the same consumer agent with the same persistent store and agent identity before calling the upstream continuation API
-- **AND** no live client, gateway, or store handle SHALL be serialized as continuation state
+- **AND** no live client, model, or store handle SHALL be serialized as continuation state
 
 #### Scenario: Persistent store is unavailable
 - **WHEN** a consumer declares restart-safe continuation but the configured store cannot be opened

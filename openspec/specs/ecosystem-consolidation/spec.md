@@ -8,7 +8,7 @@ Standardize shared Jira and GitLab infrastructure, Python project tooling, indep
 
 ### Requirement: Shared infrastructure via tdt-core
 
-The ecosystem SHALL use tdt-core as the single shared package for env loading, client factories, config models, and resilience primitives across all Python projects.
+The ecosystem SHALL use tdt-core as the single shared package for env loading, client factories, config models, and model resolution primitives across all Python projects.
 
 #### Scenario: New project authenticates to Jira via tdt-core
 

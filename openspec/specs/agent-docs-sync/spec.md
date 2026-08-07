@@ -28,7 +28,7 @@ validation, and reporting boundary for `agent-docs-sync`.
 
 ### Requirement: One canonical agent builder
 
-The consumer SHALL own one agent composition builder that receives the gateway, tools/toolsets, capabilities, hooks/policy callbacks, memory, and mode-specific instructions explicitly.
+The consumer SHALL own one agent composition builder that receives the model, tools/toolsets, capabilities, hooks/policy callbacks, memory, and mode-specific instructions explicitly.
 
 #### Scenario: Supplied registry
 
@@ -171,7 +171,7 @@ documentation mappings.
 
 #### Scenario: Unsupported configuration section
 - **WHEN** configuration contains an unknown or legacy section that is not supported by the canonical schema
-- **THEN** validation SHALL fail before gateway, persistence, or write-capable tool construction
+- **THEN** validation SHALL fail before model, persistence, or write-capable tool construction
 - **AND** the error SHALL identify the supported replacement without echoing protected values
 
 #### Scenario: Public option is accepted

@@ -31,7 +31,7 @@ The system MUST ship reusable hook implementations that cover the four most comm
 - **THEN** the hook accumulates input/output tokens and estimated cost, accessible via `cost_tracker.total_cost_usd`
 
 #### Scenario: Cost tracker reads canonical usage fields
-- **WHEN** usage data is available from the gateway response
+- **WHEN** usage data is available from the model response
 - **THEN** the hook computes totals from `prompt_tokens`, `completion_tokens`, `total_tokens`, and `cost_usd` without custom field-name mapping
 
 ### Requirement: Hook packs are composable and independently registerable
@@ -74,7 +74,7 @@ The system SHALL define three tiers of hook packs for consumer agents:
 All consumer agent builder functions SHALL register at minimum the Tier 0 hook packs (`otel_metrics`, `structured_audit`). This can be done directly via `register_pack` or indirectly via `build_agent(hooks=HookRegistry())`.
 
 #### Scenario: Agent builder uses build_agent with hooks
-- **WHEN** a consumer calls `build_agent(config, gateway, hooks=HookRegistry())`
+- **WHEN** a consumer calls `build_agent(config, model, hooks=HookRegistry())`
 - **THEN** `build_agent` SHALL auto-register `otel_metrics` and `structured_audit`
 
 #### Scenario: Agent builder uses register_pack directly
@@ -82,7 +82,7 @@ All consumer agent builder functions SHALL register at minimum the Tier 0 hook p
 - **THEN** the agent SHALL have both Tier 0 packs registered
 
 #### Scenario: Agent builder without hooks
-- **WHEN** a consumer calls `build_agent(config, gateway)` without providing `hooks`
+- **WHEN** a consumer calls `build_agent(config, model)` without providing `hooks`
 - **THEN** the agent SHALL have no hooks registered (backwards compatible)
 - **AND** a deprecation warning SHALL be logged suggesting hooks be added
 

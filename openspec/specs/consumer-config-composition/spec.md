@@ -7,7 +7,7 @@ Defines the composable configuration pattern for agent-core consumers.
 
 ### Requirement: ConsumerConfig composes Settings
 
-`ConsumerConfig` SHALL compose agent-core's `Settings` as a field (not inheritance). This allows consumers to add domain-specific config while inheriting framework config (gateway, observability, secrets, etc.).
+`ConsumerConfig` SHALL compose agent-core's `Settings` as a field (not inheritance). This allows consumers to add domain-specific config while inheriting framework config (model, observability, secrets, etc.).
 
 #### Scenario: Framework settings accessible via config
 - **WHEN** a consumer creates `DocsSyncConfig()`

@@ -37,7 +37,7 @@ The system SHALL reuse the existing `AgentResult` as the response contract; no p
 The system SHALL ship one runnable reference adapter in `agent-core/examples/code_reviewer/` that maps a domain concept to an `AgentRequest`, invokes a configured `BaseAgent`, and derives a domain result from the `AgentResult`.
 
 #### Scenario: Reference adapter builds and runs against mocks
-- **WHEN** the reference adapter is invoked with a mock domain input and a mocked gateway
+- **WHEN** the reference adapter is invoked with a mock domain input and a mocked model
 - **THEN** it constructs an `AgentRequest`, runs the agent, and returns a domain result without contacting any external service
 
 #### Scenario: Reference adapter does not modify any running service
