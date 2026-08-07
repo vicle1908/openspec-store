@@ -19,11 +19,44 @@ that duplicates features already provided natively by pydantic-ai v2:
 **Impact**: agent-core cannot use Anthropic native, Google native, OpenAI Responses API,
 or any of the 30+ providers pydantic-ai supports without routing through LiteLLM proxy.
 
+## Current Config State
+
+```yaml
+# ~/.tdt/config.yaml — NO gateway section exists
+# ~/.tdt/.env — OMNIROUTE_URL=http://localhost:20128/v1 (proxy, not wired)
+```
+
+Gateway settings are **empty** — consumers rely on env vars that are never set.
+
 ## Solution
 
 Standardize on pydantic-ai's native model resolution and remove the custom gateway layer.
 Keep TDT-specific features (flavors, skills, authority, tool registry, USD budget tracking)
 that pydantic-ai does not provide.
+
+### Target Config
+
+```yaml
+# ~/.tdt/config.yaml
+gateway:
+  # Primary model (pydantic-ai "provider:model_name" format)
+  model: "openai-chat:gpt-4o"
+  # Proxy endpoint (for OmniRoute/LiteLLM/Bifrost)
+  base_url: "http://localhost:20128/v1"
+  api_key: "${OMNIROUTE_API_KEY}"
+  # Fallback models
+  fallback_models:
+    - "openai-chat:fable-5o-mini"
+  # Semantic cache
+  semantic_cache_enabled: false
+  semantic_cache_ttl_seconds: 3600
+```
+
+```bash
+# ~/.tdt/.env
+OMNIROUTE_URL=http://localhost:20128/v1
+OMNIROUTE_API_KEY=sk-343...b53d
+```
 
 ### What Gets Removed
 
@@ -50,6 +83,7 @@ that pydantic-ai does not provide.
 1. **`_ai/models.py`** — simplified model factory using `infer_model()`
 2. **`GatewaySettings`** — extensible config for provider-native auth
 3. **`ConsumerRuntimeProfile.model`** — supports `provider:model_name` format
+4. **Real verification tests** — actual LLM API calls (not mocked)
 
 ### What Stays (TDT-specific, no pydantic-ai equivalent)
 
@@ -75,6 +109,21 @@ that pydantic-ai does not provide.
 - `build_agent(gateway=...)` becomes `build_agent(model=...)` or `build_agent(model_id="provider:model")`
 - Backward-compat adapter during transition window
 - OpenSpec change with `skip_specs: true` for initial config/tooling work
+
+## Verification Strategy
+
+Real LLM operations (not mocked) for each provider format:
+
+| Test | Provider | Assertion |
+|---|---|---|
+| `test_infer_model_openai_chat` | `openai-chat:gpt-4o` | Model is `OpenAIChatModel`, `run()` returns non-empty output |
+| `test_infer_model_anthropic` | `anthropic:claude-sonnet-4-5` | Model is `AnthropicModel`, `run()` returns non-empty output |
+| `test_infer_model_google` | `google:fable-5-2.5-flash` | Model is `GoogleModel`, `run()` returns non-empty output |
+| `test_infer_model_openai_responses` | `openai:gpt-4o` | Model is `OpenAIResponsesModel`, `run()` returns non-empty output |
+| `test_fallback_model_failover` | Primary fails → Fallback | Fallback model used, output returned |
+| `test_usage_limits_enforced` | Any model | `UsageLimitExceeded` raised at limit |
+| `test_build_agent_model_param` | `build_agent(model=...)` | Agent runs and returns `AgentResult` |
+| `test_backward_compat_gateway_param` | `build_agent(gateway=...)` | Works with deprecation warning |
 
 ## Risks
 

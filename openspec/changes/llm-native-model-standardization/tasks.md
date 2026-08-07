@@ -1,5 +1,41 @@
 # Tasks: Standardize on Native pydantic-ai Model Loading
 
+## Phase 0: Config Migration (TDT Config)
+
+### Task 0.1: Update `~/.tdt/config.yaml` with gateway section
+- **File**: `~/.tdt/config.yaml`
+- **Action**: Add `gateway:` section with model, base_url, fallback_models
+- **Content**:
+  ```yaml
+  gateway:
+    model: "openai-chat:gpt-4o"
+    base_url: "http://localhost:20128/v1"
+    fallback_models:
+      - "openai-chat:fable-5o-mini"
+    semantic_cache_enabled: false
+    semantic_cache_ttl_seconds: 3600
+  ```
+- **Test**: `agent_core.foundation.settings.load_settings()` returns populated gateway
+
+### Task 0.2: Update `~/.tdt/.env` with provider API keys
+- **File**: `~/.tdt/.env`
+- **Action**: Ensure `OMNIROUTE_URL` and `OMNIROUTE_API_KEY` are present
+- **Verify**: Env vars are readable by `GatewaySettings`
+
+### Task 0.3: Verify config loads correctly
+- **Command**: 
+  ```bash
+  cd ~/Developer/agent-core
+  uv run python -c "
+  from agent_core.foundation.settings import load_settings
+  s = load_settings()
+  print('gateway.model:', s.gateway.model)
+  print('gateway.base_url:', s.gateway.base_url)
+  print('gateway.fallback_models:', s.gateway.fallback_models)
+  "
+  ```
+- **Expected**: All fields populated from config.yaml
+
 ## Phase 1: Config & Model Factory (agent-core)
 
 ### Task 1.1: Update GatewaySettings schema
@@ -19,7 +55,7 @@
 ### Task 1.3: Update `ConsumerRuntimeProfile.model`
 - **File**: `src/agent_core/sdk/config.py`
 - **Action**: Document `provider:model_name` format, add validation
-- **Test**: `anthropic:claude-opus-4-5` passes validation
+- **Test**: `anthropic:fable-5-4-5` passes validation
 
 ## Phase 2: SDK Surface (agent-core)
 
@@ -118,30 +154,55 @@
 - **Action**: Update `create_gateway` → `create_model_from_config`
 - **Test**: Full pipeline works with new model loading
 
-## Phase 7: Validation
+## Phase 7: Real Verification (Actual LLM Operations)
 
-### Task 7.1: Run full test suite
+### Task 7.1: Create `tests/_ai/test_model_loading.py`
+- **File**: `tests/_ai/test_model_loading.py`
+- **Tests**:
+  - `test_infer_model_openai_chat()` — `infer_model("openai-chat:fable-5o")` returns `OpenAIChatModel`
+  - `test_infer_model_anthropic()` — `infer_model("anthropic:claude-sonnet-4-5")` returns `AnthropicModel`
+  - `test_infer_model_google()` — `infer_model("google:fable-5-2.5-flash")` returns `GoogleModel`
+  - `test_infer_model_openai_responses()` — `infer_model("openai:fable-5o")` returns `OpenAIResponsesModel`
+  - `test_fallback_model_failover()` — FallbackModel uses fallback on primary failure
+  - `test_usage_limits_enforced()` — UsageLimitExceeded raised at limit
+  - `test_build_agent_model_param()` — `build_agent(model=...)` returns working agent
+  - `test_backward_compat_gateway_param()` — `build_agent(gateway=...)` works with warning
+- **Mark**: `@pytest.mark.integration` for tests requiring API keys
+- **Skip**: Skip if `GATEWAY_API_KEY` not set
+
+### Task 7.2: Create `tests/_ai/test_real_llm_operations.py`
+- **File**: `tests/_ai/test_real_llm_operations.py`
+- **Tests** (require actual API keys):
+  - `test_openai_chat_completion()` — Real `openai-chat:gpt-4o` call returns non-empty
+  - `test_anthropic_completion()` — Real `anthropic:claude-sonnet-4-5` call returns non-empty
+  - `test_google_completion()` — Real `google:fable-5-2.5-flash` call returns non-empty
+  - `test_fallback_chain_real()` — Primary fails → fallback succeeds
+  - `test_model_name_parsing()` — All `provider:model` strings parse correctly
+- **Mark**: `@pytest.mark.integration`
+- **Skip**: Skip if API keys not set
+
+### Task 7.3: Run full test suite
 ```bash
 cd ~/Developer/agent-core && uv run pytest tests/ -q
 cd ~/Developer/agent-docs-sync && uv run pytest tests/ -q
 cd ~/Developer/agent-harness && uv run pytest tests/ -q
 ```
 
-### Task 7.2: Run type checks
+### Task 7.4: Run type checks
 ```bash
 cd ~/Developer/agent-core && uv run mypy src/agent_core/ --strict
 cd ~/Developer/agent-docs-sync && uv run mypy src/agent_docs_sync/ --strict
 cd ~/Developer/agent-harness && uv run mypy src/agent_harness/ --strict
 ```
 
-### Task 7.3: Run lint
+### Task 7.5: Run lint
 ```bash
 cd ~/Developer/agent-core && uv run ruff check src/ tests/
 cd ~/Developer/agent-docs-sync && uv run ruff check src/ tests/
 cd ~/Developer/agent-harness && uv run ruff check src/ tests/
 ```
 
-### Task 7.4: Verify no remaining imports
+### Task 7.6: Verify no remaining imports
 ```bash
 grep -r "from agent_core.llm_gateway" ~/Developer/agent-*/
 grep -r "from agent_core.resilience" ~/Developer/agent-*/
@@ -151,11 +212,21 @@ grep -r "BifrostGateway\|LiteLLMGateway\|ResilientGateway" ~/Developer/agent-*/
 ## Execution Order
 
 ```
-Phase 1 (Config) → Phase 2 (SDK) → Phase 3 (Remove Resilience) → 
-Phase 4 (Simplify Runtime) → Phase 5 (Delete Gateway) → 
-Phase 6 (Update Consumers) → Phase 7 (Validation)
+Phase 0 (Config) → Phase 1 (Config & Factory) → Phase 2 (SDK) → 
+Phase 3 (Remove Resilience) → Phase 4 (Simplify Runtime) → 
+Phase 5 (Delete Gateway) → Phase 6 (Update Consumers) → 
+Phase 7 (Real Verification)
 ```
 
 **Estimated lines removed**: ~989
 **Estimated lines added/modified**: ~200 (simpler, native pydantic-ai)
 **Net reduction**: ~789 lines of custom code
+
+## Verification Evidence Required
+
+For each phase, provide:
+1. **Test output**: `uv run pytest` passing
+2. **Type check**: `uv run mypy` clean
+3. **Lint**: `uv run ruff check` clean
+4. **Import check**: `grep` returns zero hits for removed symbols
+5. **Real LLM test**: At least one actual API call succeeds

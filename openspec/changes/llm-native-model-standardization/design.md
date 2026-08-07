@@ -37,10 +37,10 @@ and returns the correct `Model` subclass automatically:
 from pydantic_ai.models import infer_model
 
 # These all work:
-model = infer_model("anthropic:claude-opus-4-5")     # AnthropicModel
+model = infer_model("anthropic:fable-5-4-5")     # AnthropicModel
 model = infer_model("openai-chat:gpt-4o")              # OpenAIChatModel
 model = infer_model("google:fable-5-2.5-pro")           # GoogleModel
-model = infer_model("openai:gpt-5")                     # OpenAIResponsesModel
+model = infer_model("openai:fable-5")                     # OpenAIResponsesModel
 model = infer_model("groq:fable-5.3-70b-versatile")    # GroqModel
 ```
 
@@ -54,9 +54,9 @@ from pydantic_ai.models.fallback import FallbackModel
 
 # Primary + fallback chain
 model = FallbackModel(
-    default_model=infer_model("anthropic:claude-opus-4-5"),
+    default_model=infer_model("anthropic:fable-5-4-5"),
     fallback_models=[
-        infer_model("openai-chat:gpt-4o"),
+        infer_model("openai-chat:fable-5o"),
         infer_model("google:fable-5-2.5-pro"),
     ],
     fallback_on=(ModelAPIError, ConnectionError),
@@ -112,7 +112,7 @@ class GatewaySettings(BaseSettings):
     # Model identifier: "provider:model_name" format
     model: str = "openai-chat:gpt-4o"
     
-    # Proxy/compatible endpoint (for LiteLLM, Bifrost, etc.)
+    # Proxy/compatible endpoint (for LiteLLM, Bifrost, OmniRoute)
     base_url: str = ""
     api_key: str = ""   # from secrets
     
@@ -157,6 +157,155 @@ agent = build_agent(
 )
 ```
 
+## Config Changes
+
+### `~/.tdt/config.yaml` — Add Gateway Section
+
+```yaml
+gateway:
+  # Primary model (pydantic-ai "provider:model_name" format)
+  model: "openai-chat:gpt-4o"
+  # Proxy endpoint (for OmniRoute/LiteLLM/Bifrost)
+  base_url: "http://localhost:20128/v1"
+  # Fallback models
+  fallback_models:
+    - "openai-chat:fable-5o-mini"
+  # Semantic cache
+  semantic_cache_enabled: false
+  semantic_cache_ttl_seconds: 3600
+```
+
+### `~/.tdt/.env` — Keep Existing Keys
+
+```bash
+# OmniRoute proxy (already configured)
+OMNIROUTE_URL=http://localhost:20128/v1
+OMNIROUTE_API_KEY=sk-343...b53d
+```
+
+### Environment Variable Mapping
+
+| Config Field | Env Var | Source |
+|---|---|---|
+| `gateway.model` | `GATEWAY_MODEL` | New |
+| `gateway.base_url` | `GATEWAY_BASE_URL` | Maps from `OMNIROUTE_URL` |
+| `gateway.api_key` | `GATEWAY_API_KEY` | Maps from `OMNIROUTE_API_KEY` |
+| `gateway.fallback_models` | `GATEWAY_FALLBACK_MODELS` | New (comma-separated) |
+
+## Verification Tests
+
+Real LLM operations (not mocked) for each provider format:
+
+### Test 1: `infer_model()` Returns Correct Type
+
+```python
+import pytest
+from pydantic_ai.models import infer_model
+from pydantic_ai.models.openai import OpenAIChatModel, OpenAIResponsesModel
+from pydantic_ai.models.anthropic import AnthropicModel
+from pydantic_ai.models.google import GoogleModel
+
+@pytest.mark.parametrize("model_id,expected_type", [
+    ("openai-chat:gpt-4o", OpenAIChatModel),
+    ("anthropic:claude-sonnet-4-5", AnthropicModel),
+    ("google:fable-5-2.5-flash", GoogleModel),
+    ("openai:fable-5o", OpenAIResponsesModel),
+])
+def test_infer_model_returns_correct_type(model_id, expected_type):
+    model = infer_model(model_id)
+    assert isinstance(model, expected_type)
+```
+
+### Test 2: `create_model_from_config()` Integration
+
+```python
+import pytest
+from agent_core._ai.models import create_model_from_config
+
+def test_create_model_from_config_with_proxy():
+    config = MagicMock()
+    config.gateway.model = "openai-chat:gpt-4o"
+    config.gateway.base_url = "http://localhost:20128/v1"
+    config.gateway.api_key = "sk-test"
+    
+    model = create_model_from_config(config, "openai-chat:fable-5o")
+    assert isinstance(model, OpenAIChatModel)
+```
+
+### Test 3: `FallbackModel` Failover
+
+```python
+import pytest
+from pydantic_ai.models.fallback import FallbackModel
+from pydantic_ai.exceptions import ModelAPIError
+
+async def test_fallback_model_failover():
+    # Mock primary to fail, fallback to succeed
+    primary = AsyncMock()
+    primary.run.side_effect = ModelAPIError("Primary down")
+    
+    fallback = AsyncMock()
+    fallback.run.return_value = MagicMock(output="Fallback response")
+    
+    model = FallbackModel(default_model=primary, fallback_models=[fallback])
+    result = await model.run(...)
+    assert result.output == "Fallback response"
+```
+
+### Test 4: `UsageLimits` Enforcement
+
+```python
+async def test_usage_limits_enforced():
+    model = infer_model("openai-chat:gpt-4o")
+    agent = Agent(model, instructions="Say hello")
+    
+    with pytest.raises(UsageLimitExceeded):
+        await agent.run(
+            "task",
+            usage_limits=UsageLimits(request_limit=1),
+        )
+        await agent.run("task again")  # Should fail
+```
+
+### Test 5: `build_agent(model=...)` Integration
+
+```python
+async def test_build_agent_with_model_param():
+    profile = ConsumerRuntimeProfile(
+        consumer_name="test-agent",
+        tools_allowed=("echo",),
+    )
+    
+    agent = build_agent(
+        profile=profile,
+        model="openai-chat:gpt-4o",
+        tools=[EchoTool()],
+    )
+    
+    result = await agent.run("Say hello")
+    assert result.completed is True
+    assert result.output is not None
+```
+
+### Test 6: Backward Compatibility
+
+```python
+async def test_build_agent_backward_compat_gateway():
+    gateway = LiteLLMGateway(
+        base_url="http://localhost:20128/v1",
+        api_key="sk-test",
+    )
+    
+    with pytest.warns(DeprecationWarning, match="gateway="):
+        agent = build_agent(
+            profile=profile,
+            gateway=gateway,  # Deprecated but works
+        )
+    
+    result = await agent.run("task")
+    assert result.completed is True
+```
+
 ## File Changes
 
 ### Remove
@@ -184,6 +333,7 @@ agent = build_agent(
 | `sdk/composition.py` | Modify | `resolve_gateway()` → `resolve_model()` |
 | `sdk/agents.py` | Modify | `build_agent(model=...)` |
 | `sdk/__init__.py` | Modify | Update re-exports |
+| `tests/_ai/test_model_loading.py` | Add | Real LLM verification tests |
 
 ### Simplify
 
@@ -217,6 +367,7 @@ agent = build_agent(
 3. **Regression tests**: `build_agent(model=...)` produces equivalent behavior
 4. **Consumer tests**: agent-docs-sync, agent-harness work with new config
 5. **Backward-compat tests**: old `gateway=` parameter still works during transition
+6. **Real LLM tests**: actual API calls to verify end-to-end model loading
 
 ## Rollback
 
