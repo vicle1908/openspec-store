@@ -1,65 +1,82 @@
-# Plan Review: llm-native-model-standardization
+# Plan Review: llm-native-model-standardization (v3 — 6-Provider)
 
-**Reviewed:** 2026-08-07T00:45:00+07:00
-**Providers:** Claude Code (Security), Codex (unavailable), Antigravity (permissions), OpenCode (timeout)
+**Reviewed:** 2026-08-07T02:10:00+07:00
+**Providers:** Claude Code, Antigravity, fable-5 Code, OpenCode, Pi, Codex
 
-## Alignment Summary
+## Review Summary
 
-| Edge | Status | Provider | Evidence |
-|---|---|---|---|
-| Spec ↔ Code | PASS | Claude Code | GatewaySettings schema matches _ai/models.py patterns |
-| Code ↔ Docs | PASS | Claude Code | AGENTS.md documents llm_gateway/ correctly |
-| Docs ↔ Skills | N/A | — | No skills affected |
-| Skills ↔ Specs | N/A | — | No skills affected |
-| Spec ↔ Docs | PASS | Claude Code | Proposal/design/tasks align with spec requirements |
-| Code ↔ Skills | N/A | — | No skills affected |
-| Spec ↔ Tests | PARTIAL | Claude Code | Missing negative test cases (addressed) |
-| Code ↔ Tests | PARTIAL | Claude Code | Real LLM tests need API key setup |
-| Knowledge ↔ Code | UNKNOWN | — | Knowledge tools not queried |
+| # | Provider | Lens | Verdict | Status |
+|---|----------|------|---------|--------|
+| 1 | **Claude Code** | Security + Architecture | ✅ APPROVED_WITH_FINDINGS | 3 findings |
+| 2 | **Antigravity** | Code Quality + Tests | ❌ NOT_REVIEWED | Didn't follow instruction |
+| 3 | **fable-5 Code** | Product Scope | ❌ NOT_REVIEWED | Binary not found (`fable-5` vs `kimi`) |
+| 4 | **OpenCode** | Cross-cutting | ❌ NOT_REVIEWED | Permission denied (/tmp) |
+| 5 | **Pi** | Security + Deployment | ✅ APPROVED_WITH_FINDINGS | 8 findings (2 HIGH, 3 MEDIUM, 3 LOW) |
+| 6 | **Codex** | Spec Compliance | ❌ NOT_REVIEWED | WebSocket disabled |
 
-## Security Lens (Claude Code)
+**Effective reviews: 2/6** (Claude Code + Pi)
 
-| # | Severity | Finding | Status |
-|---|----------|---------|--------|
-| 1 | High | `GatewaySettings.api_key: str` allows plaintext in config | **FIXED** — Changed to `SecretStr` with `exclude=True` |
-| 2 | High | No `${VAR}` interpolation spec for BaseSettings | **FIXED** — Added `model_validator` for env resolution |
-| 3 | Medium | Circuit breaker removal loses slow-attack protection | **FIXED** — Added `TimeoutError` to `fallback_on` tuple |
-| 4 | Medium | No provider allowlisting for fallback chains | **FIXED** — Added regex validation on model format |
-| 5 | Medium | Backward-compat silently drops circuit breaker | **FIXED** — Added deprecation warnings with security context |
-| 6 | Low | `.env` gitignore not mentioned in migration | **FIXED** — Added Task 0.3 for gitignore verification |
-| 7 | Low | `infer_model()` has no input validation | **FIXED** — Added `field_validator` with regex pattern |
-| 8 | Low | FallbackModel lacks recovery/retry semantics | **FIXED** — Documented primary re-enablement strategy |
+## Findings Summary
 
-## Provider Findings
+### HIGH Severity (must fix before execution)
 
-### Claude Code (Security) — APPROVED_WITH_FINDINGS → APPROVED
-All 8 findings addressed in design.md and tasks.md updates.
+| # | Finding | Source | Action |
+|---|---------|--------|--------|
+| H1 | `fallback_on=(Exception,)` too broad — includes auth errors | Pi | Use `FALLBACK_EXCEPTIONS` tuple (already designed) |
+| H2 | `api_key` could leak via yaml `model_dump()` | Pi | Add yaml-level stripping or validator |
 
-### Codex (Quality & Tests) — NOT_REVIEWED
-WebSocket connection errors prevented review. Marked as UNKNOWN.
+### MEDIUM Severity (fix during implementation)
 
-### Antigravity (Architecture) — NOT_REVIEWED
-Permission denied in headless mode. Marked as UNKNOWN.
+| # | Finding | Source | Action |
+|---|---------|--------|--------|
+| M1 | Config naming inconsistency (ModelSettings vs model:) | Pi | Unify naming across all artifacts |
+| M2 | `gateway_required` removal lacks replacement validation | Pi | Add `model_required` or implicit check |
+| M3 | No atomic commit strategy for 3-repo migration | Pi | Specify atomic commit or compatibility shim |
+| C1 | SecretStr/env var ordering | Claude Code | Verify env resolution order |
+| C2 | `fallback_on` tuple needs explicit exception list | Claude Code | Use `FALLBACK_EXCEPTIONS` |
+| C3 | 16 specs referenced but never enumerated | Claude Code | Add Phase 7 task list with spec paths |
 
-### OpenCode (Cross-cutting) — NOT_REVIEWED
-Timeout after 455s. Marked as UNKNOWN.
+### LOW Severity (cleanup)
 
-## Recommended Actions
+| # | Finding | Source | Action |
+|---|---------|--------|--------|
+| L1 | `GatewayError` removal undocumented | Pi | Decide keep/remove, update catch sites |
+| L2 | Env var prefix change undocumented | Pi | Document new `env_prefix` |
+| L3 | No production monitoring plan | Pi | Add Phase 7 monitoring section |
 
-1. **Proceed with implementation** — Security findings addressed
-2. **Retry fable-5ntigravity/OpenCode reviews** after implementation
-3. **Add integration test CI** for real LLM operations
-4. **Document `.env` security** in migration guide
+## Positive Findings (confirmed by both reviewers)
+
+| Area | Verdict |
+|------|---------|
+| SecretStr for api_key | ✅ `exclude=True` prevents serialization |
+| Regex validation | ✅ Prevents injection via malformed model strings |
+| SDK surface cleanup | ✅ Complete — all 3 repos covered |
+| Cross-repo coverage | ✅ All consumer files enumerated |
+| Line count accounting | ✅ ~1,432 removed, ~100 added |
+| Test plan | ✅ 10 real LLM verification tests |
+| Rollback | ✅ `git revert` with empty prior config |
+| Deployment order | ✅ Correct dependency chain |
+
+## CLI Agent Issues
+
+| Agent | Issue | Fix |
+|-------|-------|-----|
+| Antigravity | Explained `--dangerously-skip-permissions` instead of reviewing | Prompt needs to be more explicit about reading the file |
+| fable-5 | Binary is `kimi`, not `fable-5` | Use `fable-5 --auto -p` |
+| OpenCode | Permission denied for `/tmp/*` | Copy context to working dir or use `-f` flag |
+| Codex | WebSocket disabled (`websocket_disabled`) | Provider config issue — needs websocket transport |
 
 ## Verdict
 
-**APPROVED** (with 1 successful review, 3 unavailable)
+**APPROVED_WITH_FINDINGS** — 2 successful reviews, both APPROVED_WITH_FINDINGS.
 
-The plan is sound. Security findings from Claude Code have been addressed:
-- SecretStr for API keys
-- Regex validation for model format
-- TimeoutError in fallback chain
-- Deprecation warnings for backward-compat
-- .gitignore verification step
+**Must fix before execution:**
+1. H1: Use `FALLBACK_EXCEPTIONS` tuple (already designed, just ensure it ships)
+2. H2: Add yaml-level api_key stripping
 
-Recommend proceeding to implementation phase.
+**Can fix during implementation:**
+3. M1-M3: Config naming, validation, commit strategy
+4. C1-C3: Env ordering, fallback exceptions, spec enumeration
+5. L1-L3: GatewayError, env prefix, monitoring
+
+**Estimated remediation:** ~2 hours total

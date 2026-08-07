@@ -50,17 +50,25 @@ print('api_key type:', type(s.gateway.api_key).__name__)
 - **Files**: All test files
 - **Verify**: Directory removed
 
-### Task 2.4: Rewrite `_ai/models.py`
+### Task 2.4: Delete `GatewayError` from `foundation/errors.py`
+- **Action**: Remove `GatewayError` class (L1 addressed)
+- **Action**: Update 5 catch sites in `agent_base/agent.py` (1) and `cli/agent_cmd.py` (4)
+- **Replace with**: `except (ModelAPIError, UsageLimitExceeded, ConnectionError)`
+- **Verify**: `grep -r "GatewayError" src/` returns 0 hits
+
+### Task 2.5: Rewrite `_ai/models.py`
 - **Action**: Replace with `infer_model()` + `FallbackModel`
 - **New content**: ~50 lines using `create_model()` and `create_fallback_model()`
+- **Add**: `FALLBACK_EXCEPTIONS` tuple (excludes auth/config errors) — H1 addressed
 
-### Task 2.5: Update `foundation/settings.py`
-- **Action**: Update `GatewaySettings` schema
-- **Remove**: `bifrost_url`, `litellm_url` fields
-- **Add**: `model`, `base_url`, `api_key` (SecretStr), `fallback_models`
+### Task 2.6: Update `foundation/settings.py`
+- **Action**: Rename `GatewaySettings` to `ModelSettings`
+- **Add**: `env_prefix="MODEL_"` (L2 addressed — documents env var prefix)
+- **Remove**: `bifrost_url`, `litellm_url`, `semantic_cache_enabled`, `semantic_cache_ttl_seconds`
+- **Add**: `primary`, `base_url`, `api_key` (SecretStr + model_dump override), `fallback`, `timeout_seconds`
 - **Add**: Validators for model format
 
-### Task 2.6: Update `sdk/__init__.py`
+### Task 2.7: Update `sdk/__init__.py`
 - **Remove**: `LLMGateway`, `BifrostGateway`, `LiteLLMGateway`, `ResilientGateway`
 - **Remove**: `CircuitBreaker*`, `FallbackChain*`, `retry_with_jitter`, `resilient_tool`
 
@@ -141,9 +149,13 @@ print('api_key type:', type(s.gateway.api_key).__name__)
 
 ### Task 4.3: Update `stages/classification.py`
 - **Remove**: `gateway_required` field
+- **Add**: `model_required` field (M2 addressed — replaces fail-closed validation)
+- **Update**: `validate()` to check `model_required` instead of `gateway_required`
 
 ### Task 4.4: Update `stages/contracts.py`
 - **Remove**: `gateway_required` field
+- **Add**: `model_required` field (M2 addressed)
+- **Update**: Validation logic to use `model_required`
 
 ### Task 4.5: Update `workflow/graph.py`
 - **Remove**: `gateway` resolution logic
@@ -211,13 +223,58 @@ grep -r "from agent_core.resilience" ~/Developer/agent-*/
 grep -r "LLMGateway\|BifrostGateway\|LiteLLMGateway\|ResilientGateway" ~/Developer/agent-*/
 grep -r "CircuitBreaker\|FallbackChain\|retry_with_jitter\|resilient_tool" ~/Developer/agent-*/
 grep -r "BudgetTracker\|get_budget_tracker" ~/Developer/agent-*/
+grep -r "GatewayError" ~/Developer/agent-core/src/  # Should be 0 hits
 ```
+
+## Phase 7: Spec Updates (C3 addressed — enumerate 16 specs)
+
+### Task 7.1: Enumerate affected specs
+- **Action**: Search for `LLMGateway`, `BifrostGateway`, `LiteLLMGateway`, `ResilientGateway`, `CircuitBreaker`, `FallbackChain`, `BudgetTracker` across all specs
+- **Output**: List of 16 spec files with required changes
+
+### Task 7.2: Update `sdk-public-api/spec.md`
+- **Action**: Remove `LLMGateway` from Gateway row
+- **Action**: Replace with `Model` (pydantic-ai native)
+- **Action**: Update `build_agent()` scenarios to use `model=`
+- **Action**: Remove "Valid gateway before construction" requirement
+- **Action**: Add "Valid model before construction" requirement
+
+### Task 7.3: Update `agent-core-budget-enforcement/spec.md`
+- **Action**: Remove `BudgetTracker` references
+- **Action**: Replace with `UsageLimits` (token-based)
+- **Action**: Note: USD cost tracking dropped (can be re-added later)
+
+### Task 7.4: Update `agent-core-resilience-utility/spec.md`
+- **Action**: Remove `CircuitBreaker`, `FallbackChain`, `retry_with_jitter`
+- **Action**: Note: Replaced by pydantic-ai native `FallbackModel` + `Agent.run(retries=N)`
+
+### Task 7.5: Update remaining affected specs
+- **Action**: Update each of the 16 affected specs
+
+### Task 7.6: Validate specs
+```bash
+cd ~/Developer/openspec-store
+openspec validate --all --strict
+```
+
+## Phase 8: Post-Migration Monitoring (L3 addressed)
+
+### Task 8.1: Add monitoring section to proposal
+- **Action**: Document error rate baseline before migration
+- **Action**: Document fallback model activation alerting
+- **Action**: Document latency comparison (old vs new)
+
+### Task 8.2: Create monitoring checklist
+- **Action**: Error rate monitoring during/after migration
+- **Action**: Fallback model activation alerting
+- **Action**: Latency comparison (old gateway vs native infer_model)
 
 ## Execution Order
 
 ```
 Phase 1 (Config) → Phase 2 (agent-core) → Phase 3 (agent-docs-sync) → 
-Phase 4 (agent-harness) → Phase 5 (Tests) → Phase 6 (Validation)
+Phase 4 (agent-harness) → Phase 5 (Tests) → Phase 6 (Validation) →
+Phase 7 (Spec Updates) → Phase 8 (Monitoring)
 ```
 
 **Estimated lines removed**: ~1,432

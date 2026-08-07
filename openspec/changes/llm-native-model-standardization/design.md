@@ -59,13 +59,25 @@ class ModelSettings(BaseSettings):
     
     @model_validator(mode="after")
     def _resolve_env_secrets(self) -> "ModelSettings":
-        """Resolve api_key from env if not set."""
+        """Resolve api_key from env if not set. NEVER read from yaml."""
         import os
-        if not self.api_key.get_secret_value():
-            env_key = os.environ.get("MODEL_API_KEY") or os.environ.get("OMNIROUTE_API_KEY", "")
-            if env_key:
-                self.api_key = SecretStr(env_key)
+        # H2 addressed: api_key MUST come from env vars, never from yaml
+        env_key = os.environ.get("MODEL_API_KEY") or os.environ.get("OMNIROUTE_API_KEY", "")
+        if env_key:
+            self.api_key = SecretStr(env_key)
+        elif not self.api_key.get_secret_value():
+            # No env var and no explicit api_key — leave empty (will fail at runtime)
+            pass
         return self
+    
+    def model_dump(self, **kwargs: Any) -> dict[str, Any]:
+        """Override to always exclude api_key from serialization."""
+        kwargs.setdefault("exclude", set())
+        if isinstance(kwargs["exclude"], set):
+            kwargs["exclude"].add("api_key")
+        elif isinstance(kwargs["exclude"], dict):
+            kwargs["exclude"]["api_key"] = True
+        return super().model_dump(**kwargs)
 ```
 
 **NOTE**: The old `GatewaySettings` with `bifrost_url`/`litellm_url` is fully removed.
@@ -91,8 +103,9 @@ model = FallbackModel(
 )
 ```
 
-**SECURITY**: Auth/config errors (ValueError, AuthenticationError) are NOT in `fallback_on`.
+**SECURITY (H1 addressed)**: Auth/config errors (ValueError, AuthenticationError) are NOT in `fallback_on`.
 These fail immediately rather than trying fallback providers — prevents credential confusion.
+The `FALLBACK_EXCEPTIONS` tuple is the single source of truth — design.md and _ai/models.py both reference it.
 
 ## GatewayError Catch Blocks
 
