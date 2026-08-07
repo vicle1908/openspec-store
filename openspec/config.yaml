@@ -3,13 +3,15 @@ schema: spec-driven
 context: |
   # Multi-Project Workspace
 
-  ## Go Microservices Platform
+  ## Go Microservices Platform (GREENFIELD)
   - 8 independently deployable Go services, shared platform module
-  - PostgreSQL, Kafka, Debezium CDC, Temporal, Redis, OTLP observability
+  - PostgreSQL 18.4 (182 tables, 1210 stored procedures, 68 views)
+  - Kafka 4.3.1, Debezium CDC 3.6, Temporal 1.31.2, Redis, OTLP observability
   - Architecture: DDD, hexagonal, CQRS-style handlers, ports/adapters
   - Contracts: Protobuf managed with Buf; REST for MVP client API
-  - Operations: Docker Compose local, kind K8s validation, Argo CD GitOps
+  - Operations: Docker Compose local (41 services), kind K8s validation, Argo CD GitOps
   - Quality: structured logging, health checks, unit + integration tests
+  - **Greenfield: no legacy data, no migration constraints, rewrite freely**
 
   ## TDT Mobile Platform Ecosystem
   - Mobile Apps: Swift (iOS), Kotlin (Android)
