@@ -205,7 +205,7 @@ lc.Append(fx.StartStopHook(
 - **THEN** `OnStart` returns quickly (within milliseconds) because `worker.Start()` is non-blocking; the worker keeps polling in its own goroutine until `OnStop` calls `worker.Stop()`
 
 
-### Requirement: Graceful shutdown
+### Requirement: Graceful shutdown smoke-test enforcement
 
 The platform runtime SHALL gracefully shutdown services within a 30-second budget when receiving SIGTERM.
 

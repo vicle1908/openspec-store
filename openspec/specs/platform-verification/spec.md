@@ -152,7 +152,7 @@ The `.github/workflows/release-evidence.yml` workflow SHALL be committed to the 
 - **WHEN** a reviewer reads `.github/workflows/release-evidence.yml` during a release-process audit
 - **THEN** the workflow's `on:` trigger, `permissions:` block, retention policy, and gate list are visible without leaving the file and match the design's release-cadence decisions
 
-### Requirement: Cross-service smoke test verifies end-to-end flow
+### Requirement: Cross-service smoke test scenario 1 verifies end-to-end flow
 
 > **Status**: IMPLEMENTED. Cross-service smoke test exists; exercises create-customer through reporting-projection.
 
@@ -235,7 +235,7 @@ The release gate SHALL include a step that runs `openspec validate --strict --al
 - **WHEN** the release-evidence workflow runs against a `v*` tag
 - **THEN** `openspec validate --strict --all` runs and the workflow fails the tag if the command exits non-zero
 
-### Requirement: Cross-service smoke test
+### Requirement: Cross-service smoke test scenario 2
 
 The cross-service smoke test SHALL exercise the scenario below before each release; the release-evidence workflow SHALL refuse to tag a release when the scenario fails.
 
@@ -243,7 +243,7 @@ The cross-service smoke test SHALL exercise the scenario below before each relea
 
 This scenario is exercised by the cross-service smoke test (`tests/cross-service-smoke/`).
 
-### Requirement: Cross-service smoke test
+### Requirement: Cross-service smoke test scenario 3
 
 The cross-service smoke test SHALL exercise the scenario below before each release; the release-evidence workflow SHALL refuse to tag a release when the scenario fails.
 
@@ -251,7 +251,7 @@ The cross-service smoke test SHALL exercise the scenario below before each relea
 
 This scenario is exercised by the cross-service smoke test (`tests/cross-service-smoke/`).
 
-### Requirement: Cross-service smoke test
+### Requirement: Cross-service smoke test scenario 4
 
 The cross-service smoke test SHALL exercise the scenario below before each release; the release-evidence workflow SHALL refuse to tag a release when the scenario fails.
 
@@ -259,7 +259,7 @@ The cross-service smoke test SHALL exercise the scenario below before each relea
 
 This scenario is exercised by the cross-service smoke test (`tests/cross-service-smoke/`).
 
-### Requirement: Cross-service smoke test
+### Requirement: Cross-service smoke test scenario 5
 
 The cross-service smoke test SHALL exercise the scenario below before each release; the release-evidence workflow SHALL refuse to tag a release when the scenario fails.
 
@@ -267,7 +267,7 @@ The cross-service smoke test SHALL exercise the scenario below before each relea
 
 This scenario is exercised by the cross-service smoke test (`tests/cross-service-smoke/`).
 
-### Requirement: Cross-service smoke test
+### Requirement: Cross-service smoke test scenario 6
 
 The cross-service smoke test SHALL exercise the scenario below before each release; the release-evidence workflow SHALL refuse to tag a release when the scenario fails.
 
@@ -275,7 +275,7 @@ The cross-service smoke test SHALL exercise the scenario below before each relea
 
 This scenario is exercised by the cross-service smoke test (`tests/cross-service-smoke/`).
 
-### Requirement: Cross-service smoke test
+### Requirement: Cross-service smoke test scenario 7
 
 The cross-service smoke test SHALL exercise the scenario below before each release; the release-evidence workflow SHALL refuse to tag a release when the scenario fails.
 
@@ -283,7 +283,7 @@ The cross-service smoke test SHALL exercise the scenario below before each relea
 
 This scenario is exercised by the cross-service smoke test (`tests/cross-service-smoke/`).
 
-### Requirement: Cross-service smoke test
+### Requirement: Cross-service smoke test scenario 8
 
 The cross-service smoke test SHALL exercise the scenario below before each release; the release-evidence workflow SHALL refuse to tag a release when the scenario fails.
 
@@ -291,7 +291,7 @@ The cross-service smoke test SHALL exercise the scenario below before each relea
 
 This scenario is exercised by the cross-service smoke test (`tests/cross-service-smoke/`).
 
-### Requirement: Cross-service smoke test
+### Requirement: Cross-service smoke test scenario 9
 
 The cross-service smoke test SHALL exercise the scenario below before each release; the release-evidence workflow SHALL refuse to tag a release when the scenario fails.
 
@@ -299,7 +299,7 @@ The cross-service smoke test SHALL exercise the scenario below before each relea
 
 This scenario is exercised by the cross-service smoke test (`tests/cross-service-smoke/`).
 
-### Requirement: Cross-service smoke test
+### Requirement: Cross-service smoke test scenario 10
 
 The cross-service smoke test SHALL exercise the scenario below before each release; the release-evidence workflow SHALL refuse to tag a release when the scenario fails.
 
@@ -307,7 +307,7 @@ The cross-service smoke test SHALL exercise the scenario below before each relea
 
 This scenario is exercised by the cross-service smoke test (`tests/cross-service-smoke/`).
 
-### Requirement: Cross-service smoke test
+### Requirement: Cross-service smoke test scenario 11
 
 The cross-service smoke test SHALL exercise the scenario below before each release; the release-evidence workflow SHALL refuse to tag a release when the scenario fails.
 
@@ -315,7 +315,7 @@ The cross-service smoke test SHALL exercise the scenario below before each relea
 
 This scenario is exercised by the cross-service smoke test (`tests/cross-service-smoke/`).
 
-### Requirement: Cross-service smoke test
+### Requirement: Cross-service smoke test scenario 12
 
 The cross-service smoke test SHALL exercise the scenario below before each release; the release-evidence workflow SHALL refuse to tag a release when the scenario fails.
 
@@ -323,7 +323,7 @@ The cross-service smoke test SHALL exercise the scenario below before each relea
 
 This scenario is exercised by the cross-service smoke test (`tests/cross-service-smoke/`).
 
-### Requirement: Cross-service smoke test contract for each new service
+### Requirement: Cross-service smoke test scenario 13 contract for each new service
 
 The `tests/cross-service-smoke/` directory SHALL include a contract test for each of the three new services introduced by the `extract-business-domains-and-dedicated-workflow-orchestration` change. Each contract test SHALL:
 
