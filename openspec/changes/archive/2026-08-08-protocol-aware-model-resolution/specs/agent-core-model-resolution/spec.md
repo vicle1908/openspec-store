@@ -1,9 +1,7 @@
-# agent-core-model-resolution Specification
+# agent-core-model-resolution (Delta)
 
-## Purpose
+## MODIFIED Requirements
 
-Define configuration-driven model and proxy resolution for agent-core, including the active giaoduc Anthropic Messages setup and the OpenAI-compatible alternative.
-## Requirements
 ### Requirement: Model Resolution from Config
 
 **WHEN** `create_model(model_id)` is called
@@ -84,21 +82,6 @@ Define configuration-driven model and proxy resolution for agent-core, including
 - **WHEN** `create_model("google:gemini-2.0-flash")` is called
 - **THEN** requests SHALL use OpenAI Chat Completions format via the proxy
 
-### Requirement: Config Schema
-
-**WHEN** `~/.tdt/config.yaml` is loaded
-**THEN** the model section SHALL support:
-- `primary`: Default model identifier (the active value is "anthropic:Advance")
-- `base_url`: Proxy endpoint URL
-- `api_key_env`: Environment variable name containing the API key
-- `fallback`: List of fallback model identifiers
-- `timeout_seconds`: Request timeout
-
-#### Scenario: TDT model configuration
-- **GIVEN** the active TDT config contains `model.primary`, `model.base_url`, and `model.api_key_env`
-- **WHEN** the settings and model factory are initialized
-- **THEN** the model endpoint and API key SHALL be resolved from those configured values
-
 ### Requirement: Verified Provider (giaoduc)
 
 **WHEN** using the giaoduc provider (`https://api.giaoduc.online/v1`)
@@ -114,4 +97,3 @@ Define configuration-driven model and proxy resolution for agent-core, including
 - **GIVEN** the active provider is giaoduc and the model is `anthropic:Advance`
 - **WHEN** the agent runs a real prompt
 - **THEN** the provider SHALL return an Anthropic Messages response successfully
-
