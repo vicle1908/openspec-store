@@ -47,7 +47,7 @@ The system SHALL generate an architecture-level knowledge graph for agent-docs-s
 - **WHEN** the graph is generated
 - **THEN** edges SHALL connect cli.py → workflows/sync_pipeline.py (CLI calls pipeline)
 - **AND** edges SHALL connect workflows/sync_pipeline.py → agents/generation.py (pipeline uses agent)
-- **AND** edges SHALL connect agents/generation.py → llm/gateway.py (agent uses LLM)
+- **AND** edges SHALL connect agents/generation.py → llm/model.py (agent uses the configured model)
 - **AND** edges SHALL connect tools/ → workflows/ (tools used by pipeline steps)
 
 ### Requirement: Tool availability verification

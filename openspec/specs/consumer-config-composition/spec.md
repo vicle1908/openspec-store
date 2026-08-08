@@ -12,7 +12,7 @@ Defines the composable configuration pattern for agent-core consumers.
 #### Scenario: Framework settings accessible via config
 - **WHEN** a consumer creates `DocsSyncConfig()`
 - **THEN** `config.settings` SHALL be a fully-loaded `Settings` instance
-- **AND** `config.settings.gateway.litellm_url` SHALL reflect `GATEWAY_LITELLM_URL` env var
+- **AND** `config.settings.model.base_url` SHALL reflect the `MODEL_BASE_URL` env var
 
 ### Requirement: ConsumerConfig environment variable loading
 
@@ -39,9 +39,9 @@ Defines the composable configuration pattern for agent-core consumers.
 
 ### Requirement: ConsumerConfig shortcut properties
 
-`ConsumerConfig` SHALL provide shortcut properties for common framework settings (`.gateway`, `.observability`, `.secrets`).
+`ConsumerConfig` SHALL provide shortcut properties for common framework settings (`.model`, `.observability`, `.secrets`).
 
 #### Scenario: Shortcut properties delegate to settings
-- **WHEN** a consumer accesses `config.gateway`
-- **THEN** it SHALL return `config.settings.gateway`
+- **WHEN** a consumer accesses `config.model`
+- **THEN** it SHALL return `config.settings.model`
 - **AND** the same delegation applies to `.observability` and `.secrets`

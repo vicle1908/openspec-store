@@ -31,7 +31,7 @@ A feature SHALL be promoted from a consumer into `agent-core` only when it is TD
 
 #### Scenario: Shared TDT policy
 
-- **WHEN** two active consumers require the same gateway, authorization, budget, audit, or tool-metadata policy
+- **WHEN** two active consumers require the same model-resolution, authorization, budget, audit, or tool-metadata policy
 - **THEN** the policy MAY be promoted behind a narrow public protocol
 - **AND** contract tests SHALL cover both consumers before promotion
 

@@ -73,7 +73,7 @@ local CDC MAY be referenced rather than duplicated.
 
 ### Requirement: Agent configs SHALL be wired for all supported agents
 
-The platform SHALL provide properly configured agent configuration files for all supported AI coding agents (Claude via `.claude/settings.json`, Cursor via `.cursor/mcp.json`, Codex, KiloCode, Kiro, Factory, OpenCode, Zed, Kimi, Antigravity, and Hermes where installed). Each supported MCP client SHALL use MCP Router as the single client-facing gateway for GitNexus, Graphify, and AgentMemory. Client configuration MUST NOT additionally register those same knowledge servers directly unless a documented, time-bounded compatibility exception identifies the owner, reason, expiry, and rollback. Configurations MUST remain synchronized with the platform topology and MUST NOT contain hardcoded secrets or credentials.
+The platform SHALL provide properly configured agent configuration files for all supported AI coding agents (Claude via `.claude/settings.json`, Cursor via `.cursor/mcp.json`, Codex, KiloCode, Kiro, Factory, OpenCode, Zed, Kimi, Antigravity, and Hermes where installed). Each supported MCP client SHALL use MCP Router as the single client-facing router for GitNexus, Graphify, and AgentMemory. Client configuration MUST NOT additionally register those same knowledge servers directly unless a documented, time-bounded compatibility exception identifies the owner, reason, expiry, and rollback. Configurations MUST remain synchronized with the platform topology and MUST NOT contain hardcoded secrets or credentials.
 
 The running MCP Router desktop app SHALL be the authoritative adapter and live
 configuration owner. The app SHALL remain on latest stable `0.6.3` until a newer

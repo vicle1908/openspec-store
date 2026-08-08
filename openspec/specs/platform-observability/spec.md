@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This spec defines the observability stack: OpenTelemetry trace and metric exporters with two-tier sampling, structured slog-based logging with OTel correlation, Prometheus scrape endpoint, and the DaemonSet-agent + Deployment-gateway OTel Collector topology. Trace context MUST propagate across HTTP and Kafka boundaries.
+This spec defines the observability stack: OpenTelemetry trace and metric exporters with two-tier sampling, structured slog-based logging with OTel correlation, Prometheus scrape endpoint, and the DaemonSet-agent + central-collector OTel topology. Trace context MUST propagate across HTTP and Kafka boundaries.
 ## Requirements
 
 > **Deployment-readiness status:** PARTIAL / UNVERIFIED. Source-level SDK and logging features may be implemented as annotated below, but Collector configuration, pipeline readiness, and required cross-service telemetry have not passed clean-environment acceptance together.
@@ -127,23 +127,23 @@ The platform SHALL expose baggage propagation via the OTel `TextMapPropagator` c
 - **WHEN** an outbound HTTP request is about to send a baggage key whose value matches the redact list pattern
 - **THEN** the propagator drops the key (does not send it) and logs a WARN
 
-### Requirement: OTel Collector topology — DaemonSet agent + Deployment gateway
+### Requirement: OTel Collector topology — DaemonSet agent + central collector
 
 > **Status**: PARTIAL. OTel Collector config exists; DaemonSet/Deployment topology may be partial.
 
 The platform SHALL deploy the OTel Collector with a two-tier topology in production:
 
-- **DaemonSet agent (`otelcol-agent`)** — one pod per Kubernetes node. Receives OTLP gRPC and OTLP HTTP from local apps on `0.0.0.0:4317`/`0.0.0.0:4318`. Processors in order: `memory_limiter` (FIRST, with hard `gc_limit` and `spike_limit`), `k8sattributes`, `attributes`/`transform` (cardinality control), `batch`. **Does NOT perform tail sampling** (tail sampling latency per-node would corrupt cluster-wide trace decisions). Exports OTLP via the `loadbalancing` exporter (routing-key = trace ID) to the gateway.
-- **Deployment gateway (`otelcol-gateway`)** — horizontally scaled behind a `Service`. Receives OTLP from agents. Processors in order: `memory_limiter`, `tail_sampling` (with policies `errors`, `latency` > 1s, `probabilistic` 10%), final `batch`. Exporters: `otlp/tempo` (gRPC), `otlphttp/mimir`, `otlphttp/loki`, `debug` (dev only). HPA scales on `otelcol_exporter_queue_size` and `otelcol_processor_tail_sampling_sampled_traces` metrics.
+- **DaemonSet agent (`otelcol-agent`)** — one pod per Kubernetes node. Receives OTLP gRPC and OTLP HTTP from local apps on `0.0.0.0:4317`/`0.0.0.0:4318`. Processors in order: `memory_limiter` (FIRST, with hard `gc_limit` and `spike_limit`), `k8sattributes`, `attributes`/`transform` (cardinality control), `batch`. **Does NOT perform tail sampling** (tail sampling latency per-node would corrupt cluster-wide trace decisions). Exports OTLP via the `loadbalancing` exporter (routing-key = trace ID) to the central collector.
+- **Central collector (`otelcol-gateway`)** — horizontally scaled behind a `Service`. Receives OTLP from agents. Processors in order: `memory_limiter`, `tail_sampling` (with policies `errors`, `latency` > 1s, `probabilistic` 10%), final `batch`. Exporters: `otlp/tempo` (gRPC), `otlphttp/mimir`, `otlphttp/loki`, `debug` (dev only). HPA scales on `otelcol_exporter_queue_size` and `otelcol_processor_tail_sampling_sampled_traces` metrics.
 
-The HPA SHALL trigger on `otelcol_*` queue size metrics (not just CPU) so the gateway scales before its queues overflow. The OTel Collector's own Prometheus endpoint SHALL be scraped by the platform's Prometheus; an alert fires when `otelcol_exporter_queue_size > 80% of max` for 5 minutes.
+The HPA SHALL trigger on `otelcol_*` queue size metrics (not just CPU) so the central collector scales before its queues overflow. The OTel Collector's own Prometheus endpoint SHALL be scraped by the platform's Prometheus; an alert fires when `otelcol_exporter_queue_size > 80% of max` for 5 minutes.
 
-#### Scenario: Agent forwards traces to the gateway via load-balancing exporter
+#### Scenario: Agent forwards traces to the central collector via load-balancing exporter
 - **WHEN** an app emits a span to the per-node agent
-- **THEN** the agent routes it to the gateway using trace-ID-routed load balancing, ensuring all spans of the same trace land on the same gateway instance (required for tail sampling)
+- **THEN** the agent routes it to the central collector using trace-ID-routed load balancing, ensuring all spans of the same trace land on the same central-collector instance (required for tail sampling)
 
-#### Scenario: Gateway tail sampler retains errors despite head sampler dropping
-- **WHEN** the gateway receives a complete trace where the root span was not sampled by the SDK but the trace contains a 5xx response
+#### Scenario: Central collector tail sampler retains errors despite head sampler dropping
+- **WHEN** the central collector receives a complete trace where the root span was not sampled by the SDK but the trace contains a 5xx response
 - **THEN** the `errors` policy of `tail_sampling` retains the trace and the exporter forwards it to Tempo
 
 ### Requirement: Double-instrumentation guard (mesh + app)

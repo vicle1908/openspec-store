@@ -30,17 +30,17 @@ Harness stages SHALL receive public Pydantic AI toolsets and capabilities throug
 
 ### Requirement: Explicit agent dependencies
 
-Stage agent construction SHALL require a resolved TDT gateway and immutable runtime profile.
+Stage agent construction SHALL require a resolved TDT model and immutable runtime profile.
 
-#### Scenario: Missing gateway
+#### Scenario: Missing model
 
-- **WHEN** the gateway cannot be resolved
+- **WHEN** the model cannot be resolved
 - **THEN** construction SHALL fail before a stage node runs
-- **AND** the error SHALL identify the TDT gateway configuration boundary
+- **AND** the error SHALL identify the TDT model configuration boundary
 
 ### Requirement: Production service composition root
 
-`agent-harness` SHALL construct an immutable consumer-owned service composition containing factory-owned Jira read access, bounded code-intelligence providers, bounded file access, gateway/stage-agent factories, and artifact storage. Live services SHALL be reconstructed per runner process and SHALL NOT be checkpoint values.
+`agent-harness` SHALL construct an immutable consumer-owned service composition containing factory-owned Jira read access, bounded code-intelligence providers, bounded file access, model/stage-agent factories, and artifact storage. Live services SHALL be reconstructed per runner process and SHALL NOT be checkpoint values.
 
 #### Scenario: Production runner is constructed
 
@@ -51,12 +51,12 @@ Stage agent construction SHALL require a resolved TDT gateway and immutable runt
 #### Scenario: Runner process restarts
 
 - **WHEN** a durable run is opened in a separate process
-- **THEN** the process SHALL reconstruct gateways, Jira clients, code-intelligence transports, and artifact-store handles from configuration
+- **THEN** the process SHALL reconstruct models, Jira clients, code-intelligence transports, and artifact-store handles from configuration
 - **AND** checkpoint deserialization SHALL not load a live client or transport object
 
 #### Scenario: Required service is missing
 
-- **WHEN** a stage requires Jira, code intelligence, a gateway, or artifact storage that cannot be resolved
+- **WHEN** a stage requires Jira, code intelligence, a model, or artifact storage that cannot be resolved
 - **THEN** composition or stage execution SHALL fail closed with `needs_input` or an actionable configuration error
 - **AND** an empty placeholder result SHALL not satisfy the dependency
 

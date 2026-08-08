@@ -37,7 +37,7 @@ A module SHALL be extracted into a service only when independent ownership, scal
 
 > **Status**: IMPLEMENTED. Capability-driven admission enforced via ADR; optional infrastructure requires documented rationale.
 
-Redis, search stores, schema registries, gateways, and other infrastructure SHALL be introduced only with an owned capability, failure model, operational metric, and removal strategy. The same rule SHALL apply to optional inspection tooling such as a Kafka broker UI.
+Redis, search stores, schema registries, and other optional infrastructure SHALL be introduced only with an owned capability, failure model, operational metric, and removal strategy. The same rule SHALL apply to optional inspection tooling such as a Kafka broker UI.
 
 #### Scenario: Cache proposal
 - **WHEN** a read cache is proposed
@@ -154,7 +154,7 @@ Cross-service REST paths SHALL live under `/api/v1/<peer>/<resource>`. The names
 
 > **Status**: IMPLEMENTED. Phase 2 extensions enforced; OTel-instrumented HTTP client used for cross-service calls.
 
-The capability-driven admission rule for optional infrastructure (Redis, schema registries, search, gateways, broker UI) SHALL be extended by the Phase 2 requirements below. Cross-service HTTP calls SHALL use the OTel-instrumented `platform/http.Client`, SHALL surface peer-unavailable failures as the typed `ErrPeerUnavailable` sentinel, SHALL require a capability-cache ADR before admitting any cache SDK into a service module, and SHALL route all telemetry exclusively through the platform OTel Collector.
+The capability-driven admission rule for optional infrastructure (Redis, schema registries, search, broker UI) SHALL be extended by the Phase 2 requirements below. Cross-service HTTP calls SHALL use the OTel-instrumented `platform/http.Client`, SHALL surface peer-unavailable failures as the typed `ErrPeerUnavailable` sentinel, SHALL require a capability-cache ADR before admitting any cache SDK into a service module, and SHALL route all telemetry exclusively through the platform OTel Collector.
 
 #### Scenario: Cross-service call uses the OTel-instrumented HTTP client
 - **WHEN** the order-service calls `customer-service` or `catalog-service` from `internal/application/commands/create_order.go`

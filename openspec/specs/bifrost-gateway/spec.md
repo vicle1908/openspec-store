@@ -1,85 +1,108 @@
+# OmniRoute Proxy Specification
+
 ## Purpose
 
-This specification defines requirements for Bifrost Gateway.
+This specification defines the local OmniRoute proxy deployment and its integration with agent-core's native pydantic-ai model API. OmniRoute provides an OpenAI-compatible endpoint; agent consumers resolve a pydantic-ai `Model` with `create_model()` and pass it through the `model=` parameter.
 
 ## Requirements
 
-### Requirement: Bifrost SHALL run as a Docker Compose service
+### Requirement: OmniRoute SHALL run as a Docker Compose service
 
-The system SHALL deploy Bifrost via a Docker Compose file located at `deployments/bifrost/docker-compose.yml`. The service SHALL use the upstream `maximhq/bifrost:latest` image without a custom Dockerfile.
+The system SHALL deploy OmniRoute from `~/Omniroute/docker-compose.yml` with the `base` profile. The local override SHALL use the pre-built `diegosouzapw/omniroute:latest` image, and the service SHALL be named `omniroute` with `restart: unless-stopped`.
 
 #### Scenario: Service starts successfully
-- **WHEN** `docker compose up -d` is run from `deployments/bifrost/`
-- **THEN** the Bifrost container starts and becomes healthy within 30 seconds
+- **WHEN** `docker compose --profile base up -d --no-build` is run from `~/Omniroute/`
+- **THEN** the `omniroute` container starts and its Compose health check becomes healthy
 
 #### Scenario: Service restarts automatically
-- **WHEN** the Bifrost container crashes or the host reboots
-- **THEN** the container restarts automatically (restart policy: unless-stopped)
+- **WHEN** the OmniRoute container crashes or the host restarts Docker
+- **THEN** Docker restarts the container using the `unless-stopped` policy
 
-### Requirement: Bifrost SHALL persist configuration and logs
+### Requirement: OmniRoute SHALL persist runtime data
 
-The system SHALL mount `${HOME}/.tdt/bifrost` to `/app/data` inside the container. Bifrost's SQLite database (`config.db`), request logs (`logs.db`), and any `config.json` seed file SHALL survive container rebuilds and restarts.
+The deployment SHALL mount `~/Omniroute/data` to `/app/data` in the container. OmniRoute runtime state, SQLite data, and backups SHALL survive container recreation. Redis rate-limiter state SHALL use the named `omniroute-redis-data` volume when the Redis service is enabled.
 
 #### Scenario: Configuration persists across restarts
-- **WHEN** a provider is configured via the Web UI and the container is restarted
-- **THEN** the provider configuration is still present after restart
+- **WHEN** OmniRoute runtime configuration is changed and the container is restarted
+- **THEN** the configuration and runtime data remain available after restart
 
 #### Scenario: Data directory is created if missing
-- **WHEN** `~/.tdt/bifrost/` does not exist and `docker compose up -d` is run
-- **THEN** Docker creates the directory automatically as a root-owned volume mount
+- **WHEN** `~/Omniroute/data/` does not exist and the Compose profile is started
+- **THEN** Docker creates the bind-mount source directory and the service can initialize its data store
 
-### Requirement: Bifrost SHALL expose an OpenAI-compatible API
+### Requirement: OmniRoute SHALL expose an OpenAI-compatible model API
 
-The system SHALL expose the Bifrost gateway at `http://localhost:8180/v1/chat/completions` (and other `/v1/*` endpoints). The host port SHALL be 8180, bound to loopback only (`127.0.0.1`).
+The deployment SHALL expose the configured model endpoint on the local host. In the standard single-port profile, the endpoint SHALL be `http://127.0.0.1:20128/v1`, including `/chat/completions`, `/responses`, and `/models` as supported by the selected provider. Published listeners SHALL bind to loopback unless an operator explicitly configures another network boundary.
 
-#### Scenario: Chat completion via API
-- **WHEN** a POST request is sent to `http://localhost:8180/v1/chat/completions` with a valid model and messages
-- **THEN** Bifrost returns an OpenAI-compatible chat completion response
+#### Scenario: Chat completion through the proxy
+- **WHEN** a valid OpenAI Chat Completions request is sent to `http://127.0.0.1:20128/v1/chat/completions`
+- **THEN** OmniRoute returns an OpenAI-compatible completion response from the selected provider
 
-#### Scenario: Models endpoint lists configured models
-- **WHEN** a GET request is sent to `http://localhost:8180/v1/models`
-- **THEN** Bifrost returns a list of models configured through the Web UI
+#### Scenario: Models endpoint lists available models
+- **WHEN** a client sends `GET http://127.0.0.1:20128/v1/models`
+- **THEN** OmniRoute returns the models exposed by the configured provider set
 
-#### Scenario: No LAN exposure
-- **WHEN** the Bifrost service is running
-- **THEN** port 8180 is only accessible from `127.0.0.1` (not from LAN or other machines)
+#### Scenario: No LAN exposure by default
+- **WHEN** the standard local profile is running
+- **THEN** the model API is reachable from the host loopback interface and is not exposed to the LAN
 
-### Requirement: Bifrost SHALL expose a health check endpoint
+### Requirement: Native model resolution SHALL be the consumer integration boundary
 
-The system SHALL provide a health check at `GET /health` returning HTTP 200 with `"status":"ok"` in the response body. The full response format is `{"components":{"db_pings":"ok"},"status":"ok"}`. The Docker Compose healthcheck SHALL use this endpoint.
+Agent-core consumers SHALL resolve the configured model through `create_model()` and pass the resulting pydantic-ai `Model` through `model=`. Endpoint, API key, and timeout overrides SHALL be represented by `ModelSettings` or explicit `create_model()` keyword arguments; consumers SHALL NOT construct a separate proxy client abstraction.
 
-#### Scenario: Health check returns OK
-- **WHEN** a GET request is sent to `http://localhost:8180/health`
-- **THEN** the response is HTTP 200 with body containing `"status":"ok"`
+#### Scenario: Consumer resolves an OmniRoute model
+- **WHEN** a consumer loads `model.primary` and `model.base_url` from its settings
+- **THEN** it calls `create_model(model_id, base_url=base_url, api_key=api_key)` and receives a pydantic-ai `Model`
+- **AND** it passes that instance to agent construction as `model=model`
 
-#### Scenario: Docker health check uses wget
-- **WHEN** the Docker healthcheck runs inside the container
-- **THEN** it uses `wget -qO- http://localhost:8080/health` (Bifrost image has wget, not curl)
+#### Scenario: Explicit model settings override environment defaults
+- **WHEN** `create_model()` receives an explicit `ModelSettings` value or explicit endpoint and API-key arguments
+- **THEN** those values take precedence over the process environment and provider defaults
 
-#### Scenario: Docker health check passes
-- **WHEN** the container is running and healthy
-- **THEN** `docker inspect --format='{{.State.Health.Status}}'` returns `"healthy"`
+#### Scenario: Upstream model failure is typed
+- **WHEN** OmniRoute returns an API failure or cannot reach the selected provider
+- **THEN** the model call raises `ModelAPIError` with a safe diagnostic category and without exposing credentials
 
-### Requirement: Bifrost SHALL expose a Web UI
+### Requirement: Native retry and fallback SHALL handle provider failures
 
-The system SHALL serve a Web UI at `http://localhost:8180/` for configuring providers, viewing request logs, and managing gateway settings.
+Consumers SHALL use pydantic-ai's native retry behavior and `FallbackModel` for optional provider failover. They SHALL NOT add a second resilience wrapper around OmniRoute calls. A fallback SHALL be attempted only for configured retryable model failures; authentication and invalid-request failures SHALL remain terminal.
 
-#### Scenario: Web UI is accessible
-- **WHEN** a browser navigates to `http://localhost:8180/`
-- **THEN** the Bifrost dashboard loads successfully
+#### Scenario: Transient model failure is retried
+- **WHEN** a model call fails with a timeout, connection error, or retryable 5xx response
+- **THEN** native model retry applies the configured retry limit and backoff before returning failure
 
-#### Scenario: Provider can be added via Web UI
-- **WHEN** a user adds a provider (e.g., OpenAI) with an API key through the Web UI
-- **THEN** the provider is saved to the SQLite database and available for routing requests
+#### Scenario: Fallback model is attempted
+- **WHEN** the primary OmniRoute-backed model fails with a retryable `ModelAPIError` and a fallback model is configured
+- **THEN** `FallbackModel` attempts the fallback model
 
-### Requirement: Bifrost SHALL follow TDT deployment conventions
+#### Scenario: Non-retryable model failure is not hidden
+- **WHEN** the provider returns an authentication or invalid-request error
+- **THEN** the error is surfaced immediately and no fallback attempt is made
 
-The deployment SHALL use `docker compose` (v2, no hyphen). The service SHALL bind to loopback only. The compose file SHALL include a health check with appropriate intervals. The compose project name SHALL be `bifrost`.
+### Requirement: OmniRoute SHALL expose a dashboard and health status
 
-#### Scenario: Docker compose v2 is used
-- **WHEN** the service is managed via Docker Compose
-- **THEN** `docker compose` (v2) commands are used, not `docker-compose` (hyphen)
+The service SHALL serve its dashboard on the configured main port and SHALL expose the health behavior used by the Compose health check. The health check SHALL use the image-provided `node healthcheck.mjs` command with a 30-second interval, 5-second timeout, 3 retries, and 15-second start period.
 
-#### Scenario: Health check is configured
-- **WHEN** the container is running
-- **THEN** Docker reports health status with 30s interval, 5s timeout, 3 retries, and 15s start period
+#### Scenario: Dashboard is accessible locally
+- **WHEN** a browser navigates to `http://127.0.0.1:20128/`
+- **THEN** the OmniRoute dashboard loads and reports the local proxy status
+
+#### Scenario: Compose health check passes
+- **WHEN** the service is running and its model proxy process is ready
+- **THEN** `docker inspect --format='{{.State.Health.Status}}' omniroute` returns `healthy`
+
+#### Scenario: Health check failure is visible
+- **WHEN** the proxy process cannot serve its configured endpoint
+- **THEN** the Compose health status becomes `unhealthy` and the container logs retain the diagnostic output
+
+### Requirement: OmniRoute SHALL follow local deployment conventions
+
+The deployment SHALL use Docker Compose v2 commands, keep the `base` profile opt-in, use loopback-only bindings for local model traffic by default, and keep secrets in the untracked `.env` file or an approved secret manager. The compose project and primary container name SHALL be `omniroute`.
+
+#### Scenario: Docker Compose v2 is used
+- **WHEN** the service is managed from the deployment directory
+- **THEN** `docker compose` commands are used rather than the legacy `docker-compose` command
+
+#### Scenario: Secrets are not committed
+- **WHEN** the deployment is prepared for a new workstation
+- **THEN** provider API keys are supplied through `.env` or an approved secret store and no secret value is committed to the repository
