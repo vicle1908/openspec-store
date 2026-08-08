@@ -63,6 +63,13 @@ Define configuration-driven model and proxy resolution for agent-core, including
 - **AND** SHALL use `OpenAIProvider` for `openai-chat:*` and `openai-responses:*` prefixes
 - **AND** the model kind prefix SHALL remain authoritative for endpoint selection
 
+#### Scenario: api_mode/prefix mismatch produces incompatible pairing
+- **GIVEN** `api_mode: codex_responses` and model identifier `anthropic:demo`
+- **WHEN** the model is constructed
+- **THEN** the system SHALL create an `AnthropicModel` backed by `OpenAIProvider`
+- **AND** this pairing SHALL be incompatible (Anthropic model with OpenAI client)
+- **AND** the system SHOULD detect and warn about mismatched configurations
+
 ### Requirement: Dual API Support
 
 **WHEN** a provider supports both OpenAI and Anthropic API formats
