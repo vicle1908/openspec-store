@@ -214,7 +214,9 @@ terminal(
     background=True,
     notify_on_complete=True,
 )
-# Parse: json.loads(output) → result["messages"][-1]["content"][0]["text"]
+# Parse: skip banner lines, find first {, then json.loads
+# parsed = json.loads(output[output.index('{'):])
+# answer = parsed["messages"][-1]["content"][0]["text"]
 ```
 
 ## Complexity-Adaptive Limits

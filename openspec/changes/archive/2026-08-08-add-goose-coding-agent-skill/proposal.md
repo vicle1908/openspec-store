@@ -25,7 +25,7 @@ However, Hermes lacks a dedicated orchestration skill for goose — unlike Claud
 
 2. **Update**: `coding-agent-capability-verification` skill with goose probe commands
 
-3. **Update**: AGENTS.md coding agent table
+3. **Update**: Memory entry for coding agents (no AGENTS.md change needed — no coding agent table exists there)
 
 4. **Update**: Memory entry for coding agents
 
