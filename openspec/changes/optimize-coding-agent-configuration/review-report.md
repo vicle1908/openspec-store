@@ -69,3 +69,19 @@ After the user restarted the environment:
 - Kimi Code: `default_plan_mode=false`, five attempts, 50000 reserved context, 100000ms MCP timeout.
 
 The change remains a proposal only; no agent configuration was mutated during cleanup.
+
+## Concurrency Incident
+
+All 7 CLI review agents were dispatched in parallel via `terminal(background=true)`. This bypassed Hermes delegation concurrency limits and caused an `Errno 24` (too many open files) error on subsequent tool calls within the same session.
+
+**Root cause:** Each CLI agent spawns a process tree that opens file descriptors for the CLI binary, provider connections, MCP bridges, plugins, and file handles. With the shell soft FD limit at 256, 6+ parallel agents exhausted the available FDs.
+
+**Fix applied:** Updated `openspec-review-governance` skill with a 3-agent-batch dispatch pattern:
+
+- **Batch 1** (3 parallel): Claude Code, agy, Goose
+- **Batch 2** (3 parallel): OpenCode, Codex, Advance Code
+- **Batch 3** (serial): Pi (77 MCP tools, heavy startup, timeout risk)
+
+Pi always runs last in isolation due to its 77 direct MCP tool registrations causing startup delays and FD pressure.
+
+**Lesson:** Never dispatch more than 3 CLI review agents concurrently. Use `process(action='wait')` between batches. Record timeouts as inconclusive, never as approval.
