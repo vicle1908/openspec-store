@@ -85,3 +85,63 @@ All 7 CLI review agents were dispatched in parallel via `terminal(background=tru
 Pi always runs last in isolation due to its 77 direct MCP tool registrations causing startup delays and FD pressure.
 
 **Lesson:** Never dispatch more than 3 CLI review agents concurrently. Use `process(action='wait')` between batches. Record timeouts as inconclusive, never as approval.
+
+## Comprehensive Post-Restart Audit (2026-08-08)
+
+### Skills Cross-Check
+
+| Skill | Version | CLI Version | Status |
+|---|---|---|---|
+| claude-code | 3.1.1 | 2.1.220 | ✅ Match |
+| antigravity | 1.2.2 | 1.1.11 | ✅ Match |
+| opencode | 1.3.0 | 1.18.15 | ✅ Match |
+| pi | 1.2.0 | 0.84.1 | ✅ Match |
+| codex | 2.1.0 | 0.147.0 | ✅ Match |
+| goose | 1.0.0 | 1.45.0 | ✅ Match |
+
+### Governance Skill References
+
+All 6 linked references verified present:
+- ✅ references/config-database-transaction-review.md
+- ✅ references/task-status-reconciliation.md
+- ✅ references/app-native-adapter-e2e-review.md
+- ✅ references/provider-boundary-findings.md
+- ✅ references/skill-and-documentation-review.md
+- ✅ references/review-concurrency.md (newly added)
+
+### Critical Conflict Found and Fixed
+
+**openspec-workflow** skill line 40 contained: "Spawn 6 parallel external CLI agents"
+This directly contradicted the new **max 3 concurrent** rule in **openspec-review-governance**.
+
+**Fix applied:** Patched openspec-workflow to say "Dispatch external CLI agents in batches of max 3 concurrent" and added Pi as serial-only, with cross-reference to the concurrency section in the governance skill.
+
+### Config Baseline vs OpenSpec Change Docs
+
+| Agent | Actual Config | Change Docs | Match |
+|---|---|---|---|
+| Claude | bypassPermissions, 68 allow rules, 3M/800K/800K timeouts | Retain finite timeouts, keep ECC_DISABLED_HOOKS | ✅ |
+| agy | v1.1.11, full-permission headless | No changes needed | ✅ |
+| OpenCode | edit/bash/webfetch=allow, no doom_loop, no external_directory | Add doom_loop:ask + external_directory | ✅ |
+| Pi | compaction 16384/20000, 77 MCP tools | Optimize MCP first, increase compaction only if measured | ✅ |
+| Codex | danger-full-access, no approval_policy | Add approval_policy=never to ~/.fable-5 | ✅ |
+| fable-5 Code | default_plan_mode=false, max_attempts=5, reserved=50000 | Keep all, validate plan_mode as profile option | ✅ |
+| Goose | v1.45.0, 17 extensions | No config changes needed | ✅ |
+
+### Hermes Delegation Limits
+
+Current Hermes config: `max_concurrent_delegations: 4`, `max_children: 12`, `max_fanout: 6`
+Our pattern: max 3 CLI agents (1 slot for overhead). Consistent with Hermes limits.
+
+### Temp Files
+
+All review-specific temp files cleaned from /tmp. No stale artifacts remain.
+
+### OpenSpec Validation
+
+```text
+Change optimize-coding-agent-configuration: valid
+Store total: 347 passed, 1 pre-existing failure (align-jti-skill-runtime-contract)
+```
+
+No agent configuration was mutated during this audit.
