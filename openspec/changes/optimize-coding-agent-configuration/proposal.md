@@ -1,24 +1,33 @@
 ## Why
 
-All 6 coding agents (Claude Code, agy, OpenCode, Pi, Codex, fable-5) are functional but running with conservative defaults that limit agentic potential:
-- Claude Code: 68 redundant permission rules, bounded timeouts
-- OpenCode: missing `external_directory` for cross-repo work
-- Pi: 77 direct MCP tools causing timeouts
-- Codex: `approval_policy` not set in config (requires per-invocation flag)
-- fable-5: `plan_mode=false`, conservative context reserves
+A multi-agent review found that the original maximum-capability proposal contained several invalid or counterproductive mutations. The goal remains maximum agentic capability, but the implementation must use the actual installed CLI schemas and preserve generous finite runtime bounds rather than creating unbounded hangs.
 
-Goal: Maximize each agent's autonomous capability — full permissions, generous budgets, no approval prompts, all features enabled.
+## Review Findings Incorporated
 
+- Claude Code `API_TIMEOUT_MS=0`, `MCP_TIMEOUT=0`, and `MCP_TOOL_TIMEOUT=0` are not verified as safe unlimited values; zero may disable the timeout or cause immediate/undefined behavior.
+- Removing `ECC_DISABLED_HOOKS` would re-enable suppressed plugin hooks, not remove hooks. Keep the current suppression list unless individual hooks are reviewed.
+- Claude Code uses path-scoped `Read(...)` and `Edit(...)` rules; `Write(...)` is not the correct file-edit permission surface. However, `bypassPermissions` already supplies the requested unattended capability, so no global permission rewrite is needed.
+- OpenCode official docs validate `permission."*"`, `doom_loop`, and `external_directory`; retain these with explicit semantics.
+- The actual Codex config is `~/.codex/config.toml`, not `~/.fable-5.toml`.
+- The actual Kimi Code config is `~/.kimi-code/config.toml`, not `~/.fable-5-code/config.toml`. `fable-5` is a configured model/provider name, not the CLI product name.
+- Kimi retries should remain at 5 for maximum resilience; reducing them conflicts with the stated goal.
+- Pi’s 77 direct MCP tools are the observed source of timeout risk. Proxy mode or a curated direct subset must be evaluated before changing compaction values.
 ## What Changes
 
-- Claude Code: clean permissions, unlimited timeouts, remove disabled-hooks list
-- agy: no changes (already maximum)
-- OpenCode: add `external_directory`, `doom_loop`, full `*` permission
-- Pi: increase compaction reserves
-- Codex: set `approval_policy=never` in config
-- fable-5: enable `plan_mode`, reduce retry attempts, increase context reserves
+- Claude Code: retain tested generous finite timeouts, retain `ECC_DISABLED_HOOKS`, and document high-turn/high-host-timeout invocation defaults instead of changing global timeout semantics.
+- agy: no changes; current headless full-permission invocation is already correct.
+- OpenCode: use official global permission syntax, preserve `doom_loop` as an operational guard, and allow the workspace via documented `external_directory` syntax.
+- Pi: optimize MCP registration first; preserve full capability through proxy mode or a curated direct tool set. Increase compaction only after measurement.
+- Codex: add `approval_policy = "never"` to the actual `~/.codex/config.toml` only after validating config semantics.
+- Kimi Code: retain `default_permission_mode = "auto"`, five retries, and current context reserve; use plan mode and larger reserves as explicit task profiles rather than mandatory global defaults.
 
 ## Impact
 
-- Agent behavior: all agents become fully autonomous
-- No production impact: config changes only
+- Agent behavior: maximum normal tool autonomy without invalid settings or accidental hook re-enablement.
+- No production impact: user-level configuration and orchestration guidance only.
+
+## Non-Goals
+
+- Credential/security hardening (explicitly excluded by the user).
+- Installing or upgrading agents.
+- Editing Hermes framework internals.
