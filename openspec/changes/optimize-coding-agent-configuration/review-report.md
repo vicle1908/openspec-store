@@ -48,3 +48,24 @@ Goose independently returned **MODIFY** and agreed that:
 ## Gate Decision
 
 **Current verdict: MODIFY before implementation.** The original change must not be applied. The revised proposal/design/tasks incorporate the two substantive reviews and the official documentation cross-checks. Implementation remains blocked until the revised change receives final validation.
+## Post-Restart Cleanup Verification
+
+After the user restarted the environment:
+
+- Hermes shell soft FD limit: `256`; hard limit: `unlimited`.
+- Current shell open FDs: `7`; system FDs: `23287`.
+- No Hermes-managed background processes remained.
+- No Hermes sandbox directories remained.
+- Review-specific temporary files were removed from `/tmp`.
+- Three pre-existing `<defunct>` processes remain (PIDs 39096, 31583, 31584); none are from this review session.
+- The remaining Pi, Goose desktop daemon, and ChatGPT/Codex app-server processes are expected user-launched processes.
+
+## Current Config Baseline
+
+- Claude: `bypassPermissions`, finite `3000000/800000/800000ms` timeouts, `ECC_DISABLED_HOOKS` present.
+- OpenCode: `edit/bash/webfetch=allow`; no `doom_loop` or `external_directory` yet.
+- Pi: compaction `16384/20000`; MCP config present; 77 direct tools observed in the full environment.
+- Codex: `danger-full-access`; no `approval_policy` yet.
+- Kimi Code: `default_plan_mode=false`, five attempts, 50000 reserved context, 100000ms MCP timeout.
+
+The change remains a proposal only; no agent configuration was mutated during cleanup.

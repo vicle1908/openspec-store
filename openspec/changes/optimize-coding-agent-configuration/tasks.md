@@ -8,7 +8,7 @@
 - [ ] 1.1 Back up `~/.claude/settings.json`.
 - [ ] 1.2 Verify current `API_TIMEOUT_MS`, `MCP_TIMEOUT`, and `MCP_TOOL_TIMEOUT`; retain generous finite values and do not set them to zero.
 - [ ] 1.3 Retain `ECC_DISABLED_HOOKS` unless each disabled hook is separately reviewed.
-- [ ] 1.4 Verify `bypassPermissions` and high-turn invocation behavior with a bounded smoke test.
+- [ ] 1.4 Verify `bypassPermissions` and high-turn invocation behavior with a bounded smoke test; do not rewrite the existing 68-rule permission set.
 
 ## Antigravity
 
@@ -18,9 +18,9 @@
 ## OpenCode
 
 - [ ] 3.1 Back up `~/.config/opencode/opencode.json`.
-- [ ] 3.2 Set documented ordinary permission categories to `allow` and retain `doom_loop: ask`.
-- [ ] 3.3 Add and schema-check an absolute external-directory mapping for the workspace.
-- [ ] 3.4 Verify in-repository and cross-repository smoke runs.
+- [ ] 3.2 Preserve existing `edit`, `bash`, and `webfetch` `allow` permissions; add documented `doom_loop: ask` only after schema validation.
+- [ ] 3.3 Add and schema-check `external_directory` for `/Users/androidteam/Developer/**` using the official mapping form.
+- [ ] 3.4 Verify in-repository and cross-repository smoke runs, including the external-directory rule.
 ## Pi
 
 - [ ] 4.1 Back up `~/.pi/agent/settings.json` and `~/.pi/agent/mcp.json`.
@@ -39,8 +39,8 @@
 
 - [ ] 6.1 Back up `~/.kimi-code/config.toml`.
 - [ ] 6.2 Preserve `default_permission_mode = "auto"` and `max_attempts_per_step = 5`.
-- [ ] 6.3 Preserve the current 50000 context reserve unless measured evidence supports a larger value.
-- [ ] 6.4 Add an explicit complex-task profile for plan mode and larger context only if the installed schema validates it.
+- [ ] 6.3 Preserve the current `reserved_context_size = 50000` and `mcp.tool_timeout_ms = 100000` unless measured evidence supports larger finite values.
+- [ ] 6.4 Validate whether the installed CLI supports named profiles; if not, document plan mode and larger context as invocation-level options rather than inventing config keys.
 
 ## Final Validation
 
