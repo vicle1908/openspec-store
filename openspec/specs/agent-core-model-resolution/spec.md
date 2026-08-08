@@ -87,4 +87,3 @@ Define configuration-driven model and proxy resolution for agent-core, including
 - **GIVEN** the active provider is giaoduc and the model is `anthropic:Advance`
 - **WHEN** the agent runs a real prompt
 - **THEN** the provider SHALL return an Anthropic Messages response successfully
-
