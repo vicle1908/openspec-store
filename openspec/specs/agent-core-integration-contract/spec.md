@@ -60,7 +60,7 @@ The contract document SHALL specify the durable scheduling startup order — imp
 - **THEN** it documents the import → initialize → `apply_schedules()` order and links to `agent-core/scheduler_setup.py` as the canonical reference
 
 ### Requirement: The agent-core invocation contract is defined in Phase 2
-The consumer invocation contract is defined as: a typed `AgentRequest` input and reuse of `AgentResult` as the response, with the integration contract document updated to link both.
+The consumer invocation contract SHALL be defined as: a typed `AgentRequest` input and reuse of `AgentResult` as the response, with the integration contract document updated to link both.
 
 #### Scenario: Contract document links the defined invocation contract
 - **WHEN** a developer reads the integration contract document after Phase 2
