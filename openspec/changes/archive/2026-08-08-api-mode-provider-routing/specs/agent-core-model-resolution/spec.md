@@ -1,9 +1,7 @@
-# agent-core-model-resolution Specification
+# agent-core-model-resolution (Delta)
 
-## Purpose
+## MODIFIED Requirements
 
-Define configuration-driven model and proxy resolution for agent-core, including the active giaoduc Anthropic Messages setup and the OpenAI-compatible alternative.
-## Requirements
 ### Requirement: Model Resolution from Config
 
 **WHEN** `create_model(model_id)` is called
@@ -133,4 +131,3 @@ Define configuration-driven model and proxy resolution for agent-core, including
 - **GIVEN** the active provider is giaoduc and the model is `anthropic:Advance`
 - **WHEN** the agent runs a real prompt
 - **THEN** the provider SHALL return an Anthropic Messages response successfully
-
