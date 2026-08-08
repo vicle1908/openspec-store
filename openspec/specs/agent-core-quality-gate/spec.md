@@ -6,7 +6,7 @@ Establish enforceable quality gates for all TDT Python agent-core repositories. 
 ## Requirements
 ### Requirement: Workspace repo inventory and scope
 
-The quality gate SHALL apply to a fixed inventory of Python repositories under `/Users/lekhanhvinh/Developer/tdt/`. Each repo SHALL declare its package layout (the `--cov=` target) so coverage, mypy, and lint checks all use the same root.
+The quality gate SHALL apply to a fixed inventory of Python repositories under `$WORKSPACE/`. Each repo SHALL declare its package layout (the `--cov=` target) so coverage, mypy, and lint checks all use the same root.
 
 The inventory in scope:
 
@@ -42,7 +42,7 @@ The inventory in scope:
 
 #### Scenario: New repo joins the workspace
 
-- **WHEN** a Python repo is added to `/Users/lekhanhvinh/Developer/tdt/`
+- **WHEN** a Python repo is added to `$WORKSPACE/`
 - **THEN** it SHALL be added to the inventory in this spec before the next quality-gate audit
 - **AND** the inventory table SHALL list its declared package root
 - **AND** PRs that introduce new repos SHALL update this scenario in the same change
