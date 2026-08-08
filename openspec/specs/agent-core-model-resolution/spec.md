@@ -56,19 +56,22 @@ Define configuration-driven model and proxy resolution for agent-core, including
 - **THEN** the system SHALL NOT require an explicit `protocol` field
 - **AND** the model kind prefix SHALL be the single source of truth for protocol selection
 
-#### Scenario: api_mode overrides protocol detection
+#### Scenario: api_mode selects provider class only
 - **GIVEN** the provider config has `api_mode: anthropic_messages`
 - **WHEN** the model is resolved through the configured proxy
-- **THEN** the system SHALL use `AnthropicProvider` regardless of model kind prefix
-- **AND** SHALL strip `/v1` from the base URL
+- **THEN** the system SHALL use `AnthropicProvider` for `anthropic:*` prefixes
+- **AND** SHALL use `OpenAIProvider` for `openai-chat:*` and `openai-responses:*` prefixes
+- **AND** the model kind prefix SHALL remain authoritative for endpoint selection
 
 ### Requirement: Dual API Support
 
 **WHEN** a provider supports both OpenAI and Anthropic API formats
-**THEN** the system SHALL route to the correct endpoint based on `api_mode`:
-- `api_mode: anthropic_messages` → `/v1/messages` (Anthropic format)
-- `api_mode: codex_responses` → `/v1/responses` (OpenAI format)
-- (default/empty) → `/v1/chat/completions` (OpenAI format)
+**THEN** the system SHALL route to the correct endpoint based on the model kind prefix:
+- `anthropic:*` → `/v1/messages` (Anthropic format)
+- `openai-chat:*` → `/v1/chat/completions` (OpenAI format)
+- `openai-responses:*` → `/v1/responses` (OpenAI format)
+
+The `api_mode` field selects the provider class (`AnthropicProvider` vs `OpenAIProvider`), not the endpoint.
 
 #### Scenario: OpenAI Chat Completions
 - **GIVEN** provider supports `/v1/chat/completions`
