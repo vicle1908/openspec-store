@@ -1,9 +1,7 @@
-# agent-core-model-resolution Specification
+# Delta: Agent-Core Model Resolution
 
-## Purpose
+## MODIFIED Requirements
 
-Define configuration-driven model and proxy resolution for agent-core, including the active giaoduc Anthropic Messages setup and the OpenAI-compatible alternative.
-## Requirements
 ### Requirement: Model Resolution from Config
 
 **WHEN** `create_model(model_id)` is called
@@ -83,64 +81,7 @@ Define configuration-driven model and proxy resolution for agent-core, including
 - **THEN** the `openai-chat` prefix SHALL select the configured OpenAI provider
 - **AND** `fable-5` SHALL be treated only as the model name, not as a provider prefix
 
-### Requirement: Dual API Support
-
-**WHEN** a provider supports both OpenAI and Anthropic API formats
-**THEN** the system SHALL route to the correct endpoint based on the model kind prefix:
-- `anthropic:*` → `/v1/messages` (Anthropic format)
-- `openai-chat:*` → `/v1/chat/completions` (OpenAI format)
-- `openai-responses:*` → `/v1/responses` (OpenAI format)
-
-The `api_mode` field selects the provider class (`AnthropicProvider` vs `OpenAIProvider`), not the endpoint.
-
-#### Scenario: OpenAI Chat Completions
-- **GIVEN** provider supports `/v1/chat/completions`
-- **WHEN** `create_model("openai-chat:Advance")` is called
-- **THEN** requests SHALL use OpenAI Chat Completions format
-
-#### Scenario: Anthropic Messages
-- **GIVEN** provider supports `/v1/messages`
-- **WHEN** `create_model("anthropic:Advance")` is called
-- **THEN** requests SHALL use Anthropic Messages format
-
-#### Scenario: OpenAI Responses
-- **GIVEN** provider supports `/v1/responses`
-- **WHEN** `create_model("openai-responses:gpt-5")` is called
-- **THEN** requests SHALL use OpenAI Responses format
-
-### Requirement: Config Schema
-
-**WHEN** `~/.tdt/config.yaml` is loaded
-**THEN** the model section SHALL support:
-- `primary`: Default model identifier (the active value is "anthropic:Advance")
-- `base_url`: Proxy endpoint URL
-- `api_key_env`: Environment variable name containing the API key
-- `fallback`: List of fallback model identifiers
-- `timeout_seconds`: Request timeout
-
-**AND** the providers section SHALL support:
-- `base_url`: Proxy endpoint URL (per provider)
-- `api_key_env`: Environment variable name (per provider)
-- `api_mode`: Provider class mode (`anthropic_messages`, `codex_responses`, or empty)
-- `model_names`: Optional exact model-name list checked before prefix routing
-
-#### Scenario: TDT model configuration
-- **GIVEN** the active TDT config contains `model.primary`, `model.base_url`, and `model.api_key_env`
-- **WHEN** the settings and model factory are initialized
-- **THEN** the model endpoint and API key SHALL be resolved from those configured values
-
-#### Scenario: Multi-provider with api_mode
-- **GIVEN** the active TDT config has `providers.giaoduc.api_mode: anthropic_messages`
-- **AND** `providers.shopapikey.api_mode: codex_responses`
-- **WHEN** `create_model("anthropic:Advance")` is called
-- **THEN** the giaoduc provider SHALL be used with AnthropicProvider
-- **WHEN** `create_model("openai-responses:fable-5")` is called
-- **THEN** the shopapikey provider SHALL be used with OpenAIProvider
-
-#### Scenario: Exact provider model names
-- **GIVEN** `providers.cockpit.model_names` contains `gpt-5.6-sol`
-- **WHEN** `create_model("openai-responses:gpt-5.6-sol")` is called
-- **THEN** the cockpit provider SHALL be selected before the prefix default
+## ADDED Requirements
 
 ### Requirement: Configured Fallback Loading
 
@@ -153,22 +94,6 @@ The `api_mode` field selects the provider class (`AnthropicProvider` vs `OpenAIP
 - **AND** `model.fallback` contains `openai-chat:fable-5`
 - **WHEN** the CLI prompt runtime initializes
 - **THEN** its model SHALL be a fallback chain in the configured order.
-
-### Requirement: Verified Provider (giaoduc)
-
-**WHEN** using the giaoduc provider (`https://api.giaoduc.online`)
-**THEN** the following features SHALL be supported:
-
-| API Format | Endpoint | Model Kind | api_mode | Features |
-|------------|----------|------------|----------|----------|
-| OpenAI Chat Completions | `/v1/chat/completions` | `openai-chat:Advance` | (default) | Streaming, tool calling, reasoning |
-| Anthropic Messages | `/v1/messages` | `anthropic:Advance` | `anthropic_messages` | Thinking blocks, tool use, system prompts |
-| OpenAI Responses | `/v1/responses` | `openai-responses:Advance` | `codex_responses` | Not supported by active provider |
-
-#### Scenario: giaoduc Anthropic verification
-- **GIVEN** the active provider is giaoduc and the model is `anthropic:Advance`
-- **WHEN** the agent runs a real prompt
-- **THEN** the provider SHALL return an Anthropic Messages response successfully
 
 ### Requirement: API Mode Compatibility
 
@@ -188,4 +113,3 @@ The `api_mode` field selects the provider class (`AnthropicProvider` vs `OpenAIP
 - **WHEN** the model is constructed
 - **THEN** the system SHALL raise an actionable configuration error
 - **AND** SHALL NOT construct an OpenAI model backed by an Anthropic provider.
-
