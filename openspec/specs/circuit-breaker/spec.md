@@ -49,9 +49,9 @@ For HTTP calls, the circuit breaker SHALL treat 5xx status codes as failures and
 
 ### Requirement: Circuit breaker middleware
 
-> **Status**: DEFERRED. Middleware design exists; pkg/resilience not implemented.
+> **Status**: DEFERRED. Middleware design exists; resilience middleware not yet implemented.
 
-The circuit breaker SHALL be available as HTTP middleware and gRPC unary interceptor via `pkg/resilience`. The middleware SHALL be configurable per service target with independent state machines.
+The circuit breaker SHALL be available as HTTP middleware and gRPC unary interceptor via a resilience middleware layer. The middleware SHALL be configurable per service target with independent state machines.
 
 #### Scenario: HTTP client uses circuit breaker
 - **WHEN** an HTTP client is configured with circuit breaker middleware targeting `order-service`
