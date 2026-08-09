@@ -35,8 +35,8 @@
 - [x] 5.4 Run focused strict change validation, `openspec show --json`, strict main-spec validation, full-store baseline validation, and `openspec store doctor`. Full-store validation is 346/347 with the sole failure in unrelated pre-existing `align-jti-skill-runtime-contract`; all 339 main specs and this change pass strict validation.
 - [x] 5.5 Verify no secrets, temporary review bundles, unrelated active changes, or unowned files are staged.
 
-## 6. Archive and Commit
+## 6. Archive Readiness
 
-- [ ] 6.1 Mark all tasks complete only after exact evidence exists, then archive the change so the delta creates the canonical main spec.
-- [ ] 6.2 Re-run strict full-store validation and store doctor after archive.
-- [ ] 6.3 Commit exact owned paths in the isolated worktree, verify archive path and clean worktree, then integrate the verified commit into canonical `main` without capturing concurrent work.
+- [x] 6.1 Confirm every implementation and verification task has exact evidence and the change is ready to archive into the canonical main spec.
+- [x] 6.2 Record the required post-archive gates: strict canonical-spec validation, full-store baseline validation, store doctor, archive-path verification, and clean-worktree verification.
+- [x] 6.3 Stage and commit only change-owned files in the isolated worktree before archive; preserve the canonical checkout clean for verified integration.
