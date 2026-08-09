@@ -24,22 +24,22 @@
 ## 4. Native Agent Discovery
 
 - [x] 4.1 From two independent repositories, verify fresh Claude sessions natively invoke an OpenSpec skill without filesystem-search fallback.
-- [ ] 4.2 From two independent repositories, verify fresh Claude sessions natively invoke one non-OpenSpec shared skill; add `.claude/skills` symlinks only if required.
+- [x] 4.2 From two independent repositories, verify fresh Claude sessions natively invoke one non-OpenSpec shared skill; add `.claude/skills` symlinks only if required.
 - [x] 4.3 Verify all twelve `/opsx:*` command files and remove unsupported `/opsx:help` documentation.
 - [x] 4.4 From two independent repositories and one nested directory, verify fresh Codex sessions invoke `$openspec-explore` through standard `.agents` discovery.
-- [ ] 4.5 Diagnose Graphify discovery using frontmatter validation, duplicate-name checks, fresh-session logs, minimized-artifact testing, and index-budget evidence before changing its artifact.
-- [ ] 4.6 Confirm `.codex/skills` contains only system or genuinely Codex-specific skills and no shared copies.
+- [x] 4.5 Diagnose Graphify discovery using frontmatter validation, duplicate-name checks, fresh-session logs, minimized-artifact testing, and index-budget evidence before changing its artifact.
+- [x] 4.6 Confirm `.codex/skills` contains only system or genuinely Codex-specific skills and no shared copies.
 
 ## 5. Documentation and Repository Reconciliation
 
 - [x] 5.1 Update workspace `AGENTS.md`, `.claude/CLAUDE.md`, `.codex/AGENTS.md`, and reusable skill guidance to match verified behavior.
 - [x] 5.2 Sweep active instructions for obsolete empty-`.claude`, copied-Codex, inaccurate skill-count, unsupported `/opsx:help`, `.Codex`, and mangled-path claims.
-- [ ] 5.3 Review tracked per-repository `.claude/skills/gitnexus/*` deletions and keep only deletions backed by native Claude replacement probes.
+- [x] 5.3 Review tracked per-repository `.claude/skills/gitnexus/*` deletions and keep only deletions backed by native Claude replacement probes.
 - [x] 5.4 Preserve repository-specific skills and unrelated dirty state.
 
 ## 6. Final Validation and Archive
 
 - [x] 6.1 Run focused OpenSpec validation for this change and the governing capability.
-- [ ] 6.2 Run `openspec store doctor`, verify OpenSpec version, and run full validation while reporting unrelated baseline failures separately.
+- [x] 6.2 Run `openspec store doctor`, verify OpenSpec version, and run full validation while reporting unrelated baseline failures separately.
 - [x] 6.3 Re-run structural, provenance, link, native-discovery, stale-reference, and Git-diff checks.
-- [ ] 6.4 Archive the completed change, validate the merged main spec, and commit/push only store-owned artifacts.
+- [x] 6.4 Archive the completed change, validate the merged main spec, and commit/push only store-owned artifacts.

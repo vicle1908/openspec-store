@@ -1,4 +1,18 @@
-## MODIFIED Requirements
+## REMOVED Requirements
+
+### Requirement: OpenSpec Codex skills SHALL be discoverable at workspace scope
+
+**Reason**: Codex now natively discovers standard Agent Skills through repository or user-level `.agents/skills`; requiring copied shared skills under `.codex` creates drift and does not cross independent Git-root boundaries reliably.
+
+**Migration**: Keep canonical shared skill roots under `~/Developer/.agents/skills/` and expose the selected cross-repository set through verified `~/.agents/skills/` symlinks.
+
+### Requirement: Project-managed skill mirrors MUST be preserved
+
+**Reason**: Repository-local copied mirrors are no longer the managed source of truth; adapter-specific generated sources and verified personal discovery links replace them.
+
+**Migration**: Preserve repository-specific skills where they provide unique behavior, use the tracked synchronizer for shared links, and retain `.codex` and `.claude` only for their distinct product-native capabilities.
+
+## ADDED Requirements
 
 ### Requirement: Shared Agent Skills SHALL be discoverable across independent repositories
 
