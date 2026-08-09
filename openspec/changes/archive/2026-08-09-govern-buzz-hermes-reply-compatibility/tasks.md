@@ -49,7 +49,16 @@
   - No terminal-tool error in turn ✓
   - Turn completed normally ✓
 
-## 6. Documentation and rollback
+## 6. Harness-deep extension (successor)
+
+- [x] 6.1 Verified `harness-deep` instance `respond_to` was `anyone` before fix — security risk when wrapper is active.
+- [x] 6.2 Changed `harness-deep` instance `respond_to` to `owner-only` in `managed-agents.json`.
+- [x] 6.3 Applied `agent_command_override` to both `harness-deep` records (definition + instance).
+- [x] 6.4 Backed up pre-fix state to `~/Library/Application Support/xyz.block.buzz.app/agents/backups/managed-agents.before-harness-deep-fix-20260809.json` (mode 0600).
+- [x] 6.5 Restarted Buzz Desktop, confirmed both agents use wrapper with `force_key=true`.
+- [x] 6.6 Canary test for `harness-deep`: nonce `BZH-DEEP-a7cf3288`, trigger accepted, reply received, linked as thread reply, correct author, no `BUZZ_PRIVATE_KEY` error.
+
+## 7. Documentation and rollback
 
 - [x] 6.1 Created canonical wrapper artifact at `openspec/changes/govern-buzz-hermes-reply-compatibility/artifacts/hermes-acp-buzz-wrapper`.
 - [x] 6.2 Created operator runbook at `docs/runbooks/buzz-hermes-reply-compatibility.md` with rollback, drift detection, canary, and migration gates.
@@ -61,7 +70,7 @@
 - [x] 7.1 Documented five official migration gates (Hermes terminal fix, Buzz reply broker, MCP sidecar, harness publication, native gateway) — each requires installed release, not open PR.
 - [x] 7.2 Documented canary test procedure: send labelled mention → confirm author, content, linkage → monitor for duplicates → delete wrapper after rollback window.
 
-## 8. Review and validation
+## 9. Review and validation
 
 - [x] 8.1 Proposal clearly states retrospective status (work already performed).
 - [x] 8.2 Design documents security trade-off: terminal credential exposure mitigated by owner-only gate.
@@ -70,7 +79,7 @@
 - [x] 8.5 `skip_specs: true` justified — no product specification changes.
 - [x] 8.6 `.openspec.yaml` has `schema: spec-driven` and `skip_specs: true`.
 
-## 9. Archive and integration
+## 10. Archive and integration
 
 - [x] 9.1 Focused validation passes (`openspec validate govern-buzz-hermes-reply-compatibility`).
 - [x] 9.2 Full-store validation run, unrelated failures separately classified.

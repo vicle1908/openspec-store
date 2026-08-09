@@ -3,7 +3,7 @@
 **Status:** Temporary compatibility mechanism
 **Applied:** 2026-08-09
 **Applies to:** Buzz Desktop 0.5.8 + Hermes Agent 0.20.0
-**Target agent:** `harness-1`
+**Target agents:** `harness-1`, `harness-deep`
 
 ## Problem
 
@@ -157,14 +157,27 @@ Remove the wrapper only when an accepted **released mechanism** exists — not m
 9. Delete wrapper only after rollback window (48h minimum)
 ```
 
+## Harness-deep verification
+
+```bash
+# Confirm harness-deep uses wrapper
+HARNESS_PID=$(ps -axo pid,command | grep 'buzz-acp' | grep 'harness-deep' | awk '{print $1}')
+ps eww -p "$HARNESS_PID" -o command= | grep BUZZ_ACP_AGENT_COMMAND
+# Should show: BUZZ_ACP_AGENT_COMMAND=/Users/androidteam/.buzz/bin/hermes-acp-buzz-wrapper
+
+# Canary for harness-deep
+HARNESS_DEEP_PUBKEY=$(python3 -c "import json; print([a['pubkey'] for a in json.load(open('/Users/androidteam/Library/Application Support/xyz.block.buzz.app/agents/managed-agents.json')) if a.get('name')=='harness-deep' and a.get('pubkey')][0])")
+/Applications/Buzz.app/Contents/MacOS/buzz messages send   --channel "$BUZZ_CHANNEL"   --content "Deep canary $(uuidgen): @harness-deep reply exactly \`DEEP-CANARY-ACK $(uuidgen)\`."   --mention "$HARNESS_DEEP_PUBKEY"
+```
+
 ## Security limitations
 
-- `BUZZ_PRIVATE_KEY` is available to Hermes foreground terminal children of `harness-1`. A compromised prompt could read it via the `terminal` tool.
+- `BUZZ_PRIVATE_KEY` is available to Hermes foreground terminal children of `harness-1` and `harness-deep`. A compromised prompt could read it via the `terminal` tool.
 - **Mitigated by:** `harness-1` remains `respond_to: owner-only`.
-- **Not mitigated for:** anyone who can send a DM that reaches `harness-1` — review the channel membership and DM policy.
+- **Not mitigated for:** anyone who can send a DM that reaches `harness-1` or `harness-deep` — review the channel membership and DM policy.
 - The wrapper does NOT expose credentials to `execute_code`, background spawns, or other agents.
 - The `env_passthrough` security seal (GHSA-rhgp-j443-p4rf) remains intact for all other agents.
-- Do NOT change `harness-1` to `respond_to=anyone` while this wrapper is active.
+- Do NOT change `harness-1` or `harness-deep` to `respond_to=anyone` while this wrapper is active.
 
 ## Canonical artifact
 
@@ -186,4 +199,5 @@ Compare with the canonical artifact to detect unauthorized drift.
 
 | Date | Buzz Desktop | Hermes Agent | Wrapper applied | Evidence |
 |---|---|---|---|---|
-| 2026-08-09 | 0.5.8 | 0.20.0 | Yes | Canary nonce `BZH-FIX-ac4c9bb3a5`, trigger `a176d94a5d...`, reply `50d7575e63...` |
+| 2026-08-09 | 0.5.8 | 0.20.0 | harness-1 | Canary `BZH-FIX-ac4c9bb3a5`, trigger `a176d94a5d...`, reply `50d7575e63...` |
+| 2026-08-09 | 0.5.8 | 0.20.0 | harness-deep | Canary `BZH-DEEP-a7cf3288`, trigger `a7cf3288d8f...`, reply `9071f72b4e...` |

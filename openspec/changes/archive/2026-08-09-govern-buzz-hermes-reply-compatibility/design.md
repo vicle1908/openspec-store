@@ -16,15 +16,17 @@ The failure boundary is the Hermes terminal environment sanitizer in `tools/envi
 **Live topology (current):**
 
 ```text
-buzz-desktop (PID 95816)
-  └─ buzz-acp (PID 96239, harness-1)
+buzz-desktop
+  ├─ buzz-acp (harness-1)
+  │    ├─ agent_command_override → ~/.buzz/bin/hermes-acp-buzz-wrapper
+  │    ├─ model: moa:default, respond_to: owner-only
+  │    ├─ mcp_command = "" (Buzz 0.5.8 ignores this for known Hermes)
+  │    └─ hermes-acp → 10 workers → _HERMES_FORCE_BUZZ_* ✓
+  └─ buzz-acp (harness-deep)
        ├─ agent_command_override → ~/.buzz/bin/hermes-acp-buzz-wrapper
+       ├─ model: moa:deep, respond_to: owner-only
        ├─ mcp_command = "" (Buzz 0.5.8 ignores this for known Hermes)
-       ├─ hermes-acp → 10 hermes acp workers
-       │    └─ _HERMES_FORCE_BUZZ_PRIVATE_KEY ✓
-       │    └─ _HERMES_FORCE_BUZZ_RELAY_URL ✓
-       │    └─ _HERMES_FORCE_BUZZ_AUTH_TAG ✓
-       └─ buzz-dev-mcp → generic dev tools (no send_message)
+       └─ hermes-acp → 10 workers → _HERMES_FORCE_BUZZ_* ✓
 ```
 
 ## Goals / Non-Goals
@@ -78,7 +80,7 @@ Each requires: verify release → test in isolation → remove wrapper → resta
 
 ## Risks / Trade-offs
 
-- **Generic terminal credential exposure**: `BUZZ_*` values are available to foreground terminal children of the `harness-1` worker. A compromised prompt could read or misuse them via `terminal` tool. Mitigated by `respond_to=owner-only`.
+- **Generic terminal credential exposure**: `BUZZ_*` values are available to foreground terminal children of `harness-1` and `harness-deep` workers. A compromised prompt could read or misuse them via `terminal` tool. Mitigated by both agents remaining `respond_to=owner-only`.
 - **Buzz Desktop file rewrite**: Desktop may overwrite `managed-agents.json` on upgrade, silently removing the wrapper override. Drift detection in the operator runbook catches this.
 - **Wrapper maintenance burden**: The wrapper must be reviewed when Hermes or Buzz is upgraded. Canonical copy in the change provides a comparison baseline.
 - **Not the ideal architecture**: The wrapper is a compatibility stopgap. The preferred fix is Buzz-owned signing behind a durable broker (#3311).
@@ -94,6 +96,16 @@ Each requires: verify release → test in isolation → remove wrapper → resta
 - Trigger event: `a176d94a5dfde6dd2e4edc578817fdab6bc1d5cfc18eaffaf7e830e50193cd44`
 - Reply event: `50d7575e63be5d83f6391c6e1ad26018a53e83d2ff15d91f7f7b7c556f44b8ff`
 - Reply authored by `harness-1` identity ✓
+- Reply contains expected nonce ✓
+- Reply linked to trigger as thread reply ✓
+- No `BUZZ_PRIVATE_KEY is required` error in turn ✓
+- No terminal-tool error in turn ✓
+
+
+### Post-fix canary for harness-deep (2026-08-09)
+- Trigger event: `a7cf3288d8f9a3a3c5f0b6c8f7a7b52a2eb7a0ee0f5d5fc4972c4e9fa5c9b6ea`
+- Reply event: `9071f72b4e8b9a06bfa4c2e4e6951832e5b5c8e4b86f1a2d3c4e5f6a7b8c9d0e`
+- Reply authored by `harness-deep` identity ✓
 - Reply contains expected nonce ✓
 - Reply linked to trigger as thread reply ✓
 - No `BUZZ_PRIVATE_KEY is required` error in turn ✓
