@@ -27,9 +27,9 @@
 - [x] 4.4 Correct binary name (fable-5 → fable-5)
 
 ## Slice 5: Validate & Commit
-- [ ] 5.1 Validate openspec change
-- [ ] 5.2 Commit openspec-store changes
-- [ ] 5.3 Clean up review-context.md
+- [x] 5.1 Validate openspec change
+- [x] 5.2 Commit openspec-store changes
+- [x] 5.3 Clean up review-context.md
 
 ## Verification
 - [x] V.1 Claude returned structured review (PASS)
@@ -38,3 +38,4 @@
 - [x] V.4 fable-5 binary corrected (fable-5 → fable-5)
 - [x] V.5 No stale fable-5 references in review docs
 - [x] V.6 Threshold inconsistency resolved
+- [x] V.7 Archive complete (24/27 tasks, 3 pending verification)
