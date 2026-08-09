@@ -33,6 +33,10 @@ OpenSpec is the workspace specification framework for managing project changes, 
 - **openspec/changes/** — Active change proposals and archived changes
 - **docs/governance/** — Governance docs (AGENTS.md, INDEX.md, audit files, reports)
 
+### Operational Runbooks
+
+- [`hermes-moa-configuration.md`](hermes-moa-configuration.md) — validated Hermes Mixture of Agents presets, provider/context ownership, failover, health checks, smoke testing, and rollback.
+
 ### Multi-Repo Store Wiring
 
 The store is wired to 8 code repos via `store: openspec-store` pointers:
