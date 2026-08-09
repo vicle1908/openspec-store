@@ -1,0 +1,22 @@
+# Workspace Agent Skills exposed through ~/.agents/skills for Codex user-scope discovery.
+# Keep the list intentional; canonical content stays in ~/Developer/.agents/skills.
+agent-capability-orchestration
+gitnexus-cli
+gitnexus-debugging
+gitnexus-exploring
+gitnexus-guide
+gitnexus-impact-analysis
+gitnexus-refactoring
+handoff
+openspec-apply-change
+openspec-archive-change
+openspec-bulk-archive-change
+openspec-continue-change
+openspec-explore
+openspec-ff-change
+openspec-new-change
+openspec-onboard
+openspec-propose
+openspec-sync-specs
+openspec-update-change
+openspec-verify-change

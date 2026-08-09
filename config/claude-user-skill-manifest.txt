@@ -1,0 +1,9 @@
+# Shared workspace skills exposed through ~/.claude/skills for native Claude discovery.
+# OpenSpec adapter skills are synchronized separately from the store's Claude target.
+gitnexus-cli
+gitnexus-debugging
+gitnexus-exploring
+gitnexus-guide
+gitnexus-impact-analysis
+gitnexus-refactoring
+handoff
