@@ -91,3 +91,14 @@ Current canonical specs/docs contained no MoA-specific stale provider assignment
 ## Safety and Rollback
 
 A local backup was created under `~/.hermes/backups/` before mutation. Source and backup SHA-256 values matched. The path and hash are local operational evidence and are not committed into a public spec. The backup contains configuration only and remains outside the OpenSpec repository.
+
+## Post-Archive Validation
+
+- Archive created: `openspec/changes/archive/2026-08-09-sync-hermes-moa-config-docs/`.
+- Canonical spec created: `openspec/specs/hermes-moa-configuration/spec.md` with eight requirements.
+- Archived task state: 23 complete, 0 incomplete.
+- Focused canonical spec strict validation: PASS.
+- Strict main-spec validation after archive: 340/340 PASS.
+- Full-store baseline after archive: 346/347 PASS; the only failure remains the unrelated pre-existing `align-jti-skill-runtime-contract`.
+- Store doctor: PASS.
+- Archive and worktree path checks: PASS; active change directory absent.
