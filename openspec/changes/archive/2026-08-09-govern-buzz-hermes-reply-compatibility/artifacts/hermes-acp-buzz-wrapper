@@ -1,0 +1,20 @@
+#!/bin/sh
+# Buzz Desktop compatibility wrapper for Hermes ACP.
+# The parent buzz-acp process supplies the managed agent's BUZZ_* identity.
+# Hermes intentionally strips messaging credentials from generic terminal
+# children, but its foreground terminal path supports explicit _HERMES_FORCE_
+# aliases. Copy only the three Buzz values, without logging them or placing
+# them in argv, then replace this process with the real Hermes ACP launcher.
+set -eu
+
+if [ -n "${BUZZ_PRIVATE_KEY:-}" ]; then
+  export _HERMES_FORCE_BUZZ_PRIVATE_KEY="$BUZZ_PRIVATE_KEY"
+fi
+if [ -n "${BUZZ_RELAY_URL:-}" ]; then
+  export _HERMES_FORCE_BUZZ_RELAY_URL="$BUZZ_RELAY_URL"
+fi
+if [ -n "${BUZZ_AUTH_TAG:-}" ]; then
+  export _HERMES_FORCE_BUZZ_AUTH_TAG="$BUZZ_AUTH_TAG"
+fi
+
+exec /Users/androidteam/.local/bin/hermes-acp "$@"
