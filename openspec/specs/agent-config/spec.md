@@ -1,6 +1,8 @@
+# agent-config Specification
+
 ## Purpose
 
-This specification defines requirements for Agent Config.
+Define the AgentConfig dataclass, MemoryConfig, and related configuration structures for the agent-core runtime.
 
 ## Requirements
 
@@ -11,16 +13,39 @@ The system SHALL define an `AgentConfig` dataclass in `agent_core/_ai/config.py`
 ```python
 @dataclass
 class AgentConfig:
-    model: Model
+    model: Any
     tools: list[Any] = field(default_factory=list)
     instructions: str = ""
     capabilities: list[Any] = field(default_factory=list)
+    toolsets: list[Any] = field(default_factory=list)
     max_iterations: int = 10
     timeout_seconds: float = 120.0
     mcp_servers: list[str] | None = None
-    thinking: str | bool | None = None
     tool_search: str | bool | None = None
     record_metrics: bool = True
+    name: str | None = None
+    description: Any = None
+    model_settings: dict[str, Any] | None = None
+    retries: Any = None
+    end_strategy: str = "graceful"
+    tool_timeout: float | None = None
+    metadata: dict[str, Any] | None = None
+    deps_schema: dict[str, Any] | None = None
+    output_schema: dict[str, Any] | None = None
+    spec: Any = None
+    runtime_agent: Any = None
+    source_file: str | None = None
+    context_compaction: dict[str, Any] | None = None
+    guardrails: dict[str, Any] | None = None
+    step_persistence: dict[str, Any] | None = None
+    subagents: dict[str, Any] | None = None
+    planning: dict[str, Any] | None = None
+    repo_context: dict[str, Any] | None = None
+    output_overflow: dict[str, Any] | None = None
+    cache_monitoring: dict[str, Any] | None = None
+    limit_warnings: dict[str, Any] | None = None
+    docs_access: dict[str, Any] | None = None
+    durable_execution: dict[str, Any] | None = None
 ```
 
 #### Scenario: AgentConfig is constructable with defaults
@@ -33,37 +58,56 @@ class AgentConfig:
 - **WHEN** the object is created
 - **THEN** a `TypeError` is raised (model is required)
 
+### Requirement: No AgentConfig.thinking
+
+**WHEN** `AgentConfig` is constructed
+**THEN** the system SHALL NOT have a `thinking` field on `AgentConfig`
+
+- `thinking` lives on `ModelSettings` (foundation/settings.py), not AgentConfig
+- AgentConfig uses `model_settings: dict[str, Any]` for per-run overrides
+- The `thinking` parameter is passed through `model_settings` dict
+
+#### Scenario: thinking is on ModelSettings, not AgentConfig
+- **GIVEN** a `ModelSettings` instance with `thinking="high"`
+- **WHEN** the agent is created via `build_agent(model="anthropic:Advance", thinking="high")`
+- **THEN** the `thinking` parameter SHALL be placed in `model_settings` dict
+- **AND** AgentConfig SHALL NOT have a top-level `thinking` field
+
+#### Scenario: AgentConfig has tool_search, not thinking
+- **GIVEN** `AgentConfig(model=mock_model, tool_search="semantic")`
+- **WHEN** the object is accessed
+- **THEN** `tool_search` SHALL be `"semantic"`
+- **AND** `thinking` SHALL NOT be an attribute
+
 ### Requirement: AgentRuntime accepts AgentConfig
 
-`AgentRuntime.__init__()` SHALL accept `config: AgentConfig` as the primary constructor parameter. Individual parameters are removed.
+**WHEN** `AgentRuntime` is constructed
+**THEN** it SHALL accept `config: AgentConfig` as the primary constructor parameter
 
 #### Scenario: AgentRuntime uses config
 - **GIVEN** `AgentRuntime(config=AgentConfig(model=mock_model))` is instantiated
 - **WHEN** the agent runs
 - **THEN** it uses the configuration from the config object
 
+#### Scenario: AgentRuntime extracts fields from config
+- **GIVEN** an `AgentConfig` with `max_iterations=20`
+- **WHEN** `AgentRuntime` is constructed
+- **THEN** `max_iterations` SHALL be read from the config
+
 ### Requirement: MemoryConfig dataclass
 
-The system SHALL define a `MemoryConfig` dataclass in `agent_core/memory/config.py` with the following fields:
+**WHEN** memory is configured
+**THEN** the system SHALL define a `MemoryConfig` dataclass in `agent_core/memory/config.py`
 
-```python
-@dataclass
-class MemoryConfig:
-    context: ContextMemory
-    scratch: ScratchMemory
-    long_term: PostgresMemory | None = None
-    feedback: FeedbackStore | None = None
-    vector: VectorMemory | None = None
-```
-
-#### Scenario: MemoryConfig is constructable with defaults
-- **GIVEN** `MemoryConfig(context=ctx, scratch=scratch)` is instantiated
-- **WHEN** the object is accessed
-- **THEN** optional fields default to None
+#### Scenario: MemoryConfig is constructable
+- **GIVEN** required memory instances are created
+- **WHEN** `MemoryConfig` is instantiated
+- **THEN** the object SHALL hold the memory configuration
 
 ### Requirement: Memory accepts MemoryConfig
 
-`Memory.__init__()` SHALL accept `config: MemoryConfig` as the primary constructor parameter. Individual parameters are removed.
+**WHEN** `Memory` is constructed
+**THEN** it SHALL accept `config: MemoryConfig` as the primary constructor parameter
 
 #### Scenario: Memory uses config
 - **GIVEN** `Memory(config=MemoryConfig(context=ctx, scratch=scratch))` is instantiated
@@ -72,46 +116,21 @@ class MemoryConfig:
 
 ### Requirement: Model resolution via create_model
 
-The system SHALL provide a `create_model()` function in `agent_core/_ai/models.py` that resolves provider:model_name strings to pydantic-ai Model instances.
+**WHEN** a provider:model_name string is passed to `create_model()`
+**THEN** the system SHALL resolve it to a pydantic-ai Model instance
 
-```python
-def create_model(model: str | Model) -> Model:
-    """Create a pydantic-ai Model from a provider:model_name string or pass through a Model instance."""
-    ...
-```
+#### Scenario: create_model resolves provider:model_name
+- **GIVEN** `create_model("anthropic:Advance")` is called
+- **WHEN** the model is created
+- **THEN** a pydantic-ai Model instance SHALL be returned
 
-#### Scenario: create_model resolves provider string
-- **GIVEN** `create_model("openai-chat:fable-5")` is called
-- **WHEN** the function executes
-- **THEN** a pydantic-ai Model instance is returned
+### Requirement: Config template alignment
 
-#### Scenario: create_model passes through Model instance
-- **GIVEN** `create_model(existing_model)` where `existing_model` is a Model instance
-- **WHEN** the function executes
-- **THEN** the same Model instance is returned unchanged
+**WHEN** `config.yaml.example` is read
+**THEN** it SHALL use the current model resolution and provider configuration format
 
-#### Scenario: create_model raises on invalid format
-- **GIVEN** `create_model("invalid")` is called without provider prefix
-- **WHEN** the function executes
-- **THEN** a `ValueError` is raised with message indicating expected 'provider:model_name' format
-
-### Requirement: Protocol for new backends
-
-New memory backends SHALL implement the `MemoryBackend` Protocol interface. Existing backends MAY continue using ABC inheritance.
-
-```python
-class MemoryBackend(Protocol):
-    async def store(self, session: str, key: str, value: Any, **kwargs: Any) -> None: ...
-    async def retrieve(self, session: str, key: str) -> Any | None: ...
-    async def list_keys(self, session: str) -> list[str]: ...
-```
-
-#### Scenario: New backend implements Protocol
-- **GIVEN** a new `RedisMemory` class is created
-- **WHEN** it implements the `MemoryBackend` Protocol methods
-- **THEN** it can be used with the `Memory` facade without inheritance
-
-#### Scenario: Existing backends continue working
-- **GIVEN** existing `ContextMemory`, `ScratchMemory`, etc. that inherit from ABC
-- **WHEN** the `Memory` facade is updated
-- **THEN** all existing backends continue to work without changes
+#### Scenario: config.yaml.example uses current format
+- **GIVEN** the `config.yaml.example` file is read
+- **WHEN** the model section is inspected
+- **THEN** it SHALL use `model.primary: anthropic:Advance`
+- **AND** it SHALL NOT contain `agent.default_model: fable-5o` or `gateway:` sections
