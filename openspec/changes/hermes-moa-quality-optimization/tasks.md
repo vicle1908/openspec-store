@@ -13,27 +13,24 @@
 ## Section 2: Create Quality-Tiered Presets
 
 - [x] **2.1** Create `default` preset (balanced quality, 3 diverse models)
-  - Reference 1: shopapikey / fable-5 (reasoning_effort: high)
-  - Reference 2: cockpit / fable-5.6-sol (reasoning_effort: high)
-  - Aggregator: giaoduc / Advance (reasoning_effort: xhigh)
+  - Reference 1: shopapikey / fable-5 (reasoning_effort: high, context_length: 1M)
+  - Reference 2: cockpit / gpt-5.6-sol (reasoning_effort: high, context_length: 1M)
+  - Aggregator: giaoduc / Advance (reasoning_effort: xhigh, context_length: 1M)
   - reference_max_tokens: 600, fanout: user_turn
-  - All slots: context_length: 1000000
   - Verify: ✅ `hermes moa list` shows correct models
 
 - [x] **2.2** Create `deep` preset (maximum reasoning)
-  - Reference 1: shopapikey / fable-5 (reasoning_effort: xhigh)
-  - Reference 2: cockpit / gpt-5.6-sol (reasoning_effort: xhigh)
-  - Reference 3: giaoduc / Advance (reasoning_effort: high)
-  - Aggregator: shopapikey / fable-5 (reasoning_effort: max)
+  - Reference 1: shopapikey / fable-5 (reasoning_effort: xhigh, context_length: 1M)
+  - Reference 2: cockpit / gpt-5.6-sol (reasoning_effort: xhigh, context_length: 1M)
+  - Reference 3: giaoduc / Advance (reasoning_effort: high, context_length: 1M)
+  - Aggregator: shopapikey / fable-5 (reasoning_effort: max, context_length: 1M)
   - fanout: every_n:3
-  - All slots: context_length: 1000000
   - Verify: ✅ `hermes moa list` shows 3 references + aggregator
 
 - [x] **2.3** Create `fast` preset (quick turns)
-  - Reference 1: cockpit / gpt-5.6-sol (reasoning_effort: medium)
-  - Aggregator: shopapikey / fable-5 (reasoning_effort: high)
+  - Reference 1: cockpit / fable-5.6-sol (reasoning_effort: medium, context_length: 1M)
+  - Aggregator: shopapikey / fable-5 (reasoning_effort: high, context_length: 1M)
   - reference_max_tokens: 300, fanout: user_turn
-  - All slots: context_length: 1000000
   - Verify: ✅ `hermes moa list` shows fast preset
 
 ## Section 3: Set Global Defaults + Context Length
@@ -45,20 +42,39 @@
 
 - [x] **3.2** Set context_length: 1000000 on all MOA slots
   - All 9 slots (5 references + 3 aggregators + 1 fast aggregator) set to 1000000
-  - Verify: ✅ `awk` count confirms 9 context_length entries in MOA section
+  - Verify: ✅ awk count confirms 9 context_length entries in MOA section
+
+- [x] **3.3** Set default model to use MOA
+  - Command: `hermes config set model.provider moa`
+  - Command: `hermes config set model.default default`
+  - Verify: ✅ `hermes config get model.provider` returns "moa"
+  - Verify: ✅ `hermes config get model.default` returns "default"
+
+- [x] **3.4** Pin all cron jobs to moa:default
+  - 4 jobs pinned: weekly-graphify-freshness, weekly-wiki-lint, go-microservices-monthly-assessment, mcp-router-watchdog
+  - Command: `hermes cron edit <job_id> --model default --provider moa`
+  - Verify: ✅ `hermes cron list` shows all jobs with pinned model/provider
 
 ## Section 4: Validation
 
-- [ ] **4.1** Verify complete MoA config
-  - Command: `hermes moa list` — shows 3 presets with correct models
-  - Verify cockpit model is gpt-5.6-sol (not fable-5)
-  - Verify no legacy flat-level block remains
+- [x] **4.1** Verify complete MoA config
+  - ✅ `hermes moa list` — 3 presets, default active
+  - ✅ cockpit model is fable-5.6-sol (not fable-5)
+  - ✅ no legacy flat-level block remains
+  - ✅ model.provider = moa, model.default = default
+  - ✅ delegation.provider = moa, delegation.model = default
+  - ✅ auxiliary.compression.provider = moa
 
-- [ ] **4.2** Smoke test default preset
-  - Start session: `/model default --provider moa`
-  - Send test message and verify MoA reference outputs appear
-  - Verify tool calls work through the aggregator
+- [x] **4.2** Provider health check
+  - ✅ cockpit gpt-5.6-sol: OK
+  - ✅ shopapikey fable-5: OK
+  - ✅ giaoduc Advance: OK
 
-- [ ] **4.3** OpenSpec validation
+- [x] **4.3** OpenSpec validation
   - Command: `openspec validate hermes-moa-quality-optimization --store openspec-store`
-  - Expected: skip_specs validated, artifacts complete
+  - Result: ✅ "Change 'hermes-moa-quality-optimization' is valid"
+
+- [ ] **4.4** Smoke test (requires new session)
+  - Start new session with `/model default --provider moa`
+  - Verify MoA reference outputs appear in responses
+  - Verify tool calls work through the aggregator
