@@ -13,7 +13,18 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-REPO_ROOT = Path(__file__).resolve().parents[4]
+
+
+def find_repo_root(start: Path) -> Path:
+    for candidate in (start, *start.parents):
+        if (candidate / ".hermes" / "skills").is_dir() and (
+            candidate / "openspec"
+        ).is_dir():
+            return candidate
+    raise RuntimeError("unable to locate repository root containing .hermes/skills")
+
+
+REPO_ROOT = find_repo_root(ROOT)
 SOURCE = REPO_ROOT / ".hermes" / "skills"
 MANIFEST = ROOT / "canonical-source-manifest.json"
 EVIDENCE = ROOT / "sync-evidence"

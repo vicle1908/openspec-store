@@ -52,6 +52,8 @@ Synchronization reports use stable atomic files at `sync-evidence/latest-apply.j
 
 The check report is deterministic when source and installed hashes are unchanged; it uses portable source/install labels and does not embed a new timestamp on each read-only check.
 
+The synchronization script discovers the repository root by walking upward for `.hermes/skills` and `openspec`, so it works from both active and archived change locations.
+
 ## Authoritative retained results
 
 - `results/round-1/` — diagnosis
