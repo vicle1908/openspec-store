@@ -1,0 +1,95 @@
+Reading additional input from stdin...
+OpenAI Codex v0.147.0
+--------
+workdir: /Users/androidteam/Developer/.worktrees/openspec-repair-seven-cli-review/openspec/changes/repair-seven-cli-review-verification/verification
+model: gpt-5.6-sol
+provider: codex_local_access
+approval: never
+sandbox: danger-full-access
+reasoning effort: high
+reasoning summaries: detailed
+session id: 019fe563-ddff-7e71-972f-f344ed5650d3
+--------
+user
+Review the following contract. Do not use tools or discuss CLI flags. Return exactly one VERDICT line and exactly one non-empty FINDINGS and RECOMMENDATIONS section.
+
+# Seven-CLI Review Workflow
+
+## Purpose
+
+Verify that seven installed coding-agent CLIs can run noninteractively with their configured default model/provider and produce a substantive review. This is a local capability check, not a model benchmark.
+
+## Reviewers and invocations
+
+- Claude: `claude -p PROMPT --max-turns 10 --output-format text --no-session-persistence`
+- Codex: `codex exec --ephemeral PROMPT`
+- Antigravity: `agy -p PROMPT --output-format text --print-timeout 5m`
+- Kimi: `kimi -p PROMPT --output-format text`
+- OpenCode: `opencode run PROMPT`
+- Pi: `pi -p --no-session --no-tools --no-extensions PROMPT`
+- Goose: `goose run --no-session -q --max-turns 10 -t PROMPT`
+
+No command passes a model, provider, endpoint, API key, or reasoning override. Session, tool, extension, output-format, turn, and timeout controls do not select a model/provider. Kimi's executable is `kimi`; `fable-5` is a model alias, not an executable.
+
+## Execution
+
+A full round always runs all seven CLIs in these sequential batches, with members of a batch concurrent:
+
+1. Claude, Agy, Goose
+2. OpenCode, Codex, Kimi
+3. Pi alone
+
+A smoke probe must exit 0 and include `CONNECTION_OK`. If smoke fails, review is skipped and the round fails. One CLI failure does not cancel siblings or later batches. There are no silent retries.
+
+The retained fixture is UTF-8, below 20,000 bytes, and embedded identically in every review prompt. The runner checks its SHA-256 before and after the round.
+
+## Evidence and classification
+
+The Python runner invokes CLIs directly, without shell pipelines. It retains separate redacted stdout/stderr, true return code, timestamps, duration, executable path/version, prompt and fixture hashes, output sizes/hashes, and parsed status. A zero return code alone is not success.
+
+A valid response has exactly one `VERDICT:` label with `APPROVE`, `APPROVE_WITH_CONDITIONS`, or `REJECT`, plus exactly one non-empty `FINDINGS:` and `RECOMMENDATIONS:` section. Optional Markdown emphasis around labels is accepted.
+
+- `APPROVE` with no findings -> `PASS`
+- `APPROVE` with findings -> `PASS_WITH_FINDINGS`
+- `APPROVE_WITH_CONDITIONS` -> `PASS_WITH_FINDINGS`
+- `REJECT` -> `REJECTED`
+- Missing executable, timeout, signal, invalid invocation, configuration failure, nonzero process result, empty output, and malformed review use distinct non-passing statuses.
+
+A full round passes only when all seven smoke probes are `PASS` and all seven reviews are `PASS` or `PASS_WITH_FINDINGS`.
+
+## Pi repair
+
+Pi previously exposed 77 direct MCP tools and remained alive after producing output. Its MCP adapter now uses proxy mode (`directTools: false`). Bounded no-tool reviews also use `--no-session --no-tools --no-extensions`. This preserves Pi's configured default model/provider and has been verified with exit 0.
+
+## Skill durability
+
+The tracked canonical guide source is this repository's `.hermes/skills/` tree. A manifest lists the managed files. The synchronization script backs up installed copies, installs canonical files, and verifies source/installed SHA-256 values. Installed-only edits are not treated as durable completion.
+
+## Review request
+
+Review this workflow for internal consistency and correct feature usage.
+
+Your response MUST contain exactly these section labels:
+
+VERDICT: APPROVE, APPROVE_WITH_CONDITIONS, or REJECT
+FINDINGS:
+RECOMMENDATIONS:
+
+If no issue exists, use `FINDINGS: none` and provide one brief recommendation.
+
+hook: SessionStart
+hook: SessionStart Completed
+hook: UserPromptSubmit
+hook: UserPromptSubmit Completed
+**Assessing review classification consistency**
+**Clarifying findings and redaction handling**
+codex
+VERDICT: APPROVE_WITH_CONDITIONS
+FINDINGS:
+The workflow is internally coherent and appropriately distinguishes connectivity, process completion, response validity, and substantive-review success. However, two details remain ambiguous: the contract does not define whether `CONNECTION_OK` matching is case-sensitive and token-bounded, and it does not state whether output hashes are calculated before or after redaction. The review parser should also interpret `FINDINGS: none` as “no findings” so that an approval using the required non-empty section maps consistently to `PASS`.
+RECOMMENDATIONS:
+Define the exact smoke-match rule, record both raw-output hashes and redacted-artifact hashes without retaining sensitive raw content, and explicitly specify that a normalized `none` findings value is semantically empty for status classification.
+hook: Stop
+hook: Stop Completed
+tokens used
+24,641

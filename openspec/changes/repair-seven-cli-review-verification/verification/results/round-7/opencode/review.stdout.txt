@@ -1,0 +1,12 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+
+FINDINGS:
+1. Pi's `--no-session --no-tools --no-extensions` flag set is called "repair" but is also the baseline for all bounded reviews, conflating a one-time fix with ongoing behavior.
+2. The smoke probe's `CONNECTION_OK` requirement is undefined: no CLI is specified to produce it, no expected exit code is stated, and no failure-mode description exists beyond "review is skipped and the round fails."
+3. The SHA-256 fixture check is stated but the failure action is unspecified—if the hash changes mid-round, it is unclear whether the runner aborts, discards results, or continues.
+4. Batch 3 runs Pi "alone" with no concurrency rationale; the spec never explains why Pi cannot share a batch or whether its isolation is a hard correctness requirement vs. historical artifact.
+5. "Zero return code alone is not success" requires a parsed-status gate, but the only parsed-validity rule (one VERDICT + one FINDINGS + one RECOMMENDATIONS) is not linked to the return-code rule; the contract does not state what happens when a CLI returns 0 but produces a malformed review (distinct status exists per bullet list, but the mapping from "nonzero process result" vs. "malformed review" is under-specified).
+6. "No command passes a model, provider, endpoint, API key, or reasoning override" is a constraint on the runner, not on the CLIs—the contract does not specify what happens if a CLI's own default resolution fails or if a CLI interprets a session/turn flag as a model selector (the contract asserts it does not, but provides no detection mechanism).
+
+RECOMMENDATIONS:
+Define the smoke probe contract fully: which CLI produces `CONNECTION_OK`, what exit code it must return, and the exact status assigned on failure; add a fixture-hash-mismatch abort path with an explicit status; and add a one-line rule mapping every failure mode (nonzero exit, timeout, signal, malformed review, empty output) to its status label so the classification table is closed.

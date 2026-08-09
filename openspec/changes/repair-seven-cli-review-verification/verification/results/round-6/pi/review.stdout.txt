@@ -1,0 +1,12 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+
+FINDINGS:
+- The smoke probe is described as a prerequisite gating all reviews, but the passage states "If smoke fails, review is skipped and the round fails" without clarifying whether the probe runs once before any CLI batch, once per batch, or once per CLI. Ambiguity could lead to a runner that either over-probes or under-probes.
+- The fixture integrity check (SHA-256 before and after the round) is stated as something "the runner checks," but the contract never specifies what the runner must do if the post-round hash mismatches. The natural inference is round failure, but it is not explicit alongside the smoke-probe failure rule.
+- The "zero return code alone is not success" rule is mentioned but no positive success heuristic (e.g., output must contain a verdict label) is stated in the Evidence section; the classification rules that follow implicitly define it, but the gap between the two paragraphs could cause a runner to implement validation at the wrong layer.
+- Pi's repair description references verification "with exit 0," yet the contract elsewhere requires more than exit 0 for success. This could be misread as contradicting the general rule.
+- The batching order places Agy before Goose in batch 1, while the invocation list places Claude then Codex then Agy. The mismatch between list order and batch assignment is not harmful but could confuse someone reconciling the two.
+
+RECOMMENDATIONS:
+- Add a single sentence defining the smoke probe scope (once per round, before any batch) and the exact failure action (abort entire round, report per-CLI smoke status, do not proceed to reviews).
+- Explicitly state that a fixture-hash mismatch after the round constitutes an automatic round failure with a distinct status, listed alongside the other non-passing statuses.

@@ -1,0 +1,5 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+FINDINGS:
+The workflow is internally coherent and appropriately distinguishes connectivity, process completion, response validity, and substantive-review success. However, two details remain ambiguous: the contract does not define whether `CONNECTION_OK` matching is case-sensitive and token-bounded, and it does not state whether output hashes are calculated before or after redaction. The review parser should also interpret `FINDINGS: none` as “no findings” so that an approval using the required non-empty section maps consistently to `PASS`.
+RECOMMENDATIONS:
+Define the exact smoke-match rule, record both raw-output hashes and redacted-artifact hashes without retaining sensitive raw content, and explicitly specify that a normalized `none` findings value is semantically empty for status classification.

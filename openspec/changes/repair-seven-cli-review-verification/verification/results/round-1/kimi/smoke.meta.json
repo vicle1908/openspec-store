@@ -1,0 +1,17 @@
+{
+  "started_utc": "2026-08-09T06:12:59.750154Z",
+  "finished_utc": "2026-08-09T06:13:10.101085Z",
+  "duration_seconds": 10.351,
+  "timed_out": false,
+  "exit_code": 0,
+  "status": "PASS",
+  "argv": [
+    "kimi",
+    "-p",
+    "Provide a one-sentence connectivity acknowledgement containing the token CONNECTION_OK. Do not use tools.",
+    "--output-format",
+    "text"
+  ],
+  "version": "0.34.0",
+  "executable_path": "/opt/homebrew/bin/kimi"
+}

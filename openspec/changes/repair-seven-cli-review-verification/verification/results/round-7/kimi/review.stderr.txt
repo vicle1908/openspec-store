@@ -1,0 +1,95 @@
+kimi version 0.34.0
+• The user wants me to review a contract (the "Seven-CLI Review Workflow") for internal consistency and correct feature usage, without using tools or discussing CLI flags. I need to return exactly one VERDICT line and exactly one non-empty FINDINGS and RECOMMENDATIONS section.
+
+  Let me carefully analyze the document for consistency and potential issues.
+
+  **Internal consistency checks:**
+
+  1. **Purpose vs. Execution alignment**: The purpose says "verify that seven installed coding-agent CLIs can run noninteractively with their configured default model/provider and produce a substantive review." The execution section describes running CLIs in batches, checking smoke probes, and verifying fixtures. This is consistent.
+
+  2. **Reviewers and invocations section**: Lists 7 CLIs with specific flags. Notes that "No command passes a model, provider, endpoint, API key, or reasoning override." This aligns with the purpose of checking default model/provider. The note about Kimi's executable being `Advance` and `fable-5` being a model alias is clear.
+
+  3. **Execution section**:
+     - Batches: 1) Claude, Agy, Goose; 2) OpenCode, Codex, Advance; 3) Pi alone. That's 7 CLIs total, consistent.
+     - Smoke probe must exit 0 and include `CONNECTION_OK`. If smoke fails, review is skipped and round fails. One CLI failure does not cancel siblings or later batches. No silent retries.
+     - Retained fixture: UTF-8, below 20,000 bytes, embedded identically in every review prompt. Runner checks SHA-256 before and after round. This is consistent with ensuring the fixture is stable.
+
+  4. **Evidence and classification**:
+     - Python runner invokes CLIs directly, without shell pipelines.
+     - Retains separate redacted stdout/stderr, true return code, timestamps, duration, executable path/version, prompt and fixture hashes, output sizes/hashes, and parsed status.
+     - A zero return code alone is not success.
+     - Valid response has exactly one `VERDICT:` label with `APPROVE`, `APPROVE_WITH_CONDITIONS`, or `REJECT`, plus exactly one non-empty `FINDINGS:` and `RECOMMENDATIONS:` section. Optional Markdown emphasis around labels is accepted.
+     - Classification rules: APPROVE with no findings -> PASS; APPROVE with findings -> PASS_WITH_FINDINGS; APPROVE_WITH_CONDITIONS -> PASS_WITH_FINDINGS; REJECT -> REJECTED; missing executable, timeout, signal, invalid invocation, configuration failure, nonzero process result, empty output, and malformed review use distinct non-passing statuses.
+     - A full round passes only when all seven smoke probes are PASS and all seven reviews are PASS or PASS_WITH_FINDINGS.
+
+  5. **Pi repair**: Pi previously exposed 77 direct MCP tools and remained alive after producing output. Its MCP adapter now uses proxy mode (`directTools: false`). Bounded no-tool reviews also use `--no-session --no-tools --no-extensions`. This preserves Pi's configured default model/provider and has been verified with exit 0.
+
+  6. **Skill durability**: The tracked canonical guide source is this repository's `.hermes/skills/` tree. A manifest lists the managed files. The synchronization script backs up installed copies, installs canonical files, and verifies source/installed SHA-256 values. Installed-only edits are not treated as durable completion.
+
+  **Potential issues:**
+
+  1. **Inconsistency in Pi repair section**: It says "Pi previously exposed 77 direct MCP tools and remained alive after producing output." Then "Its MCP adapter now uses proxy mode (`directTools: false`). Bounded no-tool reviews also use `--no-session --no-tools --no-extensions`." The phrase "bounded no-tool reviews" might be a bit unclear, but it's referring to the Pi invocation flags. This seems consistent with the goal of preventing Pi from hanging or exposing tools.
+
+  2. **Classification rules**: The mapping from verdict to status seems consistent: APPROVE with no findings -> PASS; APPROVE with findings -> PASS_WITH_FINDINGS; APPROVE_WITH_CONDITIONS -> PASS_WITH_FINDINGS; REJECT -> REJECTED; other failure modes have distinct non-passing statuses. This is clear.
+
+  3. **Full round pass condition**: "all seven smoke probes are PASS and all seven reviews are PASS or PASS_WITH_FINDINGS." This is consistent with the classification rules.
+
+  4. **Potential ambiguity in "FINDINGS and RECOMMENDATIONS section"**: The user's instruction says "Return exactly one VERDICT line and exactly one non-empty FINDINGS and RECOMMENDATIONS section." The contract says "Your response MUST contain exactly these section labels: VERDICT: APPROVE, APPROVE_WITH_CONDITIONS, or REJECT; FINDINGS:; RECOMMENDATIONS:". This is a bit confusing because the user's instruction says "FINDINGS and RECOMMENDATIONS section" (singular) but the contract lists two separate labels. However, the user's instruction likely means "FINDINGS:" and "RECOMMENDATIONS:" as separate sections, but the phrase "section" might be a typo. I'll assume they are separate sections as per the contract.
+
+  5. **Fixture handling**: The runner checks SHA-256 before and after the round. This ensures the fixture hasn't been tampered with during the round. Good.
+
+  6. **Evidence retention**: The runner retains separate redacted stdout/stderr, true return code, timestamps, duration, executable path/version, prompt and fixture hashes, output sizes/hashes, and parsed status. This is thorough.
+
+  7. **Zero return code alone is not success**: This is important because some CLIs might return 0 even on failure. The classification must consider output content.
+
+  8. **Valid response structure**: Exactly one VERDICT label with specific options, plus exactly one non-empty FINDINGS and RECOMMENDATIONS section. This is clear.
+
+  9. **Optional Markdown emphasis around labels is accepted**: So `**VERDICT:**` or `VERDICT:` are both acceptable.
+
+  10. **Pi repair details**: The mention of "77 direct MCP tools" seems specific but not contradictory. The fix is to use proxy mode and no-tool flags. This is consistent with the purpose of checking default model/provider without tool interference.
+
+  11. **Skill durability section**: This seems to be about managing the canonical guide source (the skills). It mentions a manifest and synchronization script. This is about maintaining the review workflow itself, not about the CLIs being reviewed. It's consistent as part of the overall workflow description.
+
+  12. **Review request**: "Review this workflow for internal consistency and correct feature usage." I need to check if the features described (CLI flags, smoke probes, fixture handling, classification) are used correctly and consistently.
+
+  **Possible inconsistencies or issues:**
+
+  - The contract says "The retained fixture is UTF-8, below 20,000 bytes, and embedded identically in every review prompt." But the runner also checks SHA-256 before and after the round. This is fine.
+
+  - The classification rules mention "distinct non-passing statuses" for various failure modes. It might be helpful to list those statuses, but the contract doesn't require it. The important thing is that they are distinct from PASS and PASS_WITH_FINDINGS.
+
+  - The Pi repair section says "Bounded no-tool reviews also use `--no-session --no-tools --no-extensions`." This is consistent with the Pi invocation flags listed earlier: `pi -p --no-session --no-tools --no-extensions PROMPT`. So "bounded no-tool reviews" refers to the Pi invocation with those flags. Good.
+
+  - The skill durability section mentions "Installed-only edits are not treated as durable completion." This means that if someone edits the installed skills but not the canonical source, those edits are not considered permanent. This is a policy for maintaining the workflow, not a consistency issue.
+
+  **Overall assessment:**
+
+  The workflow appears internally consistent. The purpose, execution, evidence, classification, and specific repairs (Pi) all align. The features (CLI flags, smoke probes, fixture handling, classification rules) are used correctly and consistently.
+
+  I don't see any major inconsistencies or incorrect feature usage. However, I should note that the contract is quite detailed and might benefit from a brief example or clarification in some areas, but that's a recommendation, not a consistency issue.
+
+  Since the user asked for "exactly one VERDICT line and exactly one non-empty FINDINGS and RECOMMENDATIONS section," I need to output:
+
+  VERDICT: APPROVE (since I see no issues)
+  FINDINGS: none (since no issues found)
+  RECOMMENDATIONS: [some brief recommendation]
+
+  But wait: the user said "If no issue exists, use `FINDINGS: none` and provide one brief recommendation." So I should do that.
+
+  However, I must also consider if there are any subtle inconsistencies. Let me re-read carefully.
+
+  One potential issue: The contract says "A full round always runs all seven CLIs in these sequential batches, with members of a batch concurrent." But then it lists three batches. That means batch 1 runs concurrently, then batch 2 runs concurrently after batch 1 finishes, then batch 3 runs after batch 2 finishes. This is sequential batches with concurrency within each batch. This is consistent with "sequential batches."
+
+  Another: The smoke probe must exit 0 and include `CONNECTION_OK`. If smoke fails, review is skipped and the round fails. One CLI failure does not cancel siblings or later batches. This is consistent: if one CLI fails its smoke, that CLI's review is skipped, and the round fails, but other CLIs in the same batch or later batches still run? Actually, it says "One CLI failure does not cancel siblings or later batches." So if one CLI fails, others continue. But if a smoke fails, the round fails. So a smoke failure in one CLI causes the entire round to fail, but other CLIs still run? The wording is a bit ambiguous. However, it's not necessarily inconsistent; it might be intentional that the round fails but execution continues to gather evidence.
+
+  But this is not a major inconsistency. It's a design choice.
+
+  Given that, I think APPROVE is appropriate.
+
+  Now, for the FINDINGS and RECOMMENDATIONS: I need to provide a non-empty section. Since I have no findings, I'll use "FINDINGS: none". Then provide one brief recommendation.
+
+  Possible recommendation: The workflow could benefit from a brief example of a valid review response to illustrate the expected format, or clarify the relationship between batch failures and round failure. But that's a minor recommendation.
+
+  I'll go with that.
+
+To resume this session: kimi -r session_9a6e4450-893d-4eee-842c-17d20179098b

@@ -1,0 +1,47 @@
+{
+  "argv": [
+    "claude",
+    "-p",
+    "<PROMPT bytes=3620 sha256=803664e59a2112a52bbb7e2cce7723cda91498cd82b0df633585e2d0a49c0ba3>",
+    "--max-turns",
+    "10",
+    "--output-format",
+    "text",
+    "--no-session-persistence"
+  ],
+  "cli": "claude",
+  "default_assurance": "NO_OVERRIDE_SUPPLIED",
+  "elapsed_ms": 56014.505,
+  "executable": {
+    "path": "/Users/androidteam/.npm-global/lib/node_modules/@anthropic-ai/claude-code/bin/claude.exe",
+    "sha256": "013a1cf17df5ff1dcc189d5d6fd3fdd5f097ddc3cd41aa9992e99805574febbe",
+    "size": 279661952
+  },
+  "finished_utc": "2026-08-09T07:22:04.356940Z",
+  "fixture_sha256": "a5a8551417c662a4dfda064bd885d5cfd1d1729c3daa08685b1e2f50cc45b472",
+  "output_limited": false,
+  "parser_version": "seven-cli-parser/v1",
+  "probe": "review",
+  "prompt_bytes": 3620,
+  "prompt_sha256": "803664e59a2112a52bbb7e2cce7723cda91498cd82b0df633585e2d0a49c0ba3",
+  "raw_stderr_bytes": 152,
+  "raw_stderr_sha256": "2c10ce3e10934e16cf44c8f2bc9e0f93aafb7db5b3419ff3315b5395ee5c42bc",
+  "raw_stdout_bytes": 1479,
+  "raw_stdout_sha256": "f6f09bf6f6a24ebcc3b5939e6dc0406904c468eec4c0c18fec9ae57de9696d7b",
+  "return_code": 0,
+  "schema": "seven-cli-evidence/v1",
+  "secret_hits": 0,
+  "signal": null,
+  "started_utc": "2026-08-09T07:21:08.344051Z",
+  "status": "PASS_WITH_FINDINGS",
+  "termination_stage": null,
+  "timed_out": false,
+  "timeout_seconds": 600,
+  "verdict": "APPROVE_WITH_CONDITIONS",
+  "version": {
+    "exit_code": 0,
+    "sha256": "e37ccb4dc1755e9f53a0f0aed3124d292b79d44274404a00ef7cf6997e4cbf07",
+    "text": "2.1.226 (Claude Code)"
+  },
+  "working_directory": "/Users/androidteam/Developer/.worktrees/openspec-repair-seven-cli-review/openspec/changes/repair-seven-cli-review-verification/verification"
+}

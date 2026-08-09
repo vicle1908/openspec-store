@@ -1,0 +1,5 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+FINDINGS:
+The workflow is generally internally consistent, but it requires smoke probes without defining their invocations, prompts, or retained evidence. This prevents independent verification that the smoke gate is implemented as specified. The requirement for exactly one non-empty findings section also conflicts slightly with the separate no-issue form `FINDINGS: none`.
+RECOMMENDATIONS:
+Define the smoke probe contract, including the command, prompt, success evidence, timeout behavior, and recorded status. Clarify that `FINDINGS: none` satisfies the non-empty-section requirement when no issue exists.

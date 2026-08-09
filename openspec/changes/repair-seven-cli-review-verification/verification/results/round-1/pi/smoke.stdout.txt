@@ -1,0 +1,1 @@
+Connection acknowledged — token **CONNECTION_OK** received, the assistant is online and ready to assist.

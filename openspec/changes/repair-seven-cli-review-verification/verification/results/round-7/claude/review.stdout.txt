@@ -1,0 +1,10 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+
+FINDINGS:
+1. The smoke probe is required to exit 0 and include `CONNECTION_OK`, but the contract does not specify what prompt the smoke probe sends or whether it uses the same retained fixture as the review. This leaves the smoke's pass criteria underspecified—if the smoke uses a different prompt, there is no contract-level definition of it.
+2. The classification matrix maps `APPROVE` → `PASS`, `APPROVE` with findings → `PASS_WITH_FINDINGS`, and `REJECT` → `REJECTED`, but `APPROVE_WITH_CONDITIONS` is never assigned a pass/fail status. The round-pass rule requires all reviews to be `PASS` or `PASS_WITH_FINDINGS`, so the contract must define where `APPROVE_WITH_CONDITIONS` falls.
+3. Goose's invocation includes `-q` which is not described anywhere in the contract. All other flags across all seven CLIs are either self-evident from context or explicitly discussed (e.g., `--no-session`, `--no-tools`).
+4. The contract states "distinct non-passing statuses" exist for timeout, signal, empty output, malformed review, etc., but never enumerates or names them. Without a status taxonomy, a runner cannot consistently map failure modes.
+
+RECOMMENDATIONS:
+Define the smoke-probe prompt (or explicitly state it uses the same retained fixture), add `APPROVE_WITH_CONDITIONS` to the classification matrix, document Goose's `-q` flag, and enumerate the non-passing status codes so the Python runner's status assignments are deterministic.

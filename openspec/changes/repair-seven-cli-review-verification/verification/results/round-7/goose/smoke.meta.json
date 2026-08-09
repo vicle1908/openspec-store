@@ -1,0 +1,45 @@
+{
+  "argv": [
+    "goose",
+    "run",
+    "--no-session",
+    "-q",
+    "--max-turns",
+    "10",
+    "-t",
+    "<PROMPT bytes=64 sha256=6fa2f422df4cad9c451ad3e26f425bb27117918e111556eac9578ddc7da7ae7e>"
+  ],
+  "cli": "goose",
+  "default_assurance": "NO_OVERRIDE_SUPPLIED",
+  "elapsed_ms": 12941.488,
+  "executable": {
+    "path": "/opt/homebrew/bin/goose",
+    "sha256": "2c9fb3ea21d09eeee2b941b76694b2d3dabc7a7d2cc2c08da922497a24908887",
+    "size": 262553568
+  },
+  "finished_utc": "2026-08-09T07:21:12.312933Z",
+  "output_limited": false,
+  "parser_version": "seven-cli-parser/v1",
+  "probe": "smoke",
+  "prompt_bytes": 64,
+  "prompt_sha256": "6fa2f422df4cad9c451ad3e26f425bb27117918e111556eac9578ddc7da7ae7e",
+  "raw_stderr_bytes": 0,
+  "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "raw_stdout_bytes": 15,
+  "raw_stdout_sha256": "69f8b712b745aef6ccf3566cf3c4880aa087e3f26484168b4dcd7545997870e2",
+  "return_code": 0,
+  "schema": "seven-cli-evidence/v1",
+  "secret_hits": 0,
+  "signal": null,
+  "started_utc": "2026-08-09T07:20:59.371160Z",
+  "status": "PASS",
+  "termination_stage": null,
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "version": {
+    "exit_code": 0,
+    "sha256": "a3b69cb8130ab8d6d3dd4caed142c836cf08c2bb9eb18023bfea24a0245c2df7",
+    "text": "1.45.0"
+  },
+  "working_directory": "/Users/androidteam/Developer/.worktrees/openspec-repair-seven-cli-review/openspec/changes/repair-seven-cli-review-verification/verification"
+}

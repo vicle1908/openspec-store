@@ -1,0 +1,63 @@
+kimi version 0.34.0
+• 用户要求我审查一个七CLI审查工作流合约。首先，我需要理解这个合约的内容。用户明确表示“不要使用工具或讨论CLI标志”，这意味着我应该基于文本分析进行审查，而不是实际运行任何命令或查看代码。
+
+  用户要求返回三个特定标签：VERDICT（裁决）、FINDINGS（发现）和RECOMMENDATIONS（建议）。裁决必须是APPROVE、APPROVE_WITH_CONDITIONS或REJECT中的一个。如果没有任何问题，FINDINGS应该写“none”，但仍然要提供简短的建议。
+
+  让我仔细阅读这个合约。合约描述了OpenSpec审查工作流支持七种外部编码代理CLI：Claude、Codex、Antigravity（`agy`）、Kimi（`Advance`）、OpenCode、Pi和Goose。
+
+  合约规定了每个审查者必须满足的七个条件：
+  1. 以非交互方式运行，使用其配置的默认模型和提供商；
+  2. 不接收模型、提供商、端点、API密钥或推理覆盖；
+  3. 审查紧凑的嵌入上下文；
+  4. 输出可识别的裁决加上实质性的发现和建议；
+  5. 保留其真实的进程退出码、stdout、stderr、持续时间、版本和确切的非机密argv；
+  6. 根据输出语义和进程状态进行分类；
+  7. 每批最多运行三个，Pi因为其MCP启动较重需要串行运行。
+
+  合约还列出了每个CLI的默认模型调用方式：
+  - Claude: `claude -p PROMPT`
+  - Codex: `codex exec PROMPT`
+  - Antigravity: `agy -p PROMPT`
+  - Kimi: `kimi -p PROMPT`
+  - OpenCode: `opencode run PROMPT`
+  - Pi: `pi -p PROMPT`
+  - Goose: `goose run --no-session -q --max-turns 10 -t PROMPT`
+
+  对于运行时控制，合约允许非交互执行、会话抑制、有界回合、输出格式和主机超时，但不允许模型/提供商覆盖。
+
+  证据要求包括：
+  - Shell过滤必须在子进程状态被捕获之后发生；
+  - 共享夹具必须保持可用，直到所有进程完成且结果被解析；
+  - 产品名称、可执行文件名称、提供商和模型别名必须保持区别；
+  - 待处理或未解析的结果不得标记为完成；
+  - 已安装的技能编辑必须有跟踪的规范源和校验和验证。
+
+  现在我需要审查这个合约是否存在内部一致性、操作安全性和证据质量问题。我需要找出矛盾、不安全的默认设置、缺失的验收标准或无法验证的声明。
+
+  让我仔细分析一下。首先，合约似乎相当全面，但可能存在一些问题。
+
+  一个潜在的问题是关于Pi的串行运行。合约说“Pi serially because its MCP startup is heavy”。这暗示Pi可能需要更多资源或更长的启动时间。但合约没有指定如何确保Pi的串行运行与其他CLI的并行运行之间的协调。如果其他CLI是并行运行的，那么Pi的串行约束如何实施？这可能是一个操作安全问题。
+
+  另一个潜在问题是关于“紧凑嵌入上下文”。合约没有定义什么是“紧凑嵌入上下文”，也没有说明如何确保上下文对所有CLI都是一致的。这可能导致验证问题。
+
+  证据要求提到“Shell filtering MUST occur only after the child process status is captured.” 这似乎合理，但需要更具体的定义。什么是“Shell filtering”？这可能指的是过滤stdout/stderr中的敏感信息。但合约没有指定过滤规则或内容。
+
+  另一个问题是关于“共享夹具”的定义。合约说“The shared fixture MUST remain available until all processes complete and results are parsed.” 但什么是“共享夹具”？这是指审查的上下文还是其他资源？这需要更清晰的定义。
+
+  合约还提到“Installed skill edits MUST have a tracked canonical source and checksum verification.” 这似乎合理，但如何实施校验和验证？使用什么算法？这可能需要更具体的规范。
+
+  关于CLI调用，合约列出了每个CLI的命令。但有些命令使用了`-p`标志，而其他命令使用了不同的标志（如Codex使用`exec`，Goose使用了多个标志）。这可能导致不一致。但合约允许运行时控制，所以这可能不是大问题。
+
+  合约没有提到如何处理CLI执行失败的情况。例如，如果某个CLI无法启动或崩溃，应该如何处理？这可能需要更明确的错误处理策略。
+
+  此外，合约没有指定如何验证CLI的版本或确保使用正确的可执行文件。这可能会影响可重复性。
+
+  合约还提到“Product names, executable names, providers, and model aliases MUST remain distinct.” 这似乎合理，但如何确保区别？是否有命名约定或验证机制？
+
+  现在，我需要根据这些分析做出裁决。我认为合约整体上是合理的，但有一些条件需要满足。因此，裁决应该是APPROVE_WITH_CONDITIONS。
+
+  对于FINDINGS，我需要列出发现的问题。对于RECOMMENDATIONS，我需要提供具体的建议。
+
+  让我整理一下。
+
+To resume this session: kimi -r session_a504dc14-9a36-4573-aaa6-399804429ac4

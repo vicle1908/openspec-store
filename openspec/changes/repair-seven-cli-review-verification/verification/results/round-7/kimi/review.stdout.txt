@@ -1,0 +1,4 @@
+• VERDICT: APPROVE
+  FINDINGS: none
+  RECOMMENDATIONS: Consider adding a brief example of a valid review response to clarify the expected format, especially the relationship between the VERDICT label and the FINDINGS/RECOMMENDATIONS sections.
+

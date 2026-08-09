@@ -1,0 +1,5 @@
+VERDICT: APPROVE
+
+FINDINGS: none
+
+RECOMMENDATIONS: The contract is well-structured and internally consistent. Consider adding a brief note clarifying that "without shell pipelines" applies to all seven CLIs, not just some, to avoid any ambiguity.

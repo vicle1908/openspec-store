@@ -1,0 +1,5 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+FINDINGS:
+The workflow is internally coherent in its scope, batching, failure isolation, fixture-integrity checks, evidence retention, response validation, and full-round pass criteria. However, the classification rule “APPROVE with no findings → PASS” conflicts with the required fallback `FINDINGS: none`: unless the parser explicitly treats the sentinel value `none` as an empty finding set, an issue-free approval may be classified as `PASS_WITH_FINDINGS`. Smoke-probe parsing is also underspecified: the contract requires exit 0 and `CONNECTION_OK`, but does not define whether the token may appear anywhere, whether stderr counts, or whether surrounding output is allowed.
+RECOMMENDATIONS:
+Define `FINDINGS: none` as semantically empty and therefore eligible for `PASS`, while requiring any other non-whitespace content to produce `PASS_WITH_FINDINGS`. Also specify that a smoke probe passes only when the process exits normally with return code zero and the exact case-sensitive token `CONNECTION_OK` appears in the designated captured output stream; document whether additional output is permitted.

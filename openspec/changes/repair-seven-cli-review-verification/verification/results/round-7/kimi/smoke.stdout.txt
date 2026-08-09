@@ -1,0 +1,2 @@
+• The network configuration was tested and returned `CONNECTION_OK`.
+

@@ -1,0 +1,15 @@
+• VERDICT: APPROVE_WITH_CONDITIONS
+  FINDINGS:
+  1. **Coordination of Pi serial execution**: The contract requires Pi to run serially but does not specify how its serial constraint will be enforced while other CLIs run in parallel batches of three. Without explicit coordination logic, there is a risk of Pi being launched concurrently, violating its heavy-startup constraint.
+  2. **Ambiguous term “shared fixture”**: The contract mandates that “the shared fixture MUST remain available until all processes complete and results are parsed.” However, the term is undefined. It is unclear whether this refers to the embedded review context, a temporary filesystem artifact, or an in-memory structure, making verification impossible.
+  3. **Vague “compact embedded context”**: The contract does not define what constitutes a “compact” context, nor how its consistency across all seven CLIs will be ensured. Different CLIs may interpret context size or format differently, undermining review reproducibility.
+  4. **Unspecified failure‑mode handling**: The contract lists success‑path evidence requirements but omits procedures for CLI execution failures (e.g., non‑zero exit codes, missing executables, timeouts). Without defined error‑handling rules, the workflow’s behavior in degraded states is indeterminate.
+  5. **Missing校验和 verification details**: While the contract requires “tracked canonical source and checksum verification” for installed skill edits, it does not specify the algorithm, storage, or verification mechanism. This leaves the security control unimplemented.
+
+  RECOMMENDATIONS:
+  1. **Define the shared fixture** (e.g., “a temporary JSON file containing the review prompt and metadata, stored in a known directory and cleaned up after result parsing”).
+  2. **Specify the serialization mechanism for Pi** (e.g., “Pi must be launched only after all other CLIs in its batch have completed; implement via a process‑monitor loop or a dedicated queue”).
+  3. **Add a failure‑mode section** that details expected actions for each CLI’s error states (e.g., retry, mark as failed, capture stderr, continue batch).
+  4. **Clarify校验和 verification** by naming the algorithm (e.g., SHA‑256), the source of truth (e.g., a manifest file), and when verification occurs (pre‑ vs post‑execution).
+  5. **Document the context‑compaction rules** that ensure the embedded review prompt is identical in size and content for all seven CLIs, possibly by specifying a maximum token count or a deterministic rendering process.
+

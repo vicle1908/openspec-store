@@ -1,0 +1,24 @@
+Reading additional input from stdin...
+OpenAI Codex v0.147.0
+--------
+workdir: /Users/androidteam/Developer/.worktrees/openspec-repair-seven-cli-review/openspec/changes/repair-seven-cli-review-verification/verification
+model: gpt-5.6-sol
+provider: codex_local_access
+approval: never
+sandbox: danger-full-access
+reasoning effort: high
+reasoning summaries: detailed
+session id: 019fe566-744a-7302-bb3f-4dae0bdd54c4
+--------
+user
+Provide one sentence containing CONNECTION_OK. Do not use tools.
+hook: SessionStart
+hook: SessionStart Completed
+hook: UserPromptSubmit
+hook: UserPromptSubmit Completed
+codex
+CONNECTION_OK confirms the connection is working.
+hook: Stop
+hook: Stop Completed
+tokens used
+23,542

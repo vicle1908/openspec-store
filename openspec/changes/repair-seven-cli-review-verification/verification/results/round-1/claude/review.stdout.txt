@@ -1,0 +1,17 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+
+FINDINGS:
+
+1. **Batch semantics for Pi are ambiguous (correctness).** The contract says "batches of no more than three, with Pi serially because its MCP startup is heavy." Two reasonable readings exist: (a) Pi always occupies its own singleton batch, or (b) Pi may share a batch slot but must be sequenced within it. The two readings produce different batch counts for 7 CLIs (three batches under (a), three batches under (b) as well — but (b) implies mixed-parallel/serial logic that is never specified). The contract should state the interpretation explicitly.
+
+2. **No failure-handling or timeout-resolution contract (correctness).** The contract specifies that exit codes, stdout, stderr, and duration are *retained*, and that "host timeout" is an allowed runtime control, but it never says what happens when a process is killed by the timeout or crashes mid-batch. Specifically: is the batch halted or do remaining CLIs continue? Is a killed process classified by exit code alone, or by the timeout signal? The "classified by output semantics as well as process status" criterion (item 6) implies post-hoc classification, but there is no specification of what classification categories exist or how a timeout-induced kill maps to them.
+
+3. **Installed skill edits verification is underspecified (evidence quality).** Requirement 7 states edits "MUST have a tracked canonical source and checksum verification," but the contract does not define what constitutes a "canonical source" (Git blob SHA? file path? lock-file entry?) or what checksum algorithm and comparison semantics apply. This makes the criterion unverifiable as written.
+
+RECOMMENDATIONS:
+
+- **Clarify Pi batch isolation.** State explicitly whether Pi always runs alone (singleton batch) or may co-reside with up to two other CLIs. If singleton, the batch decomposition is trivial; if shared, add a sequencing constraint (e.g., "Pi must finish before any parallel sibling starts").
+
+- **Add a failure-mode section.** Define: (a) whether a timeout or crash marks the individual CLI result as a failure or is retried, (b) whether batch-level failures are isolated or propagate, and (c) what the classification taxonomy looks like for abnormal exits (timeout, signal, crash, partial output).
+
+- **Pin the skill-edits evidence contract.** Replace "tracked canonical source and checksum verification" with a concrete artifact — for example, "the pre-edit file content hashed with SHA-256, stored alongside the post-edit content and the edit script, verified by re-hashing at audit time." This makes the evidence independently reproducible.

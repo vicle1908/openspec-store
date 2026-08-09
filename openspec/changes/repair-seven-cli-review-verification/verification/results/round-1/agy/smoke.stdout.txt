@@ -1,0 +1,1 @@
+Connectivity status verified successfully with token CONNECTION_OK.

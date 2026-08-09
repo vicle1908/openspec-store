@@ -1,0 +1,9 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+
+FINDINGS:
+- The criteria for smoke probe success is ambiguous in the classification rules: smoke probes require exit code 0 and `CONNECTION_OK`, but `PASS` status is defined strictly using review response verdicts (`APPROVE` with no findings).
+- The "Skill durability" section introduces file synchronization for `.hermes/skills/`, which is decoupled from the core workflow of running and evaluating the seven review executables.
+
+RECOMMENDATIONS:
+- Explicitly state the status mapping for smoke probes (e.g., exit code 0 plus `CONNECTION_OK` maps to `PASS`) within the evidence classification section.
+- Move or clarify the scope of the skill durability section to keep the contract focused directly on CLI execution and verification logic.

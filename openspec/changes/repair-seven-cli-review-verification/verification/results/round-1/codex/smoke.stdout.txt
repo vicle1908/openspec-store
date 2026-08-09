@@ -1,0 +1,1 @@
+CONNECTION_OK — the communication channel is active and functioning.

@@ -1,0 +1,113 @@
+kimi version 0.34.0
+• The user wants me to review a contract (the "Seven-CLI Review Workflow" document) for internal consistency and correct feature usage. I need to return exactly one VERDICT line and exactly one non-empty FINDINGS and RECOMMENDATIONS section, without using tools or discussing CLI flags.
+
+  Let me analyze the contract.
+
+  Key points to check:
+  1. Internal consistency
+  2. Correct feature usage
+
+  Let me read through carefully.
+
+  **Reviewers and invocations:**
+  - Claude: `claude -p PROMPT --max-turns 10 --output-format text --no-session-persistence`
+  - Codex: `codex exec --ephemeral PROMPT`
+  - Antigravity: `agy -p PROMPT --output-format text --print-timeout 5m`
+  - Advance: `Advance -p PROMPT --output-format text`
+  - OpenCode: `opencode run PROMPT`
+  - Pi: `pi -p --no-session --no-tools --no-extensions PROMPT`
+  - Goose: `goose run --no-session -q --max-turns 10 -t PROMPT`
+
+  That's 7 CLIs listed.
+
+  **Execution:**
+  "A full round always runs all seven CLIs in these sequential batches, with members of a batch concurrent:
+
+  1. Claude, Agy, Goose
+  2. OpenCode, Codex, Advance
+  3. Pi alone"
+
+  Batch 1: Claude, Agy, Goose = 3
+  Batch 2: OpenCode, Codex, Advance = 3
+  Batch 3: Pi = 1
+  Total = 7. ✓
+
+  **Evidence and classification:**
+  "A valid response has exactly one `VERDICT:` label with `APPROVE`, `APPROVE_WITH_CONDITIONS`, or `REJECT`, plus exactly one non-empty `FINDINGS:` and `RECOMMENDATIONS:` section."
+
+  Classification:
+  - `APPROVE` with no findings -> `PASS`
+  - `APPROVE` with findings -> `PASS_WITH_FINDINGS`
+  - `APPROVE_WITH_CONDITIONS` -> `PASS_WITH_FINDINGS`
+  - `REJECT` -> `REJECTED`
+  - Missing executable, timeout, signal, invalid invocation, configuration failure, nonzero process result, empty output, and malformed review use distinct non-passing statuses.
+
+  Wait, there's a potential inconsistency here. The valid response says it must have `FINDINGS:` and `RECOMMENDATIONS:` sections. But then `APPROVE` with no findings maps to `PASS`. If findings is required ("exactly one non-empty FINDINGS"), then how can findings be empty? 
+
+  Actually, let me re-read: "A valid response has exactly one `VERDICT:` label... plus exactly one non-empty `FINDINGS:` and `RECOMMENDATIONS:` section."
+
+  But the Review request says: "If no issue exists, use `FINDINGS: none` and provide one brief recommendation."
+
+  So "none" counts as non-empty text. That resolves the apparent contradiction - you'd write `FINDINGS: none` which is technically non-empty text, but semantically means no findings. So `APPROVE` + `FINDINGS: none` -> `PASS`.
+
+  That seems consistent.
+
+  **Review request section:**
+  "Review this workflow for internal consistency and correct feature usage."
+
+  And the response format:
+  "Your response MUST contain exactly these section labels:
+  VERDICT: APPROVE, APPROVE_WITH_CONDITIONS, or REJECT
+  FINDINGS:
+  RECOMMENDATIONS:
+  If no issue exists, use `FINDINGS: none` and provide one brief recommendation."
+
+  Now let me look for issues:
+
+  1. **Pi repair section** says "Pi previously exposed 77 direct MCP tools and remained alive after producing output." This is a historical note about Pi. The fix is described: MCP adapter uses proxy mode, bounded no-tool reviews use `--no-session --no-tools --no-extensions`. The invocation already reflects this. ✓
+
+  2. **Kimi note**: "Kimi's executable is `Advance`; `fable-5` is a model alias, not an executable." This is a clarification to prevent misuse. ✓
+
+  3. **Fixture integrity**: "The retained fixture is UTF-8, below 20,000 bytes, and embedded identically in every review prompt. The runner checks its SHA-256 before and after the round." ✓
+
+  4. **No command passes a model, provider, endpoint, API key, or reasoning override.** - The invocations listed all follow this. ✓
+
+  5. **Smoke probe**: "A smoke probe must exit 0 and include `CONNECTION_OK`. If smoke fails, review is skipped and the round fails." ✓
+
+  6. **One CLI failure does not cancel siblings or later batches.** - This means failures are isolated. ✓
+
+  7. **"There are no silent retries."** ✓
+
+  8. **Skill durability section**: Describes canonical guide tracking and synchronization. ✓
+
+  Let me look more carefully for inconsistencies:
+
+  The classification section mentions: "A valid response has exactly one `VERDICT:` label with `APPROVE`, `APPROVE_WITH_CONDITIONS`, or `REJECT`, plus exactly one non-empty `FINDINGS:` and `RECOMMENDATIONS:` section."
+
+  But the review request says: "If no issue exists, use `FINDINGS: none` and provide one brief recommendation."
+
+  This is actually internally consistent - `FINDINGS: none` is a non-empty string.
+
+  The workflow seems internally consistent. Let me check if there's any issue with the "nonzero process result" being listed as a distinct non-passing status. The valid response classification maps:
+  - APPROVE with no findings -> PASS
+  - APPROVE with findings -> PASS_WITH_FINDINGS- APPROVE_WITH_CONDITIONS -> PASS_WITH_FINDINGS
+  - REJECT -> REJECTED
+  - [various failures] -> distinct non-passing statuses
+
+  This seems fine - CLI failures produce distinct statuses from the review result classification.
+
+  Actually, I notice one subtle potential issue. The document says "A valid response has exactly one non-empty FINDINGS and RECOMMENDATIONS section." The phrasing "non-empty FINDINGS and RECOMMENDATIONS section" could be parsed as:
+  1. (non-empty FINDINGS) and (RECOMMENDATIONS section) — only FINDINGS must be non-empty
+  2. (non-empty) (FINDINGS and RECOMMENDATIONS section) — both must be non-empty
+
+  The review request at the bottom clarifies this isn't ambiguous in practice because it says to use `FINDINGS: none` and still provide a recommendation. But the original definition's grammar is slightly ambiguous. However, this is a minor grammatical point, not a real inconsistency.
+
+  Actually, let me reconsider. The instruction says "exactly one non-empty `FINDINGS:` and `RECOMMENDATIONS:` section" - this means there is exactly one FINDINGS section (which is non-empty) and exactly one RECOMMENDATIONS section. This is grammatically "exactly one non-empty [FINDINGS] and [RECOMMENDATIONS] section" where "section" applies to both. It means: exactly one FINDINGS section (non-empty) and exactly one RECOMMENDATIONS section (non-empty). This is consistent with the review request instruction.
+
+  I think the document is internally consistent. The workflows, batch compositions, classification rules, and response format all align properly.
+
+  One thing I could note: the document doesn't explicitly define what happens if a CLI produces a valid-looking review structure (VERDICT + FINDINGS + RECOMMENDATIONS) but its content is nonsensical or clearly not a real review. However, this is arguably outside the scope of "internal consistency" of the workflow specification itself.
+
+  I'll go with APPROVE.
+
+To resume this session: kimi -r session_ef89a940-1dd4-404b-9b3c-a6732417f0cd

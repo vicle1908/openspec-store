@@ -1,0 +1,41 @@
+{
+  "argv": [
+    "codex",
+    "exec",
+    "--ephemeral",
+    "<PROMPT bytes=64 sha256=6fa2f422df4cad9c451ad3e26f425bb27117918e111556eac9578ddc7da7ae7e>"
+  ],
+  "cli": "codex",
+  "default_assurance": "NO_OVERRIDE_SUPPLIED",
+  "elapsed_ms": 5801.819,
+  "executable": {
+    "path": "/Users/androidteam/.npm-global/lib/node_modules/@openai/codex/bin/codex.js",
+    "sha256": "134063e133f0b4244fa3b251acf973d4fe4b4aeeacbdc135211bf480f59f1477",
+    "size": 7236
+  },
+  "finished_utc": "2026-08-09T07:22:10.286643Z",
+  "output_limited": false,
+  "parser_version": "seven-cli-parser/v1",
+  "probe": "smoke",
+  "prompt_bytes": 64,
+  "prompt_sha256": "6fa2f422df4cad9c451ad3e26f425bb27117918e111556eac9578ddc7da7ae7e",
+  "raw_stderr_bytes": 703,
+  "raw_stderr_sha256": "81966a1dca049ae50dc18132500dab303ebafdb8902a798532f21264ec711c63",
+  "raw_stdout_bytes": 50,
+  "raw_stdout_sha256": "0ee28ba4a2cd2b1d6a22d7697e731946e28cc0b98221b460f2d9a1a07cec9134",
+  "return_code": 0,
+  "schema": "seven-cli-evidence/v1",
+  "secret_hits": 0,
+  "signal": null,
+  "started_utc": "2026-08-09T07:22:04.484753Z",
+  "status": "PASS",
+  "termination_stage": null,
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "version": {
+    "exit_code": 0,
+    "sha256": "47e8650c39eae3ea896e5873f03a97a65d183d81cd0d86616e8b83d7d87877ca",
+    "text": "codex-cli 0.147.0"
+  },
+  "working_directory": "/Users/androidteam/Developer/.worktrees/openspec-repair-seven-cli-review/openspec/changes/repair-seven-cli-review-verification/verification"
+}

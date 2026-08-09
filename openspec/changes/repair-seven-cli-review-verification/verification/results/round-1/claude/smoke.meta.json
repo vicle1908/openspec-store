@@ -1,0 +1,20 @@
+{
+  "started_utc": "2026-08-09T06:12:07.435019Z",
+  "finished_utc": "2026-08-09T06:12:17.091312Z",
+  "duration_seconds": 9.656,
+  "timed_out": false,
+  "exit_code": 0,
+  "status": "PASS",
+  "argv": [
+    "claude",
+    "-p",
+    "Provide a one-sentence connectivity acknowledgement containing the token CONNECTION_OK. Do not use tools.",
+    "--max-turns",
+    "5",
+    "--output-format",
+    "text",
+    "--no-session-persistence"
+  ],
+  "version": "2.1.226 (Claude Code)",
+  "executable_path": "/Users/androidteam/.npm-global/bin/claude"
+}

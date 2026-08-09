@@ -1,0 +1,1 @@
+`CONNECTION_OK` confirms the link is up.

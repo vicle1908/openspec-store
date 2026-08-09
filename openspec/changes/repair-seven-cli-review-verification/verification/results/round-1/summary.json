@@ -1,0 +1,78 @@
+{
+  "round": "round-1",
+  "generated_utc": "2026-08-09T06:25:25.530345Z",
+  "fixture_path": "/Users/androidteam/Developer/.worktrees/openspec-repair-seven-cli-review/openspec/changes/repair-seven-cli-review-verification/verification/review-context.md",
+  "fixture_sha256": "cecf7ed576f20c9bf79c4c8727d32532194e7a82171f65b2764ed45b187ceb9d",
+  "results": [
+    {
+      "cli": "claude",
+      "version": "2.1.226 (Claude Code)",
+      "executable_path": "/Users/androidteam/.npm-global/bin/claude",
+      "smoke_status": "PASS",
+      "review_status": "PASS_WITH_FINDINGS",
+      "verdict": "APPROVE_WITH_CONDITIONS",
+      "review_exit_code": 0,
+      "review_duration_seconds": 35.361
+    },
+    {
+      "cli": "codex",
+      "version": "codex-cli 0.147.0",
+      "executable_path": "/Users/androidteam/.npm-global/bin/codex",
+      "smoke_status": "PASS",
+      "review_status": "PASS_WITH_FINDINGS",
+      "verdict": "APPROVE_WITH_CONDITIONS",
+      "review_exit_code": 0,
+      "review_duration_seconds": 66.134
+    },
+    {
+      "cli": "agy",
+      "version": "1.1.11",
+      "executable_path": "/opt/homebrew/bin/agy",
+      "smoke_status": "PASS",
+      "review_status": "PASS_WITH_FINDINGS",
+      "verdict": "APPROVE_WITH_CONDITIONS",
+      "review_exit_code": 0,
+      "review_duration_seconds": 10.278
+    },
+    {
+      "cli": "kimi",
+      "version": "0.34.0",
+      "executable_path": "/opt/homebrew/bin/kimi",
+      "smoke_status": "PASS",
+      "review_status": "PASS_WITH_FINDINGS",
+      "verdict": "APPROVE_WITH_CONDITIONS",
+      "review_exit_code": 0,
+      "review_duration_seconds": 27.897
+    },
+    {
+      "cli": "opencode",
+      "version": "1.18.15",
+      "executable_path": "/Users/androidteam/.npm-global/bin/opencode",
+      "smoke_status": "PASS",
+      "review_status": "PASS_WITH_FINDINGS",
+      "verdict": "APPROVE_WITH_CONDITIONS",
+      "review_exit_code": 0,
+      "review_duration_seconds": 36.017
+    },
+    {
+      "cli": "pi",
+      "version": "0.84.1",
+      "executable_path": "/opt/homebrew/bin/pi",
+      "smoke_status": "TIMEOUT",
+      "review_status": "CONFIG_ERROR",
+      "verdict": null,
+      "review_exit_code": -15,
+      "review_duration_seconds": 373.048
+    },
+    {
+      "cli": "goose",
+      "version": "1.45.0",
+      "executable_path": "/opt/homebrew/bin/goose",
+      "smoke_status": "PASS",
+      "review_status": "PASS_WITH_FINDINGS",
+      "verdict": "APPROVE_WITH_CONDITIONS",
+      "review_exit_code": 0,
+      "review_duration_seconds": 37.345
+    }
+  ]
+}

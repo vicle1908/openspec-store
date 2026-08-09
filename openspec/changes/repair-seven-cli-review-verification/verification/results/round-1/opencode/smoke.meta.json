@@ -1,0 +1,15 @@
+{
+  "started_utc": "2026-08-09T06:12:59.693706Z",
+  "finished_utc": "2026-08-09T06:13:19.149909Z",
+  "duration_seconds": 19.456,
+  "timed_out": false,
+  "exit_code": 0,
+  "status": "PASS",
+  "argv": [
+    "opencode",
+    "run",
+    "Provide a one-sentence connectivity acknowledgement containing the token CONNECTION_OK. Do not use tools."
+  ],
+  "version": "1.18.15",
+  "executable_path": "/Users/androidteam/.npm-global/bin/opencode"
+}

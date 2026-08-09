@@ -1,0 +1,35 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+
+FINDINGS:
+
+1. **Exit-code/verdict independence is well-defined but creates an ambiguous terminal classification space.** The contract states "nonzero exit always fails the process gate; exit 0 still requires a valid substantive verdict." This is correct and internally consistent. However, the distinct terminal classifications (missing executable, invalid invocation, auth failure, timeout, signal termination, empty output, malformed output) overlap with exit-code semantics in ways the contract does not fully enumerate. For example, a signal-terminated process (e.g., SIGKILL from OOM) may never produce stdout—there is no explicit rule saying whether "empty output" or "signal termination" takes precedence when both are true. The contract should declare a priority order or a classification tree.
+
+2. **Diagnostic stderr retention is stated but the "does not fail a run by itself" clause has an edge case.** If stderr contains a recognized fatal pattern (e.g., authentication revoked message) while exit code is 0, the contract says "process status and recognized fatal patterns determine the process gate." This means stderr *can* fail a run, contradicting the simpler reading of "does not fail a run by itself." The contract should state that fatal-pattern detection is an independent gate condition, not subordinate to stderr retention.
+
+3. **The Pi timeout of 900 seconds vs. 600 seconds for all others is specified but the rationale and rollback trigger are absent.** If Pi exceeds 600 seconds but finishes before 900, no issue. But the contract does not specify what happens to batch sequencing if Pi blocks for the full 900 seconds—whether downstream evidence packaging waits or proceeds. This is an operational gap, not a contradiction.
+
+4. **Skill SHA-256 synchronization with rollback is described but the "tracked canonical source" is not named.** The contract says installed skill edits "MUST have a tracked canonical source and checksum verification" and that "canonical skill SHA-256 must match the installed copy after synchronization." It does not identify where the canonical source lives (repo root? openspec store? a manifest file?). Without this, the rollback clause is unverifiable.
+
+5. **The fixture size cap (20 KB) and immutability are stated but the contract does not specify what happens if the fixture exceeds 20 KB at evaluation time.** Is that a hard rejection of the fixture, a truncation, or a classification? This should be explicit.
+
+6. **The argv evidence rule ("stores public flags and a prompt SHA-256; MUST NOT duplicate the full prompt or any secret-bearing value") is sound.** However, it does not address environment variables that may be passed to the child process (e.g., `nhà cung cấp dịch vụ AI_API_KEY`, `OPENAI_API_KEY`). The contract should confirm that environment-variable evidence is either excluded or hashed.
+
+7. **Batch sequencing (Claude/Agy/Goose → OpenCode/Codex/fable-5 → Pi) is fixed and clearly stated.** No inconsistency found. The isolation rule ("a failed CLI is isolated to its own result; it does not erase completed sibling evidence") is compatible with this.
+
+8. **Product names, executable names, providers, and model aliases "MUST remain distinct."** This is a good requirement. No contradiction with other sections.
+
+RECOMMENDATIONS:
+
+1. Add a classification precedence table for cases where multiple failure modes are simultaneously true (e.g., signal + empty output + timeout). A simple decision tree would eliminate ambiguity.
+
+2. Reframe the stderr clause as: "Diagnostic stderr is retained. It does not independently fail the process gate. Fatal-pattern detection in stderr is a separate, independent gate condition evaluated alongside process status."
+
+3. Name the canonical skill source explicitly (e.g., "the skill definition at `~/.agents/skills/<name>/SKILL.md`" or a manifest path). Without this, the rollback clause has no anchor.
+
+4. Add: "If the fixture exceeds 20 KB at evaluation time, the fixture is rejected and the round is classified as INVALID before any CLI is invoked."
+
+5. Add: "Environment variables passed to child processes must not appear in argv evidence. If environment configuration is evidence, it must be recorded as hashed key names only (e.g., `ANTHROPIC_API_KEY=<SHA-256>`), never values."
+
+6. Specify Pi batch behavior: "If Pi exceeds 900 seconds, the round continues to evidence packaging in parallel; Pi's result is classified as TIMEOUT and does not block other evidence collection."
+
+7. Consider adding an explicit definition of "substantive verdict" (e.g., must contain at least one non-empty FINDINGS entry and a RECOMMENDATIONS entry in a recognized format) to make the exit-0-but-invalid-verdict path fully testable.

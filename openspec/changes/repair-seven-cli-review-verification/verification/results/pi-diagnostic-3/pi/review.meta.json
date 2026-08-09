@@ -1,0 +1,25 @@
+{
+  "started_utc": "2026-08-09T06:45:24.770837Z",
+  "finished_utc": "2026-08-09T06:45:50.134783Z",
+  "duration_seconds": 25.364,
+  "timed_out": false,
+  "exit_code": 0,
+  "status": "PASS_WITH_FINDINGS",
+  "verdict": "APPROVE_WITH_CONDITIONS",
+  "argv": [
+    "pi",
+    "-p",
+    "--no-session",
+    "--no-tools",
+    "--no-extensions",
+    "<PROMPT sha256=8a14a3abb07459ac3399976080f34765c730ca3a3ed72120fcde835f881c89a7>"
+  ],
+  "prompt_sha256": "8a14a3abb07459ac3399976080f34765c730ca3a3ed72120fcde835f881c89a7",
+  "stdout_sha256": "7e9258cdceb1577649eaf07fcadf484c654462275fd6749f887a3fbcc76fe2c6",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "version": "0.84.1",
+  "executable_path": "/opt/homebrew/bin/pi",
+  "fixture_sha256": "c95f3c64e91d01ada755b7c4807bf4dddf872f1f47ad84fb188642ac32b072bd",
+  "stdout_bytes": 4786,
+  "stderr_bytes": 0
+}

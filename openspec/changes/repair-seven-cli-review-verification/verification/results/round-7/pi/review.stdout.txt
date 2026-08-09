@@ -1,0 +1,5 @@
+VERDICT: APPROVE
+
+FINDINGS: none
+
+RECOMMENDATIONS: Clarify the malformed-review criteria by listing the specific parse failures that map to the "malformed review" status—e.g., zero or multiple `VERDICT:` labels, unrecognized verdict keyword, or missing `FINDINGS:`/`RECOMMENDATIONS:` section—so the runner's error taxonomy is fully deterministic without inference.

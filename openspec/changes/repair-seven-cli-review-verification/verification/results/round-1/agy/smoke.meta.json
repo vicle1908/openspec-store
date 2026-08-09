@@ -1,0 +1,19 @@
+{
+  "started_utc": "2026-08-09T06:12:07.188884Z",
+  "finished_utc": "2026-08-09T06:12:14.806653Z",
+  "duration_seconds": 7.618,
+  "timed_out": false,
+  "exit_code": 0,
+  "status": "PASS",
+  "argv": [
+    "agy",
+    "-p",
+    "Provide a one-sentence connectivity acknowledgement containing the token CONNECTION_OK. Do not use tools.",
+    "--output-format",
+    "text",
+    "--print-timeout",
+    "5m"
+  ],
+  "version": "1.1.11",
+  "executable_path": "/opt/homebrew/bin/agy"
+}

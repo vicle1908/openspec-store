@@ -1,0 +1,145 @@
+{
+  "generated_utc": null,
+  "mode": "check",
+  "source_root": ".hermes/skills",
+  "install_root": "~/.hermes/skills",
+  "backup_root": null,
+  "records": [
+    {
+      "relative_path": "autonomous-ai-agents/antigravity/SKILL.md",
+      "source_sha256": "6b512b3fe3db4e72fff69678c9227c6226f4aa93c015e8584db9a7a0b1e3d8b3",
+      "installed_before_sha256": "6b512b3fe3db4e72fff69678c9227c6226f4aa93c015e8584db9a7a0b1e3d8b3",
+      "installed_after_sha256": "6b512b3fe3db4e72fff69678c9227c6226f4aa93c015e8584db9a7a0b1e3d8b3",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "autonomous-ai-agents/claude-code/SKILL.md",
+      "source_sha256": "60014cd5ef4195842c1f4a8284b3838b6378e1bb1e41356e12cf9b516df502ae",
+      "installed_before_sha256": "60014cd5ef4195842c1f4a8284b3838b6378e1bb1e41356e12cf9b516df502ae",
+      "installed_after_sha256": "60014cd5ef4195842c1f4a8284b3838b6378e1bb1e41356e12cf9b516df502ae",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "autonomous-ai-agents/codex/SKILL.md",
+      "source_sha256": "fdb0e88776c6ed67ff2f54a087d5d5b7511a7450956f8f2ac2f1d61ba792d345",
+      "installed_before_sha256": "fdb0e88776c6ed67ff2f54a087d5d5b7511a7450956f8f2ac2f1d61ba792d345",
+      "installed_after_sha256": "fdb0e88776c6ed67ff2f54a087d5d5b7511a7450956f8f2ac2f1d61ba792d345",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "autonomous-ai-agents/goose/SKILL.md",
+      "source_sha256": "89f7ee0c31cfa7d8671e16724d99f10923c73410df05c3de7df66723e9a05e11",
+      "installed_before_sha256": "89f7ee0c31cfa7d8671e16724d99f10923c73410df05c3de7df66723e9a05e11",
+      "installed_after_sha256": "89f7ee0c31cfa7d8671e16724d99f10923c73410df05c3de7df66723e9a05e11",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "autonomous-ai-agents/kimi-code/SKILL.md",
+      "source_sha256": "5faad8485fc53cc2cb2b33f164b12472446d44f71d3104118c43e83fbb1b8037",
+      "installed_before_sha256": "5faad8485fc53cc2cb2b33f164b12472446d44f71d3104118c43e83fbb1b8037",
+      "installed_after_sha256": "5faad8485fc53cc2cb2b33f164b12472446d44f71d3104118c43e83fbb1b8037",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "autonomous-ai-agents/opencode/SKILL.md",
+      "source_sha256": "af5c436da4c83c0c9e1dafb07f7fa0eead24289e67c262306d3dd3990af3da15",
+      "installed_before_sha256": "af5c436da4c83c0c9e1dafb07f7fa0eead24289e67c262306d3dd3990af3da15",
+      "installed_after_sha256": "af5c436da4c83c0c9e1dafb07f7fa0eead24289e67c262306d3dd3990af3da15",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "autonomous-ai-agents/pi/SKILL.md",
+      "source_sha256": "e342598ed63c0083f14378d489fd5a1af1d543a742c5651d29af12b3db4f12f0",
+      "installed_before_sha256": "e342598ed63c0083f14378d489fd5a1af1d543a742c5651d29af12b3db4f12f0",
+      "installed_after_sha256": "e342598ed63c0083f14378d489fd5a1af1d543a742c5651d29af12b3db4f12f0",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "software-development/coding-agent-capability-verification/SKILL.md",
+      "source_sha256": "48b1d6e63d6cf50bc23161fc6eba0e8ce01db8574499a429343ae3c509233e33",
+      "installed_before_sha256": "48b1d6e63d6cf50bc23161fc6eba0e8ce01db8574499a429343ae3c509233e33",
+      "installed_after_sha256": "48b1d6e63d6cf50bc23161fc6eba0e8ce01db8574499a429343ae3c509233e33",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "software-development/coding-agent-capability-verification/references/headless-probes.md",
+      "source_sha256": "b305ad164ed47fb2a7947e346e88f75eb8726484d8a26712236445728a2e721c",
+      "installed_before_sha256": "b305ad164ed47fb2a7947e346e88f75eb8726484d8a26712236445728a2e721c",
+      "installed_after_sha256": "b305ad164ed47fb2a7947e346e88f75eb8726484d8a26712236445728a2e721c",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "software-development/coding-agent-capability-verification/references/multi-agent-review-patterns.md",
+      "source_sha256": "3eeadaf5781bea715aff15fbfdfb424e5694010880cca18a8aeb4ee52e59bec9",
+      "installed_before_sha256": "3eeadaf5781bea715aff15fbfdfb424e5694010880cca18a8aeb4ee52e59bec9",
+      "installed_after_sha256": "3eeadaf5781bea715aff15fbfdfb424e5694010880cca18a8aeb4ee52e59bec9",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "software-development/multi-provider-review-orchestration/SKILL.md",
+      "source_sha256": "ed2bddcb428f2f59be38f054c13a9c37cdce322ce2d50de80bc1f452a565e59b",
+      "installed_before_sha256": "ed2bddcb428f2f59be38f054c13a9c37cdce322ce2d50de80bc1f452a565e59b",
+      "installed_after_sha256": "ed2bddcb428f2f59be38f054c13a9c37cdce322ce2d50de80bc1f452a565e59b",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "software-development/openspec-workflow/SKILL.md",
+      "source_sha256": "695bf9f893a2863992aa0858242321f156bc203cbd0a0f9a852aa984b88a73fd",
+      "installed_before_sha256": "695bf9f893a2863992aa0858242321f156bc203cbd0a0f9a852aa984b88a73fd",
+      "installed_after_sha256": "695bf9f893a2863992aa0858242321f156bc203cbd0a0f9a852aa984b88a73fd",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "software-development/openspec-workflow/references/5provider-review.md",
+      "source_sha256": "3fc715feb0a267ae15d0a9f39feea0bf59c8f81925874f93afada67117c37a67",
+      "installed_before_sha256": "3fc715feb0a267ae15d0a9f39feea0bf59c8f81925874f93afada67117c37a67",
+      "installed_after_sha256": "3fc715feb0a267ae15d0a9f39feea0bf59c8f81925874f93afada67117c37a67",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "software-development/openspec-workflow/references/cli-based-review-workflow.md",
+      "source_sha256": "f6f4a370fa1748bc2ae1e7c9300a7cc1ea4baa7be1bdf8236feaee735b3c4e2b",
+      "installed_before_sha256": "f6f4a370fa1748bc2ae1e7c9300a7cc1ea4baa7be1bdf8236feaee735b3c4e2b",
+      "installed_after_sha256": "f6f4a370fa1748bc2ae1e7c9300a7cc1ea4baa7be1bdf8236feaee735b3c4e2b",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "software-development/openspec-workflow/references/cli-review-troubleshooting.md",
+      "source_sha256": "05b04e9f975c5ffab253e1071060789cade132d085d0701b5a8e53ae66278bda",
+      "installed_before_sha256": "05b04e9f975c5ffab253e1071060789cade132d085d0701b5a8e53ae66278bda",
+      "installed_after_sha256": "05b04e9f975c5ffab253e1071060789cade132d085d0701b5a8e53ae66278bda",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "software-development/openspec-workflow/references/five-provider-review-orchestration.md",
+      "source_sha256": "df76624f15879a11cfea7ff0f058982060be2d084f2aaf0fb14304c70840b38f",
+      "installed_before_sha256": "df76624f15879a11cfea7ff0f058982060be2d084f2aaf0fb14304c70840b38f",
+      "installed_after_sha256": "df76624f15879a11cfea7ff0f058982060be2d084f2aaf0fb14304c70840b38f",
+      "matched_after": true,
+      "applied": false
+    },
+    {
+      "relative_path": "software-development/openspec-workflow/references/five-provider-review-research.md",
+      "source_sha256": "559a81b5725eca4256f066d7f44f74d0d89bb310637d581171662b886ceb2382",
+      "installed_before_sha256": "559a81b5725eca4256f066d7f44f74d0d89bb310637d581171662b886ceb2382",
+      "installed_after_sha256": "559a81b5725eca4256f066d7f44f74d0d89bb310637d581171662b886ceb2382",
+      "matched_after": true,
+      "applied": false
+    }
+  ]
+}

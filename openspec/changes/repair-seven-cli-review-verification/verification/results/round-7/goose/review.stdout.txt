@@ -1,0 +1,3 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+FINDINGS: The workflow is broadly consistent, but “If smoke fails, review is skipped” is ambiguous about whether only that CLI’s review or every review in the round is skipped, while the batch rules require sibling and later batches to continue. The contract also uses `PASS` for smoke probes without defining the smoke-status parser or its mapping to the distinct non-passing statuses.
+RECOMMENDATIONS: State explicitly that a failed smoke probe skips only its corresponding review while all other scheduled CLIs continue, and define the smoke result schema, parser, and status mapping.

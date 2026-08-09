@@ -1,0 +1,25 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+
+FINDINGS:
+- “Configured default model and provider” is not independently verifiable. Environment variables, user configuration, aliases, or inherited settings could silently change the effective model or provider while still appearing to use the default invocation.
+- The contract does not define the semantic result state machine. It is unclear how malformed, truncated, empty, contradictory, or partially emitted responses are classified when the process exits successfully or unsuccessfully.
+- “True process exit code” is undefined for timeouts, signals, forced termination, launcher failures, and processes that spawn descendants. A wrapper or shell could also obscure the reviewer’s actual status.
+- Runtime safety limits are not concrete. No required host timeout, output-size limit, memory/CPU limit, descendant cleanup policy, network policy, or credential-isolation rule is specified.
+- The batching rule is ambiguous about whether Pi must be isolated from all other reviewers or merely prevented from running concurrently with another Pi process. Failure and timeout behavior within a batch is also unspecified.
+- Exact non-secret argument retention requires a defined redaction and secret-detection policy. Without one, retaining the exact arguments may leak credentials, endpoints, or sensitive fixture content; redaction also means the retained record is no longer literally exact.
+- The fixture-lifecycle requirement does not specify how availability is proven, how cleanup is deferred after failures, or how leaked processes are prevented from accessing stale or deleted fixture data.
+- “Recognizable verdict” and “substantive findings and recommendations” lack measurable acceptance criteria, making cross-reviewer evidence difficult to compare.
+- Version capture is underspecified, especially when a reviewer is unavailable, exits before reporting its version, or changes version during the test.
+- The canonical source, checksum algorithm, verification point, and failure behavior for installed skill edits are not defined.
+
+RECOMMENDATIONS:
+- Define a hermetic configuration policy and record the effective model, provider, endpoint source, and relevant configuration fingerprint without recording secrets. Fail the review when the effective configuration cannot be established.
+- Specify a result schema and finite state machine covering running, completed, failed, timed out, terminated, malformed, and unparsed states. Require both process-status and output-semantic classifications.
+- Capture child status directly, record signal and timeout termination separately from ordinary exit status, and retain launcher-versus-child failure information. Enforce descendant cleanup.
+- Set explicit per-reviewer timeouts and output/resource limits, isolate credentials and network access according to policy, and define fail-closed behavior for violations.
+- State the scheduling invariant precisely: maximum concurrent reviewers, Pi’s allowed concurrency, queue behavior, and what happens when one member of a batch fails or exceeds its timeout.
+- Define a redaction policy before argument capture, prohibit secrets in prompts and fixture data, and retain a verifiable non-secret representation such as a canonicalized record plus hash.
+- Make the fixture immutable and reference-counted until every child has terminated and every result has reached a terminal parsed state; test cleanup after success, failure, timeout, and cancellation.
+- Define the required verdict vocabulary, minimum finding and recommendation substance, parser behavior for malformed output, and acceptance tests for every status/output combination.
+- Specify version provenance and an explicit unavailable value, rather than treating a missing version as successful capture.
+- Pin each installed skill edit to a tracked canonical source, document the checksum algorithm and expected value, verify before installation and during review, and fail closed on drift.

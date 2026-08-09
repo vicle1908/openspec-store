@@ -1,0 +1,11 @@
+{
+  "surface": "~/.pi/agent/mcp.json",
+  "change": "mcpServers.mcp-router.directTools: true -> false",
+  "reason": "77 direct tools kept bounded headless Pi processes alive after valid output",
+  "provider_model_changed": false,
+  "backup_path": "~/.pi/agent/backups/mcp.json.before-repair-seven-cli-20260809",
+  "backup_mode": "0600",
+  "config_mode": "0o600",
+  "post_change_sha256": "093bfd4b697bee4e337fcbc93c17d32de38b06a734a1457a3577cd38d19d4650",
+  "secret_values_retained_in_evidence": false
+}

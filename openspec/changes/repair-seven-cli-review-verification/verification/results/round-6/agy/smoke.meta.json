@@ -1,0 +1,44 @@
+{
+  "argv": [
+    "agy",
+    "-p",
+    "<PROMPT bytes=64 sha256=6fa2f422df4cad9c451ad3e26f425bb27117918e111556eac9578ddc7da7ae7e>",
+    "--output-format",
+    "text",
+    "--print-timeout",
+    "5m"
+  ],
+  "cli": "agy",
+  "default_assurance": "NO_OVERRIDE_SUPPLIED",
+  "elapsed_ms": 9534.72,
+  "executable": {
+    "path": "/opt/homebrew/bin/agy",
+    "sha256": "198ff7c3f6d173daa510b0814aa70c6ce14c94035bcd4707a3c0e79fa38a7bc3",
+    "size": 169718336
+  },
+  "finished_utc": "2026-08-09T07:18:07.763311Z",
+  "output_limited": false,
+  "parser_version": "seven-cli-parser/v1",
+  "probe": "smoke",
+  "prompt_bytes": 64,
+  "prompt_sha256": "6fa2f422df4cad9c451ad3e26f425bb27117918e111556eac9578ddc7da7ae7e",
+  "raw_stderr_bytes": 0,
+  "raw_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "raw_stdout_bytes": 86,
+  "raw_stdout_sha256": "f1cdef7d1714be83453eb7369d398eef312cc2cd5472c7418776d1b853d1ea80",
+  "return_code": 0,
+  "schema": "seven-cli-evidence/v1",
+  "secret_hits": 0,
+  "signal": null,
+  "started_utc": "2026-08-09T07:17:58.228138Z",
+  "status": "PASS",
+  "termination_stage": null,
+  "timed_out": false,
+  "timeout_seconds": 300,
+  "version": {
+    "exit_code": 0,
+    "sha256": "75fe54d226c17e2ffce72aca63fa1e5066db0d41560e8b6dd746b2361b82574e",
+    "text": "1.1.11"
+  },
+  "working_directory": "/Users/androidteam/Developer/.worktrees/openspec-repair-seven-cli-review/openspec/changes/repair-seven-cli-review-verification/verification"
+}

@@ -1,0 +1,37 @@
+## VERDICT: APPROVE_WITH_CONDITIONS
+
+## FINDINGS
+
+1. **Ambiguous batch topology with Pi serial constraint.** Requirement 7 states batches of no more than three, with Pi serially. The contract does not specify whether Pi occupies a batch slot (batch-of-1) or runs as a dedicated phase between two batches of three. With seven CLIs, the two interpretations yield different concurrency models and failure isolation boundaries. Neither is forbidden, which means implementers may diverge.
+
+2. **Undefined "recognizable verdict" vocabulary.** Requirement 4 mandates a "recognizable verdict" and the fixture itself uses `VERDICT:` / `FINDINGS:` / `RECOMMENDATIONS:` labels. However, the contract never specifies that each CLI's raw output must contain those exact labels. Different CLIs may naturally produce prose like "Overall assessment: Approved" or "Summary: Changes look good." Without a mandated label contract, downstream parsing becomes fragile and CLI-specific.
+
+3. **Undefined "compact embedded context."** Requirement 3 says reviewers "review a compact embedded context" but provides no format, size bound, or structure for that context. "Compact" is subjective across CLIs that may have very different token windows. There is no acceptance criterion for what constitutes a context that is compact enough.
+
+4. **"Installed skill edits" evidence requirement is orphaned.** Evidence requirement 5 states "Installed skill edits MUST have a tracked canonical source and checksum verification." This requirement has no corresponding step in the seven reviewer requirements or invocation spec. Nothing else in the contract discusses skill installation or editing, making this requirement unverifiable within the contract's own scope.
+
+5. **No timeout policy or timeout-failure classification.** The invocation list references "host timeout" as an allowed runtime control, but no default timeout is specified and no rule defines how a timeout is classified — exit-code semantics vs. output semantics vs. process-status classification diverge when a CLI is killed by timeout. Requirement 6 ("classified by output semantics as well as process status") would produce conflicting signals in this case.
+
+6. **Process exit-code semantic gap is unaddressed.** Some CLIs may exit 0 even when the review content expresses rejection (the review itself is data, not an error). The contract requires retaining the "true process exit code" (requirement 5) and classifying by "output semantics as well as process status" (requirement 6) but provides no rule for resolving the conflict when exit code and output content disagree.
+
+7. **No retry or failure-mode guidance.** The contract is silent on CLI crashes, missing executables, API authentication failures at runtime, or partial output. There is no specification for whether a failed invocation is retried, reported as an error, or skipped.
+
+8. **No stderr treatment policy.** Requirement 5 requires retaining stderr, but no rule distinguishes diagnostic stderr (e.g., deprecation warnings) from actionable stderr (e.g., authentication errors that explain a non-zero exit). Downstream consumers cannot reliably interpret stderr without classification guidance.
+
+## RECOMMENDATIONS
+
+1. **Pin the batch topology.** State explicitly that Pi occupies a dedicated batch-of-1 phase and that the remaining six CLIs are grouped into two batches of three. This removes ambiguity and gives implementers a single scheduling contract.
+
+2. **Mandate output label format.** Require that each CLI prompt instruct the agent to emit the three exact labels (`VERDICT:`, `FINDINGS:`, `RECOMMENDATIONS:`) on their own lines, with a regex or simple line-prefix matcher specified for extraction. This makes parsing uniform across CLIs.
+
+3. **Define context format and bounds.** Specify the embedded context as a code block within the prompt, state a maximum token count (or line count) and a minimum completeness threshold (e.g., must include the relevant spec delta, the changed files, and the review prompt template).
+
+4. **Remove or relocate the orphaned skill-edit evidence requirement.** Either fold it into a separate skill-management contract where its scope is defined, or delete it from this fixture to keep the contract self-contained.
+
+5. **Specify a default timeout and timeout classification.** Define a host-level default (e.g., 300 seconds per CLI) and a rule: timeout produces process-status `TIMEOUT`, output-verdict `UNPARSEABLE`, and the invocation is classified as a hard failure regardless of exit code.
+
+6. **Define exit-code/content disagreement resolution.** State that output-verdict classification takes precedence over process exit code for review semantics, but a non-zero exit code always surfaces as a warning regardless of the parsed verdict. This gives downstream consumers a clear priority order.
+
+7. **Add failure-mode handling.** Specify at minimum: missing-executable → skip with error record; crash or signal → retain exit code and stderr, mark invocation `FAILED`; API auth error detected in stderr → mark `AUTH_FAILURE` and do not retry.
+
+8. **Classify stderr into diagnostic vs. actionable.** Define a small allowlist of known diagnostic patterns (deprecation warnings, version notices) that do not affect classification, and treat everything else as actionable and surfaced in the result record.

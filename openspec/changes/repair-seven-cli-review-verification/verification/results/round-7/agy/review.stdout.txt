@@ -1,0 +1,7 @@
+VERDICT: APPROVE
+
+FINDINGS:
+none
+
+RECOMMENDATIONS:
+Ensure that execution logs and stderr output from each agent run are automatically archived to simplify root-cause analysis when any capability check fails.

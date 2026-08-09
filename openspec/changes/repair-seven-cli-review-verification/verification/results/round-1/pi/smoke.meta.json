@@ -1,0 +1,15 @@
+{
+  "started_utc": "2026-08-09T06:14:12.412204Z",
+  "finished_utc": "2026-08-09T06:19:12.472145Z",
+  "duration_seconds": 300.055,
+  "timed_out": true,
+  "exit_code": null,
+  "status": "TIMEOUT",
+  "argv": [
+    "pi",
+    "-p",
+    "Provide a one-sentence connectivity acknowledgement containing the token CONNECTION_OK. Do not use tools."
+  ],
+  "version": "0.84.1",
+  "executable_path": "/opt/homebrew/bin/pi"
+}

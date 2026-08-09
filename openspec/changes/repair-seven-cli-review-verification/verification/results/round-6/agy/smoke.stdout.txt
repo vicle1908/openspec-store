@@ -1,0 +1,1 @@
+The network diagnostic test completed successfully and returned status CONNECTION_OK.

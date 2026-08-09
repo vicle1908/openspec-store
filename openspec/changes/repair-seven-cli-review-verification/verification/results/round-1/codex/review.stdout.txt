@@ -1,0 +1,91 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+
+FINDINGS:
+
+1. The contract is directionally consistent, but “configured default model and provider” is not independently verifiable from the process version, arguments, and output. Environment variables, user configuration, workspace configuration, aliases, wrappers, routing layers, and provider-side defaults may change the effective model or provider without appearing in the recorded invocation.
+
+2. “Receive no model, provider, endpoint, API-key, or reasoning override” is ambiguous. It could mean that the workflow must not inject overrides, or that no such settings may be inherited from the execution environment. The former is practical; the latter conflicts with authenticated execution and configured defaults unless inherited configuration is explicitly distinguished from workflow-supplied overrides.
+
+3. Retaining the “exact non-secret argv” is internally ambiguous. An argument vector containing the embedded context may include source code, paths, issue data, personal information, credentials, or other sensitive content. Redaction makes the retained value no longer exact, while exact retention may violate the non-secret requirement.
+
+4. Embedding the complete context in the process arguments can expose it through process inspection, diagnostics, crash reports, shell tracing, and orchestration logs. The contract does not define what information is permitted in that context or require pre-execution secret scanning and minimization.
+
+5. “Recognizable verdict,” “substantive findings,” and “recommendations” lack objective parsing and acceptance criteria. A result parser cannot reliably distinguish valid output from headings echoed from the prompt, empty boilerplate, malformed sections, contradictory verdicts, or commentary that merely claims completion.
+
+6. Process success and review outcome are not clearly separated. A reviewer may execute successfully and return a negative review verdict; conversely, a failed or timed-out process might print a verdict before termination. These states require separate execution, parsing, and review-result classifications.
+
+7. The required classification “by output semantics as well as process status” does not define the classification state machine. At minimum, timeout, launch failure, nonzero exit, signal termination, empty output, malformed output, parsed negative verdict, parsed conditional verdict, and parsed approval need distinct treatment.
+
+8. “True process exit code” is incomplete for processes terminated by a signal or host timeout. In those cases, the evidence must preserve termination cause and signal information rather than presenting a synthesized wrapper status as the child’s true exit code.
+
+9. Shell filtering after status capture protects the exit code, but it does not by itself guarantee evidence integrity. Output pipelines, merged streams, temporary files, buffering, truncation, encoding conversion, wrapper failures, and post-processing errors can still alter or misattribute evidence.
+
+10. The stdout and stderr requirements do not specify whether streams must remain separate, how ordering is represented, whether bytes or normalized text are retained, or whether output may be truncated. Without those rules, exact reproduction and comparison are not guaranteed.
+
+11. Duration lacks a defined clock, precision, and boundary. It is unclear whether duration covers only the child process or also setup, provider initialization, teardown, output draining, and parsing.
+
+12. Version evidence is underspecified. The contract does not define how an unavailable, malformed, misleading, or wrapper-provided version is handled, nor how the executable identity and resolved binary are tied to the recorded version.
+
+13. Batch size is clear, but “Pi serially” is ambiguous: it could mean only one Pi process at a time, Pi must run alone with no other reviewer concurrently, or Pi must run after all other reviewers. Those interpretations have different resource-safety properties.
+
+14. The shared-fixture lifetime requirement does not define ownership, cleanup conditions, crash recovery, or how processes are prevented from reading a partially written or prematurely replaced fixture.
+
+15. The contract does not specify isolation between reviewers. Concurrent processes may mutate shared configuration, session state, caches, repositories, authentication state, or fixture files and thereby contaminate one another’s results.
+
+16. There are no explicit network, filesystem, repository-write, subprocess, or tool-use boundaries for reviewers. A review prompt can contain untrusted content, and an external coding agent may interpret that content as instructions to inspect or modify resources beyond the fixture.
+
+17. Host timeout is permitted, but no timeout value, termination sequence, output-drain behavior, cleanup procedure, or timeout classification is defined. A timed-out process could leave descendants, locks, sessions, or partial writes behind.
+
+18. Retry behavior is unspecified. Automatic retries could produce multiple conflicting results, change provider-side defaults, incur additional cost, or conceal a first-attempt failure unless every attempt is retained and the selection rule is explicit.
+
+19. The contract does not define a completion rule for the overall seven-reviewer run. “Pending or unparsed results must not be marked complete” is necessary but does not state whether one failed reviewer fails the workflow, yields a partial result, or permits completion with an explicit incomplete status.
+
+20. Product names, executable names, providers, and model aliases are required to remain distinct, but there is no required schema or identity mapping. Free-form labels are vulnerable to accidental conflation, especially when provider routing or model aliases are discovered only at runtime.
+
+21. Installed-skill checksum verification is underspecified. The checksum algorithm, canonical manifest, trust root, expected file set, handling of generated files, and response to mismatch are not defined. A checksum only detects difference; it does not establish that the canonical source is trustworthy or authorized.
+
+22. Evidence retention has no integrity, confidentiality, access-control, retention-period, or deletion requirements. Captured arguments and output may contain proprietary code or secrets, while mutable evidence can be altered after execution.
+
+23. The contract lacks cost and rate-limit safeguards. Seven external executions, retries, provider initialization, and bounded-but-potentially-large outputs can create unexpected expense or throttling.
+
+24. The compact context is not defined canonically. If each reviewer receives differently serialized, truncated, escaped, or templated content, the results are not directly comparable even though they nominally use a shared fixture.
+
+25. No acceptance test proves that all seven configured commands correspond to the intended products rather than aliases, shell functions, wrappers, or unrelated executables with matching names.
+
+RECOMMENDATIONS:
+
+1. Define a machine-readable result schema with separate fields for execution state, parse state, and reviewer verdict. Require exactly one allowed verdict, nonempty findings, nonempty recommendations, and rejection of prompt-echo-only or contradictory output.
+
+2. Establish an explicit state machine such as pending, running, exited, timed out, launch failed, capture failed, parse failed, and completed. Reserve “completed” for a process whose execution evidence has been finalized and whose output has been successfully parsed, regardless of whether the reviewer’s substantive verdict is positive or negative.
+
+3. Clarify that the workflow itself supplies no model, provider, endpoint, credential, or reasoning overrides, while inherited configuration is allowed only from a recorded and approved baseline. Capture sanitized configuration provenance and, where the product exposes it, effective runtime model and provider identity.
+
+4. Replace “exact non-secret argv” with two artifacts: an exact protected representation subject to strict access controls, when safe and necessary, and a redacted display representation accompanied by a cryptographic digest of the original. Prefer a protected input channel over placing sensitive context in process arguments.
+
+5. Define a canonical, immutable fixture representation and record its cryptographic digest, byte length, creation time, and schema version. Give every reviewer the same bytes and keep the fixture alive until all children have terminated, all output has drained, and parsing has finished.
+
+6. Run reviewers in isolated, read-only workspaces with controlled environment inheritance, separate temporary and session directories, bounded output, restricted permissions, and an explicit prohibition on modifying repositories, shared configuration, credentials, or installed skills.
+
+7. Treat fixture content as untrusted data. Add prompt-injection resistance, secret scanning, context minimization, output sanitization, and a policy preventing reviewers from following instructions embedded in reviewed material that exceed the review scope.
+
+8. Preserve stdout and stderr separately as raw bytes, record encoding and truncation status, and optionally retain a timestamped combined event stream for ordering. Record capture and parser failures independently from the child’s termination status.
+
+9. Record monotonic start and end times, duration boundaries, timeout value, termination cause, termination signal, resolved executable identity, executable digest, version evidence, working directory, sanitized environment provenance, fixture digest, and wrapper version.
+
+10. Make the concurrency rule unambiguous: no more than three reviewer processes may run concurrently, and Pi must run alone with no other reviewer process active if its startup load is the safety concern.
+
+11. Specify timeout and cancellation behavior, including graceful termination, forced termination after a bounded grace period, descendant-process cleanup, output draining, temporary-resource cleanup, and explicit timeout classification.
+
+12. Define retry policy in advance. Preserve every attempt, prohibit silent replacement of failed evidence, cap retries and total cost, and state which attempt—if any—may supply the final semantic result.
+
+13. Define the overall workflow result: complete only when seven expected reviewer records exist and each is in a terminal, parsed state; incomplete when any reviewer is pending, missing, unparsed, or operationally failed; and successful only under an explicitly documented policy for acceptable reviewer verdicts.
+
+14. Use stable identifiers and separate schema fields for product, executable, provider, configured model alias, effective model identity, and invocation attempt. Never infer one identity field from another.
+
+15. Define canonical-source governance for installed skills: repository and revision identity, approved manifest, expected file set, checksum algorithm, signature or trust mechanism, generated-file policy, mismatch handling, and atomic installation and rollback procedures.
+
+16. Add evidence-security requirements: encryption where appropriate, least-privilege access, tamper-evident manifests, retention limits, deletion procedures, secret-redaction validation, and audit logging.
+
+17. Add deterministic fixture tests and parser tests covering approval, conditional approval, rejection, malformed output, duplicate verdicts, prompt echo, empty sections, nonzero exit, timeout, signal termination, output truncation, invalid encoding, and mixed stdout/stderr.
+
+18. Require a final evidence manifest that enumerates all seven reviewers and cryptographically binds each reviewer’s identity, fixture, executable, captured streams, execution metadata, parser result, and substantive verdict.

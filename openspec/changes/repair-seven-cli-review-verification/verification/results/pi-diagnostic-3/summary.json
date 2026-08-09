@@ -1,0 +1,18 @@
+{
+  "round": "pi-diagnostic-3",
+  "generated_utc": "2026-08-09T06:45:50.137482Z",
+  "fixture_path": "/Users/androidteam/Developer/.worktrees/openspec-repair-seven-cli-review/openspec/changes/repair-seven-cli-review-verification/verification/review-context.md",
+  "fixture_sha256": "c95f3c64e91d01ada755b7c4807bf4dddf872f1f47ad84fb188642ac32b072bd",
+  "results": [
+    {
+      "cli": "pi",
+      "version": "0.84.1",
+      "executable_path": "/opt/homebrew/bin/pi",
+      "smoke_status": "PASS",
+      "review_status": "PASS_WITH_FINDINGS",
+      "verdict": "APPROVE_WITH_CONDITIONS",
+      "review_exit_code": 0,
+      "review_duration_seconds": 25.364
+    }
+  ]
+}

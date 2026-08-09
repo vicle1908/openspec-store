@@ -1,0 +1,44 @@
+{
+  "argv": [
+    "kimi",
+    "-p",
+    "<PROMPT bytes=3620 sha256=803664e59a2112a52bbb7e2cce7723cda91498cd82b0df633585e2d0a49c0ba3>",
+    "--output-format",
+    "text"
+  ],
+  "cli": "kimi",
+  "default_assurance": "NO_OVERRIDE_SUPPLIED",
+  "elapsed_ms": 38496.321,
+  "executable": {
+    "path": "/opt/homebrew/Cellar/kimi-code/0.34.0/libexec/lib/node_modules/@moonshot-ai/kimi-code/dist/main.mjs",
+    "sha256": "984b350101c75ce8e84134443811de9df2c91b47f4b4bd1bb8dc95894b224d52",
+    "size": 21607876
+  },
+  "finished_utc": "2026-08-09T07:22:59.017638Z",
+  "fixture_sha256": "a5a8551417c662a4dfda064bd885d5cfd1d1729c3daa08685b1e2f50cc45b472",
+  "output_limited": false,
+  "parser_version": "seven-cli-parser/v1",
+  "probe": "review",
+  "prompt_bytes": 3620,
+  "prompt_sha256": "803664e59a2112a52bbb7e2cce7723cda91498cd82b0df633585e2d0a49c0ba3",
+  "raw_stderr_bytes": 10607,
+  "raw_stderr_sha256": "8843e41eb3a3a9bb9e1bd845127abc340e1b954c33dde09364fad91b78e3c4b1",
+  "raw_stdout_bytes": 246,
+  "raw_stdout_sha256": "a77f15f9becb5761d25428dff217e627be10ce6c2547b244663273572fa4ce91",
+  "return_code": 0,
+  "schema": "seven-cli-evidence/v1",
+  "secret_hits": 0,
+  "signal": null,
+  "started_utc": "2026-08-09T07:22:20.519910Z",
+  "status": "PASS",
+  "termination_stage": null,
+  "timed_out": false,
+  "timeout_seconds": 600,
+  "verdict": "APPROVE",
+  "version": {
+    "exit_code": 0,
+    "sha256": "a341550457891be148045ef7560e7499da6063d012ce8163bf6e6db2f08d2466",
+    "text": "0.34.0"
+  },
+  "working_directory": "/Users/androidteam/Developer/.worktrees/openspec-repair-seven-cli-review/openspec/changes/repair-seven-cli-review-verification/verification"
+}

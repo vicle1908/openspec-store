@@ -1,0 +1,5 @@
+kimi version 0.34.0
+• The user wants a single sentence that contains the word "CONNECTION_OK" and they explicitly said "Do not use tools."
+  Therefore, I will generate a sentence with "CONNECTION_OK" in it without using any tools.
+
+To resume this session: kimi -r session_f93be4de-bce5-481c-bea3-2867e6d048d7

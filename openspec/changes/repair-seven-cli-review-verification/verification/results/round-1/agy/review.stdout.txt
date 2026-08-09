@@ -1,0 +1,13 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+
+FINDINGS:
+1. **Unanchored Skill Edit Requirement**: The evidence requirements mandate tracked canonical sources and checksum verification for "installed skill edits," but the core workflow contract defines a read-only review of embedded context. This introduces an unanchored acceptance criterion without defining what skill edits take place or how they interact with test execution.
+2. **Unresolved Status vs. Semantics Parsing Conflicts**: Requirement 6 mandates classifying runs by output semantics as well as process status, but lacks rules for resolving conflicting signals (e.g., exit status 0 with malformed/unparseable verdict text, or non-zero exit status accompanied by complete output).
+3. **Batch Scheduling and Isolation Ambiguities**: Requirement 7 specifies running in batches of no more than three with Pi running serially. The contract leaves execution order, batch completion synchronization, and cross-process failure isolation undefined across the parallel and serial phases.
+4. **Implicit Credential & Readiness Assumptions**: Requirement 2 forbids API-key, endpoint, and provider overrides to ensure default-model testing. However, there is no explicit pre-flight check required to verify that ambient system credentials and configuration for all seven providers are valid before execution begins.
+
+RECOMMENDATIONS:
+1. **Scope Skill Verification**: Clarify whether skill edits are part of this test suite; if reviews are read-only, restrict checksum and canonical source tracking to fixture context files and runner configurations.
+2. **Define Discrepancy Resolution Protocol**: Add explicit criteria governing how output parsing failures and process exit codes are reconciled (e.g., requiring both process exit code 0 and valid semantic verdict parsing for a run to be classified as complete/successful).
+3. **Formalize Concurrency & Execution Ordering**: Specify explicit batch boundaries, execution sequence (e.g., serial Pi execution relative to batched groups), and timeout/cancellation scoping to prevent cascading failures across concurrent processes.
+4. **Add Pre-flight Environment Validation**: Define a pre-execution validation step that verifies CLI environment readiness and default credential availability without applying runtime overrides.

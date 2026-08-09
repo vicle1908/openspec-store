@@ -1,0 +1,42 @@
+{
+  "argv": [
+    "opencode",
+    "run",
+    "<PROMPT bytes=3620 sha256=803664e59a2112a52bbb7e2cce7723cda91498cd82b0df633585e2d0a49c0ba3>"
+  ],
+  "cli": "opencode",
+  "default_assurance": "NO_OVERRIDE_SUPPLIED",
+  "elapsed_ms": 37646.836,
+  "executable": {
+    "path": "/Users/androidteam/.npm-global/lib/node_modules/opencode-ai/bin/opencode.exe",
+    "sha256": "195d811a91508d856a4d67b77d04d410193b194cf509e0ee85d45cb0fa572a11",
+    "size": 143133026
+  },
+  "finished_utc": "2026-08-09T07:20:04.185139Z",
+  "fixture_sha256": "a5a8551417c662a4dfda064bd885d5cfd1d1729c3daa08685b1e2f50cc45b472",
+  "output_limited": false,
+  "parser_version": "seven-cli-parser/v1",
+  "probe": "review",
+  "prompt_bytes": 3620,
+  "prompt_sha256": "803664e59a2112a52bbb7e2cce7723cda91498cd82b0df633585e2d0a49c0ba3",
+  "raw_stderr_bytes": 29,
+  "raw_stderr_sha256": "d395917d0d5ef2a8b73496d2d2dc3911e3be7c8cba128c8f35ca664f1c950e75",
+  "raw_stdout_bytes": 158,
+  "raw_stdout_sha256": "81796fe09e7edc27b90972dfc2d36e2b1b03773631d0b846f9d85449f1372752",
+  "return_code": 0,
+  "schema": "seven-cli-evidence/v1",
+  "secret_hits": 0,
+  "signal": null,
+  "started_utc": "2026-08-09T07:19:26.537763Z",
+  "status": "PASS",
+  "termination_stage": null,
+  "timed_out": false,
+  "timeout_seconds": 600,
+  "verdict": "APPROVE",
+  "version": {
+    "exit_code": 0,
+    "sha256": "7a273794178c3c8b72b9bcd73c9de2d6f41e064eeea2180a82093d431ee09cbe",
+    "text": "1.18.15"
+  },
+  "working_directory": "/Users/androidteam/Developer/.worktrees/openspec-repair-seven-cli-review/openspec/changes/repair-seven-cli-review-verification/verification"
+}

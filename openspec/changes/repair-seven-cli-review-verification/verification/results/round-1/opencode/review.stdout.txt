@@ -1,0 +1,24 @@
+VERDICT: APPROVE_WITH_CONDITIONS
+
+FINDINGS:
+
+1. **No timeout definition for child processes.** Requirement 7 bounds batch concurrency and Pi serialization, and the contract allows a "host timeout" runtime control, but no child-level timeout is specified. A hung CLI could block the entire batch indefinitely. The contract acknowledges the host timeout is "allowed" but never requires or bounds it.
+
+2. **No failure/missing-CLI policy.** If a CLI is not installed, returns a non-zero exit that is not interpretable, or the shared fixture is torn down before its output is captured, the contract provides no recovery path or classification for that outcome. Requirement 5 retains exit codes but the contract never defines what happens when an exit code makes the verdict unparseable.
+
+3. **"Exact non-secret argv" is under-specified.** The contract requires retention of argv but does not define what filtering is applied. If the prompt itself contains sensitive text and is part of argv (as it is in all seven invocations shown), the distinction between "non-secret" and "secret" is undefined, creating a compliance gap.
+
+4. **Requirement 6 "output semantics" categories are unnamed.** The contract requires classification by output semantics but never enumerates the semantic categories (e.g., pass/fail/inconclusive/error). Without a defined taxonomy, classification is subjective and untestable.
+
+5. **Batch-of-three composition is unspecified.** "Batches of no more than three, with Pi serially" does not say whether Pi occupies a batch slot or runs in its own batch. The total of seven CLIs means the remainder (four CLIs after Pi) divides into batches of three and one — but the contract is silent on ordering and whether the remainder batch can overlap Pi's serial run.
+
+6. **Installed-skill checksum verification is disconnected.** The final evidence requirement about tracked canonical sources and checksums for installed skill edits has no corresponding acceptance criterion or failure mode. It is unclear how this interacts with the rest of the workflow or whether a checksum mismatch blocks the verdict.
+
+RECOMMENDATIONS:
+
+- Add an explicit per-child timeout (e.g., 120 seconds) with a defined failure classification (timeout → INCONCLUSIVE).
+- Define the output-semantics taxonomy: at minimum PASS, FAIL, INCONCLUSIVE, ERROR.
+- Specify that Pi occupies its own batch of one, and the remaining four CLIs run in two batches of two.
+- Define argv sanitization: strip or hash the prompt portion of argv, retain all flags.
+- Add a missing-CLI policy: absent executable → skip with ERROR classification and zero duration.
+- Bind the installed-skill checksum requirement to a specific verification step with a blocking failure mode.

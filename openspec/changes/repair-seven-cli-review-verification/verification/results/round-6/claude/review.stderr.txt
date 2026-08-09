@@ -1,0 +1,1 @@
+SessionEnd hook [node "/Users/androidteam/.npm-global/lib/node_modules/@agentmemory/agentmemory/plugin/scripts/session-end.mjs"] failed: Hook cancelled

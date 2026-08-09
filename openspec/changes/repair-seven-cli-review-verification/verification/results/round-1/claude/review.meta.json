@@ -1,0 +1,24 @@
+{
+  "started_utc": "2026-08-09T06:12:17.093132Z",
+  "finished_utc": "2026-08-09T06:12:52.454868Z",
+  "duration_seconds": 35.361,
+  "timed_out": false,
+  "exit_code": 0,
+  "status": "PASS_WITH_FINDINGS",
+  "verdict": "APPROVE_WITH_CONDITIONS",
+  "argv": [
+    "claude",
+    "-p",
+    "Review the following workflow contract. Do not use tools or discuss CLI flags. Return the exact required VERDICT, FINDINGS, and RECOMMENDATIONS labels.\n\n# Seven-CLI Review Workflow Fixture\n\n## Intended contract\n\nThe OpenSpec review workflow supports seven external coding-agent CLIs: Claude, Codex, Antigravity (`agy`), Kimi (`kimi`), OpenCode, Pi, and Goose.\n\nEach reviewer SHALL:\n\n1. run noninteractively with its configured default model and provider;\n2. receive no model, provider, endpoint, API-key, or reasoning override;\n3. review a compact embedded context;\n4. emit a recognizable verdict plus substantive findings and recommendations;\n5. have its true process exit code, stdout, stderr, duration, version, and exact non-secret argv retained;\n6. be classified by output semantics as well as process status;\n7. run in batches of no more than three, with Pi serially because its MCP startup is heavy.\n\n## Default-model invocations under test\n\n- Claude: `claude -p PROMPT`\n- Codex: `codex exec PROMPT`\n- Antigravity: `agy -p PROMPT`\n- Kimi: `kimi -p PROMPT`\n- OpenCode: `opencode run PROMPT`\n- Pi: `pi -p PROMPT`\n- Goose: `goose run --no-session -q --max-turns 10 -t PROMPT`\n\nRuntime controls for noninteractive execution, session suppression, bounded turns, output format, and host timeout are allowed. Model/provider overrides are not.\n\n## Evidence requirements\n\n- Shell filtering MUST occur only after the child process status is captured.\n- The shared fixture MUST remain available until all processes complete and results are parsed.\n- Product names, executable names, providers, and model aliases MUST remain distinct.\n- Pending or unparsed results MUST NOT be marked complete.\n- Installed skill edits MUST have a tracked canonical source and checksum verification.\n\n## Review request\n\nReview this intended contract for internal consistency, operational safety, and evidence quality. Identify contradictions, unsafe defaults, missing acceptance criteria, or unverifiable claims.\n\nYour response MUST contain these exact section labels:\n\nVERDICT: APPROVE, APPROVE_WITH_CONDITIONS, or REJECT\nFINDINGS:\nRECOMMENDATIONS:\n\nIf no issues exist, write `FINDINGS: none` and still provide a brief recommendation.\n",
+    "--max-turns",
+    "5",
+    "--output-format",
+    "text",
+    "--no-session-persistence"
+  ],
+  "version": "2.1.226 (Claude Code)",
+  "executable_path": "/Users/androidteam/.npm-global/bin/claude",
+  "fixture_sha256": "cecf7ed576f20c9bf79c4c8727d32532194e7a82171f65b2764ed45b187ceb9d",
+  "stdout_bytes": 2641,
+  "stderr_bytes": 152
+}
