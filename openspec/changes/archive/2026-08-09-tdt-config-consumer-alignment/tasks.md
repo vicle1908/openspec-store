@@ -33,5 +33,5 @@
 - [x] Ruff passes in all three repositories.
 - [x] Strict mypy passes in all three repositories.
 - [x] Focused OpenSpec change validation passes.
-- [ ] Archive the completed change.
-- [ ] Commit the archived change and merged specification in the shared store.
+- [x] Archive the completed change.
+- [x] Commit the archived change and merged specification in the shared store.
