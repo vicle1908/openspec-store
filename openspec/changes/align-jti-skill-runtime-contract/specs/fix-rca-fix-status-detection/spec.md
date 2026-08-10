@@ -39,3 +39,11 @@ The RCA classification system SHALL have comprehensive executable test coverage 
 
 - **WHEN** the v2 RCA taxonomy tests are added
 - **THEN** existing fix-status tests for structured SCM state, QA evidence, MR text, Jira status, and worktree evidence SHALL continue to pass
+#### Scenario: All 9 RCA categories are correctly classified
+
+- **NOTE** This legacy scenario name is retained because the MODIFIED requirement must preserve the archived baseline scenario identity; it describes historical v1 taxonomy fixtures, not the v2 runtime output.
+- **WHEN** an archived v1 fixture is evaluated through its historical classifier contract
+- **THEN** the fixture SHALL cover the nine archived labels: Crash/ANR, Wrong Data, Silent Exit, UI Layout, Performance, Auth, Network, Feature Not Working, and General Polish
+- **AND** the v2 classifier SHALL instead emit only the seven concrete v2 categories plus `Other / Unclassified`, as specified above
+- **AND** empty content SHALL return `None`
+- **AND** greedy patterns SHALL NOT match false positives
