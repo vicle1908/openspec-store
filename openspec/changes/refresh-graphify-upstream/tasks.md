@@ -2,24 +2,27 @@
 
 ## 1. Baseline capture
 
-- [ ] 1.1 Record current `graphify --version` and uv tool metadata
-- [ ] 1.2 Capture per-repo graph statistics (nodes, edges, communities, graph.html size) for all 18 repos
-- [ ] 1.3 Capture skill file checksums for Hermes and Pi
-- [ ] 1.4 Capture representative query results for 3 repos (webhook-receiver, agent-core, go-microservices)
-- [ ] 1.5 Capture global graph node/edge count
-- [ ] 1.6 Capture `graph.json` top-level keys and node/edge shape for schema compatibility baseline
+- [ ] 1.1 Record current `graphify --version` and `uv tool list | grep graphify`
+- [ ] 1.2 Confirm distribution: `graphifyy==0.9.38` is PyPI latest stable (0.10.0 does NOT exist)
+- [ ] 1.3 Capture per-repo graph statistics (nodes, edges, communities, graph.html size) for all 18 repos
+- [ ] 1.4 Capture skill file checksums: Hermes (no version field in frontmatter), Pi (`.graphify_version` = 0.9.34)
+- [ ] 1.5 Snapshot installed skill files for rollback: `~/.hermes/skills/graphify/`, `~/.pi/agent/skills/graphify/`, `~/.claude/skills/graphify/`
+- [ ] 1.6 Capture representative query results for 3 repos (webhook-receiver, agent-core, go-microservices)
+- [ ] 1.7 Capture global graph node/edge count
+- [ ] 1.8 Capture `graph.json` top-level keys and node/edge shape for schema compatibility baseline
 
 ## 2. Upgrade
 
-- [ ] 2.1 Upgrade graphifyy: `uv tool install graphifyy[all,postgres]==0.9.38`
-- [ ] 2.2 Verify `graphify --version` → 0.9.38
-- [ ] 2.3 Run `graphify install --platform hermes`
-- [ ] 2.4 Run `graphify install --platform pi`
-- [ ] 2.5 Run `graphify install --platform claude`
-- [ ] 2.6 Run `graphify install --platform codex`
-- [ ] 2.7 Run `graphify install --platform opencode`
-- [ ] 2.8 Verify Hermes skill file updated (timestamp, version reference)
-- [ ] 2.9 Verify Pi skill file updated
+- [ ] 2.1 Acquire workspace lock: `shlock -f ~/.hermes/locks/graphify-build.lock || { echo "lock held"; exit 1; }`
+- [ ] 2.2 Upgrade graphifyy: `uv tool install "graphifyy[all,postgres]"==0.9.38`
+- [ ] 2.3 Verify `graphify --version` → 0.9.38
+- [ ] 2.4 Run `graphify install --platform hermes`
+- [ ] 2.5 Run `graphify install --platform pi`
+- [ ] 2.6 Run `graphify install --platform claude`
+- [ ] 2.7 Run `graphify install --platform codex`
+- [ ] 2.8 Run `graphify install --platform opencode`
+- [ ] 2.9 Verify Hermes skill updated (timestamp changed; no version field in frontmatter)
+- [ ] 2.10 Verify Pi `.graphify_version` now reads `0.9.38`
 
 ## 3. Schema compatibility check
 
@@ -36,7 +39,7 @@
 - [ ] 4.4 Compare old vs new graph statistics for go-microservices
 - [ ] 4.5 Run representative queries and compare results
 - [ ] 4.6 Review graph diff for unexpected changes
-- [ ] 4.7 Decision gate: proceed to batch or halt
+- [ ] 4.7 **Decision gate**: proceed to batch or halt. Halt if any repo shows >20% node count drop or broken query results.
 
 ## 5. Determinism verification
 
@@ -71,5 +74,6 @@
 
 - [ ] 9.1 Commit graphify-out/ in all 18 repos
 - [ ] 9.2 Verify no internal files leaked into git
-- [ ] 9.3 Run `openspec validate --all`
-- [ ] 9.4 Archive change and commit store
+- [ ] 9.3 Record exact source/artifact commits and retained evidence
+- [ ] 9.4 Run `openspec validate --all`
+- [ ] 9.5 Archive change and commit store
