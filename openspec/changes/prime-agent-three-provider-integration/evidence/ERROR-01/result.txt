@@ -1,0 +1,1 @@
+Error behavior verified: invalid auth returns error, bad model returns error

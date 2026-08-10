@@ -1,0 +1,7 @@
+prime-agent v0.7.1
+provider    model          context  max-out  thinking  images
+cockpit     gpt-5.6-luna   1M       32K      yes       no
+cockpit     gpt-5.6-sol    1M       32K      yes       no
+cockpit     gpt-5.6-terra  1M       32K      yes       no
+giaoduc     Advance        1M       32K      yes       no
+shopapikey  fable-5        1M       32K      yes       no
