@@ -16,6 +16,17 @@ MoA is a virtual provider, not an HTTP endpoint. For each advisor refresh:
 4. the aggregator writes the assistant response and owns tool calls;
 5. Hermes executes requested tools and returns results to the aggregator.
 
+## Aggregator Role Research
+
+The official Hermes guide defines the aggregator as the acting model: it receives private reference outputs, receives the normal Hermes tool schema, writes the user-visible response, and continues after tool results. The official benchmark example also uses a dedicated aggregator over references. The published MoA research recommends selecting roles using both demonstrated performance and output diversity, while noting that proposer and aggregator strengths can differ.
+
+This profile therefore assigns `shopapikey:fable-5` to the normal default aggregation path and `giaoduc:Advance` to the deep aggregation path by explicit operator choice. The research supports separating roles, but no public benchmark was found for these private provider endpoints; direct inference proves availability, not comparative answer quality.
+
+Sources:
+
+- <https://hermes-agent.nousresearch.com/docs/user-guide/features/mixture-of-agents>
+- <https://arxiv.org/html/2406.04692v1>
+
 This preserves the main prompt-cache prefix. A reference failure does not by itself abort the turn: Hermes retains the degraded result and continues when the aggregator and remaining references are available.
 
 ## Default Model Selection
@@ -36,8 +47,8 @@ moa:
 
 | Preset | References | Aggregator | Limits and cadence | Use |
 |---|---|---|---|---|
-| `default` | `shopapikey:fable-5` high; `cockpit:gpt-5.6-luna` max | `cockpit:gpt-5.6-luna` max | refs 600, output 4096, temp 0.6/0.4, `user_turn` | normal high-quality work |
-| `deep` | `shopapikey:fable-5` xhigh; `cockpit:gpt-5.6-luna` max; `giaoduc:Advance` high | `cockpit:gpt-5.6-luna` max | refs 800, output 8192, temp 0.6/0.3, `every_n:3` | difficult architecture, review, and research |
+| `default` | `shopapikey:fable-5` high; `cockpit:gpt-5.6-luna` max | `shopapikey:fable-5` max | refs 600, output 4096, temp 0.6/0.4, `user_turn` | normal high-quality work |
+| `deep` | `shopapikey:fable-5` xhigh; `cockpit:gpt-5.6-luna` max; `giaoduc:Advance` high | `giaoduc:Advance` max | refs 800, output 8192, temp 0.6/0.3, `every_n:3` | difficult architecture, review, and research |
 | `fast` | `cockpit:gpt-5.6-luna` max | `shopapikey:fable-5` high | refs 300, output 4096, temp 0.6/0.4, `user_turn` | lower-latency work |
 
 Reference calls add latency and provider usage. `user_turn` runs advisors once for the turn; `every_n:3` refreshes on the first iteration and every third tool iteration. The slowest advisor usually determines fan-out latency.
