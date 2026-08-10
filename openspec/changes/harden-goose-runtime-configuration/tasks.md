@@ -21,12 +21,12 @@
 
 ## 3. Add automation contract requirements
 
-- [ ] 3.1 Document that all noninteractive Goose invocations MUST validate `metadata.status` and content `type == "text"` — never trust exit code alone
-- [ ] 3.2 Document that `goose doctor` is model-backed and MUST NOT be used in cron or health checks
-- [ ] 3.3 Document that `-q` flag is required for machine-readable JSON output (suppresses banner prefix)
-- [ ] 3.4 Document that Shopapikey provider outputs `thinking` before `text` — content selection must filter by `type == "text"`
-- [ ] 3.5 Add workspace-wide lock requirement for config mutations: `shlock -f ~/.hermes/locks/goose-config.lock || { echo "lock held"; exit 1; }`
-- [ ] 3.6 Add credential redaction rules for all Goose-related evidence files
+- [x] 3.1 Document that all noninteractive Goose invocations MUST validate `metadata.status` and content `type == "text"` — never trust exit code alone
+- [x] 3.2 Document that `goose doctor` is model-backed and MUST NOT be used in cron or health checks
+- [x] 3.3 Document that `-q` flag is required for machine-readable JSON output (suppresses banner prefix)
+- [x] 3.4 Document that Shopapikey provider outputs `thinking` before `text` — content selection must filter by `type == "text"`
+- [x] 3.5 Add workspace-wide lock requirement for config mutations: `shlock -f ~/.hermes/locks/goose-config.lock || { echo "lock held"; exit 1; }`
+- [x] 3.6 Add credential redaction rules for all Goose-related evidence files
 
 ## 4. Apply approved mutations
 
