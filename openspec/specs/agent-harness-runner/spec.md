@@ -3,9 +3,7 @@
 ## Purpose
 
 Define unified run, stream, inspection, and durable-resume behavior for the planning harness.
-
 ## Requirements
-
 ### Requirement: Unified runner execution contract
 
 Run, stream, status inspection, and resume SHALL use the same consumer-owned graph, shared `agent-core` checkpointer boundary, configured backend, and thread identity.
@@ -91,7 +89,7 @@ The runner SHALL read durable workflow status and history through public compile
 
 ### Requirement: Composed runner configuration
 
-The runner SHALL consume harness domain configuration containing an immutable core runtime profile.
+The runner SHALL consume harness domain configuration containing an immutable core runtime profile. Configuration SHALL be resolved through `load_agent_config("agent-harness")`, with `HARNESS_*` environment variables retaining precedence over agent-specific YAML, and the legacy `$TDT_HOME/harness/config.yaml` path no longer being authoritative.
 
 #### Scenario: Stage override
 
@@ -106,6 +104,35 @@ The runner SHALL consume harness domain configuration containing an immutable co
 - **AND** `HARNESS_DURABLE` SHALL populate `persistence.durable`
 - **AND** `TDT_POSTGRES_URL` SHALL populate `persistence.postgres_url`
 - **AND** the harness SHALL NOT create a second settings loader or require `HARNESS_PERSISTENCE_DURABLE`
+
+#### Scenario: Harness config resolves from agent-specific YAML
+
+- **GIVEN** `~/.tdt/agents/agent-harness.yaml` exists with model, max_iterations, and timeout_seconds
+- **WHEN** `HarnessConfig.load()` is called
+- **THEN** configuration SHALL be resolved from `~/.tdt/agents/agent-harness.yaml` via `load_agent_config("agent-harness")`
+- **AND** the loaded values SHALL be used for runtime settings
+
+#### Scenario: HARNESS environment variables override agent-specific YAML
+
+- **GIVEN** `~/.tdt/agents/agent-harness.yaml` specifies `durable: false`
+- **AND** `HARNESS_DURABLE=true` is set in the environment
+- **WHEN** `HarnessConfig.load()` is called
+- **THEN** `config.persistence.durable` SHALL be `true`
+- **AND** the environment variable SHALL take precedence
+
+#### Scenario: Legacy config path is ignored
+
+- **GIVEN** only `$TDT_HOME/harness/config.yaml` exists (no `~/.tdt/agents/agent-harness.yaml`)
+- **WHEN** `HarnessConfig.load()` is called
+- **THEN** configuration SHALL fall back to global TDT defaults and code defaults
+- **AND** the legacy path SHALL NOT be read
+
+#### Scenario: Missing agent-specific config falls back to global defaults
+
+- **GIVEN** neither `~/.tdt/agents/agent-harness.yaml` nor `$TDT_HOME/harness/config.yaml` exists
+- **WHEN** `HarnessConfig.load()` is called
+- **THEN** code defaults SHALL be used without error
+- **AND** `HARNESS_*` environment variables SHALL still be applied
 
 ### Requirement: Protected CLI lifecycle preflight
 
