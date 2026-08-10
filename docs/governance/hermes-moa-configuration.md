@@ -36,9 +36,9 @@ moa:
 
 | Preset | References | Aggregator | Limits and cadence | Use |
 |---|---|---|---|---|
-| `default` | `shopapikey:fable-5` high; `cockpit:gpt-5.6-sol` high | `cockpit:gpt-5.6-sol` xhigh | refs 600, output 4096, temp 0.6/0.4, `user_turn` | normal high-quality work |
-| `deep` | `shopapikey:fable-5` xhigh; `cockpit:gpt-5.6-sol` xhigh; `giaoduc:Advance` high | `cockpit:gpt-5.6-sol` max | refs 800, output 8192, temp 0.6/0.3, `every_n:3` | difficult architecture, review, and research |
-| `fast` | `cockpit:gpt-5.6-sol` medium | `shopapikey:fable-5` high | refs 300, output 4096, temp 0.6/0.4, `user_turn` | lower-latency work |
+| `default` | `shopapikey:fable-5` high; `cockpit:gpt-5.6-luna` max | `cockpit:gpt-5.6-luna` max | refs 600, output 4096, temp 0.6/0.4, `user_turn` | normal high-quality work |
+| `deep` | `shopapikey:fable-5` xhigh; `cockpit:gpt-5.6-luna` max; `giaoduc:Advance` high | `cockpit:gpt-5.6-luna` max | refs 800, output 8192, temp 0.6/0.3, `every_n:3` | difficult architecture, review, and research |
+| `fast` | `cockpit:gpt-5.6-luna` max | `shopapikey:fable-5` high | refs 300, output 4096, temp 0.6/0.4, `user_turn` | lower-latency work |
 
 Reference calls add latency and provider usage. `user_turn` runs advisors once for the turn; `every_n:3` refreshes on the first iteration and every third tool iteration. The slowest advisor usually determines fan-out latency.
 
@@ -69,7 +69,7 @@ hermes fallback list
 
 ## Context Windows
 
-Context length belongs to real provider/model configuration, not MoA slots. The providers used by these presets declare `context_length: 1000000`, and the used models resolve the same one-million-token window. Do not add `context_length` to reference or aggregator entries.
+The active cockpit provider default is `gpt-5.6-luna`. Its model catalog may retain other discoverable models, but no active MoA slot uses `gpt-5.6-sol`. Context length belongs to real provider/model configuration, not MoA slots. The providers used by these presets declare `context_length: 1000000`, and the used models resolve the same one-million-token window. Do not add `context_length` to reference or aggregator entries.
 
 Auxiliary operations do not run advisor fan-out. When the main route is MoA, Hermes unwraps the preset to its real aggregator for compression, title generation, vision, and similar auxiliary tasks.
 
@@ -105,7 +105,7 @@ Parse `~/.hermes/config.yaml` with `yaml.safe_load` and assert:
 
 - primary is `moa:default`;
 - presets are exactly `default`, `deep`, and `fast`;
-- every cockpit MoA slot spells the model `gpt-5.6-sol`;
+- every cockpit MoA slot spells the model `gpt-5.6-luna`;
 - no legacy flat `moa.reference_models` or `moa.aggregator` exists;
 - no MoA slot contains `context_length`;
 - real providers and used models declare `1000000` context;
@@ -115,7 +115,7 @@ Parse `~/.hermes/config.yaml` with `yaml.safe_load` and assert:
 
 Resolve credentials from the provider's `key_env` name without printing either the name's value or authorization headers. Send a short non-streaming request to:
 
-- cockpit / `gpt-5.6-sol`;
+- cockpit / `gpt-5.6-luna`;
 - shopapikey / `fable-5`;
 - giaoduc / `Advance`.
 

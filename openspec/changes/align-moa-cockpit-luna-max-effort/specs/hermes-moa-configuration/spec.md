@@ -2,12 +2,14 @@
 
 ### Requirement: Active cockpit Luna topology
 
-The active Hermes MoA configuration SHALL use cockpit model `gpt-5.6-luna` rather than `gpt-5.6-sol` in every cockpit-backed MoA slot, and every such cockpit slot SHALL use `reasoning_effort: max`.
+The active Hermes MoA configuration and cockpit provider default SHALL use model `gpt-5.6-luna` rather than `gpt-5.6-sol` in every cockpit-backed MoA slot, and every such cockpit slot SHALL use `reasoning_effort: max`.
 
 #### Scenario: No stale cockpit model remains
 
 - **WHEN** the live MoA configuration and maintained documentation are scanned
-- **THEN** every cockpit-backed MoA reference or aggregator SHALL name `gpt-5.6-luna`
+- **THEN** `providers.cockpit.model` SHALL be `gpt-5.6-luna`
+- **AND** every cockpit-backed MoA reference or aggregator SHALL name `gpt-5.6-luna`
+- **AND** every cockpit-backed MoA reference or aggregator SHALL use `reasoning_effort: max`
 - **AND** no active configuration, canonical specification, or maintained runbook SHALL name `gpt-5.6-sol` as a MoA slot
 
 #### Scenario: Cockpit Luna inference
