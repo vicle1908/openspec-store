@@ -128,10 +128,10 @@ All apply tasks remain approval-gated. Static readiness does not authorize insta
 - [x] 7.3 `REAPPLY-01` Verify rollback and reapply if Prime Agent is to remain installed.
   - Pass: final version/binary/config identities, protected surfaces, and provider canaries match approved evidence.
   - Evidence: `evidence/REAPPLY-01/`.
-- [ ] 7.4 `FINAL-REVIEW` Run final native CLI reviews against implemented evidence and disposition every finding.
+- [x] 7.4 `FINAL-REVIEW` Run final native CLI reviews against implemented evidence and disposition every finding.
   - Pass: no unresolved BLOCKER/REQUIRED finding for the implemented slice.
   - Evidence: `evidence/FINAL-REVIEW/`.
-- [ ] 7.5 `CLOSE-01` Run focused/full OpenSpec validation, `git diff --check`, secret scan, staged-byte verification, and scoped commit.
+- [x] 7.5 `CLOSE-01` Run focused/full OpenSpec validation, `git diff --check`, secret scan, staged-byte verification, and scoped commit.
   - Preserve unrelated `ecosystem-standardization/` work.
   - Archive only after all required tasks are complete and live/rollback evidence is honest.
 
