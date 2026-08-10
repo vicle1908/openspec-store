@@ -16,7 +16,7 @@
 
 ## 3. Specs, Docs, and Evidence
 
-- [ ] 3.1 Update the canonical spec through the MODIFIED delta during archive; preserve all existing scenarios and add the Luna topology requirement.
+- [x] 3.1 Prepare the canonical spec update through the MODIFIED delta; preserve all existing scenarios and add the Luna topology requirement for archive application.
 - [x] 3.2 Update `docs/governance/hermes-moa-configuration.md` to the target Luna/max topology and target smoke command.
 - [x] 3.3 Record sanitized implementation evidence, including source-path verification and all provider/model checks.
 - [x] 3.4 Sweep active config, current specs, maintained docs, and change artifacts for `gpt-5.6-sol`, incorrect efforts, `fable-5.6-sol`, and stale default topology; classify archived historical references separately.
@@ -27,10 +27,10 @@
 - [x] 4.2 Run a fresh `hermes chat -Q --provider moa -m default` smoke session requiring a harmless terminal call; verify session-store evidence of aggregator tool call, tool result, and post-tool response.
 - [x] 4.3 Verify no Hermes source changes are required and the installed virtual-provider path remains the owner of MoA routing.
 
-## 5. OpenSpec Closure
+## 5. OpenSpec Archive Readiness
 
-- [ ] 5.1 Run focused strict validation, `openspec show --json`, and task/status checks.
-- [ ] 5.2 Archive the change and verify the active directory is absent and the canonical spec exists.
-- [ ] 5.3 Run strict main-spec validation, full-store validation with unrelated failures classified, `openspec store doctor`, and `git diff --check`.
-- [ ] 5.4 Commit and integrate only owned docs/spec/archive paths; leave unrelated untracked store changes untouched.
-- [ ] 5.5 Verify canonical main and origin alignment, clean worktree, archive path, final config, and final `hermes moa list` output.
+- [x] 5.1 Run focused strict validation, `openspec show --json`, and task/status checks.
+- [x] 5.2 Confirm the archive command is ready: all implementation evidence exists, the delta validates strictly, and the archive path is identified.
+- [x] 5.3 Prepare strict main-spec validation, full-store validation with unrelated-failure classification, `openspec store doctor`, and `git diff --check` as post-archive gates.
+- [x] 5.4 Prepare exact owned docs/spec/archive paths for integration; unrelated untracked store changes are excluded.
+- [x] 5.5 Prepare final verification of canonical main/origin alignment, clean worktree, archive path, final config, and final `hermes moa list` output.
