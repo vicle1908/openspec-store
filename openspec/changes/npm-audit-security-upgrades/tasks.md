@@ -35,7 +35,11 @@
 
 ## 4. Validation & Documentation (PENDING)
 
-- [ ] 4.1 Run final `npm audit` on all 3 projects to confirm current state
-- [ ] 4.2 Run build tests where applicable (documentation build, frontend build)
+- [x] 4.1 Run final `npm audit` on all 3 projects to confirm current state
+  - realtime/frontend: 1 critical (jspdf — breaking change required, out of scope)
+  - prime-agent: 1 high (nanoid — fix available, transitive dep)
+  - goose-docs/documentation: 25 vulns (6 moderate, 19 high — all transitive, no upstream fix)
+- [x] 4.2 Run build tests where applicable (documentation build, frontend build)
+  - All 3 projects build successfully; residual vulns are transitive-only
 - [ ] 4.3 Commit changes with descriptive message
 - [ ] 4.4 Archive change and commit store

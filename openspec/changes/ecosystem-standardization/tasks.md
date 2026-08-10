@@ -20,7 +20,7 @@
 
 ## Tasks
 
-- [ ] **T1: Remove `src/reports-out/` from agent-core**
+- [x] **T1: Remove `src/reports-out/` from agent-core** — ALREADY DONE (directory empty, .gitignore present)
   - Remove 324 tracked daily report files (`blocked-*.md`, `wip-age-*.md`)
   - Add `src/reports-out/` to agent-core `.gitignore`
   - Commit with message: `chore: remove orphaned build artifacts from src/reports-out/`
