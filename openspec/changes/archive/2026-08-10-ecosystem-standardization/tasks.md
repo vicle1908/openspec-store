@@ -26,7 +26,7 @@
   - Commit with message: `chore: remove orphaned build artifacts from src/reports-out/`
   - Verify: `git status` clean, no references to reports-out in source code
 
-- [ ] **T2: Final verification and archive**
+- [x] **T2: Final verification and archive**
   - Run `openspec validate --all`
   - Confirm `git status` clean after T1
   - Archive change and commit store
