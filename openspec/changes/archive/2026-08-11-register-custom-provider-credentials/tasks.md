@@ -52,4 +52,4 @@
 
 ## Phase 8: Archive
 
-- [ ] 8.1 Archive `register-custom-provider-credentials` after final validation.
+- [x] 8.1 Archive `register-custom-provider-credentials` after final validation.
