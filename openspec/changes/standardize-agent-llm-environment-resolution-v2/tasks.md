@@ -70,14 +70,18 @@ tdt_core.agent_profile.ProfileResolutionError:
 
 This is raised by `credential_entry()` at `agent_profile.py:395-402` when `resolve_agent_profile()` iterates the `providers` mapping from the global YAML and finds an `api_key_env` that does not match any registered secret entry.
 
-#### Impact
+#### Impact (authoritative JUnit XML counts, exit code 1)
 
-| Repo | Full suite result | Affected tests | Pass count |
-|---|---|---|---|
-| `tdt-core` (focused config tests) | **60 passed** | 0 | 60 |
-| `agent-core` | 17 failed | All `build_agent` + composition tests | 12 passed |
-| `agent-harness` | 8 failed | Construction + convergence tests | 14 passed |
-| `agent-docs-sync` | 8 failed | Guardrails, parity, subagents, write containment | 237 passed |
+Test counts were captured via `pytest --junitxml` to avoid pipe-masking; explicit exit code `1` confirmed for each downstream repo. The failing path in every case is `resolve_agent_profile()` → `credential_entry()` → `HERMES_CUSTOM_GIAODUC_API_KEY` not registered.
+
+| Repo | SHA | Failed | Passed | Total | Root cause |
+|---|---|---|---|---|---|
+| `tdt-core` (focused config tests) | `d90283f` | 0 | 60 | 60 | N/A |
+| `agent-core` | `e5fb49d` | 27 | 719 | 746 | registry gap |
+| `agent-harness` | `0ad49d2` | 8 | 335 | 343 | registry gap |
+| `agent-docs-sync` | `e0ba600` | 8 | 237 | 245 | registry gap |
+
+**Caveat:** All observed downstream failures enter the unresolved custom-provider credential path; independent post-fix failures remain unverified. The registry fix may surface additional issues.
 
 **Common root cause:** `HERMES_CUSTOM_GIAODUC_API_KEY` is not in the registry. All consumer tests that call `load_agent_config()` hit this failure when the ambient `~/.tdt/config.yaml` is loaded.
 
@@ -86,13 +90,14 @@ This is raised by `credential_entry()` at `agent_profile.py:395-402` when `resol
   - Associate each key with exactly one provider (`giaoduc`, `shopapikey`, `cockpit`).
   - Preserve `secret: true` and provider binding.
   - Add registry tests: accepted custom key, wrong provider rejected, unregistered key rejected.
-  - **This is a tdt-core source change with cross-repo blast radius. Requires separate change/PR.**
+  - Run GitNexus impact analysis first (cross-repository blast radius).
+  - **This is a tdt-core source change. Must be a separate change/PR — do not modify tdt-core from this OpenSpec worktree.**
 - [ ] 4.2 Re-run `agent-core` full test suite after registry fix.
 - [ ] 4.3 Re-run `agent-harness` full test suite after registry fix.
 - [ ] 4.4 Re-run `agent-docs-sync` full test suite after registry fix.
 - [ ] 4.5 Verify `agent-core` model propagation tests pass (no additional compatibility issue after credential fix).
 
-## Phase 5: Spec reconciliation
+## Phase 5: Spec reconciliation (complete)
 
 - [x] 5.1 `agent-config-resolution` spec describes canonical six-layer precedence — matches `resolve_agent_profile()` implementation.
 - [x] 5.2 `agent-core-model-resolution` spec describes config-driven fallback chain — matches `build_agent()` path.
@@ -106,8 +111,18 @@ This is raised by `credential_entry()` at `agent_profile.py:395-402` when `resol
 
 ## Phase 6: Validation
 
-- [x] 6.1 tdt-core focused config/profile tests: 60 passed.
-- [x] 6.2 OpenSpec store validation: 358 passed, 0 failed (pre-rebase baseline).
-- [ ] 6.3 Downstream full-suite validation (blocked by 4.1).
-- [ ] 6.4 Re-run `openspec validate --all` after all changes committed.
-- [ ] 6.5 `git diff --check` clean.
+- [x] 6.1 tdt-core focused config/profile tests: **60 passed** (`d90283f`).
+- [x] 6.2 OpenSpec store validation: **358 passed, 0 failed** (post-rebase, current).
+- [x] 6.3 Change-specific validation: **valid** (post-rebase, current).
+- [x] 6.4 `git diff --check`: **clean**.
+- [ ] 6.5 Downstream full-suite validation (blocked by 4.1).
+
+## Phase 7: Documentation and delivery
+
+- [x] 7.1 Proposal, design, tasks, EVIDENCE_MANIFEST rewritten to match actual code state.
+- [x] 7.2 All 9 delta specs repaired: omitted scenarios restored, registry scenarios added.
+- [x] 7.3 Rebased onto current OpenSpec main (`6462aec`).
+- [x] 7.4 Committed as documentation-only change.
+- [ ] 7.5 CLI-provider integrations for `ai-harness-skills` and `ai-review` — `project_cli_profile()` exists in tdt-core but no consumer imports it. Pending separate change.
+- [ ] 7.6 Isolated TDT_HOME fixture validation — deferred to after registry fix.
+- [ ] 7.7 Archive — **NOT YET**. Blocked by 4.1, 7.5, 7.6.
