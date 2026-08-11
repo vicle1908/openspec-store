@@ -43,6 +43,7 @@
 - [x] 6.3 In-process redacted session inspection showed a non-empty Browserbase session ID and CDP URL, active feature `basic_stealth`, `fallback_from_cloud=false`, and no local feature.
 - [x] 6.4 Closed/released the smoke-test session; the session was removed from the active-session registry.
 - [x] 6.5 The earlier `browser_exec` failure was confirmed as a Browser Use CLI/CDP-mode incompatibility. With `browser.backend=off`, the tested native implementation created and drove the Browserbase session successfully. Browserbase returned HTTP 402 for optional keep-alive/proxy features and Hermes correctly retried without those optional features.
+- [x] 6.6 Hybrid routing was exercised with a temporary loopback HTTP server: `http://127.0.0.1:18991` succeeded through a `::local` session with the local feature enabled, no Browserbase session ID, no cloud fallback marker, and successful cleanup.
 
 ## 7. Security decision
 
