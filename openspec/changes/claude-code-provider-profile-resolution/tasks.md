@@ -65,10 +65,35 @@
 - [x] 3.6 Validate this change: `openspec validate claude-code-provider-profile-resolution --store openspec-store`.
 - [x] 3.7 Run `git diff --check`.
 
-## Phase 4: Commit
+## Phase 4: Auth (complete)
 
-- [x] 4.1 Stage only the new change files.
-  - Evidence: staged evidence.md and tasks.md updates.
-- [ ] 4.2 Commit with scoped message.
-  - Evidence: pending; this update is ready to commit separately from the base commit `22f1fc1`.
-- [ ] 4.3 Archive after all gates green (deferred — this change documents a fix, not a new feature).
+- [x] 4.1 Create provider-specific helper scripts under `~/.claude/helpers/`.
+  - Evidence: `ls ~/.claude/helpers/` shows `shopapikey-key.sh`, `giaoduc-key.sh`, `cockpit-key.sh`. Each reads `$HERMES_CUSTOM_*_API_KEY` via `set -eu` + named-variable validation. `chmod 700` on all three.
+- [x] 4.2 Add `apiKeyHelper` to `~/.claude/settings.json`.
+  - Evidence: `d.get('apiKeyHelper')` returns `/Users/androidteam/.claude/helpers/shopapikey-key.sh`.
+- [x] 4.3 Add `apiKeyHelper` to all three provider profiles.
+  - Evidence: `grep apiKeyHelper ~/.claude/profiles/*.json` shows each profile points to its provider-specific helper.
+- [x] 4.4 Run isolated apiKeyHelper capture test.
+  - Evidence: `env -i` capture server test proved `apiKeyHelper` supplies auth to Claude: wire model=fable-5, effort=xhigh, authorization present, exact sentinel `HELPER_AUTH_OK`.
+- [x] 4.5 Run bare Claude smoke (no launcher, no `--settings`).
+  - Evidence: `claude --print --output-format json` used global settings.json defaults: `system_model: fable-5[1m]`, `modelUsage: ['fable-5[1m]']`, exact sentinel `BARE_CLAUDE_WORKS`, exit 0.
+- [x] 4.6 Verify profile-over-global precedence.
+  - Evidence: Giaoduc profile (port 19999) overrode shopapikey defaults (port 19998). Captured on 19998: 0, captured on 19999: 2, wire model=Advance, effort=xhigh.
+- [x] 4.7 Verify no literal credentials in any JSON file.
+  - Evidence: regex scan for `sk-`, `pmv_t`, `Bearer ` in `settings.json` and all profile JSONs returned zero matches.
+
+## Phase 5: Documentation (complete)
+
+- [x] 5.1 Write `proposal.md` with Why, What Changes, Architecture, Auth Architecture, Security.
+- [x] 5.2 Write `design.md` with problem, solution, profile format, launcher wiring, `apiKeyHelper` authentication, `[1m]` contract, security, rollback.
+- [x] 5.3 Write `specs/.../spec.md` with requirements and scenarios including `apiKeyHelper`.
+- [x] 5.4 Write `tasks.md` with completed checkboxes and evidence.
+- [x] 5.5 Write `evidence.md` with structured verification results.
+- [x] 5.6 Validate this change: `openspec validate claude-code-provider-profile-resolution --store openspec-store`.
+- [x] 5.7 Run `git diff --check`.
+
+## Phase 6: Commit
+
+- [ ] 6.1 Stage only the new change files.
+- [ ] 6.2 Commit with scoped message.
+- [ ] 6.3 Archive deferred — giaoduc credential remains expired; cross-app Keychain migration is a separate follow-up.

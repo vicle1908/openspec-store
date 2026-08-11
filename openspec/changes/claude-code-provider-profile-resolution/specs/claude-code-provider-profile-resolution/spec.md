@@ -18,6 +18,29 @@ The `~/.claude/settings.json` file SHALL contain the shopapikey model, base URL,
 - **WHEN** `~/.claude/settings.json` is inspected
 - **THEN** it MUST NOT contain `ANTHROPIC_AUTH_TOKEN`, `API_KEY`, `TOKEN`, or `SECRET` in its `env` block
 
+### Requirement: Settings and profiles SHALL use apiKeyHelper for credential retrieval
+
+Both `~/.claude/settings.json` and each profile under `~/.claude/profiles/` SHALL contain an `apiKeyHelper` field pointing to a helper script that writes the provider API key to stdout. The helper script MUST write only the credential to stdout and MUST NOT log or expose it elsewhere.
+
+#### Scenario: settings.json apiKeyHelper provides shopapikey auth
+
+- **WHEN** bare `claude` is invoked without `ANTHROPIC_AUTH_TOKEN` in the environment
+- **THEN** the process MUST invoke `apiKeyHelper` from `~/.claude/settings.json`
+- **AND** the helper's stdout MUST be used as the bearer token
+- **AND** the request MUST reach the provider with valid authentication
+
+#### Scenario: profile apiKeyHelper overrides global
+
+- **WHEN** `claude --settings $HOME/.claude/profiles/giaoduc.json` is invoked
+- **THEN** the process MUST invoke `apiKeyHelper` from the giaoduc profile (not the global settings)
+- **AND** the giaoduc helper MUST return the giaoduc-specific credential
+
+#### Scenario: helper script failure produces nonzero exit
+
+- **WHEN** an `apiKeyHelper` script fails to produce a credential (missing env var, nonzero exit)
+- **THEN** Claude Code MUST NOT launch
+- **AND** the exit code MUST be nonzero
+
 ### Requirement: Provider profiles SHALL define model, base URL, and effort
 
 Each provider profile JSON under `~/.claude/profiles/` SHALL contain a top-level `model` field and an `env` block with `ANTHROPIC_BASE_URL`, `ANTHROPIC_MODEL`, and `CLAUDE_CODE_EFFORT_LEVEL`.

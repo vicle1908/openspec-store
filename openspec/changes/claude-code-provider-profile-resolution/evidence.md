@@ -32,6 +32,48 @@ Evidence: `python3 -c "import json; d=json.load(open(settings.json)); assert d['
 
 Evidence: `python3 -c "..."` assertions PASS for all three. No `ANTHROPIC_AUTH_TOKEN`, `API_KEY`, `TOKEN`, or `SECRET` in any profile env block.
 
+### apiKeyHelper authentication
+
+Helper scripts under `~/.claude/helpers/`, each hardened with `set -eu` and `chmod 700`:
+
+| Helper | Reads from |
+|---|---|
+| `shopapikey-key.sh` | `$HERMES_CUSTOM_SHOPAPIKEY_API_KEY` |
+| `giaoduc-key.sh` | `$HERMES_CUSTOM_GIAODUC_API_KEY` |
+| `cockpit-key.sh` | `$HERMES_CUSTOM_COCKPIT_API_KEY` |
+
+`settings.json` and all three profiles contain `apiKeyHelper` pointing to the appropriate script. No literal credentials in any JSON file.
+
+### apiKeyHelper isolated capture test
+
+`env -i` (stripping all vars), `--settings` pointing to capture server on 19999, `apiKeyHelper` supplying auth:
+
+```
+wire model: fable-5
+effort: xhigh
+authorization: present
+result: HELPER_AUTH_OK
+exit_code: 0
+system_model: fable-5[1m]
+```
+
+### bare Claude smoke
+
+Bare `claude --print` (no launcher, no `--settings`) used global settings.json defaults:
+
+```
+system_model: fable-5[1m]
+result: BARE_CLAUDE_WORKS
+exit_code: 0
+```
+
+### Profile-over-global precedence
+
+Giaoduc profile (port 19999) overrode shopapikey defaults (port 19998):
+- captured on 19998 (settings default): 0
+- captured on 19999 (giaoduc profile): 2
+- wire model: Advance, effort: xhigh
+
 ### .zshrc syntax
 
 `zsh -n ~/.zshrc` → exit 0, no errors.

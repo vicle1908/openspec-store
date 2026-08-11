@@ -52,10 +52,21 @@ For fable (built-in alias), the profile also includes:
 Each launcher function:
 1. Guards: `_claude_has` (claude in PATH)
 2. Guards: `_claude_require_token HERMES_CUSTOM_<PROVIDER>_API_KEY`
-3. Exports only `ANTHROPIC_AUTH_TOKEN` in a subshell
+3. Exports `ANTHROPIC_AUTH_TOKEN` in a subshell (belt-and-suspenders with `apiKeyHelper`)
 4. Calls `_claude_with_profile "$HOME/.claude/profiles/<provider>.json" "<model>[1m]" "$@"`
 
 The `_claude_with_profile` helper passes `--settings <profile>` to Claude Code. If no `--model` flag is present, it also passes `--model <default>`.
+
+### `apiKeyHelper` Authentication
+
+Claude Code supports `apiKeyHelper` in settings/profile JSON: a script path whose stdout is used as the bearer token. This eliminates the need to hardcode literal keys in JSON files.
+
+Precedence (highest to lowest):
+1. Profile `apiKeyHelper` (when `--settings` is used)
+2. Global `settings.json` `apiKeyHelper` (bare `claude` invocations)
+3. `ANTHROPIC_AUTH_TOKEN` in shell environment (legacy belt-and-suspenders)
+
+Helper scripts under `~/.claude/helpers/` are hardened with `set -eu` and named-variable validation. They read from `$HERMES_CUSTOM_*_API_KEY` environment variables. For cross-application support (GUI apps, CI), these helpers should be migrated to read from macOS Keychain instead.
 
 ### `[1m]` Suffix Contract
 
