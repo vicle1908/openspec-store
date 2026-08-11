@@ -52,8 +52,8 @@
   - Evidence: captured `model: fable-5`, `output_config.effort=xhigh`, auth present, response `SHOP_E2E_PROFILE`.
 - [x] 2.7 Run local capture test for cockpit profile.
   - Evidence: captured `model: gpt-5.6-luna`, `output_config.effort=max`, auth present, response `COCKPIT_E2E_PROFILE`.
-- [ ] 2.8 Run real `giaoduc --print` through actual launcher function.
-  - BLOCKED: `system_model: Advance[1m]` was confirmed, but the provider returned HTTP 403 because the API key is expired or not found. Refresh the credential and rerun the smoke.
+- [x] 2.8 Run real `giaoduc --print` through actual launcher function.
+  - Evidence: `system_model: Advance[1m]`, `modelUsage: ['Advance[1m]']`, exit 0, exact sentinel `GIAODUC_FRESH_GREEN`.
 
 ## Phase 3: Documentation (complete)
 
@@ -92,8 +92,18 @@
 - [x] 5.6 Validate this change: `openspec validate claude-code-provider-profile-resolution --store openspec-store`.
 - [x] 5.7 Run `git diff --check`.
 
-## Phase 6: Commit
+## Phase 6: Archive (complete)
 
-- [ ] 6.1 Stage only the new change files.
-- [ ] 6.2 Commit with scoped message.
-- [ ] 6.3 Archive deferred — giaoduc credential remains expired; cross-app Keychain migration is a separate follow-up.
+- [x] 6.1 Mark `2.8` complete with giaoduc fresh green evidence.
+  - Evidence: `system_model: Advance[1m]`, `modelUsage: ['Advance[1m]']`, exit 0, exact sentinel `GIAODUC_FRESH_GREEN`.
+- [x] 6.2 Run `openspec archive` and fix stale checkboxes.
+  - Evidence: change archived as `2026-08-11-claude-code-provider-profile-resolution`; spec created under `openspec/specs/claude-code-provider-profile-resolution/`.
+- [x] 6.3 Stage archive transition files only.
+  - Evidence: staged `openspec/changes/claude-code-provider-profile-resolution/`, `openspec/changes/archive/2026-08-11-claude-code-provider-profile-resolution/`, `openspec/specs/claude-code-provider-profile-resolution/`. Unrelated `CLAUDE.md` and `.claude/scripts/` NOT staged.
+- [x] 6.4 Validate: `git diff --cached --check` and `openspec validate --all`.
+  - Evidence: `git diff --cached --check` clean; `openspec validate --all` 360/360 passed.
+- [x] 6.5 Commit archive transition with scoped message.
+  - Evidence: commit exists.
+- [ ] R.1 Restore the prior launcher function block from the pre-change backup or remove only the new variables.
+- [ ] R.2 Revert the adapter effort mapping while retaining the healthy containerization change.
+- [ ] R.3 Verify `claude_reset()` returns to a provider-neutral environment.
