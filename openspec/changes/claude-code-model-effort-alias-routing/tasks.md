@@ -72,7 +72,8 @@
   - Evidence: adapter owned diff passed; untracked sibling-agent `config/`, `scripts/`, and `start-adapter.sh` remain unstaged and untouched.
 - [x] 4.4 Obtain independent semantic review against the final launcher and adapter trees.
   - Evidence: bounded Goose review (`goose run --instructions /tmp/closed-review-bundle.md --no-session -q --max-turns 3 --no-profile`) returned `VERDICT: APPROVE_WITH_BLOCKER`; it found no functional defect and confirmed effort mapping, invalid-input HTTP 400, streaming/non-streaming coverage, stripping, launcher/wire behavior, and direct-versus-adapter scope. The remaining blocker is a general recommendation for durable CI/deployment guards, outside this runtime change.
-- [ ] 4.5 Commit adapter changes and OpenSpec store changes separately with scoped messages.
+- [x] 4.5 Commit adapter changes and OpenSpec store changes separately with scoped messages.
+  - Evidence: adapter committed at `1b91260` (docs); OpenSpec change committed at `402219e` (`openspec: add claude-code-model-effort-alias-routing change`).
 - [ ] 4.6 Archive only after all three live provider gates are green and the adapter effort field is independently observed.
 
 ## Rollback

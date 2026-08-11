@@ -24,4 +24,4 @@
 
 ## Resolution status
 
-The runtime implementation and evidence gates are complete. The durable CI/deployment guard recommendation is outside this change's current runtime scope and remains an explicit release-governance disposition before commit/archive.
+The runtime implementation and evidence gates are complete. The durable CI/deployment guard recommendation is accepted as out of scope for this runtime change. Existing local regression tests and live acceptance evidence provide the current guard. A separate follow-up change should add durable CI/deployment assertions for launcher contracts and direct-versus-adapter routing.
