@@ -1,9 +1,9 @@
 ## 1. Ownership and Reproducible Baseline
 
-- [x] 1.1 Record full 40-character HEADs, branches, worktree paths, repo-local Git identity, dirty-path inventories and SHA-256 fingerprints, Graphify/GitNexus freshness, and the imported module path for all six implementation repositories and the OpenSpec store. Evidence: `EVIDENCE_MANIFEST.md`
-- [x] 1.2 Assign one writer per repository and create dedicated worktrees without modifying existing generated, untracked, credential, or concurrent OpenSpec state. Evidence: `EVIDENCE_MANIFEST.md` §5
-- [x] 1.3 Reproduce and retain isolated failing probes for agent-core environment precedence, docs-sync projection disagreement, harness production model propagation, harness explicit-config error masking, ignored agent-core `env_file`, and literal default artifact-root expansion. Evidence: `EVIDENCE_MANIFEST.md` §3
-- [x] 1.4 Capture a redacted inventory of current model/environment keys and compatibility aliases across the six participating repositories; record `prime-agent`, `claude-code-provider-adapter`, and `code-daily-scan` as explicit boundary cases. Evidence: `EVIDENCE_MANIFEST.md` §4
+- [ ] 1.1 Record full 40-character HEADs, branches, worktree paths, repo-local Git identity, dirty-path inventories and SHA-256 fingerprints, Graphify/GitNexus freshness, and the imported module path for all six implementation repositories and the OpenSpec store. Evidence: `EVIDENCE_MANIFEST.md`
+- [ ] 1.2 Assign one writer per repository and create dedicated worktrees without modifying existing generated, untracked, credential, or concurrent OpenSpec state. Evidence: `EVIDENCE_MANIFEST.md` §5
+- [ ] 1.3 Reproduce and retain isolated failing probes for agent-core environment precedence, docs-sync projection disagreement, harness production model propagation, harness explicit-config error masking, ignored agent-core `env_file`, and literal default artifact-root expansion. Evidence: `EVIDENCE_MANIFEST.md` §3
+- [ ] 1.4 Capture a redacted inventory of current model/environment keys and compatibility aliases across the six participating repositories; record `prime-agent`, `claude-code-provider-adapter`, and `code-daily-scan` as explicit boundary cases. Evidence: `EVIDENCE_MANIFEST.md` §4
 
 ## 2. tdt-core Canonical Resolution Boundary
 
