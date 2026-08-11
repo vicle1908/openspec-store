@@ -2,11 +2,15 @@
 
 ## What this change is
 
-Corrective v2 of the agent LLM environment resolution standardization. Aligns the TDT Python agent ecosystem with the provider/model/default configuration pattern proven by Codex, Grok Build, fable-5, and Pi.
+Corrective v2 of the agent LLM environment resolution standardization. Aligns the TDT Python agent ecosystem with the provider/model/default configuration pattern proven by Codex, Grok, Kimi, and Pi.
 
 ## Status
 
-**Not archive-ready.** Core resolver implementation is on `main`; the YAML-based provider/model/default schema migration is proposed but not implemented.
+**Not archive-ready.** Core resolver implementation is on `main`. Interim credential registry fix is integrated (`d63aa08`). The YAML-based provider/model/default schema migration is proposed but not implemented.
+
+## Interim fix: credential registry (RESOLVED)
+
+Three custom provider credentials were registered in `tdt-core`'s `environment-key-registry.json` via the separate `register-custom-provider-credentials` change. This was an interim compatibility fix; the YAML-based provider/model migration will eventually supersede the registry.
 
 ## Specs (10)
 
@@ -21,10 +25,11 @@ Corrective v2 of the agent LLM environment resolution standardization. Aligns th
 | `tdt-env-loader-tdt-home` | MODIFIED | Canonical dotenv authority, idempotency, path containment, registry |
 | `cli-provider-profile-resolution` | MODIFIED | CLI adapter profiles, native format projection, authentication isolation |
 | `agent-docs-sync` | MODIFIED | Docs-sync config alignment |
-| `provider-model-profile-resolution` | ADDED | YAML schema: providers, models, defaults, auth_env, protocol, referential integrity |
+| `provider-model-profile-resolution` | ADDED | YAML schema: providers, models, defaults, auth_env, protocol, referential integrity (PROPOSED, not implemented) |
 
-## Current blockers
+## Remaining blockers
 
-1. Three custom provider credentials unregistered in `environment-key-registry.json` (Phase 3).
-2. New YAML schema not implemented (Phase 4).
-3. CLI consumer integrations not implemented (Phase 6).
+1. YAML `providers/models/defaults` schema not implemented (Phase 4).
+2. CLI consumer integrations not implemented (Phase 6).
+3. Isolated `TDT_HOME` fixture validation not completed (Phase 7).
+4. Live LLM acceptance not performed (Phase 9).

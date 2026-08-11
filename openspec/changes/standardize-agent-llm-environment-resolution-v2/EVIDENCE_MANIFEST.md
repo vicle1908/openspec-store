@@ -4,7 +4,7 @@
 
 This change standardizes agent LLM environment resolution across the TDT Python
 ecosystem into a single canonical resolution boundary, converging toward the
-provider/model/default configuration pattern proven by Codex, Grok, fable-5, and
+provider/model/default configuration pattern proven by Codex, Grok, Kimi, and
 Pi. All current implementation is committed to `main` across the six affected
 repositories. The YAML schema migration (providers/models/defaults) is proposed
 but not implemented.
@@ -22,48 +22,6 @@ but not implemented.
 | Kimi | 0.34.0 | `~/.kimi/config.toml` | inline (⚠️) |
 | Pi | 0.84.1 | `~/.pi/agent/mcp.json` | parent runtime |
 
-### Codex config.toml structure
-
-```toml
-model_provider = "codex_local_access"   # provider selector
-model = "gpt-5.6-sol"                   # model selection
-model_reasoning_effort = "high"          # behavior knob
-
-[model_providers.codex_local_access]
-base_url = "http://localhost:51006/v1"
-wire_api = "responses"
-```
-
-### Grok Build config.toml structure
-
-```toml
-[models]
-default = "cockpit-terra"               # alias selection
-
-[model_providers.cockpit]
-base_url = "http://localhost:51006/v1"
-api_backend = "responses"
-context_window = 1000000
-
-[model.cockpit-terra]
-model = "gpt-5.6-terra"
-model_provider = "cockpit"
-```
-
-### fable-5 config.toml structure
-
-```toml
-default_model = "fable-52-6"            # alias selection
-
-[providers.omniroute]
-type = "openai_responses"
-base_url = "http://localhost:20128/v1"
-
-[models.fable-5-k2-6]
-provider = "omniroute"
-model = "dlg/fable-52.6"
-```
-
 ### Universal pattern
 
 All four CLIs converge on: provider definition (endpoint + protocol + auth) → model alias (provider + wire model + behavior) → default selection.
@@ -80,8 +38,9 @@ All four CLIs converge on: provider definition (endpoint + protocol + auth) → 
 | `135268d` | `fix: make agent config cache path-sensitive` |
 | `8496f8e` | `feat(tdt-core): add v2 config primitives for LLM config standardization` |
 | `d90283f` | `docs(tdt-core): add v2 config primitives to README` |
+| `d63aa08` | `fix(config): register custom provider credentials` — **interim registry fix integrated** |
 
-**Source symbols on `main` (`d90283f`):**
+**Source symbols on `main` (`d63aa08`):**
 
 | Symbol | File:Line | Purpose |
 |---|---|---|
@@ -127,21 +86,36 @@ No LLM config implementation changes. Branches identical to `main`.
 ```
 cd ~/Developer/tdt-core
 uv run pytest tests/test_config_primitives.py tests/test_llm_profile_v2.py -q
-→ 60 passed in 0.49s
+→ 60 passed
 ```
 
-### Downstream suites (BLOCKED by credential registry gap)
+### Full tdt-core suite (integrated main, no PYTHONPATH)
 
-Captured via `pytest --junitxml`; explicit exit code `1` confirmed for each.
+```
+cd ~/Developer/tdt-core
+uv run pytest -q --junitxml=/tmp/tdt-core-main.xml
+→ tests=618 passed=612 failures=0 errors=0 skipped=6
+```
 
-| Repo | SHA | Failed | Passed | Total | Root cause |
-|---|---|---|---|---|---|
-| `tdt-core` (focused) | `d90283f` | 0 | 60 | 60 | N/A |
-| `agent-core` | `e5fb49d` | 27 | 719 | 746 | registry gap |
-| `agent-harness` | `0ad49d2` | 8 | 335 | 343 | registry gap |
-| `agent-docs-sync` | `e0ba600` | 8 | 237 | 245 | registry gap |
+### Downstream suites (integrated main, no PYTHONPATH)
 
-**Caveat:** All observed downstream failures enter the unresolved custom-provider credential path; independent post-fix failures are currently masked by the first common failure.
+All downstream suites ran against integrated tdt-core main (`d63aa08`) through the normal `pyproject.toml` editable dependency (`tdt-core = { path = "../tdt-core", editable = true }`). No `PYTHONPATH` override.
+
+| Repo | SHA | Tests | Passed | Failed | Errors | Skipped |
+|---|---|---|---|---|---|---|
+| `tdt-core` | `d63aa08` | 618 | 612 | 0 | 0 | 6 |
+| `agent-core` | `e5fb49d` | 746 | 746 | 0 | 0 | 0 |
+| `agent-harness` | `0ad49d2` | 343 | 343 | 0 | 0 | 0 |
+| `agent-docs-sync` | `e0ba600` | 245 | 245 | 0 | 0 | 0 |
+| **Total** | | **1952** | **1946** | **0** | **0** | **6** |
+
+### Consumer import verification
+
+```
+agent-core:       /Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py
+agent-harness:    /Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py
+agent-docs-sync:  /Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py
+```
 
 ---
 
@@ -153,8 +127,7 @@ Captured via `pytest --junitxml`; explicit exit code `1` confirmed for each.
 4. Registry retirement decision — not made.
 5. CLI consumer integrations for `ai-harness-skills` and `ai-review` — not implemented.
 6. Isolated `TDT_HOME` fixture validation — not completed.
-7. Full downstream consumer suites pass — blocked by credential registry gap.
-8. Live LLM acceptance — not performed.
+7. Live LLM acceptance — not performed.
 
 ---
 
@@ -163,8 +136,7 @@ Captured via `pytest --junitxml`; explicit exit code `1` confirmed for each.
 | Item | Value |
 |---|---|
 | Branch | `openspec/standardize-agent-llm-environment-resolution-v2` |
-| HEAD baseline before this commit | `859fca5` |
-| OpenSpec main | `d111c3d` |
-| Files changed | 16 (all under `openspec/changes/standardize-agent-llm-environment-resolution-v2/`) |
-| External code modified | None |
-| Archive status | **NOT ARCHIVED** — blocked by Phase 3, 4, 5, 6, 7, 9 |
+| OpenSpec main | `c21c4b6` |
+| tdt-core main | `d63aa08` (registry fix integrated) |
+| External code modified | None (documentation only) |
+| Archive status | **NOT ARCHIVED** — YAML migration and CLI projections remain unimplemented |

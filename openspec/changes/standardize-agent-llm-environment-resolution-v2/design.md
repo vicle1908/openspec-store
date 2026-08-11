@@ -2,38 +2,18 @@
 
 See `proposal.md` for motivation and scope. The implementation starts from these verified constraints:
 
-- `tdt-core` owns dynamic TDT-root helpers, dotenv profile loading, global typed settings, and a cached global-plus-agent mapping loader. The canonical `resolve_agent_profile()` and `load_agent_config()` are committed to `main` (`d90283f`).
+- `tdt-core` owns dynamic TDT-root helpers, dotenv profile loading, global typed settings, and a cached global-plus-agent mapping loader. The canonical `resolve_agent_profile()` and `load_agent_config()` are committed to `main` (`d63aa08`).
+- Three custom provider credentials are now registered in `environment-key-registry.json`: `HERMES_CUSTOM_GIAODUC_API_KEY` (giaoduc), `HERMES_CUSTOM_SHOPAPIKEY_API_KEY` (shopapikey), `HERMES_CUSTOM_COCKPIT_API_KEY` (cockpit). Registry: 17 → 20 entries.
 - `agent-core` routes per-agent model config through `build_agent()` → `load_agent_config()`. Model construction consumes already-resolved values (`e5fb49d`).
 - `agent-docs-sync` uses `load_agent_config("agent-docs-sync")` for merged model/fallback/providers. Settings and generation derive from the same profile (`e0ba600`).
 - `agent-harness` implements two-plane config: `load_agent_config("agent-harness")` for LLM, domain overlay for harness-specific fields. `HarnessConfig` composes the resolved profile (`0ad49d2`).
-- `ai-harness-skills` and `ai-review` invoke provider CLIs rather than Pydantic-AI. The `project_cli_profile()` API exists in `tdt-core` (`agent_profile.py:912`) but no consumer repo imports it.
-- The current `environment-key-registry.json` contains 17 entries (3 credential, 7 shared model, 7 consumer). Three custom provider credentials (`HERMES_CUSTOM_GIAODUC_API_KEY`, `HERMES_CUSTOM_SHOPAPIKEY_API_KEY`, `HERMES_CUSTOM_COCKPIT_API_KEY`) are NOT registered, blocking all downstream consumer test suites.
-- Codex (`config.toml`), Grok Build (`config.toml`), Kimi (`config.toml`), and Pi (`mcp.json`) all converge on the same configuration pattern: provider definitions with endpoint + protocol + credential reference, named model aliases with provider + wire model + behavior, and default alias selection. TDT duplicates this information across `config.yaml`, the packaged registry, and per-agent YAML.
+- `ai-harness-skills` and `ai-review` invoke provider CLIs rather than Pydantic-AI. The `project_cli_profile()` API exists in `tdt-core` (`agent_profile.py:912`) but no consumer repo imports it. **Not yet wired.**
+- Downstream test suites pass against integrated main (no PYTHONPATH override): agent-core 746, agent-harness 343, agent-docs-sync 245 — all 0 failures.
+- Codex (`config.toml`), Grok Build (`config.toml`), fable-5 (`config.toml`), and Pi (`mcp.json`) all converge on the same configuration pattern: provider definitions with endpoint + protocol + credential reference, named model aliases with provider + wire model + behavior, and default alias selection. TDT duplicates this information across `config.yaml`, the packaged registry, and per-agent YAML.
 
 ## Runtime Transaction Boundary
 
 One profile-resolution call captures all selected file identities, registered environment inputs, explicit overrides, and source provenance into an immutable snapshot. Agent or CLI construction consumes that snapshot without reopening configuration sources. Provider invocation and credential access occur after this transaction and remain provider-specific.
-
-## Native CLI Convergence Model
-
-All four installed provider CLIs converge on the same abstract structure:
-
-```text
-provider definition: endpoint + wire protocol + credential reference + capabilities
-model profile:       provider reference + wire model ID + alias + context limit + behavior
-default:             selected model profile
-```
-
-Concrete examples from installed CLIs:
-
-| CLI | Provider section | Model section | Default |
-|---|---|---|---|
-| Codex (`~/.codex/config.toml`) | `[model_providers.X]` — `base_url`, `wire_api`, auth | `model = "..."` | top-level `model` |
-| Grok Build (`~/.grok/config.toml`) | `[model_providers.X]` — `base_url`, `api_backend`, `context_window` | `[model.X]` — `model`, `model_provider`, `reasoning_effort` | `[models].default` |
-| Kimi (`~/.kimi/config.toml`) | `[providers.X]` — `type`, `base_url`, `api_key` | `[models.X]` — `provider`, `model`, `max_context_size` | `default_model` |
-| Pi (`~/.pi/agent/mcp.json`) | Transport/MCP delegation | Inherited from parent runtime | N/A |
-
-**Key distinction:** Credentials are never in the config file for Codex (`auth.json`) or Grok (`auth.json`). Kimi is the exception — it stores API keys inline in `config.toml`. TDT follows the Codex/Grok pattern: credentials in `.env`, never in YAML.
 
 ## Current State vs Target Architecture
 
@@ -47,16 +27,16 @@ model:
 providers:
   giaoduc:
     base_url: https://api.giaoduc.online
-    api_key_env: HERMES_CUSTOM_GIAODUC_API_KEY    # ← unregistered in registry
+    api_key_env: HERMES_CUSTOM_GIAODUC_API_KEY  # ← registered in registry
   shopapikey:
     *** https://api.phanmemvip.shop/v1
-    api_key_env: HERMES_CUSTOM_SHOPAPIKEY_API_KEY  # ← unregistered in registry
+    api_key_env: HERMES_CUSTOM_SHOPAPIKEY_API_KEY  # ← registered in registry
   cockpit:
     base_url: http://localhost:51006/v1
-    api_key_env: HERMES_CUSTOM_COCKPIT_API_KEY     # ← unregistered in registry
+    api_key_env: HERMES_CUSTOM_COCKPIT_API_KEY  # ← registered in registry
 ```
 
-Plus a separate `environment-key-registry.json` with 17 entries. The registry is the validation gate, but it is out of sync with the YAML.
+Plus a packaged `environment-key-registry.json` (20 entries). The registry is the validation gate; all three custom keys are now registered as an interim fix.
 
 ### Target architecture (aligned with native CLIs)
 
@@ -102,12 +82,10 @@ models:
 
 ### Migration path
 
-1. **Current state** (`providers.*.api_key_env` + packaged registry): registry is the validation gate, three custom keys unregistered.
-2. **Interim unblocker**: register the three custom credentials in the registry. This is a tdt-core source change, separate from this OpenSpec change.
-3. **Transitional state**: add `auth_env` support to YAML and validate against environment-name grammar. Provider binding comes from YAML; registry becomes a compatibility/validation shim.
-4. **Target state**: provider binding is entirely YAML-driven; registry is reduced to generic schema validation or removed. Credentials remain in `.env` and never in serializable profiles.
+1. **Current state** (`providers.*.api_key_env` + packaged registry): all three custom keys now registered. Interim fix integrated at `d63aa08`.
+2. **Target state**: provider binding is entirely YAML-driven (`providers.*.auth_env`); registry is reduced to generic schema validation or removed. Credentials remain in `.env` and never in serializable profiles.
 
-**Do not state that step 3 or 4 is complete.**
+**Do not state that step 2 is complete.**
 
 ## Goals / Non-Goals
 
@@ -165,7 +143,7 @@ Agent-core CLI, SDK, and base-agent paths consume the same resolved profile. Doc
 
 ### 9. Add a provider-neutral projection for CLI invokers
 
-`ai-harness-skills` and `ai-review` are planned to consume a projection containing executable identity, model alias, effort, bounded limits, key-name metadata, and provenance. This is not yet implemented. The `project_cli_profile()` API exists in tdt-core but no consumer imports it. The CLI adapter spec should require a projection into each native CLI's format.
+`ai-harness-skills` and `ai-review` are planned to consume a projection containing executable identity, model alias, effort, bounded limits, key-name metadata, and provenance. This is not yet implemented. The `project_cli_profile()` API exists in tdt-core but no consumer imports it. The CLI adapter spec requires a projection into each native CLI's format.
 
 ### 10. Preserve explicit runtime boundaries
 
@@ -184,7 +162,6 @@ Before sync or archive, the sole writer must capture exact integrated SHAs, cred
 - **[Risk] Registry-to-YAML migration introduces regressions** → Stage in phases: interim unblocker first, then auth_env support, then registry retirement. Each phase has its own tests.
 - **[Risk] Removing the registry too early leaves no validation** → Keep the registry as a compatibility shim until YAML-driven validation is proven.
 - **[Risk] Native CLI format differences prevent perfect convergence** → Standardize the conceptual contract, not the file format. Each adapter projects into its target format.
-- **[Risk] Credential registry gap blocks downstream validation** → Register keys as separate focused change, then rerun suites.
 - **[Risk] CLI adapter integration not started** → Stage after Python participants stabilize.
 - **[Risk] Cache optimization reintroduces stale configuration** → Key by root, path, policy, fingerprint; test invalidation.
 - **[Risk] Provenance leaks sensitive data** → Store source class, logical key, file identity only; redaction tests.
@@ -193,7 +170,7 @@ Before sync or archive, the sole writer must capture exact integrated SHAs, cred
 
 ## Migration Plan
 
-1. Register three custom provider credentials in the environment-key registry with `secret: true`, one provider binding each, and focused tests. **Interim unblocker — separate tdt-core change.**
+1. Register three custom provider credentials in the environment-key registry with `secret: true`, one provider binding each, and focused tests. **Done** (`d63aa08`). Downstream suites pass (1946 passed, 0 failures).
 2. Convert every agent-core model-construction entry point to the resolved profile. **Done on main.**
 3. Convert docs-sync and harness. **Done on main.**
 4. Define provider/model/default YAML schema in `tdt-core` aligned with native CLI pattern. **Not started.**

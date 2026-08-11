@@ -14,6 +14,10 @@ The agent ecosystem has no single executable contract for resolving LLM models, 
 - Migrate agent-harness to source-preserving domain-overlay composition, keeping harness-owned gate, persistence, authority, validation, budget, and retention sections outside the global LLM merge.
 - Converge provider/model configuration toward the native CLI pattern: YAML `providers.*.auth_env` as credential declaration, YAML `models.*` as named aliases, YAML `defaults.model` as selected alias.
 
+## Interim Registry Fix (complete)
+
+Three custom provider credential keys (`HERMES_CUSTOM_GIAODUC_API_KEY`, `HERMES_CUSTOM_SHOPAPIKEY_API_KEY`, `HERMES_CUSTOM_COCKPIT_API_KEY`) were registered in `tdt-core`'s `environment-key-registry.json` via the separate `register-custom-provider-credentials` change. This was an interim compatibility fix; the YAML-based provider/model migration will eventually supersede the registry.
+
 ## What Was Not Part of This Change
 
 - Provider credential migration or copying between runtimes.
@@ -30,10 +34,10 @@ Claude Code's `~/.claude/settings.json` is a separate native runtime configurati
 
 The change is not archive-ready until:
 
-1. The three custom provider credentials are registered in the environment-key registry (interim unblocker) and focused tests pass.
-2. The YAML provider/model/default schema is defined and implemented in `tdt-core`.
+1. ~~The three custom provider credentials are registered in the environment-key registry.~~ **Done** (`d63aa08`). Downstream suites pass.
+2. The YAML `providers/models/defaults` schema is defined and implemented in `tdt-core`.
 3. `auth_env` support replaces direct `api_key_env` references in provider configuration.
 4. The registry is retired or reduced to generic schema validation.
-5. Full downstream consumer test suites pass in an isolated `TDT_HOME` environment.
-6. CLI-provider integrations for `ai-harness-skills` and `ai-review` are implemented, tested, and evidence is captured — or explicitly de-scoped from this change.
+5. CLI-provider integrations for `ai-harness-skills` and `ai-review` are implemented, tested, and evidence is captured — or explicitly de-scoped from this change.
+6. Full downstream consumer test suites pass in an isolated `TDT_HOME` environment with the new YAML schema.
 7. The evidence manifest covers live streaming and non-streaming paths, direct-provider versus adapter scope, and stale task/doc-count reconciliation.

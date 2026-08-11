@@ -4,7 +4,8 @@
 
 | Repo | Commit | Description |
 |---|---|---|
-| `tdt-core` (worktree) | `2897df7` | 3 credential entries added to `environment-key-registry.json` + 12 focused tests |
+| `tdt-core` (pre-integration) | `2897df7` | 3 credential entries added to `environment-key-registry.json` + 12 focused tests |
+| `tdt-core` (integrated) | `d63aa08` | Cherry-pick of `2897df7` onto tdt-core main |
 
 ### Registry changes
 
@@ -23,7 +24,7 @@
 **New focused tests (12, all pass):**
 
 ```
-cd ~/Developer/tdt-core-register-credentials
+cd ~/Developer/tdt-core
 uv run pytest tests/test_custom_provider_credentials.py -v
 → 12 passed
 ```
@@ -35,59 +36,50 @@ uv run pytest tests/test_config_primitives.py tests/test_llm_profile_v2.py -q
 → 60 passed
 ```
 
-**Full tdt-core suite (JUnit XML):**
+**Full tdt-core suite on integrated main (no PYTHONPATH override):**
 
 ```
-uv run pytest -q --junitxml=/tmp/tdt-core-reg.xml
+cd ~/Developer/tdt-core
+uv run pytest -q --junitxml=/tmp/tdt-core-main.xml
 → tests=618 passed=612 failures=0 errors=0 skipped=6
 ```
 
-**Import verification (all 6 credential entries):**
+## Downstream validation — integrated, no PYTHONPATH
 
-```
-tdt_core from: /Users/androidteam/Developer/tdt-core-register-credentials/src/tdt_core/__init__.py
-HERMES_CUSTOM_GIAODUC_API_KEY -> provider=giaoduc, secret=True
-HERMES_CUSTOM_SHOPAPIKEY_API_KEY -> provider=shopapikey, secret=True
-HERMES_CUSTOM_COCKPIT_API_KEY -> provider=cockpit, secret=True
-ANTHROPIC_API_KEY -> provider=anthropic, secret=True
-OPENAI_API_KEY -> provider=openai-chat, secret=True
-MODEL_API_KEY -> provider=None, secret=True
-```
-
-## Downstream validation
-
-All downstream suites were run against the **isolated tdt-core worktree** (`~/Developer/tdt-core-register-credentials/src`) via `PYTHONPATH` override. This proves the patch works but does NOT mean it is integrated into the normal `../tdt-core` editable dependency.
+All downstream suites ran against the integrated tdt-core main (`d63aa08`) through the normal `pyproject.toml` editable dependency (`tdt-core = { path = "../tdt-core", editable = true }`). No `PYTHONPATH` override used.
 
 ```bash
 # How downstream tests were run
-PYTHONPATH=~/Developer/tdt-core-register-credentials/src uv run pytest -q --junitxml=<path>
+cd ~/Developer/agent-core && uv run pytest -q --junitxml=/tmp/agent-core-integrated.xml
+cd ~/Developer/agent-harness && uv run pytest -q --junitxml=/tmp/agent-harness-integrated.xml
+cd ~/Developer/agent-docs-sync && uv run pytest -q --junitxml=/tmp/agent-docs-sync-integrated.xml
 ```
 
 | Repo | SHA | Tests | Passed | Failed | Errors | Skipped |
 |---|---|---|---|---|---|---|
-| `tdt-core` (full) | `2897df7` | 618 | 612 | 0 | 0 | 6 |
+| `tdt-core` | `d63aa08` | 618 | 612 | 0 | 0 | 6 |
 | `agent-core` | `e5fb49d` | 746 | 746 | 0 | 0 | 0 |
 | `agent-harness` | `0ad49d2` | 343 | 343 | 0 | 0 | 0 |
 | `agent-docs-sync` | `e0ba600` | 245 | 245 | 0 | 0 | 0 |
+| **Total** | | **1952** | **1946** | **0** | **0** | **6** |
 
-**Total: 1952 tests, 1946 passed, 0 failures, 0 errors, 6 skipped (all in tdt-core scheduler tests)**
+### Consumer import verification
 
-### Downstream import verification
-
-Each consumer was verified to load the fixed tdt-core from the isolated worktree before running tests:
+Each consumer resolves tdt-core from the integrated main:
 
 ```
-agent-core:       tdt_core from: .../tdt-core-register-credentials/src/tdt_core/__init__.py
-agent-harness:    tdt_core from: .../tdt-core-register-credentials/src/tdt_core/__init__.py
-agent-docs-sync:  tdt_core from: .../tdt-core-register-credentials/src/tdt_core/__init__.py
+agent-core:       /Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py
+agent-harness:    /Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py
+agent-docs-sync:  /Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py
 ```
+
+All consumers point to the same integrated path. The editable install `tdt-core = { path = "../tdt-core", editable = true }` in each `pyproject.toml` resolves to `~/Developer/tdt-core`, which now contains `d63aa08`.
 
 ## What is NOT proven
 
-1. The fix is integrated into `tdt-core/main` — it is on an isolated branch (`2897df7`) only.
-2. Downstream consumers pass without `PYTHONPATH` override — not tested after main integration.
-3. Other credential keys (e.g. `HERMES_CUSTOM_*` not currently in `config.yaml`) are not registered — only the three needed keys.
-4. The YAML `providers/models/defaults` migration is implemented — that is a separate change.
+1. The fix is pushed to origin — `d63aa08` is local only. Consumers that re-clone or re-install from origin will not have the fix until it is pushed.
+2. Other `HERMES_CUSTOM_*` credential keys not in `config.yaml` — only the three needed keys are registered.
+3. The YAML `providers/models/defaults` migration — that is a separate change.
 
 ## OpenSpec validation
 
