@@ -3,13 +3,74 @@
 ## Scope
 
 This change standardizes agent LLM environment resolution across the TDT Python
-ecosystem into a single canonical resolution boundary. All implementation is
-already committed to `main` across the six affected repositories. This worktree
-contains only OpenSpec documentation artifacts.
+ecosystem into a single canonical resolution boundary, converging toward the
+provider/model/default configuration pattern proven by Codex, Grok, fable-5, and
+Pi. All current implementation is committed to `main` across the six affected
+repositories. The YAML schema migration (providers/models/defaults) is proposed
+but not implemented.
 
 ---
 
-## Implementation Provenance
+## Research Evidence: Native CLI Configuration Patterns
+
+### Installed CLI versions
+
+| CLI | Version | Config file | Credential store |
+|---|---|---|---|
+| Codex | 0.147.0 | `~/.codex/config.toml` | `auth.json` |
+| Grok Build | 1.0.0 | `~/.grok/config.toml` | `auth.json` |
+| Kimi | 0.34.0 | `~/.kimi/config.toml` | inline (⚠️) |
+| Pi | 0.84.1 | `~/.pi/agent/mcp.json` | parent runtime |
+
+### Codex config.toml structure
+
+```toml
+model_provider = "codex_local_access"   # provider selector
+model = "gpt-5.6-sol"                   # model selection
+model_reasoning_effort = "high"          # behavior knob
+
+[model_providers.codex_local_access]
+base_url = "http://localhost:51006/v1"
+wire_api = "responses"
+```
+
+### Grok Build config.toml structure
+
+```toml
+[models]
+default = "cockpit-terra"               # alias selection
+
+[model_providers.cockpit]
+base_url = "http://localhost:51006/v1"
+api_backend = "responses"
+context_window = 1000000
+
+[model.cockpit-terra]
+model = "gpt-5.6-terra"
+model_provider = "cockpit"
+```
+
+### fable-5 config.toml structure
+
+```toml
+default_model = "fable-52-6"            # alias selection
+
+[providers.omniroute]
+type = "openai_responses"
+base_url = "http://localhost:20128/v1"
+
+[models.fable-5-k2-6]
+provider = "omniroute"
+model = "dlg/fable-52.6"
+```
+
+### Universal pattern
+
+All four CLIs converge on: provider definition (endpoint + protocol + auth) → model alias (provider + wire model + behavior) → default selection.
+
+---
+
+## Current Implementation Provenance
 
 ### tdt-core (foundation)
 
@@ -30,16 +91,10 @@ contains only OpenSpec documentation artifacts.
 | `load_agent_overlay()` | `config_loader.py:497` | Source-preserving agent overlay reader |
 | `load_tdt_env()` | `env.py:391` | Canonical dotenv authority |
 | `EnvironmentKeyRegistry` | `agent_profile.py:299` | Registered env-key validation |
-| `EnvironmentKey` | `agent_profile.py:281` | Per-key metadata (type, precedence, secret, provider) |
 | `ResolvedAgentProfile` | `agent_profile.py:116` | Frozen effective LLM snapshot |
 | `Provenance` | `agent_profile.py:77` | Redacted source provenance |
 | `project_cli_profile()` | `agent_profile.py:912` | CLI adapter profile projection |
 | `CLIProviderProfile` | `agent_profile.py:967` | CLI adapter profile model |
-| `CredentialResolver` | `agent_profile.py:225` | Process-local credential resolver |
-| `ProtectedCredential` | `agent_profile.py:194` | Redacted credential wrapper |
-| `ConfigMapping` | `config_loader.py:352` | Fresh validated mapping + source identity |
-| `tdt_root()` | `paths.py:74` | Canonical TDT root resolution |
-| `tdt_config_path_for_agent()` | `paths.py:132` | Per-agent config path |
 
 ### agent-core (consumer wiring)
 
@@ -47,15 +102,11 @@ contains only OpenSpec documentation artifacts.
 |---|---|
 | `e5fb49d` | `fix: route per-agent model config through build_agent and CLI paths` |
 
-**Symbol:** `build_agent()` at `sdk/agents.py:80` calls `tdt_core.config_loader.load_agent_config(agent_name)`.
-
 ### agent-harness (two-plane config)
 
 | Commit | Description |
 |---|---|
 | `6a89de6` | `feat(agent-harness): implement two-plane config loading strategy` |
-
-**Symbol:** `HarnessConfig` at `config.py:123` composes resolved profile via `load_agent_config("agent-harness")`.
 
 ### agent-docs-sync (config alignment)
 
@@ -63,15 +114,13 @@ contains only OpenSpec documentation artifacts.
 |---|---|
 | `267c3aa` | `fix: align docs-sync config with tdt-core agent config chain` |
 
-**Symbol:** `config.py:65` calls `load_agent_config("agent-docs-sync")`.
-
 ### ai-harness-skills, ai-review
 
-No LLM config implementation changes. Branches (`work/llm-env-v2-ai-harness`, `work/llm-env-v2-ai-review`) are identical to `main`.
+No LLM config implementation changes. Branches identical to `main`.
 
 ---
 
-## Test Evidence (current baselines)
+## Test Evidence
 
 ### tdt-core focused config/profile tests (PASS)
 
@@ -81,76 +130,9 @@ uv run pytest tests/test_config_primitives.py tests/test_llm_profile_v2.py -q
 → 60 passed in 0.49s
 ```
 
-### agent-core (BLOCKED)
+### Downstream suites (BLOCKED by credential registry gap)
 
-```
-cd ~/Developer/agent-core
-uv run pytest -q --tb=short
-→ 25 failed, 12 passed
-```
-
-**SHA:** `e5fb49d`
-
-### agent-harness (BLOCKED)
-
-```
-cd ~/Developer/agent-harness
-uv run pytest -q --tb=short
-→ 8 failed, 14 passed
-```
-
-**SHA:** `0ad49d2`
-
-### agent-docs-sync (BLOCKED)
-
-```
-cd ~/Developer/agent-docs-sync
-uv run pytest -q --tb=short
-→ 8 failed, 237 passed, 4 warnings
-```
-
-**SHA:** `e0ba600`
-
----
-
-## Blocker: Custom Provider Credential Registry Gap
-
-### Root Cause
-
-Production `~/.tdt/config.yaml` configures three custom providers:
-
-| Provider | `api_key_env` value | Registry status |
-|---|---|---|
-| `giaoduc` | `HERMES_CUSTOM_GIAODUC_API_KEY` | **NOT REGISTERED** |
-| `shopapikey` | `HERMES_CUSTOM_SHOPAPIKEY_API_KEY` | **NOT REGISTERED** |
-| `cockpit` | `HERMES_CUSTOM_COCKPIT_API_KEY` | **NOT REGISTERED** |
-
-The canonical `environment-key-registry.json` contains only three credential entries:
-
-| `logical_key` | `canonical_key` | `provider` |
-|---|---|---|
-| `credential.anthropic.api_key` | `ANTHROPIC_API_KEY` | `anthropic` |
-| `credential.openai.api_key` | `OPENAI_API_KEY` | `openai-chat` |
-| `credential.model.api_key` | `MODEL_API_KEY` | (none) |
-
-### Failure Mechanism
-
-`resolve_agent_profile()` at `agent_profile.py:862-865` iterates the `providers`
-mapping from global YAML, and for each entry with an `api_key_env` string, calls
-`registry.credential_entry(key_name, provider_id)`. When the key is not registered,
-`credential_entry()` raises `ProfileResolutionError`.
-
-`credential_entry()` at `agent_profile.py:395-402` correctly rejects:
-- Unknown credential keys (no match in registry)
-- Wrong-provider assignments (key registered for different provider)
-
-### Failure Signature
-
-```
-ProfileResolutionError: credential key is not registered: HERMES_CUSTOM_GIAODUC_API_KEY
-```
-
-### Impact (verified with explicit exit codes)
+Captured via `pytest --junitxml`; explicit exit code `1` confirmed for each.
 
 | Repo | SHA | Failed | Passed | Total | Root cause |
 |---|---|---|---|---|---|
@@ -159,78 +141,20 @@ ProfileResolutionError: credential key is not registered: HERMES_CUSTOM_GIAODUC_
 | `agent-harness` | `0ad49d2` | 8 | 335 | 343 | registry gap |
 | `agent-docs-sync` | `e0ba600` | 8 | 237 | 245 | registry gap |
 
-### Resolution Required (separate tdt-core change)
-
-A separate `tdt-core` change must:
-
-1. Add three credential entries to `environment-key-registry.json`.
-2. Each entry must include:
-   - `logical_key`: e.g. `credential.giaoduc.api_key`
-   - `canonical_key`: e.g. `HERMES_CUSTOM_GIAODUC_API_KEY`
-   - `owner`: `tdt-core`
-   - `value_type`: `string`
-   - `precedence`: `shared`
-   - `secret`: `true`
-   - `provider`: `giaoduc` (or `shopapikey` / `cockpit`)
-   - `aliases`: `[]`
-   - `alias_status`: `{}` (no legacy aliases)
-   - `allow_clearing`: `false`
-3. Add focused tests:
-   - Custom key accepted for its provider
-   - Wrong-provider assignment rejected
-   - Unknown credential key rejected
-   - No credential value appears in profile/provenance/diagnostics
-4. Run GitNexus impact analysis before editing (blast radius: cross-repository)
-
-### Isolated TDT_HOME Validation (deferred)
-
-The earlier isolated-TDT_HOME test failures were `fs_kernel` secure-path setup
-failures, not resolver failures. Proper isolated validation requires:
-- A `TDT_HOME` with correct directory permissions
-- A `.env` file (can be empty)
-- A `config.yaml` with registered credential keys
-- No ambient `~/.tdt` contamination
-
-This validation is deferred to after the registry fix.
-
----
-
-## Spec-to-Code Alignment (verified)
-
-| Spec | Requirement | Symbol match |
-|---|---|---|
-| `agent-config-resolution` | Six-layer precedence | `resolve_agent_profile()` — explicit → consumer env → shared env → agent YAML → global YAML → defaults |
-| `agent-config-resolution` | Single config function | `load_agent_config()` delegates to `resolve_agent_profile()` |
-| `agent-config-resolution` | Config caching | `_agent_config_cache` with fingerprint-sensitive key |
-| `agent-config-resolution` | Secure overlay API | `load_config_mapping()` + `load_agent_overlay()` with `allowed_overlay_keys` |
-| `agent-core-model-resolution` | Config-driven fallback | `build_agent()` calls `load_agent_config()`, passes model to SDK |
-| `agent-core-model-resolution` | Model layer is config-input only | No YAML/dotenv readers in `_ai/models.py` |
-| `agent-harness-runner` | Two-plane config | `HarnessConfig.from_config()` uses `load_agent_config()` + domain overlay |
-| `consumer-config-composition` | Composes Settings | `ProfileSettingsProjection` from `ResolvedAgentProfile.settings` |
-| `consumer-pattern` | Harness composes profile | `HarnessConfig` owns resolved runtime-profile field |
-| `ecosystem-config-loading` | Typed settings share snapshot | `load_agent_config()` and `resolve_agent_profile()` use same root/loader |
-| `tdt-env-loader-tdt-home` | Canonical dotenv authority | `load_tdt_env()` is the single public dotenv API |
-| `tdt-env-loader-tdt-home` | Idempotency | `_initialize_identity` guard prevents duplicate load |
-| `tdt-env-loader-tdt-home` | Environment-key registry | `EnvironmentKeyRegistry.from_resource()` with sealed validation |
-| `cli-provider-profile-resolution` | Provider-neutral CLI profile | `project_cli_profile()` projects non-secret profile for CLI adapters |
-| `agent-docs-sync` | Canonical config | `load_agent_config("agent-docs-sync")` in `config.py:65` |
+**Caveat:** All observed downstream failures enter the unresolved custom-provider credential path; independent post-fix failures are currently masked by the first common failure.
 
 ---
 
 ## What Is NOT Proven
 
-1. Full downstream consumer suites pass — blocked by credential registry gap.
-2. Isolated-environment validation — earlier attempts failed in secure dotenv path setup and do not constitute resolver evidence.
-3. CLI provider profile end-to-end smoke — `project_cli_profile()` exists in `tdt-core` but no consumer repo imports it.
-4. Provider binding enforcement by `credential_entry()` — the code exists at `agent_profile.py:395-402` but no test exercises the wrong-provider path.
-
----
-
-## OpenSpec Validation
-
-- `openspec validate standardize-agent-llm-environment-resolution-v2` — **valid**
-- `openspec validate --all --store openspec-store` — **358 passed, 0 failed**
-- `git diff --check` — **clean**
+1. The new YAML `providers/models/defaults` schema — not implemented.
+2. `auth_env` support — not implemented.
+3. Alias/protocol validation — not implemented.
+4. Registry retirement decision — not made.
+5. CLI consumer integrations for `ai-harness-skills` and `ai-review` — not implemented.
+6. Isolated `TDT_HOME` fixture validation — not completed.
+7. Full downstream consumer suites pass — blocked by credential registry gap.
+8. Live LLM acceptance — not performed.
 
 ---
 
@@ -239,8 +163,8 @@ This validation is deferred to after the registry fix.
 | Item | Value |
 |---|---|
 | Branch | `openspec/standardize-agent-llm-environment-resolution-v2` |
-| HEAD | `d18373c` (evidence-refresh baseline; this commit replaces it) |
-| OpenSpec main | `6462aec` |
-| Files changed | 15 (all under `openspec/changes/standardize-agent-llm-environment-resolution-v2/`) |
-| Insertions | 1696 |
+| HEAD baseline before this commit | `859fca5` |
+| OpenSpec main | `d111c3d` |
+| Files changed | 16 (all under `openspec/changes/standardize-agent-llm-environment-resolution-v2/`) |
 | External code modified | None |
+| Archive status | **NOT ARCHIVED** — blocked by Phase 3, 4, 5, 6, 7, 9 |

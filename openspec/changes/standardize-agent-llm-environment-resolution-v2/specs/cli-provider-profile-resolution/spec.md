@@ -1,8 +1,8 @@
 ## Purpose
 
-Define a provider-neutral configuration contract for agent repositories that invoke LLM provider CLIs while preserving each CLI's isolated authentication and runtime policy.
+Define a provider-neutral configuration contract for agent repositories that invoke LLM provider CLIs while preserving each CLI's isolated authentication and runtime policy. This spec governs how the canonical provider/model/default profile (defined by `provider-model-profile-resolution`) projects into each native CLI's configuration format.
 
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Provider-neutral CLI profile
 
@@ -97,11 +97,7 @@ Runtimes with their own model registry or provider-infrastructure role SHALL not
 
 ### Requirement: Canonical direct-model boundary for CLI projections
 
-The provider-neutral projection SHALL distinguish a native CLI `model_alias` from a
-direct Pydantic-AI model identifier. If a CLI consumer receives a direct model ID from
-the canonical resolver, it SHALL be a registered `provider:model` value. Native aliases
-remain provider-owned invocation arguments and SHALL not be presented as proof of a
-canonical direct-model route.
+The provider-neutral projection SHALL distinguish a native CLI `model_alias` from a direct Pydantic-AI model identifier. If a CLI consumer receives a direct model ID from the canonical resolver, it SHALL be a registered `provider:model` value. Native aliases remain provider-owned invocation arguments and SHALL not be presented as proof of a canonical direct-model route.
 
 #### Scenario: Native alias remains adapter-local
 
@@ -123,3 +119,73 @@ canonical direct-model route.
 - **WHEN** an adapter smoke gate runs
 - **THEN** the result SHALL be reported as prerequisite-aware N/A or provider-unavailable
 - **AND** it SHALL not use another provider's credential or silently pass
+
+## ADDED Requirements
+
+### Requirement: Each CLI adapter declares its target native format
+
+Each CLI-provider consumer SHALL declare the native configuration format it targets (e.g., Codex `config.toml`, Kimi `config.toml`, Pi `mcp.json`) and SHALL project the canonical provider/model/default profile into that format's schema. The projection SHALL preserve the provider identity, wire model ID, alias, and effort; it SHALL NOT project credential values.
+
+#### Scenario: Codex adapter projects to config.toml format
+
+- **WHEN** a Codex CLI adapter receives the canonical profile
+- **THEN** the adapter SHALL project `model_providers.<name>.base_url` and `wire_api` from the provider definition
+- **AND** the adapter SHALL project the model alias and effort into the Codex config schema
+- **AND** the adapter SHALL NOT project `auth_env` or any credential value
+
+#### Scenario: Kimi adapter projects to config.toml format
+
+- **WHEN** a Kimi CLI adapter receives the canonical profile
+- **THEN** the adapter SHALL project `[providers.<name>]` with `type`, `base_url` from the provider definition
+- **AND** the adapter SHALL project `[models.<alias>]` with `provider`, `model`, `max_context_size`
+- **AND** the adapter SHALL NOT project API key values
+
+#### Scenario: Pi adapter projects to mcp.json format
+
+- **WHEN** a Pi CLI adapter receives the canonical profile
+- **THEN** the adapter SHALL project transport configuration through the MCP boundary
+- **AND** the adapter SHALL NOT project credential values into the MCP configuration
+
+#### Scenario: Projection preserves alias and wire model distinction
+
+- **GIVEN** the canonical profile contains alias `cockpit-luna` with wire model `gpt-5.6-luna`
+- **WHEN** a CLI adapter projects this into its native format
+- **THEN** the native format SHALL contain the wire model ID as the model value
+- **AND** the alias SHALL be available for diagnostics and provenance
+- **AND** the adapter SHALL not confuse the alias with the wire model ID
+
+### Requirement: No consumer appears implemented until it imports the API
+
+A consumer SHALL NOT be described as integrated, wired, or functioning unless it imports `project_cli_profile()` or an equivalent canonical projection API. Documentation SHALL explicitly state when a consumer is proposed but not implemented.
+
+#### Scenario: ai-harness-skills is not implemented
+
+- **WHEN** `ai-harness-skills` source is audited for `project_cli_profile` or `CLIProviderProfile` imports
+- **THEN** no such import SHALL be found
+- **AND** documentation SHALL describe the consumer as proposed, not implemented
+
+#### Scenario: ai-review is not implemented
+
+- **WHEN** `ai-review` source is audited for `project_cli_profile` or `CLIProviderProfile` imports
+- **THEN** no such import SHALL be found
+- **AND** documentation SHALL describe the consumer as proposed, not implemented
+
+### Requirement: Native CLI format is advisory, not canonical
+
+The canonical provider/model/default profile is the source of truth. Each native CLI format projection is a lossy translation; the canonical profile SHALL contain strictly more information than any single CLI format. Conflicts between the canonical profile and a projected CLI format SHALL be resolved in favor of the canonical profile.
+
+#### Scenario: Canonical profile has more information than Codex config
+
+- **GIVEN** the canonical profile contains provider definition, model alias, wire model, effort, context limit, and provenance
+- **WHEN** this is projected into Codex `config.toml` format
+- **THEN** the Codex config SHALL contain base_url, wire_api, model, and effort
+- **AND** the Codex config SHALL NOT contain provenance, source fingerprints, or environment-key metadata
+- **AND** the canonical profile SHALL be the authoritative source if Codex config is stale
+
+#### Scenario: Conflicting alias between canonical and native
+
+- **GIVEN** the canonical profile specifies alias `shopapikey-fable-5` with wire model `fable-5`
+- **AND** a native CLI config contains a different model for the same provider
+- **WHEN** the adapter projects the canonical profile
+- **THEN** the canonical profile's model SHALL take precedence
+- **AND** the adapter SHALL not silently adopt the native CLI's stale value
