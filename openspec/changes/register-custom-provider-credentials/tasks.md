@@ -36,21 +36,20 @@
 - [x] 5.2 Commit tdt-core change: `d63aa08 fix(config): register custom provider credentials`.
 - [x] 5.3 Integrate tdt-core branch into main: cherry-pick `2897df7` → `d63aa08`.
 
-## Phase 6: Documentation reconciliation (not started)
+## Phase 6: Documentation reconciliation (complete)
 
-- [ ] 6.1 Update v2 `EVIDENCE_MANIFEST.md` to mark registry blocker resolved, record integrated SHA `d63aa08`, replace old blocked downstream counts.
-- [ ] 6.2 Update v2 `tasks.md` to mark Phase 3 (registry fix) complete and Phase 4 downstream as verified against integrated main.
-- [ ] 6.3 Update v2 `proposal.md` and `design.md` where they state the registry fix is pending.
-- [ ] 6.4 Validate both changes, stage only change directories, commit.
+- [x] 6.1 Update v2 `EVIDENCE_MANIFEST.md` to mark registry blocker resolved, record integrated SHA `d63aa08`, replace old blocked downstream counts.
+- [x] 6.2 Update v2 `tasks.md` to mark Phase 3 (registry fix) complete and Phase 4 downstream as verified against integrated main.
+- [x] 6.3 Update v2 `proposal.md` and `design.md` where they state the registry fix is pending.
+- [x] 6.4 Validate both changes, stage only change directories, commit (`4dffb1b`).
 
-## Phase 7: Cleanup (not started)
+## Phase 7: Cleanup (complete)
 
-- [ ] 7.1 Pop graphify-out stash on tdt-core main.
-- [ ] 7.2 Remove isolated integration worktree (`~/Developer/tdt-core-credentials-integration`).
-- [ ] 7.3 Remove v2 worktree branch if no longer needed.
-- [ ] 7.4 Decide whether to archive `register-custom-provider-credentials` — **NOT YET** until v2 change is reconciled.
+- [x] 7.1 Pop graphify-out stash on tdt-core main.
+- [x] 7.2 Remove isolated integration worktree (`~/Developer/tdt-core-credentials-integration`).
+- [x] 7.3 Integration branch removed (`integrate/register-custom-provider-credentials`).
+- [x] 7.4 tdt-core main has 6 unrelated `graphify-out/` modifications (pre-existing, not from this change).
 
-## Phase 8: Archive decision (deferred)
+## Phase 8: Archive
 
-- [ ] 8.1 Archive `register-custom-provider-credentials` only after v2 change is reconciled and no cross-repo issues remain.
-- [ ] 8.2 **Do not archive the v2 change** — provider/model/default YAML migration and CLI projections remain unimplemented.
+- [ ] 8.1 Archive `register-custom-provider-credentials` after final validation.
