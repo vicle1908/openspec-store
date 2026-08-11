@@ -105,4 +105,4 @@ The `[1m]` suffix is a Claude Code context-window selector. Claude Code strips i
 
 ## Current Closure State
 
-The implementation, all three live provider gates, deterministic validation, and independent semantic review are complete. The review returned `APPROVE_WITH_BLOCKER` with no functional defect; its remaining recommendation is a durable CI/deployment guard for launcher/routing contracts, outside this runtime change. Commit and archive remain separate pending gates requiring operator approval and the agreed release-guard disposition.
+The implementation, all three live provider gates, deterministic validation, and independent semantic review are complete. The review returned `APPROVE_WITH_BLOCKER` with no functional defect; its remaining recommendation is a durable CI/deployment guard for launcher/routing contracts, outside this runtime change. Commit and archive are complete. The change is archived at openspec/changes/archive/2026-08-11-claude-code-model-effort-alias-routing/.

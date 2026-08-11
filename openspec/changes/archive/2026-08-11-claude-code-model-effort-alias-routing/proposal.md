@@ -29,7 +29,7 @@ All evidence below was collected from the live workstation before this proposal 
 | Adapter runtime | PASS | `127.0.0.1:8787` is served by the healthy `claude-code-provider-adapter` container; cockpit listens on `127.0.0.1:51006` |
 | Existing settings isolation | PASS | `~/.claude/settings.json` has no provider-specific `ANTHROPIC_*` or effort variables |
 
-At authoring time, the giaoduc 429 was an external provider-account gate. It was not evidence that the desired request shape was accepted, so the change was required to remain unarchived until a post-lock HTTP 200 smoke was captured. That post-lock smoke is now recorded in the Phase 3 evidence.
+At authoring time, the giaoduc 429 was an external provider-account gate. It was not evidence that the desired request shape was accepted, so the change was required to remain unarchived until a post-lock HTTP 200 smoke was captured. That post-lock smoke is now recorded in the Phase 3 evidence. It was not evidence that the desired request shape was accepted, so the change was required to remain unarchived until a post-lock HTTP 200 smoke was captured. That post-lock smoke is now recorded in the Phase 3 evidence.
 
 ## What Changes
 
@@ -67,4 +67,4 @@ Implementation is complete and verified for the launcher contract, adapter mappi
 
 ## Readiness
 
-The implementation is operational, and all three live provider acceptance gates, deterministic validation, and independent semantic review are green for runtime behavior. The review verdict is `APPROVE_WITH_BLOCKER`: no functional defect was found, but it recommends durable CI/deployment guards for the launcher contracts and direct-versus-adapter routing. Commit and archive remain separate pending gates; OpenSpec tasks 4.5 and 4.6 are intentionally unchecked until that release-governance disposition and operator approval are complete.
+The implementation is operational, and all three live provider acceptance gates, deterministic validation, and independent semantic review are green for runtime behavior. The review verdict is `APPROVE_WITH_BLOCKER`: no functional defect was found, but it recommends durable CI/deployment guards for the launcher contracts and direct-versus-adapter routing. All gates are now complete. The change was committed (402219e, 8aad519) and archived (b6b0c1c). OpenSpec tasks 4.5 and 4.6 are checked. Rollback rehearsal tasks (R.1–R.3) remain unchecked by design.
