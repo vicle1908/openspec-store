@@ -1,5 +1,7 @@
 # Proposal: claude-code-three-provider-routing
 
+> **Successor note:** This change records the initial provider-routing implementation. The launcher model/effort/`[1m]` contract is now owned by `claude-code-model-effort-alias-routing`; its checked tasks are historical evidence for the earlier routing slice only.
+
 ## Why
 
 Claude Code v2.1.226 runs with a single provider (shopapikey) hardcoded in `settings.json`. The user wants shell launcher functions to switch between three providers — shopapikey, giaoduc, and cockpit — without modifying settings.json per session.

@@ -1,5 +1,7 @@
 # Design: claude-code-three-provider-routing
 
+> **Successor note:** The initial routing design is retained for historical traceability. Current launcher aliases, `[1m]` selectors, effort levels, and adapter effort propagation are defined in `claude-code-model-effort-alias-routing`.
+
 ## Architecture
 
 ```

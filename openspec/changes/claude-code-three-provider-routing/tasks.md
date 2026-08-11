@@ -1,5 +1,7 @@
 # Tasks: claude-code-three-provider-routing
 
+> **Successor note:** Tasks checked here cover the initial routing slice. Do not use them as evidence for the current `[1m]` model aliases, effort settings, or adapter effort mapping; those are tracked in `claude-code-model-effort-alias-routing`.
+
 ## Phase 0: Prerequisites
 
 - [x] 0.2 Backup `~/.claude/settings.json` to `~/.claude/backups/settings.json.pre-provider-routing`
