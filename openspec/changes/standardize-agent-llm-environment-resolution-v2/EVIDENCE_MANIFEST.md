@@ -61,7 +61,7 @@ tasks.md reversion, plus the
 pre-existing untracked v2 artifact tree (.openspec.yaml, README.md, design.md,
 proposal.md, and the nine specs/*/spec.md files). The manifest itself is
 tracked by the incident commit and is the only file changed by this corrective
-edit. The final full-untracked porcelain fingerprint after this correction is
+edit. The independently reviewed pre-commit full-untracked porcelain fingerprint is
 `3eb6b0e324f6d796df4ba3de504e113102fc6fdf5183e2c62ff4c34a3e889734`.
 The fingerprint hashes path/status records rather than file content, so recording
 it here does not change the stream while the same dirty-path set is preserved.
@@ -509,8 +509,8 @@ openspec/changes/standardize-agent-llm-environment-resolution-v2/EVIDENCE_MANIFE
 openspec/changes/standardize-agent-llm-environment-resolution-v2/tasks.md
 ~~~
 
-No task checkbox is changed by this manifest correction. The final
-full-untracked porcelain fingerprint is
+No task checkbox is changed by this manifest correction. The independently
+reviewed pre-commit full-untracked porcelain fingerprint was
 `3eb6b0e324f6d796df4ba3de504e113102fc6fdf5183e2c62ff4c34a3e889734`.
 No commit, stage,
 reset, amend, revert, sync, archive, application edit, credentialed call, or
