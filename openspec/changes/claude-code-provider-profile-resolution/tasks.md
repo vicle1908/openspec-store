@@ -52,8 +52,8 @@
   - Evidence: captured `model: fable-5`, `output_config.effort=xhigh`, auth present, response `SHOP_E2E_PROFILE`.
 - [x] 2.7 Run local capture test for cockpit profile.
   - Evidence: captured `model: gpt-5.6-luna`, `output_config.effort=max`, auth present, response `COCKPIT_E2E_PROFILE`.
-- [x] 2.8 Run real `giaoduc --print` through actual launcher function.
-  - Evidence: `system_model: Advance[1m]`, `modelUsage: ['Advance[1m]']`, exit 0, response `GIAODUC_PROFILE_LIVE`.
+- [ ] 2.8 Run real `giaoduc --print` through actual launcher function.
+  - BLOCKED: `system_model: Advance[1m]` was confirmed, but the provider returned HTTP 403 because the API key is expired or not found. Refresh the credential and rerun the smoke.
 
 ## Phase 3: Documentation (complete)
 
@@ -67,6 +67,8 @@
 
 ## Phase 4: Commit
 
-- [ ] 4.1 Stage only the new change files.
+- [x] 4.1 Stage only the new change files.
+  - Evidence: staged evidence.md and tasks.md updates.
 - [ ] 4.2 Commit with scoped message.
+  - Evidence: pending; this update is ready to commit separately from the base commit `22f1fc1`.
 - [ ] 4.3 Archive after all gates green (deferred — this change documents a fix, not a new feature).

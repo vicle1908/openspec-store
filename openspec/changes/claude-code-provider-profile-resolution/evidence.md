@@ -20,15 +20,6 @@ cockpit    → ANTHROPIC_MODEL: <unset>, ANTHROPIC_BASE_URL: <unset>
 
 ### settings.json provider-neutral
 
-```json
-// Before
-{ "model": "Advance[1m]", ... }
-
-// After
-{ "autoCompactEnabled": ..., "env": { "API_TIMEOUT_MS": ..., ... }, ... }
-// No "model" key. No ANTHROPIC_BASE_URL in env.
-```
-
 Evidence: `python3 -c "import json; d=json.load(open(settings.json)); assert 'model' not in d; assert 'ANTHROPIC_BASE_URL' not in d.get('env',{})"` — PASS.
 
 ### Profile files
@@ -47,19 +38,15 @@ Evidence: `python3 -c "..."` assertions PASS for all three. No `ANTHROPIC_AUTH_T
 
 ### Launcher wiring
 
-| Launcher | _claude_require_token | --settings | profile path |
-|---|---|---|---|
-| shopapikey() | HERMES_CUSTOM_SHOPAPIKEY_API_KEY | yes | $HOME/.claude/profiles/shopapikey.json |
-| giaoduc() | HERMES_CUSTOM_GIAODUC_API_KEY | yes | $HOME/.claude/profiles/giaoduc.json |
-| cockpit() | HERMES_CUSTOM_COCKPIT_API_KEY | yes | $HOME/.claude/profiles/cockpit.json |
-
-`grep -c '_claude_model_default' ~/.zshrc` → 0 (old helper fully removed).
-`grep -c '_claude_with_profile' ~/.zshrc` → 4 (1 definition + 3 call sites).
-`grep -c '--settings' ~/.zshrc` → 3 (one per launcher).
+- `grep -c '_claude_model_default' ~/.zshrc` → 0 (old helper fully removed).
+- `grep -c '_claude_with_profile' ~/.zshrc` → 4 (1 definition + 3 call sites).
+- `grep -c '--settings' ~/.zshrc` → 3 (one per launcher).
+- `grep -c '_claude_require_token' ~/.zshrc` → 4 (1 definition + 3 guard calls).
+- Cockpit fallback uses `gpt-5.6-luna[1m]` (user-corrected; `fable-5.6-luna` was rejected by provider).
 
 ### Auth token injection
 
-Each launcher exports only `ANTHROPIC_AUTH_TOKEN` in its subshell from `$HERMES_CUSTOM_*_API_KEY`. Token never written to profile JSON. Verified by wire capture showing `authorization: present` header.
+Each launcher exports only `ANTHROPIC_AUTH_TOKEN` in its subshell from `$HERMES_CUSTOM_*_API_KEY`. Token never written to profile JSON. Verified by wire capture showing `authorization: present`.
 
 ## Wire-level capture evidence
 
@@ -70,11 +57,9 @@ Local capture server on port 19999, profile temporarily patched to point to `htt
 ```
 wire model: fable-5
 output_config.effort: xhigh
-authorization: present (pmv_t81Mr35G6...)
+authorization: present
 captured requests: 2
 ```
-
-Note: `system_model` and `result` fields were not parseable due to iTerm2 OSC escape sequences in Claude's JSON stdout. Wire request body was captured and verified independently.
 
 ### giaoduc
 
@@ -85,9 +70,7 @@ authorization: present
 captured requests: 2
 ```
 
-Same parser caveat as shopapikey.
-
-### cockpit (gpt-5.6-luna)
+### cockpit
 
 ```
 wire model: gpt-5.6-luna
@@ -96,27 +79,21 @@ authorization: present
 captured requests: 2
 ```
 
-Same parser caveat as shopapikey.
+## Fresh-shell smoke (authoritative, latest run)
 
-## Real launcher smoke
+| Provider | Model | Sentinel | Fresh-shell result |
+|---|---|---|---|
+| shopapikey | `fable-5[1m]` | `SHOP_LIVE_GATE_7X9K` | PASS — exit 0, is_error=False, modelUsage=fable-5[1m], exact sentinel |
+| cockpit | `gpt-5.6-luna[1m]` | `COCKPIT_GPT_1M_FINAL` | PASS — exit 0, is_error=False, modelUsage=gpt-5.6-luna[1m], exact sentinel |
+| giaoduc | `Advance[1m]` | `GIAODUC_LIVE_GATE_3M2P` | BLOCKED — model resolution correct (system_model=Advance[1m]), provider returns HTTP 403 API key expired or not found |
 
-### giaoduc (full end-to-end)
+### Cockpit `[1m]` fix
 
-`zsh -lic 'giaoduc --print --output-format json "Return exactly GIAODUC_PROFILE_LIVE"'`:
+The cockpit launcher fallback was corrected from `gpt-5.6-luna` to `gpt-5.6-luna[1m]`. Fresh-shell smoke confirmed `system_model: gpt-5.6-luna[1m]` and `modelUsage: ['gpt-5.6-luna[1m]']`.
 
-```
-exit_code: 0
-system_model: Advance[1m]
-result_subtype: success
-is_error: False
-modelUsage: ['Advance[1m]']
-```
+### giaoduc status
 
-JSON output parsed after stripping iTerm2 OSC escape sequences via `sed 's/\x1b\]1337;[^[:cntrl:]]*\x07//g'`.
-
-### shopapikey and cockpit
-
-Real launcher smoke for shopapikey and cockpit was NOT performed through the full `zsh -lic` pipeline. Only wire-level local capture tests were completed. This is an honest gap in the evidence record.
+The giaoduc credential (`$HERMES_CUSTOM_GIAODUC_API_KEY`) is expired or not found. The model resolution and base URL are correct — `system_model: Advance[1m]` was confirmed by the provider before it rejected the expired token. This is a credential refresh issue, not a code defect.
 
 ## OpenSpec validation
 
@@ -129,8 +106,6 @@ openspec validate --all --store openspec-store → 358 passed, 0 failed
 
 The implementation uses `gpt-5.6-luna` because the cockpit provider accepted it. The user initially proposed `fable-5.6-luna`, but the provider rejected it with `model_not_available`.
 
-## What is NOT proven
+## Not proven
 
-1. shopapikey and cockpit real launcher smoke through `zsh -lic` (only wire capture performed).
-2. shopapikey real launcher smoke through `zsh -lic` (only wire capture performed).
-3. Provider-side 1M context window capacity (only client-side `[1m]` selector acceptance proven).
+1. Provider-side 1M context window capacity (only client-side `[1m]` selector acceptance proven).
