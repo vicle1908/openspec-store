@@ -18,9 +18,9 @@ cockpit    → ANTHROPIC_MODEL: <unset>, ANTHROPIC_BASE_URL: <unset>
 
 ## Fix verification
 
-### settings.json provider-neutral
+### settings.json provides shopapikey defaults
 
-Evidence: `python3 -c "import json; d=json.load(open(settings.json)); assert 'model' not in d; assert 'ANTHROPIC_BASE_URL' not in d.get('env',{})"` — PASS.
+Evidence: `python3 -c "import json; d=json.load(open(settings.json)); assert d['model']=='fable[1m]'; assert d['env']['ANTHROPIC_BASE_URL']=='https://api.phanmemvip.shop'; assert 'ANTHROPIC_AUTH_TOKEN' not in d.get('env',{})"` — PASS.
 
 ### Profile files
 

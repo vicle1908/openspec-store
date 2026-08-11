@@ -14,7 +14,7 @@ Additionally, launcher subshells only passed `--model` via CLI flag through `_cl
 |---|---|---|
 | Profile JSON (`~/.claude/profiles/*.json`) | Model, base URL, aliases, effort, capabilities | Persistent, `chmod 600` |
 | Shell launcher (`~/.zshrc`) | `ANTHROPIC_AUTH_TOKEN` from `$HERMES_CUSTOM_*_API_KEY` | Runtime only, per subshell |
-| Global settings (`~/.claude/settings.json`) | Provider-neutral defaults | Persistent, no model/base URL |
+| Global settings (`~/.claude/settings.json`) | shopapikey defaults (model, base URL, aliases, effort) | Persistent, no auth token |
 
 ### Profile Files
 

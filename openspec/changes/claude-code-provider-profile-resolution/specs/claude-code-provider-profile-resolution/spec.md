@@ -1,19 +1,22 @@
 ## ADDED Requirements
 
-### Requirement: Global settings SHALL be provider-neutral
+### Requirement: Global settings SHALL provide shopapikey defaults while remaining credential-free
 
-The `~/.claude/settings.json` file MUST NOT contain a top-level `model` key or any `ANTHROPIC_*` keys in its `env` block. Provider selection is determined solely by the profile loaded via `--settings` and the launcher subshell.
+The `~/.claude/settings.json` file SHALL contain the shopapikey model, base URL, resolution aliases, effort level, and capability declarations as global defaults so that bare `claude` invocations and other compatible applications use shopapikey without any launcher or `--settings` flag. The file MUST NOT contain `ANTHROPIC_AUTH_TOKEN` or any secret values.
 
-#### Scenario: settings.json has no global model
-
-- **WHEN** `~/.claude/settings.json` is loaded
-- **THEN** it MUST NOT contain a top-level `model` key
-- **AND** its `env` block MUST NOT contain `ANTHROPIC_BASE_URL`
-
-#### Scenario: provider-neutral env keys only
+#### Scenario: settings.json provides shopapikey defaults
 
 - **WHEN** `~/.claude/settings.json` is loaded
-- **THEN** its `env` block MUST contain only non-provider-specific keys (e.g. `API_TIMEOUT_MS`, `MCP_TIMEOUT`)
+- **THEN** it MUST contain a top-level `model` key set to `fable[1m]`
+- **AND** its `env` block MUST contain `ANTHROPIC_BASE_URL=https://api.phanmemvip.shop`
+- **AND** its `env` block MUST contain `ANTHROPIC_MODEL=fable[1m]`
+- **AND** its `env` block MUST contain `ANTHROPIC_DEFAULT_FABLE_MODEL=fable-5[1m]`
+- **AND** its `env` block MUST contain `CLAUDE_CODE_EFFORT_LEVEL=xhigh`
+
+#### Scenario: settings.json contains no auth tokens
+
+- **WHEN** `~/.claude/settings.json` is inspected
+- **THEN** it MUST NOT contain `ANTHROPIC_AUTH_TOKEN`, `API_KEY`, `TOKEN`, or `SECRET` in its `env` block
 
 ### Requirement: Provider profiles SHALL define model, base URL, and effort
 
