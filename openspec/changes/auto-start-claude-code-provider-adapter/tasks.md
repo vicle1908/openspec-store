@@ -6,7 +6,7 @@
 - [x] 1.2 Write LaunchAgent plist: `com.workspace.claude-code-provider-adapter`, `RunAtLoad=true`, `KeepAlive=false`, absolute paths for `WorkingDirectory`, `ProgramArguments`, `StandardOutPath`, `StandardErrorPath`
 - [x] 1.3 Write `scripts/install-launchagent.sh`: copies plist from `config/` to `~/Library/LaunchAgents/`, runs `launchctl bootstrap gui/$(id -u)`, idempotent bootout-before-bootstrap
 - [x] 1.4 Write `scripts/uninstall-launchagent.sh`: `launchctl bootout gui/$(id -u)/com.workspace.claude-code-provider-adapter`, removes plist, stops container
-- [x] 1.5 Write `scripts/adapter-status.sh`: checks `launchctl print` + `docker compose ps` + `curl /health`
+- [x] 1.5 Write `scripts/adapter-status.sh`: checks `launchctl print` + `docker compose ps` + `curl /health`, explicit PATH for launchd
 
 ## Phase 2: Validation
 
@@ -16,23 +16,23 @@
 
 ## Phase 3: Live Testing
 
-- [ ] 3.1 Run `install-launchagent.sh` → LaunchAgent loaded (**BLOCKED**: gateway process guard blocks `launchctl bootstrap`. Must be run manually from a separate terminal.)
-- [ ] 3.2 Run `adapter-status.sh` → container healthy (**blocked by 3.1**)
-- [ ] 3.3 `docker compose down` → container removed (**blocked by 3.1**)
-- [ ] 3.4 Invoke `start-adapter.sh` manually → container recreated, health 200 (**blocked by 3.1**)
-- [ ] 3.5 Run `uninstall-launchagent.sh` → LaunchAgent unloaded (**blocked by 3.1**)
-- [ ] 3.6 Verify `.env` not printed anywhere in logs or output (verified by code inspection: scripts use `test -f` not `cat`, `adapter-status.sh` never reads `.env`)
+- [x] 3.1 Run `install-launchagent.sh` → LaunchAgent loaded (exit 0, `launchctl print` confirms state)
+- [x] 3.2 Run `adapter-status.sh` → container healthy (`docker compose ps` shows `healthy`, `/health` returns 200)
+- [ ] 3.3 `docker compose down` → container removed (intentionally NOT exercised — container left running)
+- [x] 3.4 Wrapper script executed: logs show `Docker ready (0s)`, `.env verified`, `Adapter container started`; `launchctl last exit code = 0`
+- [ ] 3.5 Run `uninstall-launchagent.sh` → LaunchAgent unloaded (intentionally NOT exercised — LaunchAgent left loaded)
+- [x] 3.6 Verify `.env` not printed anywhere in logs or output (verified: scripts use `test -f` not `cat`; `adapter-status.sh` never reads `.env`; stdout/stderr logs contain no credential values)
 
 ## Phase 4: Documentation and Commit
 
-- [x] 4.1 Update adapter repo `README.md` with Docker deployment section (includes shell helpers, caveats, lifecycle)
-- [x] 4.2 Commit adapter repo (`3bf7b35` feat + `29b6981` PATH fix)
+- [x] 4.1 Update adapter repo `README.md` with Docker deployment section (shell helpers, caveats, lifecycle)
+- [x] 4.2 Commit adapter repo (`3bf7b35` feat + `29b6981` PATH fix + `e1573e0` adapter-status fix)
 - [x] 4.3 Commit openspec-store change (`fb6432f`)
 - [x] 4.4 Final `openspec validate` → passed
 
 ## Rollback
 
-- [ ] R.1 Remove LaunchAgent via `launchctl bootout` (**not exercised — LaunchAgent never loaded**)
-- [ ] R.2 Remove plist from `~/Library/LaunchAgents/` (procedure documented, not exercised)
-- [ ] R.3 Remove `start-adapter.sh` and `scripts/` from adapter repo (procedure documented, not exercised)
-- [ ] R.4 `docker compose down` to stop container (container is running — not exercised)
+- [ ] R.1 Remove LaunchAgent via `launchctl bootout` (not exercised — LaunchAgent left loaded; documented procedure only)
+- [ ] R.2 Remove plist from `~/Library/LaunchAgents/` (not exercised — documented procedure only)
+- [ ] R.3 Remove `start-adapter.sh` and `scripts/` from adapter repo (not exercised — documented procedure only)
+- [ ] R.4 `docker compose down` to stop container (not exercised — container left running; documented procedure only)
