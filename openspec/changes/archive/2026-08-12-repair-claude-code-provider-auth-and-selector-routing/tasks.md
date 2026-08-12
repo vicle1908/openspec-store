@@ -110,20 +110,15 @@
 - [x] 9.5 Run focused and full OpenSpec validation post-implementation.
   - Evidence: focused change valid; full store 362/362 passed.
 - [x] 9.6 Reconcile task statuses against evidence.
-- [ ] 9.7 Archive the change.
+- [x] 9.7 Archive the change.
+  - Evidence: archived as `2026-08-12-repair-claude-code-provider-auth-and-selector-routing`; canonical spec updated with three MODIFIED requirements; active change directory removed; strict validation passed.
 
 ## Open Security Action (outside this change)
 
-- [x] S.1 Rotate provider credentials.
-  - DISPOSITION: operator declined rotation and accepted residual exposure risk; no rotation performed.
+- [x] Record operator disposition for credential rotation.
+  - DISPOSITION: operator accepted residual risk from prior plaintext exposure; no rotation performed.
 
 ## Rollback
 
-- [x] R.1 Restore `~/.zshrc` from backup.
-  - DISPOSITION: operator waived rollback rehearsal; documented backups and rollback procedure remain available; no rollback performed.
-- [x] R.2 Restore `~/.claude/profiles/cockpit.json` from backup.
-  - DISPOSITION: same as R.1.
-- [x] R.3 Run `zsh -n ~/.zshrc` after rollback.
-  - DISPOSITION: same as R.1.
-- [x] R.4 Verify each launcher with `--print` after rollback.
-  - DISPOSITION: same as R.1.
+- [x] Record operator disposition for rollback rehearsal.
+  - DISPOSITION: operator waived rehearsal; backups at `~/.zshrc.pre-repair-auth-20260812_113415` and `~/.claude/profiles/cockpit.json.pre-repair-20260812_113415` remain available; no rollback performed.
