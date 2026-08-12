@@ -53,4 +53,3 @@ Public URLs SHALL route to Browserbase cloud. Private/loopback URLs SHALL automa
 - And `browser.auto_local_for_private_urls` is `true`
 - When native `browser_navigate` is called with a loopback URL
 - Then the request SHALL use a local Chromium sidecar and SHALL NOT send the URL to Browserbase
-
