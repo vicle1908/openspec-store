@@ -46,33 +46,49 @@ Three custom provider credential environment variable names were registered in `
 - [x] 3.2 Run all four consumer suites after registry fix.
   - Evidence: 1946 passed, 0 failures across all repos (integrated main, no PYTHONPATH override).
 
-## Phase 4: New YAML provider/model/default schema (NOT STARTED)
+## Phase 4: New YAML provider/model/default schema (COMPLETE — `21dcd5b`)
 
-- [ ] 4.1 Define `ProviderConfig` and `ModelProfile` typed models in tdt-core.
-- [ ] 4.2 Add YAML schema validation.
-- [ ] 4.3 Add `auth_env` support.
-- [ ] 4.4 Add protocol enum.
-- [ ] 4.5 Add alias semantics.
-- [ ] 4.6 Define migration compatibility.
-- [ ] 4.7 Add focused tests.
+- [x] 4.1 Define `ProviderConfig` and `ModelProfile` typed models in tdt-core.
+  - Commit: `21dcd5b`. ProviderModelConfig, ModelProfile, ModelDefaults, ProviderProtocol enum.
+- [x] 4.2 Add YAML schema validation.
+  - Commit: `21dcd5b`. Aggregated referential integrity, base_url validation, field validators.
+- [x] 4.3 Add `auth_env` support.
+  - Commit: `21dcd5b`. auth_env field in ProviderModelConfig, runtime resolution through CredentialResolver.
+- [x] 4.4 Add protocol enum.
+  - Commit: `21dcd5b`. ProviderProtocol enum: messages, responses, openai_chat.
+- [x] 4.5 Add alias semantics.
+  - Commit: `21dcd5b`. Alias resolution in resolve_cli_projection(), model_settings enrichment.
+- [x] 4.6 Define migration compatibility.
+  - Commit: `21dcd5b`. Mixed-schema rejection, legacy-only fallback, _project_new_schema() integration.
+- [x] 4.7 Add focused tests.
+  - Commit: `21dcd5b`. 46 parser tests + 39 resolver tests = 85 new tests. Total suite: 687/681/0/6.
 
-## Phase 5: Registry retirement decision (NOT STARTED)
+## Phase 5: Registry retirement decision (DEFERRED to successor change)
 
 - [ ] 5.1 Decide whether registry becomes generic schema-only validation or is removed entirely.
+  - Deferred to `integrate-canonical-cli-projections-v1`. Registry retirement affects all consumers.
 
-## Phase 6: CLI projections and consumer wiring (NOT STARTED)
+## Phase 6: CLI projections and consumer wiring (DEFERRED to successor change)
 
 - [ ] 6.1 Add `project_cli_profile()` requirement for each adapter to project into its native format.
+  - Bridge foundation committed at `b160709` in `ai-harness-skills-phase6` (9/9 GREEN).
+  - NOT wired into `build_runtime()`. NOT evidence of integration.
 - [ ] 6.2 Add scenario that no consumer appears implemented until it imports the API.
 - [ ] 6.3 Define `ai-harness-skills` and `ai-review` integration requirements.
+  - Deferred to `integrate-canonical-cli-projections-v1`.
 
-## Phase 7: Isolated TDT_HOME tests (NOT STARTED)
+## Phase 7: Isolated TDT_HOME tests (COMPLETE — `21dcd5b`)
 
-- [ ] 7.1 Create isolated TDT_HOME fixture.
-- [ ] 7.2 Prove six-layer precedence.
-- [ ] 7.3 Prove credential availability recording without secret values.
-- [ ] 7.4 Prove provenance for each resolved field.
-- [ ] 7.5 Prove cache isolation.
+- [x] 7.1 Create isolated TDT_HOME fixture.
+  - Used across 19 precedence tests and 39 resolver tests.
+- [x] 7.2 Prove six-layer precedence.
+  - 19 TestSixLayerPrecedence tests covering explicit, consumer, shared, agent, new-schema, global, defaults.
+- [x] 7.3 Prove credential availability recording without secret values.
+  - Credential tests verify available/unavailable recording, no secret leakage.
+- [x] 7.4 Prove provenance for each resolved field.
+  - Provenance tests verify source_class, source_key, shadowed_sources.
+- [x] 7.5 Prove cache isolation.
+  - reset_profile_state() tested across multiple resolution paths.
 
 ## Phase 8: Spec reconciliation (complete for existing specs)
 
@@ -85,18 +101,49 @@ Three custom provider credential environment variable names were registered in `
 - [x] 8.7 `tdt-env-loader-tdt-home`
 - [x] 8.8 `cli-provider-profile-resolution`
 - [x] 8.9 `agent-docs-sync`
-- [ ] 8.10 `provider-model-profile-resolution` — new spec added but not implemented.
+- [x] 8.10 `provider-model-profile-resolution` — implemented and integrated at `21dcd5b`.
 
-## Phase 9: Full downstream validation (COMPLETE)
+## Phase 9: Full downstream validation (PARTIAL — `21dcd5b`)
 
 - [x] 9.1 After registry fix: all consumer suites pass in integrated main (no PYTHONPATH override).
+  - Evidence: 687/681/0/6 (tdt-core), 746/746 (agent-core), 343/343 (agent-harness), 245/245 (agent-docs-sync).
 - [ ] 9.2 After schema migration: re-run all consumer suites with new YAML schema.
-- [ ] 9.3 Live LLM acceptance with registered canonical `provider:model` identifiers.
+  - Deferred to `integrate-canonical-cli-projections-v1`.
+- [x] 9.3 Live LLM acceptance with registered canonical `provider:model` identifiers.
+  - Commit: `4c277c4`. Native Codex invocation, exit 0, nonce `TDT_8ef49e53`, 7.25s.
+  - Command: `codex exec --ephemeral --skip-git-repo-check --sandbox read-only -m gpt-5.6-sol ...`
+  - Evidence file: `scripts/verify_v2_codex_acceptance.py`.
 - [ ] 9.4 Redacted diagnostics and provenance verification.
+  - Deferred to `integrate-canonical-cli-projections-v1`.
 
 ## Phase 10: Validation and delivery
 
 - [x] 10.1 OpenSpec change validation: valid.
 - [x] 10.2 Full store validation: 360/360.
 - [x] 10.3 `git diff --check`: clean.
-- [ ] 10.4 Archive — **NOT YET**. Blocked by Phase 4, 5, 6, 7, 9.2-9.4.
+- [ ] 10.4 Archive — **NOT YET**. Phase 5 and Phase 6 deferred to successor change `integrate-canonical-cli-projections-v1`.
+
+---
+
+## Successor Change: integrate-canonical-cli-projections-v1
+
+Phase 6 crosses two independent repositories (`ai-harness-skills`, `ai-review`) and introduces runtime dependency/package changes. It is isolated into a dedicated successor change.
+
+### Scope
+
+- Public canonical projection contract (if needed)
+- `ai-harness-skills` dependency and runtime integration
+- `ai-review` provider-neutral launch projection
+- Claude/Codex/Kimi/Pi capability handling
+- Fallback/error semantics
+- Clean-install dependency verification
+- Downstream matrix
+- Real CLI acceptance for each applicable provider
+
+### Foundation (pre-existing)
+
+- `ai-harness-skills-phase6` branch with bridge foundation at `b160709`
+  - `tdt_projection.py`: bridge module (9/9 focused GREEN)
+  - `tdt-core` editable dependency added
+  - NOT wired into `build_runtime()`
+  - Bridge field contract needs correction before wiring

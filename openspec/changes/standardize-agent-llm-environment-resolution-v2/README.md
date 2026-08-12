@@ -6,7 +6,29 @@ Corrective v2 of the agent LLM environment resolution standardization. Aligns th
 
 ## Status
 
-**Not archive-ready.** Core resolver implementation is on `main`. Interim credential registry fix is integrated (`d63aa08`). The YAML-based provider/model/default schema migration is proposed but not implemented.
+**Core implementation complete. Phase 6 (CLI consumer wiring) deferred to successor change `integrate-canonical-cli-projections-v1`.**
+
+## What's done
+
+| Artifact | SHA | Tests | Status |
+|----------|-----|-------|--------|
+| YAML provider/model/default schema parser | `21dcd5b` | 46 parser tests | ✅ |
+| Resolver integration (`_NewSchemaProjection` → `_choose()`) | `21dcd5b` | 39 resolver tests | ✅ |
+| Strict Codex acceptance | `4c277c4` | Nonce `TDT_8ef49e53`, exit 0 | ✅ |
+| Credential registry fix | `d63aa08` | 12 focused tests | ✅ |
+| Full tdt-core suite | `21dcd5b` | 687/681/0/6 | ✅ |
+| agent-core downstream | `e5fb49d` | 746/746 | ✅ |
+| agent-harness downstream | `0ad49d2` | 343/343 | ✅ |
+| agent-docs-sync downstream | `e0ba600` | 245/245 | ✅ |
+| Six-layer precedence tests | `21dcd5b` | 19 tests | ✅ |
+| Missing-credential proof | `21dcd5b` | Both auth_env + api_key_env | ✅ |
+
+## What's deferred
+
+- **Phase 5** (registry retirement decision) → successor change
+- **Phase 6** (CLI projections for ai-harness-skills and ai-review) → successor change
+- **Phase 9.2** (re-run consumers with new YAML schema) → successor change
+- **Phase 9.4** (redacted diagnostics verification) → successor change
 
 ## Interim fix: credential registry (RESOLVED)
 
@@ -25,11 +47,8 @@ Three custom provider credentials were registered in `tdt-core`'s `environment-k
 | `tdt-env-loader-tdt-home` | MODIFIED | Canonical dotenv authority, idempotency, path containment, registry |
 | `cli-provider-profile-resolution` | ADDED | CLI adapter profiles, native format projection, authentication isolation |
 | `agent-docs-sync` | MODIFIED | Docs-sync config alignment |
-| `provider-model-profile-resolution` | ADDED | YAML schema: providers, models, defaults, auth_env, protocol, referential integrity (PROPOSED, not implemented) |
+| `provider-model-profile-resolution` | ADDED | YAML schema: providers, models, defaults, auth_env, protocol, referential integrity |
 
-## Remaining blockers
+## Successor change
 
-1. YAML `providers/models/defaults` schema not implemented (Phase 4).
-2. CLI consumer integrations not implemented (Phase 6).
-3. Isolated `TDT_HOME` fixture validation not completed (Phase 7).
-4. Live LLM acceptance not performed (Phase 9).
+Phase 6 crosses two independent repositories (`ai-harness-skills`, `ai-review`) and introduces runtime dependency/package changes. It is isolated into a dedicated successor change: `integrate-canonical-cli-projections-v1`.
