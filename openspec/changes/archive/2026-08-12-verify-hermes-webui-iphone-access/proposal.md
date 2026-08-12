@@ -11,8 +11,8 @@ infrastructure setup and deferred iPhone acceptance to this change.
 
 The server-side setup (Hermes WebUI on port 8787, Tailscale Serve HTTPS,
 password auth, launchd persistence) is complete and verified from the Mac Mini.
-Device-side acceptance from the iPhone has not yet been confirmed — HTTPS
-reachability from Safari and authenticated chat through Hermex remain untested.
+Device-side acceptance from the iPhone has been confirmed — HTTPS
+reachability from Safari and authenticated chat through Hermex are working.
 
 ## What Changes
 

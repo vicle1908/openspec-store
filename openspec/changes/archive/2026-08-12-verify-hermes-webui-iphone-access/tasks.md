@@ -11,9 +11,9 @@
 - [x] 2.2 Tailscale Serve configured at https://iosteam-mac-mini.tailc6b508.ts.net
 - [x] 2.3 Password authentication active and verified
 
-## 3. Device-side acceptance (pending)
+## 3. Device-side acceptance (completed)
 
-- [ ] 3.1 Open iPhone Safari, visit https://iosteam-mac-mini.tailc6b508.ts.net/health
-- [ ] 3.2 Confirm JSON response contains "status":"ok"
-- [ ] 3.3 Open Hermex, enter server URL and password
-- [ ] 3.4 Send authenticated test message, confirm response received
+- [x] 3.1 Open iPhone Safari, visit https://iosteam-mac-mini.tailc6b508.ts.net/health
+- [x] 3.2 Confirm JSON response contains "status":"ok"
+- [x] 3.3 Open Hermex, enter server URL and password
+- [x] 3.4 Send authenticated test message, confirm response received
