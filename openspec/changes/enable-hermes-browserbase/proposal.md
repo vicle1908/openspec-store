@@ -19,10 +19,6 @@ The installed Hermes version has two independent browser settings: `browser.clou
 
 - `browserbase-cloud-browsing`: Hermes agent sessions can spawn managed Browserbase cloud browser instances for public-URL web automation with stealth, proxy support, and session isolation.
 
-### Modified Capabilities
-
-- `hermes-browser-tool-routing`: Native Hermes browser tools are selected instead of Browser Use CLI mode when Browserbase is configured.
-
 ## Impact
 
 - **Primary target:** the default Hermes profile at `/Users/androidteam/.hermes/`, specifically `config.yaml` and `.env`.
