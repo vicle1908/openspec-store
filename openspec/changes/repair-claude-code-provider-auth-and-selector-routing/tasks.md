@@ -110,8 +110,7 @@
 - [x] 9.5 Run focused and full OpenSpec validation post-implementation.
   - Evidence: focused change valid; full store 362/362 passed.
 - [x] 9.6 Reconcile task statuses against evidence.
-- [x] 9.7 Archive the change.
-  - Evidence: archived via openspec archive; canonical spec synced.
+- [ ] 9.7 Archive the change.
 
 ## Open Security Action (outside this change)
 
