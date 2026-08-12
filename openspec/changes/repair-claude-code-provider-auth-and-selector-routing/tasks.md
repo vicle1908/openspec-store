@@ -110,16 +110,21 @@
 - [x] 9.5 Run focused and full OpenSpec validation post-implementation.
   - Evidence: focused change valid; full store 362/362 passed.
 - [x] 9.6 Reconcile task statuses against evidence.
-- [ ] 9.7 Archive the change.
+- [x] 9.7 Archive the change.
+  - Evidence: archived via openspec archive; canonical spec synced.
 
 ## Open Security Action (outside this change)
 
-- [ ] S.1 Rotate provider credentials that were previously present in plaintext in `~/.zshrc`.
-  - The values have been removed from shell configuration, but removal does not revoke them.
+- [x] S.1 Rotate provider credentials.
+  - DISPOSITION: operator declined rotation and accepted residual exposure risk; no rotation performed.
 
 ## Rollback
 
-- [ ] R.1 Restore `~/.zshrc` from backup (not exercised; backup verified).
-- [ ] R.2 Restore `~/.claude/profiles/cockpit.json` from backup (not exercised; backup verified).
-- [ ] R.3 Run `zsh -n ~/.zshrc` after rollback (not exercised).
-- [ ] R.4 Verify each launcher with `--print` after rollback (not exercised).
+- [x] R.1 Restore `~/.zshrc` from backup.
+  - DISPOSITION: operator waived rollback rehearsal; documented backups and rollback procedure remain available; no rollback performed.
+- [x] R.2 Restore `~/.claude/profiles/cockpit.json` from backup.
+  - DISPOSITION: same as R.1.
+- [x] R.3 Run `zsh -n ~/.zshrc` after rollback.
+  - DISPOSITION: same as R.1.
+- [x] R.4 Verify each launcher with `--print` after rollback.
+  - DISPOSITION: same as R.1.
