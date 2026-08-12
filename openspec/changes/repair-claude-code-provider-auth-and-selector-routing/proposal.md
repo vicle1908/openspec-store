@@ -25,7 +25,7 @@ Additionally:
 3. Remove `ANTHROPIC_AUTH_TOKEN` exports from all three profile-based launchers; each subshell defensively unsets it.
 4. Restore cockpit `[1m]` selector in profile JSON and launcher fallback to `gpt-5.6-luna[1m]`.
 5. Add `unset CLAUDE_CODE_SUBAGENT_MODEL` to `claude_reset()`.
-6. Write delta specs adding mutual-exclusivity and helper-preflight requirements.
+6. Write MODIFIED requirements in the `claude-code-provider-profile-resolution` delta spec covering launcher auth isolation, credential-free shell config, and helper-preflight behavior.
 7. Reconcile the provider-profile skill/reference and adapter README so they describe helper-only profile launchers and distinguish `~/.hermes/.env` from the adapter's ignored Docker `.env`.
 
 ## Security

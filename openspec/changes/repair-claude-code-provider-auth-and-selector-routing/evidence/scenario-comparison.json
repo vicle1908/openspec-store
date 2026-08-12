@@ -1,0 +1,42 @@
+{
+  "spec": "claude-code-provider-profile-resolution",
+  "change": "repair-claude-code-provider-auth-and-selector-routing",
+  "scope": "MODIFIED requirements only (3 of 7 baseline requirements)",
+  "overall": "PASS",
+  "modified_requirements": {
+    "Launchers SHALL pass --settings to Claude Code": {
+      "baseline_scenarios_preserved": [
+        "giaoduc launcher uses --settings with giaoduc.json",
+        "shopapikey launcher uses --settings with shopapikey.json",
+        "cockpit launcher uses --settings with cockpit.json"
+      ],
+      "added_scenarios": [
+        "Helper preflight succeeds silently",
+        "Helper preflight fails with provider error"
+      ]
+    },
+    "Auth tokens SHALL NOT be persisted in JSON files": {
+      "baseline_scenarios_preserved": [
+        "profiles are credential-free",
+        "profile files are owner-only readable"
+      ],
+      "added_scenarios": [
+        "Shell config contains no credential values"
+      ]
+    },
+    "Missing token SHALL produce a clear error": {
+      "baseline_scenarios_preserved": [
+        "giaoduc with missing token",
+        "shopapikey with missing token",
+        "cockpit with missing token"
+      ],
+      "added_scenarios": []
+    }
+  },
+  "unchanged_requirements_correctly_absent": [
+    "Global settings SHALL provide shopapikey defaults while remaining credential-free",
+    "Settings and profiles SHALL use apiKeyHelper for credential retrieval",
+    "Provider profiles SHALL define model, base URL, and effort",
+    "claude_reset SHALL clear all provider state"
+  ]
+}

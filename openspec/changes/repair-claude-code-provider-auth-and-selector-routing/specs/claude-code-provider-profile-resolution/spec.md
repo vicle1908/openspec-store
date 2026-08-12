@@ -1,35 +1,31 @@
 # claude-code-provider-profile-resolution (Delta)
 
-## ADDED Requirements
+## MODIFIED Requirements
 
-### Requirement: Profile-based launchers SHALL NOT export ANTHROPIC_AUTH_TOKEN
+### Requirement: Launchers SHALL pass `--settings` to Claude Code
 
-Each launcher function in `~/.zshrc` that passes `--settings <profile>` with `apiKeyHelper` MUST NOT export `ANTHROPIC_AUTH_TOKEN` into the child process environment. The launcher MUST defensively unset `ANTHROPIC_AUTH_TOKEN` before exec to prevent inherited values from reaching Claude Code.
+Each launcher function in `~/.zshrc` SHALL call `_claude_with_profile` with the corresponding profile path, passing `--settings <profile>` to Claude Code. The launcher MUST NOT use the old `_claude_model_default` helper. The launcher MUST defensively unset `ANTHROPIC_AUTH_TOKEN` before exec. The launcher MUST validate credential availability by invoking the profile's `apiKeyHelper` in a child process with stdout and stderr redirected to `/dev/null` (helper preflight). A preflight failure MUST produce a non-zero exit with stderr naming the provider and stating credential unavailability. Claude Code MUST NOT be launched on preflight failure.
 
-#### Scenario: giaoduc launcher unsets ANTHROPIC_AUTH_TOKEN
+#### Scenario: giaoduc launcher uses --settings with giaoduc.json
 
 - **WHEN** a user invokes `giaoduc()` in a fresh shell
-- **THEN** the child process MUST receive `--settings $HOME/.claude/profiles/giaoduc.json`
+- **THEN** the process MUST receive `--settings $HOME/.claude/profiles/giaoduc.json`
 - **AND** `ANTHROPIC_AUTH_TOKEN` MUST be unset in the child process
 - **AND** the process MUST invoke `apiKeyHelper` from the giaoduc profile
 
-#### Scenario: shopapikey launcher unsets ANTHROPIC_AUTH_TOKEN
+#### Scenario: shopapikey launcher uses --settings with shopapikey.json
 
 - **WHEN** a user invokes `shopapikey()` in a fresh shell
-- **THEN** the child process MUST receive `--settings $HOME/.claude/profiles/shopapikey.json`
+- **THEN** the process MUST receive `--settings $HOME/.claude/profiles/shopapikey.json`
 - **AND** `ANTHROPIC_AUTH_TOKEN` MUST be unset in the child process
 - **AND** the process MUST invoke `apiKeyHelper` from the shopapikey profile
 
-#### Scenario: cockpit launcher unsets ANTHROPIC_AUTH_TOKEN
+#### Scenario: cockpit launcher uses --settings with cockpit.json
 
 - **WHEN** a user invokes `cockpit()` in a fresh shell
-- **THEN** the child process MUST receive `--settings $HOME/.claude/profiles/cockpit.json`
+- **THEN** the process MUST receive `--settings $HOME/.claude/profiles/cockpit.json`
 - **AND** `ANTHROPIC_AUTH_TOKEN` MUST be unset in the child process
 - **AND** the process MUST invoke `apiKeyHelper` from the cockpit profile
-
-### Requirement: Launchers SHALL validate credential availability via helper preflight
-
-Each launcher MUST invoke the profile's `apiKeyHelper` script in a child process with stdout and stderr redirected to `/dev/null` as a preflight check before launching Claude Code. A successful preflight produces exit code 0. A failed preflight produces nonzero exit with stderr naming the provider and stating credential unavailability. Claude Code MUST NOT be launched on preflight failure.
 
 #### Scenario: Helper preflight succeeds silently
 
@@ -44,11 +40,46 @@ Each launcher MUST invoke the profile's `apiKeyHelper` script in a child process
 - **AND** stderr MUST contain a message naming the provider (not the credential value)
 - **AND** Claude Code MUST NOT be launched
 
-### Requirement: Provider credentials SHALL NOT be persisted in shell configuration files
+### Requirement: Auth tokens SHALL NOT be persisted in JSON files
 
-Provider API keys MUST NOT be exported, assigned, or otherwise persisted in `~/.zshrc`, `~/.zshenv`, `~/.zprofile`, or any shell initialization file. Credentials MUST only be available through credential files with restrictive permissions (mode `600`) loaded at runtime through `apiKeyHelper` scripts.
+Provider API keys MUST be injected through `apiKeyHelper` scripts at runtime. Profile JSON files and `settings.json` MUST NOT contain `ANTHROPIC_AUTH_TOKEN` or any secret values. Provider API keys MUST NOT be exported, assigned, or otherwise persisted in `~/.zshrc`, `~/.zshenv`, `~/.zprofile`, or any shell initialization file.
+
+#### Scenario: profiles are credential-free
+
+- **WHEN** any profile under `~/.claude/profiles/` is inspected
+- **THEN** it MUST NOT contain `ANTHROPIC_AUTH_TOKEN`, `API_KEY`, `TOKEN`, or `SECRET` in its `env` block
+
+#### Scenario: profile files are owner-only readable
+
+- **WHEN** any profile under `~/.claude/profiles/` is stat'd
+- **THEN** its permissions MUST be `600` (owner read/write only)
 
 #### Scenario: Shell config contains no credential values
 
 - **WHEN** `~/.zshrc` is inspected
 - **THEN** it MUST NOT contain literal values for `HERMES_CUSTOM_SHOPAPIKEY_API_KEY`, `HERMES_CUSTOM_GIAODUC_API_KEY`, or `HERMES_CUSTOM_COCKPIT_API_KEY`
+
+### Requirement: Missing token SHALL produce a clear error
+
+When a provider's `apiKeyHelper` script cannot retrieve its credential, the launcher MUST exit with a clear error message naming the provider and stating credential unavailability. The launcher MUST NOT expose the helper script's stdout. No Claude process MUST be launched.
+
+#### Scenario: giaoduc with missing token
+
+- **WHEN** the giaoduc helper cannot retrieve its credential and `giaoduc()` is invoked
+- **THEN** the function MUST exit with non-zero status
+- **AND** stderr MUST name the provider and state credential unavailability
+- **AND** NO Claude process MUST be launched
+
+#### Scenario: shopapikey with missing token
+
+- **WHEN** the shopapikey helper cannot retrieve its credential and `shopapikey()` is invoked
+- **THEN** the function MUST exit with non-zero status
+- **AND** stderr MUST name the provider and state credential unavailability
+- **AND** NO Claude process MUST be launched
+
+#### Scenario: cockpit with missing token
+
+- **WHEN** the cockpit helper cannot retrieve its credential and `cockpit()` is invoked
+- **THEN** the function MUST exit with non-zero status
+- **AND** stderr MUST name the provider and state credential unavailability
+- **AND** NO Claude process MUST be launched

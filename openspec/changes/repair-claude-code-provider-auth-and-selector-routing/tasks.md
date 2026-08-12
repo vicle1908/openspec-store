@@ -17,8 +17,8 @@
 
 - [x] 1.1 Write `proposal.md` with Why, What Changes, Security, Rollback.
 - [x] 1.2 Write `design.md` with Problem, Solution Architecture, Auth Mutual Exclusivity Contract, Files Modified, Security, Verification.
-- [x] 1.3 Write delta spec for `claude-code-provider-routing` with ADDED requirements for auth mutual exclusivity, helper preflight, credential-free shell config, and reset completeness.
-- [x] 1.4 Write delta spec for `claude-code-provider-profile-resolution` with ADDED requirements for launcher auth isolation, helper preflight, credential-free shell config.
+- [x] 1.3 Write delta spec for `claude-code-provider-profile-resolution` with three MODIFIED requirements: launcher auth isolation, credential-free shell config, and helper-preflight behavior.
+  - Evidence: corrective amendment rewrote delta from dual-spec ADDED approach to single-spec MODIFIED approach. Redundant `claude-code-provider-routing` delta deleted. Baseline scenario preservation verified: 8/8 scenarios for MODIFIED requirements preserved verbatim; 3 scenarios added; 4 unchanged requirements correctly absent.
 - [x] 1.5 Write `tasks.md` and `evidence.md`.
 - [x] 1.6 Run focused OpenSpec validation for this change.
   - Evidence: `openspec validate repair-claude-code-provider-auth-and-selector-routing --store openspec-store` → valid.
