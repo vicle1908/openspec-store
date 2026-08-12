@@ -40,12 +40,14 @@
 
 - [x] 2.1 Run `zsh -n ~/.zshrc` to verify syntax.
   - Evidence: exit 0, no errors.
-- [x] 2.2 Verify `~/.claude/settings.json` has no global model or base URL.
-  - Evidence: `python3 -c "..."` confirmed `model` key absent, `ANTHROPIC_BASE_URL` absent from env.
+- [x] 2.2 Verify `~/.claude/settings.json` provides shopapikey defaults instead of the stale global `Advance[1m]` override.
+  - Evidence: current settings contain `model=fable[1m]`,
+    `ANTHROPIC_BASE_URL=https://api.phanmemvip.shop`, and the shopapikey
+    `apiKeyHelper`; no literal auth token is stored in the JSON file.
 - [x] 2.3 Verify all three profiles are valid JSON, credential-free, `chmod 600`.
   - Evidence: `python3 -c "..."` confirmed all three pass assertions.
 - [x] 2.4 Verify OpenSpec store full validation passes.
-  - Evidence: `openspec validate --all --store openspec-store` → 358 passed, 0 failed.
+  - Evidence: `openspec validate --all --store openspec-store` → 361 passed, 0 failed.
 - [x] 2.5 Run local capture test for giaoduc profile.
   - Evidence: captured `model: Advance`, `output_config.effort=xhigh`, auth present, response `GIAODUC_E2E_OK`.
 - [x] 2.6 Run local capture test for shopapikey profile.
@@ -106,4 +108,4 @@
   - Evidence: commit exists.
 - [ ] R.1 Restore the prior launcher function block from the pre-change backup or remove only the new variables.
 - [ ] R.2 Revert the adapter effort mapping while retaining the healthy containerization change.
-- [ ] R.3 Verify `claude_reset()` returns to a provider-neutral environment.
+- [ ] R.3 Verify `claude_reset()` clears launcher-specific provider state and falls back to the global shopapikey defaults.
