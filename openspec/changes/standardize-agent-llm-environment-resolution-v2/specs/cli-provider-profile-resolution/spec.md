@@ -2,7 +2,7 @@
 
 Define a provider-neutral configuration contract for agent repositories that invoke LLM provider CLIs while preserving each CLI's isolated authentication and runtime policy. This spec governs how the canonical provider/model/default profile (defined by `provider-model-profile-resolution`) projects into each native CLI's configuration format.
 
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Provider-neutral CLI profile
 
@@ -120,7 +120,6 @@ The provider-neutral projection SHALL distinguish a native CLI `model_alias` fro
 - **THEN** the result SHALL be reported as prerequisite-aware N/A or provider-unavailable
 - **AND** it SHALL not use another provider's credential or silently pass
 
-## ADDED Requirements
 
 ### Requirement: Each CLI adapter declares its target native format
 

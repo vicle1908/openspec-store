@@ -136,7 +136,7 @@ agent-docs-sync:  /Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py
 | Item | Value |
 |---|---|
 | Branch | `openspec/standardize-agent-llm-environment-resolution-v2` |
-| OpenSpec main | `c21c4b6` |
+| OpenSpec main | `8edbb6c` |
 | tdt-core main | `d63aa08` (registry fix integrated) |
 | External code modified | None (documentation only) |
 | Archive status | **NOT ARCHIVED** — YAML migration and CLI projections remain unimplemented |
