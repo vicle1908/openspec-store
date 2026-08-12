@@ -127,7 +127,7 @@ captured requests: 2
 |---|---|---|---|
 | shopapikey | `fable-5[1m]` | `SHOP_LIVE_GATE_7X9K` | PASS — exit 0, is_error=False, modelUsage=fable-5[1m], exact sentinel |
 | cockpit | `gpt-5.6-luna[1m]` | `COCKPIT_GPT_1M_FINAL` | PASS — exit 0, is_error=False, modelUsage=gpt-5.6-luna[1m], exact sentinel |
-| giaoduc | `Advance[1m]` | `GIAODUC_LIVE_GATE_3M2P` | BLOCKED — model resolution correct (system_model=Advance[1m]), provider returns HTTP 403 API key expired or not found |
+| giaoduc | `Advance[1m]` | `GIAODUC_LIVE_GATE_3M2P` | PASS — exit 0, is_error=False, modelUsage=Advance[1m], exact sentinel |
 
 ### Cockpit `[1m]` fix
 
@@ -135,13 +135,13 @@ The cockpit launcher fallback was corrected from `gpt-5.6-luna` to `gpt-5.6-luna
 
 ### giaoduc status
 
-The giaoduc credential (`$HERMES_CUSTOM_GIAODUC_API_KEY`) is expired or not found. The model resolution and base URL are correct — `system_model: Advance[1m]` was confirmed by the provider before it rejected the expired token. This is a credential refresh issue, not a code defect.
+All three providers passed fresh-shell smoke. giaoduc was initially blocked by an expired credential, which was subsequently refreshed. Fresh smoke returned `system_model: Advance[1m]`, `modelUsage: ['Advance[1m]']`, exact sentinel `GIAODUC_FRESH_GREEN`.
 
 ## OpenSpec validation
 
 ```
 openspec validate claude-code-provider-profile-resolution --store openspec-store → valid
-openspec validate --all --store openspec-store → 358 passed, 0 failed
+openspec validate --all --store openspec-store → 361 passed, 0 failed
 ```
 
 ## Cockpit model spelling
