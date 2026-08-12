@@ -105,7 +105,8 @@
 - [x] 9.2 Update `evidence.md` with all evidence IDs and results.
 - [x] 9.3 Run `git diff --check` on the store.
   - Evidence: clean.
-- [ ] 9.4 Stage and commit the change directory only.
+- [x] 9.4 Stage and commit the change directory only.
+  - Evidence: store commit `b3ec914` contains only this change directory; unrelated `CLAUDE.md`, `.claude/scripts/`, and `integrate-omp-three-provider-routing` remain untouched.
 - [x] 9.5 Run focused and full OpenSpec validation post-implementation.
   - Evidence: focused change valid; full store 362/362 passed.
 - [x] 9.6 Reconcile task statuses against evidence.
