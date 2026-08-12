@@ -23,7 +23,7 @@ Three custom provider credentials were registered in `tdt-core`'s `environment-k
 | `consumer-pattern` | MODIFIED | Harness composition, public SDK usage |
 | `ecosystem-config-loading` | MODIFIED | Typed settings + agent profile sharing |
 | `tdt-env-loader-tdt-home` | MODIFIED | Canonical dotenv authority, idempotency, path containment, registry |
-| `cli-provider-profile-resolution` | MODIFIED | CLI adapter profiles, native format projection, authentication isolation |
+| `cli-provider-profile-resolution` | ADDED | CLI adapter profiles, native format projection, authentication isolation |
 | `agent-docs-sync` | MODIFIED | Docs-sync config alignment |
 | `provider-model-profile-resolution` | ADDED | YAML schema: providers, models, defaults, auth_env, protocol, referential integrity (PROPOSED, not implemented) |
 

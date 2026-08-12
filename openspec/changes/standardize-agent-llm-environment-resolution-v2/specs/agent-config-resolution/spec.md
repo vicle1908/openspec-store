@@ -117,42 +117,6 @@ The system SHALL expose one canonical agent-profile resolution boundary that ret
 - **AND** the agent overlay's `gate` section SHALL NOT be merged into or override any global section
 - **AND** agent-harness SHALL obtain `gate` from `load_agent_overlay()`
 
-### Requirement: Secure mapping and source-preserving overlay APIs
-
-The resolver SHALL expose `load_config_mapping()` as the secure, non-merging reader
-for one selected YAML mapping and `load_agent_overlay()` as the source-preserving
-agent-overlay reader. Both APIs SHALL use the canonical root, explicit-file, secret,
-and path-containment policy. `allowed_overlay_keys` SHALL be an explicit cacheable
-policy input: the default policy permits only `model` and `runtime`, while a registered
-consumer policy MAY admit domain sections that remain outside the effective LLM merge.
-
-#### Scenario: Mapping reader does not merge sources
-
-- **WHEN** `load_config_mapping()` reads a selected global or agent YAML file
-- **THEN** it SHALL return only that file's validated mapping and source identity
-- **AND** it SHALL not apply another file, environment value, or consumer overlay
-
-#### Scenario: Overlay reader preserves domain provenance
-
-- **GIVEN** a registered consumer policy allows a domain section in an agent overlay
-- **WHEN** `load_agent_overlay()` reads the overlay
-- **THEN** it SHALL retain the domain section with its source provenance
-- **AND** `load_agent_config()` SHALL exclude that domain section from the global LLM merge
-
-#### Scenario: Strict policy rejects unregistered domain data
-
-- **GIVEN** the default policy is used for an overlay containing a `gate` or `persistence` section
-- **WHEN** the overlay is resolved
-- **THEN** validation SHALL fail with the unsupported top-level key
-- **AND** a permissive consumer result SHALL not make a later strict request succeed from cache
-
-#### Scenario: Explicit path uses canonical schema
-
-- **GIVEN** a caller selects an explicit agent-overlay path
-- **WHEN** the mapping and overlay APIs read that path
-- **THEN** they SHALL apply the same mapping, secret, key-policy, and provenance rules as the standard path
-- **AND** a legacy wrapped schema SHALL fail with migration guidance
-
 ### Requirement: Config caching with test isolation
 
 The system MAY cache parsed configuration inputs, but it MUST NOT return a stale effective profile after the selected `TDT_HOME`, environment profile, explicit paths, overlay-key policy, relevant process environment, or source-file fingerprint changes. Reset behavior SHALL clear all configuration and environment state owned by the resolver without mutating unrelated process environment.
@@ -274,26 +238,6 @@ The model-construction layer MUST receive an already resolved model profile from
 - **THEN** the factory SHALL use that selected model
 - **AND** it SHALL NOT reselect the YAML value
 
-### Requirement: Canonical direct-model identifiers
-
-Every direct Pydantic-AI primary and fallback identifier in the resolved profile SHALL
-match a registered canonical `provider:model` grammar and provider registry entry.
-Localized, unregistered, or display-only aliases SHALL be rejected during resolution;
-they SHALL never be treated as a live provider acceptance result.
-
-#### Scenario: Registered canonical identifier is accepted
-
-- **GIVEN** a registered provider accepts a canonical identifier such as `anthropic:Advance`
-- **WHEN** the profile resolves the primary or a fallback
-- **THEN** the identifier SHALL remain unchanged in the effective profile and provenance
-
-#### Scenario: Localized alias is rejected
-
-- **GIVEN** a source provides a localized or unregistered model alias
-- **WHEN** a direct-model profile is resolved or a live gate is prepared
-- **THEN** resolution SHALL fail closed with the provider/model field identified
-- **AND** it SHALL not fall through to a lower-priority model or invoke a provider
-
 ### Requirement: Consumers use load_agent_config for model resolution
 
 Direct Pydantic-AI consumers SHALL obtain LLM inputs from the canonical resolved-agent-profile boundary. CLI-provider consumers SHALL obtain the provider-neutral projection defined by `cli-provider-profile-resolution`. No consumer SHALL independently read global YAML, agent YAML, or dotenv files for LLM fields.
@@ -322,6 +266,64 @@ Direct Pydantic-AI consumers SHALL obtain LLM inputs from the canonical resolved
 - **AND** it SHALL leave CLI authentication to the provider's approved credential boundary
 
 ## ADDED Requirements
+
+### Requirement: Secure mapping and source-preserving overlay APIs
+
+The resolver SHALL expose `load_config_mapping()` as the secure, non-merging reader
+for one selected YAML mapping and `load_agent_overlay()` as the source-preserving
+agent-overlay reader. Both APIs SHALL use the canonical root, explicit-file, secret,
+and path-containment policy. `allowed_overlay_keys` SHALL be an explicit cacheable
+policy input: the default policy permits only `model` and `runtime`, while a registered
+consumer policy MAY admit domain sections that remain outside the effective LLM merge.
+
+#### Scenario: Mapping reader does not merge sources
+
+- **WHEN** `load_config_mapping()` reads a selected global or agent YAML file
+- **THEN** it SHALL return only that file's validated mapping and source identity
+- **AND** it SHALL not apply another file, environment value, or consumer overlay
+
+#### Scenario: Overlay reader preserves domain provenance
+
+- **GIVEN** a registered consumer policy allows a domain section in an agent overlay
+- **WHEN** `load_agent_overlay()` reads the overlay
+- **THEN** it SHALL retain the domain section with its source provenance
+- **AND** `load_agent_config()` SHALL exclude that domain section from the global LLM merge
+
+#### Scenario: Strict policy rejects unregistered domain data
+
+- **GIVEN** the default policy is used for an overlay containing a `gate` or `persistence` section
+- **WHEN** the overlay is resolved
+- **THEN** validation SHALL fail with the unsupported top-level key
+- **AND** a permissive consumer result SHALL not make a later strict request succeed from cache
+
+#### Scenario: Explicit path uses canonical schema
+
+- **GIVEN** a caller selects an explicit agent-overlay path
+- **WHEN** the mapping and overlay APIs read that path
+- **THEN** they SHALL apply the same mapping, secret, key-policy, and provenance rules as the standard path
+- **AND** a legacy wrapped schema SHALL fail with migration guidance
+
+
+### Requirement: Canonical direct-model identifiers
+
+Every direct Pydantic-AI primary and fallback identifier in the resolved profile SHALL
+match a registered canonical `provider:model` grammar and provider registry entry.
+Localized, unregistered, or display-only aliases SHALL be rejected during resolution;
+they SHALL never be treated as a live provider acceptance result.
+
+#### Scenario: Registered canonical identifier is accepted
+
+- **GIVEN** a registered provider accepts a canonical identifier such as `anthropic:Advance`
+- **WHEN** the profile resolves the primary or a fallback
+- **THEN** the identifier SHALL remain unchanged in the effective profile and provenance
+
+#### Scenario: Localized alias is rejected
+
+- **GIVEN** a source provides a localized or unregistered model alias
+- **WHEN** a direct-model profile is resolved or a live gate is prepared
+- **THEN** resolution SHALL fail closed with the provider/model field identified
+- **AND** it SHALL not fall through to a lower-priority model or invoke a provider
+
 
 ### Requirement: Source-preserving secure configuration input
 

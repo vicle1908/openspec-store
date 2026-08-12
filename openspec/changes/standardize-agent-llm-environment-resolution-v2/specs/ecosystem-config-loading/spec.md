@@ -50,6 +50,8 @@ Typed fields that temporarily hold credential material MUST use protected secret
 - **THEN** it SHALL contain the registered environment-key name and availability only
 - **AND** it SHALL not contain a secret value or protected type serialization
 
+## ADDED Requirements
+
 ### Requirement: Typed settings and agent profiles share one snapshot
 
 Typed global settings and an agent profile SHALL use the same effective root,
