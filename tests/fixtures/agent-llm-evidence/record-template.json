@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0.0",
+  "record_id": "agent-core-handoff",
+  "record_kind": "deterministic_handoff",
+  "planning": {
+    "store_repository": "openspec-store",
+    "baseline_sha": "${STORE_SHA}",
+    "baseline_tree_sha": "${BASELINE_TREE_SHA}",
+    "observed_store_sha": "${STORE_SHA}",
+    "corrective_tree_sha256": "${CORRECTIVE_TREE_SHA256}",
+    "planning_digest_sha256": "${PLANNING_DIGEST}",
+    "artifacts": [
+      {
+        "artifact_id": "proposal",
+        "path": "openspec/changes/complete-agent-llm-config-integration/proposal.md",
+        "sha256": "${PROPOSAL_SHA256}"
+      },
+      {
+        "artifact_id": "specs",
+        "path": "openspec/changes/complete-agent-llm-config-integration/specs/agent-config-resolution/spec.md",
+        "sha256": "${AGENT_CONFIG_SPEC_SHA256}"
+      },
+      {
+        "artifact_id": "specs",
+        "path": "openspec/changes/complete-agent-llm-config-integration/specs/agent-core-model-resolution/spec.md",
+        "sha256": "${AGENT_CORE_SPEC_SHA256}"
+      },
+      {
+        "artifact_id": "specs",
+        "path": "openspec/changes/complete-agent-llm-config-integration/specs/agent-docs-sync/spec.md",
+        "sha256": "${DOCS_SYNC_SPEC_SHA256}"
+      },
+      {
+        "artifact_id": "specs",
+        "path": "openspec/changes/complete-agent-llm-config-integration/specs/cli-provider-profile-resolution/spec.md",
+        "sha256": "${CLI_SPEC_SHA256}"
+      },
+      {
+        "artifact_id": "specs",
+        "path": "openspec/changes/complete-agent-llm-config-integration/specs/provider-model-profile-resolution/spec.md",
+        "sha256": "${PROVIDER_SPEC_SHA256}"
+      },
+      {
+        "artifact_id": "design",
+        "path": "openspec/changes/complete-agent-llm-config-integration/design.md",
+        "sha256": "${DESIGN_SHA256}"
+      },
+      {
+        "artifact_id": "tasks",
+        "path": "openspec/changes/complete-agent-llm-config-integration/tasks.md",
+        "sha256": "${TASKS_SHA256}"
+      }
+    ],
+    "evidence_schema": {
+      "id": "evidence-schema-v1",
+      "repository": "openspec-store",
+      "path": "openspec/changes/complete-agent-llm-config-integration/evidence/schema/v1/evidence-record.schema.json",
+      "sha256": "${SCHEMA_SHA256}"
+    }
+  },
+  "repositories": [
+    {
+      "id": "openspec-store",
+      "head_sha": "${STORE_SHA}",
+      "branch": "main",
+      "worktree_path": "${STORE_ROOT}",
+      "dirt_sha256": "${CLEAN_DIRT_SHA256}",
+      "dirt_inventory": []
+    },
+    {
+      "id": "tdt-core",
+      "head_sha": "${TDT_SHA}",
+      "branch": "main",
+      "worktree_path": "${TDT_ROOT}",
+      "dirt_sha256": "${CLEAN_DIRT_SHA256}",
+      "dirt_inventory": []
+    },
+    {
+      "id": "agent-core",
+      "head_sha": "${CONSUMER_SHA}",
+      "branch": "main",
+      "worktree_path": "${CONSUMER_ROOT}",
+      "dirt_sha256": "${CLEAN_DIRT_SHA256}",
+      "dirt_inventory": []
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "agent-core-to-tdt-core",
+      "consumer_repository": "agent-core",
+      "upstream_repository": "tdt-core",
+      "declaration": {
+        "id": "agent-core-pyproject",
+        "repository": "agent-core",
+        "path": "pyproject.toml",
+        "sha256": "${PYPROJECT_SHA256}"
+      },
+      "lock": {
+        "id": "agent-core-lock",
+        "repository": "agent-core",
+        "path": "uv.lock",
+        "sha256": "${LOCK_SHA256}"
+      },
+      "source_checkout": {
+        "repository": "tdt-core",
+        "path": "${TDT_ROOT}",
+        "head_sha": "${TDT_SHA}"
+      },
+      "installed": {
+        "environment": "agent-core-env",
+        "distribution": "tdt-core",
+        "import_name": "tdt_core",
+        "origin_path": "${TDT_ORIGIN}",
+        "origin_repository": "tdt-core",
+        "origin_sha": "${TDT_SHA}"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "agent-core-source",
+      "repository": "agent-core",
+      "path": "src/agent_core.py",
+      "sha256": "${SOURCE_SHA256}"
+    }
+  ],
+  "mechanisms": [
+    {
+      "id": "agent-core-test-mechanism",
+      "repository": "agent-core",
+      "path": "tests/test_agent_core.py",
+      "sha256": "${MECHANISM_SHA256}"
+    }
+  ],
+  "prerequisites": [
+    {
+      "id": "contained-target",
+      "kind": "attestation",
+      "attestation_id": "contained-target",
+      "expected_state": "authorized",
+      "expected_source_id": "fixture-containment-check",
+      "expected_source_sha256": "${ATTESTATION_SHA256}"
+    }
+  ]
+}

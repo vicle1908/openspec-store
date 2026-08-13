@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0.0",
+  "record_id": "malformed-secret-record",
+  "record_kind": "deterministic_handoff",
+  "credential_value": "VALIDATOR_CREDENTIAL_CANARY_DO_NOT_EMIT"
+}

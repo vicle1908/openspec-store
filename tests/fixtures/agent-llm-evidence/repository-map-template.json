@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0.0",
+  "change_name": "complete-agent-llm-config-integration",
+  "repositories": {
+    "openspec-store": {
+      "root": "${STORE_ROOT}"
+    },
+    "tdt-core": {
+      "root": "${TDT_ROOT}"
+    },
+    "agent-core": {
+      "root": "${CONSUMER_ROOT}"
+    },
+    "ai-review": {
+      "root": "${REVIEW_ROOT}"
+    }
+  },
+  "python_environments": {
+    "agent-core-env": {
+      "site_packages": [
+        "${SITE_PACKAGES}"
+      ]
+    },
+    "agent-docs-sync-env": {
+      "site_packages": [
+        "${SITE_PACKAGES}"
+      ]
+    },
+    "agent-harness-env": {
+      "site_packages": [
+        "${SITE_PACKAGES}"
+      ]
+    },
+    "ai-harness-skills-env": {
+      "site_packages": [
+        "${SITE_PACKAGES}"
+      ]
+    },
+    "ai-review-env": {
+      "site_packages": [
+        "${SITE_PACKAGES}",
+        "${REVIEW_SITE_PACKAGES}"
+      ]
+    }
+  },
+  "attestations": {
+    "contained-target": {
+      "state": "authorized",
+      "source_id": "fixture-containment-check",
+      "source_sha256": "${ATTESTATION_SHA256}"
+    }
+  },
+  "records": [
+    {
+      "id": "tdt-core-handoff",
+      "repository": "tdt-core",
+      "kind": "deterministic_handoff"
+    },
+    {
+      "id": "agent-core-handoff",
+      "repository": "agent-core",
+      "kind": "deterministic_handoff"
+    },
+    {
+      "id": "agent-docs-sync-handoff",
+      "repository": "agent-docs-sync",
+      "kind": "deterministic_handoff"
+    },
+    {
+      "id": "agent-harness-handoff",
+      "repository": "agent-harness",
+      "kind": "deterministic_handoff"
+    },
+    {
+      "id": "ai-harness-skills-live",
+      "repository": "ai-harness-skills",
+      "kind": "live_row"
+    },
+    {
+      "id": "ai-review-live",
+      "repository": "ai-review",
+      "kind": "live_row"
+    }
+  ],
+  "dependency_observations": [
+    {
+      "id": "agent-core-to-tdt-core",
+      "upstream_repository": "tdt-core",
+      "downstream_record": "agent-core-handoff",
+      "environment": "agent-core-env",
+      "distribution": "tdt-core",
+      "import_name": "tdt_core",
+      "origin_path": "${TDT_ORIGIN}",
+      "origin_sha": "${TDT_SHA}"
+    },
+    {
+      "id": "agent-docs-sync-to-tdt-core",
+      "upstream_repository": "tdt-core",
+      "downstream_record": "agent-docs-sync-handoff",
+      "environment": "agent-docs-sync-env",
+      "distribution": "tdt-core",
+      "import_name": "tdt_core",
+      "origin_path": "${TDT_ORIGIN}",
+      "origin_sha": "${TDT_SHA}"
+    },
+    {
+      "id": "agent-harness-to-tdt-core",
+      "upstream_repository": "tdt-core",
+      "downstream_record": "agent-harness-handoff",
+      "environment": "agent-harness-env",
+      "distribution": "tdt-core",
+      "import_name": "tdt_core",
+      "origin_path": "${TDT_ORIGIN}",
+      "origin_sha": "${TDT_SHA}"
+    },
+    {
+      "id": "ai-harness-skills-to-tdt-core",
+      "upstream_repository": "tdt-core",
+      "downstream_record": "ai-harness-skills-live",
+      "environment": "ai-harness-skills-env",
+      "distribution": "tdt-core",
+      "import_name": "tdt_core",
+      "origin_path": "${TDT_ORIGIN}",
+      "origin_sha": "${TDT_SHA}"
+    },
+    {
+      "id": "ai-review-to-tdt-core",
+      "upstream_repository": "tdt-core",
+      "downstream_record": "ai-review-live",
+      "environment": "ai-review-env",
+      "distribution": "tdt-core",
+      "import_name": "tdt_core",
+      "origin_path": "${TDT_ORIGIN}",
+      "origin_sha": "${TDT_SHA}"
+    },
+    {
+      "id": "ai-review-to-agent-core",
+      "upstream_repository": "agent-core",
+      "downstream_record": "ai-review-live",
+      "environment": "ai-review-env",
+      "distribution": "agent-core",
+      "import_name": "agent_core",
+      "origin_path": "${AGENT_CORE_ORIGIN}",
+      "origin_sha": "${CONSUMER_SHA}"
+    }
+  ]
+}

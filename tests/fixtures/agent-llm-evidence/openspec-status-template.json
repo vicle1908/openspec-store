@@ -1,0 +1,34 @@
+{
+  "changeName": "complete-agent-llm-config-integration",
+  "artifactPaths": {
+    "proposal": {
+      "existingOutputPaths": [
+        "${PROPOSAL_PATH}"
+      ]
+    },
+    "specs": {
+      "existingOutputPaths": [
+        "${AGENT_CONFIG_SPEC_PATH}",
+        "${AGENT_CORE_SPEC_PATH}",
+        "${DOCS_SYNC_SPEC_PATH}",
+        "${CLI_SPEC_PATH}",
+        "${PROVIDER_SPEC_PATH}"
+      ]
+    },
+    "design": {
+      "existingOutputPaths": [
+        "${DESIGN_PATH}"
+      ]
+    },
+    "tasks": {
+      "existingOutputPaths": [
+        "${TASKS_PATH}"
+      ]
+    }
+  },
+  "root": {
+    "path": "${STORE_ROOT}",
+    "source": "store",
+    "store_id": "openspec-store"
+  }
+}
