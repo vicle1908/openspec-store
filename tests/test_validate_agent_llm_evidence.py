@@ -816,6 +816,21 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=3, decision="blocked")
 
+    def test_uv_style_editable_pth_origin_is_discovered_without_import(self) -> None:
+        link = self.fixture.site_packages / "tdt_core"
+        link.unlink()
+        dist_info = self.fixture.site_packages / "tdt_core-1.0.0.dist-info"
+        launcher = self.fixture.site_packages / "_editable_impl_tdt_core.pth"
+        launcher.write_text(
+            str((self.fixture.tdt / "src").resolve()) + "\n", encoding="utf-8"
+        )
+        (dist_info / "RECORD").write_text(
+            "_editable_impl_tdt_core.pth,,\n", encoding="utf-8"
+        )
+        process, result = self.fixture.result()
+        self.assertDecision(process, result, exit_code=0, decision="current")
+        self.assertNotIn("TARGET_PACKAGE_MUST_NOT_BE_IMPORTED", process.stderr)
+
     def test_origin_discovery_does_not_import_target_package(self) -> None:
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=0, decision="current")

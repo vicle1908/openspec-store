@@ -1305,6 +1305,34 @@ def discover_import_origin(
             return package_init.resolve(strict=True)
         if module_relative in owned_paths and module_file.is_file():
             return module_file.resolve(strict=True)
+
+        # Modern editable installs (including uv's) record only a .pth
+        # launcher in RECORD rather than the package files themselves.  Read
+        # the launcher as inert data: accept exactly one absolute source-root
+        # line and never execute/import its contents.  The later Git identity
+        # check still binds the resolved origin to the expected checkout/SHA.
+        for owned_path in sorted(owned_paths):
+            if owned_path.suffix != ".pth" or not owned_path.name.startswith(
+                "_editable_impl_"
+            ):
+                continue
+            launcher = root / Path(owned_path)
+            try:
+                lines = launcher.read_text(encoding="utf-8").splitlines()
+            except (OSError, UnicodeError):
+                continue
+            if len(lines) != 1 or not lines[0].startswith("/"):
+                continue
+            source_root = Path(lines[0]).resolve(strict=False)
+            editable_package = source_root.joinpath(*components)
+            editable_init = editable_package / "__init__.py"
+            editable_module = source_root.joinpath(*components[:-1]) / (
+                f"{components[-1]}.py"
+            )
+            if editable_init.is_file():
+                return editable_init.resolve(strict=True)
+            if editable_module.is_file():
+                return editable_module.resolve(strict=True)
     raise LocalIdentityUnavailable("installed_origin_unresolved")
 
 
