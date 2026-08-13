@@ -68,5 +68,5 @@
 - [x] 7.5 Full-store validation run.
   - Result: 362 passed, 1 unrelated pre-existing failure in `standardize-omp-homebrew-installation`.
 - [x] 7.6 Implementation and store diffs pass `git diff --check`.
-- [ ] 7.7 Archive successor, then parent v2, using the normal OpenSpec workflow.
-- [ ] 7.8 Validate post-archive canonical specs and synchronize the store.
+- [x] 7.7 Archive successor, then parent v2, using the normal OpenSpec workflow.
+- [x] 7.8 Validate post-archive canonical specs and synchronize the store.

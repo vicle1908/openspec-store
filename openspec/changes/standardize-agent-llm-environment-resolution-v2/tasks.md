@@ -57,4 +57,4 @@
 - [x] 10.1 Focused OpenSpec change validation.
 - [x] 10.2 Full-store validation run: 362 passed, 1 unrelated pre-existing failure in `standardize-omp-homebrew-installation`.
 - [x] 10.3 Implementation/store diffs pass `git diff --check`.
-- [ ] 10.4 Archive parent and successor changes, then validate/synchronize canonical specs.
+- [x] 10.4 Archive parent and successor changes, then validate/synchronize canonical specs.
