@@ -2,53 +2,48 @@
 
 ## What this change is
 
-Corrective v2 of the agent LLM environment resolution standardization. Aligns the TDT Python agent ecosystem with the provider/model/default configuration pattern proven by Codex, Grok, Kimi, and Pi.
+Corrective v2 of the agent LLM environment-resolution standardization. It aligns the TDT Python agent ecosystem with a provider/model/default YAML configuration pattern and the canonical six-layer resolver.
 
 ## Status
 
-**Core implementation complete. Phase 6 (CLI consumer wiring) deferred to successor change `integrate-canonical-cli-projections-v1`.**
+**Implementation and consumer wiring complete.** Phase 6 consumer work was completed in successor change `integrate-canonical-cli-projections-v1`; both changes remain unarchived until the final OpenSpec archive/sync operation.
 
-## What's done
+## Completed evidence
 
-| Artifact | SHA | Tests | Status |
-|----------|-----|-------|--------|
-| YAML provider/model/default schema parser | `21dcd5b` | 46 parser tests | ✅ |
-| Resolver integration (`_NewSchemaProjection` → `_choose()`) | `21dcd5b` | 39 resolver tests | ✅ |
-| Strict Codex acceptance | `4c277c4` | Nonce `TDT_8ef49e53`, exit 0 | ✅ |
-| Credential registry fix | `d63aa08` | 12 focused tests | ✅ |
-| Full tdt-core suite | `21dcd5b` | 687/681/0/6 | ✅ |
+| Artifact | SHA | Evidence | Status |
+|---|---:|---|---|
+| YAML provider/model/default schema parser + resolver | `21dcd5b` lineage, current tdt-core `75cd519` | 46 parser tests + resolver/contract tests | ✅ |
+| Public canonical CLI selection/projection API | `75cd519` | `CanonicalCLISelection`, `select_canonical_cli_provider()`, `project_canonical_cli_profile()` | ✅ |
+| Credential registry compatibility fix | `d63aa08` lineage | 12 focused tests | ✅ |
+| tdt-core full suite | `75cd519` | 721 collected, 715 passed, 0 failed, 6 skipped | ✅ |
+| ai-harness-skills runtime wiring | `02d0410` | 606 collected, 602 passed, 0 failed, 4 skipped | ✅ |
+| ai-review runtime wiring | `bd27767` | 183 passed, 0 failed; Ruff + mypy + source compilation clean | ✅ |
 | agent-core downstream | `e5fb49d` | 746/746 | ✅ |
 | agent-harness downstream | `0ad49d2` | 343/343 | ✅ |
 | agent-docs-sync downstream | `e0ba600` | 245/245 | ✅ |
-| Six-layer precedence tests | `21dcd5b` | 19 tests | ✅ |
-| Missing-credential proof | `21dcd5b` | Both auth_env + api_key_env | ✅ |
+| Live dual-consumer Codex acceptance | current acceptance harness | nonce `TDT_PHASE6_AI_REVIEW_4cbec67f`; ai-review 15.71s; ai-harness 7.76s; process status 0 | ✅ |
 
-## What's deferred
+## Live acceptance artifact
 
-- **Phase 5** (registry retirement decision) → successor change
-- **Phase 6** (CLI projections for ai-harness-skills and ai-review) → successor change
-- **Phase 9.2** (re-run consumers with new YAML schema) → successor change
-- **Phase 9.4** (redacted diagnostics verification) → successor change
+Durable harness:
 
-## Interim fix: credential registry (RESOLVED)
+```text
+~/Developer/tdt-cli-acceptance/verify_phase6_live.py
+```
 
-Three custom provider credentials were registered in `tdt-core`'s `environment-key-registry.json` via the separate `register-custom-provider-credentials` change. This was an interim compatibility fix; the YAML-based provider/model migration will eventually supersede the registry.
+It writes an isolated new-schema YAML profile, resolves the profile through `tdt-core`, exercises the actual ai-review reviewer launch boundary and the actual ai-harness `CodexAdapter`, verifies the canonical wire model `gpt-5.6-sol`, reasoning effort `low`, nonce propagation, structured output, and credential non-disclosure. No credential values are persisted in the artifact.
 
-## Specs (10)
+## Registry decision
 
-| Spec | Status | Description |
-|---|---|---|
-| `agent-config-resolution` | MODIFIED | Six-layer precedence, single resolution boundary |
-| `agent-core-model-resolution` | MODIFIED | Config-driven fallback, model layer is config-input only |
-| `agent-harness-runner` | MODIFIED | Two-plane config, domain provenance, artifact containment |
-| `consumer-config-composition` | MODIFIED | Settings projection, env/YAML loading, shortcuts |
-| `consumer-pattern` | MODIFIED | Harness composition, public SDK usage |
-| `ecosystem-config-loading` | MODIFIED | Typed settings + agent profile sharing |
-| `tdt-env-loader-tdt-home` | MODIFIED | Canonical dotenv authority, idempotency, path containment, registry |
-| `cli-provider-profile-resolution` | ADDED | CLI adapter profiles, native format projection, authentication isolation |
-| `agent-docs-sync` | MODIFIED | Docs-sync config alignment |
-| `provider-model-profile-resolution` | ADDED | YAML schema: providers, models, defaults, auth_env, protocol, referential integrity |
+The registry is retained for legacy aliases, CLI capability metadata, and legacy environment-key lookup. New-schema `auth_env` remains provider-local. Registry removal is deferred until all legacy consumers migrate.
+
+## Specs
+
+The change reconciles the existing resolver/provider specs and adds:
+
+- `cli-provider-profile-resolution`
+- `provider-model-profile-resolution`
 
 ## Successor change
 
-Phase 6 crosses two independent repositories (`ai-harness-skills`, `ai-review`) and introduces runtime dependency/package changes. It is isolated into a dedicated successor change: `integrate-canonical-cli-projections-v1`.
+The cross-repository consumer wiring was isolated in `integrate-canonical-cli-projections-v1`, which is now implemented and ready for the normal archive/synchronize lifecycle.

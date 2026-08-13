@@ -75,10 +75,7 @@ The public selection API SHALL expose both fields. Consumers SHALL use
 
 ### Requirement: Credential filtering by provider ID
 
-The public selection API SHALL expose `credential_key_names` filtered by the
-YAML provider ID (e.g., `tdt-codex`), NOT by the CLI provider identity
-(e.g., `codex`). This resolves the current credential bug where
-`project_cli_profile()` filters by CLI identity.
+The public selection/project API SHALL expose credential key names filtered by the YAML provider ID (e.g., `tdt-codex`), not by the CLI identity. `project_canonical_cli_profile()` passes the selected YAML provider ID to the profile projection so credential ownership remains isolated.
 
 #### Scenario: Credential keys filtered by YAML provider ID
 

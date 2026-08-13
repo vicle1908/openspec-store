@@ -121,53 +121,56 @@ The provider-neutral projection SHALL distinguish a native CLI `model_alias` fro
 - **AND** it SHALL not use another provider's credential or silently pass
 
 
-### Requirement: Each CLI adapter declares its target native format
+### Requirement: Each CLI consumer declares its native invocation boundary
 
-Each CLI-provider consumer SHALL declare the native configuration format it targets (e.g., Codex `config.toml`, Kimi `config.toml`, Pi `mcp.json`) and SHALL project the canonical provider/model/default profile into that format's schema. The projection SHALL preserve the provider identity, wire model ID, alias, and effort; it SHALL NOT project credential values.
+Each CLI-provider consumer SHALL declare the native invocation format it targets and SHALL project only fields supported by that CLI. The projection SHALL preserve provider identity and canonical wire-model provenance, SHALL pass supported model/effort arguments for Claude/Codex, SHALL retain capability-safe defaults for Kimi/Pi when aliases/effort are unsupported, and SHALL NOT project credential values.
 
-#### Scenario: Codex adapter projects to config.toml format
+#### Scenario: Codex adapter receives canonical wire model and effort
 
-- **WHEN** a Codex CLI adapter receives the canonical profile
-- **THEN** the adapter SHALL project `model_providers.<name>.base_url` and `wire_api` from the provider definition
-- **AND** the adapter SHALL project the model alias and effort into the Codex config schema
-- **AND** the adapter SHALL NOT project `auth_env` or any credential value
+- **WHEN** an ai-harness or ai-review Codex boundary receives the canonical profile
+- **THEN** it SHALL pass `gpt-5.6-sol` (the wire model) to the native Codex command
+- **AND** it SHALL pass the supported reasoning effort through the native Codex configuration argument
+- **AND** it SHALL retain native authentication and the adapter environment allowlist
 
-#### Scenario: Kimi adapter projects to config.toml format
+#### Scenario: Claude reviewer receives supported model and effort
 
-- **WHEN** a Kimi CLI adapter receives the canonical profile
-- **THEN** the adapter SHALL project `[providers.<name>]` with `type`, `base_url` from the provider definition
-- **AND** the adapter SHALL project `[models.<alias>]` with `provider`, `model`, `max_context_size`
-- **AND** the adapter SHALL NOT project API key values
+- **WHEN** the ai-review Claude reviewer receives a canonical projection
+- **THEN** it SHALL pass the wire model through `--model`
+- **AND** it SHALL pass supported effort through `--effort`
+- **AND** it SHALL not project credential values
 
-#### Scenario: Pi adapter projects to mcp.json format
+#### Scenario: Kimi and Pi capability-safe fallback
 
-- **WHEN** a Pi CLI adapter receives the canonical profile
-- **THEN** the adapter SHALL project transport configuration through the MCP boundary
-- **AND** the adapter SHALL NOT project credential values into the MCP configuration
+- **WHEN** the canonical profile has no registered alias/effort capability for Kimi or Pi
+- **THEN** the consumer SHALL retain the native executable and local safe defaults
+- **AND** it SHALL not invent unsupported model or effort flags
+- **AND** it SHALL not project credential values
 
 #### Scenario: Projection preserves alias and wire model distinction
 
-- **GIVEN** the canonical profile contains alias `cockpit-luna` with wire model `gpt-5.6-luna`
-- **WHEN** a CLI adapter projects this into its native format
-- **THEN** the native format SHALL contain the wire model ID as the model value
-- **AND** the alias SHALL be available for diagnostics and provenance
-- **AND** the adapter SHALL not confuse the alias with the wire model ID
+- **GIVEN** the canonical profile contains alias `codex-default` with wire model `gpt-5.6-sol`
+- **WHEN** a CLI consumer projects the profile
+- **THEN** the native command SHALL receive the wire model ID
+- **AND** the canonical alias SHALL remain available for diagnostics/provenance
+- **AND** the consumer SHALL not confuse the alias with the wire model ID
 
-### Requirement: No consumer appears implemented until it imports the API
+### Requirement: Consumer implementation claims require canonical API evidence
 
-A consumer SHALL NOT be described as integrated, wired, or functioning unless it imports `project_cli_profile()` or an equivalent canonical projection API. Documentation SHALL explicitly state when a consumer is proposed but not implemented.
+A consumer SHALL NOT be described as integrated, wired, or functioning unless its source imports or calls an equivalent canonical projection API. Documentation SHALL name the exact consumer boundary and evidence.
 
-#### Scenario: ai-harness-skills is not implemented
+#### Scenario: ai-harness-skills canonical runtime wiring
 
-- **WHEN** `ai-harness-skills` source is audited for `project_cli_profile` or `CLIProviderProfile` imports
-- **THEN** no such import SHALL be found
-- **AND** documentation SHALL describe the consumer as proposed, not implemented
+- **WHEN** `ai-harness-skills` source is audited
+- **THEN** `build_runtime()` SHALL resolve a canonical profile and call `get_canonical_overrides()` for enabled Claude/Codex adapters
+- **AND** adapter settings SHALL receive canonical model/effort values
+- **AND** the full suite and live acceptance evidence SHALL be recorded
 
-#### Scenario: ai-review is not implemented
+#### Scenario: ai-review canonical reviewer wiring
 
-- **WHEN** `ai-review` source is audited for `project_cli_profile` or `CLIProviderProfile` imports
-- **THEN** no such import SHALL be found
-- **AND** documentation SHALL describe the consumer as proposed, not implemented
+- **WHEN** `ai-review` source is audited
+- **THEN** `_build_reviewers()` SHALL call `resolve_canonical_overrides()` at the reviewer construction boundary
+- **AND** Claude/Codex SHALL receive supported model/effort arguments while Kimi/Pi retain capability-safe defaults
+- **AND** the full suite and live acceptance evidence SHALL be recorded
 
 ### Requirement: Native CLI format is advisory, not canonical
 

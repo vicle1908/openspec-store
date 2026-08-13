@@ -2,146 +2,105 @@
 
 ## Scope
 
-Corrective v2 of the agent LLM environment resolution standardization. Aligns the TDT Python agent ecosystem with the provider/model/default configuration pattern proven by Codex, Grok, Kimi, and Pi.
+Corrective v2 of the agent LLM environment-resolution standardization. The canonical YAML provider/model/default schema, six-layer resolver, per-CLI selection, and consumer projection are implemented across the TDT ecosystem.
 
-**Core implementation complete. Phase 6 (CLI consumer wiring) deferred to successor change `integrate-canonical-cli-projections-v1`.**
+Cross-repository consumer wiring was completed in successor change `integrate-canonical-cli-projections-v1`.
 
----
+## Current implementation provenance
 
-## Current Implementation Provenance
-
-### tdt-core (foundation + schema + resolver integration)
+### tdt-core
 
 | Commit | Description |
 |---|---|
-| `e395611` | `feat(tdt-core): add per-agent config resolution` |
-| `135268d` | `fix: make agent config cache path-sensitive` |
-| `8496f8e` | `feat(tdt-core): add v2 config primitives for LLM config standardization` |
-| `d90283f` | `docs(tdt-core): add v2 config primitives to README` |
-| `d63aa08` | `fix(config): register custom provider credentials` — interim registry fix |
-| `21dcd5b` | `test: strict Codex acceptance proof via new-schema YAML pipeline` — **schema + resolver integration + acceptance** |
+| `d63aa08` lineage | Registered custom provider credentials for legacy compatibility |
+| `21dcd5b` lineage | New-schema YAML, resolver integration, strict Codex acceptance |
+| `75cd519` | Public canonical CLI selection/projection API and final tdt-core implementation checkpoint |
 
-**Source symbols on `main` (`21dcd5b`):**
+Important public symbols on current main:
 
-| Symbol | Purpose |
-|---|---|
-| `resolve_agent_profile()` | Canonical six-layer resolution boundary |
-| `_NewSchemaProjection` | New-schema YAML → `_choose()` pipeline |
-| `_project_new_schema()` | Schema parser → projection dataclass |
-| `ProviderModelConfig` | Typed YAML schema: providers, models, defaults |
-| `project_cli_profile()` | CLI adapter profile projection |
-| `CLIProviderProfile` | CLI adapter profile model |
+- `resolve_agent_profile()` — canonical six-layer resolution boundary
+- `CanonicalCLISelection` — immutable secret-free selection result
+- `select_canonical_cli_provider()` — independent per-CLI selection
+- `project_canonical_cli_profile()` — validated CLI projection
+- `CLIProviderProfile` — provider-neutral consumer profile
 
-### agent-core (consumer wiring)
+### ai-harness-skills
 
 | Commit | Description |
 |---|---|
-| `e5fb49d` | `fix: route per-agent model config through build_agent and CLI paths` |
+| `0508b0e` | TDT projection bridge and editable tdt-core dependency |
+| `5946814` | `build_runtime()` canonical per-adapter wiring |
+| `02d0410` | StageId Python 3.14 runtime-import correction; final Phase 6A main |
 
-### agent-harness (two-plane config)
-
-| Commit | Description |
-|---|---|
-| `0ad49d2` | `feat(agent-harness): implement two-plane config loading strategy` |
-
-### agent-docs-sync (config alignment)
+### ai-review
 
 | Commit | Description |
 |---|---|
-| `e0ba600` | `fix: align docs-sync config with tdt-core agent config chain` |
+| `dec288f` | Initial canonical projection bridge and reviewer launch wiring |
+| `10b470d` | Relaxed flaky concurrency timing assertion |
+| `c60a706` | Canonical profile resolution at reviewer construction boundary |
+| `0fb2b69` | Corrected source-level Python 3.14 exception syntax |
+| `f31e73b` | Projected canonical reasoning effort into Claude/Codex reviewer commands |
+| `bd27767` | Made local review-context fixtures deterministic and offline; final main |
 
-### ai-harness-skills (Phase 6 foundation — NOT wired)
+## Test evidence
 
-| Commit | Description |
-|---|---|
-| `b160709` | `feat(projection): add TDT provider-neutral projection bridge` — bridge module + 9 focused tests, NOT wired into `build_runtime()` |
+| Repository | Commit | Result |
+|---|---:|---|
+| tdt-core | `75cd519` | 721 collected, 715 passed, 0 failed, 6 skipped |
+| ai-harness-skills | `02d0410` | 606 collected, 602 passed, 0 failed, 4 skipped |
+| ai-review | `bd27767` | 183 passed, 0 failed |
+| agent-core | `e5fb49d` | 746/746 |
+| agent-harness | `0ad49d2` | 343/343 |
+| agent-docs-sync | `e0ba600` | 245/245 |
 
-### ai-review (Phase 6 — NOT started)
+ai-review gates:
 
-No implementation. Branch `phase6/tdt-core-projection` exists at `a519540` (same as main).
-
----
-
-## Test Evidence
-
-### tdt-core focused config/profile tests
-
-```
-cd ~/Developer/tdt-core
-uv run pytest tests/test_config_primitives.py tests/test_llm_profile_v2.py tests/test_provider_model_profile.py tests/test_resolver_precedence.py -q
-→ 129 passed
-```
-
-### Full tdt-core suite (integrated main, no PYTHONPATH)
-
-```
-cd ~/Developer/tdt-core
-uv run pytest -q --junitxml=/tmp/tdt-provider-model-main.xml
-→ tests=687 passed=681 failures=0 errors=0 skipped=6
-```
-
-### Downstream suites (integrated main, no PYTHONPATH)
-
-| Repo | SHA | Tests | Passed | Failed | Errors | Skipped |
-|---|---|---|---|---|---|---|
-| `tdt-core` | `21dcd5b` | 687 | 681 | 0 | 0 | 6 |
-| `agent-core` | `e5fb49d` | 746 | 746 | 0 | 0 | 0 |
-| `agent-harness` | `0ad49d2` | 343 | 343 | 0 | 0 | 0 |
-| `agent-docs-sync` | `e0ba600` | 245 | 245 | 0 | 0 | 0 |
-| **Total** | | **2021** | **2015** | **0** | **0** | **6** |
-
-### ai-harness-skills bridge tests (Phase 6 foundation)
-
-```
-cd ~/Developer/ai-harness-skills-phase6
-uv run pytest tests/unit/test_tdt_projection.py -v --no-cov
-→ 9 passed
+```text
+python3 -m py_compile src/ai_review/providers/tdt_projection.py \
+  src/ai_review/reviewers/command.py \
+  src/ai_review/review_flow/orchestrator.py \
+  tests/test_review_context.py
+uv run ruff check src/ai_review/providers/tdt_projection.py \
+  src/ai_review/reviewers/command.py \
+  src/ai_review/review_flow/orchestrator.py \
+  tests/test_tdt_projection.py tests/test_review_context.py
+uv run mypy src/ai_review/providers/tdt_projection.py \
+  src/ai_review/reviewers/command.py \
+  src/ai_review/review_flow/orchestrator.py
+uv run pytest -q --tb=short --no-cov
+→ all checks passed; 183 passed
 ```
 
----
+The `test_review_context.py` fixture now explicitly disables live GitLab calls for local-only scenarios while preserving dedicated mocked tests for GitLab fallback and diff-version caching.
 
-## Strict Codex Acceptance Evidence
+## Live dual-consumer acceptance
+
+Durable harness:
+
+```text
+~/Developer/tdt-cli-acceptance/verify_phase6_live.py
+```
+
+Latest run:
 
 | Item | Value |
 |---|---|
-| Commit | `4c277c4` |
-| Script | `scripts/verify_v2_codex_acceptance.py` |
-| Command | `codex exec --ephemeral --skip-git-repo-check --sandbox read-only -m gpt-5.6-sol ...` |
-| Exit code | 0 |
-| Nonce | `TDT_8ef49e53` |
-| Duration | 7.25s |
-| Provider | Native Codex (`gpt-5.6-sol` via `codex_local_access`) |
+| Canonical provider | `codex-native` (`cli_provider: codex`) |
+| Canonical alias | `codex-default` |
+| Wire model | `gpt-5.6-sol` |
+| Reasoning effort | `low` |
+| ai-review command | `codex exec --json --skip-git-repo-check --config model_reasoning_effort="low" --model gpt-5.6-sol` |
+| ai-review result | completed; 15.71s; nonce verified |
+| ai-harness result | process status 0; 7.76s; structured artifact nonce verified |
+| Nonce | `TDT_PHASE6_AI_REVIEW_4cbec67f` |
+| Credential leakage | none observed |
+| Consumer SHAs | ai-review `bd27767`; ai-harness-skills `02d0410`; tdt-core `75cd519` |
 
----
+## Registry decision
 
-## Missing-Credential Proof
+The registry remains authoritative for legacy aliases, CLI capability metadata, and legacy environment-key lookup. New-schema `auth_env` remains provider-local. Removal is deferred until all legacy consumers migrate.
 
-| Path | Result |
-|---|---|
-| New-schema `auth_env` path | Profile resolves, `CredentialResolver.resolve()` raises at use-time ✅ |
-| Legacy `api_key_env` path | Profile resolves, `CredentialResolver.resolve()` raises at use-time ✅ |
+## Archive status
 
----
-
-## What Is NOT Done
-
-| Item | Status | Blocked by |
-|---|---|---|
-| Phase 5: Registry retirement decision | Deferred | Successor change |
-| Phase 6: CLI projections for ai-harness-skills | Foundation only, NOT wired | Field-source matrix correction |
-| Phase 6: CLI projections for ai-review | NOT started | Phase 6 design |
-| Phase 9.2: Re-run consumers with new YAML schema | NOT done | Phase 6 completion |
-| Phase 9.4: Redacted diagnostics verification | NOT done | Phase 6 completion |
-
----
-
-## Worktree State
-
-| Item | Value |
-|---|---|
-| tdt-core main | `21dcd5b` |
-| OpenSpec baseline | `6f2763a` |
-| OpenSpec current | `c88f9b5` |
-| ai-harness-skills-phase6 | `b160709` (NOT wired) |
-| ai-review-phase6 | `a519540` (NOT started) |
-| Archive status | **NOT ARCHIVED** — Phase 5 and 6 deferred to successor change |
+Implementation and live acceptance are complete. The successor and v2 changes require final focused/full-store validation, archive, and canonical spec synchronization before closure.
