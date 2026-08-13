@@ -17,6 +17,7 @@ The principal transaction boundaries are:
 - An agent-construction transaction begins only after its caller supplies either an explicit Pydantic AI `Model` or a model identifier plus one caller-resolved immutable snapshot. Construction never resolves a missing snapshot. A separate operation or composition boundary may resolve once before invoking construction.
 - A docs-sync operation begins by capturing one canonical profile, one effective runtime-control projection, and one stable public provenance projection. In-process retries reuse that capture. Resume is a new lifecycle boundary that must restore and validate the retained non-secret operation identity before model construction, persistence, approval advancement, or write-capable construction.
 - A native-CLI selection transaction ends in exactly one of three typed states: a valid selection preserving both identities, genuine absence of an applicable mapping after successful canonical resolution, or a canonical source/resolution/projection error that prevents local fallback and process launch.
+- An evidence-preflight transaction begins with one schema-valid retained record, one selected lifecycle gate, the immutable planning-baseline identity, and an explicit local repository/worktree map. It recaptures every applicable non-secret identity from authoritative local sources, computes a deterministic decision, and ends without provider execution, consumer launch, network dependency resolution, credential-value access, or repository mutation.
 - A live-acceptance transaction begins only after its exact consumer, dependency, source, launcher, shell, provider, credential-availability, dirty-state, and authorization prerequisites have been captured. It ends with separately recorded reachability, nested consumer outcome, nonce or artifact, and target-preservation evidence.
 
 ## Goals / Non-Goals
@@ -35,6 +36,7 @@ The principal transaction boundaries are:
 - Preserve both requested CLI adapter identity and canonical provider ID across selection, projection, diagnostics, credentials, and evidence.
 - Distinguish genuine canonical mapping absence from unreadable sources or invalid canonical intent.
 - Produce exactly two required, independently attributable live consumer rows with exact dependency and prerequisite identity.
+- Make retained evidence reuse and lifecycle advancement conditional on a deterministic store-owned preflight that recaptures artifact, repository, dependency, source, mechanism, dirty-state, and presence-only prerequisite identities and propagates drift downstream.
 - Keep planning validation, deterministic implementation verification, live acceptance, spec synchronization, and archive readiness as distinct lifecycle gates.
 - Preserve the store edit boundary, predecessor archives, unrelated state, and one-writer-per-repository ownership.
 
@@ -48,6 +50,7 @@ The principal transaction boundaries are:
 - Allow repository-domain docs-sync configuration to select LLM models, fallbacks, providers, or model behavior.
 - Introduce a process-global mutable current profile, model, provider, or operation context.
 - Expand the minimum live matrix beyond one `ai-harness-skills` row and one `ai-review` row without an explicit later scope revision.
+- Introduce a watcher, daemon, scheduler, TTL-based expiry policy, provider call, consumer launch, network resolver, or automatic repository/worktree mutation for evidence validation.
 - Integrate unrelated credential-loading, shell, native-runtime, scheduler, adapter, skills, memory, hooks, or domain-workflow work.
 - Treat OpenSpec validity, task syntax, candidate tests, process reachability, exit zero, or the presence of an acceptance script as implementation acceptance.
 - Expand OpenSpec `actionContext.allowedEditRoots`, treat a personal workset as write authority, or let implementation-repository writers edit the shared store ledger.
@@ -73,7 +76,7 @@ Alternatives considered:
 
 After all revised planning artifacts are individually approved and focused validation passes, the sole store writer may create a planning-baseline commit only through a separately authorized store operation. Before doing so, the writer inventories all store dirt, stages only the corrective change subtree, inspects the cached name and content diff, and proves unrelated active changes, archives, canonical specs, generated files, and untracked paths are excluded.
 
-The full store SHA and corrective-change tree identity become prerequisites for every repository packet and retained evidence row. Later evidence updates, canonical-spec synchronization, and archive movement use separately reviewable lifecycle commits. A full-store failure from unrelated concurrent work remains an explicit external blocker; it is neither repaired through this change nor relabeled as a pass.
+The full planning-baseline store SHA and corrective-change tree identity become prerequisites for every repository packet and retained evidence row; observed current store `HEAD` is recorded separately. Later evidence updates, canonical-spec synchronization, and archive movement use separately reviewable lifecycle commits. A full-store failure from unrelated concurrent work remains an explicit external blocker; it is neither repaired through this change nor relabeled as a pass.
 
 Alternatives considered:
 
@@ -94,6 +97,7 @@ Ownership is divided as follows:
 | `cli-provider-profile-resolution` selection | `tdt-core` | both native-CLI consumer repositories |
 | `cli-provider-profile-resolution` harness adapter | `ai-harness-skills` | true contained generation boundary |
 | `cli-provider-profile-resolution` review adapter | `ai-review` | true reviewer construction and invocation boundary |
+| Automated evidence drift validator, versioned evidence schema, and store-local fixture suite | `openspec-store` | every repository handoff, retained evidence record, live row, synchronization gate, and archive-readiness gate |
 | Existing canonical harness runner contract | `agent-harness` | production composition and containment-before-write |
 
 Each repository compares its product diff only with its owned requirements and explicitly named downstream constraints. The breaking provider-bound credential boundary requires a workspace-wide caller/export/example audit even though its implementation owner is `tdt-core`.
@@ -127,6 +131,33 @@ Alternatives considered:
 - Apply known dirty diffs directly to main worktrees. Rejected because it mixes ownership and obscures provenance.
 - Accept a candidate solely because its earlier tests passed. Rejected because code, dependencies, environment, or target main may have changed after capture.
 - Remove generated or untracked files before comparing candidates. Rejected because cleanup would destroy evidence or another workflow’s state.
+
+### 4A. Build one dependency-ordered execution topology before reusing candidate work
+
+Candidate worktrees, committed candidate branches, and uncommitted candidate diffs are source-intake material, not accepted execution environments. After separate repository-scoped implementation authority is granted, the integration owner creates or designates one dedicated worktree per participating repository and records one sole writer for each worktree.
+
+Before a downstream RED, GREEN, deterministic, or live result can be retained, every applicable dependency declaration, lock or editable source, filesystem path, import origin, and full Git SHA MUST resolve the accepted upstream identity. The execution order is:
+
+1. accept `tdt-core`;
+2. bind `agent-core` to the accepted `tdt-core` identity and accept `agent-core`;
+3. bind `agent-docs-sync` and `agent-harness` to the accepted upstream identities and accept them independently;
+4. bind `ai-harness-skills` to the accepted `tdt-core` identity;
+5. bind `ai-review` to the accepted `tdt-core` and actual `agent-core` identities; and
+6. run cross-repository deterministic and live acceptance only after all participating dependency origins agree with those accepted identities.
+
+An empty branch, a worktree at main with no owned implementation diff, or a missing or prunable worktree record is classified as excluded historical state. It is not a candidate source and SHALL NOT be recreated, pruned, cleaned, reset, or otherwise changed by this correction.
+
+Existing candidate source MAY be selectively intaken after owned-path and provenance review. Prior candidate tests are stale for integration acceptance unless they are rerun from the coherent dependency topology and bound to its exact source, dependency, dirt, and prerequisite identities. Exact current worktree paths and candidate SHAs belong in mutable work packets and retained evidence rather than immutable design or task wording.
+
+Planning this topology does not create a worktree or grant source-repository write authority. Materialization begins only after the applicable repository-scoped implementation authorization.
+
+### 4B. Reconcile an already tracked planning baseline without manufacturing a second baseline
+
+If the corrective planning subtree is already tracked when execution preparation begins, the baseline step records its introducing commit, current subtree tree identity, branch divergence, and whether its introducing commit also contains unrelated paths. It SHALL NOT restage unchanged files, create an empty or no-op baseline commit, or rewrite or split historical commits merely to match the originally planned commit shape.
+
+A mixed-purpose introducing commit remains provenance for the current planning tree; it does not grant implementation authority or prove implementation acceptance. Any subsequently approved proposal, design, specification, or task reconciliation is staged only from the corrective subtree, inspected for unrelated paths and protected values, and committed as a separate planning-reconciliation commit after explicit store-commit authorization.
+
+Rewriting, amending, rebasing, or otherwise repairing the historical introducing commit is outside this change.
 
 ### 5. Represent `tdt-core` resolution as one atomic captured-input transaction
 
@@ -310,7 +341,7 @@ Only the sole store writer writes to that ledger from accepted repository handof
 
 Deterministic evidence records:
 
-- planning store SHA and corrective-change tree identity;
+- planning-baseline store SHA, observed current store `HEAD`, and corrective-change tree identity;
 - repository and worktree identity;
 - exact consumer and upstream dependency SHAs;
 - resolved dependency path, declaration or lock state, import origin, and full SHA;
@@ -328,7 +359,7 @@ Live acceptance uses one durable matrix with exactly two required independent ro
 
 Each row records:
 
-- planning store SHA and change-tree identity;
+- planning-baseline store SHA, observed current store `HEAD`, and change-tree identity;
 - consumer repository, full SHA, worktree, and dirty disposition;
 - resolved `tdt-core` dependency path, declaration/lock state, import origin, and full SHA;
 - relevant product, test, launcher, and acceptance-script identities;
@@ -373,21 +404,99 @@ Alternatives considered:
 - Embed credential values to prove account identity. Rejected because authorization and availability are proven with redacted provider-bound metadata.
 - Keep one combined row for both consumers. Rejected because independent consumer behavior, dependencies, artifacts, and prerequisites must remain attributable.
 
+### 11A. Automate drift validation with a store-owned deterministic preflight
+
+The store owns one standalone Python CLI at `scripts/validate-agent-llm-evidence.py`. It uses only the Python standard library and local executables already required by this workflow. Store-local subprocess-driven `unittest` coverage lives at `tests/test_validate_agent_llm_evidence.py`, with non-secret fixtures under `tests/fixtures/agent-llm-evidence/`. The versioned record schema lives at `openspec/changes/complete-agent-llm-config-integration/evidence/schema/v1/evidence-record.schema.json`. These paths are implementation targets for a separately authorized store-script/test packet; this planning revision does not create them.
+
+The CLI accepts one retained deterministic handoff or live-row record, the versioned schema, one selected gate, the change/store identity, and an explicit local repository/worktree map. The selected gate is one of `handoff_acceptance`, `evidence_reuse`, `downstream_unblock`, `task_completion`, `live_authorization`, `live_launch`, `spec_sync`, or `archive_readiness`. It does not discover repositories by scanning the workspace and does not accept an implicit current working directory as repository ownership.
+
+For each run, the validator recaptures the applicable identity from authoritative local sources:
+
+- `openspec status --change complete-agent-llm-config-integration --json --store openspec-store`, especially every concrete `artifactPaths.<id>.existingOutputPaths`; it never hashes or writes a glob-valued `resolvedOutputPath`;
+- the immutable planning-baseline commit, observed current store `HEAD`, and the current non-secret identities of the concrete proposal, five delta specs, design, tasks, and versioned evidence schema;
+- each explicitly mapped Git root and worktree identity, full `HEAD`, branch/worktree relationship, and complete `git status --porcelain=v1 -z --untracked-files=all` result, with content fingerprints only for explicitly classified non-secret product, test, acceptance-mechanism, and generated paths;
+- each applicable `pyproject.toml`, `uv.lock`, local/editable dependency source, filesystem checkout, installed module origin discovered without importing the target package, and full Git SHA of the checkout containing that origin;
+- canonical source paths and loader/mechanism identities that are explicitly classified as non-secret; and
+- locally observable presence-only prerequisite state, including configured environment-key presence without reading its value, executable resolution and non-secret identity, containment availability, authorization presence, and canonical provider-binding or credential-availability booleans supplied by their owning credential-safe mechanism.
+
+A prerequisite that cannot be safely observed without a provider call, consumer operation, credential-value access, network resolution, or externally owned mutation remains `indeterminate` unless a current schema-valid presence-only record from its owning mechanism is supplied. The validator never guesses, upgrades a historical observation, or treats an unavailable probe as current.
+
+The immutable planning-baseline SHA is the Git anchor for planning provenance. The validator also reports current store `HEAD` and verifies that the baseline remains in its ancestry. A descendant commit that changes only retained result records does not invalidate those records merely by advancing `HEAD`; planning drift is determined from ancestry plus the concrete proposal, delta-spec, design, task, and evidence-schema identities. A missing baseline, rewritten ancestry, or changed concrete planning/schema identity is non-current. Result-output paths are inventoried as ledger state but excluded from the planning-identity digest so a validator cannot invalidate its own output solely by writing it.
+
+The validator emits canonical JSON with stable key and comparison ordering. The result contains:
+
+- schema version, evidence-record identifier, selected gate, planning-baseline SHA, and observed store `HEAD`;
+- one comparison per required field with the expected identity, current identity, field decision, source kind, and credential-safe diagnostic;
+- the overall decision: `current`, `stale`, `blocked`, or `invalid`;
+- every directly affected evidence record and every dependency-ordered downstream invalidation decision; and
+- the deterministic exit code.
+
+Wall-clock time is omitted by default. If explicitly requested for operator diagnostics, `observed_at` is written only as separate metadata and is excluded from the canonical comparison digest and equality decisions. No comparison or diagnostic contains a protected credential value, a secret-derived fingerprint, or a serialized process environment.
+
+Exit codes are stable and covered by golden subprocess tests:
+
+- `0`: every required field is present, locally resolved, and current;
+- `2`: one or more resolved identities drifted and affected evidence is `stale`;
+- `3`: a required identity or prerequisite is missing, inaccessible, unresolved, or indeterminate and the gate is `blocked`; and
+- `4`: the schema, record, repository map, identity declaration, or validator input is malformed or internally contradictory and the record is `invalid`.
+
+When several conditions occur, `invalid` takes precedence over `blocked`, which takes precedence over `stale`, which takes precedence over `current`. A zero exit applies only to the exact record and selected gate evaluated; it does not authorize the next lifecycle action and does not establish implementation or live-provider success.
+
+Invalidation follows actual resolved dependency origin and the declared evidence graph:
+
+```text
+planning/store/schema drift
+└── all deterministic and live evidence
+
+tdt-core drift
+├── agent-core
+├── agent-docs-sync
+├── agent-harness
+├── ai-harness-skills
+└── ai-review
+
+agent-core drift
+├── agent-docs-sync
+├── agent-harness
+└── ai-review when its recorded environment actually resolves/imports agent-core
+
+consumer-local drift
+└── that consumer's deterministic evidence and live row
+
+live mechanism or prerequisite drift
+└── the affected live row
+```
+
+The planning graph alone never manufactures a dependency. Declaration, lock/editable source, filesystem checkout, installed origin, and full Git SHA determine whether an edge applies. Upstream drift propagates only along those established edges, while planning/store/schema drift invalidates every record.
+
+Preflight runs before the first repository handoff is accepted; before any retained handoff or result is reused; before a downstream repository packet is unblocked; before an evidence-backed task is checked; before either live row is authorized or launched; before canonical spec synchronization; and before archive readiness. The validator mechanism, schema, fixture suite, and separately authorized store commit must be accepted before `tdt-core` execution evidence can be accepted. Planning may prepare the `tdt-core` work packet earlier, but no repository handoff becomes accepted without a current preflight.
+
+The validator is read-only unless the caller explicitly selects one result-output path. It never calls a provider, launches a consumer operation, imports consumer packages to discover origins, reads or serializes credential values, resolves a dependency from the network, writes a lockfile, changes an environment, or cleans, resets, checks out, prunes, stages, commits, synchronizes, archives, or otherwise mutates a repository or worktree.
+
+Alternatives considered:
+
+- Keep drift invalidation as operator prose. Rejected because lifecycle advancement would still depend on a manual comparison with no deterministic fail-closed contract.
+- Add a filesystem watcher, daemon, scheduler, or TTL. Rejected because explicit gate-time recapture is sufficient and avoids background authority, timing races, and a new service lifecycle.
+- Use a package dependency or network-backed validation service. Rejected because the store currently has no Python package or test runtime, and evidence currency must remain locally reproducible without dependency resolution.
+- Let the validator run live probes to establish provider success. Rejected because evidence currency and behavioral acceptance are distinct gates, and live operations require separate row-specific authorization.
+- Compare arbitrary current store `HEAD` for exact equality with the retained planning commit. Rejected because evidence-only lifecycle commits would make records self-invalidating even when every concrete planning and schema identity remains unchanged.
+
 ### 12. Integrate in dependency order and keep lifecycle gates separate
 
 Integration proceeds in dependency order:
 
-1. `tdt-core`;
-2. `agent-core`;
-3. `agent-docs-sync`;
-4. `agent-harness`;
-5. deterministic cross-repository verification;
-6. `ai-harness-skills`;
-7. `ai-review`;
-8. exactly two authorized live consumer rows;
-9. scenario-by-scenario implementation verification;
-10. synchronization of the five authoritative delta specs; and
-11. archive readiness review.
+1. store-owned validator, evidence schema, fixture tests, and baseline preflight;
+2. `tdt-core`;
+3. `agent-core`;
+4. `agent-docs-sync`;
+5. `agent-harness`;
+6. deterministic cross-repository verification;
+7. `ai-harness-skills`;
+8. `ai-review`;
+9. exactly two authorized live consumer rows;
+10. scenario-by-scenario implementation verification;
+11. synchronization of the five authoritative delta specs; and
+12. archive readiness review.
 
 The native-CLI consumers are corrected or revalidated only against the final accepted `tdt-core` dependency identity. A failed or superseded upstream gate invalidates downstream evidence.
 
@@ -397,6 +506,7 @@ OpenSpec lifecycle gates remain distinct:
 - full-store strict validation proves current store-wide health or identifies external blockers;
 - implementation verification proves current source behavior against all scenarios;
 - live acceptance proves the two authorized true consumer operations;
+- automated preflight proves only that the exact evidence record presented to a selected gate is current, well formed, and dependency-consistent;
 - spec synchronization updates only the five paths reported by `artifactPaths.specs.existingOutputPaths`; and
 - archive readiness requires post-sync validation, current identities, complete tasks, and non-stale evidence.
 
@@ -417,6 +527,9 @@ Alternatives considered:
 - [Concurrent store work fails full-store validation] → Attribute the failure to its owning change, preserve it untouched, and retain an external store blocker rather than converting the gate into a pass.
 - [Several writers update the task or evidence ledger] → Keep one `openspec-store` writer; repository writers return handoffs only.
 - [A relative evidence path writes into the wrong worktree] → Use the one absolute evidence root and reject misplaced ledger output.
+- [A validator output commit invalidates its own planning identity] → Anchor provenance to the immutable planning-baseline commit, report current store `HEAD` separately, compare concrete planning/schema paths, and exclude result outputs from the planning digest.
+- [A validator reports current and is mistaken for implementation acceptance] → Limit the decision to evidence currency at one named gate; retain deterministic behavior verification and both live rows as separate requirements.
+- [A credential leaks through a generic file or environment collector] → Permit content hashing only for explicitly non-secret paths, test secret-key canaries and redaction, and expose environment or credential state only as names and presence-only booleans.
 - [External credential/shell/provider work changes live prerequisites] → Keep its paths externally owned and mark affected rows stale after prerequisite drift.
 - [A candidate contains incomplete, composite, or unrelated work] → Review ancestry and path-level diff in a dedicated worktree and integrate only owned corrections.
 - [Generated graph or index state obscures product dirt] → Inventory generated paths separately and preserve them; do not infer whole-tree cleanliness from filtered status.
@@ -458,6 +571,14 @@ Capture current main and candidate identities, ancestry, worktree paths, branch/
 
 Create one repository packet per Git root with its owned scenarios and required policy gates. Stop when repository-scoped implementation authority is absent, worktree provenance is unresolved, ownership overlaps, dependencies resolve unexpectedly, or unexplained product paths exist.
 
+### Phase 1A: Implement and accept automated evidence preflight
+
+Through a separately authorized `openspec-store` script/test packet, add the standard-library validator, the versioned schema, and subprocess-driven fixtures for current evidence, planning-artifact drift, repository dirt drift, lock/editable-source drift, installed-origin drift, missing dependency identity, malformed schema, indeterminate prerequisite state, dependency-ordered propagation, credential canaries, redaction, and no-side-effect behavior.
+
+Verify stable canonical JSON and exit codes `0`, `2`, `3`, and `4`; confirm `observed_at` is absent by default and excluded from comparison determinism when requested; prove that no provider, consumer, network resolver, credential-value accessor, or Git-mutating command is reachable; run store-local source/style/tests, focused and full-store strict OpenSpec validation, `git diff --check`, current GitNexus change-scope review where available, and direct path-level review. Commit the validator, schema, and tests separately only through explicit store-script/test commit authority.
+
+Run the first baseline preflight against the accepted planning and validator identities. Planning of the `tdt-core` packet may proceed in parallel with this store work, but its execution handoff cannot be accepted until the baseline preflight returns `current` with exit `0`.
+
 ### Phase 2: Integrate the canonical `tdt-core` correction
 
 Through a separately authorized `tdt-core` packet:
@@ -474,7 +595,7 @@ Through a separately authorized `tdt-core` packet:
 
 Run current impact analysis before edits, audit every protected-credential caller/export/example, pause on repository-defined high-risk findings, run focused and full deterministic gates with isolated caches and a disposable non-secret `TDT_HOME`, refresh Graphify as required, inspect the complete diff, and run the repository change-scope gate before commit.
 
-The accepted integrated `tdt-core` SHA becomes the only dependency identity eligible for downstream acceptance.
+Before handoff acceptance, run the store-owned preflight against the `tdt-core` record and selected `handoff_acceptance` gate. The accepted integrated `tdt-core` SHA becomes the only dependency identity eligible for downstream acceptance.
 
 ### Phase 3: Update direct Python consumers in dependency order
 
@@ -484,7 +605,7 @@ Execute three separately authorized repository packets:
 - Update `agent-docs-sync` so one operation context carries canonical profile, runtime controls, public provenance, retry capture, and resume identity through every path, with invalid resume/configuration blocked before model, persistence, approval, or write-capable construction.
 - Update `agent-harness` production composition to propagate the effective model while retaining containment-before-write.
 
-Each packet resolves the accepted `tdt-core` identity, runs current impact analysis and repository-specific deterministic gates, updates Graphify as required, inspects all product/test/generated dirt, runs the repository change-scope gate, creates its own integration commit, and returns a credential-safe handoff.
+Each packet resolves the accepted `tdt-core` identity, runs current impact analysis and repository-specific deterministic gates, updates Graphify as required, inspects all product/test/generated dirt, runs the repository change-scope gate, creates its own integration commit, and returns a credential-safe handoff. The store-owned preflight must return `current` for the handoff and its actual upstream dependency origins before that packet or any downstream packet is accepted.
 
 ### Phase 4: Run deterministic cross-repository verification
 
@@ -506,6 +627,8 @@ At exact accepted identities, run:
 
 Use isolated caches and disposable configuration roots where appropriate. Retain exact commands, working directories, exits, counts, prerequisites, and dirty dispositions.
 
+Run automated preflight before any retained result is reused or any evidence-backed task is checked. A current preflight establishes record currency only; the associated deterministic gate must still pass on its own merits.
+
 ### Phase 5: Correct or revalidate native CLI consumers
 
 With the accepted `tdt-core` dependency actually resolved:
@@ -517,18 +640,20 @@ Verify preservation of both identities, valid canonical projection, genuine-abse
 
 Record dependency declaration/lock, path, import origin, full `tdt-core` SHA, consumer SHA, product/test/script dirt, focused and full gate results, and rollback point. Any source or mechanism correction invalidates earlier evidence.
 
+Run `handoff_acceptance` and `downstream_unblock` preflight for each consumer against its actual resolved dependency origins before accepting the handoff or preparing live acceptance.
+
 ### Phase 6: Capture durable two-row live acceptance
 
-Only after explicit live-provider authorization, materialize exactly:
+Only after explicit live-provider authorization and successful `live_authorization` preflight, materialize exactly:
 
 - one `ai-harness-skills` contained generation row; and
 - one `ai-review` reviewer row.
 
 Perform presence-only prerequisite checks without exposing credentials. Bind each row to the current planning identity, consumer SHA, actual resolved `tdt-core` origin and SHA, dirty disposition, both provider identities, canonical source fingerprints, loader identity, launcher/script identity, shell/provider prerequisites, and credential-availability/provider-binding metadata.
 
-Execute each row independently in an approved contained target. Record reachability, process exit, nested result, expected nonce or artifact, target preservation, duration, and redacted command shape. Mark unauthorized or unavailable rows `blocked`, unsuccessful rows `failed`, and drifted rows `stale`. Both rows must be `passed` before live acceptance is complete.
+Immediately before each operation, rerun `live_launch` preflight. Execute each row independently in an approved contained target. Record reachability, process exit, nested result, expected nonce or artifact, target preservation, duration, and redacted command shape. Mark unauthorized or unavailable rows `blocked`, unsuccessful rows `failed`, and drifted rows `stale`. Both rows must be `passed` before live acceptance is complete.
 
-### Phase 7: Verify all 74 delta scenarios and the existing harness contract
+### Phase 7: Verify all 77 delta scenarios and the existing harness contract
 
 Compare accepted source and current evidence with every scenario in:
 
@@ -544,11 +669,11 @@ Reconcile every checked task with its exact committed handoff, dependency identi
 
 ### Phase 8: Synchronize and prepare archive readiness
 
-Resolve synchronization inputs only from the five current `artifactPaths.specs.existingOutputPaths`. After implementation and both live rows are verified, use the normal spec-sync workflow as the sole store writer. Inspect the canonical spec diff for exact intended requirements and scenarios, unrelated paths, duplication, protected values, and predecessor archive changes.
+Resolve synchronization inputs only from the five current `artifactPaths.specs.existingOutputPaths`. After implementation and both live rows are verified, require a current `spec_sync` preflight before using the normal spec-sync workflow as the sole store writer. Inspect the canonical spec diff for exact intended requirements and scenarios, unrelated paths, duplication, protected values, and predecessor archive changes.
 
 Run focused and full-store strict validation after synchronization. Commit synchronization and evidence separately from the planning baseline through the reviewed store workflow.
 
-Produce an archive-readiness handoff containing final store and repository SHAs, resolved dependency identities, dirty dispositions, rollback results, live row outcomes, validation totals, and external blockers. Do not archive until a later explicitly authorized archive workflow confirms that all identities and prerequisites remain current.
+Produce an archive-readiness handoff containing final store and repository SHAs, resolved dependency identities, dirty dispositions, rollback results, live row outcomes, validation totals, and external blockers. Require a fresh `archive_readiness` preflight and do not archive until a later explicitly authorized archive workflow confirms that all identities and prerequisites remain current.
 
 ### Rollback
 

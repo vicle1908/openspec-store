@@ -141,3 +141,31 @@ Live CLI acceptance SHALL be recorded in a durable, credential-safe ledger bound
 - **THEN** the prior live row SHALL be marked stale
 - **AND** presence-only prerequisite checks and the affected live row SHALL be rerun
 - **AND** no credential value SHALL be printed, compared, copied, rotated, or retained while recapturing the row
+
+### Requirement: Automated artifact and dependency drift validation
+
+Before a retained deterministic handoff or live row is reused to complete an evidence-backed task, unblock a downstream repository packet, authorize or launch either required live row, synchronize canonical specs, or declare archive readiness, a store-owned non-interactive validator MUST recapture and compare the current credential-safe acceptance identity with the identity retained by that evidence. The validator SHALL resolve the current planning store SHA and corrective-change tree; the concrete proposal, delta-spec, design, task, and evidence-schema paths and non-secret identities, including the current `artifactPaths.specs.existingOutputPaths`; participating repository and worktree SHAs plus complete relevant product, test, acceptance-script, and generated dirty-state disposition; each applicable dependency declaration, lock or editable source, filesystem checkout, installed import origin, and full Git SHA; canonical non-secret source fingerprints and loader identity; and presence-only shell, executable, provider, containment, authorization, credential-availability, and canonical-provider-binding prerequisites. It SHALL emit deterministic machine-readable per-field comparisons, affected-record and downstream-invalidation decisions, and an overall status without treating a missing, malformed, unresolved, indeterminate, or drifted field as current. Any such condition MUST produce a non-zero exit, classify affected evidence as `stale`, `blocked`, or `invalid`, and prevent reuse or lifecycle advancement until dependency-ordered recapture succeeds. The validator SHALL be read-only except for an explicitly selected result output, SHALL NOT launch a provider or consumer operation, mutate a repository or worktree, resolve dependencies from the network, or read, print, compare, serialize, or retain a credential value.
+
+#### Scenario: Current retained evidence passes automated preflight
+
+- **GIVEN** retained deterministic or live evidence contains every required planning, repository, dependency, source, dirt, mechanism, and prerequisite identity
+- **WHEN** the validator recaptures the same current identities from their authoritative local sources
+- **THEN** it SHALL emit a machine-readable `current` decision with a zero exit
+- **AND** the result SHALL identify the exact evidence record and every compared field without containing a credential value
+- **AND** only that validated record MAY be considered for the next separately authorized acceptance or lifecycle gate
+
+#### Scenario: Artifact or dependency drift fails closed
+
+- **GIVEN** retained evidence was accepted for one exact planning and dependency topology
+- **WHEN** a planning artifact, repository SHA, relevant dirty path, product/test/acceptance mechanism, dependency declaration, lock or editable source, filesystem checkout, import origin, or upstream Git SHA differs from the retained identity
+- **THEN** the validator SHALL exit non-zero and identify the changed non-secret fields
+- **AND** it SHALL classify the affected record as `stale`, propagate invalidation to dependency-ordered downstream evidence, and block reuse, live launch, task completion, synchronization, and archive readiness
+- **AND** a matching consumer SHA alone SHALL NOT override dependency or artifact drift
+
+#### Scenario: Missing or indeterminate identity remains blocked
+
+- **GIVEN** a required evidence field, repository, dependency checkout, import origin, source identity, prerequisite, or retained schema is missing, malformed, inaccessible, or cannot be resolved locally
+- **WHEN** automated preflight evaluates the record
+- **THEN** the validator SHALL exit non-zero and classify the result as `blocked` or `invalid`, never `current`
+- **AND** it SHALL perform no provider call, consumer launch, network dependency resolution, repository or worktree mutation, or credential-value access
+- **AND** the affected gate SHALL remain closed until the identity can be recaptured and validation is rerun successfully
