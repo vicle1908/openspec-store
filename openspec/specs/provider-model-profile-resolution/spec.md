@@ -3,7 +3,7 @@
 ## Purpose
 Define a YAML-based provider/model/default configuration schema for TDT Python agent consumers, aligned with the configuration patterns proven by Codex, Grok Build, and Kimi. This is the target architecture that replaces the current `model.primary`/`model.fallback`/`api_key_env` pattern and the separate packaged `environment-key-registry.json`.
 
-**Status: IMPLEMENTED in tdt-core current main (`75cd519`). Consumer projections were completed in successor change `integrate-canonical-cli-projections-v1`: ai-harness-skills `02d0410`, ai-review `bd27767`.**
+**Status: IMPLEMENTED in tdt-core current main (`75cd519`). Consumer projections were completed and corrected through successor/corrective changes: ai-harness-skills `02d0410`, ai-review `f1b6e0f`.**
 ## Requirements
 ### Requirement: Provider definitions
 
