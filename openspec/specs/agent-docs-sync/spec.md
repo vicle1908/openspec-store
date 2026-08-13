@@ -174,7 +174,7 @@ documentation mappings.
 
 ### Requirement: Canonical configuration and CLI truthfulness
 
-`agent-docs-sync` SHALL load one documented domain configuration schema and one canonical resolved agent profile. LLM model, fallback, provider, and behavior precedence SHALL be explicit run override > registered docs-sync environment > registered shared model environment > agent-specific TDT YAML > global TDT YAML > defaults. Repository configuration MAY define docs-sync domain behavior but MUST NOT define LLM fields. Every public config projection and generation path SHALL use the same resolved profile. The system SHALL validate unknown, legacy, and invalid typed values before model, persistence, or write-capable tool construction.
+`agent-docs-sync` SHALL load one documented domain configuration schema and one canonical resolved agent profile per public operation. LLM model, fallback, provider, and behavior precedence SHALL be explicit run override > registered docs-sync environment > registered shared model environment > agent-specific TDT YAML > global TDT YAML > defaults. Repository configuration MAY define supported docs-sync domain behavior and runtime controls but MUST NOT define LLM fields. Configuration, discovery, validation, generation, diagnostics, normalized results, and reports SHALL consume the same profile, provenance, source fingerprints, effective timeout and iteration controls, and non-secret configuration identity without independently reopening configuration sources. Every public diagnostic, normalized workflow result, JSON output, and report SHALL expose provenance and fingerprint data through one stable serializable mapping that excludes protected values, private fields, and implementation object representations. Retries within one public operation SHALL reuse its captured profile and effective controls. A resumed operation SHALL proceed only after restoring and validating its retained non-secret configuration identity and effective controls; if that identity cannot be safely restored, resumption SHALL fail before model, persistence, or write-capable tool construction. The system SHALL validate unknown, legacy, malformed, secret-invalid, provider-invalid, fallback-invalid, and retained-identity-invalid values before model, persistence, or write-capable tool construction.
 
 #### Scenario: Repository configuration is loaded
 
@@ -238,7 +238,7 @@ documentation mappings.
 #### Scenario: Settings and model projections agree
 
 - **WHEN** callers inspect `DocsSyncConfig.settings.model.primary`, the model shortcut, the generation runtime profile, the constructed primary/fallback chain, and the redacted diagnostics/report
-- **THEN** all SHALL identify the same effective per-agent model, fallback order, provider route, behavior settings, and source provenance
+- **THEN** all SHALL identify the same effective per-agent model, fallback order, provider route, behavior settings, source provenance, and source fingerprints
 - **AND** none SHALL trigger a second configuration load or choose a different effective value
 
 #### Scenario: Malformed configuration fails closed
@@ -284,6 +284,67 @@ documentation mappings.
 - **WHEN** a non-strict reporting command finds actionable gaps
 - **THEN** it MAY return zero only where the command contract explicitly permits informational findings
 - **AND** JSON and human-readable compliance SHALL remain false
+
+#### Scenario: Discovery validation and generation share one profile
+
+- **WHEN** one docs-sync operation constructs discovery, validation, and generation agent paths
+- **THEN** every path SHALL receive the same resolved model, fallbacks, provider route, behavior, provenance, and source fingerprints
+- **AND** no path SHALL independently load a replacement profile
+
+#### Scenario: Invalid provider or fallback relationship fails before side effects
+
+- **GIVEN** the selected profile contains an undefined provider, malformed fallback, unregistered model identifier, or cross-provider credential binding
+- **WHEN** docs-sync configuration is constructed
+- **THEN** construction SHALL fail before persistence initialization or write-capable tool construction
+- **AND** no lower-priority model or other provider credential SHALL be substituted
+
+#### Scenario: Runtime controls use one effective operation projection
+
+- **GIVEN** the canonical resolved profile supplies timeout and iteration values
+- **AND** no documented repository-domain override replaces either value
+- **WHEN** docs-sync produces its configuration, settings projection, runtime profile, execution plan, agents, diagnostics, and report for the operation
+- **THEN** every projection SHALL expose the same effective timeout and iteration values from the captured profile
+- **AND** no projection SHALL silently replace either value with constructor, runtime, or compatibility defaults
+
+#### Scenario: Supported repository runtime override remains consistent
+
+- **GIVEN** repository configuration declares a supported docs-sync runtime control
+- **WHEN** the operation applies that documented domain override
+- **THEN** the resulting value SHALL be recorded as the effective operation value in configuration, settings, runtime, execution plan, diagnostics, and report
+- **AND** the canonical source profile SHALL remain unchanged
+- **AND** the override SHALL NOT authorize repository model, fallback, provider, behavior, or credential fields
+
+#### Scenario: Typed provenance is normalized for public results
+
+- **GIVEN** the captured profile stores typed or immutable provenance and fingerprint values
+- **WHEN** docs-sync exposes diagnostics, normalized workflow results, JSON output, or reports
+- **THEN** those public surfaces SHALL use one stable serializable mapping representation
+- **AND** the representation SHALL preserve the logical field, source class, non-secret source-key or source-path metadata, alias metadata, and source fingerprint where present
+- **AND** it SHALL contain no implementation object representation, private field, or protected value
+- **AND** normalization SHALL NOT trigger another configuration load
+
+#### Scenario: Retry reuses the captured operation configuration
+
+- **GIVEN** a workflow attempt captured a resolved profile and effective operation controls
+- **WHEN** execution retries a generation, validation, or orchestration step within the same public operation
+- **THEN** the retry SHALL reuse the same non-secret configuration identity, model, fallback order, provider route, behavior, timeout, iteration values, provenance, and source fingerprints
+- **AND** it SHALL NOT reopen configuration sources or silently substitute newly resolved values
+
+#### Scenario: Resume restores the retained operation identity
+
+- **GIVEN** retained workflow state contains sufficient non-secret configuration identity, source fingerprints, and effective operation controls
+- **WHEN** resume validates that retained identity and reconstructs the operation successfully
+- **THEN** the reconstructed operation SHALL expose the same model, fallback order, provider route, behavior, timeout, iteration values, provenance, and source fingerprints
+- **AND** protected credential material SHALL NOT be persisted in or restored from workflow state
+- **AND** any required credential access SHALL remain subject to the canonical process-local provider-binding boundary
+
+#### Scenario: Resume fails when operation identity cannot be restored
+
+- **GIVEN** retained configuration identity is missing, ambiguous, internally inconsistent, or cannot validate the required provider relationship and effective controls
+- **WHEN** workflow resume is requested
+- **THEN** resumption SHALL fail before model, persistence, or write-capable tool construction
+- **AND** a newly resolved model, fallback, provider, credential binding, behavior, timeout, or iteration value SHALL NOT be silently substituted
+- **AND** no pending approval or write state SHALL be advanced
 
 ### Requirement: Zero-authority dry-run and bounded writes
 Dry-run execution SHALL be structurally unable to write. Normal generation SHALL expose write-capable tools only for explicitly configured documentation roots, and source or OpenSpec promotion SHALL require a separate authority mode and policy review.
