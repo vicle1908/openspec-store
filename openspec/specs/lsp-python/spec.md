@@ -79,3 +79,27 @@ WHEN pyright/basedpyright is not found on the system, auto-detection SHALL fall 
 #### Scenario: both pyright and basedpyright missing
 - **WHEN** the agent starts and neither `pyright` nor `basedpyright` is found but `pylsp` is
 - **THEN** pylsp SHALL be used as the primary language server and a warning SHALL be logged recommending pyright/basedpyright installation
+### Requirement: cwd-only root marker detection
+OMP LSP config resolution is cwd-only. Root markers (e.g. `pyproject.toml`) must exist in the agent's working directory for basedpyright to activate. Project-level `.omp/lsp.json` is only loaded when the agent launches from within the project directory.
+
+#### Scenario: basedpyright activates from project dir
+- **WHEN** the agent launches from `~/Developer/agent-core/`
+- **THEN** `pyproject.toml` exists in cwd
+- **AND** basedpyright SHALL be available with `typeCheckingMode: strict`
+
+#### Scenario: basedpyright filtered from workspace root
+- **WHEN** the agent launches from `~/Developer/` (no `pyproject.toml` in cwd)
+- **THEN** basedpyright SHALL be filtered out by rootMarker detection
+- **AND** the `lsp` tool SHALL report no Python servers configured
+### Requirement: cwd-only root marker detection
+OMP LSP config resolution is cwd-only. Root markers (e.g. `pyproject.toml`) must exist in the agent's working directory for basedpyright to activate. Project-level `.omp/lsp.json` is only loaded when the agent launches from within the project directory.
+
+#### Scenario: basedpyright activates from project dir
+- **WHEN** the agent launches from `~/Developer/agent-core/`
+- **THEN** `pyproject.toml` exists in cwd
+- **AND** basedpyright SHALL be available with `typeCheckingMode: strict`
+
+#### Scenario: basedpyright filtered from workspace root
+- **WHEN** the agent launches from `~/Developer/` (no `pyproject.toml` in cwd)
+- **THEN** basedpyright SHALL be filtered out by rootMarker detection
+- **AND** the `lsp` tool SHALL report no Python servers configured
