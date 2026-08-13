@@ -38,7 +38,7 @@ model:
 
 moa:
   default_preset: default
-  privacy_filter: display
+  privacy_filter: ''
 ```
 
 `hermes moa list` may show `Active in config: (off)` when `moa.active_preset` is empty. That line describes the optional config-level active-preset override. It does **not** disable MoA when `model.provider` is `moa` and `model.default` selects a preset.
@@ -47,11 +47,15 @@ moa:
 
 | Preset | References | Aggregator | Limits and cadence | Use |
 |---|---|---|---|---|
-| `default` | `shopapikey:fable-5` high; `cockpit:gpt-5.6-luna` max | `shopapikey:fable-5` max | refs 600, output 4096, temp 0.6/0.4, `user_turn` | normal high-quality work |
-| `deep` | `shopapikey:fable-5` xhigh; `cockpit:gpt-5.6-luna` max; `giaoduc:Advance` high | `giaoduc:Advance` max | refs 800, output 8192, temp 0.6/0.3, `every_n:3` | difficult architecture, review, and research |
-| `fast` | `cockpit:gpt-5.6-luna` max | `shopapikey:fable-5` high | refs 300, output 4096, temp 0.6/0.4, `user_turn` | lower-latency work |
+| `default` | `giaoduc:Advance` high; `cockpit:gpt-5.6-sol` high | `shopapikey:*** xhigh | refs 1000, output 8192, temp 0.6/0.4, `every_n:3` | normal/default route |
+| `deep` | `shopapikey:fable-5` high; `cockpit:gpt-5.6-sol` high; `giaoduc:Advance` high | `giaoduc:Advance` max | refs 800, output 8192, temp 0.6/0.3, `per_iteration` | difficult architecture, review, and research |
+| `fast` | `cockpit:gpt-5.6-sol` high | `shopapikey:fable-5` high | refs 300, output 4096, temp 0.6/0.4, `user_turn` | lower-latency work |
 
-Reference calls add latency and provider usage. `user_turn` runs advisors once for the turn; `every_n:3` refreshes on the first iteration and every third tool iteration. The slowest advisor usually determines fan-out latency.
+Every preset has `degraded_reference_policy: loud` and `enabled: true`. Reference calls add latency and provider usage. `user_turn` runs advisors once for the turn; `per_iteration` refreshes on every tool iteration; `every_n:3` refreshes on the first iteration and every third tool iteration. The slowest advisor usually determines fan-out latency.
+
+## Specialist Role Separation
+
+The current configuration intentionally separates cockpit's MoA slot model (`gpt-5.6-sol`) from its direct-provider default and fallback model (`gpt-5.6-luna`). MoA presets use `gpt-5.6-sol` as reasoning reference advisors. The direct cockpit provider default (`providers.cockpit.model`) and the fallback chain use `gpt-5.6-luna`. These are independent configuration surfaces; the cockpit model name in `providers.cockpit.model` does not constrain which model names appear in MoA presets, and vice versa.
 
 ## Selecting and Inspecting Presets
 
@@ -78,15 +82,27 @@ hermes moa list
 hermes fallback list
 ```
 
+## MoA Root Normalization
+
+The `moa` configuration root contains exactly three keys:
+
+1. `default_preset`
+2. `privacy_filter`
+3. `presets`
+
+No legacy flat-level operational fields (`reference_models`, `aggregator`, `reference_temperature`, `aggregator_temperature`, `degraded_reference_policy`, `max_tokens`, `reference_max_tokens`, `fanout`, `enabled`) exist directly under `moa`. All tuning is owned by each preset entry under `moa.presets`.
+
 ## Context Windows
 
-The active cockpit provider default is `gpt-5.6-luna`. Its model catalog may retain other discoverable models, but no active MoA slot uses `gpt-5.6-sol`. Context length belongs to real provider/model configuration, not MoA slots. The providers used by these presets declare `context_length: 1000000`, and the used models resolve the same one-million-token window. Do not add `context_length` to reference or aggregator entries.
+Context length belongs to real provider/model configuration, not MoA slots. The providers used by these presets declare `context_length: 1000000` at the provider level, and the used models resolve the same one-million-token window. Do not add `context_length` to reference or aggregator entries.
+
+The cockpit provider retains both `gpt-5.6-sol` and `gpt-5.6-luna` in its model catalog. The provider default is `gpt-5.6-luna`. No active MoA slot uses `gpt-5.6-luna`.
 
 Auxiliary operations do not run advisor fan-out. When the main route is MoA, Hermes unwraps the preset to its real aggregator for compression, title generation, vision, and similar auxiliary tasks.
 
 ## Privacy and Traces
 
-`privacy_filter: display` redacts emails, formatted phone numbers, and centrally recognized credential shapes from user-visible reference blocks and saved traces. The aggregator still receives raw advisor text to preserve quality.
+`moa.privacy_filter` is configured as the literal empty string (`''`). This runbook does not claim display-mode filtering or any redaction guarantee; privacy behavior requires separate runtime verification.
 
 `save_traces` is disabled in the validated setup. Never enable traces casually: they can retain full prompts, advisor outputs, aggregator inputs, usage, and cost metadata.
 
@@ -116,8 +132,10 @@ Parse `~/.hermes/config.yaml` with `yaml.safe_load` and assert:
 
 - primary is `moa:default`;
 - presets are exactly `default`, `deep`, and `fast`;
-- every cockpit MoA slot spells the model `gpt-5.6-luna`;
+- every cockpit MoA slot spells the model `gpt-5.6-sol`;
 - no legacy flat `moa.reference_models` or `moa.aggregator` exists;
+- `moa` root contains exactly `default_preset`, `privacy_filter`, and `presets`;
+- `moa.privacy_filter` is the literal empty string;
 - no MoA slot contains `context_length`;
 - real providers and used models declare `1000000` context;
 - fallback entries are distinct from the primary route.
@@ -126,6 +144,7 @@ Parse `~/.hermes/config.yaml` with `yaml.safe_load` and assert:
 
 Resolve credentials from the provider's `key_env` name without printing either the name's value or authorization headers. Send a short non-streaming request to:
 
+- cockpit / `gpt-5.6-sol`;
 - cockpit / `gpt-5.6-luna`;
 - shopapikey / `fable-5`;
 - giaoduc / `Advance`.

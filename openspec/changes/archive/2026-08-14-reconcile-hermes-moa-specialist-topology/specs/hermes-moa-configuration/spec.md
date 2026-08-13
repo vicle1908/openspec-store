@@ -1,23 +1,10 @@
-# hermes-moa-configuration Specification
+# Spec delta for hermes-moa-configuration
 
-## Purpose
-Define the validated local Hermes Mixture of Agents model topology, provider-level context ownership, independent failover, operational documentation, and evidence required to keep configuration, behavior, and recovery aligned.
-## Requirements
-### Requirement: MoA default route
+This delta is applied to
+`openspec/specs/hermes-moa-configuration/spec.md`
+when the `reconcile-hermes-moa-specialist-topology` change is archived.
 
-The Hermes default profile SHALL select the Mixture of Agents virtual provider with `model.provider: moa` and `model.default: default`, and the `moa.default_preset` SHALL be `default`.
-
-#### Scenario: Fresh default-profile session
-
-- **WHEN** Hermes starts a fresh session without a session-scoped model override
-- **THEN** the runtime SHALL resolve provider `moa` and preset `default`
-- **AND** the MoA facade SHALL own the main agent call path
-
-#### Scenario: Config-level active preset is empty
-
-- **WHEN** `moa.active_preset` is empty or absent while `model.provider` is `moa` and `model.default` is `default`
-- **THEN** the empty active-preset marker SHALL NOT be interpreted as disabling the selected MoA default route
-- **AND** operator documentation SHALL distinguish `moa.active_preset` from primary model selection
+## MODIFIED Requirements
 
 ### Requirement: Default MoA preset
 
@@ -67,21 +54,6 @@ The `fast` preset SHALL minimize MoA latency while retaining one independent rea
 - **AND** `degraded_reference_policy` SHALL be `loud`
 - **AND** the preset SHALL be `enabled: true`
 
-### Requirement: Context-window ownership
-
-The one-million-token context declaration SHALL be owned by provider and model configuration, and MoA reference or aggregator slots SHALL NOT duplicate `context_length`.
-
-#### Scenario: Provider context validation
-
-- **WHEN** configuration validation inspects `cockpit`, `shopapikey`, and `giaoduc`
-- **THEN** each provider SHALL declare `context_length: 1000000`
-- **AND** each MoA-used model SHALL resolve a one-million-token context declaration from its provider/model configuration
-
-#### Scenario: MoA slot validation
-
-- **WHEN** configuration validation traverses every reference and aggregator slot
-- **THEN** no slot SHALL contain a `context_length` field
-
 ### Requirement: Advisor privacy and failure isolation
 
 Hermes SHALL preserve the aggregator path when one reference model fails. The `moa.privacy_filter` value SHALL be the literal empty string. The degraded-reference policy for every preset SHALL be `loud`. A failed advisor SHALL NOT abort aggregation when another advisor and the aggregator remain available.
@@ -103,41 +75,7 @@ Hermes SHALL preserve the aggregator path when one reference model fails. The `m
 - **THEN** Hermes SHALL report or retain the degraded-reference result
 - **AND** SHALL continue to the aggregator rather than aborting the entire turn solely because of that advisor failure
 
-### Requirement: Fallback independence
-
-The fallback chain SHALL contain routes that are distinct from the selected primary `moa:default` deployment and SHALL preserve the configured direct-provider order.
-
-#### Scenario: Primary MoA failure
-
-- **WHEN** `moa:default` fails after its retry policy
-- **THEN** Hermes SHALL attempt `shopapikey:fable-5`, then `giaoduc:Advance`, then `cockpit:gpt-5.6-luna`, subject to local availability and failure-scope skip rules
-
-#### Scenario: Duplicate primary candidate
-
-- **WHEN** a fallback entry resolves to the same provider, model, and effective virtual deployment as the failed `moa:default` primary
-- **THEN** the configuration SHALL exclude that redundant entry
-- **AND** validation SHALL confirm the chain begins with an independent direct provider
-
-### Requirement: Operational documentation and evidence
-
-The maintained runbook SHALL document architecture, preset intent, selection, inspection, health checks, cost/latency, privacy, partial failures, context ownership, rollback, and sanitized validation evidence.
-
-#### Scenario: Operator validates MoA
-
-- **WHEN** an operator follows the runbook
-- **THEN** they SHALL be able to verify YAML shape, normalized configuration, all three direct providers, and a fresh MoA tool-call continuation without exposing credentials
-
-#### Scenario: Real tool-call smoke test
-
-- **WHEN** a fresh `moa:default` session is instructed to use a harmless terminal tool
-- **THEN** retained transcript or runtime metadata SHALL show the MoA aggregator requested the tool
-- **AND** the session SHALL continue after the tool result to produce the final answer
-
-#### Scenario: Rollback
-
-- **WHEN** the reconciled configuration must be rolled back
-- **THEN** the operator SHALL restore only a local sanitized backup or the explicitly removed fields/entry
-- **AND** SHALL rerun config and MoA validation before declaring recovery complete
+## ADDED Requirements
 
 ### Requirement: Specialist MoA topology and independent cockpit routes
 
@@ -185,3 +123,11 @@ The `moa` configuration root SHALL contain exactly `default_preset`, `privacy_fi
 - **WHEN** a preset is inspected for its operational parameters
 - **THEN** each preset SHALL contain its own `reference_temperature`, `aggregator_temperature`, `degraded_reference_policy`, `max_tokens`, `reference_max_tokens`, `fanout`, and `enabled` fields
 - **AND** these values SHALL NOT be inherited from or shadowed by root-level `moa.*` fields
+
+## REMOVED Requirements
+
+### Requirement: Active cockpit Luna topology
+
+**Reason:** The requirement described a topology where every cockpit-backed MoA slot used `gpt-5.6-luna` at `reasoning_effort: max`. That topology has been superseded by the current specialist design where cockpit MoA references use `gpt-5.6-sol` at `high` and the cockpit provider default uses `gpt-5.6-luna` for direct routes. The replacement contract is the `Specialist MoA topology and independent cockpit routes` requirement plus the exact preset topology defined by the modified default, deep, and fast requirements.
+
+**Migration:** Replace the former Luna-in-every-cockpit-slot contract with the exact preset topology defined by the modified default, deep, and fast requirements. Cockpit-backed MoA references use `gpt-5.6-sol` at `high`; the direct cockpit provider default and fallback entry remain `gpt-5.6-luna`.
