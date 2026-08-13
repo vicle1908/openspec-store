@@ -20,7 +20,7 @@
 
 - [x] 3.1 Sweep all OpenSpec-related user-local references for stale unscoped validation, masked OpenSpec verifier pipelines, and status/implementation conflation; classify each remaining match as corrected, historical, or requiring a follow-up patch. All actionable high-risk workflow/review examples were corrected; CLI help/history examples remain intentionally illustrative.
 - [x] 3.2 Validate this change with `openspec validate verification-loop-workflow-correction --strict --store openspec-store`.
-- [x] 3.3 Run `openspec validate --all --strict --no-interactive --store openspec-store` and classify any unrelated result: final run 374 items, 371 passed, 3 unrelated invalid specs (`lsp-go`, `lsp-python`, `lsp-user`) caused by concurrent LSP edits.
+- [x] 3.3 Run `openspec validate --all --strict --no-interactive --store openspec-store` and classify any unrelated result: current run at `7928ddd772e671cacbf592511411b6a30cda5599` reports 374 items, 374 passed, 0 failed.
 - [x] 3.4 Re-read the corrected guidance and confirm the exact state model, bounded retry rule, safe task-counting recipe, and closure-only archive semantics are present.
-- [ ] 3.5 Commit only this change directory in the shared store after explicit closure authorization.
-- [ ] 3.6 Archive this change only after tasks 3.1–3.5 are evidenced and checked; verify active absence, archive presence, all archived tasks checked, and post-archive full validation.
+- [ ] 3.5 Commit only this change directory in the shared store after explicit closure authorization; record the resulting commit SHA and verify unrelated paths remain unstaged.
+- [ ] 3.6 Confirm archive readiness: tasks 3.1–3.5 are evidenced and checked, focused validation passes, implementation progress reports `remaining=0`, and the exact archive command is authorized. Archive mutation and post-archive verification are separate lifecycle gates.
