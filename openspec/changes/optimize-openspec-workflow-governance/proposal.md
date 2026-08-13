@@ -2,7 +2,9 @@
 
 ## Why
 
-The shared OpenSpec workflow skill infrastructure has grown organically over many change cycles and now carries several operational risks that cannot be resolved by correcting individual examples. The root issues are structural: no version-controlled canonical source identified for the custom governance skills, no automated regression detection, no cross-skill consistency contract, and a 70KB primary skill file that creates significant cumulative prompt cost and increases contradiction risk when combined with review skills and change artifacts.
+The shared OpenSpec workflow skill infrastructure has grown organically over many change cycles and now carries several operational risks that cannot be resolved by correcting individual examples. The root issues are structural: no automated regression detection, no cross-skill consistency contract, no standardized pre-archive gate, and a 70KB primary skill file that creates significant cumulative prompt cost and increases contradiction risk when combined with review skills and change artifacts.
+
+The custom workflow skills live under `~/.hermes/skills/` and are managed by Hermes Agent. The OpenSpec store contains only specifications, active changes, and archives. This separation of concerns is correct and must not be changed.
 
 A structured planning investigation reveals six evidence-backed optimization tracks that, taken together, would make the workflow governance system deterministic, auditable, and self-protecting against regression.
 
@@ -49,6 +51,9 @@ This change creates the planning infrastructure for six optimization tracks. It 
 - No automatic archive mutation
 - No migration of Hermes runtime configuration (covered by the existing `optimize-hermes-agent-configuration` change)
 - No assumption that structural validation proves runtime behavior
+- **No moving or copying custom skills into `openspec-store`** — `~/.hermes/skills/` is the canonical home for custom Hermes skills; the OpenSpec store records plans and evidence only
+- No changing `skills.external_dirs` in Hermes config as part of this change
+- No deleting repository-local `.hermes/skills/` files without resolution-precedence and parity verification
 
 ## Evidence
 

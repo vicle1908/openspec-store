@@ -26,15 +26,21 @@ The OpenSpec workflow governance system operates across three distinct layers wi
 
 ## Proposed architecture
 
-### Track 1: Skill ownership and provenance markers
+### Track 1: Hermes-native ownership and provenance
 
-Add frontmatter `version`, `author`, and `source` metadata to all four custom skills. Create a provenance manifest (JSON) that records:
-- Which skill file corresponds to which logical layer
-- The SHA-256 hash of the canonical version
-- The last-modified date and the change that last touched it
-- Whether the skill is generated, custom, or a hybrid
+The custom Hermes skills live in `~/.hermes/skills/` and are managed by Hermes Agent (`skill_manage`, `openspec init --tools`, `openspec update`). The OpenSpec store does not own these skills and must not become their canonical source.
 
-The canonical source MUST be version-controlled. The manifest creates a machine-readable inventory for session-start verification and parity checks, but version control is the primary durability mechanism.
+| Surface | Purpose | Owner |
+|---|---|---|
+| `openspec-store/openspec/` | Specifications, changes, archives, change evidence | OpenSpec store |
+| `~/.hermes/skills/` | Installed custom workflow and review skills | Hermes Agent |
+| `openspec-store/.hermes/skills/` | Project-local adapters generated or loaded for that workspace | OpenSpec/Hermes integration |
+
+Implementation actions:
+1. Classify each tracked entry in `openspec-store/.hermes/skills/` as: generated OPSX adapter, intentional workspace integration, stale custom-skill copy, or unknown.
+2. Do not delete or move repository-local `.hermes/skills/` files without resolution-precedence and parity verification — Hermes may currently load that directory via `skills.external_dirs`.
+3. Add provenance markers (version, author, owning change) to installed custom skills in `~/.hermes/skills/`.
+4. Any repository-local `.hermes/skills/` cleanup is a separate authorized migration with rollback.
 
 ### Track 2: Cross-skill consistency matrix
 
