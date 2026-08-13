@@ -49,3 +49,28 @@ Establish user-level LSP defaults at `~/.omp/agent/lsp.json` so every project in
 #### Scenario: server activity resets idle timer
 - **WHEN** a language server is about to idle-shutdown and receives a new request or notification
 - **THEN** the idle timer SHALL reset and the server SHALL remain running
+
+### Requirement: official OMP config hierarchy
+OMP merges LSP config from five sources (lowest to highest precedence): `~/lsp.json` (home), plugin configs, `~/.omp/agent/lsp.json` (user config dir), `<cwd>/.omp/lsp.json` (cwd config dir), `<cwd>/lsp.json` (cwd root). Project and cwd sources do not walk ancestors. Root-marker detection at startup is cwd-only.
+
+#### Scenario: config merge order
+- **WHEN** an agent opens a file
+- **THEN** OMP SHALL merge configs from all five levels, with higher-precedence overriding lower
+
+#### Scenario: cwd-only root markers
+- **WHEN** the agent launches from a workspace root (e.g. `~/Developer/`)
+- **THEN** LSP servers whose rootMarkers do not match cwd files SHALL be filtered out
+- **AND** the `lsp` tool SHALL report "No language servers configured"
+
+### Requirement: project-scoped LSP activation
+LSP is project-scoped. The agent MUST launch from inside a project directory (e.g. `~/Developer/agent-core/`) for LSP to activate. The `--add-dir` flag adds workspace directories but does NOT change cwd for LSP config resolution.
+
+#### Scenario: LSP active from project dir
+- **WHEN** the agent launches from `~/Developer/agent-core/`
+- **THEN** `agent-core/.omp/lsp.json` SHALL be loaded and merged on user-level defaults
+- **AND** basedpyright SHALL be available with project-specific settings
+
+#### Scenario: LSP inactive from workspace root
+- **WHEN** the agent launches from `~/Developer/` (workspace root)
+- **THEN** no `.omp/lsp.json` exists at that level
+- **AND** the `lsp` tool SHALL report no servers configured
