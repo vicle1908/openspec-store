@@ -33,7 +33,7 @@ Command:
 openspec instructions apply --change complete-agent-llm-config-integration --json --store openspec-store
 ```
 
-Observed: `state=ready`, `progress.total=140`, `complete=0`, `remaining=140`.
+Observed at the current baseline: `state=ready`, `progress.total=154`, `complete=0`, `remaining=154`.
 
 Interpretation: status completion is planning-artifact completion, not implementation completion.
 

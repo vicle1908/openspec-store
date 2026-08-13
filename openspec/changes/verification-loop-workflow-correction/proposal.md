@@ -26,10 +26,10 @@ This is a workflow and documentation correction only; it does not change product
 
 Observed on 2026-08-13 with OpenSpec CLI 1.8.0:
 
-- `openspec status --change complete-agent-llm-config-integration --json --store openspec-store` returned `isComplete: true` and all four planning artifacts `done`, while the change had `0/140` implementation tasks.
-- `openspec instructions apply --change complete-agent-llm-config-integration --json --store openspec-store` returned `state: ready`, `progress.total: 140`, `complete: 0`, `remaining: 140`.
+- `openspec status --change complete-agent-llm-config-integration --json --store openspec-store` returned `isComplete: true` and all four planning artifacts `done`, while the change had `0/154` implementation tasks.
+- `openspec instructions apply --change complete-agent-llm-config-integration --json --store openspec-store` returned `state: ready`, `progress.total: 154`, `complete: 0`, `remaining: 154`.
 - `openspec validate --strict` from `~/Developer/agent-core` returned `Nothing to validate` with exit 1.
 - `openspec validate complete-agent-llm-config-integration --strict --store openspec-store` passed.
-- `openspec validate --all --strict --no-interactive --store openspec-store` passed with 373/373 items.
+- The current store-scoped full validation at baseline `7928ddd772e671cacbf592511411b6a30cda5599` passed with 374/374 items; the earlier 373/373 result is retained only as historical evidence.
 - The legacy missing-file shell pattern produced `done_count=$'0\n0'` and an arithmetic syntax error.
 - `openspec store doctor --json openspec-store` reported no issues.
