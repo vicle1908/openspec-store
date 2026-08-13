@@ -28,7 +28,7 @@ The OpenSpec workflow governance system operates across three distinct layers wi
 
 ### Track 1: Skill ownership and provenance markers
 
-Add frontmatter `version`, `author`, and `source` metadata to all three custom skills. Create a provenance manifest (JSON) that records:
+Add frontmatter `version`, `author`, and `source` metadata to all four custom skills. Create a provenance manifest (JSON) that records:
 - Which skill file corresponds to which logical layer
 - The SHA-256 hash of the canonical version
 - The last-modified date and the change that last touched it
@@ -45,7 +45,7 @@ A lightweight document (not a custom schema) that maps:
 - Review dispatch rules
 - Closure-task sequencing rules
 
-Any inconsistency between the three skills becomes a concrete task.
+Any inconsistency between the four skills becomes a concrete task.
 
 ### Track 3: Canonical pre-archive verifier script
 

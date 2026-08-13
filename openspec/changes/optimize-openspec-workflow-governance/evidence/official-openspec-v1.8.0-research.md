@@ -54,7 +54,7 @@
 
 ### Provenance audit
 **Primary tree:** 144 files (SKILL.md 70KB + 143 refs 759KB)
-**Secondary tree:** 17 files across 3 sub-skills (code-review 3 files, plan-review 3 files, review-governance 11 files)
+**Secondary tree:** 17 files (91KB) across 3 sub-skills (code-review 13KB, plan-review 12KB, review-governance 66KB)
 **Overlap:** Zero shared filenames. Different logical skills, not duplicates.
 
 ### Workspace skills
