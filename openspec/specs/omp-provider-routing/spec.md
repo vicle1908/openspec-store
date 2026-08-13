@@ -1,7 +1,7 @@
 # omp-provider-routing Specification
 
 ## Purpose
-TBD - created by archiving change integrate-omp-three-provider-routing. Update Purpose after archive.
+Defines the provider blocks, wire transports, credential references, role allocation, and native Cockpit routing for omp (oh-my-pi). All three custom providers use environment-variable credential references and are verified through real CLI smoke tests.
 ## Requirements
 ### Requirement: Provider declaration
 
@@ -149,7 +149,7 @@ providers where they were validated through omp smoke testing.
 
 #### Scenario: thinking-level selectors work
 
-Given `cockpit/gpt-5.6-luna:high` is assigned to `default`
+Given `cockpit/gpt-5.6-luna:high` is a validated explicit selector
 When invoked through omp
 Then the response SHALL contain "pong" and exit 0.
 
@@ -170,6 +170,11 @@ Then the response SHALL contain "pong" and exit 0.
 Given `giaoduc/Advance` is assigned to `task`
 When invoked through omp
 Then the response SHALL contain "pong" and exit 0.
+
+#### Scenario: no-flag default resolves to Giaoduc
+
+When a fresh login zsh shell runs `omp --no-session -p "reply only: pong"` without `--model`
+Then the default role SHALL resolve to Giaoduc Advance and return `pong` with exit 0.
 
 ### Requirement: Per-file atomic replacement with coordinated rollback
 
