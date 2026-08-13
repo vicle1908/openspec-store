@@ -1,32 +1,4 @@
-# agent-config-resolution Specification
-
-## Purpose
-Provides a standardized mechanism for TDT agent repos to load LLM configuration with per-agent overrides from `~/.tdt/agents/{name}.yaml`, using a single resolution chain that all agents share.
-## Requirements
-### Requirement: Agent-specific config files override global defaults
-
-The system SHALL load agent-specific configuration from `~/.tdt/agents/{agent-name}.yaml` when it exists, and use it to override values from `~/.tdt/config.yaml`. Only the `model` and `runtime` sections SHALL be subject to per-agent override; all other sections (providers, observability, skills, etc.) SHALL come from global config only.
-
-#### Scenario: Agent-specific model override applied
-- **WHEN** `~/.tdt/agents/agent-docs-sync.yaml` contains `model: { primary: "openai-chat:fable-5" }`
-- **AND** `~/.tdt/config.yaml` contains `model: { primary: "anthropic:Advance" }`
-- **THEN** the resolved config for agent-docs-sync SHALL have `model.primary = "openai-chat:fable-5"`
-
-#### Scenario: No agent-specific file falls back to global
-- **WHEN** `~/.tdt/agents/agent-core.yaml` does not exist
-- **AND** `~/.tdt/config.yaml` contains `model: { primary: "anthropic:Advance" }`
-- **THEN** the resolved config for agent-core SHALL have `model.primary = "anthropic:Advance"`
-
-#### Scenario: Partial agent-specific file merges with global
-- **WHEN** `~/.tdt/agents/agent-harness.yaml` contains `model: { thinking: "high" }`
-- **AND** `~/.tdt/config.yaml` contains `model: { primary: "anthropic:Advance", temperature: 0.7 }`
-- **THEN** the resolved config SHALL have `model.thinking = "high"`, `model.primary = "anthropic:Advance"`, and `model.temperature = 0.7`
-
-#### Scenario: Agent-harness resolves from agent-specific file
-- **WHEN** `~/.tdt/agents/agent-harness.yaml` contains `model: { primary: "openai-chat:fable-5" }` and `runtime: { max_iterations: 15 }`
-- **AND** `$TDT_HOME/harness/config.yaml` exists with different values
-- **THEN** the resolved config for agent-harness SHALL use the `~/.tdt/agents/` values
-- **AND** `$TDT_HOME/harness/config.yaml` SHALL NOT be read
+## MODIFIED Requirements
 
 ### Requirement: Standardized resolution precedence
 
@@ -78,18 +50,6 @@ An empty value SHALL NOT silently suppress a lower non-empty value unless the re
 - **WHEN** the profile is resolved
 - **THEN** resolution SHALL fail with the logical field and source class
 - **AND** it SHALL NOT silently fall back to a lower-priority value
-
-### Requirement: Agents directory path resolution
-
-The system SHALL provide a `tdt_agents_dir()` function in `tdt_core.paths` that returns the canonical `~/.tdt/agents/` directory path. The function SHALL validate the agent name component using existing `_validate_component()` rules.
-
-#### Scenario: Agents directory resolves correctly
-- **WHEN** `tdt_agents_dir()` is called
-- **THEN** it SHALL return `tdt_root() / "agents"`
-
-#### Scenario: Agent config path combines directory and name
-- **WHEN** `tdt_config_path_for_agent("agent-docs-sync")` is called
-- **THEN** it SHALL return `tdt_agents_dir() / "agent-docs-sync.yaml"`
 
 ### Requirement: Single config loading function
 
@@ -305,87 +265,7 @@ Direct Pydantic-AI consumers SHALL obtain LLM inputs from the canonical resolved
 - **THEN** it SHALL use the provider-neutral profile for alias and effort selection
 - **AND** it SHALL leave CLI authentication to the provider's approved credential boundary
 
-### Requirement: Secure YAML mapping loader
-
-`load_config_mapping(path: Path) -> dict[str, Any]` SHALL load a YAML file and return a validated dictionary. The function SHALL NOT merge with any other source and SHALL NOT cache its result.
-
-#### Scenario: Valid YAML mapping loaded
-
-- **GIVEN** a YAML file at `path` contains a mapping with `model: {primary: "x"}`
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** it SHALL return `{"model": {"primary": "x"}}`
-
-#### Scenario: Empty YAML file returns empty dict
-
-- **GIVEN** an empty YAML file at `path`
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** it SHALL return `{}`
-
-#### Scenario: Missing file returns empty dict
-
-- **GIVEN** no file exists at `path`
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** it SHALL return `{}`
-
-#### Scenario: Malformed YAML raises ConfigError
-
-- **GIVEN** a file at `path` contains invalid YAML syntax
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** a `ConfigError` SHALL be raised with the file path in the message
-
-#### Scenario: Non-mapping YAML raises ConfigError
-
-- **GIVEN** a file at `path` contains a YAML list (not a mapping)
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** a `ConfigError` SHALL be raised
-
-#### Scenario: Secret-shaped value rejected
-
-- **GIVEN** a file at `path` contains `secret: literal_value`
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** a `ConfigError` SHALL be raised with the key path
-
-#### Scenario: api_key_env under providers accepted
-
-- **GIVEN** a file at `path` contains `providers: {shopapikey: {api_key_env: "MY_API_KEY"}}`
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** it SHALL accept the value without error
-
-#### Scenario: api_key_env with invalid env var name rejected
-
-- **GIVEN** a file at `path` contains `providers: {x: {api_key_env: "lowercase"}}`
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** a `ConfigError` SHALL be raised
-
-### Requirement: Agent overlay loader with key policy
-
-`load_agent_overlay(agent_name: str, *, config_path: Path | None = None, allowed_keys: Collection[str] | None = None) -> dict` SHALL load only the agent-specific YAML file without reading or merging the global config. The returned dict preserves source provenance: every key came from the agent file.
-
-#### Scenario: Agent overlay loaded without global merge
-
-- **GIVEN** `~/.tdt/agents/agent-core.yaml` contains `model: {primary: "x"}`
-- **AND** `~/.tdt/config.yaml` contains `providers: {giaoduc: {base_url: "y"}}`
-- **WHEN** `load_agent_overlay("agent-core")` is called
-- **THEN** the result SHALL contain `{"model": {"primary": "x"}}`
-- **AND** `providers` SHALL NOT appear in the result
-
-#### Scenario: Unknown top-level key rejected
-
-- **GIVEN** `~/.tdt/agents/agent-core.yaml` contains `unknown_key: value`
-- **WHEN** `load_agent_overlay("agent-core", allowed_keys={"model", "runtime"})` is called
-- **THEN** a `ConfigError` SHALL be raised listing the unknown key
-
-#### Scenario: allowed_keys=None uses default set
-
-- **GIVEN** an agent YAML file with keys `model` and `runtime`
-- **WHEN** `load_agent_overlay("agent")` is called without `allowed_keys`
-- **THEN** it SHALL accept only `{"model", "runtime"}` and reject all others
-
-#### Scenario: Missing agent file returns empty dict
-
-- **GIVEN** no file exists at `~/.tdt/agents/agent-core.yaml`
-- **WHEN** `load_agent_overlay("agent-core")` is called
-- **THEN** it SHALL return `{}`
+## ADDED Requirements
 
 ### Requirement: Secure mapping and source-preserving overlay APIs
 
@@ -423,6 +303,7 @@ consumer policy MAY admit domain sections that remain outside the effective LLM 
 - **THEN** they SHALL apply the same mapping, secret, key-policy, and provenance rules as the standard path
 - **AND** a legacy wrapped schema SHALL fail with migration guidance
 
+
 ### Requirement: Canonical direct-model identifiers
 
 Every direct Pydantic-AI primary and fallback identifier in the resolved profile SHALL
@@ -442,6 +323,7 @@ they SHALL never be treated as a live provider acceptance result.
 - **WHEN** a direct-model profile is resolved or a live gate is prepared
 - **THEN** resolution SHALL fail closed with the provider/model field identified
 - **AND** it SHALL not fall through to a lower-priority model or invoke a provider
+
 
 ### Requirement: Source-preserving secure configuration input
 
@@ -479,4 +361,3 @@ The system SHALL expose a machine-readable effective-profile diagnostic containi
 - **WHEN** a selected provider references an unavailable environment key
 - **THEN** the diagnostic SHALL identify the provider and missing environment-key name
 - **AND** it SHALL fail before a live request without revealing other environment values
-

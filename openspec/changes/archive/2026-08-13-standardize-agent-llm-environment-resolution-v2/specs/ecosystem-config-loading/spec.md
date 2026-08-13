@@ -1,8 +1,5 @@
-# ecosystem-config-loading Specification
+## MODIFIED Requirements
 
-## Purpose
-Define the unified YAML-based config loading capability using pydantic-settings.
-## Requirements
 ### Requirement: TDTSettings loads from YAML with env var override
 
 Typed TDT settings SHALL load global configuration from the effective TDT root after canonical environment initialization. Registered process environment SHALL override YAML values according to the environment-key registry. Agent-specific LLM resolution SHALL compose typed global values with the agent overlay through the canonical agent-profile resolver rather than creating a second typed settings truth.
@@ -53,25 +50,7 @@ Typed fields that temporarily hold credential material MUST use protected secret
 - **THEN** it SHALL contain the registered environment-key name and availability only
 - **AND** it SHALL not contain a secret value or protected type serialization
 
-### Requirement: Config validation at load time
-
-Pydantic models SHALL validate config values at load time. Invalid values SHALL raise clear error messages.
-
-#### Scenario: Invalid port number
-
-- **GIVEN** `~/.tdt/config.yaml` contains `webhook_receiver.port: -1`
-- **WHEN** `TDTSettings.load()` is called
-- **THEN** it SHALL raise a `ValidationError` with message about port being less than minimum
-
-### Requirement: Backward-compatible env injection
-
-`load_sprint_config()` SHALL remain available as a deprecated shim. It SHALL inject config values into `os.environ` for backward compatibility during transition.
-
-#### Scenario: Deprecated function warns
-
-- **WHEN** `load_sprint_config()` is called
-- **THEN** it SHALL emit a `DeprecationWarning`
-- **AND** it SHALL set `SPREADSHEET_ID` in `os.environ`
+## ADDED Requirements
 
 ### Requirement: Typed settings and agent profiles share one snapshot
 
@@ -93,4 +72,3 @@ form a second effective model or provider truth.
 - **WHEN** typed settings or the agent profile is loaded
 - **THEN** loading SHALL fail with redacted source information
 - **AND** it SHALL not fall through to defaults or another credential
-

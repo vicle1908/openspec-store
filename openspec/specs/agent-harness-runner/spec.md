@@ -89,50 +89,60 @@ The runner SHALL read durable workflow status and history through public compile
 
 ### Requirement: Composed runner configuration
 
-The runner SHALL consume harness domain configuration containing an immutable core runtime profile. Model and runtime settings SHALL be resolved through `load_agent_config("agent-harness")` for the merged LLM configuration. Harness domain sections (`gate`, `persistence`, `authority`, `validation`, `budget`, `retention`) SHALL be resolved through `load_agent_overlay("agent-harness")`, which preserves source provenance by reading the agent YAML file directly without merging with the global config. Domain keys validated by `allowed_overlay_keys` in `load_agent_config()` SHALL be accepted without error but SHALL NOT appear in the merged LLM result — `load_agent_overlay()` is the sole source for harness domain sections. `HARNESS_*` environment variables SHALL retain precedence over agent-specific YAML values. The legacy `$TDT_HOME/harness/config.yaml` path SHALL NOT be read automatically.
+The runner SHALL compose an immutable canonical resolved agent profile with source-preserved harness domain configuration. Model and runtime LLM fields SHALL use the canonical precedence contract. Harness-owned gate, persistence, authority, validation, budget, and retention sections SHALL come only from the selected harness overlay and declared environment keys, never from same-named global sections. The legacy default harness config path SHALL not be read automatically, and explicit config files SHALL use the canonical top-level schema.
 
 #### Scenario: Stage override
 
 - **WHEN** a stage needs different limits or model settings
-- **THEN** it SHALL receive an immutable profile copy and run-scoped inputs
-- **AND** the parent harness configuration SHALL remain unchanged
+- **THEN** it SHALL receive an immutable run-scoped copy
+- **AND** the parent profile SHALL remain unchanged
 
 #### Scenario: Canonical durable environment
 
-- **WHEN** durable settings are supplied through `$TDT_HOME/.env` or the process environment
-- **THEN** `HarnessConfig.load()` SHALL delegate dotenv loading to `tdt_core.env.load_tdt_env()`
-- **AND** `HARNESS_DURABLE` SHALL populate `persistence.durable`
-- **AND** `TDT_POSTGRES_URL` SHALL populate `persistence.postgres_url`
-- **AND** the harness SHALL NOT create a second settings loader or require `HARNESS_PERSISTENCE_DURABLE`
+- **WHEN** durable settings are supplied through the canonical environment boundary
+- **THEN** registered harness environment keys SHALL populate the declared persistence fields
+- **AND** the harness SHALL NOT create a second dotenv loader or accept undeclared aliases
 
 #### Scenario: Harness config resolves from agent-specific YAML
 
-- **GIVEN** `~/.tdt/agents/agent-harness.yaml` exists with model, max_iterations, and timeout_seconds
-- **WHEN** `HarnessConfig.load()` is called
-- **THEN** configuration SHALL be resolved from `~/.tdt/agents/agent-harness.yaml` via `load_agent_config("agent-harness")`
-- **AND** the loaded values SHALL be used for runtime settings
+- **GIVEN** the agent-specific harness YAML contains model and runtime values
+- **WHEN** runner configuration is loaded
+- **THEN** its runtime profile SHALL use the canonically resolved values
+- **AND** its model and settings projections SHALL agree
 
 #### Scenario: HARNESS environment variables override agent-specific YAML
 
-- **GIVEN** `~/.tdt/agents/agent-harness.yaml` specifies `durable: false`
-- **AND** `HARNESS_DURABLE=true` is set in the environment
-- **WHEN** `HarnessConfig.load()` is called
-- **THEN** `config.persistence.durable` SHALL be `true`
-- **AND** the environment variable SHALL take precedence
+- **GIVEN** a registered harness environment value conflicts with agent YAML
+- **WHEN** runner configuration is loaded
+- **THEN** the environment value SHALL win
+- **AND** provenance SHALL identify the registered key name
+
+#### Scenario: Domain sections are source-preserved
+
+- **GIVEN** the harness overlay contains gate, persistence, or authority settings
+- **WHEN** runner configuration is loaded
+- **THEN** those settings SHALL be read from that overlay
+- **AND** same-named global sections SHALL not contribute
 
 #### Scenario: Legacy config path is ignored
 
-- **GIVEN** only `$TDT_HOME/harness/config.yaml` exists (no `~/.tdt/agents/agent-harness.yaml`)
-- **WHEN** `HarnessConfig.load()` is called
-- **THEN** configuration SHALL fall back to global TDT defaults and code defaults
-- **AND** the legacy path SHALL NOT be read
+- **GIVEN** only the removed legacy harness config path exists
+- **WHEN** runner configuration is loaded without an explicit path
+- **THEN** it SHALL use agent/global/default sources permitted by the canonical contract
+- **AND** it SHALL not read the legacy file
 
-#### Scenario: Missing agent-specific config falls back to global defaults
+#### Scenario: Explicit legacy wrapper is rejected
 
-- **GIVEN** neither `~/.tdt/agents/agent-harness.yaml` nor `$TDT_HOME/harness/config.yaml` exists
-- **WHEN** `HarnessConfig.load()` is called
-- **THEN** code defaults SHALL be used without error
-- **AND** `HARNESS_*` environment variables SHALL still be applied
+- **GIVEN** an explicitly selected config file contains the legacy harness wrapper
+- **WHEN** runner configuration is loaded
+- **THEN** it SHALL fail with migration guidance to canonical top-level sections
+
+#### Scenario: Explicit config path has canonical parity
+
+- **GIVEN** a caller supplies an explicit `config_path` containing canonical top-level sections
+- **WHEN** runner configuration is loaded
+- **THEN** it SHALL apply the same precedence, overlay-key policy, path containment, and source-provenance rules as the standard agent path
+- **AND** it SHALL not use the removed legacy wrapper or a second YAML loader
 
 #### Scenario: Domain sections sourced from agent overlay only
 
@@ -162,6 +172,39 @@ The runner SHALL consume harness domain configuration containing an immutable co
 - **GIVEN** an explicit config file contains a `harness:` top-level wrapper section
 - **WHEN** `HarnessConfig.load(config_path=path)` is called
 - **THEN** a `ConfigMigrationError` SHALL be raised directing the operator to use top-level sections
+
+#### Scenario: Missing agent-specific config falls back to global defaults
+
+- **GIVEN** no agent-specific harness overlay exists
+- **WHEN** runner configuration is loaded
+- **THEN** global LLM values and typed domain defaults SHALL be used
+- **AND** registered environment values SHALL still apply
+
+#### Scenario: Production services propagate the effective model
+
+- **WHEN** production services are constructed from a valid runner configuration
+- **THEN** `production_services().model` SHALL equal `config.model`
+- **AND** every agent-backed stage SHALL receive the effective model and model behavior from that configuration
+- **AND** stage construction SHALL not observe a missing model caused by composition loss
+
+#### Scenario: Domain overlay does not alter the LLM profile
+
+- **GIVEN** an agent overlay contains harness gate, persistence, authority, validation, budget, or retention sections
+- **WHEN** runner configuration is composed
+- **THEN** those sections SHALL remain source-preserved harness domain data
+- **AND** they SHALL not override same-named global LLM or provider fields
+
+#### Scenario: Unsafe or unresolved artifact root
+
+- **WHEN** the configured artifact root is relative, remains an unexpanded variable, escapes the approved root, or traverses a disallowed link
+- **THEN** production-service construction SHALL fail before creating a directory or writing an artifact
+
+#### Scenario: Default artifact root with TDT_HOME unset
+
+- **GIVEN** `TDT_HOME` is unset
+- **WHEN** the default artifact root is resolved
+- **THEN** it SHALL resolve beneath the canonical default TDT root
+- **AND** no literal `$TDT_HOME` path component SHALL be created
 
 ### Requirement: Protected CLI lifecycle preflight
 

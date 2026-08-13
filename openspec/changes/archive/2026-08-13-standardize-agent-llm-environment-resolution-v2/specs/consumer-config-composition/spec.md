@@ -1,8 +1,5 @@
-# consumer-config-composition Specification
+## MODIFIED Requirements
 
-## Purpose
-Defines the composable configuration pattern for agent-core consumers, extended to support per-agent TDT config overrides via `~/.tdt/agents/{consumer-name}.yaml`.
-## Requirements
 ### Requirement: ConsumerConfig composes Settings
 
 A consumer configuration SHALL compose one immutable resolved runtime profile rather than inherit a framework settings class or independently load framework settings. Any compatibility `settings`, `model`, provider, behavior, or runtime projection SHALL be derived from that same profile snapshot and SHALL not expose a second effective value. The canonical compatibility model field is `settings.model.primary`; any legacy shortcut SHALL be a derived alias, never an independent settings value.
