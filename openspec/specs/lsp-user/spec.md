@@ -51,7 +51,7 @@ Establish user-level LSP defaults at `~/.omp/agent/lsp.json` so every project in
 - **THEN** the idle timer SHALL reset and the server SHALL remain running
 
 ### Requirement: official OMP config hierarchy
-OMP merges LSP config from five sources (lowest to highest precedence): `~/lsp.json` (home), plugin configs, `~/.omp/agent/lsp.json` (user config dir), `<cwd>/.omp/lsp.json` (cwd config dir), `<cwd>/lsp.json` (cwd root). Project and cwd sources do not walk ancestors. Root-marker detection at startup is cwd-only.
+OMP SHALL merge LSP config from five sources (lowest to highest precedence): `~/lsp.json` (home), plugin configs, `~/.omp/agent/lsp.json` (user config dir), `<cwd>/.omp/lsp.json` (cwd config dir), `<cwd>/lsp.json` (cwd root). Project and cwd sources SHALL NOT walk ancestors. Root-marker detection at startup SHALL be cwd-only.
 
 #### Scenario: config merge order
 - **WHEN** an agent opens a file

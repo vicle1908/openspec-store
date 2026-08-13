@@ -58,21 +58,29 @@ Then each SHALL have `contextWindow` equal to `1000000`.
 
 The change SHALL preserve all existing provider endpoints, transports, model
 IDs, non-default role assignments, equivalence mappings, and credential values.
+The current `default` role SHALL resolve to `cockpit/gpt-5.6-luna:max`.
 
 #### Scenario: three explicit providers remain usable
 
 Given the corrected fresh-shell environment
 When each explicit selector is run through omp
-Then `cockpit/gpt-5.6-luna:high`, `shopapikey/fable-5`, and `giaoduc/Advance`
-SHALL return `pong` with exit code 0.
+Then `cockpit/gpt-5.6-luna`, `shopapikey/fable-5`, and `giaoduc/Advance`
+SHALL return `pong` with exit code 0, subject to provider-side rate limits.
 
-### Requirement: Giaoduc default role
-
-The omp `default` role SHALL resolve to `giaoduc/Advance`.
-
-#### Scenario: fresh-shell default uses Giaoduc
+#### Scenario: current default uses native Cockpit
 
 Given the custom provider credentials are loaded in a clean login shell
 When `omp --no-session -p "reply only: pong"` is run without `--model`
-Then omp SHALL resolve the default to Giaoduc Advance and return `pong` with
-exit code 0.
+Then omp SHALL resolve the default to `cockpit/gpt-5.6-luna:max` and return
+`pong` with exit code 0
+
+### Requirement: Cockpit default role
+
+The omp `default` role SHALL resolve to `cockpit/gpt-5.6-luna:max`.
+
+#### Scenario: fresh-shell default uses Cockpit
+
+Given the custom provider credentials are loaded in a clean login shell
+When `omp --no-session -p "reply only: pong"` is run without `--model`
+Then omp SHALL resolve the default to native Cockpit Luna at max thinking
+and return `pong` with exit code 0

@@ -155,7 +155,7 @@ Then the response SHALL contain "pong" and exit 0.
 
 #### Scenario: max thinking level works
 
-Given `cockpit/gpt-5.6-luna:max` is assigned to `slow` and `plan`
+Given `cockpit/gpt-5.6-luna:max` is assigned to `slow`, `plan`, and `default`
 When invoked through omp
 Then the response SHALL contain "pong" and exit 0.
 
@@ -163,7 +163,7 @@ Then the response SHALL contain "pong" and exit 0.
 
 Given `shopapikey/fable-5` is assigned to `smol` and `commit`
 When invoked through omp
-Then the response SHALL contain "pong" and exit 0.
+Then the response SHALL contain "pong" and exit 0, subject to provider-side rate limits.
 
 #### Scenario: third-provider task model works
 
@@ -171,10 +171,10 @@ Given `giaoduc/Advance` is assigned to `task`
 When invoked through omp
 Then the response SHALL contain "pong" and exit 0.
 
-#### Scenario: no-flag default resolves to Giaoduc
+#### Scenario: no-flag default resolves to native Cockpit
 
 When a fresh login zsh shell runs `omp --no-session -p "reply only: pong"` without `--model`
-Then the default role SHALL resolve to Giaoduc Advance and return `pong` with exit 0.
+Then the default role SHALL resolve to native Cockpit `gpt-5.6-luna:max` and return `pong` with exit 0.
 
 ### Requirement: Per-file atomic replacement with coordinated rollback
 

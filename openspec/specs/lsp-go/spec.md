@@ -68,31 +68,7 @@ WHEN gopls is not found on the system, auto-detection SHALL fall back to the bui
 - **WHEN** the agent starts and `gopls` is found on `$PATH`
 - **THEN** gopls SHALL be launched with the configuration from `go-microservices/.omp/lsp.json`
 ### Requirement: cwd-only root marker detection
-OMP LSP config resolution is cwd-only. Root markers (e.g. `go.mod`, `go.work`) must exist in the agent's working directory for gopls to activate. Project-level `.omp/lsp.json` is only loaded when the agent launches from within the project directory.
-
-#### Scenario: gopls activates from project dir
-- **WHEN** the agent launches from `~/Developer/go-microservices/`
-- **THEN** `go.mod` exists in cwd
-- **AND** gopls SHALL be available with staticcheck, gofumpt, and integration build flags
-
-#### Scenario: gopls filtered from workspace root
-- **WHEN** the agent launches from `~/Developer/` (no `go.mod` in cwd)
-- **THEN** gopls SHALL be filtered out by rootMarker detection
-- **AND** the `lsp` tool SHALL report no Go servers configured
-### Requirement: cwd-only root marker detection
-OMP LSP config resolution is cwd-only. Root markers (e.g. `go.mod`, `go.work`) must exist in the agent's working directory for gopls to activate. Project-level `.omp/lsp.json` is only loaded when the agent launches from within the project directory.
-
-#### Scenario: gopls activates from project dir
-- **WHEN** the agent launches from `~/Developer/go-microservices/`
-- **THEN** `go.mod` exists in cwd
-- **AND** gopls SHALL be available with staticcheck, gofumpt, and integration build flags
-
-#### Scenario: gopls filtered from workspace root
-- **WHEN** the agent launches from `~/Developer/` (no `go.mod` in cwd)
-- **THEN** gopls SHALL be filtered out by rootMarker detection
-- **AND** the `lsp` tool SHALL report no Go servers configured
-### Requirement: cwd-only root marker detection
-OMP LSP config resolution is cwd-only. Root markers (e.g. `go.mod`, `go.work`) must exist in the agent's working directory for gopls to activate. Project-level `.omp/lsp.json` is only loaded when the agent launches from within the project directory.
+OMP LSP config resolution SHALL be cwd-only. Root markers (e.g. `go.mod`, `go.work`) MUST exist in the agent's working directory for gopls to activate. Project-level `.omp/lsp.json` SHALL be loaded only when the agent launches from within the project directory.
 
 #### Scenario: gopls activates from project dir
 - **WHEN** the agent launches from `~/Developer/go-microservices/`
