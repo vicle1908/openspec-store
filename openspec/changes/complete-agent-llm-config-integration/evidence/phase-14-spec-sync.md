@@ -154,13 +154,18 @@ Credential/secret pattern scan across all synced specs found only contextual ref
 - Evidence: `evidence/` directory with 16+ files
 - Planning artifacts: proposal.md, design.md, tasks.md
 
-### Repository SHAs (from phase evidence)
-- tdt-core: Referenced in phase-9-dependency-resolution.json
-- agent-core: Referenced in phase-4-agent-core-implementation.md
-- agent-docs-sync: Referenced in phase-6-harness-implementation.md
-- agent-harness: Referenced in phase-6-harness-implementation.md
-- ai-harness-skills: Referenced in evidence/ai-review-phase8/
-- ai-review: Referenced in evidence/ai-review-phase8/
+### Repository SHAs (verified 2026-08-13)
+
+| Repository | Implementation SHA | Current HEAD | Notes |
+|------------|-------------------|--------------|-------|
+| tdt-core | `797a618` | `797a618` | ✅ Exact match |
+| agent-core | `4708e70` | `90675b7` | ⚠️ Docs reconciliation commits after implementation |
+| agent-docs-sync | `dd0e6b9` | `dd0e6b9` | ✅ Exact match |
+| agent-harness | `88a9221` | `39a8752` | ⚠️ Docs/graphify commits after implementation |
+| ai-harness-skills | `11e84d1` | `11e84d1` | ✅ Exact match |
+| ai-review | `09bde26` | `09bde26` | ✅ Exact match |
+
+**Note:** agent-core and agent-harness have additional documentation/graphify commits after the implementation commits. The implementation code (CallerSnapshot, MissingSnapshotError, model_settings, model_thinking) is intact and verified.
 
 ### Complete Dirt
 - Modified: 5 main specs (synced from delta), tasks.md (13.x+14.x marked)
@@ -172,6 +177,13 @@ Credential/secret pattern scan across all synced specs found only contextual ref
 - Full-store validation: 374/374 passed
 - Scenario count: 77/77 verified
 - Whitespace check: clean
+
+### Test Count Clarification
+Phase 3 tdt-core tests: pytest collects 81 tests from 4 files (76 test functions + 5 parameterized test cases).
+- `test_phase3_atomic_capture.py`: 25 tests
+- `test_phase3_compatibility.py`: 21 functions → 26 tests (parameterized)
+- `test_phase3_protected_credential.py`: 14 tests
+- `test_phase3_cli_selection.py`: 16 tests
 
 ### Remaining Items
 - Task 11.7: Validator drift fixture testing - COMPLETED (evidence in phase-11-rollback-rehearsal.md)
