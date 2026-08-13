@@ -12,10 +12,10 @@ This change creates the planning infrastructure for six optimization tracks. It 
 
 ### Optimization Tracks (priority ordered)
 
-**Track 1: Skill ownership and deterministic installation**
-- **Problem:** The four custom OpenSpec skill files (primary workflow, code-review, plan-review, review-governance) have no version control, no commit history, no rollback capability, and no machine-to-machine reproducibility. No canonical version-controlled source was identified in the bounded audit; the installed user-local trees are not Git repositories.
-- **Evidence:** `skill_manage(action='patch')` modifies local files with no commit, no backup, no source attribution. GitNexus `detect_changes` returns no affected symbols. `~/.hermes/skills` is not a Git repo.
-- **Proposal:** Establish a canonical source, add provenance markers, document the `openspec update` refresh path for generated skills, and add version-tracking headers.
+**Track 1: Hermes-native ownership and provenance**
+- **Problem:** Custom Hermes skills lack provenance tracking in their native `~/.hermes/skills/` location. No recorded mapping exists from each installed skill to its owning change, last-modified date, or intended state. Store-tracked `.hermes/skills/` files (generated OPSX adapters) are mixed with custom governance skills at the filesystem level.
+- **Evidence:** `skill_manage(action='patch')` modifies local files without source attribution. The provenance inventory JSON previously proposed as durable artifact contains machine-local absolute paths and hashes that become stale on any Hermes update — it must not be committed as canonical.
+- **Proposal:** Document the Hermes-native skill ownership model, add provenance markers (version, author, owning change) to installed skills, and ensure store-tracked `.hermes/skills/` are only generated adapters. Keep all custom skill management through `skill_manage` in `~/.hermes/skills/`.
 
 **Track 2: Cross-skill contract consistency**
 - **Problem:** Four independent skills (workflow, code-review, plan-review, review-governance) independently define overlapping lifecycle rules, state models, and archive gate conditions. Semantic drift between them is undetected.

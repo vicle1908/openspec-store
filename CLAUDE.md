@@ -1,7 +1,7 @@
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **openspec-store** (42368 symbols, 42712 relationships, 27 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **openspec-store** (44706 symbols, 45467 relationships, 48 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 
@@ -29,15 +29,6 @@ This project is indexed by GitNexus as **openspec-store** (42368 symbols, 42712 
 | `gitnexus://repo/openspec-store/clusters` | All functional areas |
 | `gitnexus://repo/openspec-store/processes` | All execution flows |
 | `gitnexus://repo/openspec-store/process/{name}` | Step-by-step execution trace |
-
-## Provider Smoke Tests
-
-Run the provider smoke tests with:
-```bash
-python3 .claude/scripts/provider_smoke.py
-```
-
-This validates `shopapikey`, `giaoduc`, and `cockpit` launchers and confirms the live profile tokens (`SHOP_PROFILE_LIVE`, `GIAODUC_PROFILE_LIVE`, `COCKPIT_PROFILE_LIVE`).
 
 ## CLI
 

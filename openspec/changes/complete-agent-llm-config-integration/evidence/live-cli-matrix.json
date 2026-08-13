@@ -1,0 +1,216 @@
+{
+  "schema_version": "1",
+  "phase": 12,
+  "description": "Two-row live CLI matrix for durable live acceptance",
+  "defined_at": "2026-08-13T22:30:00Z",
+  "planning_baseline": {
+    "store_sha": "6dd185d4c1a5d0ccdc2aeceea3e88740d460f485",
+    "change_name": "complete-agent-llm-config-integration",
+    "corrective_subtree_tree_sha": "9df47e9620bbf7101d8618b72ba33d8491e3572563e6ee10346f8e44ed152e63"
+  },
+  "current_store": {
+    "head_sha": "597b8e3fd10aa14ca85cf5aa44eee540edb6bef2",
+    "branch": "main"
+  },
+  "required_rows": [
+    {
+      "row_id": "ai-harness-skills-contained-generation",
+      "consumer": "ai-harness-skills",
+      "row_type": "contained_generation",
+      "consumer_repository": {
+        "name": "ai-harness-skills",
+        "path": "/Users/androidteam/Developer/ai-harness-skills",
+        "branch": "main",
+        "head_sha": "11e84d179c5fae34ec1497632911ec7314b66bc8",
+        "worktree_path": "/Users/androidteam/Developer/ai-harness-skills",
+        "worktree_clean": false,
+        "dirt_fingerprint": "graphify-out-only",
+        "dirt_items": [
+          "graphify-out/.graphify_labels.json",
+          "graphify-out/.graphify_labels.json.sig",
+          "graphify-out/GRAPH_REPORT.md",
+          "graphify-out/graph.html",
+          "graphify-out/graph.json",
+          "graphify-out/manifest.json"
+        ]
+      },
+      "dependencies": {
+        "tdt_core": {
+          "declaration": "tdt-core",
+          "source": "tdt-core",
+          "path": "../tdt-core",
+          "origin": "editable",
+          "lock_path": "uv.lock",
+          "lock_identity": "tdt-core = { path = \"/Users/androidteam/Developer/tdt-core\", editable = true }",
+          "full_sha": "797a6189b0bd74fdbf9e25d547904b3a2c33fb51",
+          "import_origin": "/Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py",
+          "pyproject_dependency": "tdt-core = { path = \"../tdt-core\", editable = true }"
+        }
+      },
+      "product_test_launcher_script": {
+        "product_files": [],
+        "test_files": [
+          "tests/providers/test_adapter_cli_identity.py",
+          "tests/providers/test_adapters.py",
+          "tests/providers/test_base.py",
+          "tests/providers/test_conformance.py",
+          "tests/integration/test_end_to_end_smoke.py"
+        ],
+        "launcher_files": [
+          "src/ai_harness/runtime.py",
+          "src/ai_harness/cli.py",
+          "src/ai_harness/providers/__init__.py"
+        ],
+        "script_files": []
+      },
+      "identities": {
+        "cli_adapter_id": "codex",
+        "canonical_provider_id": "codex-native",
+        "source_fingerprints": {
+          "tdt_projection": "/Users/androidteam/Developer/ai-harness-skills/src/ai_harness/providers/tdt_projection.py",
+          "claude_adapter": "/Users/androidteam/Developer/ai-harness-skills/src/ai_harness/providers/claude.py",
+          "codex_adapter": "/Users/androidteam/Developer/ai-harness-skills/src/ai_harness/providers/codex.py",
+          "base_provider": "/Users/androidteam/Developer/ai-harness-skills/src/ai_harness/providers/base.py",
+          "runtime": "/Users/androidteam/Developer/ai-harness-skills/src/ai_harness/runtime.py"
+        },
+        "loader_identity": {
+          "module": "tdt_core.config_loader",
+          "source_path": "/Users/androidteam/Developer/tdt-core/src/tdt_core/config_loader.py"
+        }
+      },
+      "provider_binding": {
+        "provider_id": "codex-native",
+        "protocol": "responses",
+        "auth_env": "OPENAI_API_KEY",
+        "availability": "absent",
+        "credential_prerequisite": "presence_only_verified",
+        "shell_prerequisite": "codex_executable_check",
+        "network_prerequisite": "not_required_for_boundary"
+      },
+      "prerequisites": {
+        "authentication": "presence_only_verified",
+        "executable": "absent_no_codex_binary",
+        "shell": "zsh_available",
+        "provider": "absent_no_api_key",
+        "network": "not_required_for_boundary",
+        "containment": "verified",
+        "dependency": "resolved_editable",
+        "source": "fingerprint_captured"
+      },
+      "contained_operation": {
+        "operation_type": "generation",
+        "boundary": "adapter_invoke",
+        "adapter_class": "CodexAdapter",
+        "process_containment": "SafeProcessRunner",
+        "nonce_pattern": "LIVE12_HARNESS_{hex}",
+        "expected_artifact": "StageResult with artifact_body containing nonce",
+        "result_path": "evidence/live-ai-harness-skills-result.json",
+        "target_preservation": "disposable_workspace_only"
+      },
+      "row_state": "defined"
+    },
+    {
+      "row_id": "ai-review-reviewer",
+      "consumer": "ai-review",
+      "row_type": "reviewer",
+      "consumer_repository": {
+        "name": "ai-review",
+        "path": "/Users/androidteam/Developer/ai-review",
+        "branch": "main",
+        "head_sha": "09bde26ebdd31aa4b693c8056ca896f95cc53a74",
+        "worktree_path": "/Users/androidteam/Developer/ai-review",
+        "worktree_clean": false,
+        "dirt_fingerprint": "graphify-out-only",
+        "dirt_items": [
+          "graphify-out/.graphify_labels.json",
+          "graphify-out/.graphify_labels.json.sig",
+          "graphify-out/GRAPH_REPORT.md",
+          "graphify-out/graph.html",
+          "graphify-out/graph.json",
+          "graphify-out/manifest.json"
+        ]
+      },
+      "dependencies": {
+        "tdt_core": {
+          "declaration": "tdt-core[gitlab,scheduler]>=0.3,<0.4",
+          "source": "tdt-core",
+          "path": "../tdt-core",
+          "origin": "editable",
+          "lock_path": "uv.lock",
+          "lock_identity": "tdt-core = { path = \"../tdt-core\", editable = true }",
+          "full_sha": "797a6189b0bd74fdbf9e25d547904b3a2c33fb51",
+          "import_origin": "/Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py",
+          "pyproject_dependency": "tdt-core = { path = \"../tdt-core\", editable = true }"
+        },
+        "agent_core": {
+          "note": "Not a direct dependency. Only tdt-core is imported.",
+          "import_origin": "/Users/androidteam/Developer/agent-core/src/agent_core/__init__.py",
+          "full_sha": "4708e70e72b760e7cb7f56d4b6cfb970de533884"
+        }
+      },
+      "product_test_launcher_script": {
+        "product_files": [],
+        "test_files": [
+          "tests/test_reviewer_projection.py",
+          "tests/test_tdt_projection.py"
+        ],
+        "launcher_files": [
+          "src/ai_review/review_flow/orchestrator.py",
+          "src/ai_review/reviewers/base.py",
+          "src/ai_review/reviewers/command.py",
+          "src/ai_review/providers/tdt_projection.py"
+        ],
+        "script_files": [
+          "scripts/verify_phase6_live_acceptance.py"
+        ]
+      },
+      "identities": {
+        "cli_adapter_id": "codex",
+        "canonical_provider_id": "codex-native",
+        "source_fingerprints": {
+          "tdt_projection": "/Users/androidteam/Developer/ai-review/src/ai_review/providers/tdt_projection.py",
+          "orchestrator": "/Users/androidteam/Developer/ai-review/src/ai_review/review_flow/orchestrator.py",
+          "base_reviewer": "/Users/androidteam/Developer/ai-review/src/ai_review/reviewers/base.py",
+          "command_reviewer": "/Users/androidteam/Developer/ai-review/src/ai_review/reviewers/command.py"
+        },
+        "loader_identity": {
+          "module": "tdt_core.config_loader",
+          "source_path": "/Users/androidteam/Developer/tdt-core/src/tdt_core/config_loader.py"
+        }
+      },
+      "provider_binding": {
+        "provider_id": "codex-native",
+        "protocol": "responses",
+        "auth_env": "OPENAI_API_KEY",
+        "availability": "absent",
+        "credential_prerequisite": "presence_only_verified",
+        "shell_prerequisite": "codex_executable_check",
+        "network_prerequisite": "not_required_for_boundary"
+      },
+      "prerequisites": {
+        "authentication": "presence_only_verified",
+        "executable": "absent_no_codex_binary",
+        "shell": "zsh_available",
+        "provider": "absent_no_api_key",
+        "network": "not_required_for_boundary",
+        "containment": "verified",
+        "dependency": "resolved_editable",
+        "source": "fingerprint_captured"
+      },
+      "contained_operation": {
+        "operation_type": "review",
+        "boundary": "reviewer_probe",
+        "reviewer_class": "CommandReviewer",
+        "process_containment": "subprocess_with_capture",
+        "nonce_pattern": "LIVE12_REVIEW_{hex}",
+        "expected_artifact": "ReviewResult with output containing nonce or provider-unavailable",
+        "result_path": "evidence/live-ai-review-result.json",
+        "target_preservation": "disposable_workspace_only"
+      },
+      "row_state": "defined"
+    }
+  ],
+  "scope_revision": "none",
+  "aggregate_result": "not_permitted",
+  "note": "Each row is independently required. No combined or aggregate result substitutes for either consumer row."
+}
