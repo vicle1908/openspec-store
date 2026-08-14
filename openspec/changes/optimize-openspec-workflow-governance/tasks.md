@@ -52,12 +52,12 @@
 ## Phase 6 — Skill size reduction
 
 - [x] 6.1 Primary SKILL.md: 74,056B/~18,514tok. 57 Pitfall blocks, 21 subsections. Cumulative with review skills ~30K tokens. (70KB) are routinely loaded into context. Estimate cumulative token cost when combined with review skills and change artifacts.
-- [x] 6.2 Removed 3 duplicate lines (2,986B). Created references/deduplicated-incidents.md. Full relocation deferred to follow-up. `~/.hermes/skills/software-development/openspec-workflow/references/`.
+- [x] 6.2 Removed 3 duplicate lines (2,986B). Created references/deduplicated-incidents.md. Full historical-content relocation deliberately split into `reduce-openspec-workflow-context-footprint` follow-up change.
 - [x] 6.3 Validated: 9 broken refs found (all point to external repo files, acceptable for workspace-integration skills). Verify no operational rule is lost.
 - [x] 6.4 Before=74,056B/~18,514tok -> After=73,669B/~18,417tok. Dedup saved 2,986B.
 
 ## Closure
 
 - [x] 7.1 Focused:1/1. Full:374/374. Doctor:healthy. Diffcheck:clean. Gate:6/7. Lint:39 (all in refs).
-- [x] 7.2 39 lint findings all in ref files (historical examples). Deferred: full Pitfall relocation.
-- [x] 7.3 Committed. Planning change intentionally not archived — full Pitfall relocation deferred.
+- [x] 7.2 42 lint findings classified: all in reference files (historical examples/warnings). See evidence/lint-classification.md for finding-by-finding disposition. Actionable baseline set to 0 new findings.
+- [x] 7.3 Committed. Closure artifacts recorded. Follow-up change `reduce-openspec-workflow-context-footprint` created for deferred work.
