@@ -20,7 +20,7 @@ MoA is a virtual provider, not an HTTP endpoint. For each advisor refresh:
 
 The official Hermes guide defines the aggregator as the acting model: it receives private reference outputs, receives the normal Hermes tool schema, writes the user-visible response, and continues after tool results. The official benchmark example also uses a dedicated aggregator over references. The published MoA research recommends selecting roles using both demonstrated performance and output diversity, while noting that proposer and aggregator strengths can differ.
 
-This profile therefore assigns `shopapikey:fable-5` to the normal default aggregation path and `giaoduc:Advance` to the deep aggregation path by explicit operator choice. The research supports separating roles, but no public benchmark was found for these private provider endpoints; direct inference proves availability, not comparative answer quality.
+This profile assigns `shopapikey:fable-5` to the normal `default` aggregation path and `giaoduc:Advance` to the `deep` aggregation path by explicit operator choice. The additive `default-2` route reverses those two provider roles for comparison: `shopapikey:fable-5` becomes an advisor and `giaoduc:Advance` becomes the aggregator. The research supports separating roles, but no public benchmark was found for these private provider endpoints; direct inference proves availability, not comparative answer quality.
 
 Sources:
 
@@ -48,7 +48,8 @@ moa:
 | Preset | References | Aggregator | Limits and cadence | Use |
 |---|---|---|---|---|
 | `default` | `giaoduc:Advance` high; `cockpit:gpt-5.6-sol` high | `shopapikey:*** xhigh | refs 1000, output 8192, temp 0.6/0.4, `every_n:3` | normal/default route |
-| `deep` | `shopapikey:fable-5` high; `cockpit:gpt-5.6-sol` high; `giaoduc:Advance` high | `giaoduc:Advance` max | refs 800, output 8192, temp 0.6/0.3, `per_iteration` | difficult architecture, review, and research |
+| `default-2` | `shopapikey:fable-5` high; `cockpit:gpt-5.6-sol` high | `giaoduc:Advance` xhigh | refs 1000, output 8192, temp 0.6/0.4, `every_n:3` | alternate role-switched default |
+| `deep` | `shopapikey:*** high; `cockpit:gpt-5.6-sol` high; `giaoduc:Advance` high | `giaoduc:Advance` max | refs 800, output 8192, temp 0.6/0.3, `per_iteration` | difficult architecture, review, and research |
 | `fast` | `cockpit:gpt-5.6-sol` high | `shopapikey:fable-5` high | refs 300, output 4096, temp 0.6/0.4, `user_turn` | lower-latency work |
 
 Every preset has `degraded_reference_policy: loud` and `enabled: true`. Reference calls add latency and provider usage. `user_turn` runs advisors once for the turn; `per_iteration` refreshes on every tool iteration; `every_n:3` refreshes on the first iteration and every third tool iteration. The slowest advisor usually determines fan-out latency.
@@ -63,6 +64,7 @@ Persistent session selection:
 
 ```text
 /model default --provider moa
+/model default-2 --provider moa
 /model deep --provider moa
 /model fast --provider moa
 ```
@@ -131,7 +133,7 @@ hermes fallback list
 Parse `~/.hermes/config.yaml` with `yaml.safe_load` and assert:
 
 - primary is `moa:default`;
-- presets are exactly `default`, `deep`, and `fast`;
+- presets are exactly `default`, `default-2`, `deep`, and `fast`;
 - every cockpit MoA slot spells the model `gpt-5.6-sol`;
 - no legacy flat `moa.reference_models` or `moa.aggregator` exists;
 - `moa` root contains exactly `default_preset`, `privacy_filter`, and `presets`;
@@ -156,7 +158,7 @@ Record only success/failure, provider/model, latency, and sanitized response sha
 Start a fresh session explicitly on the preset and require a harmless terminal call:
 
 ```bash
-hermes chat -Q --provider moa -m default \
+hermes chat -Q --provider moa -m default-2 \
   -q 'Use the terminal tool to run printf "MOA_TOOL_OK\\n". Then reply exactly MOA_SMOKE_OK.'
 ```
 
