@@ -8,7 +8,7 @@
         "repository": "ai-review",
         "sha256": "146d79248b57eeacd8b5be77bd9226e966a6eb283b02b6ed77161a79a0877a76"
       },
-      "id": "ai-review-agent-core",
+      "id": "ai-review-live-agent-core",
       "installed": {
         "distribution": "agent-core",
         "environment": "env-ai-review",
@@ -38,7 +38,7 @@
         "repository": "ai-review",
         "sha256": "146d79248b57eeacd8b5be77bd9226e966a6eb283b02b6ed77161a79a0877a76"
       },
-      "id": "ai-review-tdt-core",
+      "id": "ai-review-live-tdt-core",
       "installed": {
         "distribution": "tdt-core",
         "environment": "env-ai-review",
@@ -144,10 +144,24 @@
       "kind": "path_exists",
       "path": "src/ai_review/config/settings.py",
       "repository": "ai-review"
+    },
+    {
+      "id": "ai-review-live-codex-executable",
+      "kind": "executable",
+      "executable_name": "codex",
+      "expected_path": "/opt/homebrew/Caskroom/codex/0.147.0/bin/codex"
+    },
+    {
+      "id": "ai-review-live-authorization",
+      "kind": "attestation",
+      "attestation_id": "ai-review-live-authorization",
+      "expected_state": "authorized",
+      "expected_source_id": "user-live-row-authorization-20260814",
+      "expected_source_sha256": "889090694efd0bfbd1f79cce6598616f1bb0c002421f1b8fab010f2bc7b9622b"
     }
   ],
-  "record_id": "ai-review-deterministic",
-  "record_kind": "deterministic_handoff",
+  "record_id": "ai-review-reviewer",
+  "record_kind": "live_row",
   "repositories": [
     {
       "branch": "main",
@@ -270,5 +284,65 @@
       "repository": "ai-review",
       "sha256": "ca61e80098292824ec481a0d6bda96e80b87eab92dbc19f02d6af8d279b36a29"
     }
-  ]
+  ],
+  "live": {
+    "consumer_boundary": {
+      "id": "ai-review-reviewer",
+      "repository": "ai-review",
+      "kind": "reviewer"
+    },
+    "provider_route": {
+      "cli_adapter_id": "codex",
+      "canonical_provider_id": "codex-native",
+      "canonical_alias": "codex-default",
+      "wire_model": "gpt-5.6-sol",
+      "behavior_sha256": "9c3488d7c4dde8a4dd241fdfd971373e0849d5117f6883da33fda46984301fa1"
+    },
+    "mechanism": {
+      "id": "ai-review-mechanism-3",
+      "command_shape_sha256": "e66fcf107fd1ea4b3b074bca27a8f705272bfd47c94908d2e82a993dcf23c9f4",
+      "redacted_command_shape": [
+        "CodexReviewer.probe",
+        "codex",
+        "exec",
+        "--ephemeral",
+        "--ignore-rules",
+        "--model",
+        "<wire-model>",
+        "--config",
+        "model_reasoning_effort=\"<effort>\"",
+        "<nonce-prompt>"
+      ]
+    },
+    "authorization": {
+      "status": "authorized",
+      "attestation_id": "ai-review-live-authorization",
+      "source_id": "user-live-row-authorization-20260814",
+      "source_sha256": "889090694efd0bfbd1f79cce6598616f1bb0c002421f1b8fab010f2bc7b9622b"
+    },
+    "execution": {
+      "process_reachable": true,
+      "process_exit_code": 0,
+      "monotonic_duration_ms": 10740,
+      "nested_outcome": {
+        "status": "succeeded",
+        "provider_error": false,
+        "completion_state": "complete"
+      },
+      "proof": {
+        "kind": "nonce",
+        "expected": {
+          "id": "TDT_PHASE6_AI_REVIEW_bf102cd4",
+          "sha256": "f39ccfb036ea46d5da067054189687e38be1eb2bc7f45cba633ad1b644700fdf"
+        },
+        "observed": true
+      },
+      "target_preservation": {
+        "status": "preserved",
+        "source_id": "phase6-disposable-target-check",
+        "source_sha256": "3817c1b50caf0f0d0a1458f2e77f9082923cc4fef7babc816952e6ba72da1617"
+      },
+      "row_status": "passed"
+    }
+  }
 }

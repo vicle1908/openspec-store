@@ -8,7 +8,7 @@
         "repository": "ai-harness-skills",
         "sha256": "cd19c6416c4c32657d512992fe69756df70486aff103963fd1458924c790449d"
       },
-      "id": "ai-harness-skills-tdt-core",
+      "id": "ai-harness-skills-live-tdt-core",
       "installed": {
         "distribution": "tdt-core",
         "environment": "env-ai-harness-skills",
@@ -108,10 +108,24 @@
       "kind": "path_exists",
       "path": "src/ai_harness/providers/tdt_projection.py",
       "repository": "ai-harness-skills"
+    },
+    {
+      "id": "ai-harness-skills-live-codex-executable",
+      "kind": "executable",
+      "executable_name": "codex",
+      "expected_path": "/opt/homebrew/Caskroom/codex/0.147.0/bin/codex"
+    },
+    {
+      "id": "ai-harness-skills-live-authorization",
+      "kind": "attestation",
+      "attestation_id": "ai-harness-skills-live-authorization",
+      "expected_state": "authorized",
+      "expected_source_id": "user-live-row-authorization-20260814",
+      "expected_source_sha256": "889090694efd0bfbd1f79cce6598616f1bb0c002421f1b8fab010f2bc7b9622b"
     }
   ],
-  "record_id": "ai-harness-skills-deterministic",
-  "record_kind": "deterministic_handoff",
+  "record_id": "ai-harness-skills-contained-generation",
+  "record_kind": "live_row",
   "repositories": [
     {
       "branch": "main",
@@ -169,5 +183,80 @@
       "repository": "ai-harness-skills",
       "sha256": "e479e4540401b2ce3029b07159b09acbc3393383c29adf6ea4b6bf2aaac3434d"
     }
-  ]
+  ],
+  "live": {
+    "consumer_boundary": {
+      "id": "ai-harness-skills-contained-generation",
+      "repository": "ai-harness-skills",
+      "kind": "contained_generation"
+    },
+    "provider_route": {
+      "cli_adapter_id": "codex",
+      "canonical_provider_id": "codex-native",
+      "canonical_alias": "codex-default",
+      "wire_model": "gpt-5.6-sol",
+      "behavior_sha256": "9c3488d7c4dde8a4dd241fdfd971373e0849d5117f6883da33fda46984301fa1"
+    },
+    "mechanism": {
+      "id": "ai-harness-skills-mechanism-2",
+      "command_shape_sha256": "e9e9e046a93595c53b9d9d39366dcc01cc7a13d255408584605ac8856cb6b72d",
+      "redacted_command_shape": [
+        "codex",
+        "exec",
+        "--ephemeral",
+        "--ignore-rules",
+        "--skip-git-repo-check",
+        "--config",
+        "mcp_servers={}",
+        "--config",
+        "plugins={}",
+        "--config",
+        "hooks={}",
+        "--config",
+        "memories={use_memories=false,generate_memories=false}",
+        "--model",
+        "<wire-model>",
+        "--config",
+        "model_reasoning_effort=\"<effort>\"",
+        "--sandbox",
+        "read-only",
+        "--cd",
+        "<disposable-workspace>",
+        "--output-schema",
+        "<temporary-schema>",
+        "--json",
+        "-"
+      ]
+    },
+    "authorization": {
+      "status": "authorized",
+      "attestation_id": "ai-harness-skills-live-authorization",
+      "source_id": "user-live-row-authorization-20260814",
+      "source_sha256": "889090694efd0bfbd1f79cce6598616f1bb0c002421f1b8fab010f2bc7b9622b"
+    },
+    "execution": {
+      "process_reachable": true,
+      "process_exit_code": 0,
+      "monotonic_duration_ms": 6420,
+      "nested_outcome": {
+        "status": "succeeded",
+        "provider_error": false,
+        "completion_state": "complete"
+      },
+      "proof": {
+        "kind": "nonce",
+        "expected": {
+          "id": "TDT_PHASE6_AI_REVIEW_bf102cd4",
+          "sha256": "f39ccfb036ea46d5da067054189687e38be1eb2bc7f45cba633ad1b644700fdf"
+        },
+        "observed": true
+      },
+      "target_preservation": {
+        "status": "preserved",
+        "source_id": "phase6-disposable-target-check",
+        "source_sha256": "3817c1b50caf0f0d0a1458f2e77f9082923cc4fef7babc816952e6ba72da1617"
+      },
+      "row_status": "passed"
+    }
+  }
 }

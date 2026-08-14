@@ -1,5 +1,16 @@
 {
-  "attestations": {},
+  "attestations": {
+    "ai-harness-skills-live-authorization": {
+      "state": "authorized",
+      "source_id": "user-live-row-authorization-20260814",
+      "source_sha256": "889090694efd0bfbd1f79cce6598616f1bb0c002421f1b8fab010f2bc7b9622b"
+    },
+    "ai-review-live-authorization": {
+      "state": "authorized",
+      "source_id": "user-live-row-authorization-20260814",
+      "source_sha256": "889090694efd0bfbd1f79cce6598616f1bb0c002421f1b8fab010f2bc7b9622b"
+    }
+  },
   "change_name": "complete-agent-llm-config-integration",
   "dependency_observations": [
     {
@@ -81,6 +92,36 @@
       "origin_path": "/Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py",
       "origin_sha": "26319d195408658fc8b784e0fcb87caab6f5775a",
       "upstream_repository": "tdt-core"
+    },
+    {
+      "id": "ai-harness-skills-live-tdt-core",
+      "downstream_record": "ai-harness-skills-contained-generation",
+      "upstream_repository": "tdt-core",
+      "environment": "env-ai-harness-skills",
+      "distribution": "tdt-core",
+      "import_name": "tdt_core",
+      "origin_path": "/Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py",
+      "origin_sha": "26319d195408658fc8b784e0fcb87caab6f5775a"
+    },
+    {
+      "id": "ai-review-live-agent-core",
+      "downstream_record": "ai-review-reviewer",
+      "upstream_repository": "agent-core",
+      "environment": "env-ai-review",
+      "distribution": "agent-core",
+      "import_name": "agent_core",
+      "origin_path": "/Users/androidteam/Developer/agent-core/src/agent_core/__init__.py",
+      "origin_sha": "24d028042c5f654d9c7cff1499d9c545f1b96af0"
+    },
+    {
+      "id": "ai-review-live-tdt-core",
+      "downstream_record": "ai-review-reviewer",
+      "upstream_repository": "tdt-core",
+      "environment": "env-ai-review",
+      "distribution": "tdt-core",
+      "import_name": "tdt_core",
+      "origin_path": "/Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py",
+      "origin_sha": "26319d195408658fc8b784e0fcb87caab6f5775a"
     }
   ],
   "python_environments": {
@@ -140,6 +181,16 @@
       "id": "ai-review-deterministic",
       "kind": "deterministic_handoff",
       "repository": "ai-review"
+    },
+    {
+      "id": "ai-harness-skills-contained-generation",
+      "repository": "ai-harness-skills",
+      "kind": "live_row"
+    },
+    {
+      "id": "ai-review-reviewer",
+      "repository": "ai-review",
+      "kind": "live_row"
     }
   ],
   "repositories": {

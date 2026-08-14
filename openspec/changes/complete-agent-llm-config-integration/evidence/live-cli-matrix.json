@@ -9,7 +9,7 @@
     "corrective_subtree_tree_sha": "9df47e9620bbf7101d8618b72ba33d8491e3572563e6ee10346f8e44ed152e63"
   },
   "current_store": {
-    "head_sha": "5d9fab5b5d9e1d63fbd0b5485573a724abfaaa9e",
+    "head_sha": "4761654f7f6851613c74da9bbfc22dd36a14d60f",
     "branch": "main"
   },
   "required_rows": [
@@ -78,10 +78,12 @@
         "provider_id": "codex-native",
         "protocol": "responses",
         "auth_env": "OPENAI_API_KEY",
-        "availability": "absent",
+        "availability": "available_via_codex_login",
         "credential_prerequisite": "presence_only_verified",
         "shell_prerequisite": "codex_executable_check",
-        "network_prerequisite": "not_required_for_boundary"
+        "network_prerequisite": "not_required_for_boundary",
+        "canonical_alias": "codex-default",
+        "wire_model": "gpt-5.6-sol"
       },
       "prerequisites": {
         "authentication": "present_via_codex_login",
@@ -103,10 +105,15 @@
         "result_path": "evidence/live-ai-harness-skills-result.json",
         "target_preservation": "disposable_workspace_only"
       },
-      "row_state": "ready",
+      "row_state": "passed",
       "result": {
-        "status": "ready",
-        "reason": "pre_authorization"
+        "status": "passed",
+        "result_path": "evidence/live-ai-harness-skills-result.json",
+        "authorization": "authorized",
+        "process_exit_code": 0,
+        "nonce_id": "TDT_PHASE6_AI_REVIEW_bf102cd4",
+        "nonce_sha256": "f39ccfb036ea46d5da067054189687e38be1eb2bc7f45cba633ad1b644700fdf",
+        "target_preservation": "preserved"
       }
     },
     {
@@ -183,10 +190,12 @@
         "provider_id": "codex-native",
         "protocol": "responses",
         "auth_env": "OPENAI_API_KEY",
-        "availability": "absent",
+        "availability": "available_via_codex_login",
         "credential_prerequisite": "presence_only_verified",
         "shell_prerequisite": "codex_executable_check",
-        "network_prerequisite": "not_required_for_boundary"
+        "network_prerequisite": "not_required_for_boundary",
+        "canonical_alias": "codex-default",
+        "wire_model": "gpt-5.6-sol"
       },
       "prerequisites": {
         "authentication": "present_via_codex_login",
@@ -208,14 +217,25 @@
         "result_path": "evidence/live-ai-review-result.json",
         "target_preservation": "disposable_workspace_only"
       },
-      "row_state": "ready",
+      "row_state": "passed",
       "result": {
-        "status": "ready",
-        "reason": "pre_authorization"
+        "status": "passed",
+        "result_path": "evidence/live-ai-review-result.json",
+        "authorization": "authorized",
+        "process_exit_code": 0,
+        "nonce_id": "TDT_PHASE6_AI_REVIEW_bf102cd4",
+        "nonce_sha256": "f39ccfb036ea46d5da067054189687e38be1eb2bc7f45cba633ad1b644700fdf",
+        "target_preservation": "preserved"
       }
     }
   ],
   "scope_revision": "none",
   "aggregate_result": "not_permitted",
-  "note": "Each row is independently required. No combined or aggregate result substitutes for either consumer row."
+  "note": "Each row is independently required. No combined or aggregate result substitutes for either consumer row.",
+  "authorization": {
+    "source_id": "user-live-row-authorization-20260814",
+    "source_sha256": "889090694efd0bfbd1f79cce6598616f1bb0c002421f1b8fab010f2bc7b9622b",
+    "credential_rotation": "waived_by_user_for_contained_acceptance",
+    "credential_values_retained": false
+  }
 }
