@@ -9,27 +9,27 @@
 ## Phase 2 — Relocate historical incidents
 
 - [x] 2.1 Created 4 reference files: retrospective-changes-lifecycle.md (2,368B), verification-order-corrections.md (1,047B), desktop-agent-retrospective-closure.md (2,044B), compaction-loop-patterns.md (1,320B).: write a concise Hermes-native reference file under `references/` preserving the incident pattern and cross-reference.
-- [x] 2.2 Replaced 4 inline blocks with concise pointers (see Historical pattern: ...). Verified 3 pointers present in SKILL.md. inline block with a one-line pointer: `See references/<name>.md`.
+- [x] 2.2 Replaced 4 inline blocks with concise pointers to the four new references. Verified all four pointers resolve from SKILL.md.
 - [x] 2.3 Post-relocation validation: focused 1/1, full 375/375, doctor healthy. relocation batch: `openspec validate reduce-openspec-workflow-context-footprint --strict --store openspec-store`.
-- [x] 2.4 Before=73,669B/~18,417tok -> After=67,461B/~16,865tok. Reduced=6,208B/1,552tok (8%). estimated tokens after all relocations. Record before/after in evidence.
+- [x] 2.4 Relocation measurement: Before=73,669B/~18,417tok -> after relocation=67,461B/~16,865tok. After link repair=67,697B/~16,924tok. Net reduction from baseline=5,972B/~1,493tok (8.1%).
 
 ## Phase 3 — Repair broken reference links
 
 - [x] 3.1 Found 9 broken refs (external-cli-gateway-integration, crash-recovery, five-provider-review, native-cli-evidence-and-openspec-closure, workspace-skill-setup, cross-repo-enforcement-drift-patterns x2, hermes-store-separation, delta-spec-scenario-preservation). All are informational pointers in the Purpose section to external repo files. `references/...` links in the primary SKILL.md.
-- [x] 3.2 All 9 broken refs point to external repository files not present in the local references/ directory. They are informational cross-references in the skill introduction, not operational references loaded by agents. No local files needed — acceptable as-is. link: determine if target was renamed, moved, or never created. Create missing files or update paths.
-- [x] 3.3 Verified: 71 valid refs, 9 informational broken refs (all in Purpose section). No orphaned references found in operational sections. references remain after repair.
+- [x] 3.2 Repaired all 9 broken refs: mapped 7 to existing local references, created `references/hermes-store-separation.md`, and mapped the scenario-preservation link to `delta-modified-scenario-rule.md`.
+- [x] 3.3 Final local reference scan: 0 missing targets; no orphaned references remain.
 
 ## Phase 4 — Lint context-awareness and regression tests
 
-- [ ] 4.1 Add severity classification (actionable / informational / baseline) to `openspec_doc_lint.py` findings.
-- [ ] 4.2 Record the approved baseline of existing findings. Gate passes only when new actionable count is 0.
-- [ ] 4.3 Write executable Python regression tests (not just Markdown scenarios) that verify the lint catches real anti-patterns and ignores negations.
-- [ ] 4.4 Integrate regression tests into the pre-archive gate script.
+- [x] 4.1 Added severity classification (actionable / informational) to `openspec_doc_lint.py`; fixture and reference findings are informational.
+- [x] 4.2 Recorded baseline in `evidence/lint-classification.md`: 39 informational, 0 actionable. Gate blocks only on actionable findings.
+- [x] 4.3 Added executable `tests/test_doc_lint_regression.py`; anti-pattern detection and negation/fixture handling both pass.
+- [x] 4.4 Integrated documentation lint and executable regression test into `openspec_change_gate.py` pre-archive mode.
 
 ## Phase 5 — Final verification and closure
 
-- [ ] 5.1 Run focused validation, full-store validation, store doctor, and gate script.
-- [ ] 5.2 Measure final byte/token count of primary SKILL.md. Record reduction percentage.
-- [ ] 5.3 Verify Hermes skill loading after restructuring: all 4 custom skills load correctly.
-- [ ] 5.4 Run documentation lint. Confirm actionable count is 0.
+- [x] 5.1 Focused validation 1/1; full-store validation 375/375; store doctor healthy with no issues; pre-archive gate 8/9 with only implementation_progress false because 9 tasks remained at measurement time.
+- [x] 5.2 Final primary SKILL.md: 67,697B/~16,924tok versus 73,669B baseline; reduction=5,972B/~1,493tok (8.1%).
+- [x] 5.3 Verified all 4 custom Hermes skill files exist and loadable: openspec-workflow, openspec-review-governance, openspec-code-review, openspec-plan-review.
+- [x] 5.4 Documentation lint: 39 informational baseline findings, 0 actionable, all_clear=true; executable regression test PASS.
 - [ ] 5.5 Commit owned artifacts. Archive only when all tasks are genuinely complete.
