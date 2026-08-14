@@ -10,9 +10,9 @@ Create `~/Developer/.knowledge-refresh/` directory.
 
 ### 1.2 Implement owner lock mechanism
 
-Reuse the official directory-based lock pattern:
-- `acquire_gitnexus_owner` / `release_gitnexus_owner` (from knowledge-tools.sh)
-- `acquire_graphify_owner` / `release_graphify_owner` (from knowledge-tools.sh)
+Reuse the official directory-based lock pattern from `knowledge-tools.sh`:
+- `acquire_gitnexus_owner` / `release_gitnexus_owner`
+- `acquire_graphify_owner` / `release_graphify_owner`
 - Check for `.rebuild.lock` before acquiring Graphify lock
 - Stale lock detection via PID liveness check
 
@@ -48,35 +48,34 @@ Use the official foreground command: `graphify extract . --code-only`
 
 Timestamped entries with repo name, worktree/main, tool, status, duration.
 
-## 2. Create post-merge hook
+## 2. Extend existing post-merge hook for GitNexus
 
-Create a post-merge hook that triggers delayed refresh when code lands on main.
+**Critical finding:** Graphify post-merge hooks already exist in all 18 repos. We only need to add GitNexus refresh.
 
-### 2.1 Write the post-merge hook
+### 2.1 Read existing hook
 
-Hook logic (uses official patterns):
-- Detect if merge target is main branch (check `MERGE_HEAD` or branch name)
-- Acquire graphify owner lock (yields if watch/refresh running)
-- Write timestamp to `/tmp/knowledge-postmerge-<repo-slug>.ts`
-- Sleep 30 seconds (detached background)
-- Check timestamp — if changed, exit (newer merge will handle it)
-- Run: `gitnexus analyze . --index-only --default-branch main`
-- Run: `GRAPHIFY_VIZ_NODE_LIMIT=0 graphify extract . --code-only`
-- Release owner lock
-- Log result to `~/Developer/.knowledge-refresh/post-merge.log`
+The existing hook at `.git/hooks/post-merge` has:
+- `graphify-post-merge-hook-start` / `graphify-post-merge-hook-end` markers
+- `graphify_should_skip` — skips during rebase/merge/cherry-pick
+- `graphify_has_state` — checks for graphify state
+- `graphify_mark_stale` — marks graph as stale
+- `graphify_rebuild_code` — rebuilds code-only graph in background
 
-### 2.2 Create hook installer
+### 2.2 Add GitNexus refresh function
 
-Create `~/Developer/scripts/install-post-merge-hook.sh` that:
-- Finds all repos with `.gitnexus/` or `graphify-out/`
-- Installs the post-merge hook in each (idempotent, marked block)
-- Uses `# knowledge-postmerge-start` / `# knowledge-postmerge-end` markers
-- Preserves existing hook content
-- Reports which repos were updated
+Add `gitnexus_refresh_after_merge()` to the existing hook:
+- Check if `.gitnexus/` exists
+- Acquire workspace lock (yields if another refresh is running)
+- Run `gitnexus analyze . --index-only --default-branch main` in background
+- Release lock after delay
 
-### 2.3 Extend knowledge-tools.sh
+### 2.3 Test extension
 
-Add `install-post-merge-hooks` target to `go-microservices/scripts/knowledge-tools.sh` so it runs alongside the existing Graphify hook installation.
+Verify the extended hook:
+- Doesn't break existing Graphify behavior
+- GitNexus refresh runs after merge to main
+- Workspace lock coordinates with running operations
+- Yields gracefully when lock is held
 
 ## 3. Create status command
 
@@ -112,7 +111,7 @@ Load the agent and verify it fires correctly.
 
 ### 5.1 Fix AGENTS.md
 
-Remove stale "Weekly crons: graphify freshness (Mon 8AM), wiki lint (Mon 9AM)" claim. Add actual LaunchAgent + post-merge hook description.
+Remove stale "Weekly crons: graphify freshness (Mon 8AM), wiki lint (Mon 9AM)" claim. Add actual LaunchAgent + hook system description.
 
 ### 5.2 Update CLAUDE.md
 
@@ -127,9 +126,9 @@ Add automation requirements to `openspec/specs/refresh-gitnexus-index-groups/spe
 - [ ] `~/Developer/scripts/refresh-knowledge-indexes.sh` runs successfully on all repos
 - [ ] `~/Developer/scripts/refresh-knowledge-indexes.sh` discovers and refreshes worktrees
 - [ ] `~/Developer/scripts/knowledge-status.sh` reports freshness correctly for repos + worktrees
-- [ ] Post-merge hook triggers delayed refresh on merge to main
-- [ ] Post-merge debounce prevents redundant refreshes during rapid merges
-- [ ] Owner lock mechanism coordinates with existing `graphify watch` sessions
+- [ ] Extended post-merge hook triggers GitNexus refresh after merge to main
+- [ ] Extended post-merge hook doesn't break existing Graphify behavior
+- [ ] Workspace lock coordinates with running operations
 - [ ] LaunchAgent loads with `launchctl load ~/Library/LaunchAgents/com.developer.index-refresh.plist`
 - [ ] Manual trigger works: `launchctl start com.developer.index-refresh`
 - [ ] Log files are created and contain timestamped entries

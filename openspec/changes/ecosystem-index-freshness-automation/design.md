@@ -106,53 +106,66 @@ From `gitnexus-stable-contract`:
 > **THEN** an operator MAY run `analyze --index-only --default-branch main`
 > **AND** the operation SHALL reject `--force`, embeddings, PDG, skills/context injection
 
-## Part 1: Post-Merge Trigger
+## Part 1: Extend Existing Post-Merge Hook for GitNexus
 
 ### Problem
 
-When a PR merges to main, agents working on subsequent tasks get stale index results.
+When a PR merges to main, agents working on subsequent tasks get stale GitNexus index results. Graphify is already handled by the existing post-merge hook, but GitNexus has no post-merge trigger.
+
+### Critical Finding
+
+**The Graphify post-merge hook already exists in all 18 repos.** It:
+- Skips during rebase/merge/cherry-pick (advisory, doesn't block)
+- Checks for graphify state (`.graphify/graph.json` or `graphify-out/graph.json`)
+- Marks graph as stale (writes `.graphify/needs_update`)
+- Rebuilds code-only graph in background (`graphify hook-rebuild`)
+
+**We don't need to create a new post-merge hook.** We extend the existing one.
 
 ### Design
 
-A **post-merge hook** installed in each indexed repo's `.git/hooks/post-merge`. Uses the official owner lock mechanism to coordinate with the existing Graphify post-commit hook and any running `graphify watch` sessions.
+Extend the existing `graphify-post-merge-hook-start` / `graphify-post-merge-hook-end` block to also trigger GitNexus refresh:
 
-```
-.git/hooks/post-merge
-  ├── Detect if merge target is main branch
-  ├── Acquire graphify owner lock (yields if watch/refresh running)
-  ├── Debounce: write timestamp to /tmp/knowledge-postmerge-<repo>.ts
-  ├── Sleep 30s (detached background)
-  ├── Check if timestamp still matches (no newer merge)
-  ├── Run: gitnexus analyze . --index-only --default-branch main
-  ├── Run: graphify extract . --code-only (official foreground pattern)
-  ├── Release owner lock
-  └── Log result
+```bash
+# After graphify_rebuild_code
+# Add GitNexus refresh
+gitnexus_refresh_after_merge() {
+  # Check if GitNexus index exists
+  [ -d ".gitnexus" ] || return 0
+  
+  # Acquire workspace lock (yields if another refresh is running)
+  local lock_dir="$HOME/Developer/go-microservices/.knowledge-state/locks/gitnexus-workspace.lock"
+  mkdir -p "$(dirname "$lock_dir")"
+  if ! mkdir "$lock_dir" 2>/dev/null; then
+    # Another refresh is running — yield
+    return 0
+  fi
+  printf '%s\t%s\n' "$$" "post-merge" >"${lock_dir}/owner"
+  
+  # Run refresh in background (non-blocking)
+  nohup gitnexus analyze . --index-only --default-branch main \
+    >>"$HOME/.cache/gitnexus-postmerge.log" 2>&1 &
+  
+  # Release lock after a delay (let the background process start)
+  (sleep 5 && rm -f "${lock_dir}/owner" && rmdir "$lock_dir" 2>/dev/null) &
+}
 ```
 
 ### Hook installation
 
-Extend `knowledge-tools.sh install-hooks` to include post-merge alongside the existing Graphify post-commit and post-checkout hooks. Uses the same marked block pattern:
+The existing hook is installed by `graphify hook install` and uses the marked block pattern. We extend the block content rather than adding a new block:
 
 ```bash
-# knowledge-postmerge-start
-# ... hook content ...
-# knowledge-postmerge-end
+# graphify-post-merge-hook-start
+# ... existing Graphify content ...
+# graphify-post-merge-hook-end
 ```
 
-### Debounce logic
+The extension is idempotent — re-running `graphify hook install` preserves the entire block.
 
-```bash
-_REPO_SLUG=$(echo "$REPO_ROOT" | tr '/' '_' | tr '.' '_')
-_TS_FILE="/tmp/knowledge-postmerge-${_REPO_SLUG}.ts"
-echo "$(date +%s)" > "$_TS_FILE"
-sleep 30
-# Check if a newer merge happened during the sleep
-_CURRENT_TS=$(cat "$_TS_FILE" 2>/dev/null || echo 0)
-_STORED_TS=$(echo "$_CURRENT_TS" | head -1)
-if [ "$(cat "$_TS_FILE")" != "$_STORED_TS" ]; then
-  exit 0  # newer merge will handle it
-fi
-```
+### Debounce
+
+The existing hook doesn't have debounce because Graphify handles it via the `.rebuild.lock` mechanism. For GitNexus, the workspace lock provides debounce — if a previous refresh is running, the new one yields.
 
 ## Part 2: Worktree-Aware Refresh
 
