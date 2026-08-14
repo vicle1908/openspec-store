@@ -91,20 +91,20 @@
       {
         "artifact_id": "tasks",
         "path": "openspec/changes/complete-agent-llm-config-integration/tasks.md",
-        "sha256": "f5d74823fddb1304d8916cf9ca587717a380dab9315a201549937443367d56f5"
+        "sha256": "de6340faa9dc3dcee9cd921fb7cddec266a62d3b6bdb2eb82ecaf925ea69a942"
       }
     ],
     "baseline_sha": "6dd185d4c1a5d0ccdc2aeceea3e88740d460f485",
     "baseline_tree_sha": "1083b5c2c147856ee7efc0d74eede097304ce17d",
-    "corrective_tree_sha256": "ffd22777e36b396dd3e1890be90bf13316bf1e527a1c23e6248638e81887ef33",
+    "corrective_tree_sha256": "18557a8a7383ba68e7a0313e4a84b2369949140158bfcedc671b29865c7fd646",
     "evidence_schema": {
       "id": "evidence-schema",
       "path": "openspec/changes/complete-agent-llm-config-integration/evidence/schema/v1/evidence-record.schema.json",
       "repository": "openspec-store",
       "sha256": "ac4c0340c2bc61a9571b4d8e41ebe7609813305c410d382f7954b189eab7a6f5"
     },
-    "observed_store_sha": "b4e4a5bcac30daeecac8edc258bc17780f7b98d8",
-    "planning_digest_sha256": "1747d5d5cc08e71fc21013956fcb46d476a55389a99967e1c89580f4dd86bcf1",
+    "observed_store_sha": "2b04de6913854da6eed23c847ccfbef4d2f865fd",
+    "planning_digest_sha256": "57a6809a4cca3961661b0ad614747b2f9c948f3ed0f38983adfb3c11137dc626",
     "store_repository": "openspec-store"
   },
   "prerequisites": [
@@ -132,8 +132,8 @@
       "dirt_inventory": [
         {
           "category": "other_non_secret",
-          "content_classification": "non_secret",
-          "content_sha256": "4088f857f653e59ad2a00e1615d46766aadc21af16cd1d9cd67c501de3abdc2c",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
           "paths": [
             "tdt-core-handoff.md"
           ],
