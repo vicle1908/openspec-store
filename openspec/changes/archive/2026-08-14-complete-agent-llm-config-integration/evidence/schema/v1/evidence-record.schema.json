@@ -1,0 +1,846 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tdt.local/openspec/complete-agent-llm-config-integration/evidence-record/v1",
+  "title": "Agent LLM integration evidence record",
+  "description": "Credential-safe retained evidence compared by validate-agent-llm-evidence.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_id",
+    "record_kind",
+    "planning",
+    "repositories",
+    "dependencies",
+    "sources",
+    "mechanisms",
+    "prerequisites"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "record_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "record_kind": {
+      "enum": [
+        "deterministic_handoff",
+        "live_row"
+      ]
+    },
+    "planning": {
+      "$ref": "#/$defs/planning"
+    },
+    "repositories": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/repositoryExpectation"
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dependencyExpectation"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/fileExpectation"
+      }
+    },
+    "mechanisms": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/fileExpectation"
+      }
+    },
+    "prerequisites": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/prerequisiteExpectation"
+      }
+    },
+    "live": {
+      "$ref": "#/$defs/liveExpectation"
+    }
+  },
+  "$defs": {
+    "sha1": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "absolutePath": {
+      "type": "string",
+      "pattern": "^/"
+    },
+    "presenceState": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "enum": [
+            "present",
+            "absent",
+            "available",
+            "unavailable",
+            "authorized",
+            "unauthorized",
+            "ready",
+            "not_ready",
+            "contained",
+            "not_contained"
+          ]
+        }
+      ]
+    },
+    "planningArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_id",
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "enum": [
+            "proposal",
+            "specs",
+            "design",
+            "tasks"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "planning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "store_repository",
+        "baseline_sha",
+        "baseline_tree_sha",
+        "observed_store_sha",
+        "corrective_tree_sha256",
+        "planning_digest_sha256",
+        "artifacts",
+        "evidence_schema"
+      ],
+      "properties": {
+        "store_repository": {
+          "$ref": "#/$defs/identifier"
+        },
+        "baseline_sha": {
+          "$ref": "#/$defs/sha1"
+        },
+        "baseline_tree_sha": {
+          "$ref": "#/$defs/sha1"
+        },
+        "observed_store_sha": {
+          "$ref": "#/$defs/sha1"
+        },
+        "corrective_tree_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "planning_digest_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 8,
+          "items": {
+            "$ref": "#/$defs/planningArtifact"
+          }
+        },
+        "evidence_schema": {
+          "$ref": "#/$defs/fileExpectation"
+        }
+      }
+    },
+    "repositoryExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "head_sha",
+        "branch",
+        "worktree_path",
+        "dirt_sha256"
+        ,"dirt_inventory"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "head_sha": {
+          "$ref": "#/$defs/sha1"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "worktree_path": {
+          "$ref": "#/$defs/absolutePath"
+        },
+        "dirt_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "dirt_inventory": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dirtInventoryEntry"
+          }
+        }
+      }
+    },
+    "dirtInventoryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "paths",
+        "category",
+        "content_classification"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "pattern": "^..$"
+        },
+        "paths": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/relativePath"
+          }
+        },
+        "category": {
+          "enum": [
+            "product",
+            "test",
+            "acceptance_script",
+            "generated",
+            "other_non_secret"
+          ]
+        },
+        "content_classification": {
+          "enum": [
+            "non_secret",
+            "metadata_only"
+          ]
+        },
+        "content_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "liveExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "consumer_boundary",
+        "provider_route",
+        "mechanism",
+        "authorization"
+      ],
+      "properties": {
+        "consumer_boundary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "repository",
+            "kind"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "repository": {
+              "$ref": "#/$defs/identifier"
+            },
+            "kind": {
+              "enum": [
+                "contained_generation",
+                "reviewer"
+              ]
+            }
+          }
+        },
+        "provider_route": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cli_adapter_id",
+            "canonical_provider_id",
+            "canonical_alias",
+            "wire_model",
+            "behavior_sha256"
+          ],
+          "properties": {
+            "cli_adapter_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "canonical_provider_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "canonical_alias": {
+              "$ref": "#/$defs/identifier"
+            },
+            "wire_model": {
+              "type": "string",
+              "minLength": 1
+            },
+            "behavior_sha256": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        },
+        "mechanism": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "command_shape_sha256",
+            "redacted_command_shape"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "command_shape_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "redacted_command_shape": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "authorization": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "attestation_id",
+            "source_id",
+            "source_sha256"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "authorized",
+                "unauthorized"
+              ]
+            },
+            "attestation_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "source_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "source_sha256": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        },
+        "execution": {
+          "$ref": "#/$defs/liveExecution"
+        }
+      }
+    },
+    "liveExecution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "process_reachable",
+        "process_exit_code",
+        "monotonic_duration_ms",
+        "nested_outcome",
+        "proof",
+        "target_preservation",
+        "row_status"
+      ],
+      "properties": {
+        "process_reachable": {
+          "type": "boolean"
+        },
+        "process_exit_code": {
+          "type": "integer"
+        },
+        "monotonic_duration_ms": {
+          "type": "integer"
+        },
+        "nested_outcome": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "provider_error",
+            "completion_state"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "succeeded",
+                "failed",
+                "incomplete"
+              ]
+            },
+            "provider_error": {
+              "type": "boolean"
+            },
+            "completion_state": {
+              "enum": [
+                "complete",
+                "incomplete"
+              ]
+            }
+          }
+        },
+        "proof": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "expected",
+            "observed"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "nonce",
+                "artifact"
+              ]
+            },
+            "expected": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "sha256"
+              ],
+              "properties": {
+                "id": {
+                  "$ref": "#/$defs/identifier"
+                },
+                "sha256": {
+                  "$ref": "#/$defs/sha256"
+                }
+              }
+            },
+            "observed": {
+              "type": "boolean"
+            }
+          }
+        },
+        "target_preservation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "source_id",
+            "source_sha256"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "preserved",
+                "mutated"
+              ]
+            },
+            "source_id": {
+              "$ref": "#/$defs/identifier"
+            },
+            "source_sha256": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        },
+        "row_status": {
+          "enum": [
+            "unauthorized",
+            "blocked",
+            "failed",
+            "passed",
+            "stale"
+          ]
+        }
+      }
+    },
+    "fileExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "repository",
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "repository": {
+          "$ref": "#/$defs/identifier"
+        },
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "dependencyExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "consumer_repository",
+        "upstream_repository",
+        "declaration",
+        "source_checkout",
+        "installed"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "consumer_repository": {
+          "$ref": "#/$defs/identifier"
+        },
+        "upstream_repository": {
+          "$ref": "#/$defs/identifier"
+        },
+        "declaration": {
+          "$ref": "#/$defs/fileExpectation"
+        },
+        "lock": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/fileExpectation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_checkout": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "repository",
+            "path",
+            "head_sha"
+          ],
+          "properties": {
+            "repository": {
+              "$ref": "#/$defs/identifier"
+            },
+            "path": {
+              "$ref": "#/$defs/absolutePath"
+            },
+            "head_sha": {
+              "$ref": "#/$defs/sha1"
+            }
+          }
+        },
+        "installed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "environment",
+            "distribution",
+            "import_name",
+            "origin_path",
+            "origin_repository",
+            "origin_sha"
+          ],
+          "properties": {
+            "environment": {
+              "$ref": "#/$defs/identifier"
+            },
+            "distribution": {
+              "type": "string",
+              "minLength": 1
+            },
+            "import_name": {
+              "type": "string",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_.]*$"
+            },
+            "origin_path": {
+              "$ref": "#/$defs/absolutePath"
+            },
+            "origin_repository": {
+              "$ref": "#/$defs/identifier"
+            },
+            "origin_sha": {
+              "$ref": "#/$defs/sha1"
+            }
+          }
+        }
+      }
+    },
+    "prerequisiteExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kind": {
+          "enum": [
+            "environment_presence",
+            "executable",
+            "path_exists",
+            "attestation"
+          ]
+        },
+        "environment_name": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "expected_present": {
+          "type": "boolean"
+        },
+        "executable_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_path": {
+          "type": "string"
+        },
+        "expected_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "repository": {
+          "$ref": "#/$defs/identifier"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_exists": {
+          "type": "boolean"
+        },
+        "attestation_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "expected_state": {
+          "$ref": "#/$defs/presenceState"
+        },
+        "expected_source_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "expected_source_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "repositoryMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "change_name",
+        "repositories",
+        "python_environments",
+        "attestations",
+        "records",
+        "dependency_observations"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0"
+        },
+        "change_name": {
+          "const": "complete-agent-llm-config-integration"
+        },
+        "repositories": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "root"
+            ],
+            "properties": {
+              "root": {
+                "$ref": "#/$defs/absolutePath"
+              }
+            }
+          }
+        },
+        "python_environments": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "site_packages"
+            ],
+            "properties": {
+              "site_packages": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/absolutePath"
+                }
+              }
+            }
+          }
+        },
+        "attestations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "state",
+              "source_id",
+              "source_sha256"
+            ],
+            "properties": {
+              "state": {
+                "$ref": "#/$defs/presenceState"
+              },
+              "source_id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "source_sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          }
+        },
+        "records": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "repository",
+              "kind"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "repository": {
+                "$ref": "#/$defs/identifier"
+              },
+              "kind": {
+                "enum": [
+                  "deterministic_handoff",
+                  "live_row"
+                ]
+              }
+            }
+          }
+        },
+        "dependency_observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "downstream_record",
+              "upstream_repository",
+              "environment",
+              "distribution",
+              "import_name",
+              "origin_path",
+              "origin_sha"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "downstream_record": {
+                "$ref": "#/$defs/identifier"
+              },
+              "upstream_repository": {
+                "$ref": "#/$defs/identifier"
+              },
+              "environment": {
+                "$ref": "#/$defs/identifier"
+              },
+              "distribution": {
+                "type": "string",
+                "minLength": 1
+              },
+              "import_name": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_.]*$"
+              },
+              "origin_path": {
+                "$ref": "#/$defs/absolutePath"
+              },
+              "origin_sha": {
+                "$ref": "#/$defs/sha1"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-repository-map-contract": {
+    "$ref": "#/$defs/repositoryMap"
+  },
+  "x-credential-policy": {
+    "forbidden_keys": [
+      "credential",
+      "credential_value",
+      "secret",
+      "secret_value",
+      "token",
+      "password",
+      "api_key"
+    ],
+    "allowed_projection": "names and presence-only booleans"
+  }
+}

@@ -1,0 +1,883 @@
+{
+  "schema_version": "1",
+  "phase": 13,
+  "tasks": ["13.1", "13.2", "13.3", "13.4", "13.5", "13.6", "13.7", "13.8", "13.9"],
+  "verified_at": "2026-08-13T18:30:00Z",
+  "store_sha": "597b8e3fd10aa14ca85cf5aa44eee540edb6bef2",
+  "baseline_sha": "6dd185d4c1a5d0ccdc2aeceea3e88740d460f485",
+  "verification_summary": {
+    "total_delta_scenarios_declared": 77,
+    "total_delta_scenarios_verified": 77,
+    "specs_verified": 5,
+    "all_specs_pass": true,
+    "any_blocked": false,
+    "any_failed": false
+  },
+  "repository_identities": {
+    "tdt_core": {
+      "accepted_sha": "797a6189b0bd74fdbf9e25d547904b3a2c33fb51",
+      "current_sha": "797a6189b0bd74fdbf9e25d547904b3a2c33fb51",
+      "branch": "main",
+      "sha_matches": true
+    },
+    "agent_core": {
+      "accepted_sha": "4708e70e72b760e7cb7f56d4b6cfb970de533884",
+      "current_sha": "4708e70e72b760e7cb7f56d4b6cfb970de533884",
+      "branch": "main",
+      "sha_matches": true
+    },
+    "agent_docs_sync": {
+      "accepted_sha": "dd0e6b9de7056495e3b60b67e6f925b6a1c47a9e",
+      "current_sha": "dd0e6b9de7056495e3b60b67e6f925b6a1c47a9e",
+      "branch": "main",
+      "sha_matches": true
+    },
+    "agent_harness": {
+      "accepted_sha": "88a9221267ca1da21fca13cb694ce5dc026576d4",
+      "current_sha": "88a9221267ca1da21fca13cb694ce5dc026576d4",
+      "branch": "main",
+      "sha_matches": true
+    },
+    "ai_harness_skills": {
+      "accepted_sha": "11e84d179c5fae34ec1497632911ec7314b66bc8",
+      "current_sha": "11e84d179c5fae34ec1497632911ec7314b66bc8",
+      "branch": "main",
+      "sha_matches": true
+    },
+    "ai_review": {
+      "accepted_sha": "09bde26ebdd31aa4b693c8056ca896f95cc53a74",
+      "current_sha": "09bde26ebdd31aa4b693c8056ca896f95cc53a74",
+      "branch": "main",
+      "sha_matches": true
+    }
+  },
+  "predecessor_archive_verification": {
+    "task_1_4_baseline_sha": "6dd185d4c1a5d0ccdc2aeceea3e88740d460f485",
+    "standardize_agent_llm_environment_resolution_v2": {
+      "path": "openspec/changes/archive/2026-08-13-standardize-agent-llm-environment-resolution-v2/",
+      "current_tree_matches_task_1_4": true,
+      "immutable": true,
+      "blob_shas_verified": [
+        "a8821c74d0bd39900cc781d365e948b58ac13377",
+        "44f088d3b4d989dbc15de49efa84decb1876b87e",
+        "788bced168a24126d2fa600eb90475ce7f6b286b",
+        "1e9206cb8bb6213bedc691af793c33f3c49c3dfe",
+        "88aba701bf5d1147bdabf677045c5b6e9bafd919",
+        "d01a66c4e685b246899f8755a2f9cea33e554339",
+        "b1a8be3a6cf9a7e64f0266eec2de91768d83a75f",
+        "b63e468584650a5d0812cff125899f3e434ec59c",
+        "e87ff8975cbbd79ddb0b43e0eb96d43adec89067",
+        "8b49f7dc119de0d3fec0477192f2da3cb5119818",
+        "9f902ac0ee0a6f39566e86e02569df58cca2fc9c",
+        "6833034505accca23c318716ad0b31a170c79cf9",
+        "d0418fc0251256950dc3cb0af19594ca4eb6170d",
+        "0b5d800fbe13a98cdc3aa4c57a031820ca826658",
+        "517b83081488474ba51563918a571b161e29d7dd",
+        "d19c0832c0bb4b36f17c371c7b9a894d27828d49",
+        "8b18449d106fdada17279feba0a360539e15e8fd"
+      ]
+    },
+    "integrate_canonical_cli_projections_v1": {
+      "path": "openspec/changes/archive/2026-08-13-integrate-canonical-cli-projections-v1/",
+      "current_tree_matches_task_1_4": true,
+      "immutable": true,
+      "blob_shas_verified": [
+        "b4bbeb946f4c4d9310ee8730c5f89564bc95e9f0",
+        "86339668cb979f65c511696db2190132a17b6e55",
+        "942f454573abf7588226f266c64134d4061660d0",
+        "c99b0887e28b30f67d9da62f1345d538dda368b4",
+        "011e0f99b71871f6658cffd5f70369f5d60136fa"
+      ]
+    }
+  },
+  "corrective_subtree_verification": {
+    "introducing_commit": "f7ee45a097bf7458681cf13743e7a80cefe42218",
+    "corrective_paths_in_subtree": [
+      "openspec/changes/complete-agent-llm-config-integration/.openspec.yaml",
+      "openspec/changes/complete-agent-llm-config-integration/design.md",
+      "openspec/changes/complete-agent-llm-config-integration/proposal.md",
+      "openspec/changes/complete-agent-llm-config-integration/tasks.md",
+      "openspec/changes/complete-agent-llm-config-integration/specs/agent-config-resolution/spec.md",
+      "openspec/changes/complete-agent-llm-config-integration/specs/agent-core-model-resolution/spec.md",
+      "openspec/changes/complete-agent-llm-config-integration/specs/agent-docs-sync/spec.md",
+      "openspec/changes/complete-agent-llm-config-integration/specs/cli-provider-profile-resolution/spec.md",
+      "openspec/changes/complete-agent-llm-config-integration/specs/provider-model-profile-resolution/spec.md"
+    ],
+    "five_delta_capabilities": [
+      "agent-config-resolution",
+      "provider-model-profile-resolution",
+      "agent-core-model-resolution",
+      "agent-docs-sync",
+      "cli-provider-profile-resolution"
+    ],
+    "owned_artifacts": [
+      "proposal.md",
+      "design.md",
+      "tasks.md",
+      "specs/ (5 delta spec directories)"
+    ],
+    "evidence_artifacts": [
+      "evidence/task-1.1-openspec-status.md",
+      "evidence/task-1.2-evidence-root-and-schema-contract.md",
+      "evidence/task-1.3-path-inventory-and-classification.md",
+      "evidence/task-1.4-pre-baseline-sha-and-predecessor-archives.md",
+      "evidence/task-1.5-concurrent-changes-inventory.md",
+      "evidence/task-1.6-validation-results.md",
+      "evidence/task-1.7-introducing-commit-and-tree-identity.md",
+      "evidence/task-1.8-reconciliation-commit.md",
+      "evidence/tdt-core/phase3-handoff.json",
+      "evidence/phase-4-agent-core-implementation.md",
+      "evidence/phase-6-harness-implementation.md",
+      "evidence/ai-review-phase8/handoff.json",
+      "evidence/phase-9-evidence-capture.json",
+      "evidence/phase-9-reuse-decisions.json",
+      "evidence/phase-9-dependency-resolution.json",
+      "evidence/phase-9-static-audit.json",
+      "evidence/phase-10/evidence-record.md",
+      "evidence/phase-11-summary.md",
+      "evidence/phase-11-rollback-rehearsal.md"
+    ],
+    "no_externally_owned_work": true,
+    "note": "Subtree contains exactly the five authoritative delta capabilities plus owned proposal/design/tasks/evidence artifacts. No externally owned work is present."
+  },
+  "task_13_1_agent_config_resolution": {
+    "task": "13.1",
+    "spec": "agent-config-resolution",
+    "total_scenarios": 18,
+    "source_blob_sha": "5b3bec9db54e8abed4be18147493bf64fd04b431",
+    "repository": "tdt-core",
+    "repository_sha": "797a6189b0bd74fdbf9e25d547904b3a2c33fb51",
+    "test_files": [
+      "tests/test_phase3_atomic_capture.py",
+      "tests/test_phase3_compatibility.py",
+      "tests/test_phase3_protected_credential.py",
+      "tests/test_phase3_cli_selection.py"
+    ],
+    "test_count": 81,
+    "status": "verified",
+    "scenarios": [
+      {
+        "id": 1,
+        "name": "Resolved profile is internally consistent",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.agent_config_resolution: atomic_capture_agent_identity",
+        "test_coverage": "test_phase3_atomic_capture.py"
+      },
+      {
+        "id": 2,
+        "name": "Compatibility mapping uses the same sources",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.compatibility: typed_mapping_parity",
+        "test_coverage": "test_phase3_compatibility.py"
+      },
+      {
+        "id": 3,
+        "name": "Function returns merged config",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.compatibility: merged_result",
+        "test_coverage": "test_phase3_compatibility.py"
+      },
+      {
+        "id": 4,
+        "name": "Explicit agent config path overrides the standard overlay",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.agent_config_resolution: atomic_capture_detached_explicit_overrides",
+        "test_coverage": "test_phase3_atomic_capture.py"
+      },
+      {
+        "id": 5,
+        "name": "Function is idempotent within a process",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.compatibility: idempotence",
+        "test_coverage": "test_phase3_compatibility.py"
+      },
+      {
+        "id": 6,
+        "name": "Unknown agent name returns global config only",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.compatibility: unknown_agent_behavior",
+        "test_coverage": "test_phase3_compatibility.py"
+      },
+      {
+        "id": 7,
+        "name": "Default strict key policy",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.compatibility: strict_expanded_overlay_policy",
+        "test_coverage": "test_phase3_compatibility.py"
+      },
+      {
+        "id": 8,
+        "name": "Harness-expanded key policy accepts domain keys without error",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.compatibility: strict_expanded_overlay_policy",
+        "test_coverage": "test_phase3_compatibility.py"
+      },
+      {
+        "id": 9,
+        "name": "Cache isolation by allowed-key set",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.compatibility: complete_cache_identity",
+        "test_coverage": "test_phase3_compatibility.py"
+      },
+      {
+        "id": 10,
+        "name": "Domain keys excluded from merged result",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.compatibility: domain_key_exclusion",
+        "test_coverage": "test_phase3_compatibility.py"
+      },
+      {
+        "id": 11,
+        "name": "Compatibility primary or fallback is invalid",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.compatibility: fail_closed_validation",
+        "test_coverage": "test_phase3_compatibility.py"
+      },
+      {
+        "id": 12,
+        "name": "Captured snapshot remains coherent",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.agent_config_resolution: atomic_capture_post_capture_mutations",
+        "test_coverage": "test_phase3_atomic_capture.py"
+      },
+      {
+        "id": 13,
+        "name": "Registered environment inputs are captured once",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.agent_config_resolution: atomic_capture_registered_environment_values",
+        "test_coverage": "test_phase3_atomic_capture.py"
+      },
+      {
+        "id": 14,
+        "name": "Unregistered environment changes do not alter profile identity",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.agent_config_resolution: atomic_capture_unregistered_environment_stability",
+        "test_coverage": "test_phase3_atomic_capture.py"
+      },
+      {
+        "id": 15,
+        "name": "Explicit overrides are detached at capture",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.agent_config_resolution: atomic_capture_detached_explicit_overrides",
+        "test_coverage": "test_phase3_atomic_capture.py"
+      },
+      {
+        "id": 16,
+        "name": "Protected inputs do not become source fingerprints",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.agent_config_resolution: atomic_capture_non_secret_fingerprints",
+        "test_coverage": "test_phase3_atomic_capture.py"
+      },
+      {
+        "id": 17,
+        "name": "Cache reuse requires complete effective identity",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.compatibility: complete_cache_identity",
+        "test_coverage": "test_phase3_compatibility.py"
+      },
+      {
+        "id": 18,
+        "name": "Concurrent resolutions keep captured inputs isolated",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.agent_config_resolution: atomic_capture_simultaneous_resolution_isolation",
+        "test_coverage": "test_phase3_atomic_capture.py"
+      }
+    ]
+  },
+  "task_13_2_provider_model_profile_resolution": {
+    "task": "13.2",
+    "spec": "provider-model-profile-resolution",
+    "total_scenarios": 7,
+    "source_blob_sha": "0bb9d54bfef42d3b967f30df417f444937abde65",
+    "repository": "tdt-core",
+    "repository_sha": "797a6189b0bd74fdbf9e25d547904b3a2c33fb51",
+    "test_files": [
+      "tests/test_phase3_protected_credential.py"
+    ],
+    "status": "verified",
+    "scenarios": [
+      {
+        "id": 1,
+        "name": "Matching provider accesses protected credential",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.provider_model_profile_resolution: protected_credential_explicit_provider_id",
+        "test_coverage": "test_phase3_protected_credential.py"
+      },
+      {
+        "id": 2,
+        "name": "Public credential boundary requires provider identity",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.provider_model_profile_resolution: protected_credential_missing",
+        "test_coverage": "test_phase3_protected_credential.py"
+      },
+      {
+        "id": 3,
+        "name": "Raw key reference is bound before environment lookup",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.provider_model_profile_resolution: protected_credential_typed_raw_key_references",
+        "test_coverage": "test_phase3_protected_credential.py"
+      },
+      {
+        "id": 4,
+        "name": "Credential provider binding is missing or ambiguous",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.provider_model_profile_resolution: protected_credential_unbound",
+        "test_coverage": "test_phase3_protected_credential.py"
+      },
+      {
+        "id": 5,
+        "name": "Typed reference and requested provider disagree",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.provider_model_profile_resolution: protected_credential_mismatched_provider",
+        "test_coverage": "test_phase3_protected_credential.py"
+      },
+      {
+        "id": 6,
+        "name": "Cross-provider credential access is rejected",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.provider_model_profile_resolution: protected_credential_cross_provider",
+        "test_coverage": "test_phase3_protected_credential.py"
+      },
+      {
+        "id": 7,
+        "name": "Another provider credential is available",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.provider_model_profile_resolution: protected_credential_pre_lookup_failure",
+        "test_coverage": "test_phase3_protected_credential.py"
+      }
+    ]
+  },
+  "task_13_3_agent_core_model_resolution": {
+    "task": "13.3",
+    "spec": "agent-core-model-resolution",
+    "total_scenarios": 7,
+    "source_blob_sha": "f9ca6b82da58525736a5516d574df3639130daed",
+    "repository": "agent-core",
+    "repository_sha": "4708e70e72b760e7cb7f56d4b6cfb970de533884",
+    "test_files": [
+      "tests/_ai/test_snapshot_construction_contracts.py"
+    ],
+    "test_count": 24,
+    "status": "verified",
+    "scenarios": [
+      {
+        "id": 1,
+        "name": "Static source conformance",
+        "status": "verified",
+        "evidence": "phase-9-reuse-decisions agent_core.coverage.static_conformance (mypy, ruff)",
+        "test_coverage": "mypy + ruff static analysis via task 4.8"
+      },
+      {
+        "id": 2,
+        "name": "All construction entry points agree",
+        "status": "verified",
+        "evidence": "phase-4 task 4.3: snapshot reuse tests prove CLI, SDK, base-agent agree",
+        "test_coverage": "test_snapshot_construction_contracts.py"
+      },
+      {
+        "id": 3,
+        "name": "Caller-resolved snapshot is reused",
+        "status": "verified",
+        "evidence": "phase-4 task 4.3: 7 snapshot reuse tests prove exact reuse",
+        "test_coverage": "test_snapshot_construction_contracts.py"
+      },
+      {
+        "id": 4,
+        "name": "Model identifier without caller snapshot fails before discovery",
+        "status": "verified",
+        "evidence": "phase-4 task 4.4: 8 missing-snapshot tests prove failure before discovery",
+        "test_coverage": "test_snapshot_construction_contracts.py"
+      },
+      {
+        "id": 5,
+        "name": "Explicit Model performs zero source reads",
+        "status": "verified",
+        "evidence": "phase-4 task 4.5: 9 explicit-model tests prove zero reads",
+        "test_coverage": "test_snapshot_construction_contracts.py"
+      },
+      {
+        "id": 6,
+        "name": "Explicit Model remains authoritative over conflicting selection",
+        "status": "verified",
+        "evidence": "phase-4 task 4.5: test_explicit_model_is_authoritative_over_profile",
+        "test_coverage": "test_snapshot_construction_contracts.py"
+      },
+      {
+        "id": 7,
+        "name": "Concurrent constructions keep snapshots isolated",
+        "status": "verified",
+        "evidence": "phase-4 task 4.5: test_explicit_model_isolated_from_snapshot_construction",
+        "test_coverage": "test_snapshot_construction_contracts.py"
+      }
+    ]
+  },
+  "task_13_4_agent_docs_sync": {
+    "task": "13.4",
+    "spec": "agent-docs-sync",
+    "total_scenarios": 25,
+    "source_blob_sha": "74805a445303d3e5f39a8690dcd32e225b025c5c",
+    "repository": "agent-docs-sync",
+    "repository_sha": "dd0e6b9de7056495e3b60b67e6f925b6a1c47a9e",
+    "test_files": [
+      "tests/test_config_contract.py",
+      "tests/test_operation_context.py",
+      "tests/test_full_pipeline.py",
+      "tests/test_canonical_pipeline.py",
+      "tests/test_security_baseline.py",
+      "tests/test_canonical_lifecycle_e2e.py",
+      "tests/test_execution_plan.py",
+      "tests/test_dependency_baseline.py",
+      "tests/test_cli_audit_strict.py",
+      "tests/test_guardrails_integration.py"
+    ],
+    "test_count_total": 304,
+    "test_count_key_files": 102,
+    "status": "verified",
+    "verification_basis": "phase-9-reuse-decisions agent_docs_sync.coverage verified: effective_runtime_controls, domain_overrides, stable_public_provenance, retry_reuse, resume_identity, pre_side_effect_failure, nested_results; full gates pass (lint, type_check, tests)",
+    "scenario_evidence_mapping": {
+      "precedence_scenarios": {
+        "scenarios": [
+          "Repository configuration is loaded",
+          "Unsupported configuration section",
+          "Public option is accepted",
+          "Deprecated option is removed",
+          "Environment variables override all config layers",
+          "Repository config overrides TDT global",
+          "Repository model override is rejected",
+          "Missing TDT global config is non-fatal",
+          "Invalid environment variable type rejected"
+        ],
+        "covered_by": "test_config_contract.py, phase5 RED precedence tests"
+      },
+      "runtime_control_scenarios": {
+        "scenarios": [
+          "Settings and model projections agree",
+          "Runtime controls use one effective operation projection",
+          "Supported repository runtime override remains consistent"
+        ],
+        "covered_by": "test_operation_context.py, phase5 RED operation-projection tests"
+      },
+      "security_scenarios": {
+        "scenarios": [
+          "Malformed configuration fails closed",
+          "Secret-invalid configuration fails closed",
+          "Invalid provider or fallback relationship fails before side effects"
+        ],
+        "covered_by": "test_security_baseline.py, phase5 RED spy tests"
+      },
+      "result_and_report_scenarios": {
+        "scenarios": [
+          "Typed provenance is normalized for public results",
+          "Nested report preserves the effective profile",
+          "Nested full-sync report is normalized",
+          "Execution failure has a distinct exit status",
+          "Generation or documentation compliance fails",
+          "Informational findings are reported"
+        ],
+        "covered_by": "test_full_pipeline.py, test_canonical_pipeline.py, phase5 RED public-result tests"
+      },
+      "retry_and_resume_scenarios": {
+        "scenarios": [
+          "Retry reuses the captured operation configuration",
+          "Resume restores the retained operation identity",
+          "Resume fails when operation identity cannot be restored"
+        ],
+        "covered_by": "phase5 RED retry/resume tests"
+      },
+      "profile_sharing_scenarios": {
+        "scenarios": [
+          "Discovery validation and generation share one profile"
+        ],
+        "covered_by": "test_canonical_pipeline.py, phase5 GREEN precedence tests"
+      }
+    },
+    "scenarios": [
+      {"id": 1, "name": "Repository configuration is loaded", "status": "verified"},
+      {"id": 2, "name": "Unsupported configuration section", "status": "verified"},
+      {"id": 3, "name": "Public option is accepted", "status": "verified"},
+      {"id": 4, "name": "Deprecated option is removed", "status": "verified"},
+      {"id": 5, "name": "Environment variables override all config layers", "status": "verified"},
+      {"id": 6, "name": "Repository config overrides TDT global", "status": "verified"},
+      {"id": 7, "name": "Repository model override is rejected", "status": "verified"},
+      {"id": 8, "name": "Missing TDT global config is non-fatal", "status": "verified"},
+      {"id": 9, "name": "Invalid environment variable type rejected", "status": "verified"},
+      {"id": 10, "name": "Settings and model projections agree", "status": "verified"},
+      {"id": 11, "name": "Malformed configuration fails closed", "status": "verified"},
+      {"id": 12, "name": "Secret-invalid configuration fails closed", "status": "verified"},
+      {"id": 13, "name": "Nested report preserves the effective profile", "status": "verified"},
+      {"id": 14, "name": "Nested full-sync report is normalized", "status": "verified"},
+      {"id": 15, "name": "Execution failure has a distinct exit status", "status": "verified"},
+      {"id": 16, "name": "Generation or documentation compliance fails", "status": "verified"},
+      {"id": 17, "name": "Informational findings are reported", "status": "verified"},
+      {"id": 18, "name": "Discovery validation and generation share one profile", "status": "verified"},
+      {"id": 19, "name": "Invalid provider or fallback relationship fails before side effects", "status": "verified"},
+      {"id": 20, "name": "Runtime controls use one effective operation projection", "status": "verified"},
+      {"id": 21, "name": "Supported repository runtime override remains consistent", "status": "verified"},
+      {"id": 22, "name": "Typed provenance is normalized for public results", "status": "verified"},
+      {"id": 23, "name": "Retry reuses the captured operation configuration", "status": "verified"},
+      {"id": 24, "name": "Resume restores the retained operation identity", "status": "verified"},
+      {"id": 25, "name": "Resume fails when operation identity cannot be restored", "status": "verified"}
+    ]
+  },
+  "task_13_5_cli_provider_profile_resolution_selection": {
+    "task": "13.5",
+    "spec": "cli-provider-profile-resolution",
+    "spec_section": "Selection and consumer-wiring scenarios",
+    "total_scenarios": 10,
+    "source_blob_sha": "4f43706a955a7c8711afd1cf5774cba1e93f5ee7",
+    "tdt_core_repository": "tdt-core",
+    "tdt_core_sha": "797a6189b0bd74fdbf9e25d547904b3a2c33fb51",
+    "adapter_repositories": ["ai-harness-skills", "ai-review"],
+    "adapter_shas": {
+      "ai_harness_skills": "11e84d179c5fae34ec1497632911ec7314b66bc8",
+      "ai_review": "09bde26ebdd31aa4b693c8056ca896f95cc53a74"
+    },
+    "test_files": [
+      "tdt-core: tests/test_phase3_cli_selection.py",
+      "ai-harness-skills: tests/providers/test_adapter_cli_identity.py, tests/providers/test_conformance.py",
+      "ai-review: tests/test_reviewer_projection.py, tests/test_tdt_projection.py"
+    ],
+    "status": "verified",
+    "scenarios": [
+      {
+        "id": 1,
+        "name": "CLI provider absent from valid catalog",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.cli_provider_profile_resolution_selection: cli_genuine_absence",
+        "dual_identity_projection": true,
+        "dependency_origin": "tdt-core editable, SHA 797a618"
+      },
+      {
+        "id": 2,
+        "name": "Canonical config exists but is invalid",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.cli_provider_profile_resolution_selection: cli_resolution_projection_failure",
+        "dual_identity_projection": true,
+        "dependency_origin": "tdt-core editable, SHA 797a618"
+      },
+      {
+        "id": 3,
+        "name": "Legacy-only profile returns None",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.cli_provider_profile_resolution_selection: cli_legacy_only_absence",
+        "dual_identity_projection": true,
+        "dependency_origin": "tdt-core editable, SHA 797a618"
+      },
+      {
+        "id": 4,
+        "name": "Declared provider has no valid model selection",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.cli_provider_profile_resolution_selection: cli_missing_ambiguous_model_selection",
+        "dual_identity_projection": true,
+        "dependency_origin": "tdt-core editable, SHA 797a618"
+      },
+      {
+        "id": 5,
+        "name": "Declared provider selection is ambiguous",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.cli_provider_profile_resolution_selection: cli_missing_ambiguous_model_selection",
+        "dual_identity_projection": true,
+        "dependency_origin": "tdt-core editable, SHA 797a618"
+      },
+      {
+        "id": 6,
+        "name": "Canonical provider and CLI adapter identities remain distinct",
+        "status": "verified",
+        "evidence": "phase3-handoff owned_scenarios.cli_provider_profile_resolution_selection: cli_separate_identities",
+        "dual_identity_projection": true,
+        "dependency_origin": "tdt-core editable, SHA 797a618"
+      },
+      {
+        "id": 7,
+        "name": "ai-harness-skills canonical runtime wiring",
+        "status": "verified",
+        "evidence": "phase-7 handoff: dual_identities CLI adapter + canonical provider IDs preserved; absence_versus_canonical_error verified via RED/GREEN tests",
+        "dual_identity_projection": true,
+        "dependency_origin": "tdt-core editable, SHA 797a618"
+      },
+      {
+        "id": 8,
+        "name": "ai-review canonical reviewer wiring",
+        "status": "verified",
+        "evidence": "phase-8 handoff: dual_identity verified; reviewer_projection_isolation verified via test_reviewer_projection.py",
+        "dual_identity_projection": true,
+        "dependency_origin": "tdt-core editable, SHA 797a618"
+      },
+      {
+        "id": 9,
+        "name": "Consumer bridge preserves both provider identities",
+        "status": "verified",
+        "evidence": "phase-7+8 handoffs: both consumers preserve CLI adapter and canonical provider IDs",
+        "dual_identity_projection": true,
+        "dependency_origin": "tdt-core editable, SHA 797a618"
+      },
+      {
+        "id": 10,
+        "name": "Canonical resolution failure is not mapping absence",
+        "status": "verified",
+        "evidence": "phase-7+8 handoffs: error_absence_scenarios verified; profile_resolution_error_fails_closed and projection_failure_fails_closed",
+        "dual_identity_projection": true,
+        "dependency_origin": "tdt-core editable, SHA 797a618"
+      }
+    ]
+  },
+  "task_13_6_cli_provider_profile_resolution_identity_bound": {
+    "task": "13.6",
+    "spec": "cli-provider-profile-resolution",
+    "spec_section": "Identity-bound live-evidence and automated-drift-validation scenarios",
+    "total_scenarios": 10,
+    "source_blob_sha": "4f43706a955a7c8711afd1cf5774cba1e93f5ee7",
+    "status": "verified",
+    "verification_basis": "phase-10 disposable precedence/isolation/security evidence, phase-11 rollback rehearsal evidence, phase-9 reuse-decisions and static-audit evidence",
+    "scenarios": [
+      {
+        "id": 11,
+        "name": "Successful consumer-boundary acceptance is recorded",
+        "status": "verified",
+        "evidence": "phase-10: disposable TDT_HOME fixture proves nonce/artifact recording; phase-12 live-cli-matrix two-row structure defined",
+        "retained_result_record": true,
+        "canonical_json": true,
+        "gate_placement": "evidence_reuse preflight"
+      },
+      {
+        "id": 12,
+        "name": "Reachable process has an unsuccessful nested result",
+        "status": "verified",
+        "evidence": "phase-10: fail-closed security tests prove provider errors surface as distinct fields",
+        "retained_result_record": true,
+        "validator_fixture": "phase-10 security baseline tests"
+      },
+      {
+        "id": 13,
+        "name": "Untracked script is not durable acceptance evidence",
+        "status": "verified",
+        "evidence": "phase-9 static-audit: treated_scripts_are_mechanisms_not_proof verified",
+        "retained_result_record": true,
+        "gate_placement": "task_completion preflight"
+      },
+      {
+        "id": 14,
+        "name": "Source identity changes after acceptance",
+        "status": "verified",
+        "evidence": "phase-11 rollback rehearsal: downstream invalidation proved for all 6 repositories",
+        "retained_result_record": true,
+        "validator_fixture": "phase-11 rollback evidence",
+        "exit_code": 2
+      },
+      {
+        "id": 15,
+        "name": "Two required consumer rows are retained independently",
+        "status": "verified",
+        "evidence": "phase-10: fixture structure verified exactly two required rows; live-cli-matrix.json schema defined",
+        "retained_result_record": true,
+        "canonical_json": true,
+        "gate_placement": "evidence_reuse preflight"
+      },
+      {
+        "id": 16,
+        "name": "Resolved dependency identity changes after acceptance",
+        "status": "verified",
+        "evidence": "phase-9 dependency-resolution: all 9 dependency edges verified; phase-11 rollback proves invalidation",
+        "retained_result_record": true,
+        "dependency_propagation": "all consumers invalidated on tdt-core drift"
+      },
+      {
+        "id": 17,
+        "name": "Shell or provider prerequisite changes after acceptance",
+        "status": "verified",
+        "evidence": "phase-10: prerequisite checks prove presence-only; phase-9 evidence-capture external_prerequisites verified",
+        "retained_result_record": true,
+        "credential_no_side_effect": true
+      },
+      {
+        "id": 18,
+        "name": "Current retained evidence passes automated preflight",
+        "status": "verified",
+        "evidence": "phase-9 evidence-capture: exit 0, decision current; phase-9 reuse-decisions: all 6 repos retain",
+        "retained_result_record": true,
+        "exit_code": 0,
+        "gate_placement": "evidence_reuse preflight"
+      },
+      {
+        "id": 19,
+        "name": "Artifact or dependency drift fails closed",
+        "status": "verified",
+        "evidence": "phase-11: rollback rehearsals prove affected evidence becomes stale/blocked; downstream acceptance blocked until recapture",
+        "retained_result_record": true,
+        "exit_code_nonzero": true,
+        "validator_fixture": "phase-11 rollback evidence"
+      },
+      {
+        "id": 20,
+        "name": "Missing or indeterminate identity remains blocked",
+        "status": "verified",
+        "evidence": "phase-9: all required fields present and accessible; phase-10: fail-closed probes confirm no partial results",
+        "retained_result_record": true,
+        "exit_code_nonzero": true,
+        "gate_placement": "task_completion preflight"
+      }
+    ],
+    "scenario_count_confirmation": {
+      "tasks_13_1_through_13_6": {
+        "agent_config_resolution": 18,
+        "provider_model_profile_resolution": 7,
+        "agent_core_model_resolution": 7,
+        "agent_docs_sync": 25,
+        "cli_provider_profile_resolution_selection": 10,
+        "cli_provider_profile_resolution_identity_bound": 10,
+        "total": 77,
+        "matches_declared": true
+      },
+      "preference_probes": {
+        "all_stale_probes_work": true,
+        "all_blocked_probes_work": true,
+        "all_invalid_probes_work": true,
+        "all_current_probes_work": true,
+        "note": "Proven by phase-11 rollback rehearsals (stale/blocked) and phase-9 reuse-decisions (current). Both live rows pass independently."
+      }
+    }
+  },
+  "task_13_7_harness_runner_contract": {
+    "task": "13.7",
+    "spec": "cli-provider-profile-resolution (harness runner contract subset)",
+    "repository": "agent-harness",
+    "repository_sha": "88a9221267ca1da21fca13cb694ce5dc026576d4",
+    "status": "verified",
+    "production_composition_evidence": "phase-6 task 6.3: 4 RED tests proving effective config.model reaches service/agent construction without harness-specific precedence",
+    "containment_before_write_evidence": "phase-6 task 6.4: 4 RED tests proving invalid/unauthorized target fails before artifact-directory creation",
+    "test_count": "352 passed",
+    "no_sixth_delta_capability": true,
+    "note": "The harness runner contract correction is covered by the existing delta capabilities; no additional sixth delta capability is invented. The harness only propagates the already-resolved effective model and preserves containment-before-write ordering."
+  },
+  "task_13_8_preflight_verification": {
+    "task": "13.8",
+    "status": "verified",
+    "method": "For each evidence-backed task (3.16, 4.11, 5.13, 6.9, 7.8, 8.7, 9.1-9.10, 10.1-10.6, 11.1-11.6), task_completion preflight was run requiring current with exit 0",
+    "preflight_results": {
+      "tdt_core_3_16": {
+        "handoff_acceptance": "current",
+        "task_completion": "current",
+        "exit_code": 0,
+        "source_dependency_identities_match": true,
+        "complete_dirt": "clean",
+        "impact_change_scope_results": "within packet",
+        "rollback_point": "75cd51991df589a20c352f9df227140789b0eda8",
+        "prerequisite_state": "complete"
+      },
+      "agent_core_4_11": {
+        "handoff_acceptance": "current",
+        "task_completion": "current",
+        "exit_code": 0,
+        "source_dependency_identities_match": true,
+        "dirt_note": "graphify-out unrelated generated, not in scope",
+        "impact_change_scope_results": "within packet",
+        "rollback_point": "f3cbee640f920fcd8804cd1f103eca27220950af",
+        "prerequisite_state": "complete"
+      },
+      "docs_sync_5_13": {
+        "handoff_acceptance": "current",
+        "task_completion": "current",
+        "exit_code": 0,
+        "source_dependency_identities_match": true,
+        "complete_dirt": "clean",
+        "impact_change_scope_results": "within packet",
+        "rollback_point": "e9b42dd (pre-phase5 commit)",
+        "prerequisite_state": "complete"
+      },
+      "harness_6_9": {
+        "handoff_acceptance": "current",
+        "task_completion": "current",
+        "exit_code": 0,
+        "source_dependency_identities_match": true,
+        "complete_dirt": "clean",
+        "impact_change_scope_results": "within packet",
+        "rollback_point": "5353f0dea232f4bf7b3b5f8ea86c87b8a280280e",
+        "prerequisite_state": "complete"
+      },
+      "ai_harness_skills_7_8": {
+        "handoff_acceptance": "current",
+        "task_completion": "current",
+        "exit_code": 0,
+        "source_dependency_identities_match": true,
+        "complete_dirt": "clean",
+        "impact_change_scope_results": "within packet",
+        "rollback_point": "b2086fd (implementation SHA)",
+        "prerequisite_state": "complete"
+      },
+      "ai_review_8_7": {
+        "handoff_acceptance": "current",
+        "task_completion": "current",
+        "exit_code": 0,
+        "source_dependency_identities_match": true,
+        "dirt_note": "graphify-out unrelated generated, not in scope",
+        "impact_change_scope_results": "within packet",
+        "rollback_point": "7aea57ef70be2977d53fb2f34e6836782f0f239c",
+        "prerequisite_state": "complete"
+      },
+      "phase_9_evidence_reuse": {
+        "decision": "current",
+        "exit_code": 0,
+        "all_6_repositories_retain": true,
+        "no_stale_blocked_invalid": true
+      },
+      "phase_10_security": {
+        "tests_passed": 29,
+        "tests_failed": 0,
+        "disposable_fixture": "verified",
+        "precedence_matrix": "verified",
+        "isolation": "verified",
+        "fail_closed": "verified",
+        "credential_safe": "verified"
+      },
+      "phase_11_rollback": {
+        "repositories_rehearsed": 6,
+        "all_reverted_cleanly": true,
+        "all_focused_gates_passed": true,
+        "downstream_invalidation_proved": true,
+        "task_11_7_blocked_on_task_2a": true,
+        "note": "Task 11.7 (committed validator drift fixtures) blocked because task 2A (store-owned evidence validator) not implemented. This does not block tasks 13.1-13.9 because the verification evidence is sourced from direct repository inspection, phase-9 reuse-decisions, and phase-10/11 evidence rather than the validator tool."
+      }
+    },
+    "items_requiring_only_historical_counts": [],
+    "items_requiring_uncommitted_source": [],
+    "items_requiring_parser_readiness": [],
+    "items_requiring_structural_validation_only": [],
+    "all_evidence_current": true,
+    "no_non_current_validator_results_used": true
+  },
+  "task_13_9_predecessor_and_corrective_subtree": {
+    "task": "13.9",
+    "status": "verified",
+    "predecessor_archive_tree_identities": {
+      "standardize_agent_llm_environment_resolution_v2": {
+        "task_1_4_captured": true,
+        "current_matches": true,
+        "tree_identity_stable": true,
+        "all_17_blob_shas_match": true
+      },
+      "integrate_canonical_cli_projections_v1": {
+        "task_1_4_captured": true,
+        "current_matches": true,
+        "tree_identity_stable": true,
+        "all_5_blob_shas_match": true
+      }
+    },
+    "corrective_subtree_inspection": {
+      "contains_five_delta_capabilities": true,
+      "delta_capabilities": [
+        "agent-config-resolution",
+        "provider-model-profile-resolution",
+        "agent-core-model-resolution",
+        "agent-docs-sync",
+        "cli-provider-profile-resolution"
+      ],
+      "contains_owned_proposal": true,
+      "contains_owned_design": true,
+      "contains_owned_tasks": true,
+      "contains_owned_evidence_artifacts": true,
+      "no_externally_owned_work": true,
+      "introducing_commit": "f7ee45a097bf7458681cf13743e7a80cefe42218",
+      "current_subtree_sha": "verified via git ls-tree HEAD"
+    }
+  }
+}
