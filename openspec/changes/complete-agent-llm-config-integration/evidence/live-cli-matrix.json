@@ -9,7 +9,7 @@
     "corrective_subtree_tree_sha": "9df47e9620bbf7101d8618b72ba33d8491e3572563e6ee10346f8e44ed152e63"
   },
   "current_store": {
-    "head_sha": "597b8e3fd10aa14ca85cf5aa44eee540edb6bef2",
+    "head_sha": "d8d1cdcabd33bb9ab200033f6f770de437f1f336",
     "branch": "main"
   },
   "required_rows": [
@@ -21,7 +21,7 @@
         "name": "ai-harness-skills",
         "path": "/Users/androidteam/Developer/ai-harness-skills",
         "branch": "main",
-        "head_sha": "11e84d179c5fae34ec1497632911ec7314b66bc8",
+        "head_sha": "f1f383d4b143bf770b41d5a564647f504a6270b4",
         "worktree_path": "/Users/androidteam/Developer/ai-harness-skills",
         "worktree_clean": false,
         "dirt_fingerprint": "graphify-out-only",
@@ -42,7 +42,7 @@
           "origin": "editable",
           "lock_path": "uv.lock",
           "lock_identity": "tdt-core = { path = \"/Users/androidteam/Developer/tdt-core\", editable = true }",
-          "full_sha": "797a6189b0bd74fdbf9e25d547904b3a2c33fb51",
+          "full_sha": "26319d195408658fc8b784e0fcb87caab6f5775a",
           "import_origin": "/Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py",
           "pyproject_dependency": "tdt-core = { path = \"../tdt-core\", editable = true }"
         }
@@ -88,10 +88,10 @@
         "network_prerequisite": "not_required_for_boundary"
       },
       "prerequisites": {
-        "authentication": "presence_only_verified",
-        "executable": "absent_no_codex_binary",
+        "authentication": "blocked_not_authorized",
+        "executable": "present_codex_binary",
         "shell": "zsh_available",
-        "provider": "absent_no_api_key",
+        "provider": "blocked_no_api_key",
         "network": "not_required_for_boundary",
         "containment": "verified",
         "dependency": "resolved_editable",
@@ -107,7 +107,11 @@
         "result_path": "evidence/live-ai-harness-skills-result.json",
         "target_preservation": "disposable_workspace_only"
       },
-      "row_state": "defined"
+      "row_state": "blocked",
+      "result": {
+        "status": "blocked",
+        "reason": "provider_authorization_absent"
+      }
     },
     {
       "row_id": "ai-review-reviewer",
@@ -117,7 +121,7 @@
         "name": "ai-review",
         "path": "/Users/androidteam/Developer/ai-review",
         "branch": "main",
-        "head_sha": "09bde26ebdd31aa4b693c8056ca896f95cc53a74",
+        "head_sha": "8abe970dc5b6650973abe54a073ec996bde732ab",
         "worktree_path": "/Users/androidteam/Developer/ai-review",
         "worktree_clean": false,
         "dirt_fingerprint": "graphify-out-only",
@@ -138,14 +142,14 @@
           "origin": "editable",
           "lock_path": "uv.lock",
           "lock_identity": "tdt-core = { path = \"../tdt-core\", editable = true }",
-          "full_sha": "797a6189b0bd74fdbf9e25d547904b3a2c33fb51",
+          "full_sha": "26319d195408658fc8b784e0fcb87caab6f5775a",
           "import_origin": "/Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py",
           "pyproject_dependency": "tdt-core = { path = \"../tdt-core\", editable = true }"
         },
         "agent_core": {
           "note": "Not a direct dependency. Only tdt-core is imported.",
           "import_origin": "/Users/androidteam/Developer/agent-core/src/agent_core/__init__.py",
-          "full_sha": "4708e70e72b760e7cb7f56d4b6cfb970de533884"
+          "full_sha": "24d028042c5f654d9c7cff1499d9c545f1b96af0"
         }
       },
       "product_test_launcher_script": {
@@ -188,10 +192,10 @@
         "network_prerequisite": "not_required_for_boundary"
       },
       "prerequisites": {
-        "authentication": "presence_only_verified",
-        "executable": "absent_no_codex_binary",
+        "authentication": "blocked_not_authorized",
+        "executable": "present_codex_binary",
         "shell": "zsh_available",
-        "provider": "absent_no_api_key",
+        "provider": "blocked_no_api_key",
         "network": "not_required_for_boundary",
         "containment": "verified",
         "dependency": "resolved_editable",
@@ -207,7 +211,11 @@
         "result_path": "evidence/live-ai-review-result.json",
         "target_preservation": "disposable_workspace_only"
       },
-      "row_state": "defined"
+      "row_state": "blocked",
+      "result": {
+        "status": "blocked",
+        "reason": "provider_authorization_absent"
+      }
     }
   ],
   "scope_revision": "none",
