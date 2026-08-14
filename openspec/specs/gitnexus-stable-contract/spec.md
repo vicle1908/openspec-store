@@ -3,7 +3,9 @@
 ## Purpose
 
 Defines an exact, attributable, bounded, read-only GitNexus contract so impact and code-intelligence evidence can be safely consumed across the agent ecosystem.
+
 ## Requirements
+
 ### Requirement: Verified provider binding
 
 Every GitNexus result SHALL identify the canonical installed CLI version, upstream source-tag revision, executable digest, TDT adapter/schema identifier and digest, target repository identity, indexed source revision, freshness status, query class, and bounded result status. The approved provider SHALL report GitNexus `1.6.9`, whose source tag resolves to `4227194ad7bdfbedc29a7fe20e09c6737ce0e744`. `latest`, release candidates, project-runner fallback, and schemas obtained from an unpinned branch SHALL NOT satisfy the binding. MCP exposure is optional.
@@ -135,3 +137,25 @@ Consumers SHALL use the verified stable binding and SHALL surface unavailable, m
 - **THEN** consumers SHALL return a typed unavailable/needs-input outcome
 - **AND** readiness or code-change gates SHALL remain incomplete
 
+### Requirement: Authorized scheduled workspace index recovery
+
+A workspace-local scheduler SHALL perform bounded GitNexus index-only recovery only for an explicit reviewed repository inventory and SHALL NOT expose mutation through the consumer MCP adapter.
+
+#### Scenario: Scheduled recovery is approved
+
+- **WHEN** an operator explicitly approves installation of the workspace scheduler for a reviewed inventory
+- **THEN** the scheduler MAY run the already installed pinned GitNexus `1.6.9` CLI with `analyze --index-only --default-branch <inventory-branch>` only for the exact inventory entries
+- **AND** each run SHALL record the normalized inventory digest, canonical repository root, target HEAD, provider identity, and result status
+- **AND** the scheduler SHALL reject `--force`, embeddings, PDG, setup, clean, group operations, package fallback, and repositories outside the inventory
+
+#### Scenario: Inventory changes after approval
+
+- **WHEN** the inventory is added to, removed from, or changed after scheduler approval
+- **THEN** the scheduler SHALL fail closed until the changed inventory is explicitly reviewed and approved
+- **AND** it SHALL not infer authorization from dynamic repository discovery or group membership
+
+#### Scenario: Consumer adapter requests mutation
+
+- **WHEN** a consumer requests refresh, analyze, or another mutation through the stable GitNexus adapter
+- **THEN** the adapter SHALL continue to reject the request before provider execution
+- **AND** the workspace scheduler's separate operator path SHALL not be exposed as an MCP mutation tool

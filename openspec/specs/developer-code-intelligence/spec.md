@@ -3,24 +3,26 @@
 ## Purpose
 
 Define the repository contract for optional, skills-first GitNexus and Graphify developer knowledge graphs, including safe setup, independent Git-root operation, verification, lifecycle hooks, generated-state policy, and scoped rollback.
+
 ## Requirements
+
 ### Requirement: Stable skills and CLI contract
 
-The repository SHALL use the official agent skills as guidance and the pinned official CLIs as the source of truth for setup, indexing, querying, status, and rollback. The selected stable versions SHALL be GitNexus `1.6.9` and the Graphify-Labs Graphify package `graphifyy` `0.9.42`, installed with Python 3.12 and invoked through the `graphify` CLI; unrelated Graphify packages and alternate providers MUST NOT be selected implicitly.
+The repository SHALL use the official agent skills as guidance and the pinned official CLIs as the source of truth for setup, indexing, querying, status, and rollback. The selected stable versions SHALL be GitNexus `1.6.9` and Graphify-Labs Graphify package `graphifyy` `0.9.42`, installed with Python 3.12 and invoked through the `graphify` CLI. Unrelated Graphify packages or alternate providers MUST NOT be selected implicitly.
 
 #### Scenario: Pinned tools are diagnosed
 
 - **WHEN** a developer runs the knowledge-tool diagnostic
-- **THEN** it reports the exact GitNexus and Graphify versions, Node/Python prerequisites, and the recorded license decision
+- **THEN** it reports the exact GitNexus and Graphify versions, Python/Node prerequisites, upstream source, and the recorded license decision
 
 #### Scenario: Upstream has a newer stable or prerelease
 
-- **WHEN** the update check finds a newer npm or PyPI release
+- **WHEN** the update check finds a newer PyPI or npm release
 - **THEN** it reports the candidate and keeps the selected pins unchanged until license, CLI-help, hook, and focused end-to-end checks are approved
 
 #### Scenario: The workstation has the old Graphify tool
 
-- **WHEN** the diagnostic finds Graphify `0.6.7` or another version
+- **WHEN** the diagnostic finds Graphify older than `0.9.42` or another version
 - **THEN** it reports the mismatch and the bootstrap offers the pinned Graphify-Labs PyPI package `graphifyy[all,postgres]==0.9.42` with Python 3.12 without changing application dependencies
 
 #### Scenario: Optional tooling is absent
@@ -55,7 +57,7 @@ Graphify refreshes SHALL use Graphify-Labs `graphifyy[all,postgres]==0.9.42` wit
 #### Scenario: Unknown source coverage fails
 
 - **WHEN** a supported source file produces zero nodes and is not allowlisted, or a required parser dependency cannot be installed at the pinned package lock
-- **THEN** the refresh exits non-zero with a redacted actionable reason and preserves the last usable legacy or new graph
+- **THEN** the refresh exits non-zero with a redacted actionable reason and preserves the last usable graph
 
 ### Requirement: Feature-complete local graph capabilities
 
@@ -375,4 +377,3 @@ hand-authored guidance, and unrelated nested-repository changes.
 - **THEN** only GitNexus/Graphify-owned local state and configuration are
   removed, with no mutation of Go modules, production manifests, Agentmemory
   hooks, or unrelated `mcp-router` files
-
