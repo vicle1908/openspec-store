@@ -26,6 +26,10 @@ readonly GRAPHIFY_TIMEOUT=300
 readonly OVERALL_TIMEOUT=7200   # 2 hours
 readonly MAX_LOG_LINES=1000
 readonly WORKTREE_MAX_AGE_DAYS=30
+# Return codes for process_target()
+readonly RC_SUCCESS=0      # success / fresh no-op
+readonly RC_SKIP=10        # policy skip (dirty, transition, uninitialized)
+readonly RC_FAILURE=1      # provider or validation failure
 readonly EPHEMERAL_PATH=".claude/worktrees/"
 
 # ---------------------------------------------------------------------------
@@ -216,8 +220,10 @@ gitnexus_refresh() {
     log --oneline -1 HEAD --format="%H" >/dev/null 2>&1 || true
 
   timeout "${GITNEXUS_TIMEOUT}" \
+    GITNEXUS_EMBEDDING_DIMS=0 \
     gitnexus analyze "$root" \
       --index-only \
+      --drop-embeddings \
       --default-branch "$branch" \
       --name "$name" \
     2>&1 | redact || analyze_status=$?
@@ -480,6 +486,82 @@ refresh_worktrees() {
 # ---------------------------------------------------------------------------
 # Main processing
 # ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# process_target — refresh a single inventoried repository
+#
+# Called by process_inventory (batch) and main() (--repo dispatch).
+# Returns 0 on success, 1 on failure. Caller decides whether to abort.
+# ---------------------------------------------------------------------------
+process_target() {
+  local canonical_root="$1"
+  local branch="${2:-main}"
+  local gitnexus_enabled="${3:-yes}"
+  local graphify_enabled="${4:-yes}"
+  local trigger="${5:-unknown}"
+
+  local name
+  name="$(repo_name "$canonical_root")"
+  note "[trigger=$trigger] Processing ${name} (${canonical_root})"
+
+  # --- Guards ---------------------------------------------------------------
+  if [[ ! -d "$canonical_root" ]]; then
+    warn "  Repository directory missing: ${canonical_root}"
+    log_line "$name" "$trigger" "failed" "0" "directory not found"
+    return $RC_SKIP
+  fi
+
+  if ! is_repo "$canonical_root"; then
+    warn "  Not a git repository: ${canonical_root}"
+    log_line "$name" "$trigger" "skipped_uninitialized" "0" "not a git repo"
+    return $RC_SKIP
+  fi
+
+  if is_dirty "$canonical_root"; then
+    note "  Skipping ${name}: working tree is dirty"
+    log_line "$name" "$trigger" "skipped_dirty" "0" "uncommitted changes"
+    return $RC_SKIP
+  fi
+
+  if is_merge_state "$canonical_root" || is_rebase_state "$canonical_root"; then
+    note "  Skipping ${name}: merge or rebase in progress"
+    log_line "$name" "$trigger" "skipped_merge_state" "0" "merge/rebase active"
+    return 1
+  fi
+
+  local target_head
+  target_head="$(git -C "$canonical_root" rev-parse --verify HEAD 2>/dev/null || true)"
+  if [[ -z "$target_head" ]]; then
+    note "  Skipping ${name}: no HEAD"
+    log_line "$name" "$trigger" "skipped_uninitialized" "0" "no HEAD"
+    return $RC_SKIP
+  fi
+
+  # --- Refresh --------------------------------------------------------------
+  local target_start
+  target_start="$(date +%s)"
+  local target_failed=0
+
+  if [[ "$gitnexus_enabled" == "yes" ]]; then
+    gitnexus_refresh "$canonical_root" "$branch" "$name" || target_failed=1
+  fi
+
+  if [[ "$graphify_enabled" == "yes" ]]; then
+    graphify_refresh "$canonical_root" "$name" || target_failed=1
+  fi
+
+  # Refresh eligible worktrees
+  refresh_worktrees "$canonical_root" "$branch" "$name"     "$gitnexus_enabled" "$graphify_enabled"
+
+  if [[ "$target_failed" -ne 0 ]]; then
+    log_line "$name" "$trigger" "failed" "$(elapsed "$target_start")" "provider error"
+    return $RC_FAILURE
+  fi
+
+  log_line "$name" "$trigger" "success" "$(elapsed "$target_start")"     "canonical+worktrees refresh complete"
+  return 0
+}
+
 process_inventory() {
   local overall_start line_count
   overall_start="$(date +%s)"
@@ -504,76 +586,17 @@ process_inventory() {
       break
     fi
 
-    local name
-    name="$(repo_name "$canonical_root")"
-    note "[${line_count}] Processing ${name} (${canonical_root})"
-
-    # Validate git repository exists
-    if [[ ! -d "$canonical_root" ]]; then
-      warn "  Repository directory missing: ${canonical_root}"
-      log_line "$name" overall "failed" "0" "directory not found"
-      failed=$(( failed + 1 ))
-      continue
-    fi
-
-    if ! is_repo "$canonical_root"; then
-      warn "  Not a git repository: ${canonical_root}"
-      log_line "$name" overall "skipped_uninitialized" "0" "not a git repo"
-      skipped=$(( skipped + 1 ))
-      continue
-    fi
-
-    # Check dirty state
-    if is_dirty "$canonical_root"; then
-      note "  Skipping ${name}: working tree is dirty"
-      log_line "$name" overall "skipped_dirty" "0" "uncommitted changes"
-      skipped=$(( skipped + 1 ))
-      continue
-    fi
-
-    # Check merge/rebase state
-    if is_merge_state "$canonical_root" || is_rebase_state "$canonical_root"; then
-      note "  Skipping ${name}: merge or rebase in progress"
-      log_line "$name" overall "skipped_merge_state" "0" "merge/rebase active"
-      skipped=$(( skipped + 1 ))
-      continue
-    fi
-
-    # Verify HEAD exists
-    local target_head
-    target_head="$(git -C "$canonical_root" rev-parse --verify HEAD 2>/dev/null || true)"
-    if [[ -z "$target_head" ]]; then
-      note "  Skipping ${name}: no HEAD"
-      log_line "$name" overall "skipped_uninitialized" "0" "no HEAD"
-      skipped=$(( skipped + 1 ))
-      continue
-    fi
-
-    local target_start
-    target_start="$(date +%s)"
-    local target_failed=0
-
-    # Refresh canonical repository
-    if [[ "$gitnexus_enabled" == "yes" ]]; then
-      gitnexus_refresh "$canonical_root" "$branch" "$name" || target_failed=1
-    fi
-
-    if [[ "$graphify_enabled" == "yes" ]]; then
-      graphify_refresh "$canonical_root" "$name" || target_failed=1
-    fi
-
-    # Refresh eligible worktrees
-    refresh_worktrees "$canonical_root" "$branch" "$name" \
-      "$gitnexus_enabled" "$graphify_enabled"
-
-    if [[ "$target_failed" -ne 0 ]]; then
-      failed=$(( failed + 1 ))
-    else
+    # Delegate to process_target
+    if process_target "$canonical_root" "$branch" "$gitnexus_enabled" "$graphify_enabled" "batch"; then
       refreshed=$(( refreshed + 1 ))
+    else
+      local ret=$?
+      if [[ $ret -eq $RC_SKIP ]]; then
+        skipped=$(( skipped + 1 ))
+      else
+        failed=$(( failed + 1 ))
+      fi
     fi
-
-    log_line "$name" overall "success" "$(elapsed "$target_start")" \
-      "canonical+worktrees refresh complete"
 
   done < "$INVENTORY_FILE"
 
