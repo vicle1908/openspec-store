@@ -1,0 +1,23 @@
+# Repository Inventory for Knowledge Index Refresh
+# Format: canonical_root<TAB>default_branch<TAB>gitnexus_enabled<TAB>graphify_enabled
+# Approved: 2026-08-14T07:30:00Z
+# Digest: (computed on first run)
+#
+/Users/androidteam/Developer/agent-core	main	yes	yes
+/Users/androidteam/Developer/agent-docs-sync	main	yes	yes
+/Users/androidteam/Developer/agent-harness	main	yes	yes
+/Users/androidteam/Developer/ai-harness-skills	main	yes	yes
+/Users/androidteam/Developer/ai-review	main	yes	yes
+/Users/androidteam/Developer/browser-cli	main	yes	yes
+/Users/androidteam/Developer/code-daily-scan	main	yes	yes
+/Users/androidteam/Developer/jira-daily-reports	main	yes	yes
+/Users/androidteam/Developer/jira-epic-report	main	yes	yes
+/Users/androidteam/Developer/jira-kanban-from-spreadsheet	main	yes	yes
+/Users/androidteam/Developer/jira-skill	main	yes	yes
+/Users/androidteam/Developer/mcp-router	main	yes	yes
+/Users/androidteam/Developer/openspec-store	main	yes	no
+/Users/androidteam/Developer/ops-automation-suite	main	yes	yes
+/Users/androidteam/Developer/tdt-core	main	yes	yes
+/Users/androidteam/Developer/tdt-observability	main	yes	yes
+/Users/androidteam/Developer/tdt-sheets	main	yes	yes
+/Users/androidteam/Developer/webhook-receiver	main	yes	yes
