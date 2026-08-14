@@ -28,8 +28,8 @@
 
 ## Phase 5 — Final verification and closure
 
-- [x] 5.1 Focused validation 1/1; full-store validation 375/375; store doctor healthy with no issues; pre-archive gate 8/9 with only implementation_progress false because 9 tasks remained at measurement time.
+- [x] 5.1 Focused validation 1/1; full-store validation 375/375; store doctor healthy with no issues; final pre-archive gate 9/9 all_passed=true.
 - [x] 5.2 Final primary SKILL.md: 67,697B/~16,924tok versus 73,669B baseline; reduction=5,972B/~1,493tok (8.1%).
 - [x] 5.3 Verified all 4 custom Hermes skill files exist and loadable: openspec-workflow, openspec-review-governance, openspec-code-review, openspec-plan-review.
 - [x] 5.4 Documentation lint: 39 informational baseline findings, 0 actionable, all_clear=true; executable regression test PASS.
-- [ ] 5.5 Commit owned artifacts. Archive only when all tasks are genuinely complete.
+- [x] 5.5 Owned artifacts committed at `2c2ca2c`; unrelated changes remained untouched. Follow-up is ready for archive after the final readiness run.

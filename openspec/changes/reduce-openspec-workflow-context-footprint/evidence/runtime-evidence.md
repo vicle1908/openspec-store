@@ -17,3 +17,4 @@ Verification:
 - Documentation lint: 39 informational, 0 actionable
 - Regression test: PASS
 - All four custom skill files: present and loadable
+- Pre-archive gate: 9/9 all_passed=true
