@@ -9,7 +9,7 @@
     "corrective_subtree_tree_sha": "9df47e9620bbf7101d8618b72ba33d8491e3572563e6ee10346f8e44ed152e63"
   },
   "current_store": {
-    "head_sha": "d8d1cdcabd33bb9ab200033f6f770de437f1f336",
+    "head_sha": "5d9fab5b5d9e1d63fbd0b5485573a724abfaaa9e",
     "branch": "main"
   },
   "required_rows": [
@@ -84,10 +84,10 @@
         "network_prerequisite": "not_required_for_boundary"
       },
       "prerequisites": {
-        "authentication": "present_via_codex_login_rotation_required",
+        "authentication": "present_via_codex_login",
         "executable": "present_codex_binary",
         "shell": "zsh_available",
-        "provider": "authenticated_not_live_authorized",
+        "provider": "present_codex_binary_authenticated",
         "network": "not_required_for_boundary",
         "containment": "verified",
         "dependency": "resolved_editable",
@@ -103,10 +103,10 @@
         "result_path": "evidence/live-ai-harness-skills-result.json",
         "target_preservation": "disposable_workspace_only"
       },
-      "row_state": "blocked",
+      "row_state": "ready",
       "result": {
-        "status": "blocked",
-        "reason": "credential_rotation_and_explicit_live_authorization_required"
+        "status": "ready",
+        "reason": "pre_authorization"
       }
     },
     {
@@ -189,10 +189,10 @@
         "network_prerequisite": "not_required_for_boundary"
       },
       "prerequisites": {
-        "authentication": "present_via_codex_login_rotation_required",
+        "authentication": "present_via_codex_login",
         "executable": "present_codex_binary",
         "shell": "zsh_available",
-        "provider": "authenticated_not_live_authorized",
+        "provider": "present_codex_binary_authenticated",
         "network": "not_required_for_boundary",
         "containment": "verified",
         "dependency": "resolved_editable",
@@ -208,10 +208,10 @@
         "result_path": "evidence/live-ai-review-result.json",
         "target_preservation": "disposable_workspace_only"
       },
-      "row_state": "blocked",
+      "row_state": "ready",
       "result": {
-        "status": "blocked",
-        "reason": "credential_rotation_and_explicit_live_authorization_required"
+        "status": "ready",
+        "reason": "pre_authorization"
       }
     }
   ],
