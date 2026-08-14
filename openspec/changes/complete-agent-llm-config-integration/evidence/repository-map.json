@@ -1,0 +1,169 @@
+{
+  "attestations": {},
+  "change_name": "complete-agent-llm-config-integration",
+  "dependency_observations": [
+    {
+      "distribution": "tdt-core",
+      "downstream_record": "agent-core-deterministic",
+      "environment": "env-agent-core",
+      "id": "agent-core-tdt-core",
+      "import_name": "tdt_core",
+      "origin_path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna/src/tdt_core/__init__.py",
+      "origin_sha": "dd762557e89cfdddd3832a71fe0966521341f64c",
+      "upstream_repository": "tdt-core"
+    },
+    {
+      "distribution": "agent-core",
+      "downstream_record": "agent-docs-sync-deterministic",
+      "environment": "env-agent-docs-sync",
+      "id": "agent-docs-sync-agent-core",
+      "import_name": "agent_core",
+      "origin_path": "/Users/androidteam/Developer/agent-core/src/agent_core/__init__.py",
+      "origin_sha": "24d028042c5f654d9c7cff1499d9c545f1b96af0",
+      "upstream_repository": "agent-core"
+    },
+    {
+      "distribution": "tdt-core",
+      "downstream_record": "agent-docs-sync-deterministic",
+      "environment": "env-agent-docs-sync",
+      "id": "agent-docs-sync-tdt-core",
+      "import_name": "tdt_core",
+      "origin_path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna/src/tdt_core/__init__.py",
+      "origin_sha": "dd762557e89cfdddd3832a71fe0966521341f64c",
+      "upstream_repository": "tdt-core"
+    },
+    {
+      "distribution": "agent-core",
+      "downstream_record": "agent-harness-deterministic",
+      "environment": "env-agent-harness",
+      "id": "agent-harness-agent-core",
+      "import_name": "agent_core",
+      "origin_path": "/Users/androidteam/Developer/agent-core/src/agent_core/__init__.py",
+      "origin_sha": "24d028042c5f654d9c7cff1499d9c545f1b96af0",
+      "upstream_repository": "agent-core"
+    },
+    {
+      "distribution": "tdt-core",
+      "downstream_record": "agent-harness-deterministic",
+      "environment": "env-agent-harness",
+      "id": "agent-harness-tdt-core",
+      "import_name": "tdt_core",
+      "origin_path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna/src/tdt_core/__init__.py",
+      "origin_sha": "dd762557e89cfdddd3832a71fe0966521341f64c",
+      "upstream_repository": "tdt-core"
+    },
+    {
+      "distribution": "tdt-core",
+      "downstream_record": "ai-harness-skills-deterministic",
+      "environment": "env-ai-harness-skills",
+      "id": "ai-harness-skills-tdt-core",
+      "import_name": "tdt_core",
+      "origin_path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna/src/tdt_core/__init__.py",
+      "origin_sha": "dd762557e89cfdddd3832a71fe0966521341f64c",
+      "upstream_repository": "tdt-core"
+    },
+    {
+      "distribution": "agent-core",
+      "downstream_record": "ai-review-deterministic",
+      "environment": "env-ai-review",
+      "id": "ai-review-agent-core",
+      "import_name": "agent_core",
+      "origin_path": "/Users/androidteam/Developer/agent-core/src/agent_core/__init__.py",
+      "origin_sha": "24d028042c5f654d9c7cff1499d9c545f1b96af0",
+      "upstream_repository": "agent-core"
+    },
+    {
+      "distribution": "tdt-core",
+      "downstream_record": "ai-review-deterministic",
+      "environment": "env-ai-review",
+      "id": "ai-review-tdt-core",
+      "import_name": "tdt_core",
+      "origin_path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna/src/tdt_core/__init__.py",
+      "origin_sha": "dd762557e89cfdddd3832a71fe0966521341f64c",
+      "upstream_repository": "tdt-core"
+    }
+  ],
+  "python_environments": {
+    "env-agent-core": {
+      "site_packages": [
+        "/Users/androidteam/Developer/agent-core/.venv/lib/python3.14/site-packages"
+      ]
+    },
+    "env-agent-docs-sync": {
+      "site_packages": [
+        "/Users/androidteam/Developer/agent-docs-sync/.venv/lib/python3.14/site-packages"
+      ]
+    },
+    "env-agent-harness": {
+      "site_packages": [
+        "/Users/androidteam/Developer/agent-harness/.venv/lib/python3.14/site-packages"
+      ]
+    },
+    "env-ai-harness-skills": {
+      "site_packages": [
+        "/Users/androidteam/Developer/ai-harness-skills/.venv/lib/python3.14/site-packages"
+      ]
+    },
+    "env-ai-review": {
+      "site_packages": [
+        "/Users/androidteam/Developer/ai-review/.venv/lib/python3.14/site-packages"
+      ]
+    }
+  },
+  "records": [
+    {
+      "id": "tdt-core-deterministic",
+      "kind": "deterministic_handoff",
+      "repository": "tdt-core"
+    },
+    {
+      "id": "agent-core-deterministic",
+      "kind": "deterministic_handoff",
+      "repository": "agent-core"
+    },
+    {
+      "id": "agent-docs-sync-deterministic",
+      "kind": "deterministic_handoff",
+      "repository": "agent-docs-sync"
+    },
+    {
+      "id": "agent-harness-deterministic",
+      "kind": "deterministic_handoff",
+      "repository": "agent-harness"
+    },
+    {
+      "id": "ai-harness-skills-deterministic",
+      "kind": "deterministic_handoff",
+      "repository": "ai-harness-skills"
+    },
+    {
+      "id": "ai-review-deterministic",
+      "kind": "deterministic_handoff",
+      "repository": "ai-review"
+    }
+  ],
+  "repositories": {
+    "agent-core": {
+      "root": "/Users/androidteam/Developer/agent-core"
+    },
+    "agent-docs-sync": {
+      "root": "/Users/androidteam/Developer/agent-docs-sync"
+    },
+    "agent-harness": {
+      "root": "/Users/androidteam/Developer/agent-harness"
+    },
+    "ai-harness-skills": {
+      "root": "/Users/androidteam/Developer/ai-harness-skills"
+    },
+    "ai-review": {
+      "root": "/Users/androidteam/Developer/ai-review"
+    },
+    "openspec-store": {
+      "root": "/Users/androidteam/Developer/openspec-store"
+    },
+    "tdt-core": {
+      "root": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna"
+    }
+  },
+  "schema_version": "1.0.0"
+}

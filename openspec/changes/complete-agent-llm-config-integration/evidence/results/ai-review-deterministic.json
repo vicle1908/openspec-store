@@ -1,0 +1,275 @@
+{
+  "dependencies": [
+    {
+      "consumer_repository": "ai-review",
+      "declaration": {
+        "id": "ai-review-agent-core-declaration",
+        "path": "pyproject.toml",
+        "repository": "ai-review",
+        "sha256": "146d79248b57eeacd8b5be77bd9226e966a6eb283b02b6ed77161a79a0877a76"
+      },
+      "id": "ai-review-agent-core",
+      "installed": {
+        "distribution": "agent-core",
+        "environment": "env-ai-review",
+        "import_name": "agent_core",
+        "origin_path": "/Users/androidteam/Developer/agent-core/src/agent_core/__init__.py",
+        "origin_repository": "agent-core",
+        "origin_sha": "24d028042c5f654d9c7cff1499d9c545f1b96af0"
+      },
+      "lock": {
+        "id": "ai-review-agent-core-lock",
+        "path": "uv.lock",
+        "repository": "ai-review",
+        "sha256": "7aecbf9404859d77583376913c26c3283de1af3772af8f7cab0f01897fd7aadc"
+      },
+      "source_checkout": {
+        "head_sha": "24d028042c5f654d9c7cff1499d9c545f1b96af0",
+        "path": "/Users/androidteam/Developer/agent-core",
+        "repository": "agent-core"
+      },
+      "upstream_repository": "agent-core"
+    },
+    {
+      "consumer_repository": "ai-review",
+      "declaration": {
+        "id": "ai-review-tdt-core-declaration",
+        "path": "pyproject.toml",
+        "repository": "ai-review",
+        "sha256": "146d79248b57eeacd8b5be77bd9226e966a6eb283b02b6ed77161a79a0877a76"
+      },
+      "id": "ai-review-tdt-core",
+      "installed": {
+        "distribution": "tdt-core",
+        "environment": "env-ai-review",
+        "import_name": "tdt_core",
+        "origin_path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna/src/tdt_core/__init__.py",
+        "origin_repository": "tdt-core",
+        "origin_sha": "dd762557e89cfdddd3832a71fe0966521341f64c"
+      },
+      "lock": {
+        "id": "ai-review-tdt-core-lock",
+        "path": "uv.lock",
+        "repository": "ai-review",
+        "sha256": "7aecbf9404859d77583376913c26c3283de1af3772af8f7cab0f01897fd7aadc"
+      },
+      "source_checkout": {
+        "head_sha": "dd762557e89cfdddd3832a71fe0966521341f64c",
+        "path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna",
+        "repository": "tdt-core"
+      },
+      "upstream_repository": "tdt-core"
+    }
+  ],
+  "mechanisms": [
+    {
+      "id": "ai-review-mechanism-1",
+      "path": "tests/test_tdt_projection.py",
+      "repository": "ai-review",
+      "sha256": "164f8093677cf3b40c7990f4def6caf6648234c36a3c7d6d331389375369e8c9"
+    },
+    {
+      "id": "ai-review-mechanism-2",
+      "path": "tests/test_reviewer_projection.py",
+      "repository": "ai-review",
+      "sha256": "eac755e4ded79a3dc85040d1ebb5c9bdf0bea1f1a0e91f07ef1e81a2b449be41"
+    },
+    {
+      "id": "ai-review-mechanism-3",
+      "path": "scripts/verify_phase6_live_acceptance.py",
+      "repository": "ai-review",
+      "sha256": "c50cf5f108510cf665b4b7e6e86fae01255676ce0756ddea48e290623f75a6a4"
+    }
+  ],
+  "planning": {
+    "artifacts": [
+      {
+        "artifact_id": "proposal",
+        "path": "openspec/changes/complete-agent-llm-config-integration/proposal.md",
+        "sha256": "84cf4913abe9e4e8f849212c29cedccd5cc2220d5e22a9467a9ff53a146008ff"
+      },
+      {
+        "artifact_id": "specs",
+        "path": "openspec/changes/complete-agent-llm-config-integration/specs/agent-config-resolution/spec.md",
+        "sha256": "f1520bf6ffcfd9c8464de0c124582e66241cd2d010bb503cba42b17a06c56cea"
+      },
+      {
+        "artifact_id": "specs",
+        "path": "openspec/changes/complete-agent-llm-config-integration/specs/agent-core-model-resolution/spec.md",
+        "sha256": "034d961a32d3622d2d9c11494bf7bd876768e35b5cb10523fc2d094ad5353b27"
+      },
+      {
+        "artifact_id": "specs",
+        "path": "openspec/changes/complete-agent-llm-config-integration/specs/agent-docs-sync/spec.md",
+        "sha256": "9f33b1dd4aa16b6c71a0f8cb8789006c9721bc8e6e61628b62a7a2222de9fca5"
+      },
+      {
+        "artifact_id": "specs",
+        "path": "openspec/changes/complete-agent-llm-config-integration/specs/cli-provider-profile-resolution/spec.md",
+        "sha256": "810a84ff7fdb82a378204d94fbad33bef410702c0be73970921a831c5cfc7add"
+      },
+      {
+        "artifact_id": "specs",
+        "path": "openspec/changes/complete-agent-llm-config-integration/specs/provider-model-profile-resolution/spec.md",
+        "sha256": "6d1118f4a65d67061688af8d0f2079443ecb0f361bec62511b1b84afdb12047e"
+      },
+      {
+        "artifact_id": "design",
+        "path": "openspec/changes/complete-agent-llm-config-integration/design.md",
+        "sha256": "14e4cb60b2a29fb6d1e0b9249f96d414c1c4a7af63f65de8652f3eb76f9b2d29"
+      },
+      {
+        "artifact_id": "tasks",
+        "path": "openspec/changes/complete-agent-llm-config-integration/tasks.md",
+        "sha256": "de6340faa9dc3dcee9cd921fb7cddec266a62d3b6bdb2eb82ecaf925ea69a942"
+      }
+    ],
+    "baseline_sha": "6dd185d4c1a5d0ccdc2aeceea3e88740d460f485",
+    "baseline_tree_sha": "1083b5c2c147856ee7efc0d74eede097304ce17d",
+    "corrective_tree_sha256": "18557a8a7383ba68e7a0313e4a84b2369949140158bfcedc671b29865c7fd646",
+    "evidence_schema": {
+      "id": "evidence-schema",
+      "path": "openspec/changes/complete-agent-llm-config-integration/evidence/schema/v1/evidence-record.schema.json",
+      "repository": "openspec-store",
+      "sha256": "ac4c0340c2bc61a9571b4d8e41ebe7609813305c410d382f7954b189eab7a6f5"
+    },
+    "observed_store_sha": "2fc5001bdf8b5df82f099087c7beeb72a5f61819",
+    "planning_digest_sha256": "57a6809a4cca3961661b0ad614747b2f9c948f3ed0f38983adfb3c11137dc626",
+    "store_repository": "openspec-store"
+  },
+  "prerequisites": [
+    {
+      "expected_exists": true,
+      "id": "ai-review-deterministic-source-present",
+      "kind": "path_exists",
+      "path": "src/ai_review/config/settings.py",
+      "repository": "ai-review"
+    }
+  ],
+  "record_id": "ai-review-deterministic",
+  "record_kind": "deterministic_handoff",
+  "repositories": [
+    {
+      "branch": "main",
+      "dirt_inventory": [
+        {
+          "category": "generated",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "graphify-out/.graphify_labels.json"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "generated",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "graphify-out/.graphify_labels.json.sig"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "generated",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "graphify-out/GRAPH_REPORT.md"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "generated",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "graphify-out/graph.html"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "generated",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "graphify-out/graph.json"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "generated",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "graphify-out/manifest.json"
+          ],
+          "status": " M"
+        }
+      ],
+      "dirt_sha256": "9b7ba48f4a6ab5054ca9e61de58eac14fd2d387c0ff6456ee7d5c22e6ab5c7f6",
+      "head_sha": "cb1ab6ff74973c02ac9fbc4f2ce88d88373a9ba8",
+      "id": "ai-review",
+      "worktree_path": "/Users/androidteam/Developer/ai-review"
+    },
+    {
+      "branch": "main",
+      "dirt_inventory": [],
+      "dirt_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "head_sha": "24d028042c5f654d9c7cff1499d9c545f1b96af0",
+      "id": "agent-core",
+      "worktree_path": "/Users/androidteam/Developer/agent-core"
+    },
+    {
+      "branch": "work/tdt-core-v2-completion-goose-luna",
+      "dirt_inventory": [
+        {
+          "category": "other_non_secret",
+          "content_classification": "non_secret",
+          "content_sha256": "4088f857f653e59ad2a00e1615d46766aadc21af16cd1d9cd67c501de3abdc2c",
+          "paths": [
+            "tdt-core-handoff.md"
+          ],
+          "status": "??"
+        }
+      ],
+      "dirt_sha256": "d2a61c4e3f085693821e8622e3d5b756bd2cf77a6c69f581f3e70814ed949568",
+      "head_sha": "dd762557e89cfdddd3832a71fe0966521341f64c",
+      "id": "tdt-core",
+      "worktree_path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna"
+    }
+  ],
+  "schema_version": "1.0.0",
+  "sources": [
+    {
+      "id": "ai-review-source-1",
+      "path": "src/ai_review/config/settings.py",
+      "repository": "ai-review",
+      "sha256": "dff4b378e4b6d9ff56bca5366e4eaf2f0905635e007d84535bb6db4f45d06a15"
+    },
+    {
+      "id": "ai-review-source-2",
+      "path": "src/ai_review/providers/tdt_projection.py",
+      "repository": "ai-review",
+      "sha256": "f037684a449518c2ef5daf293bb00b7a754413b786b8526c8400c6832b2915b0"
+    },
+    {
+      "id": "ai-review-source-3",
+      "path": "src/ai_review/reviewers/base.py",
+      "repository": "ai-review",
+      "sha256": "eb75f328f543893fcdd9a605361708b13bab0fc7751bad9412cf8f21892207da"
+    },
+    {
+      "id": "ai-review-source-4",
+      "path": "src/ai_review/reviewers/command.py",
+      "repository": "ai-review",
+      "sha256": "2c3b6d4b33714911d6b934be487fb62c87c4757f19604f6cfced47c4fc1c804f"
+    },
+    {
+      "id": "ai-review-source-5",
+      "path": "src/ai_review/review_flow/orchestrator.py",
+      "repository": "ai-review",
+      "sha256": "ca61e80098292824ec481a0d6bda96e80b87eab92dbc19f02d6af8d279b36a29"
+    }
+  ]
+}
