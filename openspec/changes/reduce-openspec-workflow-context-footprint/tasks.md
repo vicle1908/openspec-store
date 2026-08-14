@@ -8,10 +8,10 @@
 
 ## Phase 2 — Relocate historical incidents
 
-- [ ] 2.1 For each Historical block: write a concise Hermes-native reference file under `references/` preserving the incident pattern and cross-reference.
-- [ ] 2.2 Replace each relocated inline block with a one-line pointer: `See references/<name>.md`.
-- [ ] 2.3 Validate after each relocation batch: `openspec validate reduce-openspec-workflow-context-footprint --strict --store openspec-store`.
-- [ ] 2.4 Measure bytes and estimated tokens after all relocations. Record before/after in evidence.
+- [x] 2.1 Created 4 reference files: retrospective-changes-lifecycle.md (2,368B), verification-order-corrections.md (1,047B), desktop-agent-retrospective-closure.md (2,044B), compaction-loop-patterns.md (1,320B).: write a concise Hermes-native reference file under `references/` preserving the incident pattern and cross-reference.
+- [x] 2.2 Replaced 4 inline blocks with concise pointers (see Historical pattern: ...). Verified 3 pointers present in SKILL.md. inline block with a one-line pointer: `See references/<name>.md`.
+- [x] 2.3 Post-relocation validation: focused 1/1, full 375/375, doctor healthy. relocation batch: `openspec validate reduce-openspec-workflow-context-footprint --strict --store openspec-store`.
+- [x] 2.4 Before=73,669B/~18,417tok -> After=67,461B/~16,865tok. Reduced=6,208B/1,552tok (8%). estimated tokens after all relocations. Record before/after in evidence.
 
 ## Phase 3 — Repair broken reference links
 
