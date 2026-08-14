@@ -36,6 +36,7 @@ OpenSpec is the workspace specification framework for managing project changes, 
 ### Operational Runbooks
 
 - [`hermes-moa-configuration.md`](hermes-moa-configuration.md) — validated Hermes Mixture of Agents presets, provider/context ownership, failover, health checks, smoke testing, and rollback.
+- [`hermes-display-configuration.md`](hermes-display-configuration.md) — validated Hermes balanced low-noise display profile, supported settings, preserved visibility, validation, and rollback.
 
 ### Multi-Repo Store Wiring
 
