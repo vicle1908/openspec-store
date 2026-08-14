@@ -24,14 +24,10 @@
         "head_sha": "f1f383d4b143bf770b41d5a564647f504a6270b4",
         "worktree_path": "/Users/androidteam/Developer/ai-harness-skills",
         "worktree_clean": false,
-        "dirt_fingerprint": "graphify-out-only",
+        "dirt_fingerprint": "1536261d2d6881efe063154c4aa6a362d251d1bb999d8ce8e6c6d9367d494dc9",
         "dirt_items": [
-          "graphify-out/.graphify_labels.json",
-          "graphify-out/.graphify_labels.json.sig",
-          "graphify-out/GRAPH_REPORT.md",
-          "graphify-out/graph.html",
-          "graphify-out/graph.json",
-          "graphify-out/manifest.json"
+          "M evidence/phase7/evidence-record.json",
+          "M evidence/phase7/handoff.json"
         ]
       },
       "dependencies": {
@@ -88,10 +84,10 @@
         "network_prerequisite": "not_required_for_boundary"
       },
       "prerequisites": {
-        "authentication": "blocked_not_authorized",
+        "authentication": "present_via_codex_login_rotation_required",
         "executable": "present_codex_binary",
         "shell": "zsh_available",
-        "provider": "blocked_no_api_key",
+        "provider": "authenticated_not_live_authorized",
         "network": "not_required_for_boundary",
         "containment": "verified",
         "dependency": "resolved_editable",
@@ -110,7 +106,7 @@
       "row_state": "blocked",
       "result": {
         "status": "blocked",
-        "reason": "provider_authorization_absent"
+        "reason": "credential_rotation_and_explicit_live_authorization_required"
       }
     },
     {
@@ -124,14 +120,15 @@
         "head_sha": "8abe970dc5b6650973abe54a073ec996bde732ab",
         "worktree_path": "/Users/androidteam/Developer/ai-review",
         "worktree_clean": false,
-        "dirt_fingerprint": "graphify-out-only",
+        "dirt_fingerprint": "c6dfc5c7e0162b6749bd6710318a173ac1ea9cdea916d93b3eeaa735a591b863",
         "dirt_items": [
-          "graphify-out/.graphify_labels.json",
-          "graphify-out/.graphify_labels.json.sig",
-          "graphify-out/GRAPH_REPORT.md",
-          "graphify-out/graph.html",
-          "graphify-out/graph.json",
-          "graphify-out/manifest.json"
+          "M ai-review-handoff.md",
+          "M graphify-out/.graphify_labels.json",
+          "M graphify-out/.graphify_labels.json.sig",
+          "M graphify-out/GRAPH_REPORT.md",
+          "M graphify-out/graph.html",
+          "M graphify-out/graph.json",
+          "M graphify-out/manifest.json"
         ]
       },
       "dependencies": {
@@ -192,10 +189,10 @@
         "network_prerequisite": "not_required_for_boundary"
       },
       "prerequisites": {
-        "authentication": "blocked_not_authorized",
+        "authentication": "present_via_codex_login_rotation_required",
         "executable": "present_codex_binary",
         "shell": "zsh_available",
-        "provider": "blocked_no_api_key",
+        "provider": "authenticated_not_live_authorized",
         "network": "not_required_for_boundary",
         "containment": "verified",
         "dependency": "resolved_editable",
@@ -214,7 +211,7 @@
       "row_state": "blocked",
       "result": {
         "status": "blocked",
-        "reason": "provider_authorization_absent"
+        "reason": "credential_rotation_and_explicit_live_authorization_required"
       }
     }
   ],
