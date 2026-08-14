@@ -2,194 +2,252 @@
 
 ## Purpose
 
-Define automated, non-destructive GitNexus and Graphify index freshness for all workspace repositories, including post-merge triggers for agent freshness, worktree-aware refresh, and scheduled bulk refresh.
+Define automated, non-destructive GitNexus and official Graphify-Labs Graphify index freshness for inventoried workspace repositories, including local post-merge dispatch, worktree-aware refresh, scheduled bulk refresh, and observable status.
 
 ## ADDED Requirements
 
+### Requirement: Official provider identity
+
+The workspace refresh mechanism SHALL use GitNexus `1.6.9` and Graphify from `https://github.com/Graphify-Labs/graphify`, package `graphifyy`, CLI `graphify`, pinned at `0.9.42` for this change.
+
+#### Scenario: Provider identity is verified
+
+- **WHEN** the refresh script starts
+- **THEN** it SHALL verify the installed GitNexus and Graphify executable versions
+- **AND** it SHALL fail closed for a provider version mismatch unless the operation is explicitly diagnostic
+- **AND** it SHALL NOT invoke an alternate Graphify package or provider
+
+#### Scenario: Graphify 0.9.42 features are available
+
+- **WHEN** a Graphify refresh runs
+- **THEN** non-regular files SHALL be skipped without hanging extraction
+- **AND** same-length rewrites SHALL be detected by incremental update
+- **AND** graph provenance SHALL be derived from the analyzed repository
+- **AND** canonical POSIX source paths SHALL be used
+
+### Requirement: Reviewed inventory authorization
+
+Automated refresh SHALL operate only on an explicit, version-controlled repository inventory containing canonical repository root, default branch, GitNexus enablement, and Graphify enablement.
+
+#### Scenario: Inventory entry is valid
+
+- **WHEN** an inventory entry is loaded
+- **THEN** its path SHALL resolve under an approved workspace root
+- **AND** it SHALL identify a valid Git repository
+- **AND** its default branch SHALL exist
+- **AND** its canonical Git common directory SHALL be unique
+
+#### Scenario: Inventory entry is invalid
+
+- **WHEN** an inventory entry is outside the approved root, not a Git repository, or has no valid default branch
+- **THEN** the entry SHALL be rejected
+- **AND** no refresh SHALL run for that entry
+- **AND** the rejection SHALL be logged
+
+#### Scenario: Unlisted repository is discovered
+
+- **WHEN** a repository has index state but is absent from the reviewed inventory
+- **THEN** status MAY report it as an unlisted candidate
+- **AND** the automated refresh SHALL NOT modify its index
+
 ### Requirement: Scheduled automated index refresh
 
-The workspace SHALL provide a scheduled refresh mechanism that keeps GitNexus and Graphify indexes current with each repository's latest committed HEAD.
+The workspace SHALL provide a LaunchAgent scheduled at 02:30 local time that refreshes eligible inventoried repositories without user interaction.
 
 #### Scenario: Nightly refresh runs automatically
 
-- **WHEN** the scheduled LaunchAgent fires (nightly at 02:30 local time)
-- **THEN** the refresh script SHALL discover all repositories under `~/Developer/` with existing `.gitnexus/` or `graphify-out/` state AND a valid git repository marker (`.git` directory or file)
-- **AND** for each discovered repository, it SHALL run `gitnexus analyze . --index-only --default-branch main` (if GitNexus state exists) and `graphify extract . --code-only` (if Graphify state exists)
-- **AND** the operation SHALL complete without user interaction
+- **WHEN** the LaunchAgent fires
+- **THEN** the refresh script SHALL load and validate the reviewed inventory
+- **AND** for each clean eligible repository it SHALL run `gitnexus analyze . --index-only --default-branch <inventory-branch>` when GitNexus is enabled
+- **AND** it SHALL run the official Graphify incremental command `graphify update .` when Graphify is enabled and no watcher covers the root
+- **AND** it SHALL complete without user interaction
 
-#### Scenario: Directory is not a valid repository
+#### Scenario: Graphify repair is required
 
-- **WHEN** a directory under `~/Developer/` has `.gitnexus/` or `graphify-out/` but no `.git` marker
-- **THEN** the refresh script SHALL skip it
-- **AND** the skip SHALL be logged with the reason "not a git repository"
+- **WHEN** `graphify update .` fails or the graph is missing/corrupt
+- **THEN** the script MAY run the bounded repair command `graphify extract . --code-only`
+- **AND** the repair SHALL be bounded by the per-repository timeout
+- **AND** the previous usable graph SHALL be preserved on failure
+
+#### Scenario: Provider is missing or mismatched
+
+- **WHEN** GitNexus or Graphify is absent or reports a version other than the approved pin
+- **THEN** operations for that provider SHALL be skipped with an explicit `provider_missing` or `provider_mismatch` status
+- **AND** the other provider SHALL continue independently
 
 #### Scenario: Repository has no index state
 
-- **WHEN** a repository under `~/Developer/` has neither `.gitnexus/` nor `graphify-out/`
-- **THEN** the refresh script SHALL skip it silently without error
+- **WHEN** an inventoried repository has no state directory for an enabled provider
+- **THEN** the script SHALL report `skipped_uninitialized`
+- **AND** it SHALL NOT implicitly initialize the provider index
 
-#### Scenario: GitNexus CLI is not installed
+### Requirement: Local post-merge freshness dispatch
 
-- **WHEN** the refresh script runs and `gitnexus` is not on PATH
-- **THEN** the script SHALL skip GitNexus operations for all repos and log a warning
-- **AND** it SHALL still run Graphify operations for repos with Graphify state
+When code merges or pulls to an inventoried repository's configured default branch locally, the workspace SHALL dispatch a non-blocking GitNexus refresh.
 
-#### Scenario: Graphify CLI is not installed
+#### Scenario: Local merge or merge-based pull lands on default branch
 
-- **WHEN** the refresh script runs and `graphify` is not on PATH
-- **THEN** the script SHALL skip Graphify operations for all repos and log a warning
-- **AND** it SHALL still run GitNexus operations for repos with GitNexus state
+- **WHEN** a local merge or merge-based `git pull` completes on the configured default branch
+- **THEN** the workspace-managed post-merge block SHALL dispatch the central refresh script asynchronously
+- **AND** the central script SHALL apply the same inventory, dirty-tree, lock, timeout, and revision checks as a nightly run
+- **AND** the hook SHALL not block the merge or pull operation
 
-### Requirement: Post-merge freshness trigger
+#### Scenario: Remote pull uses rebase
 
-When code merges or pulls to a repository's main branch locally, the workspace SHALL trigger an index refresh so that coding agents get fresh indexes promptly.
+- **WHEN** `git pull --rebase` completes
+- **THEN** the post-merge hook MAY not fire
+- **AND** nightly refresh SHALL remain the fallback
+- **AND** documentation SHALL not claim that remote PR merges or rebase pulls trigger this hook directly
 
-#### Scenario: Local merge or pull lands on main branch
+#### Scenario: Non-default branch
 
-- **WHEN** a local merge or `git pull` completes to a repository's main branch
-- **THEN** the existing post-merge hook SHALL trigger a Graphify refresh (already implemented) and a GitNexus refresh
-- **AND** the GitNexus refresh SHALL run `gitnexus analyze . --index-only --default-branch main` in the background
-- **AND** the refresh SHALL not block the merge or pull operation
+- **WHEN** a merge completes on a non-default branch
+- **THEN** the dispatcher SHALL exit without scheduling a refresh
 
-#### Scenario: Multiple merges land rapidly
+#### Scenario: Hook is not installed
 
-- **WHEN** multiple merges to main occur in rapid succession
-- **THEN** the workspace lock SHALL prevent concurrent refreshes
-- **AND** only one refresh SHALL run at a time per repository
-
-#### Scenario: Merge is not to main branch
-
-- **WHEN** a merge completes to a non-main branch (e.g., feature branch)
-- **THEN** the post-merge hook SHALL exit silently without triggering a refresh
-
-#### Scenario: Post-merge hook is not installed
-
-- **WHEN** a repository has not had the post-merge hook installed
-- **THEN** merges SHALL complete normally without triggering a refresh
-- **AND** the nightly bulk refresh SHALL still cover the repository
+- **WHEN** a repository lacks the workspace-managed post-merge block
+- **THEN** its Git operation SHALL complete normally
+- **AND** the nightly inventory refresh SHALL remain available
 
 ### Requirement: Worktree-aware index refresh
 
-The refresh mechanism SHALL discover and handle git worktrees, ensuring indexes are available for agents working in any worktree.
+The refresh mechanism SHALL enumerate inventoried repository worktrees and refresh only worktrees that already have the corresponding index state.
 
-#### Scenario: Worktree has its own GitNexus index
+#### Scenario: Worktree has GitNexus state
 
-- **WHEN** a worktree has a `.gitnexus/` directory
-- **THEN** the nightly refresh SHALL run `gitnexus analyze . --index-only` for that worktree independently
-- **AND** the worktree's index SHALL NOT affect the main checkout's index
+- **WHEN** an eligible non-detached worktree has `.gitnexus/`
+- **THEN** the nightly refresh SHALL run `gitnexus analyze . --index-only --default-branch <inventory-branch>` from that worktree
+- **AND** it SHALL verify the worktree index independently from the main checkout
 
-#### Scenario: Worktree has its own Graphify state
+#### Scenario: Worktree has Graphify state
 
-- **WHEN** a worktree has its own `graphify-out/` or `.graphify/` directory
-- **THEN** the nightly refresh SHALL run `graphify extract . --code-only` for that worktree independently
-- **AND** the worktree's graph SHALL NOT affect the main checkout's graph
+- **WHEN** an eligible non-detached worktree has `graphify-out/`
+- **THEN** the nightly refresh SHALL run `graphify update .` from that worktree
+- **AND** the worktree graph SHALL be evaluated independently
 
-#### Scenario: Worktree shares main checkout's Graphify graph
+#### Scenario: Worktree is uninitialized
 
-- **WHEN** a worktree has NO `graphify-out/` or `.graphify/` directory
-- **THEN** the worktree uses the main checkout's Graphify graph
-- **AND** the refresh SHALL only run `graphify extract . --code-only` from the main checkout
-- **AND** worktree status SHALL report whether the shared graph is fresh
+- **WHEN** a worktree has neither `.gitnexus/` nor `graphify-out/`
+- **THEN** it SHALL be reported as `skipped_uninitialized`
+- **AND** the refresh SHALL not create state implicitly
 
-#### Scenario: Worktree creation triggers graph refresh
+#### Scenario: Detached or stale worktree
 
-- **WHEN** `git worktree add` creates a new worktree
-- **THEN** the post-checkout hook (already installed by Graphify) SHALL trigger a Graphify refresh in the main checkout
-- **AND** the new worktree's GitNexus index SHALL be initialized on first use
+- **WHEN** a worktree is detached, under `.claude/worktrees/`, or its feature branch tip is older than 30 days
+- **THEN** the refresh SHALL skip it
+- **AND** the skip reason SHALL be logged as `detached_head`, `ephemeral_worktree`, or `stale_worktree`
 
-#### Scenario: Detached HEAD worktree is skipped
+### Requirement: Dirty and transitional repository safety
 
-- **WHEN** a worktree is in detached HEAD state
-- **THEN** the refresh script SHALL skip it
-- **AND** the skip SHALL be logged with the reason "detached HEAD"
+The refresh mechanism SHALL preserve committed-HEAD semantics and SHALL not operate during repository transitions.
 
-#### Scenario: Stale worktree is skipped
+#### Scenario: Repository is dirty
 
-- **WHEN** a worktree's branch has not been updated in more than 30 days
-- **THEN** the refresh script SHALL skip it
-- **AND** the skip SHALL be logged with the reason "stale worktree (>30 days)"
-
-### Requirement: Concurrency safety
-
-The refresh mechanism SHALL prevent overlapping runs through appropriate locking and SHALL not starve operations when a long-running watcher holds the lock.
-
-#### Scenario: Nightly refresh overlap is prevented
-
-- **WHEN** the scheduled nightly refresh fires and a previous run holds the lockfile
-- **THEN** the new run SHALL exit cleanly without waiting or killing the previous run
-- **AND** the exit SHALL be logged as "skipped: previous run active"
-
-#### Scenario: Post-merge debounce prevents redundant work
-
-- **WHEN** the post-merge hook fires and a refresh is already running
-- **THEN** the hook SHALL yield to the running refresh
-- **AND** no concurrent refresh SHALL start
-
-#### Scenario: Graphify watcher holds lock indefinitely
-
-- **WHEN** the Graphify watcher (`graphify watch`) holds the owner lock for an extended period
-- **THEN** the refresh script SHALL check the lock's age
-- **AND** if the lock is older than 30 minutes, the refresh script SHALL log a warning and proceed with a bounded refresh
-- **AND** the bounded refresh SHALL complete within 5 minutes and release the lock
-
-#### Scenario: Lock staleness detection
-
-- **WHEN** a lock file exists but its owning process is no longer running
-- **THEN** the refresh script SHALL detect the stale lock via PID liveness check
-- **AND** it SHALL remove the stale lock and acquire it
-- **AND** the stale lock removal SHALL be logged
-
-### Requirement: Observable refresh status
-
-The workspace SHALL provide a status command that reports index freshness across all repositories and worktrees.
-
-#### Scenario: Status is checked manually
-
-- **WHEN** a developer runs `~/Developer/scripts/knowledge-status.sh`
-- **THEN** it SHALL list every repository with existing index state
-- **AND** for each, it SHALL report: tool (GitNexus/Graphify), last refresh time, current HEAD revision, indexed revision, freshness status (current/stale/unknown)
-- **AND** it SHALL list worktrees for each repository with their index status
-
-#### Scenario: Refresh log is available
-
-- **WHEN** a developer inspects `~/Developer/.knowledge-refresh/refresh.log`
-- **THEN** it SHALL contain timestamped entries for each repo refresh attempt
-- **AND** entries SHALL include: timestamp, repo name, worktree/main, tool, status (success/failure/skipped), duration
-
-#### Scenario: Post-merge trigger log is available
-
-- **WHEN** a developer inspects `~/Developer/.knowledge-refresh/post-merge.log`
-- **THEN** it SHALL contain timestamped entries for each post-merge trigger
-- **AND** entries SHALL include: timestamp, repo name, merge commit, refresh result
-
-### Requirement: Non-destructive operations
-
-The refresh mechanism SHALL not modify application code, credentials, or configuration.
-
-#### Scenario: Refresh affects only index state
-
-- **WHEN** the refresh runs
-- **THEN** it SHALL modify only `.gitnexus/`, `graphify-out/`, `.graphify/`, and `.graphify/needs_update` directories/files
-- **AND** it SHALL NOT modify source code, `.env` files, `pyproject.toml`, `go.mod`, or other application files
+- **WHEN** tracked, staged, or untracked changes exist in a repository or worktree
+- **THEN** the refresh SHALL skip that target with `skipped_dirty`
+- **AND** status SHALL expose the dirty condition
 
 #### Scenario: Repository is in merge or rebase state
 
-- **WHEN** a repository is in the middle of a merge, rebase, or cherry-pick
-- **THEN** the refresh script SHALL skip that repository
-- **AND** the skip SHALL be logged with the reason "repo in merge state"
+- **WHEN** a repository is in merge, rebase, or cherry-pick state
+- **THEN** the refresh SHALL skip it with `skipped_merge_state`
+- **AND** the skip SHALL be logged
+
+### Requirement: Concurrency safety
+
+The refresh mechanism SHALL prevent overlapping writes through PID-aware directory locks and SHALL never steal a live lock based only on age.
+
+#### Scenario: Lock is free
+
+- **WHEN** no live owner holds the target lock
+- **THEN** the refresh SHALL create the lock atomically
+- **AND** it SHALL record PID, owner, timestamp, and canonical target
+
+#### Scenario: Lock is held by a live process
+
+- **WHEN** the owner PID is alive
+- **THEN** the new operation SHALL exit or skip cleanly with `lock_busy`
+- **AND** it SHALL not wait indefinitely, kill the owner, or steal the lock
+
+#### Scenario: Lock owner is dead
+
+- **WHEN** the lock exists but its recorded PID is no longer alive
+- **THEN** the refresh MAY reclaim the lock
+- **AND** the reclaim SHALL be logged
+
+#### Scenario: Graphify watcher covers a root
+
+- **WHEN** `graphify watch` is actively watching an inventoried root
+- **THEN** scheduled Graphify refresh for that root SHALL be skipped with `watcher_active`
+- **AND** the watcher SHALL remain authoritative for that root
+
+### Requirement: Bounded execution and recovery
+
+Each provider operation SHALL have a five-minute timeout, the whole nightly run SHALL have a two-hour timeout, and failed operations SHALL preserve the last usable index.
+
+#### Scenario: Provider hangs
+
+- **WHEN** a provider operation exceeds five minutes
+- **THEN** the operation SHALL be terminated or marked timed out
+- **AND** the next repository SHALL still be processed
+- **AND** the log SHALL include `timeout`
+
+#### Scenario: HEAD changes during refresh
+
+- **WHEN** the repository HEAD differs from the captured target after refresh
+- **THEN** the result SHALL be `superseded`, not success
+- **AND** the index SHALL be re-evaluated on a later run
+
+### Requirement: Observable refresh status
+
+The workspace SHALL provide a status command and bounded timestamped logs.
+
+#### Scenario: Human status is requested
+
+- **WHEN** a developer runs `knowledge-status.sh`
+- **THEN** it SHALL list every inventoried repository and eligible worktree
+- **AND** it SHALL report provider, status, last refresh, current HEAD, indexed revision, dirty state, and watcher state
+
+#### Scenario: Machine status is requested
+
+- **WHEN** a developer runs `knowledge-status.sh --json`
+- **THEN** it SHALL emit valid bounded JSON with the same status fields
+
+#### Scenario: Refresh log is inspected
+
+- **WHEN** a developer inspects the refresh log
+- **THEN** entries SHALL include timestamp, canonical target, provider, status, duration, target revision, and indexed revision where available
+- **AND** logs SHALL be rotated to a bounded size
+
+### Requirement: Non-destructive operations
+
+The refresh mechanism SHALL modify only provider-generated index state, workspace automation state, and logs.
+
+#### Scenario: Refresh succeeds
+
+- **WHEN** a refresh runs
+- **THEN** it SHALL modify only `.gitnexus/`, `graphify-out/`, `.graphify/needs_update`, lock state, and automation logs
+- **AND** it SHALL NOT modify source files, credentials, environment files, dependency manifests, or application configuration
+
+#### Scenario: Refresh fails
+
+- **WHEN** a provider fails
+- **THEN** the last usable graph/index SHALL be preserved
+- **AND** temporary files and locks SHALL be cleaned up
 
 ### Requirement: Documentation accuracy
 
-Workspace documentation SHALL accurately describe the refresh mechanism without stale claims.
+Workspace documentation SHALL describe the actual provider versions, commands, automation scope, and limitations.
 
-#### Scenario: AGENTS.md describes refresh automation
+#### Scenario: AGENTS.md is read
 
-- **WHEN** a developer reads AGENTS.md for refresh information
-- **THEN** it SHALL describe the actual LaunchAgent-based automation and post-merge triggers
-- **AND** it SHALL NOT contain stale claims about weekly crons that don't exist
+- **WHEN** a developer reads `~/Developer/AGENTS.md`
+- **THEN** it SHALL describe the LaunchAgent and local post-merge dispatcher
+- **AND** it SHALL NOT claim nonexistent weekly crons
 
-#### Scenario: CLAUDE.md reflects current staleness policy
+#### Scenario: CLAUDE.md is read
 
-- **WHEN** a developer reads the workspace root `~/Developer/CLAUDE.md` for knowledge graph guidance
-- **THEN** it SHALL reference the automated refresh mechanism
-- **AND** the staleness warning SHALL be updated to reflect that automation is in place
+- **WHEN** a developer reads `~/Developer/.claude/CLAUDE.md`
+- **THEN** it SHALL reference Graphify-Labs Graphify `graphifyy` 0.9.42 and GitNexus 1.6.9
+- **AND** it SHALL describe watcher, dirty-tree, and local-hook limitations accurately

@@ -1,151 +1,253 @@
 # Tasks: Ecosystem Index Freshness Automation
 
-## 1. Create workspace refresh script
+## 0. Provider and prerequisite reconciliation
 
-Create `~/Developer/scripts/refresh-knowledge-indexes.sh` using official patterns from `go-microservices/scripts/knowledge-tools.sh`.
+### 0.1 Record official provider identity
 
-### 1.1 Create log directory
+- [x] Record Graphify upstream as `https://github.com/Graphify-Labs/graphify`
+- [x] Record PyPI package `graphifyy`, CLI `graphify`, version `0.9.42`
+- [x] Record GitNexus version `1.6.9`
+- [x] Remove all obsolete alternate-provider references from this change
 
-Create `~/Developer/.knowledge-refresh/` directory.
+### 0.2 Complete Graphify upgrade evidence
 
-### 1.2 Implement owner lock mechanism
+- [x] Upgrade `graphifyy` from 0.9.38 to 0.9.42 using `uv tool install --python 3.12 --force 'graphifyy[all,postgres]==0.9.42'`
+- [x] Update Graphify skills with `graphify install --strict`
+- [x] Validate FIFO/non-regular-file extraction does not hang
+- [x] Validate same-length rewrite through `graphify update .`
+- [x] Validate `built_at_commit` provenance on full extraction
+- [x] Restart and verify the active watcher after upgrade
+- [x] Update `go-microservices/scripts/knowledge-tools.sh` legacy pin to 0.9.42
 
-Reuse the official directory-based lock pattern from `knowledge-tools.sh`:
-- `acquire_gitnexus_owner` / `release_gitnexus_owner`
-- `acquire_graphify_owner` / `release_graphify_owner`
-- Check for `.rebuild.lock` before acquiring Graphify lock
-- Stale lock detection via PID liveness check
+### 0.3 Correct upstream provider contract
 
-### 1.3 Implement repo discovery
+- [ ] Modify the main `developer-code-intelligence` spec to identify Graphify-Labs `graphifyy` as the official provider
+- [ ] Remove stale alternate-provider claims from the main spec
+- [ ] Validate the resulting spec and cross-repository references
 
-Find repos by checking for `.gitnexus/` and `graphify-out/` directories. **Require valid git repository marker** (`.git` directory or file) to prevent indexing workspace root or non-repo directories.
+## 1. Create reviewed repository inventory
 
-### 1.4 Implement worktree discovery
+### 1.1 Define inventory format
 
-For each repo, run `git worktree list --porcelain` and filter:
-- Skip main checkout (handled separately)
-- Skip detached HEAD worktrees
-- Skip worktrees with no branch activity in 30+ days
-- Skip `.claude/worktrees/` (ephemeral)
+Create `openspec-store/scripts/knowledge-refresh/knowledge-refresh-inventory.tsv` with columns:
 
-### 1.5 Implement GitNexus refresh
+```text
+canonical_root<TAB>default_branch<TAB>gitnexus_enabled<TAB>graphify_enabled
+```
 
-Use the official command: `gitnexus analyze . --index-only --default-branch main`
-- Acquire workspace lock before refresh
-- Release after refresh
-- For worktrees: run from worktree directory (each has own `.gitnexus/`)
+### 1.2 Populate inventory
 
-### 1.6 Implement Graphify refresh
+- [ ] Include only explicitly approved repositories
+- [ ] Use canonical absolute paths under `~/Developer/`
+- [ ] Record each repository's actual default branch
+- [ ] Exclude workspace root and non-repositories
+- [ ] Deduplicate linked worktrees by Git common directory
 
-Use the official foreground command: `graphify extract . --code-only`
-- Acquire repo owner lock before refresh
-- Release after refresh
-- Only run from main checkouts (not worktrees)
-- Set `GRAPHIFY_VIZ_NODE_LIMIT=0` (official pattern)
-- Backup `graph.json` before refresh, restore on failure
-- **Worktree handling**: Check if worktree has its own `graphify-out/` or `.graphify/` — if yes, refresh independently; if no, use main checkout's graph
+### 1.3 Validate inventory
 
-### 1.7 Implement watcher lock starvation mitigation
+- [ ] Reject paths outside approved workspace roots
+- [ ] Reject missing/non-Git paths
+- [ ] Reject missing default branches
+- [ ] Compute and log normalized inventory SHA-256
+- [ ] Add a test fixture for path escape and unlisted repository
 
-Check lock age before proceeding:
-- If lock is older than 30 minutes, log warning and proceed with bounded refresh
-- Bounded refresh completes within 5 minutes and releases lock
-- Log the starvation detection and recovery
+## 2. Implement central refresh script
 
-### 1.8 Implement logging
+Create `openspec-store/scripts/knowledge-refresh/refresh-knowledge-indexes.sh`.
 
-Timestamped entries with repo name, worktree/main, tool, status, duration.
+### 2.1 Shell safety and environment
 
-## 2. Extend existing post-merge hook for GitNexus
+- [ ] Use Bash with `set -euo pipefail`
+- [ ] Use absolute tool paths or explicit PATH
+- [ ] Never print credentials or environment secrets
+- [ ] Use canonical path resolution before operating
+- [ ] Create bounded log directory
 
-**Critical finding:** Graphify post-merge hooks already exist in all 18 repos. We only need to add GitNexus refresh.
+### 2.2 Inventory and target validation
 
-### 2.1 Read existing hook
+- [ ] Load and validate the reviewed inventory
+- [ ] Validate Git common directory and configured branch
+- [ ] Exclude unlisted repositories
+- [ ] Record inventory digest in each run
 
-The existing hook at `.git/hooks/post-merge` has:
-- `graphify-post-merge-hook-start` / `graphify-post-merge-hook-end` markers
-- `graphify_should_skip` — skips during rebase/merge/cherry-pick
-- `graphify_has_state` — checks for graphify state
-- `graphify_mark_stale` — marks graph as stale
-- `graphify_rebuild_code` — rebuilds code-only graph in background
+### 2.3 State guards
 
-### 2.2 Add GitNexus refresh function
+- [ ] Skip dirty repositories/worktrees with `skipped_dirty`
+- [ ] Skip merge/rebase/cherry-pick state with `skipped_merge_state`
+- [ ] Skip detached, ephemeral, and >30-day stale worktrees
+- [ ] Skip uninitialized provider state with `skipped_uninitialized`
 
-Add `gitnexus_refresh_after_merge()` to the existing hook:
-- Check if `.gitnexus/` exists
-- Acquire workspace lock (yields if another refresh is running)
-- Run `gitnexus analyze . --index-only --default-branch main` in background
-- Release lock after delay
+### 2.4 PID-aware locks
 
-### 2.3 Test extension
+- [ ] Implement canonical-path-derived lock identifiers
+- [ ] Acquire via atomic `mkdir`
+- [ ] Record PID, owner, timestamp, and canonical target
+- [ ] Reclaim only when owner PID is dead
+- [ ] Never steal a live lock based on age
+- [ ] Release locks using `trap`
+- [ ] Add lock-busy, dead-owner, and cleanup tests
 
-Verify the extended hook:
-- Doesn't break existing Graphify behavior
-- GitNexus refresh runs after merge to main
-- Workspace lock coordinates with running operations
-- Yields gracefully when lock is held
+### 2.5 GitNexus refresh
 
-## 3. Create status command
+- [ ] Verify GitNexus 1.6.9
+- [ ] Run `gitnexus analyze . --index-only --default-branch <inventory-branch>`
+- [ ] Apply five-minute per-target timeout
+- [ ] Capture target HEAD before execution
+- [ ] Verify indexed revision after execution
+- [ ] Report `superseded` when HEAD changes during execution
+- [ ] Never enable embeddings, PDG, `--force`, or package fallback
 
-Create `~/Developer/scripts/knowledge-status.sh` that reports freshness across all repos and worktrees.
+### 2.6 Graphify refresh
 
-### 3.1 Implement status discovery
+- [ ] Verify Graphify-Labs `graphifyy` 0.9.42
+- [ ] Detect active `graphify watch` for the target root
+- [ ] Report `watcher_active` and skip scheduled Graphify for watched roots
+- [ ] Run routine `graphify update .`
+- [ ] On missing/corrupt graph or update failure, run bounded `graphify extract . --code-only`
+- [ ] Set `GRAPHIFY_VIZ_NODE_LIMIT=0` for foreground refresh
+- [ ] Preserve last usable output on failure
+- [ ] Verify `graphify-out/graph.json` parses after success
 
-Same discovery as refresh script (repos + worktrees), with valid git marker check.
+### 2.7 Worktree refresh
 
-### 3.2 Implement freshness check
+- [ ] Enumerate worktrees using `git worktree list --porcelain`
+- [ ] Refresh only worktrees with existing `.gitnexus/` or `graphify-out/`
+- [ ] Report missing state as `skipped_uninitialized`
+- [ ] Keep worktree indexes independent from main checkout
 
-For each repo/worktree:
-- GitNexus: compare `meta.json` `lastCommit` with current HEAD
-- Graphify: compare `graph.json` timestamp with last commit time
+### 2.8 Timeouts and logs
 
-### 3.3 Implement formatted output
+- [ ] Enforce five-minute per-target timeout
+- [ ] Enforce two-hour overall timeout
+- [ ] Log target, provider, status, duration, target revision, indexed revision
+- [ ] Rotate logs to a bounded size
+- [ ] Emit machine-readable event lines
 
-Table output with repo, worktree, tool, last refresh, freshness status.
+## 3. Implement status command
 
-## 4. Create LaunchAgent
+Create `openspec-store/scripts/knowledge-refresh/knowledge-status.sh`.
 
-Create `~/Library/LaunchAgents/com.developer.index-refresh.plist` for nightly execution.
+### 3.1 Human output
 
-### 4.1 Write plist file
+- [ ] List every inventoried repository
+- [ ] List all eligible worktrees
+- [ ] Report GitNexus status: `FRESH`, `STALE`, `UNKNOWN`, `UNINITIALIZED`
+- [ ] Report Graphify status: `FRESH`, `STALE`, `WATCHER`, `UNKNOWN`, `UNINITIALIZED`
+- [ ] Report dirty file count and branch
+- [ ] Report lock state and active owner
 
-Nightly schedule at 02:30 local time with KeepAlive on crash.
+### 3.2 JSON output
 
-### 4.2 Load and verify LaunchAgent
+- [ ] Implement `--json`
+- [ ] Emit bounded valid JSON
+- [ ] Include inventory digest and generation timestamp
+- [ ] Include provider version and indexed/current revisions
 
-Load the agent and verify it fires correctly.
+## 4. Implement post-merge dispatcher and installer
 
-## 5. Update documentation
+Create `openspec-store/scripts/knowledge-refresh/install-hooks.sh`.
 
-### 5.1 Fix AGENTS.md
+### 4.1 Managed block
 
-Remove stale "Weekly crons: graphify freshness (Mon 8AM), wiki lint (Mon 9AM)" claim. Add actual LaunchAgent + hook system description.
+- [ ] Add `knowledge-gitnexus-post-merge-start/end` markers
+- [ ] Dispatcher only; no lock acquisition in hook
+- [ ] Dispatch asynchronously to central refresh script
+- [ ] Check configured default branch
+- [ ] Preserve Graphify-owned hook blocks byte-for-byte
 
-### 5.2 Update CLAUDE.md
+### 4.2 Installation
 
-Update staleness warnings in `~/Developer/CLAUDE.md` (workspace root) to reference the automated refresh mechanism.
+- [ ] Enumerate approved inventory only
+- [ ] Resolve Git common directory
+- [ ] Install once per common directory
+- [ ] Back up hooks before mutation
+- [ ] Make installation idempotent
+- [ ] Validate hooks with `sh -n`
+- [ ] Provide rollback using backups
 
-## 6. Extend existing spec
+### 4.3 Hook tests
 
-**Extend, not replace** the existing `openspec/specs/refresh-gitnexus-index-groups/spec.md` with automation requirements. The existing spec has 33 lines covering bounded index maintenance and group synchronization. We add requirements for scheduled refresh, post-merge triggers, and worktree awareness.
+- [ ] Local merge to default branch dispatches
+- [ ] Non-default branch does not dispatch
+- [ ] Dirty tree dispatch is safely skipped by central script
+- [ ] Existing Graphify behavior remains unchanged
+- [ ] Repeated installation produces no diff
+- [ ] Linked worktrees do not duplicate the block
 
-## Verification
+## 5. Implement and install LaunchAgent
 
-- [ ] `~/Developer/scripts/refresh-knowledge-indexes.sh` runs successfully on all repos
-- [ ] `~/Developer/scripts/refresh-knowledge-indexes.sh` discovers and refreshes worktrees
-- [ ] `~/Developer/scripts/refresh-knowledge-indexes.sh` requires valid git marker (skips ~/Developer/)
-- [ ] `~/Developer/scripts/knowledge-status.sh` reports freshness correctly for repos + worktrees
-- [ ] Extended post-merge hook triggers GitNexus refresh after local merge/pull
-- [ ] Extended post-merge hook doesn't break existing Graphify behavior
-- [ ] Workspace lock coordinates with running operations
-- [ ] Watcher lock starvation is detected and mitigated (30min age check)
-- [ ] LaunchAgent loads with `launchctl load ~/Library/LaunchAgents/com.developer.index-refresh.plist`
-- [ ] Manual trigger works: `launchctl start com.developer.index-refresh`
-- [ ] Log files are created and contain timestamped entries
-- [ ] Owner lock contention yields gracefully (no forced override)
-- [ ] Missing CLI (gitnexus/graphify) doesn't crash the script
-- [ ] Detached HEAD worktrees are skipped
-- [ ] Stale worktrees (>30 days) are skipped
-- [ ] Worktrees with own graphify-out are refreshed independently
-- [ ] AGENTS.md no longer contains stale cron claims
-- [ ] CLAUDE.md (workspace root) staleness warning is updated
+### 5.1 Plist
+
+Create `openspec-store/scripts/knowledge-refresh/com.developer.index-refresh.plist.template`:
+
+- [ ] `StartCalendarInterval` at 02:30 local time
+- [ ] No persistent keep-alive key for the batch job
+- [ ] Absolute `/bin/bash` and script paths
+- [ ] Explicit PATH containing `~/.npm-global/bin`, `~/.local/bin`, Homebrew, and system paths
+- [ ] Explicit HOME and WorkingDirectory
+- [ ] Separate stdout/stderr log paths
+
+### 5.2 Lifecycle
+
+- [ ] Install with `launchctl bootstrap gui/$(id -u)`
+- [ ] Verify with `launchctl print gui/$(id -u)/com.developer.index-refresh`
+- [ ] Trigger manually with `launchctl kickstart -k gui/$(id -u)/com.developer.index-refresh`
+- [ ] Capture launchd stdout/stderr
+- [ ] Do not claim durable `graphify watch` lifecycle in this change
+
+## 6. Documentation and specification alignment
+
+### 6.1 AGENTS.md
+
+- [ ] Remove nonexistent weekly cron claim
+- [ ] Document actual LaunchAgent, inventory, status command, and local-hook scope
+- [ ] Document Graphify-Labs/graphify identity and version
+
+### 6.2 `.claude/CLAUDE.md`
+
+- [ ] Replace stale GitNexus warning with automated refresh guidance
+- [ ] Replace stale Graphify warning with `graphify update .` guidance
+- [ ] Document dirty-tree and watcher limitations
+- [ ] Remove nonexistent weekly cron claim
+
+### 6.3 OpenSpec main specs
+
+- [ ] Correct `developer-code-intelligence` Graphify provider identity
+- [ ] Add scheduled-refresh authorization scenario to `gitnexus-stable-contract`
+- [ ] Keep `workspace-index-freshness` as a separate new capability
+- [ ] Do not modify `refresh-gitnexus-index-groups` unless an independent relationship requires it
+
+## 7. Verification gates
+
+### 7.1 Static gates
+
+- [ ] `bash -n` all shell scripts
+- [ ] `plutil -lint` LaunchAgent
+- [ ] `openspec validate ecosystem-index-freshness-automation --strict`
+- [ ] Full stale-reference sweep across proposal, design, spec, tasks, main specs, docs, and scripts
+- [ ] Verify no alternate Graphify provider, legacy pin, age-only lock stealing, or wrong CLAUDE path remains
+
+### 7.2 Functional gates
+
+- [ ] Refresh script runs against a disposable clean repo
+- [ ] GitNexus refresh uses exact pinned command
+- [ ] Graphify update succeeds on a clean fixture
+- [ ] Graphify extract repair succeeds on a clean fixture
+- [ ] Dirty repository is skipped
+- [ ] Merge-state repository is skipped
+- [ ] Live lock causes clean skip
+- [ ] Dead lock is reclaimed
+- [ ] Watcher-active Graphify target is skipped
+- [ ] Hook installer is idempotent
+- [ ] Hook syntax passes for all approved repositories
+- [ ] Status table and JSON parse correctly
+- [ ] LaunchAgent loads, prints, and kickstarts successfully
+
+### 7.3 Evidence
+
+- [ ] Save redacted version/digest evidence
+- [ ] Save inventory digest
+- [ ] Save hook installation manifest
+- [ ] Save functional test results
+- [ ] Save final status JSON
+- [ ] Record known limitation: `post-merge` covers local merge/merge-pull only, not remote PR merge or `git pull --rebase`
