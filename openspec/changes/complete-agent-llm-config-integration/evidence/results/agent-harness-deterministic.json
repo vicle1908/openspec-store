@@ -139,64 +139,9 @@
   "repositories": [
     {
       "branch": "main",
-      "dirt_inventory": [
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/.graphify_labels.json"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/.graphify_labels.json.sig"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/GRAPH_REPORT.md"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/graph.html"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/graph.json"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/manifest.json"
-          ],
-          "status": " M"
-        }
-      ],
-      "dirt_sha256": "9b7ba48f4a6ab5054ca9e61de58eac14fd2d387c0ff6456ee7d5c22e6ab5c7f6",
-      "head_sha": "cab3321503c37190cf653639c2b92a0b94105f68",
+      "dirt_inventory": [],
+      "dirt_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "head_sha": "b6059898a540529233660ffa7ca6b693f9ea81a2",
       "id": "agent-harness",
       "worktree_path": "/Users/androidteam/Developer/agent-harness"
     },

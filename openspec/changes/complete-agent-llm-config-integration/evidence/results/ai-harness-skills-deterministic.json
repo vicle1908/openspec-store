@@ -124,73 +124,10 @@
             "evidence/phase7/evidence-record.json"
           ],
           "status": " M"
-        },
-        {
-          "category": "other_non_secret",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "evidence/phase7/handoff.json"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/.graphify_labels.json"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/.graphify_labels.json.sig"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/GRAPH_REPORT.md"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/graph.html"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/graph.json"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/manifest.json"
-          ],
-          "status": " M"
         }
       ],
-      "dirt_sha256": "6f8a324ce9ae7a3530bcb341b2622f355d4869fc4b47a0dfbcb6aec0ccaa5537",
-      "head_sha": "0b119ae20b614ce8b14fbc6dd80541c68379b3b5",
+      "dirt_sha256": "235bc29ba319479943a7d444ce267a419a1678902d7d0cb42c7c450bf7a5bad0",
+      "head_sha": "167099c72682439f809905f344aa8803a83b83d1",
       "id": "ai-harness-skills",
       "worktree_path": "/Users/androidteam/Developer/ai-harness-skills"
     },

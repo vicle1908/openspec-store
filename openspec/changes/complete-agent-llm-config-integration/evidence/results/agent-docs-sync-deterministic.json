@@ -151,64 +151,9 @@
   "repositories": [
     {
       "branch": "main",
-      "dirt_inventory": [
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/.graphify_labels.json"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/.graphify_labels.json.sig"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/GRAPH_REPORT.md"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/graph.html"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/graph.json"
-          ],
-          "status": " M"
-        },
-        {
-          "category": "generated",
-          "content_classification": "metadata_only",
-          "content_sha256": null,
-          "paths": [
-            "graphify-out/manifest.json"
-          ],
-          "status": " M"
-        }
-      ],
-      "dirt_sha256": "9b7ba48f4a6ab5054ca9e61de58eac14fd2d387c0ff6456ee7d5c22e6ab5c7f6",
-      "head_sha": "5de7e2346880abd60eb4284de13831a7a91e04f2",
+      "dirt_inventory": [],
+      "dirt_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "head_sha": "27a9a72dca24c216d2939d70af68434acf36987f",
       "id": "agent-docs-sync",
       "worktree_path": "/Users/androidteam/Developer/agent-docs-sync"
     },
