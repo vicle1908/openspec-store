@@ -60,5 +60,7 @@
   - Evidence: pass; staged paths are the active change directory and maintained MoA runbook only.
 - [x] 6.4 Run GitNexus change detection before the scoped commit.
   - Evidence: low risk, 0 affected processes, 8 owned changed files.
-- [ ] 6.5 Commit the active change artifacts and maintained runbook on the isolated branch.
-- [ ] 6.6 Confirm archive readiness: focused validation passes, all implementation tasks are complete, and the archive destination is known.
+- [x] 6.5 Commit the active change artifacts and maintained runbook on the isolated branch.
+  - Evidence: pre-archive commit `8285f88`.
+- [x] 6.6 Confirm archive readiness: focused validation passes, all implementation tasks are complete, and the archive destination is known.
+  - Evidence: focused strict validation passes; archive target is `2026-08-14-default-2-moa-role-switch`.
