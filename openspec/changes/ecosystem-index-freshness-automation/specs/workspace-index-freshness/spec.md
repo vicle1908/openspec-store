@@ -13,9 +13,15 @@ The workspace SHALL provide a scheduled refresh mechanism that keeps GitNexus an
 #### Scenario: Nightly refresh runs automatically
 
 - **WHEN** the scheduled LaunchAgent fires (nightly at 02:30 local time)
-- **THEN** the refresh script SHALL discover all repositories under `~/Developer/` with existing `.gitnexus/` or `graphify-out/` state
-- **AND** for each discovered repository, it SHALL run `gitnexus analyze . --index-only --default-branch main` (if GitNexus state exists) and `graphify update .` (if Graphify state exists)
+- **THEN** the refresh script SHALL discover all repositories under `~/Developer/` with existing `.gitnexus/` or `graphify-out/` state AND a valid git repository marker (`.git` directory or file)
+- **AND** for each discovered repository, it SHALL run `gitnexus analyze . --index-only --default-branch main` (if GitNexus state exists) and `graphify extract . --code-only` (if Graphify state exists)
 - **AND** the operation SHALL complete without user interaction
+
+#### Scenario: Directory is not a valid repository
+
+- **WHEN** a directory under `~/Developer/` has `.gitnexus/` or `graphify-out/` but no `.git` marker
+- **THEN** the refresh script SHALL skip it
+- **AND** the skip SHALL be logged with the reason "not a git repository"
 
 #### Scenario: Repository has no index state
 
@@ -36,20 +42,20 @@ The workspace SHALL provide a scheduled refresh mechanism that keeps GitNexus an
 
 ### Requirement: Post-merge freshness trigger
 
-When code merges to any repository's main branch, the workspace SHALL trigger a delayed index refresh so that coding agents get fresh indexes within minutes.
+When code merges or pulls to a repository's main branch locally, the workspace SHALL trigger an index refresh so that coding agents get fresh indexes promptly.
 
-#### Scenario: Merge lands on main branch
+#### Scenario: Local merge or pull lands on main branch
 
-- **WHEN** a merge completes to a repository's main branch
-- **THEN** a post-merge hook SHALL detect the merge and schedule a delayed refresh (30 seconds)
-- **AND** after the delay, it SHALL run `gitnexus analyze . --index-only --default-branch main` and `graphify update .` from the main checkout
-- **AND** the refresh SHALL run in the background without blocking the merge
+- **WHEN** a local merge or `git pull` completes to a repository's main branch
+- **THEN** the existing post-merge hook SHALL trigger a Graphify refresh (already implemented) and a GitNexus refresh
+- **AND** the GitNexus refresh SHALL run `gitnexus analyze . --index-only --default-branch main` in the background
+- **AND** the refresh SHALL not block the merge or pull operation
 
 #### Scenario: Multiple merges land rapidly
 
-- **WHEN** multiple merges to main occur within the 30-second debounce window
-- **THEN** only the last merge SHALL trigger a refresh
-- **AND** earlier scheduled refreshes SHALL be cancelled by the debounce check
+- **WHEN** multiple merges to main occur in rapid succession
+- **THEN** the workspace lock SHALL prevent concurrent refreshes
+- **AND** only one refresh SHALL run at a time per repository
 
 #### Scenario: Merge is not to main branch
 
@@ -72,11 +78,17 @@ The refresh mechanism SHALL discover and handle git worktrees, ensuring indexes 
 - **THEN** the nightly refresh SHALL run `gitnexus analyze . --index-only` for that worktree independently
 - **AND** the worktree's index SHALL NOT affect the main checkout's index
 
-#### Scenario: Worktree shares Graphify graph
+#### Scenario: Worktree has its own Graphify state
 
-- **WHEN** a worktree exists for a repository with `graphify-out/`
-- **THEN** the worktree shares the main checkout's Graphify graph
-- **AND** the refresh SHALL only run `graphify update .` from the main checkout
+- **WHEN** a worktree has its own `graphify-out/` or `.graphify/` directory
+- **THEN** the nightly refresh SHALL run `graphify extract . --code-only` for that worktree independently
+- **AND** the worktree's graph SHALL NOT affect the main checkout's graph
+
+#### Scenario: Worktree shares main checkout's Graphify graph
+
+- **WHEN** a worktree has NO `graphify-out/` or `.graphify/` directory
+- **THEN** the worktree uses the main checkout's Graphify graph
+- **AND** the refresh SHALL only run `graphify extract . --code-only` from the main checkout
 - **AND** worktree status SHALL report whether the shared graph is fresh
 
 #### Scenario: Worktree creation triggers graph refresh
@@ -99,7 +111,7 @@ The refresh mechanism SHALL discover and handle git worktrees, ensuring indexes 
 
 ### Requirement: Concurrency safety
 
-The refresh mechanism SHALL prevent overlapping runs through appropriate locking.
+The refresh mechanism SHALL prevent overlapping runs through appropriate locking and SHALL not starve operations when a long-running watcher holds the lock.
 
 #### Scenario: Nightly refresh overlap is prevented
 
@@ -109,15 +121,23 @@ The refresh mechanism SHALL prevent overlapping runs through appropriate locking
 
 #### Scenario: Post-merge debounce prevents redundant work
 
-- **WHEN** the post-merge hook fires and a newer merge timestamp is detected after the delay
-- **THEN** the hook SHALL exit without running a refresh
-- **AND** the newer merge's hook SHALL handle the refresh
+- **WHEN** the post-merge hook fires and a refresh is already running
+- **THEN** the hook SHALL yield to the running refresh
+- **AND** no concurrent refresh SHALL start
 
-#### Scenario: Post-merge and nightly refresh overlap
+#### Scenario: Graphify watcher holds lock indefinitely
 
-- **WHEN** a post-merge refresh is running when the nightly refresh starts
-- **THEN** the nightly refresh SHALL wait for the post-merge to complete (or skip the affected repo)
-- **AND** no index corruption SHALL occur from concurrent writes
+- **WHEN** the Graphify watcher (`graphify watch`) holds the owner lock for an extended period
+- **THEN** the refresh script SHALL check the lock's age
+- **AND** if the lock is older than 30 minutes, the refresh script SHALL log a warning and proceed with a bounded refresh
+- **AND** the bounded refresh SHALL complete within 5 minutes and release the lock
+
+#### Scenario: Lock staleness detection
+
+- **WHEN** a lock file exists but its owning process is no longer running
+- **THEN** the refresh script SHALL detect the stale lock via PID liveness check
+- **AND** it SHALL remove the stale lock and acquire it
+- **AND** the stale lock removal SHALL be logged
 
 ### Requirement: Observable refresh status
 
@@ -149,7 +169,7 @@ The refresh mechanism SHALL not modify application code, credentials, or configu
 #### Scenario: Refresh affects only index state
 
 - **WHEN** the refresh runs
-- **THEN** it SHALL modify only `.gitnexus/` and `graphify-out/` directories
+- **THEN** it SHALL modify only `.gitnexus/`, `graphify-out/`, `.graphify/`, and `.graphify/needs_update` directories/files
 - **AND** it SHALL NOT modify source code, `.env` files, `pyproject.toml`, `go.mod`, or other application files
 
 #### Scenario: Repository is in merge or rebase state
@@ -170,6 +190,6 @@ Workspace documentation SHALL accurately describe the refresh mechanism without 
 
 #### Scenario: CLAUDE.md reflects current staleness policy
 
-- **WHEN** a developer reads CLAUDE.md for knowledge graph guidance
+- **WHEN** a developer reads the workspace root `~/Developer/CLAUDE.md` for knowledge graph guidance
 - **THEN** it SHALL reference the automated refresh mechanism
 - **AND** the staleness warning SHALL be updated to reflect that automation is in place

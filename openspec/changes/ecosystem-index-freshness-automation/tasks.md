@@ -18,7 +18,7 @@ Reuse the official directory-based lock pattern from `knowledge-tools.sh`:
 
 ### 1.3 Implement repo discovery
 
-Find repos by checking for `.gitnexus/` and `graphify-out/` directories.
+Find repos by checking for `.gitnexus/` and `graphify-out/` directories. **Require valid git repository marker** (`.git` directory or file) to prevent indexing workspace root or non-repo directories.
 
 ### 1.4 Implement worktree discovery
 
@@ -43,8 +43,16 @@ Use the official foreground command: `graphify extract . --code-only`
 - Only run from main checkouts (not worktrees)
 - Set `GRAPHIFY_VIZ_NODE_LIMIT=0` (official pattern)
 - Backup `graph.json` before refresh, restore on failure
+- **Worktree handling**: Check if worktree has its own `graphify-out/` or `.graphify/` — if yes, refresh independently; if no, use main checkout's graph
 
-### 1.7 Implement logging
+### 1.7 Implement watcher lock starvation mitigation
+
+Check lock age before proceeding:
+- If lock is older than 30 minutes, log warning and proceed with bounded refresh
+- Bounded refresh completes within 5 minutes and releases lock
+- Log the starvation detection and recovery
+
+### 1.8 Implement logging
 
 Timestamped entries with repo name, worktree/main, tool, status, duration.
 
@@ -83,7 +91,7 @@ Create `~/Developer/scripts/knowledge-status.sh` that reports freshness across a
 
 ### 3.1 Implement status discovery
 
-Same discovery as refresh script (repos + worktrees).
+Same discovery as refresh script (repos + worktrees), with valid git marker check.
 
 ### 3.2 Implement freshness check
 
@@ -115,20 +123,22 @@ Remove stale "Weekly crons: graphify freshness (Mon 8AM), wiki lint (Mon 9AM)" c
 
 ### 5.2 Update CLAUDE.md
 
-Update staleness warnings to reference the automated refresh mechanism.
+Update staleness warnings in `~/Developer/CLAUDE.md` (workspace root) to reference the automated refresh mechanism.
 
 ## 6. Extend existing spec
 
-Add automation requirements to `openspec/specs/refresh-gitnexus-index-groups/spec.md`.
+**Extend, not replace** the existing `openspec/specs/refresh-gitnexus-index-groups/spec.md` with automation requirements. The existing spec has 33 lines covering bounded index maintenance and group synchronization. We add requirements for scheduled refresh, post-merge triggers, and worktree awareness.
 
 ## Verification
 
 - [ ] `~/Developer/scripts/refresh-knowledge-indexes.sh` runs successfully on all repos
 - [ ] `~/Developer/scripts/refresh-knowledge-indexes.sh` discovers and refreshes worktrees
+- [ ] `~/Developer/scripts/refresh-knowledge-indexes.sh` requires valid git marker (skips ~/Developer/)
 - [ ] `~/Developer/scripts/knowledge-status.sh` reports freshness correctly for repos + worktrees
-- [ ] Extended post-merge hook triggers GitNexus refresh after merge to main
+- [ ] Extended post-merge hook triggers GitNexus refresh after local merge/pull
 - [ ] Extended post-merge hook doesn't break existing Graphify behavior
 - [ ] Workspace lock coordinates with running operations
+- [ ] Watcher lock starvation is detected and mitigated (30min age check)
 - [ ] LaunchAgent loads with `launchctl load ~/Library/LaunchAgents/com.developer.index-refresh.plist`
 - [ ] Manual trigger works: `launchctl start com.developer.index-refresh`
 - [ ] Log files are created and contain timestamped entries
@@ -136,4 +146,6 @@ Add automation requirements to `openspec/specs/refresh-gitnexus-index-groups/spe
 - [ ] Missing CLI (gitnexus/graphify) doesn't crash the script
 - [ ] Detached HEAD worktrees are skipped
 - [ ] Stale worktrees (>30 days) are skipped
+- [ ] Worktrees with own graphify-out are refreshed independently
 - [ ] AGENTS.md no longer contains stale cron claims
+- [ ] CLAUDE.md (workspace root) staleness warning is updated
