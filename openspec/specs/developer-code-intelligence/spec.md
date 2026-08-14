@@ -6,7 +6,7 @@ Define the repository contract for optional, skills-first GitNexus and Graphify 
 ## Requirements
 ### Requirement: Stable skills and CLI contract
 
-The repository SHALL use the official agent skills as guidance and the pinned official CLIs as the source of truth for setup, indexing, querying, status, and rollback. The selected latest stable versions SHALL be GitNexus `1.6.9` and Graphify package `@sentropic/graphify` `0.17.1`; prerelease/specialized GitNexus tags and the legacy Graphify compatibility-forwarder package MUST NOT be selected implicitly.
+The repository SHALL use the official agent skills as guidance and the pinned official CLIs as the source of truth for setup, indexing, querying, status, and rollback. The selected stable versions SHALL be GitNexus `1.6.9` and the Graphify-Labs Graphify package `graphifyy` `0.9.42`, installed with Python 3.12 and invoked through the `graphify` CLI; unrelated Graphify packages and alternate providers MUST NOT be selected implicitly.
 
 #### Scenario: Pinned tools are diagnosed
 
@@ -21,7 +21,7 @@ The repository SHALL use the official agent skills as guidance and the pinned of
 #### Scenario: The workstation has the old Graphify tool
 
 - **WHEN** the diagnostic finds Graphify `0.6.7` or another version
-- **THEN** it reports the mismatch and the bootstrap offers the pinned Node.js 20+ `@sentropic/graphify@0.17.1` path without changing application dependencies
+- **THEN** it reports the mismatch and the bootstrap offers the pinned Graphify-Labs PyPI package `graphifyy[all,postgres]==0.9.42` with Python 3.12 without changing application dependencies
 
 #### Scenario: Optional tooling is absent
 
@@ -35,17 +35,17 @@ The repository SHALL use the official agent skills as guidance and the pinned of
 
 ### Requirement: Graphify extraction coverage and warning policy
 
-Graphify refreshes SHALL use `@sentropic/graphify@0.17.1` with Node.js 20+ and the reviewed optional parser/database/MCP dependency profile. Refresh diagnostics SHALL classify expected unsupported, sensitive, and allowlisted zero-node inputs separately from actionable parser, runtime, migration, or unknown-source coverage failures. Generated state SHALL use `.graphify/`; legacy `graphify-out/` state SHALL remain a read-only migration canary until acceptance.
+Graphify refreshes SHALL use Graphify-Labs `graphifyy[all,postgres]==0.9.42` with Python 3.12 and the reviewed optional parser/database/MCP dependency profile. Refresh diagnostics SHALL classify expected unsupported, sensitive, and allowlisted zero-node inputs separately from actionable parser, runtime, migration, or unknown-source coverage failures. Generated state SHALL use `graphify-out/`; any older state remains a read-only migration canary until acceptance.
 
 #### Scenario: SQL source coverage is enabled
 
 - **WHEN** the pinned Graphify environment is bootstrapped and refreshed
-- **THEN** the PostgreSQL/SQL ingestion dependencies in the reviewed optional profile are installed at the `0.17.1` package lock and SQL files are not skipped solely because the legacy Python SQL parser is absent
+- **THEN** the PostgreSQL/SQL ingestion dependencies in the reviewed optional profile are installed at the `0.9.42` package lock and SQL files are not skipped solely because a parser is absent
 
 #### Scenario: The graph exceeds the HTML visualization threshold
 
 - **WHEN** a refresh produces more nodes than the configured visualization limit
-- **THEN** Graphify preserves `.graphify/graph.json` and the textual report, generates or omits the static studio according to the reviewed threshold policy, and emits no fatal visualization warning
+- **THEN** Graphify preserves `graphify-out/graph.json` and the textual report, generates or omits the static studio according to the reviewed threshold policy, and emits no fatal visualization warning
 
 #### Scenario: Expected files are excluded
 
@@ -59,7 +59,7 @@ Graphify refreshes SHALL use `@sentropic/graphify@0.17.1` with Node.js 20+ and t
 
 ### Requirement: Feature-complete local graph capabilities
 
-The integration SHALL install, expose, and verify the complete feature set supported by the pinned tools. GitNexus SHALL support embeddings, PDG-backed control/data and taint queries, generated repository skills, structural checks, route/API analysis, branch-aware indexes, local HTTP UI/MCP, wiki generation, and repository-group contract synchronization. Graphify `@sentropic/graphify@0.17.1` SHALL support structural and semantic extraction, directed and incremental/watch workflows, the reviewed optional dependency profile, local exports, ontology/reconciliation workflows, multi-project MCP access through one validating router-owned boundary, graph query/path/explain/summary, and supported local ingestion sources.
+The integration SHALL install, expose, and verify the complete feature set supported by the pinned tools. GitNexus SHALL support embeddings, PDG-backed control/data and taint queries, generated repository skills, structural checks, route/API analysis, branch-aware indexes, local HTTP UI/MCP, wiki generation, and repository-group contract synchronization. Graphify-Labs `graphifyy` `0.9.42` SHALL support structural and semantic extraction, directed and incremental/watch workflows, the reviewed optional dependency profile, local exports, ontology/reconciliation workflows, multi-project MCP access through one validating router-owned boundary, graph query/path/explain/summary, and supported local ingestion sources.
 
 #### Scenario: GitNexus full local analysis is enabled
 
@@ -80,7 +80,7 @@ The integration SHALL install, expose, and verify the complete feature set suppo
 #### Scenario: Graphify MCP and export capabilities are enabled
 
 - **WHEN** the corresponding local feature profile is selected
-- **THEN** one router-owned Graphify adapter provides explicit multi-project routing to canonical outer and mcp-router `.graphify/graph.json` artifacts even though native `graphify serve` is single-graph
+- **THEN** one router-owned Graphify adapter provides explicit multi-project routing to canonical `graphify-out/graph.json` artifacts even though native Graphify serves one graph per process
 - **AND** callers select a project by its canonical absolute project root rather than by relying on duplicate tool names or server ordering
 - **AND** Graphify can generate HTML/no-viz, SVG, GraphML, wiki, Obsidian, Neo4j, and FalkorDB artifacts plus MCP pull-request triage output without placing generated state under version control
 
@@ -117,7 +117,7 @@ The integration SHALL install, expose, and verify the complete feature set suppo
 
 #### Scenario: Upgraded Graphify lacks native multi-project or PR tools
 
-- **WHEN** capability discovery on `@sentropic/graphify@0.17.1` confirms native `serve` is single-graph and lacks legacy PR tools
+- **WHEN** capability discovery on Graphify-Labs `graphifyy` `0.9.42` confirms native serving is single-graph and lacks legacy PR tools
 - **THEN** the router-owned adapter provides required project selection and compatibility PR-analysis schemas
 - **AND** cutover is blocked if graph/query/review parity cannot be proven for both repositories
 
@@ -134,13 +134,13 @@ The integration SHALL install, expose, and verify the complete feature set suppo
 #### Scenario: The full Graphify environment is installed
 
 - **WHEN** the full Graphify tool profile is bootstrapped
-- **THEN** it uses Node.js 20+, installs `@sentropic/graphify@0.17.1` with the reviewed optional language/database/MCP dependencies, verifies `graphify serve` and required parser/export features, and reports any required unavailable dependency as a setup failure
+- **THEN** it uses Python 3.12, installs Graphify-Labs `graphifyy[all,postgres]==0.9.42` with the reviewed optional language/database/MCP dependencies, verifies `graphify update`, `graphify extract`, and required parser/export features, and reports any required unavailable dependency as a setup failure
 
 #### Scenario: Legacy Graphify state is migrated
 
-- **WHEN** the workstation contains preserved legacy Graphify state under `graphify-out/` with captured command/runtime identity (npm has no `graphifyy@0.9.26` release)
-- **THEN** migration preserves that state as a read-only canary, builds new `.graphify/graph.json` artifacts with `@sentropic/graphify@0.17.1`, and compares graph identity plus representative query and PR results
-- **AND** router registration switches only after acceptance and rollback can restore the legacy command/path without deleting either graph
+- **WHEN** the workstation contains existing Graphify state under `graphify-out/` with captured command/runtime identity
+- **THEN** the upgrade preserves that state, validates the upgraded `graphifyy` command against a canary repository, and compares graph identity plus representative query results
+- **AND** rollback can restore the previous pinned `graphifyy` package without deleting the generated graph
 
 #### Scenario: Capability state is inspected
 

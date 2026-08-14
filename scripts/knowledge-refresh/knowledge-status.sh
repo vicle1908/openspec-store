@@ -6,6 +6,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INVENTORY="${SCRIPT_DIR}/knowledge-refresh-inventory.tsv"
+APPROVAL_FILE="${SCRIPT_DIR}/knowledge-refresh-approval.sha256"
 STALENESS_THRESHOLD_DAYS=1
 
 # --- Flags ---
@@ -36,6 +37,20 @@ if [[ ! -f "$INVENTORY" ]]; then
   echo "Inventory not found: $INVENTORY" >&2
   exit 1
 fi
+
+inventory_digest=$(shasum -a 256 "$INVENTORY" | awk '{print $1}')
+
+tool_version() {
+  local tool="$1"
+  if command -v "$tool" >/dev/null 2>&1; then
+    "$tool" --version 2>&1 | head -1 | tr -d '\r' | sed 's/"/\\"/g'
+  else
+    echo "missing"
+  fi
+}
+
+gitnexus_version="$(tool_version gitnexus)"
+graphify_version="$(tool_version graphify)"
 
 # --- Helpers ---
 
@@ -171,28 +186,58 @@ graphify_indexed_sha() {
     echo ""
     return
   fi
-  # Try to extract a commit field if present
-  grep -o '"commit"[[:space:]]*:[[:space:]]*"[^"]*"' "$graph" 2>/dev/null \
-    | head -1 \
-    | sed 's/.*"commit"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' || true
+  python3 - "$graph" <<'PY'
+import json
+import sys
+
+try:
+    data = json.load(open(sys.argv[1], encoding="utf-8"))
+except (OSError, ValueError):
+    raise SystemExit(0)
+for key in ("built_at_commit", "builtAtCommit", "commit"):
+    value = data.get(key)
+    if isinstance(value, str) and value:
+        print(value)
+        break
+PY
 }
 
 # Check if a lock file exists for a repo
 lock_info() {
-  local repo_name="$1"
-  local lock_dir="${HOME}/.claude/locks"
+  local root="$1"
+  local repo_name
+  repo_name=$(basename "$root")
+  local lock_dir="${HOME}/Developer/.knowledge-refresh/locks"
   if [[ ! -d "$lock_dir" ]]; then
     echo ""
     return
   fi
-  local lock_file="${lock_dir}/${repo_name}.lock"
-  if [[ -f "$lock_file" ]]; then
-    local owner
-    owner=$(cat "$lock_file" 2>/dev/null || echo "unknown")
-    echo "$owner"
-  else
-    echo ""
-  fi
+  local candidate owner
+  local lock_id
+  lock_id=$(printf '%s' "$root" | shasum -a 256 | awk '{print $1}')
+  for candidate in \
+    "${lock_dir}/graphify-${lock_id}/owner" \
+    "${lock_dir}/gitnexus-${lock_id}/owner" \
+    "${lock_dir}/graphify-${repo_name}/owner" \
+    "${lock_dir}/gitnexus-workspace/owner" \
+    "${lock_dir}/${repo_name}.lock"; do
+    if [[ -f "$candidate" ]]; then
+      owner=$(cat "$candidate" 2>/dev/null || echo "unknown")
+      echo "$owner"
+      return
+    fi
+  done
+  echo ""
+}
+
+dirty_file_count() {
+  git -C "$1" status --porcelain=v1 --untracked-files=all 2>/dev/null \
+    | wc -l | tr -d ' '
+}
+
+watcher_active_for() {
+  local root="$1"
+  pgrep -f "graphify watch.*${root}" >/dev/null 2>&1
 }
 
 # Discover worktrees for a repo (excluding main checkout and detached HEAD)
@@ -270,7 +315,14 @@ process_repo() {
   head_sha_val=$(head_sha "$root")
   head_ts=$(head_timestamp "$root")
   head_date=$(epoch_to_date "$head_ts")
-  lock_owner=$(lock_info "$repo_name")
+  lock_owner=$(lock_info "$root")
+
+  local dirty_count
+  dirty_count=$(dirty_file_count "$root")
+  if [[ "$dirty_count" =~ ^[0-9]+$ ]] && (( dirty_count > 0 )); then
+    RESULTS+=("$(printf '%-32s %-10s %-12s %-15s %s' "$repo_name" "Dirty" "${dirty_count} files" "-" "-")")
+    JSON_ITEMS+=("{\"repo\":\"${repo_name}\",\"tool\":\"Dirty\",\"status\":\"DIRTY\",\"dirtyFiles\":${dirty_count},\"lastRefresh\":\"-\",\"indexedSha\":\"\",\"headSha\":\"-\",\"lockOwner\":null}")
+  fi
 
   # --- GitNexus status ---
   if [[ "$gn_enabled" == "yes" ]]; then
@@ -309,10 +361,13 @@ process_repo() {
 
   # --- Graphify status ---
   if [[ "$gf_enabled" == "yes" ]]; then
-    local gf_idx_ts gf_status
+    local gf_idx_ts gf_idx_sha gf_status
     gf_idx_ts=$(graphify_index_timestamp "$root")
+    gf_idx_sha=$(graphify_indexed_sha "$root")
 
-    if [[ "$gf_idx_ts" == "0" ]]; then
+    if watcher_active_for "$root"; then
+      gf_status="WATCHER"
+    elif [[ "$gf_idx_ts" == "0" ]]; then
       gf_status="UNINITIALIZED"
     else
       gf_status=$(classify_freshness "$gf_idx_ts" "$head_ts")
@@ -328,7 +383,7 @@ process_repo() {
       lock_json="\"${lock_owner}\""
     fi
 
-    JSON_ITEMS+=("{\"repo\":\"${repo_name}\",\"tool\":\"Graphify\",\"status\":\"${gf_status}\",\"lastRefresh\":\"${gf_idx_date}\",\"indexedSha\":\"\",\"headSha\":\"${head_sha_val}\",\"lockOwner\":${lock_json}}")
+    JSON_ITEMS+=("{\"repo\":\"${repo_name}\",\"tool\":\"Graphify\",\"status\":\"${gf_status}\",\"lastRefresh\":\"${gf_idx_date}\",\"indexedSha\":\"$(short_sha "$gf_idx_sha")\",\"headSha\":\"${head_sha_val}\",\"lockOwner\":${lock_json}}")
   fi
 
   # --- Worktrees ---
@@ -380,6 +435,8 @@ if $JSON_MODE; then
   echo "{"
   echo "  \"generated\": \"$(date -u '+%Y-%m-%dT%H:%M:%SZ')\","
   echo "  \"inventory\": \"${INVENTORY}\","
+  echo "  \"inventoryDigest\": \"${inventory_digest}\","
+  echo "  \"providerVersions\": {\"gitnexus\":\"${gitnexus_version}\",\"graphify\":\"${graphify_version}\"},"
   echo "  \"stalenessThresholdDays\": ${STALENESS_THRESHOLD_DAYS},"
   echo "  \"repos\": ["
   for i in "${!JSON_ITEMS[@]}"; do

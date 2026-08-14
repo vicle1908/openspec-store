@@ -8,6 +8,7 @@
 #   skipped_uninitialized, provider_missing, lock_busy, watcher_active,
 #   timeout, failed, superseded
 set -euo pipefail
+export PATH="/Users/androidteam/.npm-global/bin:/Users/androidteam/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -22,6 +23,7 @@ readonly STATE_DIR="${HOME}/Developer/.knowledge-refresh"
 readonly LOG_FILE="${STATE_DIR}/refresh.log"
 readonly LOCK_DIR="${STATE_DIR}/locks"
 readonly GITNEXUS_TIMEOUT=300   # 5 minutes per target
+readonly GITNEXUS_INDEX_EMBEDDING_DIMS=768  # nomic-embed-text local endpoint
 readonly GRAPHIFY_TIMEOUT=300
 readonly OVERALL_TIMEOUT=7200   # 2 hours
 readonly MAX_LOG_LINES=1000
@@ -50,13 +52,13 @@ log_rotate() {
       tmp="$(mktemp "${LOG_FILE}.rotating.XXXXXX")"
       tail -n "$tail_count" "$LOG_FILE" > "$tmp"
       mv "$tmp" "$LOG_FILE"
-      log_line INFO root rotation "rotated from ${lines} to ${tail_count} lines"
+      log_line root rotation "log_rotated" 0 "rotated from ${lines} to ${tail_count} lines"
     fi
   fi
 }
 
 log_line() {
-  local level="$1" repo="$2" tool="$3" status="$4" duration="${5:-0}" extra="${6:-}"
+  local repo="$1" tool="$2" status="$3" duration="${4:-0}" extra="${5:-}"
   printf '[%s] [%s] [%s] [%s] [%s] %s\n' \
     "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
     "$repo" "$tool" "$status" "${duration}s" "$extra" \
@@ -86,6 +88,39 @@ repo_name() {
   basename "$1"
 }
 
+# PID-aware timeout: macOS-native alternative to GNU timeout.
+# Usage: run_with_timeout <seconds> <command> [args...]
+# Returns: child exit status, or 124 on timeout.
+run_with_timeout() {
+  local seconds="$1"
+  shift
+
+  local output pid elapsed=0 rc=0
+  output="$(mktemp "${TMPDIR:-/tmp}/knowledge-refresh-timeout.XXXXXX")"
+
+  "$@" >"$output" 2>&1 &
+  pid=$!
+
+  while kill -0 "$pid" 2>/dev/null; do
+    if (( elapsed >= seconds )); then
+      kill -TERM "$pid" 2>/dev/null || true
+      sleep 5
+      kill -KILL "$pid" 2>/dev/null || true
+      wait "$pid" 2>/dev/null || true
+      cat "$output"
+      rm -f "$output"
+      return 124
+    fi
+    sleep 1
+    elapsed=$((elapsed + 1))
+  done
+
+  wait "$pid" || rc=$?
+  cat "$output"
+  rm -f "$output"
+  return "$rc"
+}
+
 # ---------------------------------------------------------------------------
 # Inventory validation
 # ---------------------------------------------------------------------------
@@ -101,6 +136,22 @@ validate_inventory() {
   if [[ "$actual_digest" != "$expected_digest" ]]; then
     die "inventory SHA-256 mismatch (expected=${expected_digest} actual=${actual_digest}); inventory is not approved"
   fi
+
+  local root branch gitnexus_enabled graphify_enabled canonical_root
+  while IFS=$'\t' read -r root branch gitnexus_enabled graphify_enabled; do
+    [[ "$root" =~ ^#.*$ || -z "$root" ]] && continue
+    case "$root" in
+      "$HOME/Developer"/*) ;;
+      *) die "inventory path is outside approved workspace: ${root}" ;;
+    esac
+    [[ -d "$root" ]] || die "inventory repository missing: ${root}"
+    is_repo "$root" || die "inventory path is not a Git repository: ${root}"
+    canonical_root="$(cd "$root" 2>/dev/null && pwd)" || die "cannot canonicalize inventory path: ${root}"
+    [[ "$canonical_root" == "$root" ]] || die "inventory path is not canonical: ${root} (canonical=${canonical_root})"
+    [[ -n "$branch" ]] || die "inventory default branch missing: ${root}"
+    git -C "$root" show-ref --verify --quiet "refs/heads/${branch}" || \
+      die "inventory default branch not found: ${root} (${branch})"
+  done < "$INVENTORY_FILE"
   note "inventory approved (${actual_digest:0:12}...)"
 }
 
@@ -112,7 +163,7 @@ is_repo() {
 }
 
 is_dirty() {
-  ! git -C "$1" diff --quiet HEAD 2>/dev/null
+  [[ -n "$(git -C "$1" status --porcelain=v1 --untracked-files=all 2>/dev/null)" ]]
 }
 
 is_merge_state() {
@@ -129,13 +180,19 @@ is_rebase_state() {
 # ---------------------------------------------------------------------------
 # Lock management (PID-aware, never steal live locks)
 # ---------------------------------------------------------------------------
+lock_id() {
+  local canonical_root="$1"
+  printf '%s' "$canonical_root" | shasum -a 256 | awk '{print $1}'
+}
+
 acquire_lock() {
   local name="$1"
   local lock_dir="${LOCK_DIR}/${name}"
 
   mkdir -p "$LOCK_DIR"
   if mkdir "$lock_dir" 2>/dev/null; then
-    printf '%s\t%s\n' "$$" "$name" > "${lock_dir}/owner"
+    printf '%s\t%s\t%s\t%s\n' "$$" "${USER:-unknown}" \
+      "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$name" > "${lock_dir}/owner"
     return 0
   fi
 
@@ -152,7 +209,8 @@ acquire_lock() {
     rm -f "${lock_dir}/owner"
     rmdir "$lock_dir" 2>/dev/null || true
     if mkdir "$lock_dir" 2>/dev/null; then
-      printf '%s\t%s\n' "$$" "$name" > "${lock_dir}/owner"
+      printf '%s\t%s\t%s\t%s\n' "$$" "${USER:-unknown}" \
+        "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$name" > "${lock_dir}/owner"
       return 0
     fi
   fi
@@ -172,6 +230,9 @@ release_lock() {
 gitnexus_refresh() {
   local root="$1" branch="$2" name="$3"
   local start_ts status
+  local lock_name="gitnexus-$(lock_id "$root")"
+  local target_head="" indexed_rev="" final_head=""
+  start_ts="$(date +%s)"
 
   # Check gitnexus availability
   if ! command -v gitnexus >/dev/null 2>&1; then
@@ -190,7 +251,7 @@ gitnexus_refresh() {
   fi
 
   # Acquire workspace lock (atomic mkdir)
-  if ! acquire_lock "gitnexus-workspace"; then
+  if ! acquire_lock "$lock_name"; then
     status="lock_busy"
     note "  GitNexus: workspace lock busy for ${name}"
     log_line "$name" gitnexus "$status" "$(elapsed "$start_ts")"
@@ -198,16 +259,15 @@ gitnexus_refresh() {
   fi
 
   start_ts="$(date +%s)"
-  trap 'release_lock gitnexus-workspace' RETURN
+  trap 'release_lock $lock_name' RETURN
 
   # Check if index is already current
-  local target_head
   target_head="$(git -C "$root" rev-parse --verify HEAD 2>/dev/null || true)"
   if [[ -z "$target_head" ]]; then
     status="skipped_uninitialized"
     note "  GitNexus: no HEAD for ${name}"
     log_line "$name" gitnexus "$status" "$(elapsed "$start_ts")"
-    release_lock gitnexus-workspace
+    release_lock $lock_name
     trap - RETURN
     return 0
   fi
@@ -215,18 +275,15 @@ gitnexus_refresh() {
   note "  GitNexus: analyzing ${name} (branch=${branch})"
 
   local analyze_status=0
-  timeout "${GITNEXUS_TIMEOUT}" \
-    git -C "$root" -c core.pager=cat \
-    log --oneline -1 HEAD --format="%H" >/dev/null 2>&1 || true
-
-  timeout "${GITNEXUS_TIMEOUT}" \
-    GITNEXUS_EMBEDDING_DIMS=0 \
-    gitnexus analyze "$root" \
-      --index-only \
-      --drop-embeddings \
-      --default-branch "$branch" \
-      --name "$name" \
-    2>&1 | redact || analyze_status=$?
+  (
+    cd "$root"
+    GITNEXUS_EMBEDDING_DIMS="$GITNEXUS_INDEX_EMBEDDING_DIMS" \
+    run_with_timeout "$GITNEXUS_TIMEOUT" \
+      gitnexus analyze . \
+        --index-only \
+        --default-branch "$branch" \
+        --name "$name"
+  ) 2>&1 | redact || analyze_status=$?
 
   local dur
   dur="$(elapsed "$start_ts")"
@@ -234,29 +291,51 @@ gitnexus_refresh() {
   if [[ "$analyze_status" -eq 124 ]]; then
     status="timeout"
     warn "  GitNexus: analysis timed out for ${name} after ${GITNEXUS_TIMEOUT}s"
-    log_line "$name" gitnexus "$status" "$dur"
-    release_lock gitnexus-workspace
+    log_line "$name" gitnexus "$status" "$dur" \
+      "target=${target_head};indexed=${indexed_rev};final=${final_head}"
+    release_lock $lock_name
     trap - RETURN
     return 0
   elif [[ "$analyze_status" -ne 0 ]]; then
     status="failed"
     warn "  GitNexus: analysis failed for ${name} (exit=${analyze_status})"
-    log_line "$name" gitnexus "$status" "$dur"
-    release_lock gitnexus-workspace
+    log_line "$name" gitnexus "$status" "$dur" \
+      "target=${target_head};indexed=${indexed_rev};final=${final_head}"
+    release_lock $lock_name
     trap - RETURN
     return 1
   fi
 
-  # Verify indexed revision matches target HEAD
-  local indexed_rev=""
-  if command -v gitnexus >/dev/null 2>&1; then
-    indexed_rev="$(gitnexus status --repo "$name" --json 2>/dev/null | \
-      command -v jq >/dev/null 2>&1 && \
-      jq -r '.revision // .current_commit // empty' 2>/dev/null || true)" || true
-  fi
+  # Verify indexed revision from GitNexus metadata. The installed CLI's
+  # `status` command is current-repository-only and has no --repo/--json API.
+  indexed_rev="$(python3 - "${root}/.gitnexus/meta.json" \
+    "${root}/.gitnexus/gitnexus.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+for raw in sys.argv[1:]:
+    path = Path(raw)
+    if not path.is_file():
+        continue
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        continue
+    value = data.get("lastCommit") or data.get("current_commit") or data.get("revision")
+    if isinstance(value, str) and value:
+        print(value)
+        break
+PY
+  )"
+
+  final_head="$(git -C "$root" rev-parse --verify HEAD 2>/dev/null || true)"
 
   status="success"
-  if [[ -n "$indexed_rev" && -n "$target_head" && "$indexed_rev" == "$target_head" ]]; then
+  if [[ -n "$final_head" && "$final_head" != "$target_head" ]]; then
+    status="superseded"
+    warn "  GitNexus: ${name} HEAD changed during refresh (${target_head:0:12} -> ${final_head:0:12})"
+  elif [[ -n "$indexed_rev" && -n "$target_head" && "$indexed_rev" == "$target_head" ]]; then
     note "  GitNexus: ${name} indexed at ${target_head:0:12}"
   elif [[ -n "$indexed_rev" && -n "$target_head" && "$indexed_rev" != "$target_head" ]]; then
     status="superseded"
@@ -266,8 +345,9 @@ gitnexus_refresh() {
     note "  GitNexus: ${name} refreshed (could not verify revision)"
   fi
 
-  log_line "$name" gitnexus "$status" "$dur"
-  release_lock gitnexus-workspace
+  log_line "$name" gitnexus "$status" "$dur" \
+      "target=${target_head};indexed=${indexed_rev};final=${final_head}"
+  release_lock $lock_name
   trap - RETURN
   return 0
 }
@@ -275,9 +355,31 @@ gitnexus_refresh() {
 # ---------------------------------------------------------------------------
 # Graphify refresh
 # ---------------------------------------------------------------------------
+snapshot_graph_outputs() {
+  local root="$1" snapshot_dir="$2"
+  local output
+  mkdir -p "$snapshot_dir"
+  for output in graph.json manifest.json .graphify_analysis.json GRAPH_REPORT.md; do
+    if [[ -f "${root}/graphify-out/${output}" ]]; then
+      cp -p "${root}/graphify-out/${output}" "${snapshot_dir}/${output}"
+    fi
+  done
+}
+
+restore_graph_outputs() {
+  local root="$1" snapshot_dir="$2"
+  local output
+  for output in "$snapshot_dir"/*; do
+    [[ -f "$output" ]] || continue
+    cp -p "$output" "${root}/graphify-out/$(basename "$output")"
+  done
+}
+
 graphify_refresh() {
   local root="$1" name="$2"
   local start_ts status
+  local lock_name="graphify-$(lock_id "$root")"
+  start_ts="$(date +%s)"
 
   # Check graphify availability
   if ! command -v graphify >/dev/null 2>&1; then
@@ -302,7 +404,7 @@ graphify_refresh() {
     if [[ -n "$watcher_pid" ]] && [[ "$watcher_pid" =~ ^[0-9]+$ ]]; then
       if lsof -p "$watcher_pid" >/dev/null 2>&1; then
         status="watcher_active"
-        note "  Graphify: active watcher for ${name} (PID=${watcher_pid}), skipping"
+        note "  Graphify: watcher_active for ${name} (PID=${watcher_pid}), skipping"
         log_line "$name" graphify "$status" "$(elapsed "$start_ts")"
         return 0
       fi
@@ -310,7 +412,7 @@ graphify_refresh() {
   fi
 
   # Acquire owner lock (atomic mkdir)
-  if ! acquire_lock "graphify-${name}"; then
+  if ! acquire_lock "$lock_name"; then
     status="lock_busy"
     note "  Graphify: lock busy for ${name}"
     log_line "$name" graphify "$status" "$(elapsed "$start_ts")"
@@ -318,24 +420,27 @@ graphify_refresh() {
   fi
 
   start_ts="$(date +%s)"
-  trap 'release_lock "graphify-${name}"' RETURN
+  trap 'release_lock "$lock_name"' RETURN
 
-  # Backup graph.json before refresh
+  # Snapshot all usable Graphify outputs before refresh
   local backup_dir
   backup_dir="$(mktemp -d "${TMPDIR:-/tmp}/graphify-backup-${name}.XXXXXX")"
+  snapshot_graph_outputs "$root" "$backup_dir"
   local had_graph=0
-  if [[ -f "${root}/graphify-out/graph.json" ]]; then
-    cp "${root}/graphify-out/graph.json" "${backup_dir}/graph.json"
-    had_graph=1
+  if [[ -f "${backup_dir}/graph.json" ]] && \
+    ! python3 -c 'import json, sys; json.load(open(sys.argv[1]))' \
+      "${backup_dir}/graph.json" >/dev/null 2>&1; then
+    rm -f "${backup_dir}/graph.json"
   fi
+  [[ -f "${backup_dir}/graph.json" ]] && had_graph=1
 
   note "  Graphify: refreshing ${name}"
 
   local graphify_status=0
   (
     cd "$root"
-    GRAPHIFY_VIZ_NODE_LIMIT=0 timeout "${GRAPHIFY_TIMEOUT}" \
-      graphify extract . --code-only 2>&1 | redact
+    GRAPHIFY_VIZ_NODE_LIMIT=0 run_with_timeout "${GRAPHIFY_TIMEOUT}" \
+      graphify update . 2>&1 | redact
   ) >> "${LOG_FILE}" 2>&1 || graphify_status=$?
 
   local dur
@@ -345,24 +450,75 @@ graphify_refresh() {
     status="timeout"
     warn "  Graphify: refresh timed out for ${name} after ${GRAPHIFY_TIMEOUT}s"
     # Restore on failure
-    if [[ "$had_graph" -eq 1 ]] && [[ -f "${backup_dir}/graph.json" ]]; then
-      cp "${backup_dir}/graph.json" "${root}/graphify-out/graph.json"
-      note "  Graphify: restored graph.json backup for ${name}"
+    if [[ "$had_graph" -eq 1 ]]; then
+      restore_graph_outputs "$root" "$backup_dir"
+      note "  Graphify: restored output snapshot for ${name}"
     fi
-    log_line "$name" graphify "$status" "$dur"
-    release_lock "graphify-${name}"
+    rm -rf "$backup_dir"
+      log_line "$name" graphify "$status" "$dur"
+    release_lock "$lock_name"
     trap - RETURN
     return 0
   elif [[ "$graphify_status" -ne 0 ]]; then
-    status="failed"
-    warn "  Graphify: refresh failed for ${name} (exit=${graphify_status})"
-    # Restore on failure
-    if [[ "$had_graph" -eq 1 ]] && [[ -f "${backup_dir}/graph.json" ]]; then
-      cp "${backup_dir}/graph.json" "${root}/graphify-out/graph.json"
-      note "  Graphify: restored graph.json backup for ${name}"
+    warn "  Graphify: update failed for ${name} (exit=${graphify_status}); trying code-only repair"
+    graphify_status=0
+    local repair_dir
+    repair_dir="$(mktemp -d "${TMPDIR:-/tmp}/graphify-repair-${name}.XXXXXX")"
+    (
+      cd "$root"
+      GRAPHIFY_VIZ_NODE_LIMIT=0 run_with_timeout "${GRAPHIFY_TIMEOUT}" \
+        graphify extract . --code-only --out "$repair_dir" 2>&1 | redact
+    ) >> "${LOG_FILE}" 2>&1 || graphify_status=$?
+    dur="$(elapsed "$start_ts")"
+
+    if [[ "$graphify_status" -eq 0 ]] && \
+      [[ -f "${repair_dir}/graphify-out/graph.json" ]] && \
+      python3 -c 'import json, sys; json.load(open(sys.argv[1]))' \
+        "${repair_dir}/graphify-out/graph.json" >/dev/null 2>&1; then
+      cp -R "${repair_dir}/graphify-out/." "${root}/graphify-out/"
+    elif [[ "$graphify_status" -eq 0 ]]; then
+      graphify_status=1
     fi
-    log_line "$name" graphify "$status" "$dur"
-    release_lock "graphify-${name}"
+    rm -rf "$repair_dir"
+
+    if [[ "$graphify_status" -eq 124 ]]; then
+      status="timeout"
+      warn "  Graphify: repair timed out for ${name} after ${GRAPHIFY_TIMEOUT}s"
+      if [[ "$had_graph" -eq 1 ]]; then
+        restore_graph_outputs "$root" "$backup_dir"
+      fi
+      rm -rf "$backup_dir"
+      log_line "$name" graphify "$status" "$dur"
+      release_lock "$lock_name"
+      trap - RETURN
+      return 0
+    elif [[ "$graphify_status" -ne 0 ]]; then
+      status="failed"
+      warn "  Graphify: repair failed for ${name} (exit=${graphify_status})"
+      if [[ "$had_graph" -eq 1 ]]; then
+        restore_graph_outputs "$root" "$backup_dir"
+        note "  Graphify: restored output snapshot for ${name}"
+      fi
+      rm -rf "$backup_dir"
+      log_line "$name" graphify "$status" "$dur"
+      release_lock "$lock_name"
+      trap - RETURN
+      return 1
+    fi
+  fi
+
+  if [[ ! -f "${root}/graphify-out/graph.json" ]] || \
+    ! python3 -c 'import json, sys; json.load(open(sys.argv[1]))' \
+      "${root}/graphify-out/graph.json" >/dev/null 2>&1; then
+    status="failed"
+    warn "  Graphify: graph.json missing or invalid for ${name}"
+    if [[ "$had_graph" -eq 1 ]]; then
+      restore_graph_outputs "$root" "$backup_dir"
+      note "  Graphify: restored output snapshot for ${name}"
+    fi
+    rm -rf "$backup_dir"
+      log_line "$name" graphify "$status" "$dur"
+    release_lock "$lock_name"
     trap - RETURN
     return 1
   fi
@@ -374,7 +530,7 @@ graphify_refresh() {
   # Cleanup backup
   rm -rf "$backup_dir"
 
-  release_lock "graphify-${name}"
+  release_lock "$lock_name"
   trap - RETURN
   return 0
 }
@@ -428,7 +584,7 @@ refresh_worktrees() {
         # End of one worktree entry -- evaluate it
         if [[ -n "$current_wt" && -n "$canonical_root" ]]; then
           local wt_name
-          wt_name="$(repo_name "$current_wt")"
+          wt_name="$(repo_name "$current_wt")-wt-$(lock_id "$current_wt" | cut -c1-8)"
 
           # Skip main checkout
           if [[ "$current_wt" == "$canonical_root" || "$current_wt" == "$canonical_root/" ]]; then
@@ -526,7 +682,7 @@ process_target() {
   if is_merge_state "$canonical_root" || is_rebase_state "$canonical_root"; then
     note "  Skipping ${name}: merge or rebase in progress"
     log_line "$name" "$trigger" "skipped_merge_state" "0" "merge/rebase active"
-    return 1
+    return $RC_SKIP
   fi
 
   local target_head
@@ -635,6 +791,9 @@ process_single_repo() {
   local repo_path="$1"
   local trigger="${2:-manual}"
 
+  log_init
+  log_rotate
+
   # Canonicalize and validate
   local canonical
   canonical="$(cd "$repo_path" 2>/dev/null && pwd)" || { warn "Directory not found: $repo_path"; return 0; }
@@ -662,7 +821,7 @@ process_single_repo() {
   done < "$INVENTORY_FILE"
 
   if ! $found; then
-    warn "Repository not in approved inventory: $canonical"
+    note "  Skipping $(repo_name "$canonical"): skipped_unlisted (not in inventory)"
     log_line "$(repo_name "$canonical")" "$trigger" "skipped_unlisted" "0" "not in inventory"
     return 0
   fi
@@ -679,9 +838,6 @@ process_single_repo() {
     # Graphify handled by existing hook
     inv_gf="no"
   fi
-
-  log_init
-  log_rotate
 
   # Advisory: hook must never block git operations
   if process_target "$canonical" "$inv_branch" "$inv_gn" "$inv_gf" "$trigger"; then
@@ -757,7 +913,13 @@ main() {
       validate_inventory
       log_init
       log_rotate
-      process_inventory
+      local batch_status=0
+      run_with_timeout "$OVERALL_TIMEOUT" process_inventory || batch_status=$?
+      if [[ "$batch_status" -eq 124 ]]; then
+        log_line "SYSTEM" overall "timeout" "$OVERALL_TIMEOUT" "batch timeout"
+        return 0
+      fi
+      return "$batch_status"
       ;;
   esac
 }
