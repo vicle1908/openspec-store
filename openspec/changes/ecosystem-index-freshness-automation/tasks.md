@@ -2,24 +2,19 @@
 
 ## 1. Create workspace refresh script
 
-Create `~/Developer/scripts/refresh-knowledge-indexes.sh` that:
-- Discovers repos with `.gitnexus/` or `graphify-out/` under `~/Developer/`
-- Discovers worktrees for each repo via `git worktree list --porcelain`
-- Runs `gitnexus analyze . --index-only --default-branch main` for GitNexus repos
-- Runs `graphify update .` for Graphify repos (main checkout only)
-- Uses lockfile for concurrency safety
-- Logs to `~/Developer/.knowledge-refresh/refresh.log`
-- Skips repos in merge/rebase state
-- Skips detached HEAD and stale (>30 day) worktrees
-- Handles missing CLIs gracefully (skip + warning)
+Create `~/Developer/scripts/refresh-knowledge-indexes.sh` using official patterns from `go-microservices/scripts/knowledge-tools.sh`.
 
 ### 1.1 Create log directory
 
 Create `~/Developer/.knowledge-refresh/` directory.
 
-### 1.2 Implement lockfile mechanism
+### 1.2 Implement owner lock mechanism
 
-Non-blocking lockfile at `/tmp/knowledge-refresh.lock` with stale detection.
+Reuse the official directory-based lock pattern:
+- `acquire_gitnexus_owner` / `release_gitnexus_owner` (from knowledge-tools.sh)
+- `acquire_graphify_owner` / `release_graphify_owner` (from knowledge-tools.sh)
+- Check for `.rebuild.lock` before acquiring Graphify lock
+- Stale lock detection via PID liveness check
 
 ### 1.3 Implement repo discovery
 
@@ -35,11 +30,19 @@ For each repo, run `git worktree list --porcelain` and filter:
 
 ### 1.5 Implement GitNexus refresh
 
-Run `gitnexus analyze . --index-only --default-branch main` with timeout and error handling. For worktrees, run from the worktree directory.
+Use the official command: `gitnexus analyze . --index-only --default-branch main`
+- Acquire workspace lock before refresh
+- Release after refresh
+- For worktrees: run from worktree directory (each has own `.gitnexus/`)
 
 ### 1.6 Implement Graphify refresh
 
-Run `graphify update .` with timeout and error handling. Only run from main checkouts (not worktrees).
+Use the official foreground command: `graphify extract . --code-only`
+- Acquire repo owner lock before refresh
+- Release after refresh
+- Only run from main checkouts (not worktrees)
+- Set `GRAPHIFY_VIZ_NODE_LIMIT=0` (official pattern)
+- Backup `graph.json` before refresh, restore on failure
 
 ### 1.7 Implement logging
 
@@ -51,13 +54,15 @@ Create a post-merge hook that triggers delayed refresh when code lands on main.
 
 ### 2.1 Write the post-merge hook
 
-Hook logic:
+Hook logic (uses official patterns):
 - Detect if merge target is main branch (check `MERGE_HEAD` or branch name)
+- Acquire graphify owner lock (yields if watch/refresh running)
 - Write timestamp to `/tmp/knowledge-postmerge-<repo-slug>.ts`
-- Sleep 30 seconds (detached background process)
-- Read timestamp back — if changed, exit (newer merge will handle it)
-- Run `gitnexus analyze . --index-only --default-branch main`
-- Run `graphify update .`
+- Sleep 30 seconds (detached background)
+- Check timestamp — if changed, exit (newer merge will handle it)
+- Run: `gitnexus analyze . --index-only --default-branch main`
+- Run: `GRAPHIFY_VIZ_NODE_LIMIT=0 graphify extract . --code-only`
+- Release owner lock
 - Log result to `~/Developer/.knowledge-refresh/post-merge.log`
 
 ### 2.2 Create hook installer
@@ -65,6 +70,7 @@ Hook logic:
 Create `~/Developer/scripts/install-post-merge-hook.sh` that:
 - Finds all repos with `.gitnexus/` or `graphify-out/`
 - Installs the post-merge hook in each (idempotent, marked block)
+- Uses `# knowledge-postmerge-start` / `# knowledge-postmerge-end` markers
 - Preserves existing hook content
 - Reports which repos were updated
 
@@ -123,10 +129,11 @@ Add automation requirements to `openspec/specs/refresh-gitnexus-index-groups/spe
 - [ ] `~/Developer/scripts/knowledge-status.sh` reports freshness correctly for repos + worktrees
 - [ ] Post-merge hook triggers delayed refresh on merge to main
 - [ ] Post-merge debounce prevents redundant refreshes during rapid merges
+- [ ] Owner lock mechanism coordinates with existing `graphify watch` sessions
 - [ ] LaunchAgent loads with `launchctl load ~/Library/LaunchAgents/com.developer.index-refresh.plist`
 - [ ] Manual trigger works: `launchctl start com.developer.index-refresh`
 - [ ] Log files are created and contain timestamped entries
-- [ ] Overlapping runs are prevented by lockfile
+- [ ] Owner lock contention yields gracefully (no forced override)
 - [ ] Missing CLI (gitnexus/graphify) doesn't crash the script
 - [ ] Detached HEAD worktrees are skipped
 - [ ] Stale worktrees (>30 days) are skipped

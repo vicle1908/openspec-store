@@ -2,120 +2,172 @@
 
 ## Architecture Overview
 
-Three complementary mechanisms ensure indexes stay fresh for coding agents:
+Three complementary mechanisms ensure indexes stay fresh for coding agents, built on top of the official Graphify and GitNexus patterns already established in `go-microservices/scripts/knowledge-tools.sh`:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    FRESHNESS LAYERS                      │
-├─────────────┬──────────────────┬────────────────────────┤
-│  Layer 1    │  Layer 2         │  Layer 3               │
-│  Post-Merge │  Worktree-Aware  │  Nightly Bulk          │
-│  Trigger    │  Refresh         │  Refresh               │
-├─────────────┼──────────────────┼────────────────────────┤
-│ Fires:      │ Fires:           │ Fires:                 │
-│ 30s after   │ On worktree      │ 02:30 AM daily         │
-│ merge to    │ creation/switch  │                        │
-│ main        │                  │                        │
-├─────────────┼──────────────────┼────────────────────────┤
-│ Scope:      │ Scope:           │ Scope:                 │
-│ Main checkout│ Main checkout   │ All repos + all        │
-│ of merged   │ + new worktree   │ worktrees              │
-│ repo only   │                  │                        │
-├─────────────┼──────────────────┼────────────────────────┤
-│ Tools:      │ Tools:           │ Tools:                 │
-│ gitnexus    │ graphify update  │ gitnexus analyze       │
-│ analyze     │ (main checkout)  │ --index-only           │
-│ --index-only│                  │ graphify update .      │
-│ graphify    │                  │                        │
-│ update .    │                  │                        │
-└─────────────┴──────────────────┴────────────────────────┘
+┌─────────────────┬──────────────────┬────────────────────────┐
+│  Layer 1        │  Layer 2         │  Layer 3               │
+│  Post-Merge     │  Worktree-Aware  │  Nightly Bulk          │
+│  Trigger        │  Refresh         │  Refresh               │
+├─────────────────┼──────────────────┼────────────────────────┤
+│  30s after      │  On worktree     │  02:30 AM daily        │
+│  merge to main  │  creation        │                        │
+├─────────────────┼──────────────────┼────────────────────────┤
+│  Main checkout  │  Main + new      │  All repos + all       │
+│  of merged repo │  worktree        │  worktrees             │
+├─────────────────┼──────────────────┼────────────────────────┤
+│  Official       │  Official owner  │  Official              │
+│  post-merge     │  lock pattern    │  analyze --index-only  │
+│  hook pattern   │  + COMMONDIR     │  + extract --code-only │
+└─────────────────┴──────────────────┴────────────────────────┘
 ```
+
+## Official Patterns (from knowledge-tools.sh)
+
+This design reuses the established patterns from `go-microservices/scripts/knowledge-tools.sh` rather than inventing new ones:
+
+### Graphify owner lock mechanism
+
+```bash
+# Official pattern: directory-based lock with owner tracking
+graphify_lock_dir() {
+  local name="$1"
+  printf '%s/locks/graphify-%s.lock\n' "$STATE_DIR" "$name"
+}
+
+acquire_graphify_owner() {
+  local root="$1" name="$2" owner="$3"
+  local lock_dir
+  lock_dir="$(graphify_lock_dir "$name")"
+  mkdir -p "${STATE_DIR}/locks"
+  # Check for hook-owned rebuild lock
+  if [[ -e "${root}/graphify-out/.rebuild.lock" ]]; then
+    warn "Graphify ${name} is already rebuilding under the hook-owned lock"
+    return 1
+  fi
+  if ! mkdir "$lock_dir" 2>/dev/null; then
+    # Lock held by another process
+    local active_owner="unknown"
+    [[ -f "${lock_dir}/owner" ]] && active_owner="$(head -1 "${lock_dir}/owner")"
+    warn "Graphify ${name} refresh owner is ${active_owner}; ${owner} cannot start"
+    return 1
+  fi
+  printf '%s\n' "$owner" >"${lock_dir}/owner"
+}
+```
+
+### GitNexus workspace lock
+
+```bash
+# Official pattern: directory-based lock
+gitnexus_lock_dir() {
+  printf '%s/locks/gitnexus-workspace.lock\n' "$STATE_DIR"
+}
+
+acquire_gitnexus_owner() {
+  local owner="$1"
+  local lock_dir
+  lock_dir="$(gitnexus_lock_dir)"
+  mkdir -p "${STATE_DIR}/locks"
+  if mkdir "$lock_dir" 2>/dev/null; then
+    printf '%s\t%s\n' "$$" "$owner" >"${lock_dir}/owner"
+    return 0
+  fi
+  # Stale lock detection: check if owner PID is still alive
+  local active_pid="" active_owner="unknown"
+  [[ -f "${lock_dir}/owner" ]] && read -r active_pid active_owner <"${lock_dir}/owner"
+  if [[ "$active_pid" =~ ^[0-9]+$ ]] && ! kill -0 "$active_pid" 2>/dev/null; then
+    rm -f "${lock_dir}/owner" && rmdir "$lock_dir" 2>/dev/null
+    if mkdir "$lock_dir" 2>/dev/null; then
+      printf '%s\t%s\n' "$$" "$owner" >"${lock_dir}/owner"
+      return 0
+    fi
+  fi
+  warn "GitNexus workspace owner is ${active_owner}; ${owner} cannot start"
+  return 1
+}
+```
+
+### Graphify hook coordination
+
+The existing Graphify post-commit hook checks for the owner lock and yields:
+
+```bash
+# From .git/hooks/post-commit
+_KNOWLEDGE_GRAPHIFY_OWNER=/Users/androidteam/Developer/go-microservices/.knowledge-state/locks/graphify-microservices.lock
+[ -d "$_KNOWLEDGE_GRAPHIFY_OWNER" ] && exit 0  # yield to explicit refresh
+```
+
+### GitNexus authorized recovery pattern
+
+From `gitnexus-stable-contract`:
+
+> **WHEN** an index is stale and the user has contemporaneously authorized recovery
+> **THEN** an operator MAY run `analyze --index-only --default-branch main`
+> **AND** the operation SHALL reject `--force`, embeddings, PDG, skills/context injection
 
 ## Part 1: Post-Merge Trigger
 
 ### Problem
 
-When a PR merges to main, agents working on subsequent tasks get stale index results. The 30-60s delay lets git operations settle (pack files, ref updates) before indexing.
+When a PR merges to main, agents working on subsequent tasks get stale index results.
 
 ### Design
 
-A **post-merge hook** installed in each indexed repo's `.git/hooks/post-merge`. Unlike the existing Graphify post-commit hook (which runs on every commit), this only fires on actual merges to main.
+A **post-merge hook** installed in each indexed repo's `.git/hooks/post-merge`. Uses the official owner lock mechanism to coordinate with the existing Graphify post-commit hook and any running `graphify watch` sessions.
 
 ```
 .git/hooks/post-merge
   ├── Detect if merge target is main branch
+  ├── Acquire graphify owner lock (yields if watch/refresh running)
   ├── Debounce: write timestamp to /tmp/knowledge-postmerge-<repo>.ts
-  ├── Sleep 30s (lets git operations settle)
-  ├── Check if timestamp still matches (no newer merge happened)
-  ├── If match: run refresh in background (detached process)
-  └── If mismatch: skip (newer merge will handle it)
+  ├── Sleep 30s (detached background)
+  ├── Check if timestamp still matches (no newer merge)
+  ├── Run: gitnexus analyze . --index-only --default-branch main
+  ├── Run: graphify extract . --code-only (official foreground pattern)
+  ├── Release owner lock
+  └── Log result
 ```
-
-### Key decisions
-
-**Why post-merge, not post-commit?**
-- Post-commit fires on every commit including local WIP commits
-- Post-merge only fires when code actually lands on a branch
-- The existing Graphify post-commit hook already handles local commits (in go-microservices)
-
-**Why 30s delay?**
-- Git operations (pack files, ref updates) take a few seconds after merge
-- GitHub/GitLab push events may trigger additional operations
-- 30s is enough for settling but fast enough for agent freshness
-- The debounce check prevents redundant work if multiple merges land quickly
-
-**Why not use `at` or `launchctl` for the delay?**
-- `at` is deprecated on macOS
-- LaunchAgent scheduling is too coarse (minute-level)
-- A simple `sleep 30` in the hook is reliable and self-contained
-- The hook already runs detached (background), so it doesn't block the merge
 
 ### Hook installation
 
-The hook is installed alongside the existing Graphify post-commit hook:
-- `knowledge-tools.sh install-hooks` extends to include post-merge
-- The hook is marked with `# knowledge-postmerge-start` / `# knowledge-postmerge-end` blocks
-- Idempotent: re-running install-hooks doesn't duplicate the block
+Extend `knowledge-tools.sh install-hooks` to include post-merge alongside the existing Graphify post-commit and post-checkout hooks. Uses the same marked block pattern:
+
+```bash
+# knowledge-postmerge-start
+# ... hook content ...
+# knowledge-postmerge-end
+```
+
+### Debounce logic
+
+```bash
+_REPO_SLUG=$(echo "$REPO_ROOT" | tr '/' '_' | tr '.' '_')
+_TS_FILE="/tmp/knowledge-postmerge-${_REPO_SLUG}.ts"
+echo "$(date +%s)" > "$_TS_FILE"
+sleep 30
+# Check if a newer merge happened during the sleep
+_CURRENT_TS=$(cat "$_TS_FILE" 2>/dev/null || echo 0)
+_STORED_TS=$(echo "$_CURRENT_TS" | head -1)
+if [ "$(cat "$_TS_FILE")" != "$_STORED_TS" ]; then
+  exit 0  # newer merge will handle it
+fi
+```
 
 ## Part 2: Worktree-Aware Refresh
 
 ### Problem
 
-Git worktrees are used extensively (4 active). Each worktree:
+Git worktrees are used extensively. Each worktree:
 - Has its own `.gitnexus/` directory (GitNexus indexes per-worktree correctly)
 - Shares the main checkout's `graphify-out/` (Graphify graph is shared)
 - The existing Graphify hook explicitly skips worktrees (COMMONDIR check)
-
-When agents work in worktrees, they need:
-1. Their own GitNexus index to be current
-2. The shared Graphify graph to be current (refreshed from main checkout)
 
 ### Design
 
 #### GitNexus worktree indexing
 
-Each worktree already has its own `.gitnexus/` with a separate index. The nightly refresh discovers worktrees and refreshes each one:
-
-```
-For each repo with .gitnexus/:
-  1. git worktree list --porcelain
-  2. For each worktree path:
-     a. If worktree has .gitnexus/ → run gitnexus analyze --index-only
-     b. Skip bare repos and detached HEAD worktrees
-```
-
-GitNexus handles worktree isolation natively — each worktree's index is independent.
-
-#### Graphify worktree awareness
-
-Worktrees share the main checkout's `graphify-out/`. The strategy:
-
-1. **Post-merge hook** runs from main checkout → refreshes shared graph
-2. **Worktree creation** triggers post-checkout hook → refreshes main checkout's graph
-3. **Nightly refresh** scans main checkouts only for Graphify (not worktrees)
-4. **Worktree status** reports whether the shared graph is fresh
-
-#### Worktree discovery
+Each worktree already has its own `.gitnexus/` with a separate index. The nightly refresh discovers worktrees and refreshes each one using the official `analyze --index-only` pattern:
 
 ```bash
 discover_worktrees() {
@@ -124,6 +176,33 @@ discover_worktrees() {
     awk '/^worktree / { print $2 }' | \
     grep -v "^${repo_root}$"  # exclude main checkout
 }
+
+# For each worktree with .gitnexus/
+for wt in $(discover_worktrees "$repo_root"); do
+  if [[ -d "$wt/.gitnexus" ]]; then
+    (cd "$wt" && gitnexus analyze . --index-only --default-branch main)
+  fi
+done
+```
+
+GitNexus handles worktree isolation natively — each worktree's index is independent.
+
+#### Graphify worktree awareness
+
+Worktrees share the main checkout's `graphify-out/`. The official pattern (from the Graphify post-commit hook) is:
+
+1. **Hook-owned refresh** runs from main checkout → refreshes shared graph
+2. **Worktree creation** triggers post-checkout hook → refreshes main checkout's graph
+3. **Nightly refresh** uses owner lock mechanism to coordinate with hooks
+
+The COMMONDIR check in the existing hook ensures worktrees don't run Graphify refreshes:
+
+```bash
+_GFY_GITDIR=$(cd "$(git rev-parse --git-dir 2>/dev/null)" 2>/dev/null && pwd)
+_GFY_COMMONDIR=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd)
+if [ -n "$_GFY_COMMONDIR" ] && [ "$_GFY_GITDIR" != "$_GFY_COMMONDIR" ]; then
+    exit 0  # skip worktrees
+fi
 ```
 
 #### Worktree filtering
@@ -141,7 +220,7 @@ Catches anything the post-merge trigger missed (manual `git pull`, force pushes,
 
 ### Design
 
-Same as original proposal — LaunchAgent at 02:30 AM running the refresh script across all repos and worktrees.
+LaunchAgent at 02:30 AM running the refresh script. Uses the official owner lock mechanism to coordinate with any running watch sessions or hooks.
 
 ```
 ~/Library/LaunchAgents/com.developer.index-refresh.plist
@@ -149,8 +228,13 @@ Same as original proposal — LaunchAgent at 02:30 AM running the refresh script
         ├── discovers repos with .gitnexus/ or graphify-out/
         ├── discovers worktrees for each repo
         ├── for each repo + worktree:
+        │   ├── acquire_gitnexus_owner (yields if workspace lock held)
         │   ├── gitnexus analyze . --index-only --default-branch main
-        │   └── graphify update .  (main checkout only)
+        │   ├── release_gitnexus_owner
+        │   ├── acquire_graphify_owner (yields if watch/hook running)
+        │   ├── graphify extract . --code-only (official foreground pattern)
+        │   ├── release_graphify_owner
+        │   └── (worktrees: gitnexus analyze --index-only only)
         └── writes: ~/Developer/.knowledge-refresh/refresh.log
 ```
 
@@ -164,9 +248,33 @@ Same as original proposal — LaunchAgent at 02:30 AM running the refresh script
 | Worktree-aware | On worktree creation | New worktrees | Low (one-shot) |
 | Nightly bulk | Hours (02:30 AM) | Everything | Low (incremental) |
 
-Each layer catches what the others miss. The post-merge trigger gives agents fresh indexes within minutes of a merge. The nightly refresh is the safety net.
+### 2. Official commands, not custom ones
 
-### 2. `--index-only` for GitNexus (no embeddings/PDG)
+| Tool | Official Command | Why |
+|---|---|---|
+| GitNexus refresh | `gitnexus analyze . --index-only --default-branch main` | Authorized in `gitnexus-stable-contract` for stale-index recovery |
+| Graphify foreground refresh | `graphify extract . --code-only` | Official pattern from `knowledge-tools.sh` line 404 |
+| Graphify hook refresh | `graphify update .` | Official pattern from post-commit hook |
+
+**NOT** `graphify update .` for foreground refresh — the official `knowledge-tools.sh` uses `graphify extract . --code-only` for foreground operations (line 404) and reserves `graphify update .` for the hook (line 892).
+
+### 3. Official owner lock mechanism
+
+Reuses the established directory-based lock pattern from `knowledge-tools.sh`:
+- `acquire_graphify_owner` / `release_graphify_owner`
+- `acquire_gitnexus_owner` / `release_gitnexus_owner`
+- Checks for `.rebuild.lock` (hook-owned rebuild)
+- Stale lock detection via PID liveness check
+
+### 4. Hook coordination, not hook replacement
+
+The post-merge hook coordinates with existing hooks:
+- Checks `_KNOWLEDGE_GRAPHIFY_OWNER` lock before running
+- Uses the same marked block pattern for installation
+- Yields to running `graphify watch` sessions
+- Doesn't duplicate the Graphify post-commit hook's work
+
+### 5. `--index-only` for GitNexus (no embeddings/PDG)
 
 Embeddings and PDG are expensive and should remain on-demand. The refresh uses `--index-only` which:
 - Updates the symbol graph and FTS index
@@ -174,71 +282,17 @@ Embeddings and PDG are expensive and should remain on-demand. The refresh uses `
 - Skips PDG analysis
 - Matches the bounded recovery authorized in `gitnexus-stable-contract`
 
-### 3. `graphify update .` for Graphify (AST-only)
-
-`graphify update .` runs incremental AST extraction:
-- No LLM/API cost
-- Fast (typically 5-15s per repo)
-- Only processes new/changed files
-- Matches the existing post-commit hook behavior
-
-### 4. Debounce over dedup
-
-The post-merge hook uses timestamp-based debounce rather than lockfile-based dedup:
-- Simpler (no lockfile management needed)
-- Handles rapid merge sequences (merge queue)
-- The 30s sleep naturally coalesces rapid merges
-- No risk of abandoned locks
-
-### 5. LaunchAgent over crontab
+### 6. LaunchAgent over crontab
 
 - LaunchAgent survives macOS restarts (crontab doesn't on modern macOS)
 - Integrates with `launchd` logging
 - Consistent with AgentMemory's proven pattern
 
-### 6. Concurrency guard
-
-The nightly refresh script uses a lockfile (`/tmp/knowledge-refresh.lock`). The post-merge hook uses debounce (no lockfile needed since it's per-repo).
-
-## Script Flow: Nightly Refresh
-
-```
-1. Acquire lockfile (non-blocking, exit if held)
-2. Start logging with timestamp
-3. Discover repos:
-   a. Find all dirs under ~/Developer with .gitnexus/ → GitNexus repos
-   b. Find all dirs under ~/Developer with graphify-out/ → Graphify repos
-4. For each repo:
-   a. Check if git operations are safe (not in merge/rebase)
-   b. Run gitnexus analyze --index-only (if GitNexus repo)
-   c. Run graphify update . (if Graphify repo, main checkout only)
-   d. Discover worktrees:
-      - git worktree list --porcelain
-      - For each worktree with .gitnexus/: run gitnexus analyze --index-only
-   e. Record success/failure
-5. Write summary to log
-6. Release lockfile
-```
-
-## Script Flow: Post-Merge Hook
-
-```
-1. Check if merge target is main branch (exit if not)
-2. Write current timestamp to /tmp/knowledge-postmerge-<repo-slug>.ts
-3. Sleep 30 seconds (background, detached)
-4. Read timestamp back — if changed, exit (newer merge will handle it)
-5. Acquire per-repo lockfile (non-blocking)
-6. Run gitnexus analyze . --index-only --default-branch main
-7. Run graphify update . (from main checkout)
-8. Log result
-9. Release lockfile
-```
-
 ## Files to Create/Modify
 
 | File | Action | Purpose |
 |---|---|---|
-| `~/Developer/scripts/refresh-knowledge-indexes.sh` | CREATE | Main nightly refresh script |
+| `~/Developer/scripts/refresh-knowledge-indexes.sh` | CREATE | Main nightly refresh script (uses official owner lock) |
 | `~/Developer/scripts/knowledge-status.sh` | CREATE | Status check across all repos + worktrees |
 | `~/Developer/scripts/install-post-merge-hook.sh` | CREATE | Install post-merge hook in indexed repos |
 | `~/Library/LaunchAgents/com.developer.index-refresh.plist` | CREATE | Nightly LaunchAgent |
@@ -247,22 +301,12 @@ The nightly refresh script uses a lockfile (`/tmp/knowledge-refresh.lock`). The 
 | `~/Developer/.claude/CLAUDE.md` | MODIFY | Update staleness warnings |
 | `openspec/specs/refresh-gitnexus-index-groups/spec.md` | MODIFY | Add automation requirements |
 
-## Logging
-
-- Log directory: `~/Developer/.knowledge-refresh/`
-- Log files:
-  - `refresh.log` — nightly bulk refresh (rotated weekly, max 52)
-  - `post-merge.log` — post-merge triggers (rotated weekly)
-  - `worktree-refresh.log` — worktree-specific refreshes
-- Format: `[ISO timestamp] [repo-name] [worktree|main] [tool] [status] [duration]`
-- Example: `[2026-08-14T02:30:01Z] [agent-core] [main] [gitnexus] [success] [8.2s]`
-- Example: `[2026-08-14T14:22:31Z] [go-microservices] [main] [gitnexus] [success] [12.3s]` (post-merge)
-
 ## Error Handling
 
 - Individual repo failures don't abort the script
-- Lockfile contention exits cleanly (no retry)
+- Owner lock contention yields gracefully (no forced override)
 - Missing tools (gitnexus/graphify not installed) skip repos with a warning
 - Stale worktrees (detached HEAD, old feature branches) are skipped
 - Post-merge debounce prevents redundant refreshes during rapid merges
+- Graphify output preservation: backup `graph.json` before refresh, restore on failure
 - Logs capture both stdout and stderr per repo
