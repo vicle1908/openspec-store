@@ -8,8 +8,8 @@
       "environment": "env-agent-core",
       "id": "agent-core-tdt-core",
       "import_name": "tdt_core",
-      "origin_path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna/src/tdt_core/__init__.py",
-      "origin_sha": "dd762557e89cfdddd3832a71fe0966521341f64c",
+      "origin_path": "/Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py",
+      "origin_sha": "26319d195408658fc8b784e0fcb87caab6f5775a",
       "upstream_repository": "tdt-core"
     },
     {
@@ -28,8 +28,8 @@
       "environment": "env-agent-docs-sync",
       "id": "agent-docs-sync-tdt-core",
       "import_name": "tdt_core",
-      "origin_path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna/src/tdt_core/__init__.py",
-      "origin_sha": "dd762557e89cfdddd3832a71fe0966521341f64c",
+      "origin_path": "/Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py",
+      "origin_sha": "26319d195408658fc8b784e0fcb87caab6f5775a",
       "upstream_repository": "tdt-core"
     },
     {
@@ -48,8 +48,8 @@
       "environment": "env-agent-harness",
       "id": "agent-harness-tdt-core",
       "import_name": "tdt_core",
-      "origin_path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna/src/tdt_core/__init__.py",
-      "origin_sha": "dd762557e89cfdddd3832a71fe0966521341f64c",
+      "origin_path": "/Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py",
+      "origin_sha": "26319d195408658fc8b784e0fcb87caab6f5775a",
       "upstream_repository": "tdt-core"
     },
     {
@@ -58,8 +58,8 @@
       "environment": "env-ai-harness-skills",
       "id": "ai-harness-skills-tdt-core",
       "import_name": "tdt_core",
-      "origin_path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna/src/tdt_core/__init__.py",
-      "origin_sha": "dd762557e89cfdddd3832a71fe0966521341f64c",
+      "origin_path": "/Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py",
+      "origin_sha": "26319d195408658fc8b784e0fcb87caab6f5775a",
       "upstream_repository": "tdt-core"
     },
     {
@@ -78,8 +78,8 @@
       "environment": "env-ai-review",
       "id": "ai-review-tdt-core",
       "import_name": "tdt_core",
-      "origin_path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna/src/tdt_core/__init__.py",
-      "origin_sha": "dd762557e89cfdddd3832a71fe0966521341f64c",
+      "origin_path": "/Users/androidteam/Developer/tdt-core/src/tdt_core/__init__.py",
+      "origin_sha": "26319d195408658fc8b784e0fcb87caab6f5775a",
       "upstream_repository": "tdt-core"
     }
   ],
@@ -162,7 +162,7 @@
       "root": "/Users/androidteam/Developer/openspec-store"
     },
     "tdt-core": {
-      "root": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna"
+      "root": "/Users/androidteam/Developer/tdt-core"
     }
   },
   "schema_version": "1.0.0"
