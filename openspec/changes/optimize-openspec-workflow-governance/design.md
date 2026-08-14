@@ -42,16 +42,9 @@ Implementation actions:
 3. Add provenance markers (version, author, owning change) to installed custom skills in `~/.hermes/skills/`.
 4. Any repository-local `.hermes/skills/` cleanup is a separate authorized migration with rollback.
 
-### Track 2: Cross-skill consistency matrix
+### Track 2: Cross-skill contract consistency
 
-A lightweight document (not a custom schema) that maps:
-- State model definitions across all four skills
-- Archive gate conditions
-- Validation commands referenced
-- Review dispatch rules
-- Closure-task sequencing rules
-
-Any inconsistency between the four skills becomes a concrete task.
+Four independent custom skills (workflow, code-review, plan-review, review-governance) define overlapping lifecycle rules. The consistency matrix will be a planning artifact in the OpenSpec change; it will not become a new Hermes skill or be installed into the store's `.hermes/skills/` tree.
 
 ### Track 3: Canonical pre-archive verifier script
 
@@ -90,12 +83,12 @@ This is already partially implemented in the workflow guidance but never formali
 
 ### Track 6: Primary skill size reduction
 
-The primary workflow SKILL.md is 70KB. The historical incident pitfall sections dominate the operational path. Move them to separate reference files:
-- Pitfall sections that describe specific past incidents → `references/incident-cases.md`
-- Pitfall sections that describe general anti-patterns → keep in SKILL.md (they are operational)
+The primary workflow SKILL.md is 70KB. The historical incident pitfall sections dominate the operational path. Move them to separate reference files under the same Hermes-native skill directory:
+- Pitfall sections that describe specific past incidents → `~/.hermes/skills/software-development/openspec-workflow/references/incident-cases.md`
+- Pitfall sections that describe general anti-patterns → keep in the Hermes skill (they are operational)
 - Reduce SKILL.md size (targeting ~30KB as initial hypothesis, not acceptance criterion) while preserving all operational guidance and verifying no rule is lost
 
-The review-governance skill (66KB) is a separate concern addressed in Track 2 (consistency matrix).
+This change does not move the skill directory into `openspec-store`.
 
 ## Non-goals
 

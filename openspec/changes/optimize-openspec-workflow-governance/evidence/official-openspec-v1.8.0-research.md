@@ -11,20 +11,28 @@
 - https://raw.githubusercontent.com/Fission-AI/OpenSpec/v1.8.0/docs/commands.md
 - https://raw.githubusercontent.com/Fission-AI/OpenSpec/v1.8.0/docs/workflows.md
 
-## Evidence Matrix
+## Hermes skill source evidence
 
-| Topic | Exact-version source | Installed evidence | Planning implication |
-|---|---|---|---|
-| Root precedence | agent-contract.md §3 | context --json → source:"store" | Require explicit --store and verify returned root.store_id |
-| Planning status | agent-contract.md §4 | status --json → isComplete | Never infer implementation completion from isComplete |
-| Task progress | agent-contract.md §4 | instructions apply --json | Authoritative task counter; use progress.remaining==0 |
-| Archive guidance | agent-contract.md, cli.md | instructions archive --json | Advisory/read-only, not readiness proof |
-| Archive mutation | cli.md | installed --help | Separate mutation from readiness; --yes overrides incomplete warning |
-| Generated skills | CLI docs/help | disposable init --tools test | 12 OPSX lifecycle skills regenerated; custom skills not affected |
-| Schema commands | CLI docs | schema which/fork experiments | Experimental; defer custom schema |
-| Stores/worksets | stores guide | context --json | Beta/version-sensitive surface |
+- Custom skill home: `~/.hermes/skills/` (Hermes Agent native path)
+- Store: `openspec-store/openspec/` remains the canonical OpenSpec planning store
+- Current Hermes config shape (read-only observation):
+  ```yaml
+  skills:
+    external_dirs: '["/Users/androidteam/Developer/openspec-store/.hermes/skills"]'
+  ```
+- Interpretation: the store-local `.hermes/skills/` directory is an active Hermes external skill source. It is not evidence that `openspec-store` owns the custom skills. Resolution precedence and duplicate-name behavior remain open Task 1.3 questions.
+- Safety boundary: do not change `skills.external_dirs`, move skills, or delete store-local adapters during planning.
 
-## CLI Experiments
+## Skill surface snapshot
+
+| Surface | Role | Current evidence |
+|---|---|---|
+| `~/.hermes/skills/` | Hermes-native custom skill home | Four custom skill groups present |
+| `openspec-store/.hermes/skills/` | Configured Hermes external directory | 29 tracked entries; mixed/generated classification pending |
+| `openspec-store/openspec/` | Canonical OpenSpec store | Specs, changes, archives, evidence |
+| `~/Developer/.agents/skills/` | Workspace shared generated skills | OpenSpec command adapters present |
+
+No runtime mutation or skill migration was performed.
 
 ### instructions archive (read-only)
 ```json

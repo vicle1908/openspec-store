@@ -57,16 +57,14 @@ This change creates the planning infrastructure for six optimization tracks. It 
 
 ## Evidence
 
-All findings are backed by concrete experiments and official documentation:
-
 | Finding | Source | Evidence |
 |---|---|---|
-| Primary skill not version-controlled | Filesystem | `test -d ~/.hermes/skills/.git` → NO |
-| Four custom skills, no overlapping relative paths | Provenance audit | Primary: 144 files (70KB + 759KB refs), Secondary: 17 files (11KB), 0 shared filenames |
-| Generated OPSX skills are 12 lifecycle commands | `init --tools hermes,agents` | Creates `.hermes/skills/` and `.agents/skills/` with 12 SKILL.md files, `generatedBy: "1.8.0"` |
-| `instructions archive` is read-only | Official docs + experiment | Returns `changeName`, `context`, `operationGuidance`, `root`; does not merge or move |
+| Custom skills live in `~/.hermes/skills/`, managed by Hermes | Filesystem + skill_manage | `test -d ~/.hermes/skills/.git` → NO (not a Git repo) |
+| Store tracks 29 `.hermes/skills/` entries (mixed content) | `git ls-files` | Generated OPSX adapters + intentional workspace integrations + unclassified |
+| Four custom governance skills, separate review tree | Provenance audit | Primary: 144 files (829 KB), Review tree: 17 files (91 KB), different logical skills |
+| `instructions archive` is read-only | Official docs + experiment | Returns `{changeName, context, operationGuidance, root}` |
 | Root precedence is 5-level | Official agent-contract.md | `--store` > nearest root > defaultStore > registered stores > scaffolding |
 | `schema fork` creates project-local schema | Experiment | Forks `spec-driven` into `openspec/schemas/test-fork/` with 4 templates |
 | `schema which --all --json` returns schema list | Experiment | 1 schema (`spec-driven`) from `package` source, no shadows |
 | Existing optimization change is Hermes runtime | Task inventory | `optimize-hermes-agent-configuration` (22/59) covers approvals, memory, browser, delegation |
-| `instructions archive` context is opaque text | Experiment | `context` is a string (2,642 chars), not structured JSON — not machine-parseable |
+| `instructions archive` context is opaque text | Experiment | `context` is a string (2,642 chars), not structured JSON |

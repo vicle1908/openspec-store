@@ -4,9 +4,10 @@
 
 - [x] 1.1 Record OpenSpec version (`1.8.0`), binary path (`/opt/homebrew/bin/openspec`), and official v1.8.0 doc URLs.
 - [x] 1.2 Inventory installed skills: four custom skills (openspec-workflow, openspec-code-review, openspec-plan-review, openspec-review-governance) and twelve generated OPSX lifecycle skills with paths and SHA-256 hashes.
-- [ ] 1.3 Research Hermes skill resolution: default skill discovery roots, `skills.external_dirs` meaning, precedence when the same skill name exists in multiple roots, and whether repository `.hermes/skills/` directories are auto-loaded. Do not infer from file presence alone.
-- [ ] 1.4 Classify every tracked entry in `openspec-store/.hermes/skills/` as: generated OPSX adapter, intentional workspace integration, stale custom-skill copy, or unknown. Do not delete or move anything until classification and parity checks pass.
-- [ ] 1.5 Record current resolution precedence and rollback behavior. Preserve `~/.hermes/skills/` as the custom-skill authority.
+- [ ] 1.3 Research Hermes skill resolution: default skill discovery roots, `skills.external_dirs` meaning, precedence when the same skill name exists in multiple roots, and whether repository `.hermes/skills/` directories are auto-loaded. Current evidence: `skills.external_dirs` is configured as a serialized list containing `/Users/androidteam/Developer/openspec-store/.hermes/skills`; this is an active integration boundary, not evidence that the store owns custom skills.
+- [ ] 1.4 Classify every tracked entry in `openspec-store/.hermes/skills/` as: generated OPSX adapter, intentional workspace integration, stale custom-skill copy, or unknown. Do not delete or move anything until classification, resolution precedence, and parity checks pass.
+- [ ] 1.5 Record current resolution precedence and rollback behavior. Preserve `~/.hermes/skills/` as the custom-skill authority; treat the configured store `external_dirs` as an integration source requiring explicit ownership documentation.
+
 
 ## Phase 2 — Shared lifecycle contract
 
