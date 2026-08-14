@@ -124,9 +124,18 @@
             "evidence/phase7/evidence-record.json"
           ],
           "status": " M"
+        },
+        {
+          "category": "other_non_secret",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "evidence/phase7/handoff.json"
+          ],
+          "status": " M"
         }
       ],
-      "dirt_sha256": "235bc29ba319479943a7d444ce267a419a1678902d7d0cb42c7c450bf7a5bad0",
+      "dirt_sha256": "1536261d2d6881efe063154c4aa6a362d251d1bb999d8ce8e6c6d9367d494dc9",
       "head_sha": "167099c72682439f809905f344aa8803a83b83d1",
       "id": "ai-harness-skills",
       "worktree_path": "/Users/androidteam/Developer/ai-harness-skills"
