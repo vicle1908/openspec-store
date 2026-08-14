@@ -1,0 +1,530 @@
+{
+  "schema_version": "1.0.0",
+  "change": "complete-agent-llm-config-integration",
+  "captured_store_sha": "03608370230e2a97dc1b54879618ddbb38fecc0c",
+  "captured_store_branch": "main",
+  "corrective_tree_sha256": "0508a2285cf29079b05ea20e48448fd5eaad085f27682e20c88ee19e25694e0c",
+  "planning_baseline_sha": "6dd185d4c1a5d0ccdc2aeceea3e88740d460f485",
+  "records": [
+    "agent-core-deterministic",
+    "agent-core-deterministic.archive_readiness.pre-provenance-fix",
+    "agent-core-deterministic.downstream_unblock",
+    "agent-core-deterministic.downstream_unblock.final",
+    "agent-core-deterministic.downstream_unblock.final-reconcile",
+    "agent-core-deterministic.downstream_unblock.fresh",
+    "agent-core-deterministic.downstream_unblock.latest",
+    "agent-core-deterministic.downstream_unblock.latest-final",
+    "agent-core-deterministic.downstream_unblock.ledger-reconcile",
+    "agent-core-deterministic.downstream_unblock.local-evidence",
+    "agent-core-deterministic.downstream_unblock.postcommit",
+    "agent-core-deterministic.downstream_unblock.recapture",
+    "agent-core-deterministic.evidence_reuse",
+    "agent-core-deterministic.evidence_reuse.final",
+    "agent-core-deterministic.evidence_reuse.final-reconcile",
+    "agent-core-deterministic.evidence_reuse.fresh",
+    "agent-core-deterministic.evidence_reuse.latest",
+    "agent-core-deterministic.evidence_reuse.latest-final",
+    "agent-core-deterministic.evidence_reuse.ledger-reconcile",
+    "agent-core-deterministic.evidence_reuse.local-evidence",
+    "agent-core-deterministic.evidence_reuse.postcommit",
+    "agent-core-deterministic.evidence_reuse.recapture",
+    "agent-core-deterministic.handoff_acceptance",
+    "agent-core-deterministic.handoff_acceptance.final",
+    "agent-core-deterministic.handoff_acceptance.final-reconcile",
+    "agent-core-deterministic.handoff_acceptance.fresh",
+    "agent-core-deterministic.handoff_acceptance.latest",
+    "agent-core-deterministic.handoff_acceptance.latest-final",
+    "agent-core-deterministic.handoff_acceptance.ledger-reconcile",
+    "agent-core-deterministic.handoff_acceptance.local-evidence",
+    "agent-core-deterministic.handoff_acceptance.postcommit",
+    "agent-core-deterministic.handoff_acceptance.recapture",
+    "agent-core-deterministic.task_completion",
+    "agent-core-deterministic.task_completion.final",
+    "agent-core-deterministic.task_completion.final-reconcile",
+    "agent-core-deterministic.task_completion.fresh",
+    "agent-core-deterministic.task_completion.latest",
+    "agent-core-deterministic.task_completion.latest-final",
+    "agent-core-deterministic.task_completion.ledger-reconcile",
+    "agent-core-deterministic.task_completion.local-evidence",
+    "agent-core-deterministic.task_completion.postcommit",
+    "agent-core-deterministic.task_completion.recapture",
+    "agent-core-handoff",
+    "agent-docs-sync-deterministic",
+    "agent-docs-sync-deterministic.archive_readiness.pre-provenance-fix",
+    "agent-docs-sync-deterministic.downstream_unblock",
+    "agent-docs-sync-deterministic.downstream_unblock.final",
+    "agent-docs-sync-deterministic.downstream_unblock.final-reconcile",
+    "agent-docs-sync-deterministic.downstream_unblock.fresh",
+    "agent-docs-sync-deterministic.downstream_unblock.latest",
+    "agent-docs-sync-deterministic.downstream_unblock.latest-final",
+    "agent-docs-sync-deterministic.downstream_unblock.ledger-reconcile",
+    "agent-docs-sync-deterministic.downstream_unblock.local-evidence",
+    "agent-docs-sync-deterministic.downstream_unblock.postcommit",
+    "agent-docs-sync-deterministic.downstream_unblock.recapture",
+    "agent-docs-sync-deterministic.evidence_reuse",
+    "agent-docs-sync-deterministic.evidence_reuse.final",
+    "agent-docs-sync-deterministic.evidence_reuse.final-reconcile",
+    "agent-docs-sync-deterministic.evidence_reuse.fresh",
+    "agent-docs-sync-deterministic.evidence_reuse.latest",
+    "agent-docs-sync-deterministic.evidence_reuse.latest-final",
+    "agent-docs-sync-deterministic.evidence_reuse.ledger-reconcile",
+    "agent-docs-sync-deterministic.evidence_reuse.local-evidence",
+    "agent-docs-sync-deterministic.evidence_reuse.postcommit",
+    "agent-docs-sync-deterministic.evidence_reuse.recapture",
+    "agent-docs-sync-deterministic.handoff_acceptance",
+    "agent-docs-sync-deterministic.handoff_acceptance.final",
+    "agent-docs-sync-deterministic.handoff_acceptance.final-reconcile",
+    "agent-docs-sync-deterministic.handoff_acceptance.fresh",
+    "agent-docs-sync-deterministic.handoff_acceptance.latest",
+    "agent-docs-sync-deterministic.handoff_acceptance.latest-final",
+    "agent-docs-sync-deterministic.handoff_acceptance.ledger-reconcile",
+    "agent-docs-sync-deterministic.handoff_acceptance.local-evidence",
+    "agent-docs-sync-deterministic.handoff_acceptance.postcommit",
+    "agent-docs-sync-deterministic.handoff_acceptance.recapture",
+    "agent-docs-sync-deterministic.task_completion",
+    "agent-docs-sync-deterministic.task_completion.final",
+    "agent-docs-sync-deterministic.task_completion.final-reconcile",
+    "agent-docs-sync-deterministic.task_completion.fresh",
+    "agent-docs-sync-deterministic.task_completion.latest",
+    "agent-docs-sync-deterministic.task_completion.latest-final",
+    "agent-docs-sync-deterministic.task_completion.ledger-reconcile",
+    "agent-docs-sync-deterministic.task_completion.local-evidence",
+    "agent-docs-sync-deterministic.task_completion.postcommit",
+    "agent-docs-sync-deterministic.task_completion.recapture",
+    "agent-harness-deterministic",
+    "agent-harness-deterministic.archive_readiness.pre-provenance-fix",
+    "agent-harness-deterministic.downstream_unblock",
+    "agent-harness-deterministic.downstream_unblock.final",
+    "agent-harness-deterministic.downstream_unblock.final-reconcile",
+    "agent-harness-deterministic.downstream_unblock.fresh",
+    "agent-harness-deterministic.downstream_unblock.latest",
+    "agent-harness-deterministic.downstream_unblock.latest-final",
+    "agent-harness-deterministic.downstream_unblock.ledger-reconcile",
+    "agent-harness-deterministic.downstream_unblock.local-evidence",
+    "agent-harness-deterministic.downstream_unblock.postcommit",
+    "agent-harness-deterministic.downstream_unblock.recapture",
+    "agent-harness-deterministic.evidence_reuse",
+    "agent-harness-deterministic.evidence_reuse.final",
+    "agent-harness-deterministic.evidence_reuse.final-reconcile",
+    "agent-harness-deterministic.evidence_reuse.fresh",
+    "agent-harness-deterministic.evidence_reuse.latest",
+    "agent-harness-deterministic.evidence_reuse.latest-final",
+    "agent-harness-deterministic.evidence_reuse.ledger-reconcile",
+    "agent-harness-deterministic.evidence_reuse.local-evidence",
+    "agent-harness-deterministic.evidence_reuse.postcommit",
+    "agent-harness-deterministic.evidence_reuse.recapture",
+    "agent-harness-deterministic.handoff_acceptance",
+    "agent-harness-deterministic.handoff_acceptance.final",
+    "agent-harness-deterministic.handoff_acceptance.final-reconcile",
+    "agent-harness-deterministic.handoff_acceptance.fresh",
+    "agent-harness-deterministic.handoff_acceptance.latest",
+    "agent-harness-deterministic.handoff_acceptance.latest-final",
+    "agent-harness-deterministic.handoff_acceptance.ledger-reconcile",
+    "agent-harness-deterministic.handoff_acceptance.local-evidence",
+    "agent-harness-deterministic.handoff_acceptance.postcommit",
+    "agent-harness-deterministic.handoff_acceptance.recapture",
+    "agent-harness-deterministic.task_completion",
+    "agent-harness-deterministic.task_completion.final",
+    "agent-harness-deterministic.task_completion.final-reconcile",
+    "agent-harness-deterministic.task_completion.fresh",
+    "agent-harness-deterministic.task_completion.latest",
+    "agent-harness-deterministic.task_completion.latest-final",
+    "agent-harness-deterministic.task_completion.ledger-reconcile",
+    "agent-harness-deterministic.task_completion.local-evidence",
+    "agent-harness-deterministic.task_completion.postcommit",
+    "agent-harness-deterministic.task_completion.recapture",
+    "ai-harness-skills-contained-generation",
+    "ai-harness-skills-deterministic",
+    "ai-harness-skills-deterministic.archive_readiness.pre-provenance-fix",
+    "ai-harness-skills-deterministic.downstream_unblock",
+    "ai-harness-skills-deterministic.downstream_unblock.final",
+    "ai-harness-skills-deterministic.downstream_unblock.final-reconcile",
+    "ai-harness-skills-deterministic.downstream_unblock.fresh",
+    "ai-harness-skills-deterministic.downstream_unblock.handoff-refresh",
+    "ai-harness-skills-deterministic.downstream_unblock.latest",
+    "ai-harness-skills-deterministic.downstream_unblock.latest-final",
+    "ai-harness-skills-deterministic.downstream_unblock.ledger-reconcile",
+    "ai-harness-skills-deterministic.downstream_unblock.local-evidence",
+    "ai-harness-skills-deterministic.downstream_unblock.postcommit",
+    "ai-harness-skills-deterministic.downstream_unblock.recapture",
+    "ai-harness-skills-deterministic.evidence_reuse",
+    "ai-harness-skills-deterministic.evidence_reuse.final",
+    "ai-harness-skills-deterministic.evidence_reuse.final-reconcile",
+    "ai-harness-skills-deterministic.evidence_reuse.fresh",
+    "ai-harness-skills-deterministic.evidence_reuse.handoff-refresh",
+    "ai-harness-skills-deterministic.evidence_reuse.latest",
+    "ai-harness-skills-deterministic.evidence_reuse.latest-final",
+    "ai-harness-skills-deterministic.evidence_reuse.ledger-reconcile",
+    "ai-harness-skills-deterministic.evidence_reuse.local-evidence",
+    "ai-harness-skills-deterministic.evidence_reuse.postcommit",
+    "ai-harness-skills-deterministic.evidence_reuse.recapture",
+    "ai-harness-skills-deterministic.handoff_acceptance",
+    "ai-harness-skills-deterministic.handoff_acceptance.final",
+    "ai-harness-skills-deterministic.handoff_acceptance.final-reconcile",
+    "ai-harness-skills-deterministic.handoff_acceptance.fresh",
+    "ai-harness-skills-deterministic.handoff_acceptance.handoff-refresh",
+    "ai-harness-skills-deterministic.handoff_acceptance.latest",
+    "ai-harness-skills-deterministic.handoff_acceptance.latest-final",
+    "ai-harness-skills-deterministic.handoff_acceptance.ledger-reconcile",
+    "ai-harness-skills-deterministic.handoff_acceptance.local-evidence",
+    "ai-harness-skills-deterministic.handoff_acceptance.postcommit",
+    "ai-harness-skills-deterministic.handoff_acceptance.recapture",
+    "ai-harness-skills-deterministic.task_completion",
+    "ai-harness-skills-deterministic.task_completion.final",
+    "ai-harness-skills-deterministic.task_completion.final-reconcile",
+    "ai-harness-skills-deterministic.task_completion.fresh",
+    "ai-harness-skills-deterministic.task_completion.handoff-refresh",
+    "ai-harness-skills-deterministic.task_completion.latest",
+    "ai-harness-skills-deterministic.task_completion.latest-final",
+    "ai-harness-skills-deterministic.task_completion.ledger-reconcile",
+    "ai-harness-skills-deterministic.task_completion.local-evidence",
+    "ai-harness-skills-deterministic.task_completion.postcommit",
+    "ai-harness-skills-deterministic.task_completion.recapture",
+    "ai-review-deterministic",
+    "ai-review-deterministic.archive_readiness.pre-provenance-fix",
+    "ai-review-deterministic.downstream_unblock",
+    "ai-review-deterministic.downstream_unblock.current-refresh",
+    "ai-review-deterministic.downstream_unblock.final",
+    "ai-review-deterministic.downstream_unblock.final-reconcile",
+    "ai-review-deterministic.downstream_unblock.fresh",
+    "ai-review-deterministic.downstream_unblock.handoff-dirt-refresh",
+    "ai-review-deterministic.downstream_unblock.latest",
+    "ai-review-deterministic.downstream_unblock.latest-final",
+    "ai-review-deterministic.downstream_unblock.ledger-reconcile",
+    "ai-review-deterministic.downstream_unblock.local-evidence",
+    "ai-review-deterministic.downstream_unblock.postcommit",
+    "ai-review-deterministic.downstream_unblock.recapture",
+    "ai-review-deterministic.evidence_reuse",
+    "ai-review-deterministic.evidence_reuse.current-refresh",
+    "ai-review-deterministic.evidence_reuse.final",
+    "ai-review-deterministic.evidence_reuse.final-reconcile",
+    "ai-review-deterministic.evidence_reuse.fresh",
+    "ai-review-deterministic.evidence_reuse.handoff-dirt-refresh",
+    "ai-review-deterministic.evidence_reuse.latest",
+    "ai-review-deterministic.evidence_reuse.latest-final",
+    "ai-review-deterministic.evidence_reuse.ledger-reconcile",
+    "ai-review-deterministic.evidence_reuse.local-evidence",
+    "ai-review-deterministic.evidence_reuse.postcommit",
+    "ai-review-deterministic.evidence_reuse.recapture",
+    "ai-review-deterministic.handoff_acceptance",
+    "ai-review-deterministic.handoff_acceptance.current-refresh",
+    "ai-review-deterministic.handoff_acceptance.final",
+    "ai-review-deterministic.handoff_acceptance.final-reconcile",
+    "ai-review-deterministic.handoff_acceptance.fresh",
+    "ai-review-deterministic.handoff_acceptance.handoff-dirt-refresh",
+    "ai-review-deterministic.handoff_acceptance.latest",
+    "ai-review-deterministic.handoff_acceptance.latest-final",
+    "ai-review-deterministic.handoff_acceptance.ledger-reconcile",
+    "ai-review-deterministic.handoff_acceptance.local-evidence",
+    "ai-review-deterministic.handoff_acceptance.postcommit",
+    "ai-review-deterministic.handoff_acceptance.recapture",
+    "ai-review-deterministic.task_completion",
+    "ai-review-deterministic.task_completion.current-refresh",
+    "ai-review-deterministic.task_completion.final",
+    "ai-review-deterministic.task_completion.final-reconcile",
+    "ai-review-deterministic.task_completion.fresh",
+    "ai-review-deterministic.task_completion.handoff-dirt-refresh",
+    "ai-review-deterministic.task_completion.latest",
+    "ai-review-deterministic.task_completion.latest-final",
+    "ai-review-deterministic.task_completion.ledger-reconcile",
+    "ai-review-deterministic.task_completion.local-evidence",
+    "ai-review-deterministic.task_completion.postcommit",
+    "ai-review-deterministic.task_completion.recapture",
+    "ai-review-reviewer",
+    "tdt-core-deterministic",
+    "tdt-core-deterministic.archive_readiness.pre-provenance-fix",
+    "tdt-core-deterministic.downstream_unblock",
+    "tdt-core-deterministic.downstream_unblock.final",
+    "tdt-core-deterministic.downstream_unblock.final-reconcile",
+    "tdt-core-deterministic.downstream_unblock.fresh",
+    "tdt-core-deterministic.downstream_unblock.latest",
+    "tdt-core-deterministic.downstream_unblock.latest-final",
+    "tdt-core-deterministic.downstream_unblock.ledger-reconcile",
+    "tdt-core-deterministic.downstream_unblock.local-evidence",
+    "tdt-core-deterministic.downstream_unblock.postcommit",
+    "tdt-core-deterministic.downstream_unblock.recapture",
+    "tdt-core-deterministic.evidence_reuse",
+    "tdt-core-deterministic.evidence_reuse.final",
+    "tdt-core-deterministic.evidence_reuse.final-reconcile",
+    "tdt-core-deterministic.evidence_reuse.fresh",
+    "tdt-core-deterministic.evidence_reuse.latest",
+    "tdt-core-deterministic.evidence_reuse.latest-final",
+    "tdt-core-deterministic.evidence_reuse.ledger-reconcile",
+    "tdt-core-deterministic.evidence_reuse.local-evidence",
+    "tdt-core-deterministic.evidence_reuse.postcommit",
+    "tdt-core-deterministic.evidence_reuse.recapture",
+    "tdt-core-deterministic.handoff_acceptance",
+    "tdt-core-deterministic.handoff_acceptance.final",
+    "tdt-core-deterministic.handoff_acceptance.final-reconcile",
+    "tdt-core-deterministic.handoff_acceptance.fresh",
+    "tdt-core-deterministic.handoff_acceptance.latest",
+    "tdt-core-deterministic.handoff_acceptance.latest-final",
+    "tdt-core-deterministic.handoff_acceptance.ledger-reconcile",
+    "tdt-core-deterministic.handoff_acceptance.local-evidence",
+    "tdt-core-deterministic.handoff_acceptance.postcommit",
+    "tdt-core-deterministic.handoff_acceptance.recapture",
+    "tdt-core-deterministic.task_completion",
+    "tdt-core-deterministic.task_completion.final",
+    "tdt-core-deterministic.task_completion.final-reconcile",
+    "tdt-core-deterministic.task_completion.fresh",
+    "tdt-core-deterministic.task_completion.latest",
+    "tdt-core-deterministic.task_completion.latest-final",
+    "tdt-core-deterministic.task_completion.ledger-reconcile",
+    "tdt-core-deterministic.task_completion.local-evidence",
+    "tdt-core-deterministic.task_completion.postcommit",
+    "tdt-core-deterministic.task_completion.recapture",
+    "tdt-core-handoff"
+  ],
+  "repository_states": {
+    "agent-core": {
+      "root": "/Users/androidteam/Developer/agent-core",
+      "head_sha": "24d028042c5f654d9c7cff1499d9c545f1b96af0",
+      "branch": "main",
+      "dirt_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "dirt_inventory": []
+    },
+    "agent-docs-sync": {
+      "root": "/Users/androidteam/Developer/agent-docs-sync",
+      "head_sha": "27a9a72dca24c216d2939d70af68434acf36987f",
+      "branch": "main",
+      "dirt_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "dirt_inventory": []
+    },
+    "agent-harness": {
+      "root": "/Users/androidteam/Developer/agent-harness",
+      "head_sha": "b6059898a540529233660ffa7ca6b693f9ea81a2",
+      "branch": "main",
+      "dirt_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "dirt_inventory": []
+    },
+    "ai-harness-skills": {
+      "root": "/Users/androidteam/Developer/ai-harness-skills",
+      "head_sha": "f1f383d4b143bf770b41d5a564647f504a6270b4",
+      "branch": "main",
+      "dirt_sha256": "1536261d2d6881efe063154c4aa6a362d251d1bb999d8ce8e6c6d9367d494dc9",
+      "dirt_inventory": [
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "evidence/phase7/evidence-record.json"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "evidence/phase7/handoff.json"
+          ],
+          "status": " M"
+        }
+      ]
+    },
+    "ai-review": {
+      "root": "/Users/androidteam/Developer/ai-review",
+      "head_sha": "8abe970dc5b6650973abe54a073ec996bde732ab",
+      "branch": "main",
+      "dirt_sha256": "c6dfc5c7e0162b6749bd6710318a173ac1ea9cdea916d93b3eeaa735a591b863",
+      "dirt_inventory": [
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "ai-review-handoff.md"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "graphify-out/.graphify_labels.json"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "graphify-out/.graphify_labels.json.sig"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "graphify-out/GRAPH_REPORT.md"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "graphify-out/graph.html"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "graphify-out/graph.json"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "graphify-out/manifest.json"
+          ],
+          "status": " M"
+        }
+      ]
+    },
+    "openspec-store": {
+      "root": "/Users/androidteam/Developer/openspec-store",
+      "head_sha": "03608370230e2a97dc1b54879618ddbb38fecc0c",
+      "branch": "main",
+      "dirt_sha256": "45c98e7240198c7c97e0acf9928c73d3f0e6d0d4919ae7c2195f22ce54841203",
+      "dirt_inventory": [
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "openspec/changes/complete-agent-llm-config-integration/tasks.md"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "openspec/changes/ecosystem-index-freshness-automation/design.md"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "openspec/changes/ecosystem-index-freshness-automation/proposal.md"
+          ],
+          "status": " M"
+        },
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "openspec/changes/remediate-archived-store-validation/.openspec.yaml"
+          ],
+          "status": "??"
+        },
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "openspec/changes/remediate-archived-store-validation/README.md"
+          ],
+          "status": "??"
+        },
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "openspec/changes/remediate-archived-store-validation/proposal.md"
+          ],
+          "status": "??"
+        },
+        {
+          "category": "unclassified",
+          "content_classification": "metadata_only",
+          "content_sha256": null,
+          "paths": [
+            "openspec/changes/remediate-archived-store-validation/tasks.md"
+          ],
+          "status": "??"
+        }
+      ]
+    },
+    "tdt-core": {
+      "root": "/Users/androidteam/Developer/tdt-core",
+      "head_sha": "26319d195408658fc8b784e0fcb87caab6f5775a",
+      "branch": "main",
+      "dirt_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "dirt_inventory": []
+    }
+  },
+  "live_rows": [
+    {
+      "row_id": "ai-harness-skills-contained-generation",
+      "status": "passed",
+      "result_path": "evidence/live-ai-harness-skills-result.json",
+      "duration_ms": 6420,
+      "nonce_id": "TDT_PHASE6_AI_REVIEW_bf102cd4",
+      "credential_leak": "none"
+    },
+    {
+      "row_id": "ai-review-reviewer",
+      "status": "passed",
+      "result_path": "evidence/live-ai-review-result.json",
+      "duration_ms": 10740,
+      "nonce_id": "TDT_PHASE6_AI_REVIEW_bf102cd4",
+      "credential_leak": "none"
+    }
+  ],
+  "authorization": {
+    "source_id": "user-live-row-authorization-20260814",
+    "credential_rotation": "waived_for_contained_acceptance",
+    "credential_values_retained": false
+  },
+  "validation": {
+    "targeted_gate_matrix": "41/41 current; exit=0; zero stale",
+    "validator_suite": "62 passed, 16 subtests passed",
+    "focused_openspec": "pass",
+    "full_store": "374/375; unrelated failure remediate-archived-store-validation",
+    "scenario_count": 77,
+    "task_progress_before_closure_commit": "154/154 after this ledger update"
+  },
+  "rollback_results": "existing repository rollback rehearsals retained in prior evidence; no live repository mutation performed",
+  "remaining_blockers": [
+    {
+      "kind": "full_store_baseline",
+      "change": "remediate-archived-store-validation",
+      "status": "unrelated_external_failure"
+    },
+    {
+      "kind": "archive_mutation",
+      "status": "not_executed_requires_later_explicit_authorization"
+    }
+  ],
+  "unrelated_dirty_preserved": [
+    " M openspec/changes/complete-agent-llm-config-integration/tasks.md",
+    " M openspec/changes/ecosystem-index-freshness-automation/design.md",
+    " M openspec/changes/ecosystem-index-freshness-automation/proposal.md",
+    "?? openspec/changes/remediate-archived-store-validation/.openspec.yaml",
+    "?? openspec/changes/remediate-archived-store-validation/README.md",
+    "?? openspec/changes/remediate-archived-store-validation/proposal.md",
+    "?? openspec/changes/remediate-archived-store-validation/tasks.md"
+  ],
+  "archive_command": "openspec archive complete-agent-llm-config-integration --store openspec-store --yes",
+  "archive_executed": false
+}
