@@ -14,5 +14,10 @@
 
 ## 2. Validate
 
-- [ ] 2.1 CI passes on PR
-- [ ] 2.2 CI passes on main
+- [x] [historical] 2.1 CI passes on PR
+- [x] [historical] 2.2 CI passes on main
+
+
+---
+
+> **Historical record:** This change was archived with 2 incomplete task(s) (11/13 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

@@ -89,61 +89,61 @@ Tasks 1.1–1.4 for taxonomy are done for v0. A new change `expand-status-taxono
 
 ## 6. Integration: Sheet Live Bootstrap
 
-- [ ] 6.1 Run `uv run jira-skill status render-sheet --full` to populate `status_catalog` with all 750 live records.
+- [x] [historical] 6.1 Run `uv run jira-skill status render-sheet --full` to populate `status_catalog` with all 750 live records.
   **Blocker**: `JIRA_STATUS_REGISTRY_SHEET_ID` not set in `~/.tdt/.env`. Sheet must be created first.
-- [ ] 6.2 Review the populated Sheet. Identify records needing human `decision_note` review.
-- [ ] 6.3 Run `uv run jira-skill status audit --output tabular` and save output for verification artifact.
+- [x] [historical] 6.2 Review the populated Sheet. Identify records needing human `decision_note` review.
+- [x] [historical] 6.3 Run `uv run jira-skill status audit --output tabular` and save output for verification artifact.
 
 ## 7. Integration: Dedupe Dry-Run
 
-- [ ] 7.1 Run `uv run jira-skill status dedupe --dry-run` against production. Capture output.
-- [ ] 7.2 Verify output shows all 47 duplicate clusters with correct `target_jira_id`, `cluster_size`, and loser IDs.
-- [ ] 7.3 Investigate any unexpected data before proceeding.
+- [x] [historical] 7.1 Run `uv run jira-skill status dedupe --dry-run` against production. Capture output.
+- [x] [historical] 7.2 Verify output shows all 47 duplicate clusters with correct `target_jira_id`, `cluster_size`, and loser IDs.
+- [x] [historical] 7.3 Investigate any unexpected data before proceeding.
 
 ## 8. Integration: Phase A — Dedupe Execution
 
-- [ ] 8.1 Confirm all sign-off requirements met: review `status_catalog` Sheet for pending human decisions.
-- [ ] 8.2 Ensure at least one `instance_admin` sign-off exists in `project_manifest` (global gate).
-- [ ] 8.3 Run `uv run jira-skill status dedupe --global-confirm` against production.
-- [ ] 8.4 Verify `dedupe_log` has 47 rows (one per cluster).
-- [ ] 8.5 Verify `status_catalog` `cluster_size` is now 1 for all clusters.
-- [ ] 8.6 Verify `merge_log` has rows for every project-transition pair.
-- [ ] 8.7 Run `uv run jira-skill status audit --output tabular` to confirm post-dedupe baseline.
+- [x] [historical] 8.1 Confirm all sign-off requirements met: review `status_catalog` Sheet for pending human decisions.
+- [x] [historical] 8.2 Ensure at least one `instance_admin` sign-off exists in `project_manifest` (global gate).
+- [x] [historical] 8.3 Run `uv run jira-skill status dedupe --global-confirm` against production.
+- [x] [historical] 8.4 Verify `dedupe_log` has 47 rows (one per cluster).
+- [x] [historical] 8.5 Verify `status_catalog` `cluster_size` is now 1 for all clusters.
+- [x] [historical] 8.6 Verify `merge_log` has rows for every project-transition pair.
+- [x] [historical] 8.7 Run `uv run jira-skill status audit --output tabular` to confirm post-dedupe baseline.
 
 ## 9. Integration: Phase B — Singleton Classification
 
-- [ ] 9.1 Run `uv run jira-skill status classify-singletons` against production.
-- [ ] 9.2 Review proposed `bucket` classifications in Sheet. Correct mis-classifications.
-- [ ] 9.3 Run `uv run jira-skill status classify-singletons --confirm` to apply.
-- [ ] 9.4 Verify catalog row count: should be ≤ 100 records after v1 taxonomy expansion (was ≤ 50 in v0 proposal, accounting for v1 additions it may be ~100).
-- [ ] 9.5 Verify `dedupe_log` has rows for each alias resolution and garbage cleanup.
+- [x] [historical] 9.1 Run `uv run jira-skill status classify-singletons` against production.
+- [x] [historical] 9.2 Review proposed `bucket` classifications in Sheet. Correct mis-classifications.
+- [x] [historical] 9.3 Run `uv run jira-skill status classify-singletons --confirm` to apply.
+- [x] [historical] 9.4 Verify catalog row count: should be ≤ 100 records after v1 taxonomy expansion (was ≤ 50 in v0 proposal, accounting for v1 additions it may be ~100).
+- [x] [historical] 9.5 Verify `dedupe_log` has rows for each alias resolution and garbage cleanup.
 
 ## 10. Integration: Phase C — Manifest Sweep
 
-- [ ] 10.1 Run `uv run jira-skill status render-sheet --full` to regenerate `project_manifest`.
-- [ ] 10.2 Review `project_manifest`: identify projects with `divergence_count > 0`.
-- [ ] 10.3 Sign off for first batch: run `signoff --project <KEY> --role instance_admin` and `--project_admin` for each.
-- [ ] 10.4 Verify `signoff_log` has rows for all sign-off events.
+- [x] [historical] 10.1 Run `uv run jira-skill status render-sheet --full` to regenerate `project_manifest`.
+- [x] [historical] 10.2 Review `project_manifest`: identify projects with `divergence_count > 0`.
+- [x] [historical] 10.3 Sign off for first batch: run `signoff --project <KEY> --role instance_admin` and `--project_admin` for each.
+- [x] [historical] 10.4 Verify `signoff_log` has rows for all sign-off events.
 
 ## 11. Integration: Phase D — Project-Level Merges
 
-- [ ] 11.1 Run `uv run jira-skill status standardize --projects PDS,PWM,RMD,SR,TJ --dry-run`. Review output.
-- [ ] 11.2 Run `uv run jira-skill status standardize --projects PDS,PWM,RMD,SR,TJ --yes-i-understand-this-is-irreversible`.
-- [ ] 11.3 Verify `project_manifest.merge_status=completed` for all 5 projects.
-- [ ] 11.4 Run `uv run jira-skill status audit --output tabular` — all 5 should show `divergence_count=0`.
-- [ ] 11.5 Repeat for 8 CFD-family + DA + STABI projects.
+- [x] [historical] 11.1 Run `uv run jira-skill status standardize --projects PDS,PWM,RMD,SR,TJ --dry-run`. Review output.
+- [x] [historical] 11.2 Run `uv run jira-skill status standardize --projects PDS,PWM,RMD,SR,TJ --yes-i-understand-this-is-irreversible`.
+- [x] [historical] 11.3 Verify `project_manifest.merge_status=completed` for all 5 projects.
+- [x] [historical] 11.4 Run `uv run jira-skill status audit --output tabular` — all 5 should show `divergence_count=0`.
+- [x] [historical] 11.5 Repeat for 8 CFD-family + DA + STABI projects.
 
 ## 12. Daily Audit: DBOS Workflow Registration
 
 - [x] 12.1 Add `jira-status-audit` to `jira-skill/src/jira_skill/schedule.py` (daily 07:00 UTC). ✅ CODE DONE
-- [ ] 12.2 Deploy `jira-skill` and confirm DBOS scheduler picks up the new workflow.
-- [ ] 12.3 Run manually: `uv run jira-skill status audit`. Confirm it writes to `audit_log`.
-- [ ] 12.4 Confirm 7 consecutive daily runs with no false-positive alerts.
+- [x] [historical] 12.2 Deploy `jira-skill` and confirm DBOS scheduler picks up the new workflow.
+- [x] [historical] 12.3 Run manually: `uv run jira-skill status audit`. Confirm it writes to `audit_log`.
+- [x] [historical] 12.4 Confirm 7 consecutive daily runs with no false-positive alerts.
 
 ## 13. Final Verification
 
-- [ ] 13.1 Run `openspec verify jira-status-hygiene` and confirm CRITICAL count is 0.
-- [ ] 13.2 Confirm acceptance criteria:
+- [x] [historical] 13.1 Run `openspec verify jira-status-hygiene` and confirm CRITICAL count is 0.
+- [x] [historical] 13.2 Confirm acceptance criteria:
   - Catalog row count ≤ 100 (v1 revised target; v0 was ≤ 50)
   - `cluster_size == 1` for all rows
   - PDS/PWM/RMD/SR/TJ `divergence_count=0` in `project_manifest`
@@ -151,3 +151,8 @@ Tasks 1.1–1.4 for taxonomy are done for v0. A new change `expand-status-taxono
   - 7 daily audit runs, no false positives
   - `signoff_log`, `merge_log`, `dedupe_log` non-empty
   - Zero rows with wrong category
+
+
+---
+
+> **Historical record:** This change was archived with 32 incomplete task(s) (31/63 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

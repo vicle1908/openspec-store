@@ -8,8 +8,8 @@
 
 ## Task 2: Enhance proxy factory (if needed)
 - [x] Test current factory with all supported prefixes
-- [ ] Add openai-responses routing (if giaoduc adds support)
-- [ ] Add google-native routing (if needed)
+- [x] [historical] Add openai-responses routing (if giaoduc adds support)
+- [x] [historical] Add google-native routing (if needed)
 
 ## Task 3: Update documentation
 - [x] Document model kind prefix → protocol mapping
@@ -19,3 +19,8 @@
 ## Task 4: Verify
 - [x] Real LLM calls for each supported prefix
 - [x] Fallback model works across protocols
+
+
+---
+
+> **Historical record:** This change was archived with 2 incomplete task(s) (10/12 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

@@ -20,10 +20,10 @@
 
 ## 3. Document Remaining Gaps for Future Implementation
 
-- [ ] 3.1 Create tracking issue for aggregate-version gap detection
-- [ ] 3.2 Create tracking issue for workflowcheck static analysis
-- [ ] 3.3 Create tracking issue for circuit breaker pattern
-- [ ] 3.4 Create tracking issue for fuzz testing
+- [x] [historical] 3.1 Create tracking issue for aggregate-version gap detection
+- [x] [historical] 3.2 Create tracking issue for workflowcheck static analysis
+- [x] [historical] 3.3 Create tracking issue for circuit breaker pattern
+- [x] [historical] 3.4 Create tracking issue for fuzz testing
 
 ---
 
@@ -57,3 +57,8 @@
 **Remaining:** 4 (create tracking issues)
 
 This change aligns specs with actual implementation by marking deferred/partial items.
+
+
+---
+
+> **Historical record:** This change was archived with 4 incomplete task(s) (12/16 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

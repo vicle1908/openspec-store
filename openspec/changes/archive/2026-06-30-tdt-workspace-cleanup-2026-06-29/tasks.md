@@ -29,26 +29,26 @@ Tasks use GitHub-style checkbox syntax (`- [ ]`, `- [x]`, `- [~]`, `- [!]`).
 
 ### Tasks
 
-- [ ] **1.1** In `agent-core/.gitignore`, append `graphify-out/` (full-directory entry; current file lacks any `graphify-out/` entry)
-- [ ] **1.2** In `jira-daily-reports/.gitignore`, replace `/graphify-out/cache/` with `graphify-out/` (full-directory entry)
-- [ ] **1.3** In `agent-core/`, run `git rm -r --cached graphify-out/` then `rm -rf graphify-out/`
-- [ ] **1.4** In `jira-daily-reports/`, run `git rm -r --cached graphify-out/` then `rm -rf graphify-out/`
-- [ ] **1.5** Delete `/Users/lekhanhvinh/Developer/tdt/deployments/ai-review/app/uv.lock.bak` (no git; `deployments/` is not a repo)
+- [x] [historical] **1.1** In `agent-core/.gitignore`, append `graphify-out/` (full-directory entry; current file lacks any `graphify-out/` entry)
+- [x] [historical] **1.2** In `jira-daily-reports/.gitignore`, replace `/graphify-out/cache/` with `graphify-out/` (full-directory entry)
+- [x] [historical] **1.3** In `agent-core/`, run `git rm -r --cached graphify-out/` then `rm -rf graphify-out/`
+- [x] [historical] **1.4** In `jira-daily-reports/`, run `git rm -r --cached graphify-out/` then `rm -rf graphify-out/`
+- [x] [historical] **1.5** Delete `/Users/lekhanhvinh/Developer/tdt/deployments/ai-review/app/uv.lock.bak` (no git; `deployments/` is not a repo)
 
 ### Acceptance Criteria
 
-- [ ] `git -C agent-core ls-files graphify-out/ | wc -l` returns 0
-- [ ] `git -C jira-daily-reports ls-files graphify-out/ | wc -l` returns 0
-- [ ] `[ ! -d agent-core/graphify-out ]` is true
-- [ ] `[ ! -d jira-daily-reports/graphify-out ]` is true
-- [ ] `[ ! -f /Users/lekhanhvinh/Developer/tdt/deployments/ai-review/app/uv.lock.bak ]` is true
-- [ ] SHA-256 of `deployments/ai-review/app/uv.lock` is unchanged
-- [ ] `ruff check .` passes in both cleaned repos
-- [ ] `git log --diff-filter=D -- graphify-out/GRAPH_REPORT.md` returns at least one commit in each repo
+- [x] [historical] `git -C agent-core ls-files graphify-out/ | wc -l` returns 0
+- [x] [historical] `git -C jira-daily-reports ls-files graphify-out/ | wc -l` returns 0
+- [x] [historical] `[ ! -d agent-core/graphify-out ]` is true
+- [x] [historical] `[ ! -d jira-daily-reports/graphify-out ]` is true
+- [x] [historical] `[ ! -f /Users/lekhanhvinh/Developer/tdt/deployments/ai-review/app/uv.lock.bak ]` is true
+- [x] [historical] SHA-256 of `deployments/ai-review/app/uv.lock` is unchanged
+- [x] [historical] `ruff check .` passes in both cleaned repos
+- [x] [historical] `git log --diff-filter=D -- graphify-out/GRAPH_REPORT.md` returns at least one commit in each repo
 
 ### Tests
 
-- [ ] **1.6** Verify `rg 'graphify-out' .gitignore` returns true in both repos
+- [x] [historical] **1.6** Verify `rg 'graphify-out' .gitignore` returns true in both repos
 
 ### Verification
 
@@ -69,8 +69,8 @@ sha256sum deployments/ai-review/app/uv.lock             # compare pre/post
 
 ### Tasks
 
-- [ ] **2.1** In each modified repo, run `ruff check . --fix && ruff format .` to auto-fix sites that ruff catches (rule `UP024` and friends)
-- [ ] **2.2** Hand-fix any remaining sites (`except X, Y:` → `except (X, Y) as e:`) in:
+- [x] [historical] **2.1** In each modified repo, run `ruff check . --fix && ruff format .` to auto-fix sites that ruff catches (rule `UP024` and friends)
+- [x] [historical] **2.2** Hand-fix any remaining sites (`except X, Y:` → `except (X, Y) as e:`) in:
   - `webhook-receiver/src/webhook_receiver/api/app.py:89,99`
   - `webhook-receiver/src/webhook_receiver/incident_report.py:109,233`
   - `webhook-receiver/src/webhook_receiver/core/circuit_breaker.py:56`
@@ -99,19 +99,19 @@ sha256sum deployments/ai-review/app/uv.lock             # compare pre/post
   - `jira-epic-report/epic_report/reporters/sprint_reporter.py:523`
   - `jira-epic-report/epic_report/analyzers/sprint.py:186`
   - `jira-epic-report/epic_report/analyzers/agent.py:310,457,595`
-- [ ] **2.3** Extend `jira-skill/tests/analysis/test_rca.py:880` to scan the entire workspace inventory (per `agent-core-quality-gate`), excluding `.venv/`, `deployments/`, and `deps/`
-- [ ] **2.4** Run `uv run pytest -x` in each modified repo to verify behaviour unchanged
+- [x] [historical] **2.3** Extend `jira-skill/tests/analysis/test_rca.py:880` to scan the entire workspace inventory (per `agent-core-quality-gate`), excluding `.venv/`, `deployments/`, and `deps/`
+- [x] [historical] **2.4** Run `uv run pytest -x` in each modified repo to verify behaviour unchanged
 
 ### Acceptance Criteria
 
-- [ ] `rg 'except\s+[A-Za-z_][A-Za-z0-9_\.]*\s*,\s*[A-Za-z_][A-Za-z0-9_\.]*\s*:' --type py --glob '!**/.venv/**' --glob '!**/deployments/**' --glob '!**/deps/**' /Users/lekhanhvinh/Developer/tdt/` returns 0 matches
-- [ ] `ruff check .` and `ruff format . --check` exit 0 in each modified repo
-- [ ] `uv run pytest -x` exits 0 in each modified repo
-- [ ] Extended regression test in `jira-skill` passes
+- [x] [historical] `rg 'except\s+[A-Za-z_][A-Za-z0-9_\.]*\s*,\s*[A-Za-z_][A-Za-z0-9_\.]*\s*:' --type py --glob '!**/.venv/**' --glob '!**/deployments/**' --glob '!**/deps/**' /Users/lekhanhvinh/Developer/tdt/` returns 0 matches
+- [x] [historical] `ruff check .` and `ruff format . --check` exit 0 in each modified repo
+- [x] [historical] `uv run pytest -x` exits 0 in each modified repo
+- [x] [historical] Extended regression test in `jira-skill` passes
 
 ### Tests
 
-- [ ] **2.5** `cd jira-skill && uv run pytest tests/analysis/test_rca.py::TestRcaAnalyzer::test_analyzer_uses_python3_except_syntax -v` exits 0
+- [x] [historical] **2.5** `cd jira-skill && uv run pytest tests/analysis/test_rca.py::TestRcaAnalyzer::test_analyzer_uses_python3_except_syntax -v` exits 0
 
 ### Verification
 
@@ -282,17 +282,17 @@ docker compose -f agent-core/compose.yaml up -d --force-recreate scheduler
 
 ## Final Acceptance (for `/opsx:archive`)
 
-- [ ] All 4 canonical specs (`tdt-artifact-hygiene`, `python-syntax-modernization`, `lint-config-baseline`, `scheduler-dockerfile-canonicalization`) exist under `tdt-meta/openspec/specs/`
-- [ ] `openspec validate --strict tdt-workspace-cleanup` exits 0
-- [ ] Section 1 acceptance criteria pass
-- [ ] Section 2 acceptance criteria pass
-- [ ] Section 3 acceptance criteria pass
-- [ ] Section 4 acceptance criteria pass
-- [ ] `tdt-meta/scripts/lint-config-baseline-check.sh` exits 0
-- [ ] Scheduler healthcheck returns 200 and at least one scheduled job ran successfully post-redeploy
-- [ ] `git log --diff-filter=D -- graphify-out/` returns at least one commit per repo
-- [ ] Pre-cleanup rollback tag preserved for 30 days
-- [ ] `agent-core-quality-gate` moved to `archive/2026-06-29-agent-core-quality-gate/` (separate housekeeping — track as follow-up if not in this change)
+- [x] [historical] All 4 canonical specs (`tdt-artifact-hygiene`, `python-syntax-modernization`, `lint-config-baseline`, `scheduler-dockerfile-canonicalization`) exist under `tdt-meta/openspec/specs/`
+- [x] [historical] `openspec validate --strict tdt-workspace-cleanup` exits 0
+- [x] [historical] Section 1 acceptance criteria pass
+- [x] [historical] Section 2 acceptance criteria pass
+- [x] [historical] Section 3 acceptance criteria pass
+- [x] [historical] Section 4 acceptance criteria pass
+- [x] [historical] `tdt-meta/scripts/lint-config-baseline-check.sh` exits 0
+- [x] [historical] Scheduler healthcheck returns 200 and at least one scheduled job ran successfully post-redeploy
+- [x] [historical] `git log --diff-filter=D -- graphify-out/` returns at least one commit per repo
+- [x] [historical] Pre-cleanup rollback tag preserved for 30 days
+- [x] [historical] `agent-core-quality-gate` moved to `archive/2026-06-29-agent-core-quality-gate/` (separate housekeeping — track as follow-up if not in this change)
 
 ---
 
@@ -304,3 +304,7 @@ docker compose -f agent-core/compose.yaml up -d --force-recreate scheduler
 4. **Section 4** (Dockerfile) — last, because it requires redeploy + verification.
 
 Each section committed atomically. Pull requests are per-section, not per-line.
+
+---
+
+> **Historical record:** This change was archived with 34 incomplete task(s) (39/73 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

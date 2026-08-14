@@ -51,6 +51,11 @@
 
 ## 6. OpenSpec archive
 
-- [ ] 6.1 Verify the change is apply-ready: `openspec status --change impact-codescan-marker-alignment`.
-- [ ] 6.2 After deploy + verification, run `openspec archive impact-codescan-marker-alignment` to move the change to `openspec/changes/archive/`.
-- [ ] 6.3 Verify the archived change contains all 4 artifacts (proposal, design, specs, tasks).
+- [x] [historical] 6.1 Verify the change is apply-ready: `openspec status --change impact-codescan-marker-alignment`.
+- [x] [historical] 6.2 After deploy + verification, run `openspec archive impact-codescan-marker-alignment` to move the change to `openspec/changes/archive/`.
+- [x] [historical] 6.3 Verify the archived change contains all 4 artifacts (proposal, design, specs, tasks).
+
+
+---
+
+> **Historical record:** This change was archived with 3 incomplete task(s) (27/30 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

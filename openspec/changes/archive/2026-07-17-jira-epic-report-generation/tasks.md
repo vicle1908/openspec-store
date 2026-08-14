@@ -77,7 +77,7 @@ All v1.0 work complete: models, collector, risk/resource/timeline/status analyze
 
 ### Task 8.1: Integration testing
 - [x] Manual end-to-end dashboard smoke generation from live Jira — verified 2026-07-17 with `RMD-4160` and the five-epic set `PDS-81 AM-2054 AM-2025 TJ-1656 TJ-1683`; Markdown and HTML dashboards generated successfully. This was a manual smoke run, not an automated live integration test.
-- [ ] Explicit automated edge tests: empty subtasks, no bugs, no sprints, and zero collected items — transferred to `jira-epic-report-archive-gap-closure` after post-archive verification found the named paths were not individually covered
+- [x] [historical] Explicit automated edge tests: empty subtasks, no bugs, no sprints, and zero collected items — transferred to `jira-epic-report-archive-gap-closure` after post-archive verification found the named paths were not individually covered
 - [x] Test coverage ≥80% — 626 tests passed at 84.39% on 2026-07-17
 
 ### Task 8.2: Documentation
@@ -90,3 +90,8 @@ All v1.0 work complete: models, collector, risk/resource/timeline/status analyze
 
 **Total Phase 5-8:** 25 hours
 **Total project:** 53h (v1.0) + 25h (v2.0) = 78 hours
+
+
+---
+
+> **Historical record:** This change was archived with 1 incomplete task(s) (39/40 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

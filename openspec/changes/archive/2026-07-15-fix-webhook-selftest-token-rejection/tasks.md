@@ -28,4 +28,8 @@
 
 ## archive
 
-- [ ] 18. Promote change via `openspec archive fix-webhook-selftest-token-rejection`
+- [x] [historical] 18. Promote change via `openspec archive fix-webhook-selftest-token-rejection`
+
+---
+
+> **Historical record:** This change was archived with 1 incomplete task(s) (17/18 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

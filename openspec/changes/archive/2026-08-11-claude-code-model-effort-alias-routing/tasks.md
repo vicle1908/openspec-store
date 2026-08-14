@@ -79,6 +79,11 @@
 
 ## Rollback
 
-- [ ] R.1 Restore the prior launcher function block from the pre-change backup or remove only the new variables.
-- [ ] R.2 Revert the adapter effort mapping while retaining the healthy containerization change.
-- [ ] R.3 Verify `claude_reset()` returns to a provider-neutral environment.
+- [x] [historical] R.1 Restore the prior launcher function block from the pre-change backup or remove only the new variables.
+- [x] [historical] R.2 Revert the adapter effort mapping while retaining the healthy containerization change.
+- [x] [historical] R.3 Verify `claude_reset()` returns to a provider-neutral environment.
+
+
+---
+
+> **Historical record:** This change was archived with 3 incomplete task(s) (31/34 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

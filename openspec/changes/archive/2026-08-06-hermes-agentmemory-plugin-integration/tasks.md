@@ -53,8 +53,8 @@
 - [x] Commit all changes to openspec-store
 
 ## Archive
-- [ ] Run `openspec archive hermes-agentmemory-plugin-integration --store openspec-store --yes`
-- [ ] Commit store: `cd ~/Developer/openspec-store && git add openspec/ && git commit -m "archive: hermes-agentmemory-plugin-integration"`
+- [x] [historical] Run `openspec archive hermes-agentmemory-plugin-integration --store openspec-store --yes`
+- [x] [historical] Commit store: `cd ~/Developer/openspec-store && git add openspec/ && git commit -m "archive: hermes-agentmemory-plugin-integration"`
 
 ## Evidence Collected (2026-08-06)
 
@@ -98,3 +98,8 @@ AGENTMEMORY_HOST=127.0.0.1
 AGENTMEMORY_PORT=3111
 AGENTMEMORY_VIEWER_PORT=3113
 ```
+
+
+---
+
+> **Historical record:** This change was archived with 2 incomplete task(s) (38/40 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

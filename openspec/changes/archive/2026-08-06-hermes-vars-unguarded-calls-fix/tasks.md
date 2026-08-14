@@ -7,17 +7,22 @@
 - [x] Add pitfall: "Do NOT patch framework code"
 
 ## Phase 2: Report upstream
-- [ ] File issue on hermes-agent GitHub repo with bug locations
-- [ ] Include reproduction steps (delegate_task with max_iterations)
-- [ ] Suggest fix: try/except (TypeError, AttributeError) guards
+- [x] [historical] File issue on hermes-agent GitHub repo with bug locations
+- [x] [historical] Include reproduction steps (delegate_task with max_iterations)
+- [x] [historical] Suggest fix: try/except (TypeError, AttributeError) guards
 
 ## Phase 3: Verify delegation works
-- [ ] Run 5-reviewer batch with inline context
-- [ ] Confirm ~60% automated success rate
-- [ ] Verify manual consolidation works for failures
-- [ ] Document actual success rate in review-plan.md
+- [x] [historical] Run 5-reviewer batch with inline context
+- [x] [historical] Confirm ~60% automated success rate
+- [x] [historical] Verify manual consolidation works for failures
+- [x] [historical] Document actual success rate in review-plan.md
 
 ## Done
 - [x] Revert all framework patches (turn_finalizer.py, conversation_loop.py, conversation_compression.py)
 - [x] Skill updated with proper guidance
 - [x] Proposal updated to reflect no-framework-patch approach
+
+
+---
+
+> **Historical record:** This change was archived with 7 incomplete task(s) (7/14 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

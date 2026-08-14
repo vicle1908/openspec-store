@@ -72,7 +72,7 @@
 - [x] 5.0 Create `src/jira_skill/workflow/cli_extras.py` with the new commands
   - The module is self-contained and exports a `register(workflow_app, console)` function
   - Adds: `preview`, `validate`, `add-transition`, `validate-payload`
-- [ ] 5.1 Add the import + register call in `src/jira_skill/cli.py`:
+- [x] [historical] 5.1 Add the import + register call in `src/jira_skill/cli.py`:
   ```python
   from jira_skill.workflow.cli_extras import register as _register_workflow_extras
   _register_workflow_extras(workflow_app, console)
@@ -83,7 +83,7 @@
 - [x] 5.3 `jira workflow add-transition --project <key> --from <status> --to <status> --name <name>` — in cli_extras.py
 - [x] 5.4 `jira workflow validate-payload` — in cli_extras.py
 - [x] 5.5 `jira workflow validate --project <key> --from <status> --to <status> --fields <names>` — in cli_extras.py
-- [ ] 5.6 Test the CLI manually against the GWM and AM projects (deferred until 5.1 is applied)
+- [x] [historical] 5.6 Test the CLI manually against the GWM and AM projects (deferred until 5.1 is applied)
 
 ## 6. Documentation
 
@@ -127,9 +127,9 @@
 
 ## 8. Archive Old Change
 
-- [ ] 8.1 Add a `superseded-by: jira-workflow-validator-team-managed` note to the README of the old change (`openspec/changes/jira-code-review-field-validation/README.md`)
+- [x] [historical] 8.1 Add a `superseded-by: jira-workflow-validator-team-managed` note to the README of the old change (`openspec/changes/jira-code-review-field-validation/README.md`)
 - [x] 8.2 Run `openspec validate jira-workflow-validator-team-managed` to confirm the new change is internally consistent
-- [ ] 8.3 Once the new change is applied and verified, archive both the new change (which becomes the source of truth for the spec delta) and the old one (with the supersession note)
+- [x] [historical] 8.3 Once the new change is applied and verified, archive both the new change (which becomes the source of truth for the spec delta) and the old one (with the supersession note)
 
 ## 9. Live integration test results (2026-06-15)
 
@@ -257,7 +257,7 @@ request/response sequence.
   Rationale: in some Jira instances, the server regenerates broken
   rules on each update, so the strip is a no-op. Keeping it opt-in
   avoids surprising behavior for users whose workflows are clean.
-- [ ] 15.3 Document the limitation in `LIVE-VERIFICATION.md` and
+- [x] [historical] 15.3 Document the limitation in `LIVE-VERIFICATION.md` and
   `QUICK-REFERENCE.md`: workflows with pre-existing broken rules
   must be fixed manually via the Jira UI before the SDK can update
   them. (Pending — see 15.3 below.)
@@ -927,3 +927,8 @@ blocked projects programmatically.
 - [x] **25.7** Run full test suite — 1205/1205 passing
   (1193 baseline + 12 new).
 
+
+
+---
+
+> **Historical record:** This change was archived with 5 incomplete task(s) (212/217 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

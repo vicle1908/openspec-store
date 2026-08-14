@@ -65,11 +65,11 @@
 - [x] 7.2 Verify `kustomize build deploy/k8s/overlays/production` produces valid YAML
 - [x] 7.2a Verify all 12 Kustomize overlays produce valid YAML (base, local, staging, production, 8 services)
 - [x] 7.7 Verify Docker Compose YAML syntax for all 12 compose files
-- [ ] 7.3 Test deployment on kind cluster with order-service pilot
-- [ ] 7.4 Verify health probes respond correctly in K8s environment
-- [ ] 7.5 Test HPA scales pods under load
-- [ ] 7.6 Test PDB maintains availability during node drain
-- [ ] 7.8 Run existing smoke tests against K8s deployment
+- [x] [historical] 7.3 Test deployment on kind cluster with order-service pilot
+- [x] [historical] 7.4 Verify health probes respond correctly in K8s environment
+- [x] [historical] 7.5 Test HPA scales pods under load
+- [x] [historical] 7.6 Test PDB maintains availability during node drain
+- [x] [historical] 7.8 Run existing smoke tests against K8s deployment
 
 ## 8. Documentation
 
@@ -141,3 +141,8 @@
 
 ### Ready for Production Use
 All manifests, configurations, and documentation are ready for deployment. Only cluster-level integration tests remain pending.
+
+
+---
+
+> **Historical record:** This change was archived with 5 incomplete task(s) (57/62 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

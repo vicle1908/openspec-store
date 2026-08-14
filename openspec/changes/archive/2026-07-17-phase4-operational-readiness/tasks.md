@@ -35,8 +35,8 @@
 
 ## Task 6: Wire agent config files
 
-- [ ] 6.1 Add `.agent/`, `.claude/`, `.cursor/` to `.gitignore` tracked patterns
-- [ ] 6.2 Document agent config directory conventions in README
+- [x] [historical] 6.1 Add `.agent/`, `.claude/`, `.cursor/` to `.gitignore` tracked patterns
+- [x] [historical] 6.2 Document agent config directory conventions in README
 
 ## Task 7: Phase 4 proposal and design
 
@@ -51,3 +51,8 @@
 - [x] `docs/runbooks/README.md` exists with template
 - [x] `services/payment-service/Dockerfile.payment-service` updated to canonical pattern
 - [x] All 4 openspec specs created/updated
+
+
+---
+
+> **Historical record:** This change was archived with 2 incomplete task(s) (26/28 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

@@ -37,6 +37,11 @@
 - [x] **3.3** OpenSpec validation
   - Command: `openspec validate moa-config-quality-tuning --store openspec-store`
 
-- [ ] **3.4** Smoke test in new session
+- [x] [historical] **3.4** Smoke test in new session
   - Switch to `/model default --provider moa`
   - Verify MoA pipeline works with new aggregator
+
+
+---
+
+> **Historical record:** This change was archived with 1 incomplete task(s) (7/8 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

@@ -105,9 +105,9 @@
 - [x] **8.2** Run `ruff check . --fix && ruff format .` inside `agent-core/` to confirm formatting/lint passes for new files.
 - [x] **8.3** Run `mypy deployments/scheduler/ tests/scheduler/test_entrypoint_manifest_generation.py --strict` and confirm no new type errors are introduced.
 - [x] **8.4** Run `pytest -x agent-core/tests/scheduler/test_entrypoint_manifest_generation.py -q` and confirm all tests pass.
-- [ ] **8.5** Run `bash agent-core/scripts/verify_scheduler_compose_up.sh` end-to-end (on this macOS dev host) and confirm PASS.
+- [x] [historical] **8.5** Run `bash agent-core/scripts/verify_scheduler_compose_up.sh` end-to-end (on this macOS dev host) and confirm PASS.
 - [x] **8.6** Verify the legacy `code-daily-scan/scripts/deploy.sh` no longer references `cd $HOME/deployments/code-daily-scan/app` in a misleading way; operator-facing notes updated.
-- [ ] **8.7** Confirm via `tdt-scheduler schedules list` inside the freshly-built container that **all expected schedules are present** (cross-check against the current baseline of 18).
+- [x] [historical] **8.7** Confirm via `tdt-scheduler schedules list` inside the freshly-built container that **all expected schedules are present** (cross-check against the current baseline of 18).
 
 ---
 
@@ -116,3 +116,8 @@
 - Tasks are ordered roughly by dependency: framework → constants → entrypoint → compose/Dockerfile → host-side deploy.sh reduction → tests → docs → validation.
 - All test tasks (Group 6) should be implementable **before** the compose changes (Group 4) because they exercise the generators in isolation.
 - Task 8.5 requires the host machine to have Docker available. If unavailable, Task 8.5 can be reported as `deferred` and the change still applied.
+
+
+---
+
+> **Historical record:** This change was archived with 2 incomplete task(s) (27/29 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

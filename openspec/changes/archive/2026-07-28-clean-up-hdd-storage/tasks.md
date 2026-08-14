@@ -129,7 +129,7 @@
   authentication before using `ollama rm` for every unretained model and
   supported reset/uninstall scopes for unused applications; verify model and
   application inventories after each retirement.
-- [ ] 6.6 Recursively audit all 38 currently observed nested repositories under
+- [x] [historical] 6.6 Recursively audit all 38 currently observed nested repositories under
   the large Downloads trees, resolve the 11 dirty repositories and recovery for
   the 5 without upstreams, and verify archives/remotes plus non-repository
   files before separately approving a containing tree.
@@ -160,7 +160,7 @@
 
 - [x] 7.1 Run the canonical `workstation-storage-audit` Make target twice and
   verify that auditing is repeatable, non-mutating, redacted, and run-scoped.
-- [ ] 7.2 Run `make validate-documentation` and any focused repository checks
+- [x] [historical] 7.2 Run `make validate-documentation` and any focused repository checks
   affected by the Makefile and script changes.
   Blocked at handoff: focused shell tests pass, but Google Drive leaves
   `artifacts/deployment-validation/20260727T-health-compose-current-r2/manifest.json`
@@ -176,7 +176,12 @@
 - [x] 7.5 Run `make preflight` only after final capacity is recorded; retain
   its separate result and do not start `make local-operational-readiness`
   implicitly.
-- [ ] 7.6 If separately authorized, run the canonical local readiness workflow
+- [x] [historical] 7.6 If separately authorized, run the canonical local readiness workflow
   using its exact run/project evidence contract and keep readiness evidence
   separate from storage-hygiene evidence.
   Not authorized at handoff; local operational readiness was not started.
+
+
+---
+
+> **Historical record:** This change was archived with 3 incomplete task(s) (38/41 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

@@ -47,7 +47,7 @@
 - [x] 3.20 Re-index jira-kanban-from-spreadsheet with embeddings — **VERIFIED 2026-08-06**: 1,042 embeddings
 - [x] 3.21 Re-index jira-skill with embeddings — **VERIFIED 2026-08-06**: 7,904 embeddings
 - [x] 3.22 Re-index mcp-router with embeddings — **VERIFIED 2026-08-06**: 2,660 embeddings
-- [ ] 3.23 Re-index go-microservices with embeddings — **PENDING**: background job running (18,529 nodes, large repo)
+- [x] [historical] 3.23 Re-index go-microservices with embeddings — **PENDING**: background job running (18,529 nodes, large repo)
 
 ## 4. Configure wiki generation
 
@@ -73,3 +73,8 @@
 
 **Total embeddings across workspace:** 39,622 (17/18 repos)
 **Total nodes:** ~67,000 | **Total edges:** ~120,000
+
+
+---
+
+> **Historical record:** This change was archived with 1 incomplete task(s) (47/48 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

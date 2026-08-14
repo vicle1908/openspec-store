@@ -114,7 +114,12 @@
 
 ## 8. Mark change complete
 
-- [ ] 8.1 `openspec validate fix-app-services-apply-schedules` exits 0.
-- [ ] 8.2 `openspec archive fix-app-services-apply-schedules --yes` archives
+- [x] [historical] 8.1 `openspec validate fix-app-services-apply-schedules` exits 0.
+- [x] [historical] 8.2 `openspec archive fix-app-services-apply-schedules --yes` archives
   the change and promotes the new capabilities to
   `tdt-meta/openspec/specs/`.
+
+
+---
+
+> **Historical record:** This change was archived with 2 incomplete task(s) (28/30 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

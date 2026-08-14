@@ -70,7 +70,12 @@
 
 ## Deferred (NOT in this change)
 
-- [ ] Remove DBOS from `webhook-receiver` (selftest, dlq_reaper,
+- [x] [historical] Remove DBOS from `webhook-receiver` (selftest, dlq_reaper,
   report_freshness). Larger refactor; tracked as a follow-up.
-- [ ] Add automated test that injects a malformed `.env` line and
+- [x] [historical] Add automated test that injects a malformed `.env` line and
   verifies the service still starts.
+
+
+---
+
+> **Historical record:** This change was archived with 2 incomplete task(s) (17/19 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

@@ -38,7 +38,7 @@
 - [x] 3.3 Remove `complete()`, `stream()`, `_stream_impl()`, `_parse_response()`, `_parse_delta()` from `BifrostGateway`
 - [x] 3.4 Remove `complete()`, `stream()`, `_stream_impl()`, `_parse_response()`, `_parse_delta()` from `LiteLLMGateway`
 - [x] 3.5 Remove `httpx.AsyncClient` setup (`self._client`) from both gateway implementations
-- [ ] 3.6 Rewire `BudgetTracker` — move from dead HTTP path to pydantic-ai hooks system (deferred — requires BudgetHook design)
+- [x] [historical] 3.6 Rewire `BudgetTracker` — move from dead HTTP path to pydantic-ai hooks system (deferred — requires BudgetHook design)
 - [x] 3.7 Add `usage: Any` field to `AgentResult` in `agent_base/types.py`
 - [x] 3.8 Update `AgentRuntime._to_result()` in `_ai/agent.py` — propagate `RunUsage` to `AgentResult`
 - [x] 3.9 Update `tests/llm_gateway/test_gateway.py` — remove dead tests, keep BudgetTracker and create_gateway tests
@@ -81,3 +81,8 @@
 - [x] 7.7 Verify memory enhancement works: `uv run python -c "from agent_core.memory import Memory, ContextMemory, ScratchMemory; print('OK')"`
 - [x] 7.8 Verify agent-docs-sync still imports cleanly — no breaking changes to public API
 - [x] 7.9 Verify `httpx` usage — httpx stays (used by tool_registry and memory/embedding)
+
+
+---
+
+> **Historical record:** This change was archived with 1 incomplete task(s) (62/63 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

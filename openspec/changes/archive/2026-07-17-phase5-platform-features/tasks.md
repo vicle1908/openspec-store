@@ -36,26 +36,31 @@
 
 ## Task 4: Kafka retry-topic chain
 
-- [ ] Create `pkg/kafkax/retry.go`
-- [ ] Create `pkg/kafkax/dead_letter.go`
-- [ ] Create `pkg/kafkax/consumer.go` with retry routing
-- [ ] Add unit tests
-- [ ] Integrate with order-service consumer
-- [ ] Add configuration schema
+- [x] [historical] Create `pkg/kafkax/retry.go`
+- [x] [historical] Create `pkg/kafkax/dead_letter.go`
+- [x] [historical] Create `pkg/kafkax/consumer.go` with retry routing
+- [x] [historical] Add unit tests
+- [x] [historical] Integrate with order-service consumer
+- [x] [historical] Add configuration schema
 
 ## Task 5: Circuit breaker middleware
 
-- [ ] Create `pkg/resilience/circuit_breaker.go`
-- [ ] Create `pkg/resilience/middleware.go`
-- [ ] Add unit tests
-- [ ] Integrate with service-to-service HTTP calls
-- [ ] Add configuration schema
-- [ ] Add metrics endpoint
+- [x] [historical] Create `pkg/resilience/circuit_breaker.go`
+- [x] [historical] Create `pkg/resilience/middleware.go`
+- [x] [historical] Add unit tests
+- [x] [historical] Integrate with service-to-service HTTP calls
+- [x] [historical] Add configuration schema
+- [x] [historical] Add metrics endpoint
 
 ## Task 6: Worker Versioning v2 design
 
-- [ ] Document current workflow versioning approach
-- [ ] Design version migration strategy
-- [ ] Define deprecation policy
-- [ ] Create example implementation
-- [ ] Review with team
+- [x] [historical] Document current workflow versioning approach
+- [x] [historical] Design version migration strategy
+- [x] [historical] Define deprecation policy
+- [x] [historical] Create example implementation
+- [x] [historical] Review with team
+
+
+---
+
+> **Historical record:** This change was archived with 17 incomplete task(s) (12/29 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

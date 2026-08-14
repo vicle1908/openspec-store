@@ -1,22 +1,27 @@
 # Tasks
 
 ## Phase 1: code-daily-scan
-- [ ] Read test_quick_scan.py
-- [ ] Replace hardcoded path with `IOS_REPO_PATH` env var
-- [ ] Add pytest.skip when path not available
-- [ ] Verify test skips gracefully
+- [x] [historical] Read test_quick_scan.py
+- [x] [historical] Replace hardcoded path with `IOS_REPO_PATH` env var
+- [x] [historical] Add pytest.skip when path not available
+- [x] [historical] Verify test skips gracefully
 
 ## Phase 2: jira-skill
-- [ ] Read test_redis_integration.py
-- [ ] Check if Docker/Redis available before running
-- [ ] Add proper skip decorator
+- [x] [historical] Read test_redis_integration.py
+- [x] [historical] Check if Docker/Redis available before running
+- [x] [historical] Add proper skip decorator
 
 ## Phase 3: webhook-receiver
-- [ ] Read test_settings.py
-- [ ] Fix dotenv path assumptions
-- [ ] Update tests to use temp dirs
+- [x] [historical] Read test_settings.py
+- [x] [historical] Fix dotenv path assumptions
+- [x] [historical] Update tests to use temp dirs
 
 ## Phase 4: Validation
-- [ ] Run all modified test files
-- [ ] Commit changes
-- [ ] Update OpenSpec status
+- [x] [historical] Run all modified test files
+- [x] [historical] Commit changes
+- [x] [historical] Update OpenSpec status
+
+
+---
+
+> **Historical record:** This change was archived with 13 incomplete task(s) (0/13 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

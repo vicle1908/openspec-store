@@ -14,23 +14,28 @@
 
 ## 3. Spreadsheet Health and Filtering
 
-- [ ] 3.1 Characterize current health tiers and decide the canonical boundaries and labels recorded in the delta spec.
-- [ ] 3.2 Align all managed spreadsheet tabs to the chosen health contract and add exact-boundary tests.
-- [ ] 3.3 Add managed filters for issue key, status, assignee, blocker state, and impact tier through the authenticated `tdt-sheets` integration.
-- [ ] 3.4 Verify filter creation failures propagate and unknown or protected stakeholder tabs remain unchanged.
+- [x] [historical] 3.1 Characterize current health tiers and decide the canonical boundaries and labels recorded in the delta spec.
+- [x] [historical] 3.2 Align all managed spreadsheet tabs to the chosen health contract and add exact-boundary tests.
+- [x] [historical] 3.3 Add managed filters for issue key, status, assignee, blocker state, and impact tier through the authenticated `tdt-sheets` integration.
+- [x] [historical] 3.4 Verify filter creation failures propagate and unknown or protected stakeholder tabs remain unchanged.
 
 ## 4. Capacity Data and Role Grouping
 
-- [ ] 4.1 Identify authoritative Jira or planning sources for logged effort, planned estimate, blocked time, and role; document unavailable fields by project.
-- [ ] 4.2 Extend normalized models and collection only for supported authoritative inputs.
-- [ ] 4.3 Calculate bounded Effective Utilization when all required time inputs exist; otherwise render an explicit unavailable state.
-- [ ] 4.4 Rename any item-count proxy so it cannot be mistaken for time utilization.
-- [ ] 4.5 Add optional role grouping with an ungrouped fallback and tests proving every person appears exactly once.
+- [x] [historical] 4.1 Identify authoritative Jira or planning sources for logged effort, planned estimate, blocked time, and role; document unavailable fields by project.
+- [x] [historical] 4.2 Extend normalized models and collection only for supported authoritative inputs.
+- [x] [historical] 4.3 Calculate bounded Effective Utilization when all required time inputs exist; otherwise render an explicit unavailable state.
+- [x] [historical] 4.4 Rename any item-count proxy so it cannot be mistaken for time utilization.
+- [x] [historical] 4.5 Add optional role grouping with an ungrouped fallback and tests proving every person appears exactly once.
 
 ## 5. Documentation and Verification
 
-- [ ] 5.1 Update `jira-epic-report` architecture documents to record `tdt-core` client creation and the authenticated `tdt-sheets` integration boundary.
-- [ ] 5.2 Reconcile stale command, package-layout, and test-count statements without replacing historical dated evidence.
-- [ ] 5.3 Run `ruff check . --fix`, `ruff format .`, strict mypy, and the focused and full pytest suites in `jira-epic-report`.
-- [ ] 5.4 Run strict OpenSpec validation and update the archived reconciliation notes with this change's final outcome.
-- [ ] 5.5 If spreadsheet validation regresses managed workbooks, roll back the affected reporter change while retaining characterization tests and failure evidence.
+- [x] [historical] 5.1 Update `jira-epic-report` architecture documents to record `tdt-core` client creation and the authenticated `tdt-sheets` integration boundary.
+- [x] [historical] 5.2 Reconcile stale command, package-layout, and test-count statements without replacing historical dated evidence.
+- [x] [historical] 5.3 Run `ruff check . --fix`, `ruff format .`, strict mypy, and the focused and full pytest suites in `jira-epic-report`.
+- [x] [historical] 5.4 Run strict OpenSpec validation and update the archived reconciliation notes with this change's final outcome.
+- [x] [historical] 5.5 If spreadsheet validation regresses managed workbooks, roll back the affected reporter change while retaining characterization tests and failure evidence.
+
+
+---
+
+> **Historical record:** This change was archived with 14 incomplete task(s) (8/22 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

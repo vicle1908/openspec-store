@@ -10,21 +10,21 @@
 
 - [x] 1.5.1 Update `design.md` Decision 3: `synchronized {}` → Flow-based reactive design (`MutableStateFlow`, `MutableSharedFlow<ConnEvent>`, `Mutex`, `onEach/launchIn/filterIsInstance/dropWhile/combine/distinctUntilChanged`)
 - [x] 1.5.2 Update `specs/pmp-connection-center/spec.md`: add Flow-based state machine requirement with explicit `onEach { }.launchIn(scope)` operators, `combine` price-tick gate, and `distinctUntilChanged` reconnect watcher
-- [ ] 1.5.3 Implement `PMPNode.kt` with Flow operators (see design.md §Architecture for diagram):
-  - [ ] `MutableStateFlow<State>` for state (replaces `AtomicReference<State>`)
-  - [ ] `MutableSharedFlow<ConnEvent>` sealed class hierarchy (replaces 3 separate `scope.launch` callbacks)
-  - [ ] `onEach { }.launchIn(scope)` pipeline per event type (replaces `scope.launch { _event.collect { when ... } }`)
-  - [ ] `combine(_event, _state) { tick, connected }` price-tick gate (replaces inline `_state.value == Connected` check)
-  - [ ] `distinctUntilChanged().filter { Idle && subs }.onEach { connect() }.launchIn(scope)` reconnect watcher
-  - [ ] `connSeq: MutableStateFlow<Int>` stale-callback guard (replaces `AtomicInteger`)
-  - [ ] `mutationLock: Mutex` compound serialization (replaces `synchronized(this)`)
-  - [ ] `dropWhile { it != Connected }.first()` in `subscribe()` for `onReady` await
-  - [ ] `tryEmit` in listener callbacks (non-blocking socket thread)
-  - [ ] Socket I/O (`submitSubscribe`, `submitUnsubscribe`) moved outside `mutationLock.withLock {}`
-- [ ] 1.5.4 `./gradlew :app:compileUatDebugKotlin` — BUILD SUCCESSFUL
-- [ ] 1.5.5 `./gradlew :app:testUatDebugUnitTest --tests "com.tdt.pmobile3.viewmodels.common.PMPNodeTest"` — PASS
-- [ ] 1.5.6 Manual smoke test: login → Trade → background 30s → foreground → prices update
-- [ ] 1.5.7 Push to `hoangtran/sr-3738-pmp-connection-center`
+- [x] [historical] 1.5.3 Implement `PMPNode.kt` with Flow operators (see design.md §Architecture for diagram):
+  - [x] [historical] `MutableStateFlow<State>` for state (replaces `AtomicReference<State>`)
+  - [x] [historical] `MutableSharedFlow<ConnEvent>` sealed class hierarchy (replaces 3 separate `scope.launch` callbacks)
+  - [x] [historical] `onEach { }.launchIn(scope)` pipeline per event type (replaces `scope.launch { _event.collect { when ... } }`)
+  - [x] [historical] `combine(_event, _state) { tick, connected }` price-tick gate (replaces inline `_state.value == Connected` check)
+  - [x] [historical] `distinctUntilChanged().filter { Idle && subs }.onEach { connect() }.launchIn(scope)` reconnect watcher
+  - [x] [historical] `connSeq: MutableStateFlow<Int>` stale-callback guard (replaces `AtomicInteger`)
+  - [x] [historical] `mutationLock: Mutex` compound serialization (replaces `synchronized(this)`)
+  - [x] [historical] `dropWhile { it != Connected }.first()` in `subscribe()` for `onReady` await
+  - [x] [historical] `tryEmit` in listener callbacks (non-blocking socket thread)
+  - [x] [historical] Socket I/O (`submitSubscribe`, `submitUnsubscribe`) moved outside `mutationLock.withLock {}`
+- [x] [historical] 1.5.4 `./gradlew :app:compileUatDebugKotlin` — BUILD SUCCESSFUL
+- [x] [historical] 1.5.5 `./gradlew :app:testUatDebugUnitTest --tests "com.tdt.pmobile3.viewmodels.common.PMPNodeTest"` — PASS
+- [x] [historical] 1.5.6 Manual smoke test: login → Trade → background 30s → foreground → prices update
+- [x] [historical] 1.5.7 Push to `hoangtran/sr-3738-pmp-connection-center`
 
 
 
@@ -444,12 +444,12 @@ The `resetAllData()` call can be removed — `PMPViewModel.subscribe()` handles 
 
 ### 11. Verification
 
-- [ ] 11.1 `./gradlew :app:compileDevDebugKotlin --quiet` — BUILD SUCCESSFUL
-- [ ] 11.2 `./gradlew :app:testDevDebugUnitTest --tests "com.tdt.pmobile3.viewmodels.common.PMPNodeTest" --tests "com.tdt.pmobile3.viewmodels.common.PMPTokenTest"` — pre-existing test rot blocks this (see task 13.1). Run manually in Android Studio.
-- [ ] 11.3 Manual smoke test 1 (SR-3738): Open Trade bottom sheet → background app 30s → foreground → prices update within 5s
-- [ ] 11.4 Manual smoke test 2 (stale-then-live): Same as 11.3 but background 2min → stale prices flash then live prices update
-- [ ] 11.5 Manual smoke test 3 (close/reopen): Open bottom sheet → close → wait 5s → reopen → immediate snapshot prices
-- [ ] 11.6 Manual smoke test 4 (counter switch): Open → switch counter → switch back → no lag
+- [x] [historical] 11.1 `./gradlew :app:compileDevDebugKotlin --quiet` — BUILD SUCCESSFUL
+- [x] [historical] 11.2 `./gradlew :app:testDevDebugUnitTest --tests "com.tdt.pmobile3.viewmodels.common.PMPNodeTest" --tests "com.tdt.pmobile3.viewmodels.common.PMPTokenTest"` — pre-existing test rot blocks this (see task 13.1). Run manually in Android Studio.
+- [x] [historical] 11.3 Manual smoke test 1 (SR-3738): Open Trade bottom sheet → background app 30s → foreground → prices update within 5s
+- [x] [historical] 11.4 Manual smoke test 2 (stale-then-live): Same as 11.3 but background 2min → stale prices flash then live prices update
+- [x] [historical] 11.5 Manual smoke test 3 (close/reopen): Open bottom sheet → close → wait 5s → reopen → immediate snapshot prices
+- [x] [historical] 11.6 Manual smoke test 4 (counter switch): Open → switch counter → switch back → no lag
 
 ### 12. Git & MR
 
@@ -471,8 +471,8 @@ pmpDataFlow: SharedFlow[PMPUpdate]. NewOrderBottomSheet migrated as first screen
 fixes SR-3738
 ```
 
-- [ ] 12.6 Push to `hoangtran/sr-3738-pmp-connection-center`
-- [ ] 12.7 Update MR description
+- [x] [historical] 12.6 Push to `hoangtran/sr-3738-pmp-connection-center`
+- [x] [historical] 12.7 Update MR description
 
 ---
 
@@ -514,10 +514,10 @@ Risk: LOW.
 
 ## 13. Follow-ups
 
-- [ ] 13.1 **Pre-existing test rot.** `./gradlew :app:testDevDebugUnitTest` fails with ~1200 compile errors across 30+ unrelated test files (`DetailSettingViewModelTest.kt`, `DisplaySettingViewModelTest.kt`, `WatchListTabNewViewModelTest.kt`, and many `viewmodels/watchlist/*` and `viewmodels/auth/*`). This blocks all unit test runs. Fix pattern: align `mockk.every` setups with current production method signatures. Estimated effort: 1-2h per owning team. **New PMP tests (`PMPNodeTest`, `PMPTokenTest`) compile cleanly and will run automatically once test rotation is fixed.**
-- [ ] 13.2 **`aliasFields` reuse.** `PMPUtilViewModel.aliasFields()` was added in Phase 2 and uses the `getFinalHashMapPmpResponse` extraction. After revert, if `aliasFields` is still called by other code paths (e.g. `getFinalHashMapPmpResponse`), keep it. If it's only used by `dispatchToLegacyCallbacks`, revert it completely.
-- [ ] 13.3 **`isAllDataReturned` sentinel.** `PMPViewModel.collector` currently hardcodes `isAllDataReturned = false`. Implement batch-end detection: track the number of expected topics per subscribe() call and set `isAllDataReturned = true` on the last emission. Use the `PMPNode` `subscriberTokens` to know how many topics are active. **Tracked by sub-change `android-pmp-topmarket-migration`** — `IndicesDetailScreen` is the only consumer in the entire PMP codebase that exercises this field, so the implementation lands together with the TopMarket migration.
-- [ ] 13.4 **Custom lint rule.** Add Android Lint check that flags any fragment using `PMPUtilViewModel` without calling `unsubscribe()` in `onDestroy()`.
+- [x] [historical] 13.1 **Pre-existing test rot.** `./gradlew :app:testDevDebugUnitTest` fails with ~1200 compile errors across 30+ unrelated test files (`DetailSettingViewModelTest.kt`, `DisplaySettingViewModelTest.kt`, `WatchListTabNewViewModelTest.kt`, and many `viewmodels/watchlist/*` and `viewmodels/auth/*`). This blocks all unit test runs. Fix pattern: align `mockk.every` setups with current production method signatures. Estimated effort: 1-2h per owning team. **New PMP tests (`PMPNodeTest`, `PMPTokenTest`) compile cleanly and will run automatically once test rotation is fixed.**
+- [x] [historical] 13.2 **`aliasFields` reuse.** `PMPUtilViewModel.aliasFields()` was added in Phase 2 and uses the `getFinalHashMapPmpResponse` extraction. After revert, if `aliasFields` is still called by other code paths (e.g. `getFinalHashMapPmpResponse`), keep it. If it's only used by `dispatchToLegacyCallbacks`, revert it completely.
+- [x] [historical] 13.3 **`isAllDataReturned` sentinel.** `PMPViewModel.collector` currently hardcodes `isAllDataReturned = false`. Implement batch-end detection: track the number of expected topics per subscribe() call and set `isAllDataReturned = true` on the last emission. Use the `PMPNode` `subscriberTokens` to know how many topics are active. **Tracked by sub-change `android-pmp-topmarket-migration`** — `IndicesDetailScreen` is the only consumer in the entire PMP codebase that exercises this field, so the implementation lands together with the TopMarket migration.
+- [x] [historical] 13.4 **Custom lint rule.** Add Android Lint check that flags any fragment using `PMPUtilViewModel` without calling `unsubscribe()` in `onDestroy()`.
 
 ---
 
@@ -537,15 +537,20 @@ Both bugs produce the same user-visible symptom: a transient "you must login" ex
 
 ### Tasks
 
-- [ ] 1.6.1 Add `connectionRef.set(null)` to `connect()` catch block at `PMPNode.kt` line 683-686. **CRITICAL: must be BEFORE `_state.value = State.Idle`** to prevent a window where `submitSubscribe` reads a non-null `conn` against an Idle state. Verify by reading the code in the next 30 seconds.
-- [ ] 1.6.2 Add `connectionFactory: (String) -> PMPConnection` test seam at `PMPNode.kt` after the `companion object`. Mark with `@VisibleForTesting`. Default delegates to `PMPConnection(url, listener, PULL_TIME_IN_SEC)`. Use a function-reference `var` (not `open fun`) so the final class doesn't need to be opened.
-- [ ] 1.6.3 Add snapshot guard to `submitSubscribe` at `PMPNode.kt` line 689-715. After the state check and before `buildSubscribeRequest`, add `if (conn !== connectionRef.get()) { Timber.w(...); return }`. Reference equality, not seq.
-- [ ] 1.6.4 Add 4 new unit tests to `PMPNodeTest.kt` (after the existing 4): catch path clears connectionRef, catch path does not throw, submitSubscribe with stale connectionRef, connectionRef set order in catch.
-- [ ] 1.6.5 `./gradlew :app:compileUatDebugKotlin` — expect BUILD SUCCESSFUL.
-- [ ] 1.6.6 `./gradlew :app:testUatDebugUnitTest --tests "com.tdt.pmobile3.viewmodels.common.PMPNodeTest"` — expect 8 tests pass (4 existing + 4 new). **Known blocker:** the test infrastructure is currently broken with ~1200 pre-existing compile errors across `viewmodels/watchlist/*Test.kt` files AND Robolectric 4.5 (ASM 6) cannot load Java 21 class files (`Unsupported class file major version 65`). See tasks §13.1 follow-up. The 4 new tests compile cleanly and are ready to run once the team upgrades Robolectric (likely same release cycle).
-- [ ] 1.6.7 `./gradlew :app:assembleUatDebug` — produces UAT APK.
-- [ ] 1.6.8 Install on emulator: `adb install -r app/build/outputs/apk/uat/debug/app-uat-debug.apk`.
-- [ ] 1.6.9 Manual smoke test: login → Trade → home (background) → 30s → resume → verify prices update. Capture `adb logcat -d -t 1000 | grep -E "submitSubscribe failed|all URLs exhausted"` and verify **zero matches**.
-- [ ] 1.6.10 Run smoke tests 1-4 from Phase 1.5 (background 30s, stale-then-live 2min, close/reopen, counter switch) — verify all pass.
-- [ ] 1.6.11 Commit: `fix(android): PMPNode — clear connectionRef on connect() throw + snapshot guard in submitSubscribe (SR-3738 Phase 1.6)`. Body explains both bugs, references the live logcat evidence, and links this phase.
-- [ ] 1.6.12 Push to `hoangtran/sr-3738-pmp-connection-center`. Do NOT open a new MR — this is part of the existing SR-3738 MR.
+- [x] [historical] 1.6.1 Add `connectionRef.set(null)` to `connect()` catch block at `PMPNode.kt` line 683-686. **CRITICAL: must be BEFORE `_state.value = State.Idle`** to prevent a window where `submitSubscribe` reads a non-null `conn` against an Idle state. Verify by reading the code in the next 30 seconds.
+- [x] [historical] 1.6.2 Add `connectionFactory: (String) -> PMPConnection` test seam at `PMPNode.kt` after the `companion object`. Mark with `@VisibleForTesting`. Default delegates to `PMPConnection(url, listener, PULL_TIME_IN_SEC)`. Use a function-reference `var` (not `open fun`) so the final class doesn't need to be opened.
+- [x] [historical] 1.6.3 Add snapshot guard to `submitSubscribe` at `PMPNode.kt` line 689-715. After the state check and before `buildSubscribeRequest`, add `if (conn !== connectionRef.get()) { Timber.w(...); return }`. Reference equality, not seq.
+- [x] [historical] 1.6.4 Add 4 new unit tests to `PMPNodeTest.kt` (after the existing 4): catch path clears connectionRef, catch path does not throw, submitSubscribe with stale connectionRef, connectionRef set order in catch.
+- [x] [historical] 1.6.5 `./gradlew :app:compileUatDebugKotlin` — expect BUILD SUCCESSFUL.
+- [x] [historical] 1.6.6 `./gradlew :app:testUatDebugUnitTest --tests "com.tdt.pmobile3.viewmodels.common.PMPNodeTest"` — expect 8 tests pass (4 existing + 4 new). **Known blocker:** the test infrastructure is currently broken with ~1200 pre-existing compile errors across `viewmodels/watchlist/*Test.kt` files AND Robolectric 4.5 (ASM 6) cannot load Java 21 class files (`Unsupported class file major version 65`). See tasks §13.1 follow-up. The 4 new tests compile cleanly and are ready to run once the team upgrades Robolectric (likely same release cycle).
+- [x] [historical] 1.6.7 `./gradlew :app:assembleUatDebug` — produces UAT APK.
+- [x] [historical] 1.6.8 Install on emulator: `adb install -r app/build/outputs/apk/uat/debug/app-uat-debug.apk`.
+- [x] [historical] 1.6.9 Manual smoke test: login → Trade → home (background) → 30s → resume → verify prices update. Capture `adb logcat -d -t 1000 | grep -E "submitSubscribe failed|all URLs exhausted"` and verify **zero matches**.
+- [x] [historical] 1.6.10 Run smoke tests 1-4 from Phase 1.5 (background 30s, stale-then-live 2min, close/reopen, counter switch) — verify all pass.
+- [x] [historical] 1.6.11 Commit: `fix(android): PMPNode — clear connectionRef on connect() throw + snapshot guard in submitSubscribe (SR-3738 Phase 1.6)`. Body explains both bugs, references the live logcat evidence, and links this phase.
+- [x] [historical] 1.6.12 Push to `hoangtran/sr-3738-pmp-connection-center`. Do NOT open a new MR — this is part of the existing SR-3738 MR.
+
+
+---
+
+> **Historical record:** This change was archived with 39 incomplete task(s) (26/65 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

@@ -9,4 +9,8 @@
 - [x] 7. Rebuild scheduler image, `docker compose up -d --force-recreate scheduler`
 - [x] 8. Verify `docker logs --since 5m` shows structlog heartbeat lines immediately
 - [x] 9. Verify host file shows structlog lines immediately
-- [ ] 10. Archive via `openspec archive scheduler-entrypoint-log-hygiene`
+- [x] [historical] 10. Archive via `openspec archive scheduler-entrypoint-log-hygiene`
+
+---
+
+> **Historical record:** This change was archived with 1 incomplete task(s) (9/10 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

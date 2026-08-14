@@ -78,8 +78,13 @@ cat .gitnexusrc
 ## Section 4: Repository Validation
 
 ### 4.1 Full Validation
-- [ ] 4.1.1 Run `openspec validate --strict --all`
+- [x] [historical] 4.1.1 Run `openspec validate --strict --all`
 - [x] 4.1.2 Run `make -C services/catalog-service verify-pr` (skipped — no
       new Go code in catalog-service, only config field removal)
 - [x] 4.1.3 Run `make -C services/order-service verify-pr` (skipped — only
       dead code removal, no behavior change)
+
+
+---
+
+> **Historical record:** This change was archived with 1 incomplete task(s) (24/25 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

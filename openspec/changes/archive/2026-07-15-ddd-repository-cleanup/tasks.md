@@ -70,5 +70,10 @@
 
 ## 5. Archive
 
-- [ ] 5.1 Final review of all changes
-- [ ] 5.2 Archive change: `openspec archive ddd-repository-cleanup`
+- [x] [historical] 5.1 Final review of all changes
+- [x] [historical] 5.2 Archive change: `openspec archive ddd-repository-cleanup`
+
+
+---
+
+> **Historical record:** This change was archived with 2 incomplete task(s) (32/34 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

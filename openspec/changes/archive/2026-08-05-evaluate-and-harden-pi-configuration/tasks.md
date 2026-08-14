@@ -21,6 +21,11 @@
 
 ## 4. Validation and closure
 
-- [ ] 4.1 Validate the updated Pi skill.
-- [ ] 4.2 Run strict OpenSpec validation.
-- [ ] 4.3 Run store doctor, review the diff, archive the change, and commit the store.
+- [x] [historical] 4.1 Validate the updated Pi skill.
+- [x] [historical] 4.2 Run strict OpenSpec validation.
+- [x] [historical] 4.3 Run store doctor, review the diff, archive the change, and commit the store.
+
+
+---
+
+> **Historical record:** This change was archived with 3 incomplete task(s) (12/15 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

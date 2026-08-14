@@ -74,7 +74,12 @@
   - Command: `openspec validate hermes-moa-quality-optimization --store openspec-store`
   - Result: ✅ "Change 'hermes-moa-quality-optimization' is valid"
 
-- [ ] **4.4** Smoke test (requires new session)
+- [x] [historical] **4.4** Smoke test (requires new session)
   - Start new session with `/model default --provider moa`
   - Verify MoA reference outputs appear in responses
   - Verify tool calls work through the aggregator
+
+
+---
+
+> **Historical record:** This change was archived with 1 incomplete task(s) (12/13 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

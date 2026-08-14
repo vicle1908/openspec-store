@@ -4,8 +4,8 @@
 
 - [x] 1.1 Create `review-scope.yaml` template with all required fields ✅
 - [x] 1.2 Define schema: change_name, repositories, specs, docs, skills, excluded ✅
-- [ ] 1.3 Add validation logic for scope file
-- [ ] 1.4 Document how to create scope for each change
+- [x] [historical] 1.3 Add validation logic for scope file
+- [x] [historical] 1.4 Document how to create scope for each change
 
 ## 2. Create Plan Review Skill (Revised)
 
@@ -24,7 +24,7 @@
 - [x] 2.13 Implement feedback consolidation with status semantics (in SKILL.md workflow) ✅
 - [x] 2.14 Create `review-plan.md` output template with 8-edge matrix ✅
 - [x] 2.15 Add error handling for provider failures (UNKNOWN/NOT_REVIEWED) (in SKILL.md) ✅
-- [ ] 2.16 Test with existing change (e.g., optimize-hermes-agent-configuration)
+- [x] [historical] 2.16 Test with existing change (e.g., optimize-hermes-agent-configuration)
 
 ## 3. Create Code Review Skill (Revised)
 
@@ -44,7 +44,7 @@
 - [x] 3.14 Implement feedback consolidation with status semantics (in SKILL.md workflow) ✅
 - [x] 3.15 Create `review-code.md` output template with 8-edge matrix ✅
 - [x] 3.16 Add error handling for provider failures (UNKNOWN/NOT_REVIEWED) (in SKILL.md) ✅
-- [ ] 3.17 Test with existing implemented change
+- [x] [historical] 3.17 Test with existing implemented change
 
 ## 4. Create Alignment Templates
 
@@ -53,7 +53,7 @@
 - [x] 4.3 Create `review-code.md` template with alignment matrix sections ✅
 - [x] 4.4 Create provider-specific finding sections (in templates) ✅
 - [x] 4.5 Create recommended fixes format (in templates) ✅
-- [ ] 4.6 Create documentation/skills update tracking format
+- [x] [historical] 4.6 Create documentation/skills update tracking format
 
 ## 5. Documentation
 
@@ -67,19 +67,24 @@
 
 ## 6. Validation
 
-- [ ] 6.1 Test plan review skill with a real change
-- [ ] 6.2 Test code review skill with a real implemented change
-- [ ] 6.3 Verify parallel execution works (5 providers run concurrently)
-- [ ] 6.4 Verify error handling (one provider fails, others continue)
-- [ ] 6.5 Verify alignment matrix output is correct and readable
-- [ ] 6.6 Verify trust boundary is enforced (reviewers are read-only)
-- [ ] 6.7 Verify evidence collection works (file paths, line numbers)
-- [ ] 6.8 Verify status semantics are applied correctly
-- [ ] 6.9 Update SPEC_INDEX.md if delta specs are created
+- [x] [historical] 6.1 Test plan review skill with a real change
+- [x] [historical] 6.2 Test code review skill with a real implemented change
+- [x] [historical] 6.3 Verify parallel execution works (5 providers run concurrently)
+- [x] [historical] 6.4 Verify error handling (one provider fails, others continue)
+- [x] [historical] 6.5 Verify alignment matrix output is correct and readable
+- [x] [historical] 6.6 Verify trust boundary is enforced (reviewers are read-only)
+- [x] [historical] 6.7 Verify evidence collection works (file paths, line numbers)
+- [x] [historical] 6.8 Verify status semantics are applied correctly
+- [x] [historical] 6.9 Update SPEC_INDEX.md if delta specs are created
 
 ## 7. Integration
 
 - [x] 7.1 Add skills to openspec-workflow skill category ✅
-- [ ] 7.2 Update openspec-workflow SKILL.md to reference new skills
-- [ ] 7.3 Commit all changes to openspec-store
-- [ ] 7.4 Archive change after validation
+- [x] [historical] 7.2 Update openspec-workflow SKILL.md to reference new skills
+- [x] [historical] 7.3 Commit all changes to openspec-store
+- [x] [historical] 7.4 Archive change after validation
+
+
+---
+
+> **Historical record:** This change was archived with 17 incomplete task(s) (46/63 completed). The remaining tasks were not implemented or were superseded by subsequent changes.

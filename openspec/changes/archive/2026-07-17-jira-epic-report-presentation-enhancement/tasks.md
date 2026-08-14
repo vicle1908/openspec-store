@@ -158,7 +158,7 @@ Do not expand without authoritative model inputs.
 
 - [x] 10.1 Add sprint report header with blocking metrics (Sprint Name, Health Tier, % Blocked, Root Blockers)
 - [x] 10.2 Implement health tier calculation with blocking risk (current blocked %, root blocker count, and impact behavior; exact boundary alignment transferred to follow-up)
-- [ ] 10.3 Add blocking columns to target vs actual table (Blocked By, Blocks, Impact Radius) — transferred to `jira-epic-report-archive-gap-closure`
+- [x] [historical] 10.3 Add blocking columns to target vs actual table (Blocked By, Blocks, Impact Radius) — transferred to `jira-epic-report-archive-gap-closure`
 - [x] 10.4 Highlight root blockers in sprint report (red background, ROOT BLOCKER badge)
 - [x] 10.5 Add sprint summary metrics with blocking stats
 - [x] 10.6 Add blocking columns to person capacity table (Blockers Owned, Items Blocked, Blocked %, Blocking Impact)
@@ -166,11 +166,11 @@ Do not expand without authoritative model inputs.
 - [x] 10.8 Implement Items Blocked calculation (count of person's items that are blocked)
 - [x] 10.9 Implement Blocked % formula
 - [x] 10.10 Implement Blocking Impact calculation (sum of impact radii of person's root blockers)
-- [ ] 10.11 Implement time-based Effective Utilization with blocking adjustment — current item-count proxy is not equivalent; transferred to `jira-epic-report-archive-gap-closure`
+- [x] [historical] 10.11 Implement time-based Effective Utilization with blocking adjustment — current item-count proxy is not equivalent; transferred to `jira-epic-report-archive-gap-closure`
 - [x] 10.12 Add utilization color coding for the current item-flow metric (green >=90%, yellow 70-89%, red <70%)
 - [x] 10.13 Add action recommendations based on blocking context
 - [x] 10.14 Add team summary row (Total Persons, Avg Utilization, Total Blockers, Team Health)
-- [ ] 10.15 Add role-based grouping support — no authoritative normalized role field; transferred to `jira-epic-report-archive-gap-closure`
+- [x] [historical] 10.15 Add role-based grouping support — no authoritative normalized role field; transferred to `jira-epic-report-archive-gap-closure`
 - [x] 10.16 Write unit test: `test_sprint_report_blocking_metrics`
 - [x] 10.17 Write unit test: `test_sprint_report_health_tier_with_blocking`
 - [x] 10.18 Write unit test: `test_person_capacity_blocking_columns`
@@ -264,3 +264,8 @@ Do not expand without authoritative model inputs.
 - Sprint report in spreadsheet shows health tier with blocking risk
 - Person capacity in spreadsheet shows blocking impact per person
 - BlockingAnalysisMetrics emitted correctly in all analysis flows
+
+
+---
+
+> **Historical record:** This change was archived with 3 incomplete task(s) (170/173 completed). The remaining tasks were not implemented or were superseded by subsequent changes.
