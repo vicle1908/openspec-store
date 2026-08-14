@@ -4,11 +4,13 @@
 
 Create `~/Developer/scripts/refresh-knowledge-indexes.sh` that:
 - Discovers repos with `.gitnexus/` or `graphify-out/` under `~/Developer/`
+- Discovers worktrees for each repo via `git worktree list --porcelain`
 - Runs `gitnexus analyze . --index-only --default-branch main` for GitNexus repos
-- Runs `graphify update .` for Graphify repos
+- Runs `graphify update .` for Graphify repos (main checkout only)
 - Uses lockfile for concurrency safety
 - Logs to `~/Developer/.knowledge-refresh/refresh.log`
 - Skips repos in merge/rebase state
+- Skips detached HEAD and stale (>30 day) worktrees
 - Handles missing CLIs gracefully (skip + warning)
 
 ### 1.1 Create log directory
@@ -23,67 +25,109 @@ Non-blocking lockfile at `/tmp/knowledge-refresh.lock` with stale detection.
 
 Find repos by checking for `.gitnexus/` and `graphify-out/` directories.
 
-### 1.4 Implement GitNexus refresh
+### 1.4 Implement worktree discovery
 
-Run `gitnexus analyze . --index-only --default-branch main` with timeout and error handling.
+For each repo, run `git worktree list --porcelain` and filter:
+- Skip main checkout (handled separately)
+- Skip detached HEAD worktrees
+- Skip worktrees with no branch activity in 30+ days
+- Skip `.claude/worktrees/` (ephemeral)
 
-### 1.5 Implement Graphify refresh
+### 1.5 Implement GitNexus refresh
 
-Run `graphify update .` with timeout and error handling.
+Run `gitnexus analyze . --index-only --default-branch main` with timeout and error handling. For worktrees, run from the worktree directory.
 
-### 1.6 Implement logging
+### 1.6 Implement Graphify refresh
 
-Timestamped entries with repo name, tool, status, duration.
+Run `graphify update .` with timeout and error handling. Only run from main checkouts (not worktrees).
 
-## 2. Create status command
+### 1.7 Implement logging
 
-Create `~/Developer/scripts/knowledge-status.sh` that reports freshness across all repos.
+Timestamped entries with repo name, worktree/main, tool, status, duration.
 
-### 2.1 Implement status discovery
+## 2. Create post-merge hook
 
-Same discovery as refresh script.
+Create a post-merge hook that triggers delayed refresh when code lands on main.
 
-### 2.2 Implement freshness check
+### 2.1 Write the post-merge hook
 
-For each repo, check indexed revision vs current HEAD.
+Hook logic:
+- Detect if merge target is main branch (check `MERGE_HEAD` or branch name)
+- Write timestamp to `/tmp/knowledge-postmerge-<repo-slug>.ts`
+- Sleep 30 seconds (detached background process)
+- Read timestamp back — if changed, exit (newer merge will handle it)
+- Run `gitnexus analyze . --index-only --default-branch main`
+- Run `graphify update .`
+- Log result to `~/Developer/.knowledge-refresh/post-merge.log`
 
-### 2.3 Implement formatted output
+### 2.2 Create hook installer
 
-Table output with repo, tool, last refresh, freshness status.
+Create `~/Developer/scripts/install-post-merge-hook.sh` that:
+- Finds all repos with `.gitnexus/` or `graphify-out/`
+- Installs the post-merge hook in each (idempotent, marked block)
+- Preserves existing hook content
+- Reports which repos were updated
 
-## 3. Create LaunchAgent
+### 2.3 Extend knowledge-tools.sh
+
+Add `install-post-merge-hooks` target to `go-microservices/scripts/knowledge-tools.sh` so it runs alongside the existing Graphify hook installation.
+
+## 3. Create status command
+
+Create `~/Developer/scripts/knowledge-status.sh` that reports freshness across all repos and worktrees.
+
+### 3.1 Implement status discovery
+
+Same discovery as refresh script (repos + worktrees).
+
+### 3.2 Implement freshness check
+
+For each repo/worktree:
+- GitNexus: compare `meta.json` `lastCommit` with current HEAD
+- Graphify: compare `graph.json` timestamp with last commit time
+
+### 3.3 Implement formatted output
+
+Table output with repo, worktree, tool, last refresh, freshness status.
+
+## 4. Create LaunchAgent
 
 Create `~/Library/LaunchAgents/com.developer.index-refresh.plist` for nightly execution.
 
-### 3.1 Write plist file
+### 4.1 Write plist file
 
 Nightly schedule at 02:30 local time with KeepAlive on crash.
 
-### 3.2 Load and verify LaunchAgent
+### 4.2 Load and verify LaunchAgent
 
 Load the agent and verify it fires correctly.
 
-## 4. Update documentation
+## 5. Update documentation
 
-### 4.1 Fix AGENTS.md
+### 5.1 Fix AGENTS.md
 
-Remove stale "Weekly crons: graphify freshness (Mon 8AM), wiki lint (Mon 9AM)" claim. Add actual LaunchAgent description.
+Remove stale "Weekly crons: graphify freshness (Mon 8AM), wiki lint (Mon 9AM)" claim. Add actual LaunchAgent + post-merge hook description.
 
-### 4.2 Update CLAUDE.md
+### 5.2 Update CLAUDE.md
 
 Update staleness warnings to reference the automated refresh mechanism.
 
-## 5. Extend existing spec
+## 6. Extend existing spec
 
 Add automation requirements to `openspec/specs/refresh-gitnexus-index-groups/spec.md`.
 
 ## Verification
 
 - [ ] `~/Developer/scripts/refresh-knowledge-indexes.sh` runs successfully on all repos
-- [ ] `~/Developer/scripts/knowledge-status.sh` reports freshness correctly
+- [ ] `~/Developer/scripts/refresh-knowledge-indexes.sh` discovers and refreshes worktrees
+- [ ] `~/Developer/scripts/knowledge-status.sh` reports freshness correctly for repos + worktrees
+- [ ] Post-merge hook triggers delayed refresh on merge to main
+- [ ] Post-merge debounce prevents redundant refreshes during rapid merges
 - [ ] LaunchAgent loads with `launchctl load ~/Library/LaunchAgents/com.developer.index-refresh.plist`
 - [ ] Manual trigger works: `launchctl start com.developer.index-refresh`
-- [ ] Log file is created and contains timestamped entries
+- [ ] Log files are created and contain timestamped entries
 - [ ] Overlapping runs are prevented by lockfile
 - [ ] Missing CLI (gitnexus/graphify) doesn't crash the script
+- [ ] Detached HEAD worktrees are skipped
+- [ ] Stale worktrees (>30 days) are skipped
 - [ ] AGENTS.md no longer contains stale cron claims
