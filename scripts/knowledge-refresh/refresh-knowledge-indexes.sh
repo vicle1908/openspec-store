@@ -615,15 +615,119 @@ process_inventory() {
 
 # ---------------------------------------------------------------------------
 # Entry point
-# ---------------------------------------------------------------------------
+usage() {
+  cat <<'EOF'
+Usage: refresh-knowledge-indexes.sh [options]
+
+Options:
+  --repo <path>       Refresh a single inventoried repository
+  --trigger <type>    Trigger type: post-merge, manual, launchd, test
+  --dry-run           Validate inventory without refreshing
+  --status            Show recent log entries
+  --rotate            Rotate the refresh log
+  --help, -h          Show this help
+
+Without arguments, performs a full batch refresh of all inventoried repos.
+EOF
+}
+
+process_single_repo() {
+  local repo_path="$1"
+  local trigger="${2:-manual}"
+
+  # Canonicalize and validate
+  local canonical
+  canonical="$(cd "$repo_path" 2>/dev/null && pwd)" || { warn "Directory not found: $repo_path"; return 0; }
+
+  # Validate git repo (handles worktree .git files)
+  if ! git -C "$canonical" rev-parse --git-dir >/dev/null 2>&1; then
+    warn "Not a git repository: $canonical"
+    log_line "$(repo_name "$canonical")" "$trigger" "skipped_uninitialized" "0" "not a git repo"
+    return 0
+  fi
+
+  # Lookup in inventory (exact canonical match required)
+  local inv_branch="main" inv_gn="yes" inv_gf="yes" found=false
+  while IFS=$'\t' read -r i_root i_branch i_gn i_gf; do
+    [[ "$i_root" == \#* || -z "$i_root" ]] && continue
+    local i_canonical
+    i_canonical="$(cd "$i_root" 2>/dev/null && pwd)" 2>/dev/null || continue
+    if [[ "$i_canonical" == "$canonical" ]]; then
+      inv_branch="${i_branch:-main}"
+      inv_gn="${i_gn:-yes}"
+      inv_gf="${i_gf:-yes}"
+      found=true
+      break
+    fi
+  done < "$INVENTORY_FILE"
+
+  if ! $found; then
+    warn "Repository not in approved inventory: $canonical"
+    log_line "$(repo_name "$canonical")" "$trigger" "skipped_unlisted" "0" "not in inventory"
+    return 0
+  fi
+
+  # For post-merge: require current branch matches inventory default
+  if [[ "$trigger" == "post-merge" ]]; then
+    local current_branch
+    current_branch="$(git -C "$canonical" symbolic-ref --short HEAD 2>/dev/null)" || return 0
+    if [[ "$current_branch" != "$inv_branch" ]]; then
+      log_line "$(repo_name "$canonical")" "$trigger" "skipped_wrong_branch" "0" \
+        "branch=$current_branch expected=$inv_branch"
+      return 0
+    fi
+    # Graphify handled by existing hook
+    inv_gf="no"
+  fi
+
+  log_init
+  log_rotate
+
+  # Advisory: hook must never block git operations
+  if process_target "$canonical" "$inv_branch" "$inv_gn" "$inv_gf" "$trigger"; then
+    return 0
+  else
+    local rc=$?
+    log_line "$(repo_name "$canonical")" "$trigger" "failed" "0" "exit=$rc"
+    return 0
+  fi
+}
+
 main() {
-  local cmd="${1:-}"
-  case "$cmd" in
-    --dry-run)
+  local mode="batch"
+  local repo_path=""
+  local trigger="manual"
+
+  while (($#)); do
+    case "$1" in
+      --repo)
+        (($# >= 2)) || die "--repo requires a path"
+        repo_path="$2"
+        mode="single"
+        shift 2
+        ;;
+      --trigger)
+        (($# >= 2)) || die "--trigger requires a value"
+        trigger="$2"
+        shift 2
+        ;;
+      --dry-run) mode="dry-run"; shift ;;
+      --status) mode="status"; shift ;;
+      --rotate) mode="rotate"; shift ;;
+      --help|-h) usage; return 0 ;;
+      *) usage >&2; return 2 ;;
+    esac
+  done
+
+  case "$mode" in
+    single)
+      validate_inventory
+      process_single_repo "$repo_path" "$trigger"
+      ;;
+    dry-run)
       note "Dry run -- validating inventory only"
       validate_inventory
       note "Inventory validation passed"
-      # Show what would be processed
       while IFS=$'\t' read -r canonical_root branch gitnexus_enabled graphify_enabled; do
         [[ "$canonical_root" == \#* ]] && continue
         [[ -z "$canonical_root" ]] && continue
@@ -635,7 +739,7 @@ main() {
           "$name" "$gitnexus_enabled" "$graphify_enabled" "$exists"
       done < "$INVENTORY_FILE"
       ;;
-    --status)
+    status)
       validate_inventory
       log_rotate
       if [[ -f "$LOG_FILE" ]]; then
@@ -645,34 +749,16 @@ main() {
         note "No log file found at ${LOG_FILE}"
       fi
       ;;
-    --rotate)
+    rotate)
       log_rotate
       note "Log rotated"
       ;;
-    "")
+    batch)
       validate_inventory
       log_init
       log_rotate
       process_inventory
       ;;
-    *)
-      printf '%s\n' \
-        "Usage: refresh-knowledge-indexes.sh [--dry-run | --status | --rotate]" \
-        "" \
-        "Refresh GitNexus and Graphify indexes for all inventory entries." \
-        "Without arguments, performs a full refresh cycle." \
-        "" \
-        "Options:" \
-        "  --dry-run   Validate inventory and show targets without refreshing" \
-        "  --status    Show recent log entries" \
-        "  --rotate    Rotate the refresh log" \
-        "" \
-        "Status values: success, fresh_noop, skipped_dirty, skipped_merge_state," \
-        "  skipped_uninitialized, provider_missing, lock_busy, watcher_active," \
-        "  timeout, failed, superseded"
-      exit 2
-      ;;
   esac
 }
-
 main "$@"

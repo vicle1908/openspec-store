@@ -2,8 +2,9 @@
 # install-hooks.sh — Install managed post-merge dispatcher in all inventoried repos
 #
 # This script installs a lightweight post-merge hook that dispatches to the
-  nohup "$HOME/Developer/scripts/knowledge-refresh/refresh-knowledge-indexes.sh" \
-    >>"$HOME/Developer/.knowledge-refresh/post-merge.log" 2>&1 </dev/null &
+# central refresh-knowledge-indexes.sh script. The hook itself contains no
+# logic — all validation, branch checking, and locking happens centrally.
+#
 # Idempotent: checks for the managed block marker before inserting.
 #
 # Usage:
@@ -26,7 +27,8 @@ read -r -d '' DISPATCHER_BLOCK << 'BLOCK_EOF' || true
 # Managed by workspace refresh system — do not edit between markers.
 knowledge_gitnexus_dispatch() {
   nohup "$HOME/Developer/scripts/knowledge-refresh/refresh-knowledge-indexes.sh" \
-    >>"$HOME/Developer/.knowledge-refresh/post-merge.log" 2>&1 </dev/null &
+    --repo "$(git rev-parse --show-toplevel)" \
+    --trigger post-merge \
     >>"$HOME/Developer/.knowledge-refresh/post-merge.log" 2>&1 </dev/null &
 }
 knowledge_gitnexus_dispatch
