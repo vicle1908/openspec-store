@@ -1,0 +1,272 @@
+[
+  {
+    "idx": 1,
+    "start": 129,
+    "end": 229,
+    "lines": 101,
+    "bytes": 5794,
+    "title": "**Pitfall (archived overlap name):** A prior change may be referenced in prose but have already been archived under a da",
+    "class": "normative"
+  },
+  {
+    "idx": 2,
+    "start": 230,
+    "end": 233,
+    "lines": 4,
+    "bytes": 1408,
+    "title": "**Pitfall (store-connected repos + `openspec init --tools`):** Repos that use an external store (have `store: openspec-s",
+    "class": "normative"
+  },
+  {
+    "idx": 3,
+    "start": 234,
+    "end": 239,
+    "lines": 6,
+    "bytes": 1528,
+    "title": "**Pitfall:** When writing multiple files to a change directory via `write_file`, the `.openspec.yaml` created by `opensp",
+    "class": "normative"
+  },
+  {
+    "idx": 4,
+    "start": 240,
+    "end": 243,
+    "lines": 4,
+    "bytes": 590,
+    "title": "**Pitfall:** For tooling/config-only changes (new skills, CLI setup, agent wiring), use `skip_specs: true` in `.openspec",
+    "class": "normative"
+  },
+  {
+    "idx": 5,
+    "start": 244,
+    "end": 247,
+    "lines": 4,
+    "bytes": 1000,
+    "title": "**Pitfall:** Change proposals may contain fabricated or outdated factual claims (version numbers, rule counts, dependenc",
+    "class": "normative"
+  },
+  {
+    "idx": 6,
+    "start": 248,
+    "end": 251,
+    "lines": 4,
+    "bytes": 855,
+    "title": "**Pitfall:** When implementing changes that update tool versions or APIs, ALWAYS update tests to match the new API \u2014 nev",
+    "class": "normative"
+  },
+  {
+    "idx": 7,
+    "start": 252,
+    "end": 255,
+    "lines": 4,
+    "bytes": 1217,
+    "title": "**Pitfall:** Tool upgrades can silently change output directory layouts. After upgrading a tool (graphify, gitnexus, etc",
+    "class": "normative"
+  },
+  {
+    "idx": 8,
+    "start": 256,
+    "end": 269,
+    "lines": 14,
+    "bytes": 2368,
+    "title": "**Pitfall:** Retrospective changes (work already done, spec after) still require the full OpenSpec lifecycle \u2014 create ch",
+    "class": "historical"
+  },
+  {
+    "idx": 9,
+    "start": 270,
+    "end": 273,
+    "lines": 4,
+    "bytes": 1047,
+    "title": "**Pitfall (user correction \u2014 verification order):** When creating changes for new tool integrations, run ACTUAL verifica",
+    "class": "historical"
+  },
+  {
+    "idx": 10,
+    "start": 274,
+    "end": 276,
+    "lines": 3,
+    "bytes": 2044,
+    "title": "**Pitfall (retrospective desktop-agent live-integration closure):** When documenting a fix already applied to a desktop-",
+    "class": "historical"
+  },
+  {
+    "idx": 11,
+    "start": 277,
+    "end": 280,
+    "lines": 4,
+    "bytes": 1148,
+    "title": "**Pitfall:** Archive fails when MODIFIED delta spec headers don't exactly match existing spec headers. The archive tool ",
+    "class": "normative"
+  },
+  {
+    "idx": 12,
+    "start": 281,
+    "end": 284,
+    "lines": 4,
+    "bytes": 1433,
+    "title": "**Pitfall \u2014 delegate_task reviews crash with vars() serialization bug (USE CLI AGENTS INSTEAD):** The Hermes `conversati",
+    "class": "operational"
+  },
+  {
+    "idx": 13,
+    "start": 285,
+    "end": 288,
+    "lines": 4,
+    "bytes": 722,
+    "title": "**Pitfall:** ALWAYS pass inline content in the `context` parameter to delegate_task, NEVER file paths. File paths cause ",
+    "class": "operational"
+  },
+  {
+    "idx": 14,
+    "start": 289,
+    "end": 292,
+    "lines": 4,
+    "bytes": 1367,
+    "title": "**Pitfall:** When deleting source packages (e.g. `llm_gateway/`, `resilience/`), always check for test files that import",
+    "class": "normative"
+  },
+  {
+    "idx": 15,
+    "start": 293,
+    "end": 296,
+    "lines": 4,
+    "bytes": 1320,
+    "title": "**Pitfall (context compaction loops):** After context compaction, the agent may lose track of completed operations and l",
+    "class": "historical"
+  },
+  {
+    "idx": 16,
+    "start": 297,
+    "end": 300,
+    "lines": 4,
+    "bytes": 782,
+    "title": "**Pitfall:** Knowledge tools can return stale data \u2014 always verify freshness before using as evidence. `graphify check-u",
+    "class": "normative"
+  },
+  {
+    "idx": 17,
+    "start": 301,
+    "end": 304,
+    "lines": 4,
+    "bytes": 1009,
+    "title": "**Pitfall:** After large code changes (API migrations, package deletions), sweep ALL of: `src/`, `tests/`, `docs/`, `exa",
+    "class": "normative"
+  },
+  {
+    "idx": 18,
+    "start": 305,
+    "end": 308,
+    "lines": 4,
+    "bytes": 991,
+    "title": "**Pitfall (model_names vs prefix ambiguity):** When adding provider configs with `model_names`, verify that no model nam",
+    "class": "normative"
+  },
+  {
+    "idx": 19,
+    "start": 309,
+    "end": 425,
+    "lines": 117,
+    "bytes": 13951,
+    "title": "**Pitfall:** GitNexus MCP tools have specific parameter schemas that differ from CLI flags. `ask_question` uses `repoNam",
+    "class": "normative"
+  },
+  {
+    "idx": 20,
+    "start": 426,
+    "end": 429,
+    "lines": 4,
+    "bytes": 1758,
+    "title": "**Pitfall (MoA variant proposals and role switches):** Before creating/applying a MoA change, separate the current live ",
+    "class": "normative"
+  },
+  {
+    "idx": 21,
+    "start": 430,
+    "end": 433,
+    "lines": 4,
+    "bytes": 2018,
+    "title": "**Pitfall:** `hermes config set moa.presets.<name> '{...}'` stores the value as a JSON string instead of a proper YAML d",
+    "class": "normative"
+  },
+  {
+    "idx": 22,
+    "start": 434,
+    "end": 443,
+    "lines": 10,
+    "bytes": 1096,
+    "title": "**Pitfall:** `hermes moa delete` refuses to delete the only preset (\"Cannot delete the only MoA preset\"). Create the rep",
+    "class": "normative"
+  },
+  {
+    "idx": 23,
+    "start": 444,
+    "end": 447,
+    "lines": 4,
+    "bytes": 1072,
+    "title": "**Pitfall (OpenSpec worktree vs store path confusion):** When creating changes with `openspec new change <name> --store ",
+    "class": "normative"
+  },
+  {
+    "idx": 24,
+    "start": 448,
+    "end": 452,
+    "lines": 5,
+    "bytes": 1070,
+    "title": "**Pitfall (phase boundaries \u2014 explore/propose/execute):** Distinguish explore, propose, and execute phases. During propo",
+    "class": "normative"
+  },
+  {
+    "idx": 25,
+    "start": 453,
+    "end": 456,
+    "lines": 4,
+    "bytes": 1128,
+    "title": "**Pitfall (disposable profiles for model-selection tests):** When testing explicit `--model` selectors or thinking-level",
+    "class": "normative"
+  },
+  {
+    "idx": 26,
+    "start": 457,
+    "end": 460,
+    "lines": 4,
+    "bytes": 844,
+    "title": "**Pitfall (per-file atomic rollback, not pair-atomic):** For two-file changes (e.g. `models.yml` + `config.yml`), use pe",
+    "class": "operational"
+  },
+  {
+    "idx": 27,
+    "start": 461,
+    "end": 464,
+    "lines": 4,
+    "bytes": 786,
+    "title": "**Pitfall (overlap ownership):** Before modifying a file or port, search active OpenSpec changes for overlapping claims.",
+    "class": "normative"
+  },
+  {
+    "idx": 28,
+    "start": 465,
+    "end": 468,
+    "lines": 4,
+    "bytes": 1054,
+    "title": "**Pitfall (role-selector validation completeness):** Validate every unique selector through the target runtime, plus nor",
+    "class": "operational"
+  },
+  {
+    "idx": 29,
+    "start": 469,
+    "end": 472,
+    "lines": 4,
+    "bytes": 1091,
+    "title": "**Pitfall (installation inventory before omp changes):** When an omp task involves the binary itself (upgrade, migration",
+    "class": "operational"
+  },
+  {
+    "idx": 30,
+    "start": 473,
+    "end": 474,
+    "lines": 2,
+    "bytes": 780,
+    "title": "**Pitfall (delta spec scenario preservation \u2014 verbatim baseline):** When writing `## MODIFIED Requirements` in delta spe",
+    "class": "operational"
+  }
+]

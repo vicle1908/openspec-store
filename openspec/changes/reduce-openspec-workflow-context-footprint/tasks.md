@@ -2,9 +2,9 @@
 
 ## Phase 1 — Inventory and classify
 
-- [ ] 1.1 Scan `~/.hermes/skills/software-development/openspec-workflow/SKILL.md` for all `**Pitfall**` blocks. Record line ranges, byte counts, and surrounding context.
-- [ ] 1.2 Classify each block as Normative, Operational, or Historical using the design taxonomy.
-- [ ] 1.3 Build a manifest (`evidence/classification-manifest.md`) listing every block with its class, line range, byte count, and relocation recommendation.
+- [x] 1.1 Scanned SKILL.md: found 30 Pitfall blocks (20 normative, 6 operational, 4 historical). Blocks JSON and manifest at evidence/blocks.json and evidence/classification-manifest.md. `~/.hermes/skills/software-development/openspec-workflow/SKILL.md` for all `**Pitfall**` blocks. Record line ranges, byte counts, and surrounding context.
+- [x] 1.2 Classified all 30 blocks using design taxonomy. Historical: #8, #9, #10, #15 (6,779B total). each block as Normative, Operational, or Historical using the design taxonomy.
+- [x] 1.3 Manifest written to evidence/classification-manifest.md with class, line range, byte count, and relocation recommendation for every block. a manifest (`evidence/classification-manifest.md`) listing every block with its class, line range, byte count, and relocation recommendation.
 
 ## Phase 2 — Relocate historical incidents
 
