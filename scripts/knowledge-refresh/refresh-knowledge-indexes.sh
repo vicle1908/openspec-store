@@ -759,14 +759,23 @@ process_inventory() {
   local total_elapsed
   total_elapsed="$(elapsed "$overall_start")"
   note ""
+  local overall_status="success"
+  if [[ "$failed" -gt 0 ]]; then
+    overall_status="failed"
+  fi
+
   note "=== Refresh complete ==="
   note "Processed: ${line_count} targets"
   note "Refreshed: ${refreshed}"
   note "Skipped:   ${skipped}"
   note "Failed:    ${failed}"
   note "Duration:  ${total_elapsed}s"
-  log_line "SYSTEM" overall "success" "$total_elapsed" \
+  log_line "SYSTEM" overall "$overall_status" "$total_elapsed" \
     "targets=${line_count} refreshed=${refreshed} skipped=${skipped} failed=${failed}"
+
+  if [[ "$failed" -gt 0 ]]; then
+    return $RC_FAILURE
+  fi
 }
 
 # ---------------------------------------------------------------------------
