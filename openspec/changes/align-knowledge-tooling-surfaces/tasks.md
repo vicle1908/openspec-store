@@ -29,5 +29,5 @@
 - [x] Run focused tooling tests, syntax checks, JSON validation, and merge-attribute checks.
 - [x] Run focused and full OpenSpec strict validation.
 - [x] Run stale-reference and current-path sweeps across active docs/scripts/specs/skills.
-- [ ] Commit store-owned alignment artifacts.
+- [x] Commit store-owned alignment artifacts.
 - [ ] Archive this change after all closure evidence is captured.
