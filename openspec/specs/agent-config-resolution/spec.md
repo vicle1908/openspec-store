@@ -2,82 +2,8 @@
 
 ## Purpose
 Provides a standardized mechanism for TDT agent repos to load LLM configuration with per-agent overrides from `~/.tdt/agents/{name}.yaml`, using a single resolution chain that all agents share.
+
 ## Requirements
-### Requirement: Agent-specific config files override global defaults
-
-The system SHALL load agent-specific configuration from `~/.tdt/agents/{agent-name}.yaml` when it exists, and use it to override values from `~/.tdt/config.yaml`. Only the `model` and `runtime` sections SHALL be subject to per-agent override; all other sections (providers, observability, skills, etc.) SHALL come from global config only.
-
-#### Scenario: Agent-specific model override applied
-- **WHEN** `~/.tdt/agents/agent-docs-sync.yaml` contains `model: { primary: "openai-chat:fable-5" }`
-- **AND** `~/.tdt/config.yaml` contains `model: { primary: "anthropic:Advance" }`
-- **THEN** the resolved config for agent-docs-sync SHALL have `model.primary = "openai-chat:fable-5"`
-
-#### Scenario: No agent-specific file falls back to global
-- **WHEN** `~/.tdt/agents/agent-core.yaml` does not exist
-- **AND** `~/.tdt/config.yaml` contains `model: { primary: "anthropic:Advance" }`
-- **THEN** the resolved config for agent-core SHALL have `model.primary = "anthropic:Advance"`
-
-#### Scenario: Partial agent-specific file merges with global
-- **WHEN** `~/.tdt/agents/agent-harness.yaml` contains `model: { thinking: "high" }`
-- **AND** `~/.tdt/config.yaml` contains `model: { primary: "anthropic:Advance", temperature: 0.7 }`
-- **THEN** the resolved config SHALL have `model.thinking = "high"`, `model.primary = "anthropic:Advance"`, and `model.temperature = 0.7`
-
-#### Scenario: Agent-harness resolves from agent-specific file
-- **WHEN** `~/.tdt/agents/agent-harness.yaml` contains `model: { primary: "openai-chat:fable-5" }` and `runtime: { max_iterations: 15 }`
-- **AND** `$TDT_HOME/harness/config.yaml` exists with different values
-- **THEN** the resolved config for agent-harness SHALL use the `~/.tdt/agents/` values
-- **AND** `$TDT_HOME/harness/config.yaml` SHALL NOT be read
-
-### Requirement: Standardized resolution precedence
-
-The system SHALL resolve every effective agent LLM value in this priority order from highest to lowest:
-
-1. Explicit run-scoped override supplied by the caller.
-2. Consumer-specific process environment declared in the environment-key registry.
-3. Shared model process environment declared in the environment-key registry.
-4. Agent-specific TDT configuration under `$TDT_HOME/agents/{agent-name}.yaml`.
-5. Global TDT configuration under `$TDT_HOME/config.yaml`.
-6. Typed code defaults.
-
-An empty value SHALL NOT silently suppress a lower non-empty value unless the registered field explicitly supports clearing. Every resolved field SHALL retain redacted provenance identifying its source class and logical key without retaining a secret value.
-
-#### Scenario: Explicit run override wins
-
-- **GIVEN** a run supplies model `openai-responses:gpt-5.6-luna`
-- **AND** consumer environment, agent YAML, and global YAML specify other models
-- **WHEN** the agent profile is resolved
-- **THEN** the effective model SHALL be `openai-responses:gpt-5.6-luna`
-- **AND** its provenance SHALL identify an explicit run override
-
-#### Scenario: Env var overrides agent-specific YAML
-
-- **GIVEN** `DOCS_SYNC_MODEL=openai-chat:fable-5` and `MODEL_PRIMARY=anthropic:Advance`
-- **AND** the agent and global YAML files specify other models
-- **WHEN** the `agent-docs-sync` profile is resolved
-- **THEN** the effective model SHALL be `openai-chat:fable-5`
-- **AND** no lower-priority source SHALL replace it later in model construction
-
-#### Scenario: Agent-specific env var overrides agent-specific YAML
-
-- **GIVEN** a registered consumer-specific model key and the shared model key are both set
-- **AND** agent YAML specifies another model
-- **WHEN** that consumer's profile is resolved
-- **THEN** the consumer-specific environment value SHALL win
-
-#### Scenario: Agent-specific YAML overrides global
-
-- **GIVEN** no registered model environment variable is set
-- **AND** agent YAML specifies `openai-chat:fable-5`
-- **AND** global YAML specifies `anthropic:Advance`
-- **WHEN** the profile is resolved
-- **THEN** the effective model SHALL be `openai-chat:fable-5`
-
-#### Scenario: Invalid high-priority value fails closed
-
-- **GIVEN** a registered environment key contains an invalid model identifier or invalid typed value
-- **WHEN** the profile is resolved
-- **THEN** resolution SHALL fail with the logical field and source class
-- **AND** it SHALL NOT silently fall back to a lower-priority value
 
 ### Requirement: Agents directory path resolution
 
@@ -90,175 +16,6 @@ The system SHALL provide a `tdt_agents_dir()` function in `tdt_core.paths` that 
 #### Scenario: Agent config path combines directory and name
 - **WHEN** `tdt_config_path_for_agent("agent-docs-sync")` is called
 - **THEN** it SHALL return `tdt_agents_dir() / "agent-docs-sync.yaml"`
-
-### Requirement: Single config loading function
-
-The system SHALL expose one canonical agent-profile resolution boundary that returns an immutable effective profile containing model, fallbacks, model behavior, provider metadata, runtime values, environment-key metadata, and redacted source provenance. Before resolving any effective field, one resolution request SHALL capture as one coherent immutable input snapshot the agent identity; effective root and environment profile; selected dotenv, global-configuration, and agent-overlay identities; non-secret source fingerprints; overlay-key policy; a detached copy of explicit overrides; the presence and values of every relevant registered non-secret environment input; and only redacted presence and provider-binding metadata for relevant registered secret inputs. The resolver, typed result, and compatibility projection SHALL consume only that captured snapshot and SHALL NOT reread files, process environment, caller-owned override objects, or loader identity during the request. Source fingerprints SHALL identify non-secret configuration material and MUST NOT contain or be derived from protected values. Existing mapping-based loading SHALL remain only as a compatibility projection of that same snapshot and SHALL NOT implement a second precedence chain. Every primary or fallback identifier declared through the compatibility path MUST pass the same canonical grammar, provider-registration, and fail-closed validation as the typed profile before a mapping is returned. Any cached effective profile or compatibility projection MUST be reused only when its complete captured request identity and effective input state are equivalent; reuse SHALL NOT cross agent, root, environment-profile, selected-path, source-fingerprint, overlay-policy, explicit-override, registered-environment, or secret-availability/provider-binding boundaries.
-
-#### Scenario: Resolved profile is internally consistent
-
-- **WHEN** a consumer resolves its agent profile
-- **THEN** the profile's effective model, fallbacks, behavior settings, providers, runtime values, provenance, root identity, and source fingerprints SHALL describe the same resolution snapshot
-- **AND** downstream consumers SHALL NOT need to reload YAML or dotenv files
-
-#### Scenario: Compatibility mapping uses the same sources
-
-- **WHEN** a legacy caller requests the mapping projection for an agent
-- **THEN** the projection SHALL be derived from the canonical loading primitives and captured source snapshot
-- **AND** equivalent fields SHALL match the typed resolved profile
-
-#### Scenario: Function returns merged config
-
-- **WHEN** the compatibility mapping is requested for an agent
-- **THEN** it SHALL contain the merged model and runtime projection from the same secure source snapshot
-
-#### Scenario: Explicit agent config path overrides the standard overlay
-
-- **GIVEN** a caller supplies an explicit agent-overlay path
-- **WHEN** the profile and source-preserving overlay are loaded
-- **THEN** both SHALL use that path instead of the standard agent YAML path
-- **AND** the compatibility mapping SHALL pass the same explicit path into canonical validation
-- **AND** diagnostics SHALL identify the explicit source path without exposing values
-
-#### Scenario: Function is idempotent within a process
-
-- **WHEN** the compatibility mapping is requested twice with unchanged effective inputs
-- **THEN** both returned mappings SHALL be value-equivalent
-
-#### Scenario: Unknown agent name returns global config only
-
-- **GIVEN** no overlay exists for a valid unknown agent name
-- **WHEN** its compatibility mapping is requested
-- **THEN** global configuration and defaults SHALL remain available without error
-
-#### Scenario: Default strict key policy
-
-- **WHEN** `load_agent_config("agent-core")` is called without `allowed_overlay_keys`
-- **AND** the agent YAML contains a top-level key `gate: {approvers: ["x"]}`
-- **THEN** a `ConfigError` SHALL be raised (the default `{"model", "runtime"}` policy applies)
-
-#### Scenario: Harness-expanded key policy accepts domain keys without error
-
-- **WHEN** `load_agent_config("agent-harness", allowed_overlay_keys={"model", "runtime", "gate", "persistence", "authority"})` is called
-- **AND** the agent YAML contains `gate: {approvers: ["x"]}` and `persistence: {durable: true}`
-- **THEN** the call SHALL succeed without `ConfigError`
-- **AND** the returned dict SHALL retain unrelated global sections unchanged; only `model` and `runtime` are affected by the overlay merge; domain keys validated by the allowed set SHALL not cause `ConfigError` but SHALL not be merged
-
-#### Scenario: Cache isolation by allowed-key set
-
-- **GIVEN** `load_agent_config("agent", allowed_overlay_keys={"model", "runtime"})` is called
-- **WHEN** `load_agent_config("agent", allowed_overlay_keys={"model", "runtime", "gate"})` is called
-- **THEN** both calls SHALL resolve independently with no cache collision
-
-#### Scenario: Domain keys excluded from merged result
-
-- **WHEN** `load_agent_config("agent-harness", allowed_overlay_keys={"model", "runtime", "gate"})` is called
-- **AND** the agent YAML contains `gate: {approvers: ["x"]}`
-- **THEN** the returned dict SHALL retain unrelated global sections unchanged
-- **AND** the agent overlay's `gate` section SHALL NOT be merged into or override any global section
-- **AND** agent-harness SHALL obtain `gate` from `load_agent_overlay()`
-
-#### Scenario: Compatibility primary or fallback is invalid
-
-- **GIVEN** a selected compatibility source declares a malformed, localized, or unregistered primary or fallback identifier
-- **WHEN** the mapping projection is requested
-- **THEN** canonical resolution SHALL fail with the logical model field and redacted source identity
-- **AND** no partially validated mapping SHALL be returned
-- **AND** resolution SHALL NOT fall through to a lower-priority model
-
-#### Scenario: Captured snapshot remains coherent
-
-- **GIVEN** one resolution request has captured its selected source identities and registered environment inputs
-- **WHEN** a source changes before a downstream constructor consumes the returned profile or mapping
-- **THEN** that returned result SHALL remain internally consistent with its captured fingerprints
-- **AND** a later resolution request SHALL observe the changed source as a new snapshot
-
-#### Scenario: Registered environment inputs are captured once
-
-- **GIVEN** one resolution request has captured its registered consumer-specific and shared non-secret environment inputs
-- **AND** it has captured only redacted availability and provider-binding metadata for relevant registered secret inputs
-- **WHEN** one of those process-environment inputs changes before the returned profile or compatibility projection is consumed
-- **THEN** the in-flight result SHALL continue to use only the state captured for that request
-- **AND** no field in the result SHALL combine values, provenance, or availability metadata from the later process-environment state
-- **AND** a later resolution request SHALL observe the changed registered input as a new snapshot
-
-#### Scenario: Unregistered environment changes do not alter profile identity
-
-- **GIVEN** the effective root, environment profile, selected source identities, explicit overrides, allowed overlay keys, and all relevant registered environment inputs are unchanged
-- **WHEN** an unrelated unregistered process-environment value changes
-- **THEN** the effective profile and compatibility projection SHALL remain value-equivalent
-- **AND** the unrelated value SHALL NOT appear in configuration identity, provenance, source fingerprints, diagnostics, or cache eligibility
-
-#### Scenario: Explicit overrides are detached at capture
-
-- **GIVEN** a caller supplies a mutable explicit-override mapping
-- **WHEN** the caller mutates that mapping after the resolution request captures its inputs
-- **THEN** the in-flight profile and compatibility projection SHALL retain the originally captured override values and provenance
-- **AND** they SHALL retain no mutable reference through which the caller can alter the captured snapshot
-- **AND** a later request supplied with the modified mapping SHALL resolve it as a distinct input state
-
-#### Scenario: Protected inputs do not become source fingerprints
-
-- **GIVEN** the selected environment file or process environment contains protected provider credential material
-- **WHEN** the resolver produces source fingerprints, configuration identity, diagnostics, provenance, cache metadata, or a compatibility projection
-- **THEN** none of those surfaces SHALL contain a raw, encoded, hashed, or otherwise value-derived representation of the protected material
-- **AND** they MAY retain only the non-secret source identity, registered key-name metadata, availability state, and canonical provider binding needed by the public contract
-- **AND** fingerprints for non-secret YAML or explicit configuration material SHALL remain distinguishable from protected-input metadata
-
-#### Scenario: Cache reuse requires complete effective identity
-
-- **GIVEN** an effective profile or compatibility projection is eligible for caching
-- **WHEN** a later request differs in agent identity, root, environment profile, selected dotenv or YAML path, non-secret source fingerprint, allowed overlay keys, explicit overrides, relevant registered non-secret environment state, or secret availability/provider binding
-- **THEN** the prior effective result SHALL NOT be reused for the later request
-- **AND** the later request SHALL resolve and validate its own coherent snapshot
-- **AND** cache metadata SHALL NOT expose protected values
-
-#### Scenario: Concurrent resolutions keep captured inputs isolated
-
-- **GIVEN** two simultaneous requests use different roots, environment profiles, selected paths, explicit overrides, allowed overlay keys, or registered environment states
-- **WHEN** both requests resolve typed profiles or compatibility projections
-- **THEN** each result SHALL contain only its own captured effective values, provenance, source identities, fingerprints, and redacted credential metadata
-- **AND** neither request SHALL overwrite, supply, or cache-substitute any input or result belonging to the other
-
-### Requirement: Config caching with test isolation
-
-The system MAY cache parsed configuration inputs, but it MUST NOT return a stale effective profile after the selected `TDT_HOME`, environment profile, explicit paths, overlay-key policy, relevant process environment, or source-file fingerprint changes. Reset behavior SHALL clear all configuration and environment state owned by the resolver without mutating unrelated process environment.
-
-#### Scenario: Relevant environment changes between resolutions
-
-- **GIVEN** a profile was resolved with one registered model environment value
-- **WHEN** that process environment value changes and the profile is resolved again
-- **THEN** the second effective profile SHALL reflect the new value rather than a cached value
-
-#### Scenario: Cache is populated on first access
-
-- **WHEN** a cacheable configuration source is read for the first time
-- **THEN** any stored entry SHALL include the effective root, path, policy, and source fingerprint
-
-#### Scenario: Cache is cleared by reset function
-
-- **WHEN** the public resolver reset is invoked
-- **THEN** all agent-config source-cache entries SHALL be cleared
-
-#### Scenario: TDT_HOME changes between resolutions
-
-- **GIVEN** a profile was resolved under one `TDT_HOME`
-- **WHEN** `TDT_HOME` changes to another absolute root
-- **THEN** subsequent resolution SHALL use only the new root's configuration inputs
-
-#### Scenario: Reset preserves unrelated environment
-
-- **GIVEN** test isolation has loaded configuration and environment state
-- **WHEN** the resolver reset is invoked
-- **THEN** all resolver-owned caches and loader state SHALL be cleared
-- **AND** unrelated process environment values SHALL remain unchanged
-
-#### Scenario: Returned state cannot poison another consumer
-
-- **GIVEN** a consumer receives a resolved mapping or profile
-- **WHEN** it attempts to mutate the returned object
-- **THEN** subsequent resolutions SHALL retain the original effective values and provenance
-- **AND** strict and permissive overlay calls SHALL remain isolated
 
 ### Requirement: Secrets remain in .env only
 
@@ -281,231 +38,6 @@ Agent and global YAML MUST NOT contain literal credential values. A provider ent
 - **WHEN** a harness domain section contains provider credential metadata outside the registered provider schema
 - **THEN** resolution SHALL fail closed
 
-### Requirement: Unknown top-level keys rejected
-
-Each agent overlay SHALL be validated against an explicit owner-specific top-level key policy. The default policy SHALL permit only model and runtime sections. A consumer MAY register additional domain keys, but those keys SHALL remain source-preserved consumer data and SHALL NOT enter the global LLM merge.
-
-#### Scenario: Unknown top-level key in agent YAML is rejected
-
-- **WHEN** an ordinary agent overlay contains an unregistered `gate` section
-- **THEN** resolution SHALL fail with all unsupported top-level keys listed
-
-#### Scenario: Multiple unknown keys reported
-
-- **WHEN** an agent overlay contains multiple unsupported top-level keys
-- **THEN** one redacted validation error SHALL list every offending key in deterministic order
-
-#### Scenario: Harness policy accepts owned domain keys
-
-- **WHEN** the harness overlay contains registered gate, persistence, authority, validation, budget, or retention sections
-- **THEN** the source-preserving overlay SHALL accept them
-- **AND** those sections SHALL NOT override same-named global sections
-
-#### Scenario: Allowed-key policy cannot poison strict cache
-
-- **WHEN** the same file is loaded once with the harness policy and once with the default policy
-- **THEN** the two validations SHALL execute independently
-- **AND** the permissive result SHALL NOT cause the strict request to succeed
-
-#### Scenario: Allowed keys accepted without error
-
-- **WHEN** `load_agent_config("agent-harness", allowed_overlay_keys={"model", "runtime", "gate"})` is called
-- **AND** the agent YAML contains `gate: {approvers: ["x"]}`
-- **THEN** the call SHALL succeed without `ConfigError` for the `gate` key
-
-### Requirement: Model factory receives config dict
-
-The model-construction layer MUST receive an already resolved model profile from its caller. It MUST NOT read YAML, dotenv files, or process environment while selecting the primary model, fallbacks, provider route, or behavior settings. Credential material SHALL be supplied through the canonical environment boundary without being added to serializable configuration.
-
-#### Scenario: Model factory uses passed config
-
-- **WHEN** model construction receives a resolved primary, fallbacks, provider metadata, and behavior settings
-- **THEN** it SHALL construct the requested model chain from those inputs
-- **AND** it SHALL perform no configuration-file read
-
-#### Scenario: Model factory without config falls through to native provider
-
-- **WHEN** an explicit native provider:model identifier is constructed without proxy-provider metadata
-- **THEN** the supported native provider resolver SHALL construct it
-- **AND** no TDT configuration source SHALL be read
-
-#### Scenario: Removed functions no longer exist
-
-- **WHEN** model-layer source is inspected
-- **THEN** removed direct TDT YAML loader functions SHALL not exist
-
-#### Scenario: Model factory cannot change precedence
-
-- **GIVEN** the resolved profile selected an environment-provided model over agent YAML
-- **WHEN** the model is constructed
-- **THEN** the factory SHALL use that selected model
-- **AND** it SHALL NOT reselect the YAML value
-
-### Requirement: Consumers use load_agent_config for model resolution
-
-Direct Pydantic-AI consumers SHALL obtain LLM inputs from the canonical resolved-agent-profile boundary. CLI-provider consumers SHALL obtain the provider-neutral projection defined by `cli-provider-profile-resolution`. No consumer SHALL independently read global YAML, agent YAML, or dotenv files for LLM fields.
-
-#### Scenario: Direct consumer uses one profile
-
-- **WHEN** agent-core, agent-docs-sync, or agent-harness constructs an agent
-- **THEN** model construction and public configuration diagnostics SHALL consume the same resolved profile snapshot
-
-#### Scenario: Agent-core build_agent uses load_agent_config
-
-- **WHEN** agent-core builds an SDK agent without an explicit Model instance
-- **THEN** it SHALL consume the canonical resolved profile compatibility boundary
-- **AND** it SHALL pass the resolved model/provider inputs to construction
-
-#### Scenario: Agent-docs-sync uses load_agent_config for model
-
-- **WHEN** docs-sync constructs configuration or a generation agent
-- **THEN** it SHALL consume the canonical resolved agent profile
-- **AND** it SHALL not read global TDT YAML directly for model configuration
-
-#### Scenario: CLI-provider consumer preserves its execution boundary
-
-- **WHEN** ai-harness-skills or ai-review invokes a provider CLI
-- **THEN** it SHALL use the provider-neutral profile for alias and effort selection
-- **AND** it SHALL leave CLI authentication to the provider's approved credential boundary
-
-### Requirement: Secure YAML mapping loader
-
-`load_config_mapping(path: Path) -> dict[str, Any]` SHALL load a YAML file and return a validated dictionary. The function SHALL NOT merge with any other source and SHALL NOT cache its result.
-
-#### Scenario: Valid YAML mapping loaded
-
-- **GIVEN** a YAML file at `path` contains a mapping with `model: {primary: "x"}`
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** it SHALL return `{"model": {"primary": "x"}}`
-
-#### Scenario: Empty YAML file returns empty dict
-
-- **GIVEN** an empty YAML file at `path`
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** it SHALL return `{}`
-
-#### Scenario: Missing file returns empty dict
-
-- **GIVEN** no file exists at `path`
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** it SHALL return `{}`
-
-#### Scenario: Malformed YAML raises ConfigError
-
-- **GIVEN** a file at `path` contains invalid YAML syntax
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** a `ConfigError` SHALL be raised with the file path in the message
-
-#### Scenario: Non-mapping YAML raises ConfigError
-
-- **GIVEN** a file at `path` contains a YAML list (not a mapping)
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** a `ConfigError` SHALL be raised
-
-#### Scenario: Secret-shaped value rejected
-
-- **GIVEN** a file at `path` contains `secret: literal_value`
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** a `ConfigError` SHALL be raised with the key path
-
-#### Scenario: api_key_env under providers accepted
-
-- **GIVEN** a file at `path` contains `providers: {shopapikey: {api_key_env: "MY_API_KEY"}}`
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** it SHALL accept the value without error
-
-#### Scenario: api_key_env with invalid env var name rejected
-
-- **GIVEN** a file at `path` contains `providers: {x: {api_key_env: "lowercase"}}`
-- **WHEN** `load_config_mapping(path)` is called
-- **THEN** a `ConfigError` SHALL be raised
-
-### Requirement: Agent overlay loader with key policy
-
-`load_agent_overlay(agent_name: str, *, config_path: Path | None = None, allowed_keys: Collection[str] | None = None) -> dict` SHALL load only the agent-specific YAML file without reading or merging the global config. The returned dict preserves source provenance: every key came from the agent file.
-
-#### Scenario: Agent overlay loaded without global merge
-
-- **GIVEN** `~/.tdt/agents/agent-core.yaml` contains `model: {primary: "x"}`
-- **AND** `~/.tdt/config.yaml` contains `providers: {giaoduc: {base_url: "y"}}`
-- **WHEN** `load_agent_overlay("agent-core")` is called
-- **THEN** the result SHALL contain `{"model": {"primary": "x"}}`
-- **AND** `providers` SHALL NOT appear in the result
-
-#### Scenario: Unknown top-level key rejected
-
-- **GIVEN** `~/.tdt/agents/agent-core.yaml` contains `unknown_key: value`
-- **WHEN** `load_agent_overlay("agent-core", allowed_keys={"model", "runtime"})` is called
-- **THEN** a `ConfigError` SHALL be raised listing the unknown key
-
-#### Scenario: allowed_keys=None uses default set
-
-- **GIVEN** an agent YAML file with keys `model` and `runtime`
-- **WHEN** `load_agent_overlay("agent")` is called without `allowed_keys`
-- **THEN** it SHALL accept only `{"model", "runtime"}` and reject all others
-
-#### Scenario: Missing agent file returns empty dict
-
-- **GIVEN** no file exists at `~/.tdt/agents/agent-core.yaml`
-- **WHEN** `load_agent_overlay("agent-core")` is called
-- **THEN** it SHALL return `{}`
-
-### Requirement: Secure mapping and source-preserving overlay APIs
-
-The resolver SHALL expose `load_config_mapping()` as the secure, non-merging reader
-for one selected YAML mapping and `load_agent_overlay()` as the source-preserving
-agent-overlay reader. Both APIs SHALL use the canonical root, explicit-file, secret,
-and path-containment policy. `allowed_overlay_keys` SHALL be an explicit cacheable
-policy input: the default policy permits only `model` and `runtime`, while a registered
-consumer policy MAY admit domain sections that remain outside the effective LLM merge.
-
-#### Scenario: Mapping reader does not merge sources
-
-- **WHEN** `load_config_mapping()` reads a selected global or agent YAML file
-- **THEN** it SHALL return only that file's validated mapping and source identity
-- **AND** it SHALL not apply another file, environment value, or consumer overlay
-
-#### Scenario: Overlay reader preserves domain provenance
-
-- **GIVEN** a registered consumer policy allows a domain section in an agent overlay
-- **WHEN** `load_agent_overlay()` reads the overlay
-- **THEN** it SHALL retain the domain section with its source provenance
-- **AND** `load_agent_config()` SHALL exclude that domain section from the global LLM merge
-
-#### Scenario: Strict policy rejects unregistered domain data
-
-- **GIVEN** the default policy is used for an overlay containing a `gate` or `persistence` section
-- **WHEN** the overlay is resolved
-- **THEN** validation SHALL fail with the unsupported top-level key
-- **AND** a permissive consumer result SHALL not make a later strict request succeed from cache
-
-#### Scenario: Explicit path uses canonical schema
-
-- **GIVEN** a caller selects an explicit agent-overlay path
-- **WHEN** the mapping and overlay APIs read that path
-- **THEN** they SHALL apply the same mapping, secret, key-policy, and provenance rules as the standard path
-- **AND** a legacy wrapped schema SHALL fail with migration guidance
-
-### Requirement: Canonical direct-model identifiers
-
-Every direct Pydantic-AI primary and fallback identifier in the resolved profile SHALL
-match a registered canonical `provider:model` grammar and provider registry entry.
-Localized, unregistered, or display-only aliases SHALL be rejected during resolution;
-they SHALL never be treated as a live provider acceptance result.
-
-#### Scenario: Registered canonical identifier is accepted
-
-- **GIVEN** a registered provider accepts a canonical identifier such as `anthropic:Advance`
-- **WHEN** the profile resolves the primary or a fallback
-- **THEN** the identifier SHALL remain unchanged in the effective profile and provenance
-
-#### Scenario: Localized alias is rejected
-
-- **GIVEN** a source provides a localized or unregistered model alias
-- **WHEN** a direct-model profile is resolved or a live gate is prepared
-- **THEN** resolution SHALL fail closed with the provider/model field identified
-- **AND** it SHALL not fall through to a lower-priority model or invoke a provider
-
 ### Requirement: Source-preserving secure configuration input
 
 The configuration provider SHALL be able to load one YAML mapping without merging it, validate its shape and secret policy, and preserve which source supplied every accepted key. Standard agent files SHALL be read through contained, no-follow semantics; unsafe components, symlinks, substituted descendants, and paths escaping the selected root SHALL fail closed.
@@ -527,19 +59,374 @@ The configuration provider SHALL be able to load one YAML mapping without mergin
 - **WHEN** a standard agent-overlay path or one of its descendants resolves through a link outside `TDT_HOME`
 - **THEN** the read SHALL fail before any external file content is trusted
 
-### Requirement: Redacted effective-config diagnostics
+### Requirement: Canonical agent selection precedence and overlay schema
 
-The system SHALL expose a machine-readable effective-profile diagnostic containing the selected model identifier, fallback identifiers, non-secret provider metadata, runtime values, registered environment-key names, and source provenance. It MUST NOT include credential values.
+The global canonical configuration SHALL own the complete `providers`, `models`, and `defaults` catalog. An agent overlay MAY contain `defaults` selection/behavior fields, `runtime`, and explicitly registered consumer domain sections. It MUST NOT define or replace `providers`, `models`, endpoint metadata, protocols, credential references, wire models, or CLI relationships. Every model selector from an explicit run override, registered consumer environment input, registered shared environment input, agent overlay, or global default MUST name an alias already defined in the same canonical global `models` catalog.
 
-#### Scenario: Diagnostic explains precedence
+Effective selection SHALL use this priority order: explicit run-scoped canonical alias, registered consumer alias selector, registered shared alias selector, agent-overlay canonical alias, then global canonical default. Typed behavior inputs SHALL follow their registered precedence independently. Invalid higher-priority aliases or behavior MUST fail closed rather than fall through. Each selected value SHALL retain redacted source provenance.
 
-- **WHEN** multiple sources define the same model field
-- **THEN** the diagnostic SHALL identify the winning and shadowed source classes
-- **AND** it SHALL not render any protected value
+#### Scenario: Agent overlay selects a canonical alias
 
-#### Scenario: Provider key is missing
+- **GIVEN** the global catalog defines aliases `primary-a` and `primary-b`
+- **AND** an agent overlay contains `defaults: {model: primary-b}`
+- **WHEN** the agent profile is resolved
+- **THEN** `primary-b` SHALL project through its global model/provider definition
+- **AND** the overlay SHALL not replace route metadata
 
-- **WHEN** a selected provider references an unavailable environment key
-- **THEN** the diagnostic SHALL identify the provider and missing environment-key name
-- **AND** it SHALL fail before a live request without revealing other environment values
+#### Scenario: Agent overlay cannot define routes
 
+- **GIVEN** an agent overlay contains `providers`, `models`, a raw endpoint, protocol, credential reference, or wire model
+- **WHEN** overlay validation runs
+- **THEN** it SHALL fail with every unsupported logical key
+- **AND** no global route relationship SHALL be shadowed or merged
+
+#### Scenario: Missing overlay uses canonical global defaults
+
+- **GIVEN** no agent overlay exists
+- **WHEN** the profile is resolved
+- **THEN** the global canonical `defaults.model` and ordered `defaults.fallback` aliases SHALL be selected
+- **AND** no old-schema or consumer-local default SHALL be consulted
+
+#### Scenario: Partial overlay changes selection only
+
+- **GIVEN** an agent overlay changes one permitted canonical alias or typed behavior field
+- **WHEN** the profile is resolved
+- **THEN** unspecified selections and behavior SHALL remain canonical global values
+- **AND** provider/model catalog definitions SHALL remain byte-for-byte global inputs
+
+#### Scenario: Explicit alias override wins
+
+- **GIVEN** an explicit run override names a defined canonical alias
+- **AND** registered environment, agent overlay, and global defaults select other aliases
+- **WHEN** the profile is resolved
+- **THEN** the explicit alias SHALL be selected with explicit-override provenance
+- **AND** its route SHALL still come entirely from the canonical catalog
+
+#### Scenario: Registered selector must name a canonical alias
+
+- **GIVEN** a registered consumer or shared environment selector contains an undefined, provider-prefixed, localized, or wire-model value
+- **WHEN** the profile is resolved
+- **THEN** resolution SHALL fail with the logical selector and source class
+- **AND** no lower selection SHALL replace it
+
+#### Scenario: Consumer-specific alias selector wins over shared selector
+
+- **GIVEN** registered consumer and shared selectors name different defined canonical aliases
+- **WHEN** that consumer's profile is resolved
+- **THEN** the consumer-specific alias SHALL be selected
+- **AND** the exact route projection SHALL match the canonical definition for that alias
+
+#### Scenario: Agent overlay key policy preserves domain ownership
+
+- **GIVEN** an agent overlay contains `defaults`, `runtime`, and a registered consumer domain section
+- **WHEN** the overlay is loaded
+- **THEN** selection/runtime fields SHALL be validated by canonical profile resolution
+- **AND** the domain section SHALL remain source-preserved consumer data outside LLM selection
+
+#### Scenario: Unregistered overlay key fails
+
+- **GIVEN** an agent overlay contains one or more unregistered top-level keys
+- **WHEN** overlay validation runs
+- **THEN** one redacted failure SHALL list every unsupported key deterministically
+- **AND** a permissive consumer cache entry SHALL not make a strict request succeed
+
+### Requirement: Canonical source mapping and overlay primitives
+
+`load_config_mapping(path)` SHALL remain a secure non-merging, non-caching reader for one YAML mapping, and `load_agent_overlay` SHALL remain a source-preserving reader for one agent overlay. Those primitives SHALL enforce path containment, YAML mapping shape, literal-secret rejection, detached results, and source identity, but SHALL NOT declare an LLM schema valid or merge an effective LLM profile. Only `resolve_agent_profile` SHALL apply canonical provider/model/default validation and selection.
+
+#### Scenario: Mapping reader is source-local
+
+- **WHEN** `load_config_mapping` reads one selected file
+- **THEN** it SHALL return only that detached mapping and source identity
+- **AND** it SHALL not merge another file, environment selector, agent overlay, or default
+
+#### Scenario: Missing optional overlay is empty source input
+
+- **GIVEN** no agent overlay exists for a valid agent name
+- **WHEN** `load_agent_overlay` reads it
+- **THEN** it SHALL return an empty detached overlay input
+- **AND** canonical profile resolution SHALL continue from the global canonical catalog
+
+#### Scenario: Malformed or non-mapping YAML fails
+
+- **GIVEN** a selected source contains malformed YAML or a non-mapping document
+- **WHEN** a source primitive reads it
+- **THEN** it SHALL raise a redacted `ConfigError` naming the source path
+- **AND** canonical resolution SHALL not treat it as absence
+
+#### Scenario: Literal secret-shaped value fails
+
+- **GIVEN** a selected source contains literal API key, token, password, authorization, DSN, or credential material
+- **WHEN** a source primitive validates the mapping
+- **THEN** it SHALL fail with the logical key and path
+- **AND** the diagnostic SHALL omit the value
+
+#### Scenario: Canonical auth_env metadata is validated later
+
+- **GIVEN** a global mapping contains `providers.<id>.auth_env`
+- **WHEN** it is used for LLM resolution
+- **THEN** canonical schema validation SHALL require the supported uppercase environment-name grammar and provider binding
+- **AND** the source reader SHALL not resolve the credential value
+
+#### Scenario: Unsupported api_key_env is rejected for LLM configuration
+
+- **GIVEN** a selected LLM mapping contains `providers.<id>.api_key_env`
+- **WHEN** canonical profile resolution validates it
+- **THEN** validation SHALL fail as unsupported schema
+- **AND** the key SHALL not be renamed, normalized, or ignored
+
+#### Scenario: Explicit overlay path uses the same clean schema
+
+- **GIVEN** a composition root selects an explicit contained agent-overlay path
+- **WHEN** the overlay and profile are resolved
+- **THEN** the same canonical key, secret, provenance, and relationship rules SHALL apply
+- **AND** no wrapped or mapping compatibility schema SHALL be accepted
+
+#### Scenario: Removed effective mapping function is not called
+
+- **WHEN** active source and tests inspect the source primitives
+- **THEN** neither primitive SHALL call or expose `load_agent_config`
+- **AND** no effective LLM mapping projection SHALL be returned
+
+### Requirement: Canonical profile caching with test isolation
+
+The resolver MAY cache secure source inputs and fully validated `ResolvedAgentProfile` values. Cache identity MUST include agent identity, canonical root, environment profile, selected source paths, non-secret source fingerprints, overlay key policy, detached explicit inputs, every registered non-secret selector/behavior input, and only credential key-name/availability/provider-binding metadata. Cache reuse SHALL NOT cross any difference in that complete safe identity. Reset SHALL clear resolver-owned caches without mutating unrelated process environment.
+
+#### Scenario: Relevant selector changes between resolutions
+
+- **GIVEN** a profile was resolved with one registered canonical alias selector
+- **WHEN** that selector changes to another defined alias and the profile is resolved again
+- **THEN** the second profile SHALL contain the newly selected exact route
+- **AND** the first cached result SHALL not be reused
+
+#### Scenario: Source fingerprint participates in cache identity
+
+- **GIVEN** one selected canonical source changes without changing its path
+- **WHEN** a later resolution begins
+- **THEN** its changed non-secret content fingerprint SHALL force revalidation
+- **AND** path equality alone SHALL not authorize reuse
+
+#### Scenario: TDT root changes between resolutions
+
+- **GIVEN** a profile was resolved under one canonical TDT root
+- **WHEN** a later request selects another absolute canonical root
+- **THEN** only the later root's sources and catalog SHALL participate
+- **AND** no profile/source cache entry SHALL cross roots
+
+#### Scenario: Reset preserves unrelated environment
+
+- **GIVEN** resolver-owned caches and registered input state exist
+- **WHEN** the public resolver reset is invoked
+- **THEN** all resolver-owned state SHALL be cleared
+- **AND** unrelated process-environment values SHALL remain unchanged
+
+#### Scenario: Returned profile cannot poison cache
+
+- **GIVEN** a consumer receives a recursively immutable resolved profile
+- **WHEN** it attempts to mutate route, behavior, runtime, provenance, or fingerprint state
+- **THEN** mutation SHALL fail
+- **AND** later resolutions SHALL retain validated canonical values
+
+#### Scenario: Cache keys exclude credential values
+
+- **GIVEN** credential availability or binding participates in request identity
+- **WHEN** a cache key or diagnostic is produced
+- **THEN** it MAY include key name, availability, and provider binding
+- **AND** it MUST NOT contain a raw, encoded, hashed, or otherwise value-derived credential representation
+
+### Requirement: Exact route diagnostics match canonical resolution
+
+The system SHALL expose a machine-readable safe diagnostic for the effective typed profile. For each selected route it SHALL report ordered position, canonical alias, model kind, wire model, canonical provider ID, explicit transport, typed protocol, normalized non-secret endpoint metadata, credential key-name/availability/provider-binding metadata, typed behavior, structured provenance, root identity, and non-secret source fingerprints. It MUST NOT contain credential values, arbitrary provider mappings, or compatibility projections.
+
+#### Scenario: Diagnostic explains exact selection and precedence
+
+- **WHEN** multiple permitted sources select the same logical alias or behavior field
+- **THEN** the diagnostic SHALL identify the winning and shadowed source classes and the exact resulting route
+- **AND** execution SHALL consume that same route/context identity
+- **AND** no protected value SHALL be rendered
+
+#### Scenario: Provider credential reference is unavailable
+
+- **WHEN** a selected route's canonical provider references an unavailable credential key
+- **THEN** the diagnostic SHALL identify the route provider and missing key name
+- **AND** resolution/construction SHALL fail before a live request
+- **AND** no other environment value SHALL be read or revealed
+
+### Requirement: Canonical typed agent profile resolution
+
+The system SHALL expose `resolve_agent_profile` as the only public LLM configuration-resolution boundary. It SHALL accept only the canonical `providers`, `models`, and `defaults` schema and SHALL return one recursively immutable `ResolvedAgentProfile`. The profile SHALL contain one exact selected primary route, an ordered tuple of exact fallback routes, exact native CLI selections, runtime values, redacted provenance, root identity, and non-secret source fingerprints. Each route SHALL distinguish canonical model alias, model/factory kind, wire model, canonical provider ID, explicit native/endpoint transport kind, typed protocol, normalized non-secret endpoint metadata, provider-bound credential-reference metadata, behavior, and provenance.
+
+The system MUST remove the public LLM mapping projection `load_agent_config`, its legacy loader, settings-shaped profile projection, and `primary`, `fallback`, or equivalent compatibility aliases. Secure mapping and agent-overlay readers MAY remain only for their explicitly owned source-reading and domain-overlay responsibilities; they SHALL NOT return or select an effective LLM profile. Unsupported legacy-only or mixed LLM schemas MUST fail canonical validation and MUST NOT return `None`, defaults, or a partial mapping.
+
+#### Scenario: Canonical profile is internally exact
+
+- **WHEN** a consumer resolves an agent profile
+- **THEN** the primary and fallback route projections SHALL describe the exact canonical aliases, model kinds, wire models, providers, transport kinds, protocols, endpoints, credential references, behavior, provenance, and source fingerprints selected in that request
+- **AND** downstream consumers SHALL NOT need a YAML, dotenv, environment, prefix, or mapping reconstruction step
+
+#### Scenario: Canonical schema is required
+
+- **GIVEN** an LLM configuration uses top-level `model`, `gateway`, `providers.*.api_key_env`, `api_mode`, or a mixture of those fields with canonical fields
+- **WHEN** canonical profile resolution begins
+- **THEN** validation SHALL fail with a redacted logical-field diagnostic
+- **AND** no typed profile, compatibility mapping, provider model, or fallback chain SHALL be returned
+
+#### Scenario: Canonical relationships are complete
+
+- **GIVEN** `defaults.model`, a `defaults.fallback` entry, or `defaults.cli_models` references an undefined model alias
+- **OR** a model references an undefined provider
+- **WHEN** canonical profile resolution begins
+- **THEN** validation SHALL report every invalid non-secret relationship
+- **AND** resolution SHALL fail before credential access or consumer construction
+
+#### Scenario: Explicit run override names a defined alias
+
+- **GIVEN** a caller supplies an explicit run-scoped model override
+- **WHEN** the resolver validates that override
+- **THEN** the override MUST name a model alias already defined in canonical `models`
+- **AND** it SHALL NOT inject or replace provider, endpoint, protocol, credential-reference, wire-model, or fallback mappings
+
+#### Scenario: Mapping compatibility API is absent
+
+- **WHEN** the supported `tdt_core` public exports and active product call sites are inspected
+- **THEN** `load_agent_config`, the legacy LLM loader, and settings-shaped compatibility projections SHALL be absent
+- **AND** all participating LLM consumers SHALL use typed profile resolution
+
+#### Scenario: Explicit source path remains one canonical source
+
+- **GIVEN** a composition root supplies an explicitly owned canonical configuration path
+- **WHEN** the profile is resolved
+- **THEN** that path SHALL participate in the same canonical validation, provenance, and fingerprint rules
+- **AND** no mapping compatibility projection or second precedence chain SHALL be activated
+
+#### Scenario: Registered inputs are captured once
+
+- **GIVEN** one resolution request has selected its root, source identities, explicit overrides, and registered environment inputs
+- **WHEN** a source or registered input changes during the request
+- **THEN** the returned profile SHALL remain coherent with the state captured for that request
+- **AND** a later request SHALL observe the change as a different source identity
+
+#### Scenario: Protected values are excluded from identity
+
+- **GIVEN** a selected provider requires protected credential material
+- **WHEN** the resolver produces routes, profile identity, provenance, fingerprints, diagnostics, exceptions, cache metadata, or evidence
+- **THEN** those surfaces SHALL retain only credential key-name, availability, and canonical provider-binding metadata
+- **AND** no raw, encoded, hashed, or otherwise value-derived credential material SHALL appear
+
+#### Scenario: Cache reuse requires complete identity
+
+- **WHEN** a later request differs in agent identity, canonical root, environment profile, selected paths, source fingerprint, explicit canonical alias override, registered non-secret environment state, or credential availability/provider binding
+- **THEN** an earlier resolved profile SHALL NOT be reused
+- **AND** the later request SHALL resolve its own coherent profile
+
+#### Scenario: Concurrent resolutions remain isolated
+
+- **GIVEN** simultaneous requests resolve different roots, agents, source states, canonical aliases, or provider relationships
+- **WHEN** both requests complete
+- **THEN** each profile SHALL contain only its own immutable route and source state
+- **AND** neither request SHALL mutate, cache-substitute, or expose state from the other
+
+### Requirement: Model factory receives caller-resolved construction context
+
+The model-construction layer MUST receive one complete caller-resolved `ModelConstructionContext` rather than an arbitrary profile, settings object, or mapping. The context SHALL carry the exact immutable primary and fallback route projections selected by the canonical profile and, when protected material is needed, a separate process-local `CredentialResolver` bound to those provider identities. Model construction MUST NOT read YAML, dotenv, TDT configuration, process environment, or consumer configuration while selecting a canonical alias, model kind, wire model, primary, fallback order, provider, endpoint, protocol, credential reference, or behavior.
+
+#### Scenario: Model factory uses exact passed routes
+
+- **WHEN** model construction receives a complete caller-resolved context
+- **THEN** it SHALL construct the ordered primary/fallback chain from the exact routes in that context
+- **AND** it SHALL perform no independent configuration read, relationship reconstruction, or selection
+
+#### Scenario: Native provider route is explicit
+
+- **GIVEN** the context selects a supported native route without proxy endpoint metadata
+- **WHEN** the model is constructed
+- **THEN** the selected model kind, wire model, provider ID, and protocol SHALL determine the provider-library boundary
+- **AND** native authentication MAY occur only inside that approved provider library after selection
+- **AND** project code SHALL perform no environment-owned routing or fallback
+
+#### Scenario: Missing or incomplete context fails before access
+
+- **GIVEN** a string model input has no complete construction context or lacks an exact selected route
+- **WHEN** public model construction is invoked
+- **THEN** it SHALL fail with an actionable redacted diagnostic
+- **AND** it SHALL read no configuration, environment, provider credential, or fallback source
+- **AND** it SHALL construct no provider model
+
+#### Scenario: Factory preserves canonical selection
+
+- **GIVEN** the canonical resolver selected one model/provider relationship over another candidate
+- **WHEN** the factory constructs the model chain
+- **THEN** it SHALL preserve that canonical alias, wire model, provider, protocol, endpoint, and fallback order
+- **AND** it SHALL NOT reselect values from prefixes, environment, local configuration, or provider defaults
+
+#### Scenario: Protected access is provider-bound
+
+- **GIVEN** one selected route requires protected provider material
+- **WHEN** final provider construction requests it
+- **THEN** the process-local resolver SHALL require the same non-empty canonical provider ID as the route
+- **AND** cross-provider access SHALL fail before the value is revealed
+
+#### Scenario: Explicit Model bypasses all resolution
+
+- **GIVEN** a caller supplies an already constructed `Model`
+- **WHEN** public model or agent construction begins
+- **THEN** the same object SHALL be used by identity
+- **AND** no context, profile, configuration, environment, credential, provider, or fallback source SHALL be accessed
+
+### Requirement: Composition roots resolve canonical model context
+
+Every participating direct Pydantic-AI composition root SHALL resolve one canonical profile and build one process-local construction context before invoking string-based `create_model` or `build_agent`. Nested factories, SDK builders, base-agent constructors, stage constructors, generation helpers, adapters, and retry paths SHALL NOT call a profile/configuration loader or reconstruct selection. A contained target or repository under review MUST NOT become the canonical TDT root. An enabled native CLI consumer MUST have an explicit canonical CLI model relationship and MUST NOT fall back to consumer-local model configuration.
+
+#### Scenario: Direct consumer resolves once
+
+- **WHEN** agent-core, agent-harness, or agent-docs-sync begins one LLM operation from a canonical alias
+- **THEN** its composition root SHALL resolve exactly one canonical profile and construction context before model construction
+- **AND** diagnostics and execution SHALL preserve the same safe identity
+- **AND** nested construction SHALL resolve no second profile
+
+#### Scenario: build_agent receives context from caller
+
+- **WHEN** an SDK caller builds an agent from a canonical alias
+- **THEN** it SHALL supply the complete construction context to `build_agent`
+- **AND** `build_agent` SHALL call no configuration or profile loader
+
+#### Scenario: BaseAgent receives only a Model
+
+- **WHEN** `BaseAgent` is constructed
+- **THEN** its model argument SHALL already be a Pydantic-AI `Model`
+- **AND** `BaseAgent` SHALL own no string, profile, context, configuration, credential, provider, or fallback resolution path
+
+#### Scenario: docs-sync preserves one operation identity
+
+- **WHEN** docs-sync begins generation or synchronization
+- **THEN** configuration, generation, diagnostics, retries, and same-process resume checks SHALL use the same safe canonical profile/context identity
+- **AND** no nested path SHALL infer provider identity from a model string
+
+#### Scenario: docs-sync resume reacquires process-local access
+
+- **GIVEN** docs-sync resumes retained safe identity in a new process
+- **WHEN** a provider model must be reconstructed
+- **THEN** the composition root SHALL resolve a fresh context through the same canonical provider binding and compare the complete safe identity
+- **AND** identity drift SHALL fail before write-capable generation
+- **AND** no credential value SHALL have been serialized
+
+#### Scenario: Enabled CLI consumer requires canonical mapping
+
+- **WHEN** ai-harness-skills or ai-review enables a native CLI provider
+- **THEN** its composition root SHALL resolve an explicit canonical CLI mapping from the consumer-owned canonical TDT root
+- **AND** missing, invalid, or ambiguous mapping SHALL fail before adapter construction
+- **AND** consumer-local model selection SHALL NOT be used
+
+#### Scenario: Contained target cannot select sources
+
+- **GIVEN** a consumer operates on a contained project, generated artifact, or repository under review
+- **WHEN** it resolves its canonical LLM or CLI profile
+- **THEN** it SHALL use the consumer-owned canonical TDT root
+- **AND** target-local files SHALL NOT influence model, provider, protocol, endpoint, credential reference, behavior, or source selection
+
+#### Scenario: Canonical resolution failure stops construction
+
+- **GIVEN** a selected canonical source is unreadable, unavailable, malformed, incomplete, ambiguous, or inconsistent
+- **WHEN** a composition root resolves the profile or context
+- **THEN** the operation SHALL fail with a redacted diagnostic before model, adapter, process, or write-capable construction
+- **AND** no local mapping, default, old schema, or native-auth route SHALL be activated

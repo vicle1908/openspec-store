@@ -3,55 +3,8 @@
 ## Purpose
 
 Define the provider-neutral contract for resolving canonical TDT provider/model/default profiles into isolated native CLI invocation settings. The contract preserves per-CLI identity, wire model, supported effort, credential-key metadata, provenance, and native authentication boundaries without exposing credential values.
+
 ## Requirements
-### Requirement: Provider CLI identity mapping
-
-A provider configuration SHALL declare an optional `cli_provider` field that maps
-a YAML provider identity (e.g., `tdt-codex`) to a registered CLI identity
-(e.g., `codex`). This mapping enables the public `select_canonical_cli_provider()`
-API to resolve provider identity correctly without guessing from protocol.
-
-#### Scenario: Provider with cli_provider mapping
-
-- **GIVEN** a YAML provider `tdt-codex` with `cli_provider: codex`
-- **WHEN** a consumer calls `select_canonical_cli_provider(profile, cli_provider="codex")`
-- **THEN** the selector SHALL resolve to the `tdt-codex` provider definition
-- **AND** the credential filtering SHALL use the YAML provider ID `tdt-codex`
-- **AND** the protocol SHALL be taken from the provider definition
-
-#### Scenario: Provider without cli_provider mapping
-
-- **GIVEN** a YAML provider `tdt-legacy` without a `cli_provider` field
-- **WHEN** a consumer calls `select_canonical_cli_provider(profile, cli_provider="legacy")`
-- **THEN** the selector SHALL return `None` for that CLI provider
-- **AND** it SHALL NOT guess the mapping from protocol or other heuristics
-
-### Requirement: Default CLI model mapping
-
-A canonical configuration SHALL declare an optional `defaults.cli_models` mapping
-that associates each registered CLI provider identity with a specific model alias.
-This replaces the current incorrect assumption that `defaults.model` applies to
-all enabled providers simultaneously.
-
-#### Scenario: Explicit cli_models mapping
-
-- **GIVEN** `defaults: { model: codex-default, cli_models: { codex: codex-default, claude: claude-review } }`
-- **WHEN** the selector resolves for `codex` and `claude`
-- **THEN** each SHALL use its own mapped model alias
-- **AND** no cross-contamination SHALL occur
-
-#### Scenario: cli_models absent — compatibility fallback
-
-- **GIVEN** `defaults: { model: codex-default }` with no `cli_models`
-- **AND** exactly one model belongs to a provider whose `cli_provider` matches
-- **WHEN** the selector resolves for that CLI provider
-- **THEN** the unique matching alias SHALL be selected as a compatibility fallback
-
-#### Scenario: Ambiguous aliases without cli_models
-
-- **GIVEN** two models both targeting `cli_provider: codex` without explicit `cli_models`
-- **WHEN** the selector resolves for `codex`
-- **THEN** a `ProfileResolutionError` SHALL be raised identifying the ambiguity
 
 ### Requirement: Canonical alias versus wire model
 
@@ -95,55 +48,6 @@ The public selection/project API SHALL expose credential key names filtered by t
 - **THEN** each selection SHALL contain only its own provider's credential key names
 - **AND** cross-contamination SHALL be impossible
 
-### Requirement: Selection failure modes
-
-The selector SHALL treat a requested CLI adapter identity and a selected canonical provider identity as distinct typed identities. Candidate discovery SHALL use only explicit `cli_provider` declarations and `defaults.cli_models` relationships in a valid canonical catalog; it SHALL NOT infer a canonical provider identity from a CLI name, protocol, model, endpoint, executable, or credential availability. A successful selection and its provider-neutral projection SHALL preserve both the requested CLI adapter identity and selected canonical provider ID, use the CLI identity for adapter capability and executable validation, and use the canonical provider ID for provider-owned credential metadata. The selector SHALL distinguish absence of an applicable canonical CLI mapping from a canonical configuration that declares a relationship for the requested CLI but cannot produce one valid selection. It SHALL return no selection only when the requested CLI provider is genuinely absent from a valid canonical catalog—meaning that no provider declaration or default mapping targets that CLI identity—or when the profile is valid and legacy-only. Once any canonical provider or default mapping declares a relationship for the requested CLI identity, a missing, undefined, ambiguous, mismatched, unsupported, or otherwise invalid provider/model relationship MUST fail closed before local fallback or process launch.
-
-#### Scenario: CLI provider absent from valid catalog
-
-- **GIVEN** a valid canonical catalog with `codex` and `claude` but no declaration for `kimi`
-- **WHEN** selection is requested for `kimi`
-- **THEN** the return value SHALL indicate no canonical selection
-- **AND** the consumer MAY use its permitted local configuration
-
-#### Scenario: Canonical config exists but is invalid
-
-- **GIVEN** a canonical catalog maps `codex` to a nonexistent model
-- **WHEN** the selector resolves for `codex`
-- **THEN** selection SHALL fail before any process launch
-- **AND** the error SHALL identify the invalid alias without exposing protected values
-- **AND** the consumer SHALL NOT use local fallback
-
-#### Scenario: Legacy-only profile returns None
-
-- **GIVEN** a legacy-only profile with no per-CLI model mapping and no new-schema providers
-- **WHEN** selection is requested for `codex`
-- **THEN** the return value SHALL indicate no canonical selection
-- **AND** the consumer MAY fall back to its local configuration
-
-#### Scenario: Declared provider has no valid model selection
-
-- **GIVEN** the canonical catalog declares a provider for `codex` but no model can be selected for it
-- **WHEN** selection is requested for `codex`
-- **THEN** selection SHALL fail before local fallback or process launch
-- **AND** the error SHALL identify the provider and missing selection relationship
-
-#### Scenario: Declared provider selection is ambiguous
-
-- **GIVEN** the canonical catalog declares multiple eligible models for one CLI provider without an explicit disambiguating selection
-- **WHEN** selection is requested for that provider
-- **THEN** selection SHALL fail with the conflicting canonical aliases
-- **AND** no model or credential from either candidate SHALL be passed to a process
-
-#### Scenario: Canonical provider and CLI adapter identities remain distinct
-
-- **GIVEN** canonical provider `tdt-codex` declares `cli_provider: codex`
-- **WHEN** selection and provider-neutral projection are requested for CLI adapter identity `codex`
-- **THEN** the result SHALL preserve `codex` as the CLI adapter identity and `tdt-codex` as the canonical provider ID
-- **AND** adapter capability and executable validation SHALL use `codex`
-- **AND** provider-owned credential metadata SHALL be filtered using `tdt-codex`
-- **AND** neither identity SHALL be inferred from or replaced by the protocol, endpoint, model, executable, or credential availability
-
 ### Requirement: Supported fields validation
 
 The selector SHALL validate against the CLI capability registry:
@@ -181,24 +85,6 @@ A CLI-provider consumer SHALL resolve an immutable profile per provider containi
 
 - **WHEN** a profile supplies an alias, effort, or limit that the selected CLI does not support
 - **THEN** configuration validation SHALL fail before process launch with the provider and logical field identified
-
-### Requirement: Canonical precedence and provenance
-
-CLI-provider profile fields SHALL follow the canonical agent precedence contract and SHALL retain redacted provenance. Consumer-specific aliases MAY be supported only when declared in the environment-key registry with an explicit compatibility status.
-
-#### Scenario: Environment alias overrides YAML alias
-
-- **GIVEN** a registered consumer environment key specifies a model alias
-- **AND** agent YAML specifies a different alias
-- **WHEN** the CLI-provider profile is resolved
-- **THEN** the environment alias SHALL win
-- **AND** provenance SHALL identify the registered environment key name
-
-#### Scenario: Undeclared legacy key is ignored or rejected explicitly
-
-- **WHEN** an undeclared environment key resembles a model alias setting
-- **THEN** it SHALL NOT silently affect the resolved profile
-- **AND** strict diagnostics SHALL report it only if it is part of the configured unknown-key audit
 
 ### Requirement: Provider authentication remains isolated
 
@@ -252,31 +138,6 @@ Runtimes with their own model registry or provider-infrastructure role SHALL not
 - **WHEN** claude-code-provider-adapter translates provider protocols
 - **THEN** it SHALL remain provider infrastructure rather than a per-agent CLI-profile consumer
 
-### Requirement: Canonical direct-model boundary for CLI projections
-
-The provider-neutral projection SHALL distinguish a native CLI `model_alias` from a direct Pydantic-AI model identifier. If a CLI consumer receives a direct model ID from the canonical resolver, it SHALL be a registered `provider:model` value. Native aliases remain provider-owned invocation arguments and SHALL not be presented as proof of a canonical direct-model route.
-
-#### Scenario: Native alias remains adapter-local
-
-- **GIVEN** an enabled Claude, Codex, Kimi, or Pi adapter supports a provider-specific model alias
-- **WHEN** the provider-neutral profile is projected
-- **THEN** the alias SHALL remain a non-secret adapter field with its provider identity and provenance
-- **AND** the adapter SHALL not route it through the Pydantic-AI model factory
-
-#### Scenario: Localized alias is rejected for direct live use
-
-- **GIVEN** a profile supplies a localized, display-only, or unregistered value where a direct `provider:model` ID is required
-- **WHEN** live-provider acceptance is prepared
-- **THEN** validation SHALL fail before process launch or provider invocation
-- **AND** model construction or a zero-exit CLI wrapper SHALL not count as live success
-
-#### Scenario: Native authentication remains isolated
-
-- **GIVEN** a provider-neutral profile is valid but the provider CLI's native credential boundary is unavailable
-- **WHEN** an adapter smoke gate runs
-- **THEN** the result SHALL be reported as prerequisite-aware N/A or provider-unavailable
-- **AND** it SHALL not use another provider's credential or silently pass
-
 ### Requirement: Each CLI consumer declares its native invocation boundary
 
 Each CLI-provider consumer SHALL declare the native invocation format it targets and SHALL project only fields supported by that CLI. The projection SHALL preserve provider identity and canonical wire-model provenance, SHALL pass supported model/effort arguments for Claude/Codex, SHALL retain capability-safe defaults for Kimi/Pi when aliases/effort are unsupported, and SHALL NOT project credential values.
@@ -312,7 +173,7 @@ Each CLI-provider consumer SHALL declare the native invocation format it targets
 
 ### Requirement: Consumer implementation claims require canonical API evidence
 
-An enabled consumer SHALL NOT be described as integrated, wired, or functioning unless its invocation boundary resolves one canonical profile, consumes the resulting provider-neutral projection while preserving its CLI adapter and canonical provider identities, and constructs provider-specific arguments from that projection. An enabled consumer MAY use local configuration only after canonical profile resolution succeeds and the typed selector explicitly reports genuine mapping absence for that CLI identity. An unavailable or unreadable selected canonical source, canonical schema or relationship error, ambiguous selection, unsupported projection field, or other resolution/projection failure MUST fail before local fallback or process launch. A consumer bridge SHALL NOT convert such a failure into an empty override mapping, `None`, ordinary absence, or local configuration.
+An enabled consumer SHALL NOT be described as integrated, wired, or functioning unless its invocation boundary resolves one canonical profile from the consumer-owned canonical TDT root, consumes one explicit `defaults.cli_models` selection while preserving its CLI adapter and canonical provider identities, and constructs provider-specific arguments only from that projection. A contained project, generated artifact, repository under review, or other operation target MUST NOT select or replace the canonical TDT root. Missing mapping, unavailable or unreadable source, schema or relationship error, ambiguous selection, unsupported projection field, or other resolution/projection failure MUST fail before adapter construction, credential access, or process launch. An enabled consumer MUST NOT use consumer-local or native CLI model configuration for missing or failed canonical selection, and a bridge SHALL NOT convert any such state into an empty override, `None`, ordinary absence, or fallback configuration.
 
 #### Scenario: ai-harness-skills canonical runtime wiring
 
@@ -344,6 +205,20 @@ An enabled consumer SHALL NOT be described as integrated, wired, or functioning 
 - **THEN** the consumer bridge SHALL propagate a redacted failure before adapter construction or process launch
 - **AND** it SHALL NOT return an empty override mapping or `None`
 - **AND** it SHALL NOT preserve or activate local model configuration as though the CLI mapping were genuinely absent
+
+#### Scenario: Missing mapping for enabled provider fails closed
+
+- **GIVEN** canonical profile resolution succeeds but no explicit CLI model relationship exists for a provider enabled by the consumer
+- **WHEN** the consumer builds its invocation
+- **THEN** it SHALL fail before adapter construction or process launch
+- **AND** it SHALL NOT use a unique candidate, global default, consumer-local setting, or native CLI configuration
+
+#### Scenario: Contained target cannot select canonical sources
+
+- **GIVEN** ai-harness-skills operates on a contained project or ai-review operates on a repository under review
+- **WHEN** the consumer resolves its canonical profile
+- **THEN** resolution SHALL use the consumer-owned canonical TDT root
+- **AND** no configuration file beneath the target root SHALL influence canonical provider, alias, wire-model, behavior, or source selection merely because it is the target
 
 ### Requirement: Native CLI format is advisory, not canonical
 
@@ -421,9 +296,45 @@ Live CLI acceptance SHALL be recorded in a durable, credential-safe ledger bound
 - **AND** presence-only prerequisite checks and the affected live row SHALL be rerun
 - **AND** no credential value SHALL be printed, compared, copied, rotated, or retained while recapturing the row
 
+#### Scenario: Direct adapter invocation is not consumer acceptance
+
+- **GIVEN** an acceptance mechanism constructs or invokes a provider adapter directly
+- **WHEN** implementation readiness is evaluated
+- **THEN** that result SHALL be treated as adapter reachability evidence only
+- **AND** it SHALL NOT satisfy the required ai-harness-skills generation row or ai-review reviewer row
+- **AND** each required row SHALL remain incomplete until its true public consumer operation succeeds
+
+#### Scenario: Duplicate nonce or artifact invalidates independence
+
+- **GIVEN** the two required rows reuse the same nonce or claim the same generated artifact
+- **WHEN** live acceptance is evaluated
+- **THEN** the rows SHALL NOT be considered independently proven
+- **AND** both affected rows SHALL remain incomplete until distinct consumer-owned results are captured
+
+#### Scenario: Resolved executable must match the launched process
+
+- **GIVEN** a required row records one executable path or version
+- **WHEN** the consumer operation launches the provider CLI
+- **THEN** the retained executable identity SHALL match the actual resolved and launched executable
+- **AND** a different shim, candidate path, or reported version SHALL invalidate the row
+
+#### Scenario: Provider is not currently enabled
+
+- **GIVEN** a provider is catalogued but not currently supported and enabled by the selected public consumer operation
+- **WHEN** live acceptance is attempted
+- **THEN** the prerequisite SHALL be blocked and no process SHALL launch
+- **AND** historical availability or disposable configuration SHALL NOT satisfy current enablement
+
+#### Scenario: Current live authorization is absent
+
+- **GIVEN** deterministic verification is complete but current authorization for credential-bearing live operations is absent
+- **WHEN** live acceptance is considered
+- **THEN** both required live rows SHALL remain blocked without process launch or credential access
+- **AND** deterministic readiness SHALL remain separately reportable
+
 ### Requirement: Automated artifact and dependency drift validation
 
-Before a retained deterministic handoff or live row is reused to complete an evidence-backed task, unblock a downstream repository packet, authorize or launch either required live row, synchronize canonical specs, or declare archive readiness, a store-owned non-interactive validator MUST recapture and compare the current credential-safe acceptance identity with the identity retained by that evidence. The validator SHALL resolve the current planning store SHA and corrective-change tree; the concrete proposal, delta-spec, design, task, and evidence-schema paths and non-secret identities, including the current `artifactPaths.specs.existingOutputPaths`; participating repository and worktree SHAs plus complete relevant product, test, acceptance-script, and generated dirty-state disposition; each applicable dependency declaration, lock or editable source, filesystem checkout, installed import origin, and full Git SHA; canonical non-secret source fingerprints and loader identity; and presence-only shell, executable, provider, containment, authorization, credential-availability, and canonical-provider-binding prerequisites. It SHALL emit deterministic machine-readable per-field comparisons, affected-record and downstream-invalidation decisions, and an overall status without treating a missing, malformed, unresolved, indeterminate, or drifted field as current. Any such condition MUST produce a non-zero exit, classify affected evidence as `stale`, `blocked`, or `invalid`, and prevent reuse or lifecycle advancement until dependency-ordered recapture succeeds. The validator SHALL be read-only except for an explicitly selected result output, SHALL NOT launch a provider or consumer operation, mutate a repository or worktree, resolve dependencies from the network, or read, print, compare, serialize, or retain a credential value.
+Before a retained deterministic handoff or live row is reused to complete an evidence-backed task, unblock a downstream repository packet, authorize or launch either required live row, synchronize canonical specs, or declare archive readiness, a store-owned non-interactive validator MUST recapture and compare the current credential-safe acceptance identity with the identity retained by that evidence. The validator SHALL resolve the current planning store SHA and corrective-change tree; the concrete proposal, delta-spec, design, task, retained schema, and evidence paths and non-secret identities through the change's current active or archived lifecycle location, including the current `artifactPaths.specs.existingOutputPaths`; participating repository and worktree SHAs plus complete relevant product, test, acceptance-script, and generated dirty-state disposition; each applicable dependency declaration, lock or editable source, filesystem checkout, installed import origin, and full Git SHA; canonical non-secret source fingerprints and loader identity; and presence-only shell, executable, provider, containment, authorization, credential-availability, and canonical-provider-binding prerequisites. It SHALL emit deterministic machine-readable per-field comparisons, affected-record and downstream-invalidation decisions, and an overall status without treating a missing, malformed, unresolved, indeterminate, or drifted field as current. Any such condition MUST produce a non-zero exit, classify affected evidence as `stale`, `blocked`, or `invalid`, and prevent reuse or lifecycle advancement until dependency-ordered recapture succeeds. The validator SHALL be read-only except for an explicitly selected result output, SHALL NOT launch a provider or consumer operation, mutate a repository or worktree, resolve dependencies from the network, or read, print, compare, serialize, or retain a credential value.
 
 #### Scenario: Current retained evidence passes automated preflight
 
@@ -448,3 +359,198 @@ Before a retained deterministic handoff or live row is reused to complete an evi
 - **THEN** the validator SHALL exit non-zero and classify the result as `blocked` or `invalid`, never `current`
 - **AND** it SHALL perform no provider call, consumer launch, network dependency resolution, repository or worktree mutation, or credential-value access
 - **AND** the affected gate SHALL remain closed until the identity can be recaptured and validation is rerun successfully
+
+#### Scenario: Active change archives without breaking retained validation
+
+- **GIVEN** the evidence validator and its tests refer to schemas or artifacts owned by an active change
+- **WHEN** that change is archived and its lifecycle root moves from `changes/<name>` to `changes/archive/<dated-name>`
+- **THEN** the validator SHALL resolve the retained schema and artifacts through the current lifecycle location or a stable store-owned reference
+- **AND** the validator's complete retained test suite SHALL remain executable after the active path is removed
+- **AND** a deleted active-change path SHALL NOT remain the only hardcoded schema or artifact source
+
+#### Scenario: Archive-aware lookup fails safely
+
+- **GIVEN** neither an active nor archived lifecycle location can be resolved uniquely for retained evidence
+- **WHEN** the validator or its tests resolve a required schema or artifact
+- **THEN** validation SHALL fail with a deterministic non-secret blocked or invalid result
+- **AND** it SHALL not launch product code, access a credential value, search the network, or mutate the store
+
+### Requirement: Explicit provider CLI identity mapping
+
+A canonical provider MAY declare one registered `cli_provider` identity. Selection SHALL match that explicit relationship only and SHALL preserve the canonical provider ID separately from the native adapter identity. A provider without `cli_provider` has no native CLI relationship. That absence MUST NOT be guessed from protocol, alias, wire model, endpoint, executable, or credentials and MUST NOT authorize launch when a consumer enables the adapter.
+
+#### Scenario: Provider declares a CLI identity
+
+- **GIVEN** canonical provider `tdt-codex` declares `cli_provider: codex`
+- **WHEN** selection is requested for native adapter identity `codex`
+- **THEN** the selector SHALL resolve `tdt-codex` as the canonical provider
+- **AND** credential-reference filtering SHALL use `tdt-codex`
+- **AND** adapter capability/executable validation SHALL use `codex`
+
+#### Scenario: Provider has no CLI identity
+
+- **GIVEN** canonical provider `batch-provider` has no `cli_provider`
+- **WHEN** catalog inspection requests a native relationship for it
+- **THEN** no native CLI relationship SHALL be returned
+- **AND** no identity SHALL be inferred from any other provider field
+
+#### Scenario: Enabled adapter cannot use unmapped provider
+
+- **GIVEN** a consumer enables one native adapter identity
+- **AND** no canonical provider explicitly declares that identity
+- **WHEN** consumer composition begins
+- **THEN** it SHALL fail before model selection or process launch
+- **AND** no unmapped provider or local configuration SHALL be substituted
+
+### Requirement: Required explicit CLI model mapping
+
+Canonical `defaults.cli_models` SHALL contain exactly one explicit model-alias relationship for every native CLI identity enabled by a participating consumer. Each mapped alias MUST exist in canonical `models`, and that model's provider MUST declare the same `cli_provider` identity. Selection SHALL NOT infer a model from `defaults.model`, a unique candidate, provider name, protocol, wire model, executable, endpoint, credential availability, consumer-local configuration, or native CLI configuration.
+
+#### Scenario: Explicit mappings select independently
+
+- **GIVEN** `defaults.cli_models` maps `codex` to `codex-default` and `claude` to `claude-review`
+- **WHEN** canonical selections are resolved
+- **THEN** each CLI identity SHALL receive exactly its mapped canonical alias
+- **AND** no alias, wire model, provider, or credential metadata SHALL cross between them
+
+#### Scenario: Enabled provider has no mapping
+
+- **GIVEN** a consumer enables `codex` but canonical `defaults.cli_models` has no `codex` entry
+- **WHEN** the consumer resolves its invocation profile
+- **THEN** resolution SHALL fail before adapter construction or process launch
+- **AND** it SHALL NOT infer a candidate or use consumer-local/native CLI model configuration
+
+#### Scenario: Mapping alias is undefined
+
+- **GIVEN** `defaults.cli_models.codex` references an alias absent from canonical `models`
+- **WHEN** canonical schema validation runs
+- **THEN** validation SHALL fail with the logical mapping and alias identified
+- **AND** no partial CLI selection SHALL be returned
+
+#### Scenario: Mapping targets the wrong provider identity
+
+- **GIVEN** `defaults.cli_models.codex` references a model whose provider declares `cli_provider: claude`
+- **WHEN** canonical schema validation runs
+- **THEN** validation SHALL fail with both non-secret identities
+- **AND** no model or credential-reference metadata SHALL be projected to either adapter
+
+#### Scenario: Unique candidate does not imply selection
+
+- **GIVEN** exactly one canonical model belongs to a provider declaring `cli_provider: codex`
+- **AND** `defaults.cli_models` does not map `codex`
+- **WHEN** selection is requested for an enabled Codex consumer
+- **THEN** selection SHALL fail as missing explicit mapping
+- **AND** uniqueness SHALL NOT create an implicit default
+
+### Requirement: Fail-closed canonical CLI selection
+
+The selector SHALL preserve the requested native CLI adapter identity and the selected canonical provider ID as distinct typed identities. Candidate discovery SHALL use only explicit `providers.<id>.cli_provider` and `defaults.cli_models` relationships in a valid canonical profile. A successful selection SHALL preserve canonical alias, wire model, provider ID, typed protocol, supported behavior, provider-filtered credential-reference metadata, and redacted provenance.
+
+If an enabled consumer's canonical source is absent, unreadable, malformed, incomplete, ambiguous, or inconsistent, or its explicit CLI mapping cannot produce exactly one supported selection, the operation MUST fail before local configuration, adapter construction, credential access, or process launch. Neither the selector nor a consumer bridge may convert failure into `None`, an empty override, defaults, native CLI configuration, or consumer-local model selection. The selector MAY return no selection only for a CLI identity that the caller is not enabling and that has no provider or mapping relationship in the valid canonical catalog; that result confers no permission to launch it.
+
+#### Scenario: Unconfigured and disabled identity has no selection
+
+- **GIVEN** a valid catalog and an identity that no provider or default mapping declares
+- **AND** the consumer is not enabling that identity
+- **WHEN** catalog inspection requests its selection
+- **THEN** the selector MAY report no selection
+- **AND** the result SHALL NOT authorize local configuration or process launch
+
+#### Scenario: Enabled identity without relationship fails
+
+- **GIVEN** a public consumer enables one CLI identity
+- **AND** the valid canonical catalog declares no complete provider/model/default relationship for it
+- **WHEN** consumer composition begins
+- **THEN** the operation SHALL fail with a redacted missing-mapping diagnostic
+- **AND** no local or native model configuration SHALL be activated
+
+#### Scenario: Invalid canonical source fails
+
+- **GIVEN** an enabled consumer selects an unavailable, unreadable, malformed, or relationship-invalid canonical source
+- **WHEN** resolution is attempted
+- **THEN** the original typed failure SHALL propagate in redacted form
+- **AND** no adapter, credential access, or process launch SHALL occur
+
+#### Scenario: Ambiguous relationship fails
+
+- **GIVEN** canonical relationships produce zero or multiple eligible selections for an explicit CLI mapping
+- **WHEN** selection is requested
+- **THEN** selection SHALL fail with the conflicting non-secret identities
+- **AND** no candidate SHALL be chosen by order, uniqueness heuristic, or consumer preference
+
+#### Scenario: Provider and adapter identities remain distinct
+
+- **GIVEN** canonical provider `tdt-codex` declares `cli_provider: codex`
+- **WHEN** selection and provider-neutral projection are requested for adapter identity `codex`
+- **THEN** the result SHALL retain `codex` for adapter capability/executable validation and `tdt-codex` for provider-owned route and credential-reference metadata
+- **AND** neither identity SHALL be inferred from protocol, endpoint, alias, wire model, executable, or credential availability
+
+#### Scenario: Consumer bridge cannot restore local selection
+
+- **GIVEN** canonical selection returns or raises any missing, invalid, ambiguous, unsupported, or indeterminate result for an enabled provider
+- **WHEN** ai-harness-skills or ai-review handles that result
+- **THEN** the bridge SHALL fail before adapter construction
+- **AND** it SHALL NOT preserve, merge, or activate a consumer-local model, effort, provider, endpoint, or executable mapping as a fallback
+
+### Requirement: Canonical CLI override and provenance
+
+Canonical provider definitions, model definitions, and provider relationships SHALL come only from the validated canonical profile. A supported run-scoped override MAY select one canonical alias already defined in `models`; it MUST pass the same provider/CLI relationship and capability validation as `defaults.cli_models`. An override SHALL NOT supply a raw wire model, provider, endpoint, protocol, credential reference/value, executable, fallback list, or arbitrary mapping. Every effective selection SHALL retain redacted canonical source and override provenance.
+
+#### Scenario: Run override selects a defined canonical alias
+
+- **GIVEN** canonical model alias `codex-review` belongs to the provider mapped to CLI identity `codex`
+- **WHEN** an explicit run-scoped override selects `codex-review`
+- **THEN** that alias SHALL become the selection for the operation
+- **AND** provider, wire model, protocol, supported behavior, and credential-reference metadata SHALL still come from its canonical definitions
+- **AND** provenance SHALL identify the override without exposing values
+
+#### Scenario: Undefined or cross-provider override fails
+
+- **GIVEN** a run-scoped override names an undefined alias or an alias belonging to a different CLI provider relationship
+- **WHEN** selection is resolved
+- **THEN** resolution SHALL fail before adapter construction
+- **AND** no local alias or closest candidate SHALL be substituted
+
+#### Scenario: Raw route override is rejected
+
+- **GIVEN** an override attempts to provide a wire model, provider, endpoint, protocol, credential, executable, fallback list, or mapping
+- **WHEN** canonical input validation runs
+- **THEN** the unsupported fields SHALL be rejected
+- **AND** canonical provider/model definitions SHALL remain unchanged
+
+#### Scenario: Undeclared environment alias has no authority
+
+- **WHEN** an undeclared process-environment key resembles a CLI model or provider selector
+- **THEN** it SHALL have no effect on canonical selection, provenance, identity, or cache eligibility
+- **AND** strict unknown-input diagnostics MAY report only the key name without reading it as model authority
+
+### Requirement: Canonical alias boundary for CLI and Pydantic models
+
+The provider-neutral CLI projection SHALL expose `canonical_alias` and `wire_model` as distinct values bound to the selected canonical provider and native adapter identity. Native adapters SHALL receive `wire_model` only through their typed projection. Direct Pydantic-AI construction SHALL receive the same `canonical_alias` plus the complete exact construction context. No path SHALL convert a native alias or wire model into a provider-prefixed public model string, and no native CLI argument SHALL be routed through the Pydantic-AI model factory.
+
+#### Scenario: Native adapter receives wire model
+
+- **GIVEN** a canonical selection has alias `codex-default` and wire model `gpt-5.6-sol`
+- **WHEN** the Codex adapter constructs its command
+- **THEN** its model argument SHALL be `gpt-5.6-sol`
+- **AND** `codex-default` SHALL remain the canonical diagnostic/provenance identity
+
+#### Scenario: Pydantic factory receives canonical alias and context
+
+- **GIVEN** the same canonical catalog selects one direct Pydantic-AI route
+- **WHEN** agent-core construction begins
+- **THEN** `create_model` SHALL receive the selected canonical alias and exact context
+- **AND** it SHALL not receive the CLI wire model, native alias, or provider-prefixed reconstruction
+
+#### Scenario: Localized or native alias is rejected at direct boundary
+
+- **GIVEN** a caller supplies a display-only, localized, native CLI, wire-model, or provider-prefixed string to the direct Pydantic-AI boundary
+- **WHEN** construction validates it against the context primary route
+- **THEN** construction SHALL fail before provider or credential access
+- **AND** no string translation or nearest canonical alias SHALL be attempted
+
+#### Scenario: Native authentication remains adapter-local
+
+- **WHEN** a native CLI operation launches from a canonical projection
+- **THEN** authentication SHALL remain within that adapter's approved native boundary
+- **AND** no credential value SHALL enter the canonical profile, projection, Pydantic model factory, or consumer evidence

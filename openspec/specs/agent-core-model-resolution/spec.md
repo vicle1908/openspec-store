@@ -3,279 +3,8 @@
 ## Purpose
 
 Define configuration-driven model and proxy resolution for agent-core, including the active giaoduc Anthropic Messages setup and the OpenAI-compatible alternative.
+
 ## Requirements
-### Requirement: Model Resolution from Config
-
-**WHEN** `create_model(model_id)` is called
-**AND** no explicit `base_url`/`api_key` kwargs provided
-**THEN** the system SHALL resolve proxy configuration in this order:
-1. `MODEL_BASE_URL` + `MODEL_API_KEY` env vars
-2. Exact provider `model_names` entries in `~/.tdt/config.yaml` providers map
-3. `~/.tdt/config.yaml` providers map using the model-kind prefix and `api_mode`
-4. `~/.tdt/config.yaml` model.base_url + env var from model.api_key_env
-5. native provider environment variables handled by pydantic-ai
-
-#### Scenario: Config-based resolution
-- **GIVEN** `~/.tdt/config.yaml` has `model.primary: anthropic:Advance`
-- **AND** `model.base_url: https://api.giaoduc.online`
-- **AND** `model.api_key_env: HERMES_CUSTOM_GIAODUC_API_KEY`
-- **AND** `HERMES_CUSTOM_GIAODUC_API_KEY=pmv_...` is set in environment
-- **WHEN** `create_model("openai-chat:Advance")` is called
-- **THEN** the model SHALL be created using the proxy endpoint via OpenAI Chat Completions API
-
-#### Scenario: Anthropic Messages API
-- **GIVEN** `~/.tdt/config.yaml` has `model.primary: anthropic:Advance`
-- **AND** `model.base_url: https://api.giaoduc.online`
-- **AND** `model.api_key_env: HERMES_CUSTOM_GIAODUC_API_KEY`
-- **WHEN** `create_model("anthropic:Advance")` is called
-- **THEN** the model SHALL be created using the proxy endpoint via Anthropic Messages API
-
-#### Scenario: Provider-specific factory
-- **GIVEN** the configured model identifier starts with `anthropic:`
-- **WHEN** the model is resolved through the configured proxy
-- **THEN** the system SHALL use `AnthropicProvider`
-- **AND** SHALL remove one trailing `/v1` from the configured base URL before constructing it
-
-#### Scenario: Explicit kwargs override config
-- **GIVEN** `create_model("openai-chat:Advance", base_url="https://other.com/v1", api_key="key")`
-- **WHEN** the model is created
-- **THEN** the explicit kwargs SHALL be used instead of config
-
-#### Scenario: Protocol routing via model kind prefix
-- **GIVEN** the model identifier is `anthropic:Advance`
-- **WHEN** the model is resolved through the configured proxy
-- **THEN** the system SHALL use `AnthropicProvider` and route to `/v1/messages`
-
-#### Scenario: OpenAI Chat via model kind prefix
-- **GIVEN** the model identifier is `openai-chat:fable-5`
-- **WHEN** the model is resolved through the configured proxy
-- **THEN** the system SHALL use `OpenAIProvider` and route to `/v1/chat/completions`
-
-#### Scenario: No explicit protocol field needed
-- **GIVEN** the model kind prefix determines the protocol
-- **WHEN** the config is loaded
-- **THEN** the system SHALL NOT require an explicit `protocol` field
-- **AND** the model kind prefix SHALL be the single source of truth for protocol selection
-
-#### Scenario: api_mode selects provider class only
-- **GIVEN** the provider config has `api_mode: anthropic_messages`
-- **WHEN** the model is resolved through the configured proxy
-- **THEN** the system SHALL use `AnthropicProvider` for `anthropic:*` prefixes
-- **AND** SHALL use `OpenAIProvider` for `openai-chat:*` and `openai-responses:*` prefixes
-- **AND** the model kind prefix SHALL remain authoritative for endpoint selection
-
-#### Scenario: api_mode/prefix mismatch produces incompatible pairing
-- **GIVEN** `api_mode: anthropic_messages` and model identifier `openai-chat:demo`
-- **WHEN** the model is constructed
-- **THEN** the system SHALL raise an actionable configuration error
-- **AND** SHALL NOT construct an OpenAI model backed by an Anthropic provider
-
-#### Scenario: Cockpit model-name routing
-- **GIVEN** a provider config contains `model_names: [gpt-5.6-sol]`
-- **AND** the model identifier is `openai-responses:gpt-5.6-sol`
-- **WHEN** the model is resolved
-- **THEN** the cockpit provider configuration SHALL be selected
-- **AND** the `openai-responses:` prefix SHALL remain authoritative for the Responses endpoint
-
-#### Scenario: Ambiguous model name is not a provider prefix
-- **GIVEN** the model identifier is `openai-chat:fable-5`
-- **WHEN** the provider is resolved
-- **THEN** the `openai-chat` prefix SHALL select the configured OpenAI provider
-- **AND** `fable-5` SHALL be treated only as the model name, not as a provider prefix
-
-### Requirement: Dual API Support
-
-**WHEN** a provider supports both OpenAI and Anthropic API formats
-**THEN** the system SHALL route to the correct endpoint based on the model kind prefix:
-- `anthropic:*` → `/v1/messages` (Anthropic format)
-- `openai-chat:*` → `/v1/chat/completions` (OpenAI format)
-- `openai-responses:*` → `/v1/responses` (OpenAI format)
-
-The `api_mode` field selects the provider class (`AnthropicProvider` vs `OpenAIProvider`), not the endpoint.
-
-#### Scenario: OpenAI Chat Completions
-- **GIVEN** provider supports `/v1/chat/completions`
-- **WHEN** `create_model("openai-chat:Advance")` is called
-- **THEN** requests SHALL use OpenAI Chat Completions format
-
-#### Scenario: Anthropic Messages
-- **GIVEN** provider supports `/v1/messages`
-- **WHEN** `create_model("anthropic:Advance")` is called
-- **THEN** requests SHALL use Anthropic Messages format
-
-#### Scenario: OpenAI Responses
-- **GIVEN** provider supports `/v1/responses`
-- **WHEN** `create_model("openai-responses:gpt-5")` is called
-- **THEN** requests SHALL use OpenAI Responses format
-
-### Requirement: Config Schema
-
-**WHEN** `~/.tdt/config.yaml` is loaded
-**THEN** the model section SHALL support:
-- `primary`: Default model identifier (the active value is "anthropic:Advance")
-- `base_url`: Proxy endpoint URL
-- `api_key_env`: Environment variable name containing the API key
-- `fallback`: List of fallback model identifiers
-- `timeout_seconds`: Request timeout
-
-**AND** the providers section SHALL support:
-- `base_url`: Proxy endpoint URL (per provider)
-- `api_key_env`: Environment variable name (per provider)
-- `api_mode`: Provider class mode (`anthropic_messages`, `codex_responses`, or empty)
-- `model_names`: Optional exact model-name list checked before prefix routing
-
-#### Scenario: TDT model configuration
-- **GIVEN** the active TDT config contains `model.primary`, `model.base_url`, and `model.api_key_env`
-- **WHEN** the settings and model factory are initialized
-- **THEN** the model endpoint and API key SHALL be resolved from those configured values
-
-#### Scenario: Multi-provider with api_mode
-- **GIVEN** the active TDT config has `providers.giaoduc.api_mode: anthropic_messages`
-- **AND** `providers.shopapikey.api_mode: codex_responses`
-- **WHEN** `create_model("anthropic:Advance")` is called
-- **THEN** the giaoduc provider SHALL be used with AnthropicProvider
-- **WHEN** `create_model("openai-responses:fable-5")` is called
-- **THEN** the shopapikey provider SHALL be used with OpenAIProvider
-
-#### Scenario: Exact provider model names
-- **GIVEN** `providers.cockpit.model_names` contains `gpt-5.6-sol`
-- **WHEN** `create_model("openai-responses:gpt-5.6-sol")` is called
-- **THEN** the cockpit provider SHALL be selected before the prefix default
-
-### Requirement: Configured Fallback Loading
-
-When the resolved agent profile contains a non-empty fallback list, every agent-core CLI and SDK construction path SHALL build the native fallback chain from the resolved primary followed by the resolved fallback identifiers in order. Construction SHALL NOT re-read configuration or replace an environment-selected primary with an agent-YAML value.
-
-#### Scenario: CLI consumes configured fallback
-
-- **GIVEN** the effective profile selects primary `anthropic:Advance`
-- **AND** its fallbacks are `openai-chat:fable-5` then `openai-responses:gpt-5.6-luna`
-- **WHEN** a CLI prompt runtime initializes
-- **THEN** its model SHALL preserve that exact order
-
-#### Scenario: Environment-selected primary remains selected
-
-- **GIVEN** the effective profile selected a process-environment primary over a different agent-YAML primary
-- **WHEN** a CLI or SDK agent is built
-- **THEN** the constructed chain SHALL start with the environment-selected primary
-
-### Requirement: Verified Provider (giaoduc)
-
-**WHEN** using the giaoduc provider (`https://api.giaoduc.online`)
-**THEN** the following features SHALL be supported:
-
-| API Format | Endpoint | Model Kind | api_mode | Features |
-|------------|----------|------------|----------|----------|
-| OpenAI Chat Completions | `/v1/chat/completions` | `openai-chat:Advance` | (default) | Streaming, tool calling, reasoning |
-| Anthropic Messages | `/v1/messages` | `anthropic:Advance` | `anthropic_messages` | Thinking blocks, tool use, system prompts |
-| OpenAI Responses | `/v1/responses` | `openai-responses:Advance` | `codex_responses` | Not supported by active provider |
-
-#### Scenario: giaoduc Anthropic verification
-- **GIVEN** the active provider is giaoduc and the model is `anthropic:Advance`
-- **WHEN** the agent runs a real prompt
-- **THEN** the provider SHALL return an Anthropic Messages response successfully
-
-### Requirement: API Mode Compatibility
-
-**WHEN** a configured provider has an `api_mode`
-**THEN** the system SHALL select the corresponding compatible pydantic-ai provider class
-**AND** SHALL reject an incompatible model-kind prefix before constructing the model.
-
-#### Scenario: Compatible Anthropic mode
-- **GIVEN** `api_mode: anthropic_messages`
-- **AND** the model identifier starts with `anthropic:`
-- **WHEN** the model is constructed
-- **THEN** `AnthropicProvider` SHALL be used.
-
-#### Scenario: Incompatible mode is rejected
-- **GIVEN** `api_mode: anthropic_messages`
-- **AND** the model identifier starts with `openai-chat:`
-- **WHEN** the model is constructed
-- **THEN** the system SHALL raise an actionable configuration error
-- **AND** SHALL NOT construct an OpenAI model backed by an Anthropic provider.
-
-### Requirement: Configurable Thinking Effort
-
-**WHEN** `model.thinking` is set in `~/.tdt/config.yaml` or `MODEL_THINKING` env var
-**THEN** the system SHALL inject a `pydantic_ai.capabilities.Thinking` capability into the agent
-**AND** the effort level SHALL be one of: `true`, `false`, `'minimal'`, `'low'`, `'medium'`, `'high'`, `'xhigh'`
-**AND** the Thinking capability SHALL translate the effort level to the active provider's native format automatically.
-
-#### Scenario: Config-driven thinking for Anthropic
-- **GIVEN** `model.thinking: "high"` in config.yaml
-- **AND** the active model is `anthropic:Advance`
-- **WHEN** `build_agent()` is called
-- **THEN** the agent SHALL have a Thinking capability with effort `'high'`
-- **AND** the capability SHALL translate to Anthropic's adaptive thinking format
-
-#### Scenario: Config-driven thinking for OpenAI
-- **GIVEN** `model.thinking: "medium"` in config.yaml
-- **AND** the active model is `openai-chat:fable-5`
-- **WHEN** `build_agent()` is called
-- **THEN** the agent SHALL have a Thinking capability with effort `'medium'`
-- **AND** the capability SHALL translate to OpenAI's `reasoning_effort: 'medium'`
-
-#### Scenario: Env var override
-- **GIVEN** `model.thinking: "low"` in config.yaml
-- **AND** `MODEL_THINKING=high` in environment
-- **WHEN** settings are loaded
-- **THEN** the thinking level SHALL be `'high'` (env var takes precedence)
-
-#### Scenario: Thinking disabled
-- **GIVEN** `model.thinking: false` or `MODEL_THINKING=false`
-- **WHEN** the agent is built
-- **THEN** no Thinking capability SHALL be injected
-- **AND** the model SHALL use its default behavior (may include thinking for reasoning models)
-
-#### Scenario: Thinking override per-call
-- **GIVEN** a `build_agent()` call with `thinking="high"` parameter
-- **AND** config has `thinking: "low"`
-- **WHEN** the agent is built
-- **THEN** the per-call `thinking` parameter SHALL take precedence
-
-### Requirement: Model Behavior Defaults
-
-**WHEN** `model.temperature`, `model.max_tokens`, or `model.service_tier` are set in config or env vars
-**THEN** the system SHALL include these as default model_settings in every agent run
-**AND** per-call `model_settings` parameter SHALL override config defaults.
-
-#### Scenario: Temperature from config
-- **GIVEN** `model.temperature: 0.7` in config.yaml
-- **WHEN** the agent runs
-- **THEN** the request SHALL include `temperature: 0.7` in model settings
-
-#### Scenario: Max tokens from config
-- **GIVEN** `model.max_tokens: 4096` in config.yaml
-- **AND** `MODEL_MAX_TOKENS=8192` in environment
-- **WHEN** settings are loaded
-- **THEN** the effective max_tokens SHALL be `8192`
-
-#### Scenario: Service tier selection
-- **GIVEN** `model.service_tier: "flex"` in config.yaml
-- **WHEN** the agent runs
-- **THEN** the request SHALL use the flex service tier
-
-#### Scenario: Per-call override
-- **GIVEN** config has `temperature: 0.7`
-- **AND** a run call passes `model_settings={'temperature': 0.2}`
-- **WHEN** the agent runs
-- **THEN** the run SHALL use `temperature: 0.2` (override wins)
-
-### Requirement: Provider-Specific Settings Escape Hatch
-
-**WHEN** `model.extra_model_settings` is set in config
-**THEN** the system SHALL merge those key-value pairs into the model_settings dict
-**AND** they SHALL take precedence over the unified fields.
-
-#### Scenario: Anthropic thinking config
-- **GIVEN** `model.extra_model_settings: {anthropic_thinking: {type: 'enabled', budget_tokens: 8192}}`
-- **WHEN** the agent runs with an Anthropic model
-- **THEN** the request SHALL include the native Anthropic thinking config
-
-#### Scenario: OpenAI reasoning summary
-- **GIVEN** `model.extra_model_settings: {openai_reasoning_summary: 'detailed'}`
-- **WHEN** the agent runs with an OpenAI Responses model
-- **THEN** the request SHALL include `openai_reasoning_summary: 'detailed'`
 
 ### Requirement: Thinking Field Migration
 
@@ -287,216 +16,6 @@ When the resolved agent profile contains a non-empty fallback list, every agent-
 - **GIVEN** `AgentConfig` is defined in `_ai/config.py`
 - **WHEN** the codebase is searched for `AgentConfig.thinking`
 - **THEN** zero references SHALL be found outside of test assertions for removal
-
-### Requirement: extra_model_settings Security Validation
-
-**WHEN** `model.extra_model_settings` is set in config
-**THEN** the system SHALL reject keys `extra_headers` and `extra_body` (header/body injection risk)
-**AND** SHALL reject keys matching sensitive patterns (`api_key`, `secret`, `token`, `password`, `authorization`)
-**AND** SHALL NOT serialize `extra_model_settings` in `model_dump()` output
-
-#### Scenario: Blocked dangerous keys
-- **GIVEN** config has `extra_model_settings: {extra_headers: {Authorization: "Bearer x"}}`
-- **WHEN** settings are loaded
-- **THEN** a `ValueError` SHALL be raised with the blocked key name
-
-#### Scenario: Sensitive key rejection
-- **GIVEN** config has `extra_model_settings: {api_key: "sk-123"}`
-- **WHEN** settings are loaded
-- **THEN** a `ValueError` SHALL be raised listing the sensitive key
-
-#### Scenario: Serialization exclusion
-- **GIVEN** `extra_model_settings` contains `{anthropic_thinking: {type: 'adaptive'}}`
-- **WHEN** `model_dump()` is called on ModelSettings
-- **THEN** the output SHALL NOT contain `extra_model_settings`
-
-### Requirement: Model Settings Range Validation
-
-**WHEN** `model.temperature` or `model.max_tokens` are set
-**THEN** the system SHALL validate `temperature` is between 0.0 and 2.0
-**AND** SHALL validate `max_tokens` is between 1 and 1,000,000
-**AND** SHALL raise `ValueError` for out-of-range values
-
-#### Scenario: Temperature in range
-- **GIVEN** `model.temperature: 0.7`
-- **WHEN** settings are loaded
-- **THEN** no error SHALL be raised
-
-#### Scenario: Temperature out of range
-- **GIVEN** `model.temperature: 5.0`
-- **WHEN** settings are loaded
-- **THEN** a `ValueError` SHALL be raised
-
-### Requirement: CLI Consumer Model Behavior Alignment
-
-The agent-core CLI SHALL apply the same config-driven model behavior contract as
-SDK consumers. It SHALL pass configured sampling, token, service-tier, and
-provider-specific settings through `BaseAgent.run(model_settings=...)`, and SHALL
-represent `model.thinking` using the public Thinking capability.
-
-#### Scenario: CLI applies unified model settings
-
-- **GIVEN** `~/.tdt/config.yaml` contains `model.temperature: 0.7`, `model.max_tokens: 4096`, and `model.service_tier: flex`
-- **WHEN** a CLI review, propose, explore, or REPL prompt runs
-- **THEN** the CLI SHALL pass those values as default model settings to `BaseAgent.run()`
-
-#### Scenario: CLI flattens provider-specific settings
-
-- **GIVEN** `model.extra_model_settings` contains `openai_reasoning_summary: detailed`
-- **WHEN** a CLI prompt runs
-- **THEN** the CLI SHALL pass `openai_reasoning_summary: detailed` as a top-level model setting
-- **AND** SHALL NOT pass an `extra_model_settings` wrapper key
-
-#### Scenario: CLI injects configured thinking
-
-- **GIVEN** `model.thinking: high`
-- **WHEN** a CLI prompt runtime initializes
-- **THEN** the CLI SHALL add a Thinking capability with effort `high`
-- **AND** SHALL NOT pass `thinking` as a raw model-settings key
-
-#### Scenario: CLI uses pydantic-ai defaults when behavior settings are absent
-
-- **GIVEN** no sampling, token, service-tier, provider-specific, or thinking settings are configured
-- **WHEN** a CLI prompt runs
-- **THEN** the CLI SHALL pass no config-derived model settings
-- **AND** SHALL add no Thinking capability
-
-### Requirement: Canonical Model YAML Section
-
-The settings loader SHALL use `model:` as the only YAML section for model
-configuration and SHALL NOT fall back to the removed legacy `gateway:` section.
-
-#### Scenario: Legacy gateway section is ignored
-
-- **GIVEN** a configuration file contains a `gateway:` section but no `model:` section
-- **WHEN** `load_settings()` is called
-- **THEN** model settings SHALL use canonical defaults and environment overrides
-- **AND** SHALL NOT read values from `gateway:`
-
-#### Scenario: Canonical model section is loaded
-
-- **GIVEN** a configuration file contains `model.primary: openai-chat:fable-5`
-- **WHEN** `load_settings()` is called
-- **THEN** `settings.model.primary` SHALL equal `openai-chat:fable-5`
-
-### Requirement: CLI Fallback Behavior Settings
-
-When the CLI creates a native `FallbackModel`, it SHALL construct the primary and
-fallback models in configured positional order and SHALL apply behavior settings
-at the enclosing agent-run boundary so the settings govern whichever model is
-selected.
-
-#### Scenario: Fallback chain uses configured agent-run settings
-
-- **GIVEN** `model.primary: anthropic:Advance`
-- **AND** `model.fallback: [openai-chat:fable-5]`
-- **AND** `model.temperature: 0.7`
-- **WHEN** the CLI prompt runtime initializes
-- **THEN** the native fallback chain SHALL preserve the configured model order
-- **AND** the CLI SHALL pass `temperature: 0.7` to `BaseAgent.run()`
-
-### Requirement: Streaming Responses model aggregation boundary
-
-When a configured provider returns SSE streams for non-stream requests, the system SHALL aggregate the stream into a standard ModelResponse. The aggregation SHALL preserve text output, tool calls, usage metadata, and finish reason from the completion event.
-
-#### Scenario: SSE stream aggregation
-
-- **GIVEN** a provider configured with `api_mode: codex_responses`
-- **AND** the provider returns SSE streams for non-stream requests
-- **WHEN** a model request is made
-- **THEN** the system SHALL aggregate the stream into a single ModelResponse
-- **AND** text output, tool calls, usage, and finish reason SHALL be preserved
-
-#### Scenario: Empty completion output normalization
-
-- **GIVEN** a provider that returns `response.output: null` on completion
-- **WHEN** the stream is aggregated
-- **THEN** the null output SHALL be normalized to an empty list
-- **AND** the ModelResponse SHALL be returned without error
-
-#### Scenario: Upstream exception propagated
-
-- **GIVEN** an SSE stream that raises an exception during iteration
-- **WHEN** the streaming model processes the event
-- **THEN** the exception SHALL be propagated to the caller without masking
-
-### Requirement: Config-driven fallback chain construction
-
-Model-chain construction SHALL consume the primary and fallback identifiers supplied in the resolved agent profile. It SHALL resolve model definitions at construction time but SHALL NOT read TDT YAML, dotenv files, or process environment to discover fallback identifiers or provider routing. It SHALL NOT make a network request merely to construct the chain.
-
-#### Scenario: Config-driven fallback
-
-- **GIVEN** the resolved profile contains primary `provider:model-a` and fallback `provider:model-b`
-- **WHEN** model-chain construction runs
-- **THEN** it SHALL return a fallback chain containing primary then fallback
-- **AND** it SHALL perform no config-source read
-
-#### Scenario: No fallback configured
-
-- **GIVEN** the resolved profile has no fallback identifiers
-- **WHEN** model-chain construction runs
-- **THEN** it SHALL return only the resolved primary model
-
-#### Scenario: Explicit Model instance bypasses fallback
-
-- **GIVEN** a caller supplies an already constructed Model instance
-- **WHEN** model-chain construction runs
-- **THEN** the instance SHALL be returned unchanged
-- **AND** no config or credential source SHALL be consulted
-
-### Requirement: Model layer is configuration-input only
-
-The model layer MUST be configuration-input only for model selection and provider routing. Every public model constructor, CLI helper, SDK builder, and base-agent path SHALL receive either an already constructed model instance or a model identifier together with one caller-resolved immutable profile or compatibility snapshot. These construction paths SHALL NOT own YAML, dotenv, environment, credential, provider, or fallback precedence. If a caller supplies a model identifier or omits an already constructed model without supplying the resolved snapshot needed for selection, construction MUST fail before configuration discovery, provider or credential lookup, fallback construction, or model instantiation. A caller-supplied model instance MUST remain authoritative and bypass configuration, environment, provider-credential, and fallback discovery entirely, including when another supplied input contains conflicting model-selection fields.
-
-#### Scenario: Static source conformance
-
-- **WHEN** the model construction modules are audited
-- **THEN** they SHALL contain no YAML reader, dotenv reader, TDT config-path read, or independent model-environment lookup
-
-#### Scenario: All construction entry points agree
-
-- **WHEN** CLI, SDK, and base-agent entry points receive the same resolved snapshot
-- **THEN** they SHALL select the same primary, fallbacks, provider route, and model behavior settings
-- **AND** none of those entry points SHALL resolve a second configuration snapshot
-
-#### Scenario: Caller-resolved snapshot is reused
-
-- **GIVEN** a caller has already resolved an agent profile or compatibility projection
-- **WHEN** it constructs an agent through a public entry point using a model identifier
-- **THEN** the primary, fallback order, provider route, behavior, provenance, and source fingerprints SHALL come from that supplied snapshot
-- **AND** nested construction SHALL NOT reload, replace, or mutate any of those values
-
-#### Scenario: Model identifier without caller snapshot fails before discovery
-
-- **GIVEN** a caller supplies a model identifier or omits an already constructed model
-- **AND** the caller does not supply a resolved profile or compatibility snapshot
-- **WHEN** a public CLI, SDK, or base-agent construction entry point is invoked
-- **THEN** construction SHALL fail with an actionable missing-snapshot diagnostic
-- **AND** no TDT configuration, YAML, dotenv, model environment, provider credential, or fallback source SHALL be read
-- **AND** no provider model or fallback chain SHALL be constructed
-
-#### Scenario: Explicit Model performs zero source reads
-
-- **GIVEN** a caller supplies an already constructed model instance
-- **WHEN** any public agent-construction entry point builds the agent
-- **THEN** the same model instance SHALL be used unchanged
-- **AND** no TDT configuration, YAML, dotenv, model environment, provider credential, or fallback source SHALL be read
-
-#### Scenario: Explicit Model remains authoritative over conflicting selection
-
-- **GIVEN** a caller supplies an already constructed model instance
-- **AND** another already supplied input names a different primary, fallback chain, provider route, or credential reference
-- **WHEN** a public agent-construction entry point builds the agent
-- **THEN** the constructed model instance SHALL remain the selected model by object identity
-- **AND** the conflicting selection fields SHALL NOT replace, rebuild, wrap, or add a fallback around that instance
-- **AND** no credential lookup for the conflicting provider SHALL occur
-
-#### Scenario: Concurrent constructions keep snapshots isolated
-
-- **GIVEN** two callers supply different resolved snapshots to simultaneous construction operations
-- **WHEN** the operations construct their agents
-- **THEN** each agent SHALL use only its own snapshot's primary, fallback order, provider route, behavior, provenance, and source fingerprints
-- **AND** neither construction SHALL mutate, cache over, or substitute values from the other snapshot
 
 ### Requirement: Effective model diagnostics match execution
 
@@ -513,25 +32,358 @@ Agent-core diagnostics SHALL report the effective model chain and non-secret pro
 - **THEN** diagnostics and construction SHALL fail with the same provider and environment-key name
 - **AND** neither output SHALL reveal credential values
 
-### Requirement: Caller-owned fallback and identifier validation
+### Requirement: Model Resolution from Caller Context
 
-The caller that resolves an agent profile SHALL own the primary and fallback
-identifiers passed to model construction. A model factory or fallback helper SHALL
-not reinterpret a native CLI alias as a direct model, read TDT configuration to fill
-missing fallback values, or replace a caller-selected identifier with a localized
-alias. Direct identifiers SHALL be registered canonical `provider:model` values.
+Public model construction SHALL have exactly two authoritative paths:
 
-#### Scenario: Caller-owned fallback is preserved
+1. `create_model(model: Model, *, context: None = None) -> Model`; or
+2. `create_model(model: str, *, context: ModelConstructionContext) -> Model`.
 
-- **GIVEN** a caller passes a resolved primary and ordered fallback identifiers
-- **WHEN** the fallback chain is constructed
-- **THEN** construction SHALL use exactly those identifiers in that order
-- **AND** it SHALL perform no YAML, dotenv, or process-environment lookup for fallback discovery
+An explicit `Model` MUST be returned by object identity without accessing the optional context or any configuration, environment, credential, provider, or fallback source. A string MUST be the exact canonical primary alias selected by `context.primary_route`; it SHALL NOT be a wire model, provider prefix, localized alias, display name, or consumer-local model. The string path SHALL automatically construct the primary and ordered fallback chain from the exact routes in the context. The factory SHALL NOT rediscover or replace any route field from environment variables, YAML, dotenv, raw kwargs, native CLI configuration, model prefixes, provider defaults, or another fallback list.
 
-#### Scenario: Unregistered live identifier is rejected
+`create_model` SHALL be the only public model factory. `create_fallback_model`, `create_model_with_fallback`, and the agent-core public `infer_model` re-export MUST be removed. Any protocol/fallback construction helpers SHALL be private and SHALL accept exact route/context types only.
 
-- **GIVEN** a direct-model input is a localized, display-only, or otherwise unregistered alias
-- **WHEN** a CLI or SDK model chain is prepared
-- **THEN** preparation SHALL fail before provider invocation
-- **AND** model construction or a zero-exit wrapper SHALL not count as live acceptance
+#### Scenario: Explicit Model is returned unchanged
 
+- **GIVEN** a caller passes an already constructed Pydantic-AI `Model`
+- **WHEN** `create_model` is called
+- **THEN** it SHALL return the same object by identity
+- **AND** it SHALL not inspect a context or read configuration, environment, credentials, providers, or fallbacks
+
+#### Scenario: Canonical alias constructs the complete chain
+
+- **GIVEN** a complete context selects canonical primary alias `primary-a` and ordered fallback aliases `fallback-b`, `fallback-c`
+- **WHEN** `create_model("primary-a", context=context)` is called
+- **THEN** it SHALL construct the primary and fallbacks in exactly that route order
+- **AND** each model SHALL use its route's model kind, wire model, provider ID, protocol, endpoint metadata, credential reference, and behavior
+
+#### Scenario: String must match selected canonical alias
+
+- **GIVEN** a complete context whose primary canonical alias is `primary-a`
+- **WHEN** a caller supplies a different alias, wire model, provider-prefixed string, localized alias, or display name
+- **THEN** construction SHALL fail with a redacted identity-mismatch diagnostic
+- **AND** no provider, credential, or fallback model SHALL be constructed
+
+#### Scenario: Missing context fails before discovery
+
+- **GIVEN** a caller supplies a string without a complete `ModelConstructionContext`
+- **WHEN** `create_model` is called
+- **THEN** construction SHALL fail before configuration, environment, provider, credential, fallback, or native-auth access
+- **AND** no model SHALL be instantiated
+
+#### Scenario: Anthropic Messages route is exact
+
+- **GIVEN** a selected route carries model kind `anthropic`, typed protocol `messages`, one wire model, and one canonical provider ID
+- **WHEN** its provider model is constructed
+- **THEN** the Anthropic Messages implementation SHALL use those exact route values
+- **AND** no prefix, `api_mode`, endpoint, or environment inference SHALL replace them
+
+#### Scenario: OpenAI Chat and Responses routes remain distinct
+
+- **GIVEN** selected routes carry `openai_chat` and `openai_responses` model kinds with their matching typed protocols
+- **WHEN** the provider models are constructed
+- **THEN** each SHALL use its matching protocol-specific implementation
+- **AND** canonical alias, wire model, and provider identity SHALL remain distinct values
+
+#### Scenario: Route kind and protocol mismatch fails closed
+
+- **GIVEN** a selected route has an incompatible model/factory kind and typed protocol
+- **WHEN** canonical context construction or model construction validates the route
+- **THEN** it SHALL fail with a redacted relationship diagnostic
+- **AND** no primary or fallback provider model SHALL be created
+
+#### Scenario: Raw constructor authorities are absent
+
+- **WHEN** the public model factory signature and active exports are inspected
+- **THEN** raw `base_url`, `api_key`, `providers`, `model_config`, `snapshot`, and `fallback_ids` parameters SHALL be absent
+- **AND** `_UNSET`, legacy-kwarg, transition-release, and migration-exception shims SHALL be absent
+
+#### Scenario: Public fallback factories are absent
+
+- **WHEN** agent-core public modules and SDK exports are inspected
+- **THEN** `create_fallback_model`, `create_model_with_fallback`, and public `infer_model` SHALL be absent
+- **AND** callers SHALL use `create_model` for both single-model and fallback-chain construction
+
+#### Scenario: Native authentication cannot select a route
+
+- **GIVEN** the context explicitly selects a supported native provider route
+- **WHEN** final provider construction delegates authentication to the provider library
+- **THEN** only that library MAY read its documented authentication environment after route selection
+- **AND** project code SHALL perform no environment lookup for model, provider, endpoint, protocol, fallback, or behavior selection
+- **AND** canonical resolution failure SHALL never fall through to native authentication
+
+### Requirement: Canonical Model Selection Schema
+
+The canonical LLM schema SHALL contain exactly these model-selection sections:
+
+- `providers.<provider_id>` owns explicit `transport` (`native` or `endpoint`), typed `protocol`, provider-bound `auth_env` reference, optional `cli_provider` identity, and a normalized `base_url` that is required for endpoint transport and forbidden for native transport;
+- `models.<canonical_alias>` owns one `provider` reference, one wire-model `model` value, and supported behavior such as reasoning effort or context window; and
+- `defaults` owns one primary model alias in `model`, an ordered alias tuple in `fallback`, optional global behavior defaults, and explicit `cli_models` mappings.
+
+Canonical resolution SHALL validate every relationship before returning a profile. It SHALL project each selected alias to an exact immutable `ResolvedModelRoute` with separate fields for `canonical_alias`, closed `model_kind`, `wire_model`, `provider_id`, explicit `transport`, typed `protocol`, normalized non-secret endpoint metadata, provider-bound credential-reference metadata, behavior, and structured provenance. `model_kind` SHALL be produced by a closed validated protocol/factory mapping; it SHALL NOT be inferred from provider names, wire models, endpoints, credentials, or environment. Protected credential values MUST NOT appear in the schema, profile, route, context digest, diagnostics, exceptions, or evidence.
+
+Top-level `model`, `gateway`, `providers.*.api_key_env`, `api_mode`, legacy-only documents, and mixed canonical/unsupported documents MUST fail validation. There is no normalization, projection, alias, or compatibility mode for those inputs.
+
+#### Scenario: Canonical config binds exact routes
+
+- **GIVEN** canonical `defaults` selects aliases defined in `models` and each model references a provider defined in `providers`
+- **WHEN** the caller resolves the profile and construction context
+- **THEN** the primary and ordered fallback aliases SHALL project to complete exact routes
+- **AND** provider endpoint, protocol, credential reference, and CLI identity SHALL remain owned by the referenced canonical provider
+
+#### Scenario: Alias and wire model remain distinct
+
+- **GIVEN** canonical alias `review-default` names wire model `gpt-5.6-sol`
+- **WHEN** the profile and route are projected
+- **THEN** both identities SHALL be retained in distinct immutable fields
+- **AND** neither SHALL be reinterpreted as the provider ID or model kind
+
+#### Scenario: Provider and model kind remain distinct
+
+- **GIVEN** canonical provider `shopapikey` uses typed protocol `messages`
+- **WHEN** a route is projected
+- **THEN** the route SHALL preserve `shopapikey` as provider ID and the closed Messages factory kind as model kind
+- **AND** agent-core SHALL not infer either identity from the other
+
+#### Scenario: Native and endpoint transports are explicit
+
+- **GIVEN** one provider declares `transport: native` and another declares `transport: endpoint`
+- **WHEN** canonical schema validation and route projection run
+- **THEN** the native provider SHALL forbid `base_url` and the endpoint provider SHALL require one normalized HTTP(S) `base_url`
+- **AND** construction SHALL not infer transport from endpoint presence, provider name, protocol, credentials, or environment
+
+#### Scenario: Undefined relationships fail together
+
+- **GIVEN** canonical configuration contains undefined provider references, undefined primary/fallback aliases, or invalid CLI alias relationships
+- **WHEN** validation runs
+- **THEN** it SHALL report all non-secret relationship errors in one redacted failure
+- **AND** it SHALL return no partial profile or route
+
+#### Scenario: Unsupported old schema fails closed
+
+- **GIVEN** configuration contains a top-level `model` or `gateway` section, `providers.*.api_key_env`, `api_mode`, or a mixture with canonical fields
+- **WHEN** canonical validation runs
+- **THEN** it SHALL reject the document
+- **AND** it SHALL NOT normalize, ignore, project, default, or fall back from any unsupported field
+
+#### Scenario: Explicit run override is selection-only
+
+- **GIVEN** an operation supplies an explicit model override
+- **WHEN** canonical profile resolution applies it
+- **THEN** the override MUST name one existing canonical alias
+- **AND** the alias SHALL resolve through its already declared model/provider relationship
+- **AND** the override SHALL NOT inject endpoint, credential, provider, protocol, wire-model, or fallback mappings
+
+#### Scenario: Credential values never enter serializable state
+
+- **WHEN** canonical configuration, profile, route, context identity, diagnostic, exception, provenance, or evidence is serialized
+- **THEN** it SHALL contain only non-secret credential-reference and provider-binding metadata
+- **AND** no protected value or value-derived fingerprint SHALL be present
+
+### Requirement: Clean model and agent construction boundaries
+
+`create_model` and `build_agent` SHALL be the only public string-aware construction boundaries. `build_agent` SHALL accept either an explicit `Model` or one canonical alias plus a complete `ModelConstructionContext`; it SHALL call `create_model` for the string path and SHALL call no configuration or profile resolver. `ConsumerRuntimeProfile` SHALL contain only pure framework/runtime settings and SHALL have no model-selection field, settings projection, profile identity, or I/O-producing default. `CallerSnapshot` and every snapshot-shaped public input MUST be removed.
+
+`BaseAgent` SHALL accept an already constructed `Model` only. It MUST NOT accept a string, profile, context, config mapping, provider mapping, or fallback input and MUST NOT call `create_model`, `load_settings`, `load_agent_config`, `resolve_agent_profile`, or another selection/resolution function. Agent-core CLI composition SHALL resolve one context before `build_agent` and SHALL not maintain an independent `_create_runtime_model` authority.
+
+`ModelConstructionContext` SHALL be a final slotted non-dataclass with a module-private factory-only construction path. Direct public construction MUST fail. It SHALL reject shallow/deep copy, pickle/reduction, `vars`, dataclass `asdict`/`astuple`/`replace`, Pydantic model/type-adapter dumping, and any advertised serialization hook. Its deterministic SHA-256 identity SHALL cover canonical JSON for agent identity, ordered primary/fallback canonical aliases, model kinds, wire models, provider IDs, transport kinds, protocols, normalized endpoint metadata, provider-bound credential-reference metadata, behavior, structured provenance identity, and source fingerprints. The digest MUST NOT include or derive from credential values.
+
+#### Scenario: build_agent explicit Model path is pure
+
+- **GIVEN** `build_agent` receives an explicit `Model` and optional pure runtime profile
+- **WHEN** it constructs the agent
+- **THEN** it SHALL preserve the model by object identity
+- **AND** it SHALL access no context, profile, configuration, environment, credential, provider, or fallback source
+
+#### Scenario: build_agent string path delegates once
+
+- **GIVEN** `build_agent` receives a canonical alias and complete context
+- **WHEN** it constructs the agent
+- **THEN** it SHALL call the sole public `create_model` boundary using those inputs
+- **AND** it SHALL resolve no profile or configuration itself
+- **AND** it SHALL pass the resulting `Model` into `BaseAgent`
+
+#### Scenario: Runtime profile has no LLM authority
+
+- **WHEN** `ConsumerRuntimeProfile` is constructed or serialized
+- **THEN** it SHALL contain only pure framework/runtime fields
+- **AND** it SHALL have no `model`, settings projection, canonical-profile identity, provider identity, fallback list, or I/O-producing default
+
+#### Scenario: BaseAgent rejects string construction
+
+- **GIVEN** a caller attempts to pass a string or configuration authority to `BaseAgent`
+- **WHEN** Python validates the public constructor call
+- **THEN** the call SHALL fail through the clean `Model`-only signature
+- **AND** `BaseAgent` SHALL perform no resolution or compatibility handling
+
+#### Scenario: CLI composition resolves one context
+
+- **WHEN** an agent-core CLI operation needs a canonical model
+- **THEN** its composition root SHALL resolve one context and invoke `build_agent` or `create_model`
+- **AND** `_create_runtime_model` or another CLI-owned model-selection authority SHALL be absent
+
+#### Scenario: Context direct construction is unavailable
+
+- **WHEN** external code attempts to instantiate `ModelConstructionContext` without the module-private factory capability
+- **THEN** construction SHALL fail
+- **AND** no incomplete, forged, or empty-digest context SHALL be produced
+
+#### Scenario: Context cannot be copied or serialized
+
+- **WHEN** code applies copy, deepcopy, pickle/reduction, `vars`, dataclass serialization/replacement, Pydantic dumping, or an advertised context serialization hook
+- **THEN** the operation SHALL raise `TypeError("ModelConstructionContext is process-local")`
+- **AND** no credential resolver, credential value, or usable context clone SHALL be emitted
+
+#### Scenario: Context digest covers complete safe identity
+
+- **GIVEN** two contexts differ in any selected non-secret agent, route, behavior, provenance, credential-reference, endpoint, order, or source-fingerprint field
+- **WHEN** their identity digests are computed from canonical JSON
+- **THEN** the digests SHALL differ deterministically
+- **AND** protected credential values SHALL have no effect on either digest
+
+#### Scenario: Concurrent construction remains isolated
+
+- **GIVEN** two callers supply different valid contexts simultaneously
+- **WHEN** both construct agents
+- **THEN** each agent SHALL use only its own exact routes and credential binding
+- **AND** no mutable cache or global selection state SHALL cross the operations
+
+#### Scenario: Active public examples use only clean boundaries
+
+- **WHEN** active source, tests, templates, examples, and documentation are searched
+- **THEN** string construction SHALL occur only through `create_model` or `build_agent` with a complete context
+- **AND** direct `BaseAgent` examples SHALL pass an already constructed `Model`
+- **AND** removed factories, snapshots, compatibility properties, mapping loaders, raw kwargs, and local fallback examples SHALL be absent
+
+### Requirement: Canonical route behavior and run settings
+
+Canonical `models.<alias>` and `defaults` definitions MAY contain only registered typed behavior fields, including supported reasoning effort, temperature, maximum tokens, service tier, and context window. Canonical resolution SHALL validate their types, ranges, model-kind/protocol capability, and precedence, then copy the effective immutable behavior into each exact `ResolvedModelRoute`. Arbitrary `extra_model_settings`, raw provider request bodies/headers, and unknown behavior keys MUST be rejected.
+
+`create_model` SHALL use route behavior only for construction-time provider/model capabilities. Request-scoped behavior SHALL be applied at the public agent-run boundary from the route's typed defaults plus an optional typed/allowlisted run override. Run overrides SHALL NOT change canonical alias, model kind, wire model, provider, protocol, endpoint, credential reference, or fallback order. CLI and SDK paths MUST apply the same behavior merge and MUST NOT reload configuration.
+
+#### Scenario: Canonical reasoning effort is projected
+
+- **GIVEN** a canonical model or default declares a supported reasoning effort
+- **WHEN** its route is resolved and the agent is built
+- **THEN** the immutable route SHALL carry the effective effort
+- **AND** the matching public capability/request setting SHALL translate it for the selected model kind and protocol
+
+#### Scenario: Canonical numeric behavior is validated
+
+- **GIVEN** canonical behavior declares temperature or maximum tokens
+- **WHEN** schema/profile validation runs
+- **THEN** temperature SHALL be between 0.0 and 2.0 and maximum tokens between 1 and 1,000,000
+- **AND** out-of-range values SHALL fail before route/context construction
+
+#### Scenario: Unsupported behavior field is rejected
+
+- **GIVEN** canonical configuration or a run override includes an unknown field, arbitrary provider settings, raw headers/body, or a secret-shaped key
+- **WHEN** behavior validation runs
+- **THEN** validation SHALL fail with the logical field identified and value omitted
+- **AND** the field SHALL not reach model or request construction
+
+#### Scenario: Model-specific behavior overrides canonical defaults
+
+- **GIVEN** `defaults` defines one typed behavior value and the selected `models.<alias>` defines another supported value for the same field
+- **WHEN** the exact route is resolved
+- **THEN** the model-specific value SHALL win
+- **AND** provenance SHALL retain both selected and shadowed non-secret sources
+
+#### Scenario: Typed run override changes behavior only
+
+- **GIVEN** a route carries canonical typed behavior and a run supplies a supported typed behavior override
+- **WHEN** the agent run begins
+- **THEN** the run override SHALL win for that request
+- **AND** every route identity, transport, credential binding, and fallback position SHALL remain unchanged
+
+#### Scenario: Unsupported capability fails before provider access
+
+- **GIVEN** behavior is valid in general but unsupported by the selected model kind or protocol
+- **WHEN** canonical route or run behavior is validated
+- **THEN** the operation SHALL fail with model kind, protocol, and logical behavior field identified
+- **AND** no credential or provider request SHALL occur
+
+#### Scenario: CLI and SDK apply identical behavior
+
+- **GIVEN** CLI and SDK composition receive the same exact context and typed run override
+- **WHEN** they execute an agent run
+- **THEN** they SHALL produce the same effective request behavior
+- **AND** neither SHALL read YAML, dotenv, process environment, settings projections, or consumer-local configuration
+
+#### Scenario: Absent behavior uses provider-library defaults
+
+- **GIVEN** neither canonical route behavior nor a run override specifies an optional field
+- **WHEN** the agent runs
+- **THEN** project code SHALL omit that field
+- **AND** it SHALL not synthesize an old-schema or environment default
+
+#### Scenario: Fallback routes retain their own behavior
+
+- **GIVEN** primary and fallback canonical aliases define different supported behavior
+- **WHEN** `create_model` constructs the chain
+- **THEN** each route SHALL retain its own construction-time capability behavior
+- **AND** request-scoped settings SHALL be applied through the documented enclosing run boundary without changing fallback order
+
+#### Scenario: Provider verification is evidence-bound
+
+- **WHEN** a provider route is accepted for release
+- **THEN** deterministic tests SHALL prove protocol/factory/request construction without network access
+- **AND** any live-success claim SHALL identify the current endpoint metadata fingerprint, canonical route, executable/library, repository SHAs, nested outcome, and authorization in retained evidence
+- **AND** no mutable endpoint or historical success SHALL be normative proof by itself
+
+### Requirement: Supported typed provider protocols
+
+Agent-core SHALL support Anthropic Messages, OpenAI Chat Completions, and OpenAI Responses only when canonical resolution supplies a matching closed `model_kind` and typed `protocol` pair in an exact route. Provider class, endpoint suffix behavior, request format, and response handling SHALL follow that pair. `api_mode`, model/provider prefixes, endpoint inspection, and environment state SHALL have no protocol-selection authority.
+
+#### Scenario: Anthropic Messages construction
+
+- **GIVEN** an exact route selects model kind `anthropic` and protocol `messages`
+- **WHEN** its provider model is constructed
+- **THEN** agent-core SHALL use the Anthropic Messages provider/model implementation
+- **AND** it SHALL preserve the route's wire model, provider ID, and endpoint metadata
+
+#### Scenario: OpenAI Chat construction
+
+- **GIVEN** an exact route selects model kind `openai_chat` and protocol `openai_chat`
+- **WHEN** its provider model is constructed
+- **THEN** agent-core SHALL use the OpenAI Chat Completions provider/model implementation
+- **AND** it SHALL not route through Responses or Messages
+
+#### Scenario: OpenAI Responses construction
+
+- **GIVEN** an exact route selects model kind `openai_responses` and protocol `responses`
+- **WHEN** its provider model is constructed
+- **THEN** agent-core SHALL use the OpenAI Responses provider/model implementation
+- **AND** it SHALL not route through Chat Completions or Messages
+
+#### Scenario: Unsupported pair is rejected
+
+- **GIVEN** a route contains an unregistered or incompatible model-kind/protocol pair
+- **WHEN** canonical context or model construction validates it
+- **THEN** construction SHALL fail before credential access or model instantiation
+- **AND** no prefix, endpoint, or native-auth fallback SHALL select another protocol
+
+### Requirement: Typed Responses streaming aggregation boundary
+
+Streaming aggregation for OpenAI Responses SHALL activate only for a route whose validated model kind is `openai_responses` and protocol is `responses`. The provider integration SHALL parse SSE events through Pydantic AI's Responses model boundary, combine text deltas deterministically, normalize an empty successful completion to an empty string, and propagate upstream provider/transport exceptions unchanged. It SHALL NOT select aggregation behavior from `api_mode`, endpoint text, provider name, or model prefix.
+
+#### Scenario: SSE stream aggregation
+
+- **GIVEN** an exact Responses route and an SSE stream with multiple output-text delta events
+- **WHEN** model execution completes
+- **THEN** the returned text SHALL equal the deltas concatenated in event order
+- **AND** transport framing SHALL not appear in the result
+
+#### Scenario: Empty completion output normalization
+
+- **GIVEN** an exact Responses route whose successful stream contains no output-text delta
+- **WHEN** model execution completes
+- **THEN** the returned text SHALL be the empty string
+- **AND** the result SHALL not be `None`
+
+#### Scenario: Upstream exception propagated
+
+- **GIVEN** the selected Responses provider raises an authentication, transport, or protocol exception
+- **WHEN** streaming execution is awaited
+- **THEN** agent-core SHALL propagate the upstream exception
+- **AND** it SHALL not convert the error into an empty successful response or try another protocol outside the canonical fallback chain
