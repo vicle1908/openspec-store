@@ -1,0 +1,21 @@
+{
+  "proof": "non-mutating dependency-ordered rollback",
+  "status": "PASS",
+  "order": [
+    "ai-review",
+    "ai-harness-skills",
+    "agent-docs-sync",
+    "agent-harness",
+    "agent-core",
+    "tdt-core"
+  ],
+  "method": "Read-only git status/rev-parse checks; no reset, checkout, file copy, credential access, or product mutation.",
+  "checks": {
+    "ai-review": {"sha": "e71ce742cdb88b2a2c8c621eaed1c34f67f4a6ab", "clean": true, "target_preserved": true},
+    "ai-harness-skills": {"sha": "fb21b093f0207bd40f4fd0d7d9cffdce682b0089", "clean": true, "target_preserved": true},
+    "agent-docs-sync": {"sha": "a189c50452015a06d4f63fc342fa22e7e31e34ad", "clean": true, "target_preserved": true},
+    "agent-harness": {"sha": "70d0da2fbdfa15c1382cec6a09468dfc7e86e7c1", "clean": true, "target_preserved": true},
+    "agent-core": {"sha": "3742e858f77a629f8fb119f2388d36f4f6201041", "clean": true, "target_preserved": true},
+    "tdt-core": {"sha": "a5cee90f20af0a20f7a1d2499884f713c1a29b2d", "clean": true, "target_preserved": true}
+  }
+}

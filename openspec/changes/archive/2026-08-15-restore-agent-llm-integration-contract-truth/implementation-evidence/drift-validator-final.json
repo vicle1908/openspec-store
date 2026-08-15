@@ -1,0 +1,77 @@
+{
+  "failures": [],
+  "records": {
+    "agent-core": {
+      "actual_branch": "openspec/restore-agent-llm-agent-core",
+      "actual_sha": "3742e858f77a629f8fb119f2388d36f4f6201041",
+      "clean": true,
+      "dirt": "",
+      "expected_branch": "openspec/restore-agent-llm-agent-core",
+      "expected_sha": "3742e858f77a629f8fb119f2388d36f4f6201041",
+      "path": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-agent-core",
+      "status": "PASS"
+    },
+    "agent-docs-sync": {
+      "actual_branch": "openspec/restore-agent-llm-agent-docs-sync",
+      "actual_sha": "a189c50452015a06d4f63fc342fa22e7e31e34ad",
+      "clean": true,
+      "dirt": "",
+      "expected_branch": "openspec/restore-agent-llm-agent-docs-sync",
+      "expected_sha": "a189c50452015a06d4f63fc342fa22e7e31e34ad",
+      "path": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-agent-docs-sync",
+      "status": "PASS"
+    },
+    "agent-harness": {
+      "actual_branch": "openspec/restore-agent-llm-agent-harness",
+      "actual_sha": "70d0da2fbdfa15c1382cec6a09468dfc7e86e7c1",
+      "clean": true,
+      "dirt": "",
+      "expected_branch": "openspec/restore-agent-llm-agent-harness",
+      "expected_sha": "70d0da2fbdfa15c1382cec6a09468dfc7e86e7c1",
+      "path": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-agent-harness",
+      "status": "PASS"
+    },
+    "ai-harness-skills": {
+      "actual_branch": "openspec/restore-agent-llm-ai-harness-skills",
+      "actual_sha": "fb21b093f0207bd40f4fd0d7d9cffdce682b0089",
+      "clean": true,
+      "dirt": "",
+      "expected_branch": "openspec/restore-agent-llm-ai-harness-skills",
+      "expected_sha": "fb21b093f0207bd40f4fd0d7d9cffdce682b0089",
+      "path": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-ai-harness-skills",
+      "status": "PASS"
+    },
+    "ai-review": {
+      "actual_branch": "openspec/restore-agent-llm-ai-review",
+      "actual_sha": "e71ce742cdb88b2a2c8c621eaed1c34f67f4a6ab",
+      "clean": true,
+      "dirt": "",
+      "expected_branch": "openspec/restore-agent-llm-ai-review",
+      "expected_sha": "e71ce742cdb88b2a2c8c621eaed1c34f67f4a6ab",
+      "path": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-ai-review",
+      "status": "PASS"
+    },
+    "openspec-store": {
+      "actual_branch": "openspec/restore-agent-llm-openspec-store",
+      "actual_sha": "7791792bc58a01168d5b2150ed499478742d5963",
+      "clean": true,
+      "dirt": "",
+      "expected_branch": "openspec/restore-agent-llm-openspec-store",
+      "expected_sha": "7791792bc58a01168d5b2150ed499478742d5963",
+      "path": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-openspec-store",
+      "status": "PASS"
+    },
+    "tdt-core": {
+      "actual_branch": "openspec/restore-agent-llm-tdt-core",
+      "actual_sha": "a5cee90f20af0a20f7a1d2499884f713c1a29b2d",
+      "clean": true,
+      "dirt": "",
+      "expected_branch": "openspec/restore-agent-llm-tdt-core",
+      "expected_sha": "a5cee90f20af0a20f7a1d2499884f713c1a29b2d",
+      "path": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-tdt-core",
+      "status": "PASS"
+    }
+  },
+  "status": "PASS",
+  "validator": "restore-agent-llm-final-drift"
+}

@@ -1,0 +1,51 @@
+{
+  "checks": {
+    "canonical_resolution": {
+      "agent": "test-agent",
+      "alias": "fable-5",
+      "fallback_count": 2,
+      "identity_digest": "039caaf2d099fe39384f437509f645e33c75154b3afe744174c9d4cc3a2e6a74",
+      "protocol": "responses",
+      "provider": "shopapikey",
+      "status": "PASS",
+      "transport": "endpoint",
+      "wire_model": "fable-5"
+    },
+    "cli_mapping": {
+      "codex_alias": "fable-5",
+      "codex_provider": "shopapikey",
+      "count": 1,
+      "status": "PASS"
+    },
+    "credential_redaction": {
+      "method": "checked protected env-var values were absent from diagnostic; values not serialized",
+      "status": "PASS"
+    },
+    "dependency_origins": {
+      "agent_core_origin": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-agent-core/src/agent_core/__init__.py",
+      "agent_core_sha": "3742e858f77a629f8fb119f2388d36f4f6201041",
+      "status": "PASS",
+      "tdt_core_origin": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-tdt-core/src/tdt_core/__init__.py",
+      "tdt_core_sha": "a5cee90f20af0a20f7a1d2499884f713c1a29b2d"
+    },
+    "same_consumer_enablement": {
+      "status": "PASS",
+      "consumer": "ai-review",
+      "enabled_reviewers": ["codescan"],
+      "use_worktree": true,
+      "local_repo_project_ids": [231],
+      "executable": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-ai-review/.venv/bin/python3",
+      "package_version": "0.2.0",
+      "settings_validation": "PASS"
+    },
+    "target_containment": {
+      "status": "PASS",
+      "tdt_home": "/private/tmp/restore-agent-llm-live-acceptance/tdt-home"
+    }
+  },
+  "command": "UV_CACHE_DIR=/private/tmp/preflight-final TDT_HOME=/private/tmp/restore-agent-llm-live-acceptance/tdt-home uv run --no-sync python <preflight script>",
+  "observed_at": "2026-08-15T06:35Z",
+  "record_type": "live-preflight",
+  "status": "PASS",
+  "target_root": "/private/tmp/restore-agent-llm-live-acceptance/tdt-home"
+}

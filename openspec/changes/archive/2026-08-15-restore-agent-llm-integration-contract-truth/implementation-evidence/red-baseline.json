@@ -1,0 +1,2668 @@
+{
+  "captured_at": "2026-08-14T18:22:27.477089+00:00",
+  "categories": {
+    "cli_model_resolution": {
+      "file_count": 26,
+      "files": [
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed.json",
+          "repository": "agent-core",
+          "sha256": "007f1d18fcf9691f73521ce1e7a1d6a1e349b0fdee1871c43b989b9072e104bd"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc.json",
+          "repository": "agent-core",
+          "sha256": "bc21adb7f3412f519041d98cf781b61547ac3c123b43045a96275630840695e5"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "d6ffa71683692d539699d26a6c647c03236f020a3e18317d25a143da359d0026"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "ab3230e77086e31fb8692bb6d86037ddcdfb09a414597be9b604712fa177ed42"
+        },
+        {
+          "line_matches": 7,
+          "path": "docs/configuration.md",
+          "repository": "agent-core",
+          "sha256": "5ec1fc8c4948fe6d472f090fc6838307bb76763fceed5fa60c9c5aecc7d7b2f8"
+        },
+        {
+          "line_matches": 5,
+          "path": "docs/extending.md",
+          "repository": "agent-core",
+          "sha256": "2f2e5d7a3ae8eee4a2eec1ec316cefdae01e1fe0fdd93e2d141e86d3dafd984f"
+        },
+        {
+          "line_matches": 9,
+          "path": "src/agent_core/_ai/models.py",
+          "repository": "agent-core",
+          "sha256": "9fb2a566c3c0bd081abc6ba8aa8771803c238c103972bb7356b9b29c327127fa"
+        },
+        {
+          "line_matches": 1,
+          "path": ".agents/skills/doc-sync/SKILL.md",
+          "repository": "agent-docs-sync",
+          "sha256": "da6aaecdf6affe2e2c53653b57450b37005fb6e4120225f8375f574611ba5521"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/configuration.md",
+          "repository": "agent-docs-sync",
+          "sha256": "679c37dce1c73666065609b21ec4d1962ccd61ae0b1bae1b7f8209fb6b09f6a8"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_tdt_projection.py",
+          "repository": "ai-harness-skills",
+          "sha256": "135ed769dcafa4eb3318bef4b8f20b7b34d38e1183e542f1bc2cedea9b6c04b1"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a.json",
+          "repository": "tdt-core",
+          "sha256": "9197f3540bedec35b36e723dc0f9c8117f2c07a7e58d90dd2611a870fbf87e4d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a.json",
+          "repository": "tdt-core",
+          "sha256": "dbc789066fe51e7464edea9440f57cec94029302f98a95f69ebd85ca82ceb66d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a-w1-0.json",
+          "repository": "tdt-core",
+          "sha256": "4f02479b757ceaea7d41f6b06639e0b048062cf81236ccba035b48f11e15e7ad"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a-w2-0.json",
+          "repository": "tdt-core",
+          "sha256": "26ebb8da010fe201df95ac6f8dbf24aa52839e671e14b07382dc8db3d0e0a66a"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a-w1-0.json",
+          "repository": "tdt-core",
+          "sha256": "cfe9ee052adcb7106bc4dbca87b9431f3f08d722e74b8fba2064e8f9b66491b6"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a-w2-0.json",
+          "repository": "tdt-core",
+          "sha256": "4706697f217108aa01157fa19c7b2a14d3614e8c6424e74885130a716dbdf89a"
+        },
+        {
+          "line_matches": 3,
+          "path": "scripts/verify_v2_codex_acceptance.py",
+          "repository": "tdt-core",
+          "sha256": "ba2ce9937f4588a484842a92f5462b37983c339253894b2fda33382167f32333"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/tdt_core/__init__.py",
+          "repository": "tdt-core",
+          "sha256": "56ac00c18073f16530f08321a3aa45e7f7a20dc122caf655c87b6bbd0281d50c"
+        },
+        {
+          "line_matches": 11,
+          "path": "src/tdt_core/agent_profile.py",
+          "repository": "tdt-core",
+          "sha256": "cfd6c91c38ce58503d4f7f0ae767d31ecf5ca241469f4f0c2157561cbd07a369"
+        },
+        {
+          "line_matches": 10,
+          "path": "src/tdt_core/provider_model_profile.py",
+          "repository": "tdt-core",
+          "sha256": "6c6ed65df96fc68b2bf8e9b9509ca77aefea05c3684c8b8ae840658edff78c71"
+        },
+        {
+          "line_matches": 6,
+          "path": "tests/test_canonical_cli_selection_api.py",
+          "repository": "tdt-core",
+          "sha256": "b2e20891a045e13b54930c6d5f3d6563f46b22936771f2febf4fa15b7395286d"
+        },
+        {
+          "line_matches": 14,
+          "path": "tests/test_canonical_cli_selection_resolution.py",
+          "repository": "tdt-core",
+          "sha256": "fdb00fc638db811a4d83d2ce5276ed513039c5c471b3c82233bc4abf1ff6bfc9"
+        },
+        {
+          "line_matches": 12,
+          "path": "tests/test_llm_profile_v2.py",
+          "repository": "tdt-core",
+          "sha256": "e225b9e9bd604ce907147447aa5e586e24095828afd1f99c6ee7acf64cee90d1"
+        },
+        {
+          "line_matches": 17,
+          "path": "tests/test_phase3_cli_selection.py",
+          "repository": "tdt-core",
+          "sha256": "4d21a7245ddec900302604150a71aab4e28c2b92be6a7ad396af363f2d911790"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_project_canonical_cli_profile.py",
+          "repository": "tdt-core",
+          "sha256": "53d5eaf95ce187ffa2018642b3e4f0a8dc544a9ad190519c9b3d9c2dd42bc2d8"
+        },
+        {
+          "line_matches": 36,
+          "path": "tests/test_provider_model_cli_fields.py",
+          "repository": "tdt-core",
+          "sha256": "e5a2fe5d3b24f67effcd184d65eb2073147a6b1b33f95c434f94778fcd2ebe57"
+        }
+      ],
+      "line_match_count": 145
+    },
+    "config_owning_base_agent": {
+      "file_count": 54,
+      "files": [
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed.json",
+          "repository": "agent-core",
+          "sha256": "007f1d18fcf9691f73521ce1e7a1d6a1e349b0fdee1871c43b989b9072e104bd"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc.json",
+          "repository": "agent-core",
+          "sha256": "bc21adb7f3412f519041d98cf781b61547ac3c123b43045a96275630840695e5"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "d6ffa71683692d539699d26a6c647c03236f020a3e18317d25a143da359d0026"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed-w2-0.json",
+          "repository": "agent-core",
+          "sha256": "b8598d2ca2ef11b3c8f5665ce62332bbd0f1d8f25a7c5573fc019a43e890b6e2"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "ab3230e77086e31fb8692bb6d86037ddcdfb09a414597be9b604712fa177ed42"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc-w2-0.json",
+          "repository": "agent-core",
+          "sha256": "230ebe946083cdb3c8c73c004ddace0214886fbe0de908d1d6da20be0ada507b"
+        },
+        {
+          "line_matches": 1,
+          "path": "coverage.json",
+          "repository": "agent-core",
+          "sha256": "e4994bf85b59ea5dd6b9f33babd00ff2e0df6509547bcbaf838ffe687c11e05d"
+        },
+        {
+          "line_matches": 13,
+          "path": "docs/building-agents.md",
+          "repository": "agent-core",
+          "sha256": "b0938731378709b0ad80eff021fed2bb6082dd02227668051981d084c715be12"
+        },
+        {
+          "line_matches": 3,
+          "path": "docs/configuration.md",
+          "repository": "agent-core",
+          "sha256": "5ec1fc8c4948fe6d472f090fc6838307bb76763fceed5fa60c9c5aecc7d7b2f8"
+        },
+        {
+          "line_matches": 1,
+          "path": "examples/code_reviewer/src/code_reviewer/adapter.py",
+          "repository": "agent-core",
+          "sha256": "882d1c273f9935d20b7f87c89863aa377f5cf8b7b254270ceb8e20a2f927f673"
+        },
+        {
+          "line_matches": 1,
+          "path": "examples/code_reviewer/src/code_reviewer/runtime.py",
+          "repository": "agent-core",
+          "sha256": "61d715aa08d2e569c62c6f8af34cf243a34d77cf8d75e96fdac83ef5d9b537c8"
+        },
+        {
+          "line_matches": 1,
+          "path": "examples/code_reviewer/tests/test_runtime.py",
+          "repository": "agent-core",
+          "sha256": "6ef69299e4d79939b0b1e609fae60b12175cbeec107462dd7150588ccf84b076"
+        },
+        {
+          "line_matches": 1,
+          "path": "examples/custom_tool.py",
+          "repository": "agent-core",
+          "sha256": "c6ecc0fb028970fadbaf43b4cd42b241d1d57189bdfcafc792fc8b10c06914a7"
+        },
+        {
+          "line_matches": 1,
+          "path": "examples/flavor_composition.py",
+          "repository": "agent-core",
+          "sha256": "43c6d2d67bd21240679832a596b129ea7d75b1ca546e1676d35f289f507007ca"
+        },
+        {
+          "line_matches": 1,
+          "path": "examples/minimal_agent.py",
+          "repository": "agent-core",
+          "sha256": "ce41575312455e9096fbc2f206a9310b6604f83d4166ed31510c614a7de241c4"
+        },
+        {
+          "line_matches": 7,
+          "path": "src/agent_core/agent_base/agent.py",
+          "repository": "agent-core",
+          "sha256": "3429f262cb4e10adbd67e3db4aca4d7888e7c0fc881532f932b3cdcdeb493eab"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/agent_core/cli/app.py",
+          "repository": "agent-core",
+          "sha256": "6606b9d7b4f1a4229ff3d273e85e5c519696fe624d30a788d996526a86af5de4"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/cli/config_cmd.py",
+          "repository": "agent-core",
+          "sha256": "7a5142fedec0aa307665f149782cda3b92704f765c18a792c1c958065be4c3fc"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/cli/eval_cmd.py",
+          "repository": "agent-core",
+          "sha256": "ade302841005bd9cb7b562918e1e8af2ed209ba5d2a563ac79976221277d4a75"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/cli/health_cmd.py",
+          "repository": "agent-core",
+          "sha256": "a7f92ec962da794204cc0df5abd5b2bbfbab598dd3dbbee51f0b15a34289e085"
+        },
+        {
+          "line_matches": 4,
+          "path": "src/agent_core/cli/schedules.py",
+          "repository": "agent-core",
+          "sha256": "db4bc4fee8d071577690bdf5ff6d1927ca146be82d50057b7ba319e737a892eb"
+        },
+        {
+          "line_matches": 4,
+          "path": "src/agent_core/cli/skills.py",
+          "repository": "agent-core",
+          "sha256": "68f91a01f1c23a238ef74976f485144d5d846b4213efc95294add934b9028a30"
+        },
+        {
+          "line_matches": 7,
+          "path": "src/agent_core/cli/utils.py",
+          "repository": "agent-core",
+          "sha256": "1dfe5286771aeb27fe46d863283382823f5e96add57fd52c874c92ebb876953a"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/foundation/__init__.py",
+          "repository": "agent-core",
+          "sha256": "3ac95e9de0ff3754d60aeb12af73c523247ce542a958aee3fccc0a2f97623e18"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/foundation/settings.py",
+          "repository": "agent-core",
+          "sha256": "8c76ad0181d56219c77797fd921a469ae759517739ad0c99b17c898500430e5c"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/observability/scorers/runner.py",
+          "repository": "agent-core",
+          "sha256": "1e4b66f9eb498420506b7b85fa0e736e82cf1fc55c6743a4cc95ea00283ea39b"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/agent_core/orchestration/graph.py",
+          "repository": "agent-core",
+          "sha256": "b4bdfd6356f115ddc32930f13d678876c32079624fc5e8cbba263cf30f00c8ff"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/sdk/__init__.py",
+          "repository": "agent-core",
+          "sha256": "54da41db35e9587a70ae4133911bbc5996886c7f575e0002407e139e66f8a055"
+        },
+        {
+          "line_matches": 4,
+          "path": "src/agent_core/sdk/agents.py",
+          "repository": "agent-core",
+          "sha256": "e7707e8e77a2fe12cd01fb90add3d5aaec36713b58019b258da31327c0abb255"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/sdk/config.py",
+          "repository": "agent-core",
+          "sha256": "9f4850a3bca74114dcc53cbd399309f0b7fc1d7e740cb2aadb000db22efb8cdf"
+        },
+        {
+          "line_matches": 6,
+          "path": "src/agent_core/sdk/memory.py",
+          "repository": "agent-core",
+          "sha256": "43ae6250953692c98aaed11860ea302c87e2528d6833d77a123c3050c998956f"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/sdk/observability.py",
+          "repository": "agent-core",
+          "sha256": "3a380fc5d072936076f27bf6fd08cf00692e8aaf1ccbc962d82ec695be034df4"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/tool_registry/builtins/http_request.py",
+          "repository": "agent-core",
+          "sha256": "051ebe027b0f69f291cb5ed6586e8fbf0ecf37493c151b23eaa1c51d40b7be53"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/_ai/test_native_approvals.py",
+          "repository": "agent-core",
+          "sha256": "80c3e947d7af3b599c81fd049d9db2adb2a229e18b60c28c0e7e7796931344f0"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/_ai/test_run_controls.py",
+          "repository": "agent-core",
+          "sha256": "a788a9a08dcd4e4a2d3ffcd2a4bc3772eedd22744d17dca77c3a094ee7199149"
+        },
+        {
+          "line_matches": 13,
+          "path": "tests/agent_base/test_agent.py",
+          "repository": "agent-core",
+          "sha256": "33ff5e44c7a787bd723a339bfceb3f8d21f1459f0e64a0fc7f2516f66237ac80"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/agent_base/test_run_scope.py",
+          "repository": "agent-core",
+          "sha256": "a9b543e120765cbfac267d3fb9489b850c8b281dd55aa0fb2f4f4edbbbc19987"
+        },
+        {
+          "line_matches": 12,
+          "path": "tests/ai/test_models.py",
+          "repository": "agent-core",
+          "sha256": "63a19be32b43680e52467082181553b837e523353b4b0b8fbcb3db7c378c47c7"
+        },
+        {
+          "line_matches": 3,
+          "path": "tests/cli/test_cli.py",
+          "repository": "agent-core",
+          "sha256": "d2266022035e98c47b2d35fb6e23316247984cf2f9ca9af0d55d358da828075b"
+        },
+        {
+          "line_matches": 7,
+          "path": "tests/cli/test_eval_cmd_extended.py",
+          "repository": "agent-core",
+          "sha256": "5060e42975750d6ea7679e15b766ab0ed1931f393e52fd854850b6e2cf78c790"
+        },
+        {
+          "line_matches": 10,
+          "path": "tests/cli/test_utils_extended.py",
+          "repository": "agent-core",
+          "sha256": "3e1e112ca581e548ffb2968471ee4c1927387d93b8e76fce153d3d62fcf82f1a"
+        },
+        {
+          "line_matches": 63,
+          "path": "tests/foundation/test_settings.py",
+          "repository": "agent-core",
+          "sha256": "06681de945e18d017fe1b157a3aeb2410d845ef494826dd4f30ea694c947606b"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/sdk/test_agents.py",
+          "repository": "agent-core",
+          "sha256": "3f7463a786a34b0c1d7a46230c6621eb961817d2c14f32dc3383e8d8b11ba704"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/test_characterization.py",
+          "repository": "agent-core",
+          "sha256": "cdb27611d76decb67371e395b7557531b87a7b47a0ec778d6fee20d1071e9ade"
+        },
+        {
+          "line_matches": 1,
+          "path": ".agents/skills/doc-sync/SKILL.md",
+          "repository": "agent-docs-sync",
+          "sha256": "da6aaecdf6affe2e2c53653b57450b37005fb6e4120225f8375f574611ba5521"
+        },
+        {
+          "line_matches": 1,
+          "path": "README.md",
+          "repository": "agent-docs-sync",
+          "sha256": "363b214801f242a06e03c22c4bee49d99dfe0edd75099ddd9ed993f30785562f"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/architecture.md",
+          "repository": "agent-docs-sync",
+          "sha256": "3ebbcb1097798210b241ed80b5d13484a987b38b89f1f3f0bb588934dad11f44"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/configuration.md",
+          "repository": "agent-docs-sync",
+          "sha256": "679c37dce1c73666065609b21ec4d1962ccd61ae0b1bae1b7f8209fb6b09f6a8"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/40620e3b95d0ecf7e31269479300357b745d7e57ac6bdeaa5cf7fa2f0e875d7f/40620e3b95d0ecf7e31269479300357b745d7e57ac6bdeaa5cf7fa2f0e875d7f-w1-0.json",
+          "repository": "agent-harness",
+          "sha256": "7e42c3b68610a9015d480ac0789c9b51549e8a8b0017a69621325e6aea5384a9"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e-w1-0.json",
+          "repository": "agent-harness",
+          "sha256": "58bc5a228ca7a18be251e03cf3641a6e06cffb63db04429edc3a8cd986005aa1"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_harness/config.py",
+          "repository": "agent-harness",
+          "sha256": "7add46c72a07b4ee057048468369e6a874018c63eb655bc171a513b0b6069a79"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/be45ce5841aa6cb9a7deadbb4e2b12b42d6ac7e64ff4bacbb81bf96fdbf7759c.json",
+          "repository": "ai-review",
+          "sha256": "6b9b647992b2387ba720394e437fa3855ddf937dcfa8a8194e8a1fb61bc00c22"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/be45ce5841aa6cb9a7deadbb4e2b12b42d6ac7e64ff4bacbb81bf96fdbf7759c/be45ce5841aa6cb9a7deadbb4e2b12b42d6ac7e64ff4bacbb81bf96fdbf7759c-w1-0.json",
+          "repository": "ai-review",
+          "sha256": "97412965ae601e2f747cd259594b5efab0343b6256529b40f286063b0e8712f7"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/ai_review/config/settings.py",
+          "repository": "ai-review",
+          "sha256": "dff4b378e4b6d9ff56bca5366e4eaf2f0905635e007d84535bb6db4f45d06a15"
+        }
+      ],
+      "line_match_count": 212
+    },
+    "consumer_local_fallback": {
+      "file_count": 43,
+      "files": [
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed.json",
+          "repository": "agent-core",
+          "sha256": "007f1d18fcf9691f73521ce1e7a1d6a1e349b0fdee1871c43b989b9072e104bd"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc.json",
+          "repository": "agent-core",
+          "sha256": "bc21adb7f3412f519041d98cf781b61547ac3c123b43045a96275630840695e5"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "d6ffa71683692d539699d26a6c647c03236f020a3e18317d25a143da359d0026"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "ab3230e77086e31fb8692bb6d86037ddcdfb09a414597be9b604712fa177ed42"
+        },
+        {
+          "line_matches": 1,
+          "path": "CHANGELOG.md",
+          "repository": "agent-core",
+          "sha256": "926bfad6efc73c9eb0ce3d11e4c90532f12ba20d6f19ed12f0855a1f39ec1079"
+        },
+        {
+          "line_matches": 1,
+          "path": "README.md",
+          "repository": "agent-core",
+          "sha256": "4359d3e5cb2ea2fb2470b5389c13ec30a8440602f9830ad558c507de3929d170"
+        },
+        {
+          "line_matches": 1,
+          "path": "SPEC_INDEX.md",
+          "repository": "agent-core",
+          "sha256": "149eaaef2aa991fe6a02936939b183022f484b908e8b03307d048abf3cd5b641"
+        },
+        {
+          "line_matches": 1,
+          "path": "coverage.json",
+          "repository": "agent-core",
+          "sha256": "e4994bf85b59ea5dd6b9f33babd00ff2e0df6509547bcbaf838ffe687c11e05d"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/architecture.md",
+          "repository": "agent-core",
+          "sha256": "c2d334f265a0ae75219440e6825be24a21134df4cc134d14000a8908450549bf"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/extending.md",
+          "repository": "agent-core",
+          "sha256": "2f2e5d7a3ae8eee4a2eec1ec316cefdae01e1fe0fdd93e2d141e86d3dafd984f"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/research/feature-mapping.md",
+          "repository": "agent-core",
+          "sha256": "e94f7924652620a0acde9be6677a976c06247c285c2e1f4b4c5de0c42d755971"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/research/pydanticai-langgraph.md",
+          "repository": "agent-core",
+          "sha256": "ef09bfa4387f7c115f0feb8d400e09276ef409dfcc8364b1aa12e1accdf80055"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/_ai/__init__.py",
+          "repository": "agent-core",
+          "sha256": "6e241e9424ff974ef7421c228dce0cea4f8bfcb2b93280915f8b738415ab89c0"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/agent_core/_ai/models.py",
+          "repository": "agent-core",
+          "sha256": "9fb2a566c3c0bd081abc6ba8aa8771803c238c103972bb7356b9b29c327127fa"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/cli/utils.py",
+          "repository": "agent-core",
+          "sha256": "1dfe5286771aeb27fe46d863283382823f5e96add57fd52c874c92ebb876953a"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/sdk/__init__.py",
+          "repository": "agent-core",
+          "sha256": "54da41db35e9587a70ae4133911bbc5996886c7f575e0002407e139e66f8a055"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/agent_core/sdk/config.py",
+          "repository": "agent-core",
+          "sha256": "9f4850a3bca74114dcc53cbd399309f0b7fc1d7e740cb2aadb000db22efb8cdf"
+        },
+        {
+          "line_matches": 5,
+          "path": "tests/_ai/test_model_loading.py",
+          "repository": "agent-core",
+          "sha256": "47f4aa84b7d26cb7bdd42331cc9612b05eae4123d66d9b7e1af4edfac7661227"
+        },
+        {
+          "line_matches": 9,
+          "path": "tests/_ai/test_snapshot_construction_contracts.py",
+          "repository": "agent-core",
+          "sha256": "b193d2c4fe1563c6acf5cd27d01abc45de2a4db2b34460f1bb62b671efca411e"
+        },
+        {
+          "line_matches": 4,
+          "path": "tests/ai/test_models.py",
+          "repository": "agent-core",
+          "sha256": "63a19be32b43680e52467082181553b837e523353b4b0b8fbcb3db7c378c47c7"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/cli/test_utils_extended.py",
+          "repository": "agent-core",
+          "sha256": "3e1e112ca581e548ffb2968471ee4c1927387d93b8e76fce153d3d62fcf82f1a"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/47c77a0f1fb3f1c2931b11a12330fdf8013345ac767a28b2628ae5c2f83e6d90.json",
+          "repository": "agent-docs-sync",
+          "sha256": "399053e09f5262d1cd8592d0090e8d3bdd099354a62b2882275831789715e7b8"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22.json",
+          "repository": "agent-docs-sync",
+          "sha256": "8f84f452a71032c2bcbaab3f13a7b9c445e060c52c52bc03f7c12a650466f78f"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/47c77a0f1fb3f1c2931b11a12330fdf8013345ac767a28b2628ae5c2f83e6d90/47c77a0f1fb3f1c2931b11a12330fdf8013345ac767a28b2628ae5c2f83e6d90-w1-0.json",
+          "repository": "agent-docs-sync",
+          "sha256": "01d27b8ec0868c3f56554e51811005ef90e2b9852888b6053578a5fc5d801dbe"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22-w1-0.json",
+          "repository": "agent-docs-sync",
+          "sha256": "3d9ade2607001288eea1d2c4fb2a40098789cfe56ad2083c23df19d5dd835d82"
+        },
+        {
+          "line_matches": 1,
+          "path": "README.md",
+          "repository": "agent-docs-sync",
+          "sha256": "363b214801f242a06e03c22c4bee49d99dfe0edd75099ddd9ed993f30785562f"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_docs_sync/agents/generation.py",
+          "repository": "agent-docs-sync",
+          "sha256": "efbdb8d24822567677f996d16de666fd348490e998d863909f18b8440fa7181f"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_config_contract.py",
+          "repository": "agent-docs-sync",
+          "sha256": "7e45bc0d46cfa837fe36223959842c9d29c75908fccbef0253fa3b692ba6fff1"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/test_operation_context.py",
+          "repository": "agent-docs-sync",
+          "sha256": "75ae4f3153c7efc3da88bcee4ad1e1bf6fece49475597ae3b5e3bf15f5ba4c9b"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/40620e3b95d0ecf7e31269479300357b745d7e57ac6bdeaa5cf7fa2f0e875d7f.json",
+          "repository": "agent-harness",
+          "sha256": "583b14b7350600be24cafb8f1d61eb5c1d8f0e94c18cdfa2b06d00ec96eb904d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e.json",
+          "repository": "agent-harness",
+          "sha256": "3f8f220362a3bd9c34b07f7994ce3013000f495bb0d0e7a52b689eb1bbcce063"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e-w1-0.json",
+          "repository": "agent-harness",
+          "sha256": "58bc5a228ca7a18be251e03cf3641a6e06cffb63db04429edc3a8cd986005aa1"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/1b63fc9300eecb17928199eb3af6c6957f68d02456f2f53fe57757d07d30ed0d.json",
+          "repository": "ai-harness-skills",
+          "sha256": "dd2aa6fcbe61d9077c73d18896acaba3d839c7ce23c95b8c73a17845eb69e4da"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/1b63fc9300eecb17928199eb3af6c6957f68d02456f2f53fe57757d07d30ed0d/1b63fc9300eecb17928199eb3af6c6957f68d02456f2f53fe57757d07d30ed0d-w2-0.json",
+          "repository": "ai-harness-skills",
+          "sha256": "5334ac2f0086546bc82a06e692e5b59edca59d5431aa892ff7fad997657bb933"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/be45ce5841aa6cb9a7deadbb4e2b12b42d6ac7e64ff4bacbb81bf96fdbf7759c.json",
+          "repository": "ai-review",
+          "sha256": "6b9b647992b2387ba720394e437fa3855ddf937dcfa8a8194e8a1fb61bc00c22"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/be45ce5841aa6cb9a7deadbb4e2b12b42d6ac7e64ff4bacbb81bf96fdbf7759c/be45ce5841aa6cb9a7deadbb4e2b12b42d6ac7e64ff4bacbb81bf96fdbf7759c-w1-0.json",
+          "repository": "ai-review",
+          "sha256": "97412965ae601e2f747cd259594b5efab0343b6256529b40f286063b0e8712f7"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a.json",
+          "repository": "tdt-core",
+          "sha256": "9197f3540bedec35b36e723dc0f9c8117f2c07a7e58d90dd2611a870fbf87e4d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a.json",
+          "repository": "tdt-core",
+          "sha256": "dbc789066fe51e7464edea9440f57cec94029302f98a95f69ebd85ca82ceb66d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a-w1-0.json",
+          "repository": "tdt-core",
+          "sha256": "4f02479b757ceaea7d41f6b06639e0b048062cf81236ccba035b48f11e15e7ad"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a-w2-0.json",
+          "repository": "tdt-core",
+          "sha256": "26ebb8da010fe201df95ac6f8dbf24aa52839e671e14b07382dc8db3d0e0a66a"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a-w1-0.json",
+          "repository": "tdt-core",
+          "sha256": "cfe9ee052adcb7106bc4dbca87b9431f3f08d722e74b8fba2064e8f9b66491b6"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a-w2-0.json",
+          "repository": "tdt-core",
+          "sha256": "4706697f217108aa01157fa19c7b2a14d3614e8c6424e74885130a716dbdf89a"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/tdt_core/data/environment-key-registry.json",
+          "repository": "tdt-core",
+          "sha256": "14949627344de9dae5acb78143aa8339942fd80e6fcb89a73b3ecf9c91e79eaf"
+        }
+      ],
+      "line_match_count": 66
+    },
+    "extra_model_factories": {
+      "file_count": 21,
+      "files": [
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed.json",
+          "repository": "agent-core",
+          "sha256": "007f1d18fcf9691f73521ce1e7a1d6a1e349b0fdee1871c43b989b9072e104bd"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc.json",
+          "repository": "agent-core",
+          "sha256": "bc21adb7f3412f519041d98cf781b61547ac3c123b43045a96275630840695e5"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "d6ffa71683692d539699d26a6c647c03236f020a3e18317d25a143da359d0026"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "ab3230e77086e31fb8692bb6d86037ddcdfb09a414597be9b604712fa177ed42"
+        },
+        {
+          "line_matches": 1,
+          "path": "coverage.json",
+          "repository": "agent-core",
+          "sha256": "e4994bf85b59ea5dd6b9f33babd00ff2e0df6509547bcbaf838ffe687c11e05d"
+        },
+        {
+          "line_matches": 4,
+          "path": "src/agent_core/_ai/__init__.py",
+          "repository": "agent-core",
+          "sha256": "6e241e9424ff974ef7421c228dce0cea4f8bfcb2b93280915f8b738415ab89c0"
+        },
+        {
+          "line_matches": 5,
+          "path": "src/agent_core/_ai/models.py",
+          "repository": "agent-core",
+          "sha256": "9fb2a566c3c0bd081abc6ba8aa8771803c238c103972bb7356b9b29c327127fa"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/cli/utils.py",
+          "repository": "agent-core",
+          "sha256": "1dfe5286771aeb27fe46d863283382823f5e96add57fd52c874c92ebb876953a"
+        },
+        {
+          "line_matches": 4,
+          "path": "src/agent_core/sdk/__init__.py",
+          "repository": "agent-core",
+          "sha256": "54da41db35e9587a70ae4133911bbc5996886c7f575e0002407e139e66f8a055"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/agent_core/sdk/agents.py",
+          "repository": "agent-core",
+          "sha256": "e7707e8e77a2fe12cd01fb90add3d5aaec36713b58019b258da31327c0abb255"
+        },
+        {
+          "line_matches": 9,
+          "path": "tests/_ai/test_model_loading.py",
+          "repository": "agent-core",
+          "sha256": "47f4aa84b7d26cb7bdd42331cc9612b05eae4123d66d9b7e1af4edfac7661227"
+        },
+        {
+          "line_matches": 22,
+          "path": "tests/_ai/test_snapshot_construction_contracts.py",
+          "repository": "agent-core",
+          "sha256": "b193d2c4fe1563c6acf5cd27d01abc45de2a4db2b34460f1bb62b671efca411e"
+        },
+        {
+          "line_matches": 4,
+          "path": "tests/ai/test_models.py",
+          "repository": "agent-core",
+          "sha256": "63a19be32b43680e52467082181553b837e523353b4b0b8fbcb3db7c378c47c7"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/cli/test_utils_extended.py",
+          "repository": "agent-core",
+          "sha256": "3e1e112ca581e548ffb2968471ee4c1927387d93b8e76fce153d3d62fcf82f1a"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/sdk/test_agents.py",
+          "repository": "agent-core",
+          "sha256": "3f7463a786a34b0c1d7a46230c6621eb961817d2c14f32dc3383e8d8b11ba704"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22.json",
+          "repository": "agent-docs-sync",
+          "sha256": "8f84f452a71032c2bcbaab3f13a7b9c445e060c52c52bc03f7c12a650466f78f"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/47c77a0f1fb3f1c2931b11a12330fdf8013345ac767a28b2628ae5c2f83e6d90/47c77a0f1fb3f1c2931b11a12330fdf8013345ac767a28b2628ae5c2f83e6d90-w1-0.json",
+          "repository": "agent-docs-sync",
+          "sha256": "01d27b8ec0868c3f56554e51811005ef90e2b9852888b6053578a5fc5d801dbe"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22-w1-0.json",
+          "repository": "agent-docs-sync",
+          "sha256": "3d9ade2607001288eea1d2c4fb2a40098789cfe56ad2083c23df19d5dd835d82"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_docs_sync/agents/generation.py",
+          "repository": "agent-docs-sync",
+          "sha256": "efbdb8d24822567677f996d16de666fd348490e998d863909f18b8440fa7181f"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_config_contract.py",
+          "repository": "agent-docs-sync",
+          "sha256": "7e45bc0d46cfa837fe36223959842c9d29c75908fccbef0253fa3b692ba6fff1"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_operation_context.py",
+          "repository": "agent-docs-sync",
+          "sha256": "75ae4f3153c7efc3da88bcee4ad1e1bf6fece49475597ae3b5e3bf15f5ba4c9b"
+        }
+      ],
+      "line_match_count": 67
+    },
+    "legacy_config_loader": {
+      "file_count": 45,
+      "files": [
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed.json",
+          "repository": "agent-core",
+          "sha256": "007f1d18fcf9691f73521ce1e7a1d6a1e349b0fdee1871c43b989b9072e104bd"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc.json",
+          "repository": "agent-core",
+          "sha256": "bc21adb7f3412f519041d98cf781b61547ac3c123b43045a96275630840695e5"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "d6ffa71683692d539699d26a6c647c03236f020a3e18317d25a143da359d0026"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "ab3230e77086e31fb8692bb6d86037ddcdfb09a414597be9b604712fa177ed42"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc-w2-0.json",
+          "repository": "agent-core",
+          "sha256": "230ebe946083cdb3c8c73c004ddace0214886fbe0de908d1d6da20be0ada507b"
+        },
+        {
+          "line_matches": 1,
+          "path": "coverage.json",
+          "repository": "agent-core",
+          "sha256": "e4994bf85b59ea5dd6b9f33babd00ff2e0df6509547bcbaf838ffe687c11e05d"
+        },
+        {
+          "line_matches": 6,
+          "path": "docs/agent-config.md",
+          "repository": "agent-core",
+          "sha256": "d26341f40f162d899568c2d51e9b8eb18cebc3f2a5eb0ac3049c73bbeea0229a"
+        },
+        {
+          "line_matches": 5,
+          "path": "docs/configuration.md",
+          "repository": "agent-core",
+          "sha256": "5ec1fc8c4948fe6d472f090fc6838307bb76763fceed5fa60c9c5aecc7d7b2f8"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/research/feature-mapping.md",
+          "repository": "agent-core",
+          "sha256": "e94f7924652620a0acde9be6677a976c06247c285c2e1f4b4c5de0c42d755971"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/research/upgrade-opportunities.md",
+          "repository": "agent-core",
+          "sha256": "bd16c9eb88ce0ef5c9989b0e717afd9d277f70f494519af1324037a44cc45328"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/_ai/config_loader.py",
+          "repository": "agent-core",
+          "sha256": "f5e38610daf87f3c641e0130506a92478747f1e5a2fa7f6ccb48234d16b18cf6"
+        },
+        {
+          "line_matches": 7,
+          "path": "src/agent_core/_ai/models.py",
+          "repository": "agent-core",
+          "sha256": "9fb2a566c3c0bd081abc6ba8aa8771803c238c103972bb7356b9b29c327127fa"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/agent_core/agent_base/agent.py",
+          "repository": "agent-core",
+          "sha256": "3429f262cb4e10adbd67e3db4aca4d7888e7c0fc881532f932b3cdcdeb493eab"
+        },
+        {
+          "line_matches": 4,
+          "path": "src/agent_core/cli/utils.py",
+          "repository": "agent-core",
+          "sha256": "1dfe5286771aeb27fe46d863283382823f5e96add57fd52c874c92ebb876953a"
+        },
+        {
+          "line_matches": 5,
+          "path": "src/agent_core/sdk/agents.py",
+          "repository": "agent-core",
+          "sha256": "e7707e8e77a2fe12cd01fb90add3d5aaec36713b58019b258da31327c0abb255"
+        },
+        {
+          "line_matches": 3,
+          "path": "tests/_ai/test_agent_spec_convergence.py",
+          "repository": "agent-core",
+          "sha256": "c69586dba91f6c59f4a2b8b9712a5220d425b55f8f2d7e3a19096f1450c2d5aa"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/_ai/test_snapshot_construction_contracts.py",
+          "repository": "agent-core",
+          "sha256": "b193d2c4fe1563c6acf5cd27d01abc45de2a4db2b34460f1bb62b671efca411e"
+        },
+        {
+          "line_matches": 5,
+          "path": "tests/cli/test_utils_extended.py",
+          "repository": "agent-core",
+          "sha256": "3e1e112ca581e548ffb2968471ee4c1927387d93b8e76fce153d3d62fcf82f1a"
+        },
+        {
+          "line_matches": 10,
+          "path": "tests/foundation/test_settings.py",
+          "repository": "agent-core",
+          "sha256": "06681de945e18d017fe1b157a3aeb2410d845ef494826dd4f30ea694c947606b"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/sdk/test_agents.py",
+          "repository": "agent-core",
+          "sha256": "3f7463a786a34b0c1d7a46230c6621eb961817d2c14f32dc3383e8d8b11ba704"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22.json",
+          "repository": "agent-docs-sync",
+          "sha256": "8f84f452a71032c2bcbaab3f13a7b9c445e060c52c52bc03f7c12a650466f78f"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22-w1-0.json",
+          "repository": "agent-docs-sync",
+          "sha256": "3d9ade2607001288eea1d2c4fb2a40098789cfe56ad2083c23df19d5dd835d82"
+        },
+        {
+          "line_matches": 4,
+          "path": "docs/configuration.md",
+          "repository": "agent-docs-sync",
+          "sha256": "679c37dce1c73666065609b21ec4d1962ccd61ae0b1bae1b7f8209fb6b09f6a8"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_config_contract.py",
+          "repository": "agent-docs-sync",
+          "sha256": "7e45bc0d46cfa837fe36223959842c9d29c75908fccbef0253fa3b692ba6fff1"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/40620e3b95d0ecf7e31269479300357b745d7e57ac6bdeaa5cf7fa2f0e875d7f.json",
+          "repository": "agent-harness",
+          "sha256": "583b14b7350600be24cafb8f1d61eb5c1d8f0e94c18cdfa2b06d00ec96eb904d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e.json",
+          "repository": "agent-harness",
+          "sha256": "3f8f220362a3bd9c34b07f7994ce3013000f495bb0d0e7a52b689eb1bbcce063"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/40620e3b95d0ecf7e31269479300357b745d7e57ac6bdeaa5cf7fa2f0e875d7f/40620e3b95d0ecf7e31269479300357b745d7e57ac6bdeaa5cf7fa2f0e875d7f-w1-0.json",
+          "repository": "agent-harness",
+          "sha256": "7e42c3b68610a9015d480ac0789c9b51549e8a8b0017a69621325e6aea5384a9"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e-w1-0.json",
+          "repository": "agent-harness",
+          "sha256": "58bc5a228ca7a18be251e03cf3641a6e06cffb63db04429edc3a8cd986005aa1"
+        },
+        {
+          "line_matches": 2,
+          "path": "docs/configuration.md",
+          "repository": "agent-harness",
+          "sha256": "c575f95daeacabf8c896a1ce8a2f48b9e5e3f037e8b08b3b862022219e029588"
+        },
+        {
+          "line_matches": 5,
+          "path": "src/agent_harness/config.py",
+          "repository": "agent-harness",
+          "sha256": "7add46c72a07b4ee057048468369e6a874018c63eb655bc171a513b0b6069a79"
+        },
+        {
+          "line_matches": 15,
+          "path": "tests/test_config.py",
+          "repository": "agent-harness",
+          "sha256": "2639f7dd838182c015e44b1c486f561edac9fe165cb138462bfef9a6f4f5b8c1"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a.json",
+          "repository": "tdt-core",
+          "sha256": "9197f3540bedec35b36e723dc0f9c8117f2c07a7e58d90dd2611a870fbf87e4d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a.json",
+          "repository": "tdt-core",
+          "sha256": "dbc789066fe51e7464edea9440f57cec94029302f98a95f69ebd85ca82ceb66d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a-w1-0.json",
+          "repository": "tdt-core",
+          "sha256": "4f02479b757ceaea7d41f6b06639e0b048062cf81236ccba035b48f11e15e7ad"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a-w2-0.json",
+          "repository": "tdt-core",
+          "sha256": "26ebb8da010fe201df95ac6f8dbf24aa52839e671e14b07382dc8db3d0e0a66a"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a-w1-0.json",
+          "repository": "tdt-core",
+          "sha256": "cfe9ee052adcb7106bc4dbca87b9431f3f08d722e74b8fba2064e8f9b66491b6"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a-w2-0.json",
+          "repository": "tdt-core",
+          "sha256": "4706697f217108aa01157fa19c7b2a14d3614e8c6424e74885130a716dbdf89a"
+        },
+        {
+          "line_matches": 2,
+          "path": "README.md",
+          "repository": "tdt-core",
+          "sha256": "6253b3ec9279856edd8216daef66f804493e18e38e485bef56b820aed674cc7f"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/tdt_core/__init__.py",
+          "repository": "tdt-core",
+          "sha256": "56ac00c18073f16530f08321a3aa45e7f7a20dc122caf655c87b6bbd0281d50c"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/tdt_core/config_loader.py",
+          "repository": "tdt-core",
+          "sha256": "60af2eb84563c6cef61ac2090ab889f0f66f2d9d5552daf829535a11358be48d"
+        },
+        {
+          "line_matches": 43,
+          "path": "tests/test_agent_config.py",
+          "repository": "tdt-core",
+          "sha256": "899783665772566e51a8d15e37bc46699d377698533a79537213f88cffa0f8b9"
+        },
+        {
+          "line_matches": 9,
+          "path": "tests/test_config_primitives.py",
+          "repository": "tdt-core",
+          "sha256": "4216142dcf59569b813f786bc2ccf31d74c393833103cceca21f4e08d9647187"
+        },
+        {
+          "line_matches": 7,
+          "path": "tests/test_llm_profile_v2.py",
+          "repository": "tdt-core",
+          "sha256": "e225b9e9bd604ce907147447aa5e586e24095828afd1f99c6ee7acf64cee90d1"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/test_phase3_atomic_capture.py",
+          "repository": "tdt-core",
+          "sha256": "d6fe3791a450b0380368d5275072bd0bc5f70a5df4bf1cb2c1ae622dc292ef95"
+        },
+        {
+          "line_matches": 20,
+          "path": "tests/test_phase3_compatibility.py",
+          "repository": "tdt-core",
+          "sha256": "99f4207f8b0305c87162a4a7a02f87f2b7a8e0601aa8b87308459abbbcd10ed6"
+        }
+      ],
+      "line_match_count": 186
+    },
+    "legacy_schema_fields": {
+      "file_count": 84,
+      "files": [
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed.json",
+          "repository": "agent-core",
+          "sha256": "007f1d18fcf9691f73521ce1e7a1d6a1e349b0fdee1871c43b989b9072e104bd"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc.json",
+          "repository": "agent-core",
+          "sha256": "bc21adb7f3412f519041d98cf781b61547ac3c123b43045a96275630840695e5"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "d6ffa71683692d539699d26a6c647c03236f020a3e18317d25a143da359d0026"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "ab3230e77086e31fb8692bb6d86037ddcdfb09a414597be9b604712fa177ed42"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc-w2-0.json",
+          "repository": "agent-core",
+          "sha256": "230ebe946083cdb3c8c73c004ddace0214886fbe0de908d1d6da20be0ada507b"
+        },
+        {
+          "line_matches": 7,
+          "path": "CHANGELOG.md",
+          "repository": "agent-core",
+          "sha256": "926bfad6efc73c9eb0ce3d11e4c90532f12ba20d6f19ed12f0855a1f39ec1079"
+        },
+        {
+          "line_matches": 1,
+          "path": "coverage.json",
+          "repository": "agent-core",
+          "sha256": "e4994bf85b59ea5dd6b9f33babd00ff2e0df6509547bcbaf838ffe687c11e05d"
+        },
+        {
+          "line_matches": 12,
+          "path": "docs/configuration.md",
+          "repository": "agent-core",
+          "sha256": "5ec1fc8c4948fe6d472f090fc6838307bb76763fceed5fa60c9c5aecc7d7b2f8"
+        },
+        {
+          "line_matches": 12,
+          "path": "docs/extending.md",
+          "repository": "agent-core",
+          "sha256": "2f2e5d7a3ae8eee4a2eec1ec316cefdae01e1fe0fdd93e2d141e86d3dafd984f"
+        },
+        {
+          "line_matches": 21,
+          "path": "docs/research/architecture-analysis.md",
+          "repository": "agent-core",
+          "sha256": "1cb07bae61c74f118ff4b2b74eb8e1279250d3b9e31f41ef1c08444730b2412d"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/research/feature-mapping.md",
+          "repository": "agent-core",
+          "sha256": "e94f7924652620a0acde9be6677a976c06247c285c2e1f4b4c5de0c42d755971"
+        },
+        {
+          "line_matches": 65,
+          "path": "src/agent_core/_ai/models.py",
+          "repository": "agent-core",
+          "sha256": "9fb2a566c3c0bd081abc6ba8aa8771803c238c103972bb7356b9b29c327127fa"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/agent_base/agent.py",
+          "repository": "agent-core",
+          "sha256": "3429f262cb4e10adbd67e3db4aca4d7888e7c0fc881532f932b3cdcdeb493eab"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/agent_core/authority_execution.py",
+          "repository": "agent-core",
+          "sha256": "abbc0ef805258941f9c5396cfdfc5e1aaf12687e38f99f5e05e6c58139180700"
+        },
+        {
+          "line_matches": 4,
+          "path": "src/agent_core/authority_policy.py",
+          "repository": "agent-core",
+          "sha256": "0f57151d49afe0b8e0e9d0071020f88a9c54e070390e07e3aa7a15134a6bfdd8"
+        },
+        {
+          "line_matches": 9,
+          "path": "src/agent_core/cli/utils.py",
+          "repository": "agent-core",
+          "sha256": "1dfe5286771aeb27fe46d863283382823f5e96add57fd52c874c92ebb876953a"
+        },
+        {
+          "line_matches": 17,
+          "path": "src/agent_core/foundation/settings.py",
+          "repository": "agent-core",
+          "sha256": "8c76ad0181d56219c77797fd921a469ae759517739ad0c99b17c898500430e5c"
+        },
+        {
+          "line_matches": 4,
+          "path": "src/agent_core/lifecycle_identity.py",
+          "repository": "agent-core",
+          "sha256": "69b57ad46997c0685464876093bdc0b49766a32f2504bba5f5ae1e8ba034f73a"
+        },
+        {
+          "line_matches": 14,
+          "path": "src/agent_core/sdk/agents.py",
+          "repository": "agent-core",
+          "sha256": "e7707e8e77a2fe12cd01fb90add3d5aaec36713b58019b258da31327c0abb255"
+        },
+        {
+          "line_matches": 4,
+          "path": "src/agent_core/sdk/config.py",
+          "repository": "agent-core",
+          "sha256": "9f4850a3bca74114dcc53cbd399309f0b7fc1d7e740cb2aadb000db22efb8cdf"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/agent_core/skill_system/models.py",
+          "repository": "agent-core",
+          "sha256": "1bd05459372850a7b0c0f1eb2893b6ffff7a90b727a1d6cf7dafe3f0789c05ed"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/agent_core/skill_system/profiles.py",
+          "repository": "agent-core",
+          "sha256": "eb10cb2436f5792d03031e8a739d4f6b15af0c3cbe1b2022b319f0570c542af9"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/agent_core/tool_registry/types.py",
+          "repository": "agent-core",
+          "sha256": "0c02fc28bcf8c5db4db9e24c2d7a19a1993a8e385658b7f5c81ceb76144a6f11"
+        },
+        {
+          "line_matches": 8,
+          "path": "tests/_ai/test_model_loading.py",
+          "repository": "agent-core",
+          "sha256": "47f4aa84b7d26cb7bdd42331cc9612b05eae4123d66d9b7e1af4edfac7661227"
+        },
+        {
+          "line_matches": 23,
+          "path": "tests/_ai/test_snapshot_construction_contracts.py",
+          "repository": "agent-core",
+          "sha256": "b193d2c4fe1563c6acf5cd27d01abc45de2a4db2b34460f1bb62b671efca411e"
+        },
+        {
+          "line_matches": 5,
+          "path": "tests/_ai/test_streaming_responses.py",
+          "repository": "agent-core",
+          "sha256": "67213e99b548f210b81115b76d1a23940d1b091801f85db97c3f7760006cdb0a"
+        },
+        {
+          "line_matches": 27,
+          "path": "tests/ai/test_models.py",
+          "repository": "agent-core",
+          "sha256": "63a19be32b43680e52467082181553b837e523353b4b0b8fbcb3db7c378c47c7"
+        },
+        {
+          "line_matches": 3,
+          "path": "tests/cli/test_utils_extended.py",
+          "repository": "agent-core",
+          "sha256": "3e1e112ca581e548ffb2968471ee4c1927387d93b8e76fce153d3d62fcf82f1a"
+        },
+        {
+          "line_matches": 5,
+          "path": "tests/foundation/test_settings.py",
+          "repository": "agent-core",
+          "sha256": "06681de945e18d017fe1b157a3aeb2410d845ef494826dd4f30ea694c947606b"
+        },
+        {
+          "line_matches": 1,
+          "path": ".agents/skills/doc-sync/SKILL.md",
+          "repository": "agent-docs-sync",
+          "sha256": "da6aaecdf6affe2e2c53653b57450b37005fb6e4120225f8375f574611ba5521"
+        },
+        {
+          "line_matches": 1,
+          "path": ".docs-sync-state.yaml",
+          "repository": "agent-docs-sync",
+          "sha256": "82cbc489ba41c35aec9336b4bb1d41b1a2de7656ee5da9f82539879160286f1a"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/47c77a0f1fb3f1c2931b11a12330fdf8013345ac767a28b2628ae5c2f83e6d90.json",
+          "repository": "agent-docs-sync",
+          "sha256": "399053e09f5262d1cd8592d0090e8d3bdd099354a62b2882275831789715e7b8"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22.json",
+          "repository": "agent-docs-sync",
+          "sha256": "8f84f452a71032c2bcbaab3f13a7b9c445e060c52c52bc03f7c12a650466f78f"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/47c77a0f1fb3f1c2931b11a12330fdf8013345ac767a28b2628ae5c2f83e6d90/47c77a0f1fb3f1c2931b11a12330fdf8013345ac767a28b2628ae5c2f83e6d90-w1-0.json",
+          "repository": "agent-docs-sync",
+          "sha256": "01d27b8ec0868c3f56554e51811005ef90e2b9852888b6053578a5fc5d801dbe"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22-w1-0.json",
+          "repository": "agent-docs-sync",
+          "sha256": "3d9ade2607001288eea1d2c4fb2a40098789cfe56ad2083c23df19d5dd835d82"
+        },
+        {
+          "line_matches": 1,
+          "path": "CLAUDE.md",
+          "repository": "agent-docs-sync",
+          "sha256": "ac92a1f277b79bd07dbd7e95abbade317412afeec4a47a4b85015aab55983bc5"
+        },
+        {
+          "line_matches": 1,
+          "path": "coverage.json",
+          "repository": "agent-docs-sync",
+          "sha256": "e2ff4f9ee4e97fcfc8b698775a19464601f95524fe23bc359a2a906b672a6af1"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/configuration.md",
+          "repository": "agent-docs-sync",
+          "sha256": "679c37dce1c73666065609b21ec4d1962ccd61ae0b1bae1b7f8209fb6b09f6a8"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/agent_docs_sync/agents/generation.py",
+          "repository": "agent-docs-sync",
+          "sha256": "efbdb8d24822567677f996d16de666fd348490e998d863909f18b8440fa7181f"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/agent_docs_sync/config.py",
+          "repository": "agent-docs-sync",
+          "sha256": "aced767bbdc8519fb6655a9c1da97191b61796e3853791e3fcd6ee8b3ead9807"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/agent_docs_sync/execution.py",
+          "repository": "agent-docs-sync",
+          "sha256": "0da9d154543b7d9480a105a410d6fc9ea1dc07027e57d644f6ca2fb57b8efaf9"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/test_config_contract.py",
+          "repository": "agent-docs-sync",
+          "sha256": "7e45bc0d46cfa837fe36223959842c9d29c75908fccbef0253fa3b692ba6fff1"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/40620e3b95d0ecf7e31269479300357b745d7e57ac6bdeaa5cf7fa2f0e875d7f.json",
+          "repository": "agent-harness",
+          "sha256": "583b14b7350600be24cafb8f1d61eb5c1d8f0e94c18cdfa2b06d00ec96eb904d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e.json",
+          "repository": "agent-harness",
+          "sha256": "3f8f220362a3bd9c34b07f7994ce3013000f495bb0d0e7a52b689eb1bbcce063"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/40620e3b95d0ecf7e31269479300357b745d7e57ac6bdeaa5cf7fa2f0e875d7f/40620e3b95d0ecf7e31269479300357b745d7e57ac6bdeaa5cf7fa2f0e875d7f-w1-0.json",
+          "repository": "agent-harness",
+          "sha256": "7e42c3b68610a9015d480ac0789c9b51549e8a8b0017a69621325e6aea5384a9"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e-w1-0.json",
+          "repository": "agent-harness",
+          "sha256": "58bc5a228ca7a18be251e03cf3641a6e06cffb63db04429edc3a8cd986005aa1"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/agent_harness/artifact_publication.py",
+          "repository": "agent-harness",
+          "sha256": "608638d1cd1ad944e596ec97d4139f53ffcc83c3126bb6ab5649f2ea0ce797df"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/agent_harness/artifact_verification.py",
+          "repository": "agent-harness",
+          "sha256": "3924ebfd4b8822c12facd4b7d8583a8322f685ee8457eac8332025b438f68525"
+        },
+        {
+          "line_matches": 4,
+          "path": "src/agent_harness/checkpoint_compatibility.py",
+          "repository": "agent-harness",
+          "sha256": "103b5895e15c17508d5cb481a7d6aec6cdda310594d28be533d773398bf09be9"
+        },
+        {
+          "line_matches": 7,
+          "path": "src/agent_harness/config.py",
+          "repository": "agent-harness",
+          "sha256": "7add46c72a07b4ee057048468369e6a874018c63eb655bc171a513b0b6069a79"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/agent_harness/lifecycle_auth.py",
+          "repository": "agent-harness",
+          "sha256": "668f5534ad3a9670a9ddeef1f60822d37f172f008789c943460fddf047626312"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/agent_harness/models/artifacts.py",
+          "repository": "agent-harness",
+          "sha256": "9663bae57420b6dad6afd647025c2571439d8a3375be273a3bd140643e047a14"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_harness/models/gates.py",
+          "repository": "agent-harness",
+          "sha256": "a930ae1b8d559647825a23696367f06b4e04417172cf5626ab724706ff4d6d4d"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/agent_harness/models/trace.py",
+          "repository": "agent-harness",
+          "sha256": "de95410acc2ed8f9f28fcf78129b26144424c8ac877f8c3383686905abd9b9f8"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/ai-agent-system/solution-design.md",
+          "repository": "ai-harness-skills",
+          "sha256": "07fc594224c07783cd6b2be4f7e2223633a16292103de54c165b9fc561bcb071"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/be45ce5841aa6cb9a7deadbb4e2b12b42d6ac7e64ff4bacbb81bf96fdbf7759c.json",
+          "repository": "ai-review",
+          "sha256": "6b9b647992b2387ba720394e437fa3855ddf937dcfa8a8194e8a1fb61bc00c22"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/be45ce5841aa6cb9a7deadbb4e2b12b42d6ac7e64ff4bacbb81bf96fdbf7759c/be45ce5841aa6cb9a7deadbb4e2b12b42d6ac7e64ff4bacbb81bf96fdbf7759c-w1-0.json",
+          "repository": "ai-review",
+          "sha256": "97412965ae601e2f747cd259594b5efab0343b6256529b40f286063b0e8712f7"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/ai_review/models.py",
+          "repository": "ai-review",
+          "sha256": "d24def4070b9e9053f8cc1d9305d2c896e161e814611078a7ae8b244a3cca0e1"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a.json",
+          "repository": "tdt-core",
+          "sha256": "9197f3540bedec35b36e723dc0f9c8117f2c07a7e58d90dd2611a870fbf87e4d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a.json",
+          "repository": "tdt-core",
+          "sha256": "dbc789066fe51e7464edea9440f57cec94029302f98a95f69ebd85ca82ceb66d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a-w1-0.json",
+          "repository": "tdt-core",
+          "sha256": "4f02479b757ceaea7d41f6b06639e0b048062cf81236ccba035b48f11e15e7ad"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a-w2-0.json",
+          "repository": "tdt-core",
+          "sha256": "26ebb8da010fe201df95ac6f8dbf24aa52839e671e14b07382dc8db3d0e0a66a"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a-w1-0.json",
+          "repository": "tdt-core",
+          "sha256": "cfe9ee052adcb7106bc4dbca87b9431f3f08d722e74b8fba2064e8f9b66491b6"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a-w2-0.json",
+          "repository": "tdt-core",
+          "sha256": "4706697f217108aa01157fa19c7b2a14d3614e8c6424e74885130a716dbdf89a"
+        },
+        {
+          "line_matches": 21,
+          "path": "src/tdt_core/agent_profile.py",
+          "repository": "tdt-core",
+          "sha256": "cfd6c91c38ce58503d4f7f0ae767d31ecf5ca241469f4f0c2157561cbd07a369"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/tdt_core/clients/gitlab.py",
+          "repository": "tdt-core",
+          "sha256": "2c35a60594505e0c12cee2f7b6e05686f15ee364b51f298f40a001e3d24c4ce4"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/tdt_core/clients/jira.py",
+          "repository": "tdt-core",
+          "sha256": "0ec29f99dd04cd773e2f848d6730f433b45cb4c551848b6508161778758f3914"
+        },
+        {
+          "line_matches": 4,
+          "path": "src/tdt_core/config_loader.py",
+          "repository": "tdt-core",
+          "sha256": "60af2eb84563c6cef61ac2090ab889f0f66f2d9d5552daf829535a11358be48d"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/tdt_core/config_models.py",
+          "repository": "tdt-core",
+          "sha256": "8a16ae50d20ce75102a0e22fe36dac8e1cf9d759aeb26236539a81a82e516a98"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/tdt_core/control_plane_schema.py",
+          "repository": "tdt-core",
+          "sha256": "363146e1a1573177d0cd007ec904f63813de7354d7722157501545a964be0e31"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/tdt_core/migration_backup.py",
+          "repository": "tdt-core",
+          "sha256": "adc9125e05c7d5fa0ec9ba09b2992f822613e3fdb6975cc4fab156b854ea2647"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/tdt_core/migration_plan.py",
+          "repository": "tdt-core",
+          "sha256": "75a004e8be8a348c92f2eb935fa25ef9d46fafb1c73d2c171eeb863dee42c4ca"
+        },
+        {
+          "line_matches": 9,
+          "path": "src/tdt_core/provider_model_profile.py",
+          "repository": "tdt-core",
+          "sha256": "6c6ed65df96fc68b2bf8e9b9509ca77aefea05c3684c8b8ae840658edff78c71"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/tdt_core/scheduler/schedule_manifest.py",
+          "repository": "tdt-core",
+          "sha256": "52d3a0fd87600e6f04ef44c01be27b607eefcf1f5ddcdb74ee588eefdd0b4e0a"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/tdt_core/scheduler/settings.py",
+          "repository": "tdt-core",
+          "sha256": "9cb6d15d13c1d241b2b9f349151a0784aeb358b46471f4b18c054998c4cffc34"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/tdt_core/source_registry.py",
+          "repository": "tdt-core",
+          "sha256": "6a560e2c5309a117aeac37928c0c38015fd18d26d587ff2a7706f80e7267938b"
+        },
+        {
+          "line_matches": 10,
+          "path": "tests/test_config_primitives.py",
+          "repository": "tdt-core",
+          "sha256": "4216142dcf59569b813f786bc2ccf31d74c393833103cceca21f4e08d9647187"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_custom_provider_credentials.py",
+          "repository": "tdt-core",
+          "sha256": "45b7e53f74fd8dd6f97bdb635814cf432226f691466d21ac2a3e902b22612ef6"
+        },
+        {
+          "line_matches": 6,
+          "path": "tests/test_llm_profile_v2.py",
+          "repository": "tdt-core",
+          "sha256": "e225b9e9bd604ce907147447aa5e586e24095828afd1f99c6ee7acf64cee90d1"
+        },
+        {
+          "line_matches": 3,
+          "path": "tests/test_phase3_atomic_capture.py",
+          "repository": "tdt-core",
+          "sha256": "d6fe3791a450b0380368d5275072bd0bc5f70a5df4bf1cb2c1ae622dc292ef95"
+        },
+        {
+          "line_matches": 11,
+          "path": "tests/test_phase3_protected_credential.py",
+          "repository": "tdt-core",
+          "sha256": "6e00b5c58d2aa3632554d680e93e8ac67504bd56f967b70a6ae19876a0bd79c1"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/test_provider_model_cli_fields.py",
+          "repository": "tdt-core",
+          "sha256": "e5a2fe5d3b24f67effcd184d65eb2073147a6b1b33f95c434f94778fcd2ebe57"
+        },
+        {
+          "line_matches": 43,
+          "path": "tests/test_provider_model_profile.py",
+          "repository": "tdt-core",
+          "sha256": "3e177cafcc1af160784bd6b8c60a0d9f9935384ef89957a30f3f5e3045159a7b"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_resolver_precedence.py",
+          "repository": "tdt-core",
+          "sha256": "2f804a107438b322ebda7f980161638fe8cc3d4150d64e953170ba9d3df77dca"
+        }
+      ],
+      "line_match_count": 431
+    },
+    "profile_aliases": {
+      "file_count": 148,
+      "files": [
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed.json",
+          "repository": "agent-core",
+          "sha256": "007f1d18fcf9691f73521ce1e7a1d6a1e349b0fdee1871c43b989b9072e104bd"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc.json",
+          "repository": "agent-core",
+          "sha256": "bc21adb7f3412f519041d98cf781b61547ac3c123b43045a96275630840695e5"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "d6ffa71683692d539699d26a6c647c03236f020a3e18317d25a143da359d0026"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed-w2-0.json",
+          "repository": "agent-core",
+          "sha256": "b8598d2ca2ef11b3c8f5665ce62332bbd0f1d8f25a7c5573fc019a43e890b6e2"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "ab3230e77086e31fb8692bb6d86037ddcdfb09a414597be9b604712fa177ed42"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc-w2-0.json",
+          "repository": "agent-core",
+          "sha256": "230ebe946083cdb3c8c73c004ddace0214886fbe0de908d1d6da20be0ada507b"
+        },
+        {
+          "line_matches": 1,
+          "path": "CHANGELOG.md",
+          "repository": "agent-core",
+          "sha256": "926bfad6efc73c9eb0ce3d11e4c90532f12ba20d6f19ed12f0855a1f39ec1079"
+        },
+        {
+          "line_matches": 7,
+          "path": "agent-core-handoff.md",
+          "repository": "agent-core",
+          "sha256": "d8f43fffc7160c24ace09f54379f639c53912f53a4c817c0ba7404561fd223af"
+        },
+        {
+          "line_matches": 1,
+          "path": "coverage.json",
+          "repository": "agent-core",
+          "sha256": "e4994bf85b59ea5dd6b9f33babd00ff2e0df6509547bcbaf838ffe687c11e05d"
+        },
+        {
+          "line_matches": 2,
+          "path": "docs/configuration.md",
+          "repository": "agent-core",
+          "sha256": "5ec1fc8c4948fe6d472f090fc6838307bb76763fceed5fa60c9c5aecc7d7b2f8"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/distribution.md",
+          "repository": "agent-core",
+          "sha256": "64a17c3d4097c7b70396ec6d0b982d3022d1f81b775ea2efe6b6abfa8eb21d31"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/extending.md",
+          "repository": "agent-core",
+          "sha256": "2f2e5d7a3ae8eee4a2eec1ec316cefdae01e1fe0fdd93e2d141e86d3dafd984f"
+        },
+        {
+          "line_matches": 2,
+          "path": "docs/harness-integration.md",
+          "repository": "agent-core",
+          "sha256": "3fa0151db09e37438fdfc5eff319b3d006a3d6d5920aa8c5b351caf1203d84ba"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/observability.md",
+          "repository": "agent-core",
+          "sha256": "de08e402493107e1538e9d3d8301aa860c22ad6163ab708be299ff660d207fc1"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/research/architecture-analysis.md",
+          "repository": "agent-core",
+          "sha256": "1cb07bae61c74f118ff4b2b74eb8e1279250d3b9e31f41ef1c08444730b2412d"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/research/feature-mapping.md",
+          "repository": "agent-core",
+          "sha256": "e94f7924652620a0acde9be6677a976c06247c285c2e1f4b4c5de0c42d755971"
+        },
+        {
+          "line_matches": 6,
+          "path": "docs/research/pydanticai-langgraph.md",
+          "repository": "agent-core",
+          "sha256": "ef09bfa4387f7c115f0feb8d400e09276ef409dfcc8364b1aa12e1accdf80055"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/research/upgrade-opportunities.md",
+          "repository": "agent-core",
+          "sha256": "bd16c9eb88ce0ef5c9989b0e717afd9d277f70f494519af1324037a44cc45328"
+        },
+        {
+          "line_matches": 15,
+          "path": "src/agent_core/_ai/agent.py",
+          "repository": "agent-core",
+          "sha256": "e0216ee5b5051158b1a5cc132db84086e8ee387e569e1dd8084d86c53496a73a"
+        },
+        {
+          "line_matches": 42,
+          "path": "src/agent_core/_ai/models.py",
+          "repository": "agent-core",
+          "sha256": "9fb2a566c3c0bd081abc6ba8aa8771803c238c103972bb7356b9b29c327127fa"
+        },
+        {
+          "line_matches": 6,
+          "path": "src/agent_core/agent_base/agent.py",
+          "repository": "agent-core",
+          "sha256": "3429f262cb4e10adbd67e3db4aca4d7888e7c0fc881532f932b3cdcdeb493eab"
+        },
+        {
+          "line_matches": 5,
+          "path": "src/agent_core/cli/utils.py",
+          "repository": "agent-core",
+          "sha256": "1dfe5286771aeb27fe46d863283382823f5e96add57fd52c874c92ebb876953a"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/agent_core/foundation/__init__.py",
+          "repository": "agent-core",
+          "sha256": "3ac95e9de0ff3754d60aeb12af73c523247ce542a958aee3fccc0a2f97623e18"
+        },
+        {
+          "line_matches": 5,
+          "path": "src/agent_core/foundation/errors.py",
+          "repository": "agent-core",
+          "sha256": "7cf112d9db2edee371a0fe190c7c305c7dfffdb8fd95075e4a811d0254400aed"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/agent_core/orchestration/graph.py",
+          "repository": "agent-core",
+          "sha256": "b4bdfd6356f115ddc32930f13d678876c32079624fc5e8cbba263cf30f00c8ff"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/sdk/__init__.py",
+          "repository": "agent-core",
+          "sha256": "54da41db35e9587a70ae4133911bbc5996886c7f575e0002407e139e66f8a055"
+        },
+        {
+          "line_matches": 5,
+          "path": "src/agent_core/sdk/agents.py",
+          "repository": "agent-core",
+          "sha256": "e7707e8e77a2fe12cd01fb90add3d5aaec36713b58019b258da31327c0abb255"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/sdk/config.py",
+          "repository": "agent-core",
+          "sha256": "9f4850a3bca74114dcc53cbd399309f0b7fc1d7e740cb2aadb000db22efb8cdf"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/_ai/test_model_loading.py",
+          "repository": "agent-core",
+          "sha256": "47f4aa84b7d26cb7bdd42331cc9612b05eae4123d66d9b7e1af4edfac7661227"
+        },
+        {
+          "line_matches": 81,
+          "path": "tests/_ai/test_snapshot_construction_contracts.py",
+          "repository": "agent-core",
+          "sha256": "b193d2c4fe1563c6acf5cd27d01abc45de2a4db2b34460f1bb62b671efca411e"
+        },
+        {
+          "line_matches": 4,
+          "path": "tests/cli/test_utils_extended.py",
+          "repository": "agent-core",
+          "sha256": "3e1e112ca581e548ffb2968471ee4c1927387d93b8e76fce153d3d62fcf82f1a"
+        },
+        {
+          "line_matches": 22,
+          "path": "tests/foundation/test_settings.py",
+          "repository": "agent-core",
+          "sha256": "06681de945e18d017fe1b157a3aeb2410d845ef494826dd4f30ea694c947606b"
+        },
+        {
+          "line_matches": 16,
+          "path": "tests/sdk/test_agents.py",
+          "repository": "agent-core",
+          "sha256": "3f7463a786a34b0c1d7a46230c6621eb961817d2c14f32dc3383e8d8b11ba704"
+        },
+        {
+          "line_matches": 9,
+          "path": "tests/sdk/test_memory_convergence.py",
+          "repository": "agent-core",
+          "sha256": "2fb3c3a1ee0f32f7189809040d2d2edea8ddf96bfbc9128319d5b9c0a8f457cd"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_characterization.py",
+          "repository": "agent-core",
+          "sha256": "cdb27611d76decb67371e395b7557531b87a7b47a0ec778d6fee20d1071e9ade"
+        },
+        {
+          "line_matches": 1,
+          "path": ".agents/skills/doc-sync/SKILL.md",
+          "repository": "agent-docs-sync",
+          "sha256": "da6aaecdf6affe2e2c53653b57450b37005fb6e4120225f8375f574611ba5521"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/47c77a0f1fb3f1c2931b11a12330fdf8013345ac767a28b2628ae5c2f83e6d90.json",
+          "repository": "agent-docs-sync",
+          "sha256": "399053e09f5262d1cd8592d0090e8d3bdd099354a62b2882275831789715e7b8"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22.json",
+          "repository": "agent-docs-sync",
+          "sha256": "8f84f452a71032c2bcbaab3f13a7b9c445e060c52c52bc03f7c12a650466f78f"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/47c77a0f1fb3f1c2931b11a12330fdf8013345ac767a28b2628ae5c2f83e6d90/47c77a0f1fb3f1c2931b11a12330fdf8013345ac767a28b2628ae5c2f83e6d90-w1-0.json",
+          "repository": "agent-docs-sync",
+          "sha256": "01d27b8ec0868c3f56554e51811005ef90e2b9852888b6053578a5fc5d801dbe"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22/609067dbb86e57d0b0ca8634628eeaba380418373b0b4921ed012e84bec15e22-w1-0.json",
+          "repository": "agent-docs-sync",
+          "sha256": "3d9ade2607001288eea1d2c4fb2a40098789cfe56ad2083c23df19d5dd835d82"
+        },
+        {
+          "line_matches": 2,
+          "path": "agent-docs-sync-handoff.md",
+          "repository": "agent-docs-sync",
+          "sha256": "8c6fea0b411d9466ff15c29613a511394f4136379b076c9494b1ea4fb7392c63"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_docs_sync/agents/discovery.py",
+          "repository": "agent-docs-sync",
+          "sha256": "5c23d229495063b849ccd614f76611e2e913535cbb28087d06bcc28ce1688ebb"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/agent_docs_sync/agents/generation.py",
+          "repository": "agent-docs-sync",
+          "sha256": "efbdb8d24822567677f996d16de666fd348490e998d863909f18b8440fa7181f"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_docs_sync/agents/validation.py",
+          "repository": "agent-docs-sync",
+          "sha256": "f844448615f48ed71d36355ee15912a2c34397d77edcb5e8aa475396242a2e89"
+        },
+        {
+          "line_matches": 17,
+          "path": "src/agent_docs_sync/config.py",
+          "repository": "agent-docs-sync",
+          "sha256": "aced767bbdc8519fb6655a9c1da97191b61796e3853791e3fcd6ee8b3ead9807"
+        },
+        {
+          "line_matches": 5,
+          "path": "src/agent_docs_sync/operation_context.py",
+          "repository": "agent-docs-sync",
+          "sha256": "b301084fa38564b0086480c61ba24813c638fc86d8c5e974f70f64d86f671c4b"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/test_canonical_pipeline.py",
+          "repository": "agent-docs-sync",
+          "sha256": "dba25d89362a1e65a784dd00defc9587bcb24e9957fe890eb7a70bbccce97ab2"
+        },
+        {
+          "line_matches": 19,
+          "path": "tests/test_config_contract.py",
+          "repository": "agent-docs-sync",
+          "sha256": "7e45bc0d46cfa837fe36223959842c9d29c75908fccbef0253fa3b692ba6fff1"
+        },
+        {
+          "line_matches": 8,
+          "path": "tests/test_operation_context.py",
+          "repository": "agent-docs-sync",
+          "sha256": "75ae4f3153c7efc3da88bcee4ad1e1bf6fece49475597ae3b5e3bf15f5ba4c9b"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/40620e3b95d0ecf7e31269479300357b745d7e57ac6bdeaa5cf7fa2f0e875d7f.json",
+          "repository": "agent-harness",
+          "sha256": "583b14b7350600be24cafb8f1d61eb5c1d8f0e94c18cdfa2b06d00ec96eb904d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e.json",
+          "repository": "agent-harness",
+          "sha256": "3f8f220362a3bd9c34b07f7994ce3013000f495bb0d0e7a52b689eb1bbcce063"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/40620e3b95d0ecf7e31269479300357b745d7e57ac6bdeaa5cf7fa2f0e875d7f/40620e3b95d0ecf7e31269479300357b745d7e57ac6bdeaa5cf7fa2f0e875d7f-w1-0.json",
+          "repository": "agent-harness",
+          "sha256": "7e42c3b68610a9015d480ac0789c9b51549e8a8b0017a69621325e6aea5384a9"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e/d06d4928c907de7a788c100833d8794307fc93e3f99cc98a933c42c1bb02323e-w1-0.json",
+          "repository": "agent-harness",
+          "sha256": "58bc5a228ca7a18be251e03cf3641a6e06cffb63db04429edc3a8cd986005aa1"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/artifact-integrity.md",
+          "repository": "agent-harness",
+          "sha256": "1426b4dea2fc2cbf85a575738952aa7a5bcca6e046ec40bc3536efbaa0a1a60b"
+        },
+        {
+          "line_matches": 12,
+          "path": "src/agent_harness/artifact_publication.py",
+          "repository": "agent-harness",
+          "sha256": "608638d1cd1ad944e596ec97d4139f53ffcc83c3126bb6ab5649f2ea0ce797df"
+        },
+        {
+          "line_matches": 7,
+          "path": "src/agent_harness/cli.py",
+          "repository": "agent-harness",
+          "sha256": "494ce2a2f3b9be85299e62d7f8d31396818af01e9494e969de29f2e701863891"
+        },
+        {
+          "line_matches": 43,
+          "path": "src/agent_harness/workflow/runner.py",
+          "repository": "agent-harness",
+          "sha256": "ffa7a5faa721506c0a3576cc3396540d457d21876002341c05d4cac8afe35e8c"
+        },
+        {
+          "line_matches": 7,
+          "path": "tests/test_artifact_publication.py",
+          "repository": "agent-harness",
+          "sha256": "94628bfff8672943daeab10f15c54529b3ee1a71355c8602557091b3a64e3451"
+        },
+        {
+          "line_matches": 4,
+          "path": "tests/test_artifact_reference_loader.py",
+          "repository": "agent-harness",
+          "sha256": "c76acfe39c67cc21b95d0d0210d95e712e9b210fb206941c418a94f3c063045e"
+        },
+        {
+          "line_matches": 7,
+          "path": "tests/test_checkpoint_reference_read_paths.py",
+          "repository": "agent-harness",
+          "sha256": "bb1f56b3a9d08b8feaf8c755c7c10af99da6ce198c2ec05688478d65264f20e0"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_config.py",
+          "repository": "agent-harness",
+          "sha256": "2639f7dd838182c015e44b1c486f561edac9fe165cb138462bfef9a6f4f5b8c1"
+        },
+        {
+          "line_matches": 12,
+          "path": "tests/test_durable_fixtures.py",
+          "repository": "agent-harness",
+          "sha256": "667207d0d07abbb0d052f2371c116f108dad8bb926311311ee54d98fc575a4ff"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/test_durable_runner_boundary.py",
+          "repository": "agent-harness",
+          "sha256": "ca188511da36acaaa9ec32fb2fde0d8a4852544a01f340477a521b94e8a65153"
+        },
+        {
+          "line_matches": 5,
+          "path": "tests/test_gate_trace.py",
+          "repository": "agent-harness",
+          "sha256": "208b8e44918685995c795821ec6ec751773499a91f519ba11de3d0180f7cabc6"
+        },
+        {
+          "line_matches": 6,
+          "path": "tests/test_live_reference_checkpoint.py",
+          "repository": "agent-harness",
+          "sha256": "3918e471294f9138f97a32b3a1d43622c12242e272df31c7fae2b71ca88c753d"
+        },
+        {
+          "line_matches": 13,
+          "path": "tests/test_postgres_integration.py",
+          "repository": "agent-harness",
+          "sha256": "940aa1df489d83db8c424ec8461108e9f778a6953815fc4f4c2a641d02a45b39"
+        },
+        {
+          "line_matches": 12,
+          "path": "tests/test_runner_contracts.py",
+          "repository": "agent-harness",
+          "sha256": "5ad76153b3d5b85ea7e8c6615b2a2e8f44e63de90163650cd599d496ed40e872"
+        },
+        {
+          "line_matches": 27,
+          "path": "tests/test_state_runtime.py",
+          "repository": "agent-harness",
+          "sha256": "bb703935072df307deed259dfc0c115e22712f0264c827faa5754a00710902b9"
+        },
+        {
+          "line_matches": 5,
+          "path": "tests/test_workflow.py",
+          "repository": "agent-harness",
+          "sha256": "e2232a723ac678ce7de1ba9b70ec414f8a09747db17b406a21014c0c6fd39964"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/1b63fc9300eecb17928199eb3af6c6957f68d02456f2f53fe57757d07d30ed0d.json",
+          "repository": "ai-harness-skills",
+          "sha256": "dd2aa6fcbe61d9077c73d18896acaba3d839c7ce23c95b8c73a17845eb69e4da"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/1b63fc9300eecb17928199eb3af6c6957f68d02456f2f53fe57757d07d30ed0d/1b63fc9300eecb17928199eb3af6c6957f68d02456f2f53fe57757d07d30ed0d-w1-0.json",
+          "repository": "ai-harness-skills",
+          "sha256": "e2b86f5bc09f8dacbc7aaad45afa889ce971f17dc2228345d28f7e123fd9019a"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/1b63fc9300eecb17928199eb3af6c6957f68d02456f2f53fe57757d07d30ed0d/1b63fc9300eecb17928199eb3af6c6957f68d02456f2f53fe57757d07d30ed0d-w2-0.json",
+          "repository": "ai-harness-skills",
+          "sha256": "5334ac2f0086546bc82a06e692e5b59edca59d5431aa892ff7fad997657bb933"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/ai-agent-system/challenges.md",
+          "repository": "ai-harness-skills",
+          "sha256": "d28d12edbb89b2a8cbcc7e478f823d994e8958f3528800bf26acdb59afff24d0"
+        },
+        {
+          "line_matches": 1,
+          "path": "docs/architecture.md",
+          "repository": "ai-harness-skills",
+          "sha256": "c3587c67106857b31cb28005d6efda81853231d080fa3ea9eec46c773b6cf5db"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/ai_harness/audit/__init__.py",
+          "repository": "ai-harness-skills",
+          "sha256": "fcf23c5503a8654700923b43e98687b6d6fcc75610ed847bb36b6459ab0bb748"
+        },
+        {
+          "line_matches": 14,
+          "path": "src/ai_harness/audit/capabilities.py",
+          "repository": "ai-harness-skills",
+          "sha256": "716a87dce406eb2694927407ca41bd9d6ce8035d604a7ad79169fed7a91c1534"
+        },
+        {
+          "line_matches": 7,
+          "path": "src/ai_harness/audit/digests.py",
+          "repository": "ai-harness-skills",
+          "sha256": "e2463e12ec248f3620e323bde76b28938a5a427642b3731b9dc52a50305edc53"
+        },
+        {
+          "line_matches": 5,
+          "path": "src/ai_harness/audit/models.py",
+          "repository": "ai-harness-skills",
+          "sha256": "0b4bd81921f5d7317ee9dd2172c6f6fc5ffbaff2e724878ed7cbe1d25be96e65"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/ai_harness/audit/registry.py",
+          "repository": "ai-harness-skills",
+          "sha256": "b13d1a5c417552f9dccedabeed774002afd5dc4f07feb20421770dc24fe817cd"
+        },
+        {
+          "line_matches": 12,
+          "path": "src/ai_harness/cli.py",
+          "repository": "ai-harness-skills",
+          "sha256": "06ebf0e19ad063d834f1d81e78c5fe00de5ee8165fc118f947d64bbde9764696"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/ai_harness/contracts.py",
+          "repository": "ai-harness-skills",
+          "sha256": "d27504f391e59881c3cf9bb5e1591651f9a613bc53f013057a39d388f31c5fa4"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/ai_harness/ledger/models.py",
+          "repository": "ai-harness-skills",
+          "sha256": "2d0606b2bdb2a1b920123ee025653f0ef2ecbefda657a722cad358addd3109d5"
+        },
+        {
+          "line_matches": 9,
+          "path": "src/ai_harness/ledger/repository.py",
+          "repository": "ai-harness-skills",
+          "sha256": "10defde40f697b3cf837d3d455531b10a02f753149f4ad02e5b2747f4051e5ba"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/ai_harness/ledger/schema.py",
+          "repository": "ai-harness-skills",
+          "sha256": "a0023bf637dab015b825071acdddf94d660c895026d4d28db494fab472e813ed"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/ai_harness/providers/tdt_projection.py",
+          "repository": "ai-harness-skills",
+          "sha256": "aaa9230ec034956ab317b8152e42f1acdc142326f2a1171cd985a142467b699d"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/ai_harness/workflow/__init__.py",
+          "repository": "ai-harness-skills",
+          "sha256": "7cc30e08e94c49fbab6bdcacea2dcd97c2afd19ca438344edfc6844c785243e6"
+        },
+        {
+          "line_matches": 13,
+          "path": "src/ai_harness/workflow/engine.py",
+          "repository": "ai-harness-skills",
+          "sha256": "2a7059f6c73a3aee3713836d2557ca3471dc4f6663d5b0058ea2820c85e93c8a"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/ai_harness/workflow/types.py",
+          "repository": "ai-harness-skills",
+          "sha256": "bad52036d5a4c9a3da8530e66add3f0563f53251506ea0200a6ffc6d928f3570"
+        },
+        {
+          "line_matches": 4,
+          "path": "tests/contracts/test_all_phases.py",
+          "repository": "ai-harness-skills",
+          "sha256": "5c0b8b999a28397a59e44e9f48aec323e5a1321ffaaed9d0e8bb04df24b0dde3"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/contracts/test_archive_runtime_regressions.py",
+          "repository": "ai-harness-skills",
+          "sha256": "a291b5ea9aa28bf31355e50efc16eb06156d28a402a06d302f06aec3fb4fe5ce"
+        },
+        {
+          "line_matches": 19,
+          "path": "tests/integration/test_end_to_end_smoke.py",
+          "repository": "ai-harness-skills",
+          "sha256": "91b1c6fface06b494428de4138d0abe6dd519d228940fba02bcc6cb7ebf64ae3"
+        },
+        {
+          "line_matches": 8,
+          "path": "tests/integration/test_full_headless.py",
+          "repository": "ai-harness-skills",
+          "sha256": "7fe60b7b3d3b3eb1a87197158e7c7b6b791d6770382948f3fc94baffe9cdc9eb"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/integration/test_runtime_composition.py",
+          "repository": "ai-harness-skills",
+          "sha256": "e86eba08d825409e7655bc69df7f08d2c564c0775320f4473d224bb10f8f7c3f"
+        },
+        {
+          "line_matches": 7,
+          "path": "tests/integration/test_workflow_quality.py",
+          "repository": "ai-harness-skills",
+          "sha256": "aff11948783487d22b679313de19096e0b2c773cd05a453ded2f2ba8d15274f9"
+        },
+        {
+          "line_matches": 4,
+          "path": "tests/ledger/test_ledger.py",
+          "repository": "ai-harness-skills",
+          "sha256": "b55325bfcc50b0f5f7df9b564d2cbf867002adc8b94195084b8b794d66adb365"
+        },
+        {
+          "line_matches": 7,
+          "path": "tests/test_artifact_diagnostics_rollback.py",
+          "repository": "ai-harness-skills",
+          "sha256": "83ef9dda2ccdf14d0d88b184b0f05a8b386fefeee1cf58d8f44d3987b56fb47e"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_reporting.py",
+          "repository": "ai-harness-skills",
+          "sha256": "387a2e0087fec641d3aab54920f821c496666b89e26b8542d570eb5e9e037166"
+        },
+        {
+          "line_matches": 22,
+          "path": "tests/workflow/test_engine.py",
+          "repository": "ai-harness-skills",
+          "sha256": "df087ec1c15996cdb7983c752492f970ed9a554ef2f5f6b32b18773054d5e62c"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/be45ce5841aa6cb9a7deadbb4e2b12b42d6ac7e64ff4bacbb81bf96fdbf7759c.json",
+          "repository": "ai-review",
+          "sha256": "6b9b647992b2387ba720394e437fa3855ddf937dcfa8a8194e8a1fb61bc00c22"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/be45ce5841aa6cb9a7deadbb4e2b12b42d6ac7e64ff4bacbb81bf96fdbf7759c/be45ce5841aa6cb9a7deadbb4e2b12b42d6ac7e64ff4bacbb81bf96fdbf7759c-w1-0.json",
+          "repository": "ai-review",
+          "sha256": "97412965ae601e2f747cd259594b5efab0343b6256529b40f286063b0e8712f7"
+        },
+        {
+          "line_matches": 1,
+          "path": "AGENTS.md",
+          "repository": "ai-review",
+          "sha256": "9459131142abf80cacfcd3f5ad1ed51be09359f773fa74010b8309ed4cedb63e"
+        },
+        {
+          "line_matches": 7,
+          "path": "README.md",
+          "repository": "ai-review",
+          "sha256": "83b0e68aca047b1900415387277284602a2cf3b5ec5017ccfecf546d791f3994"
+        },
+        {
+          "line_matches": 51,
+          "path": "scripts/deploy.sh",
+          "repository": "ai-review",
+          "sha256": "478d4e83c5fdc934f77c2ba294680f5ba503247f70d8043abfe05887012cd11c"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/ai_review/cli.py",
+          "repository": "ai-review",
+          "sha256": "87a947e9b2a44c6750d83d4df8d18aafb9c9e29d664872ea3cb32b2c8211e6eb"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/ai_review/coverage/scanner.py",
+          "repository": "ai-review",
+          "sha256": "475ee0fc48cd2d634c62e9b11bd12569d64f3c40131be285333ac8f9b717b0f1"
+        },
+        {
+          "line_matches": 5,
+          "path": "src/ai_review/models.py",
+          "repository": "ai-review",
+          "sha256": "d24def4070b9e9053f8cc1d9305d2c896e161e814611078a7ae8b244a3cca0e1"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/ai_review/prompts/builder.py",
+          "repository": "ai-review",
+          "sha256": "962f891a4e2824783a36709e477fc657f1053b3e4edab5d4e4c79ce4754ca960"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/ai_review/providers/tdt_projection.py",
+          "repository": "ai-review",
+          "sha256": "f037684a449518c2ef5daf293bb00b7a754413b786b8526c8400c6832b2915b0"
+        },
+        {
+          "line_matches": 32,
+          "path": "src/ai_review/review_flow/context.py",
+          "repository": "ai-review",
+          "sha256": "dbcd7e04e6f1c8646342e1852f2865e9ac1748fabef6c46366000bb6e72b464b"
+        },
+        {
+          "line_matches": 9,
+          "path": "src/ai_review/review_flow/orchestrator.py",
+          "repository": "ai-review",
+          "sha256": "ca61e80098292824ec481a0d6bda96e80b87eab92dbc19f02d6af8d279b36a29"
+        },
+        {
+          "line_matches": 7,
+          "path": "src/ai_review/reviewers/code_scan_reviewer.py",
+          "repository": "ai-review",
+          "sha256": "753ab533fbc8d715c5d94bf1ef37671e3534f0c83cf19b6633e07534a61774b1"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/ai_review/validation/__init__.py",
+          "repository": "ai-review",
+          "sha256": "493ca2686d29b3a7462529a11d4678c40aeaece823def23774b3b0a9f240fc83"
+        },
+        {
+          "line_matches": 12,
+          "path": "src/ai_review/validation/hunk_gate.py",
+          "repository": "ai-review",
+          "sha256": "a0aed47956df0ff626d4438a20a8cbb21e564f68c5e60bad5af3a92a86cc77f2"
+        },
+        {
+          "line_matches": 12,
+          "path": "tests/test_code_scan_reviewer.py",
+          "repository": "ai-review",
+          "sha256": "1c3d4b60fa2a8cd3b02642531585f2b0a80a59a2c3f2fc202481ca4d3cc08618"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_orchestrator.py",
+          "repository": "ai-review",
+          "sha256": "a677f53bf20fda01e18bd673b94aaa572380e8199119c347efd090d8af5c7c7b"
+        },
+        {
+          "line_matches": 3,
+          "path": "tests/test_prompt_builder.py",
+          "repository": "ai-review",
+          "sha256": "7abc4fcb2ff03a78d68aeee6d8544c31bb204e2d3f77b3f75439919294ff58ae"
+        },
+        {
+          "line_matches": 23,
+          "path": "tests/test_review_context.py",
+          "repository": "ai-review",
+          "sha256": "292fa6c303a19e52b936c6f25f98277f38789a67c853550b9be4bf7b74bac2eb"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a.json",
+          "repository": "tdt-core",
+          "sha256": "9197f3540bedec35b36e723dc0f9c8117f2c07a7e58d90dd2611a870fbf87e4d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a.json",
+          "repository": "tdt-core",
+          "sha256": "dbc789066fe51e7464edea9440f57cec94029302f98a95f69ebd85ca82ceb66d"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a-w1-0.json",
+          "repository": "tdt-core",
+          "sha256": "4f02479b757ceaea7d41f6b06639e0b048062cf81236ccba035b48f11e15e7ad"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a/41dde4aa2c0d0a392ee8da9e18645cbaf01139293626caf47c1950abe415188a-w2-0.json",
+          "repository": "tdt-core",
+          "sha256": "26ebb8da010fe201df95ac6f8dbf24aa52839e671e14b07382dc8db3d0e0a66a"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a-w1-0.json",
+          "repository": "tdt-core",
+          "sha256": "cfe9ee052adcb7106bc4dbca87b9431f3f08d722e74b8fba2064e8f9b66491b6"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a/7796ad11ce1ceb2e9579858b4bd94df1cab744e6618e52fcd32b7d559ea0129a-w2-0.json",
+          "repository": "tdt-core",
+          "sha256": "4706697f217108aa01157fa19c7b2a14d3614e8c6424e74885130a716dbdf89a"
+        },
+        {
+          "line_matches": 2,
+          "path": "PROVIDER_LAYOUT.md",
+          "repository": "tdt-core",
+          "sha256": "7e1776a30789148b2e434922acd50cfd122aa4ca34c315a44af36f64ccb960c0"
+        },
+        {
+          "line_matches": 1,
+          "path": "README.md",
+          "repository": "tdt-core",
+          "sha256": "6253b3ec9279856edd8216daef66f804493e18e38e485bef56b820aed674cc7f"
+        },
+        {
+          "line_matches": 1,
+          "path": "scripts/verify_v2_codex_acceptance.py",
+          "repository": "tdt-core",
+          "sha256": "ba2ce9937f4588a484842a92f5462b37983c339253894b2fda33382167f32333"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/tdt_core/__init__.py",
+          "repository": "tdt-core",
+          "sha256": "56ac00c18073f16530f08321a3aa45e7f7a20dc122caf655c87b6bbd0281d50c"
+        },
+        {
+          "line_matches": 32,
+          "path": "src/tdt_core/agent_profile.py",
+          "repository": "tdt-core",
+          "sha256": "cfd6c91c38ce58503d4f7f0ae767d31ecf5ca241469f4f0c2157561cbd07a369"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/tdt_core/config_loader.py",
+          "repository": "tdt-core",
+          "sha256": "60af2eb84563c6cef61ac2090ab889f0f66f2d9d5552daf829535a11358be48d"
+        },
+        {
+          "line_matches": 1,
+          "path": "src/tdt_core/data/environment-key-registry.json",
+          "repository": "tdt-core",
+          "sha256": "14949627344de9dae5acb78143aa8339942fd80e6fcb89a73b3ecf9c91e79eaf"
+        },
+        {
+          "line_matches": 3,
+          "path": "src/tdt_core/env.py",
+          "repository": "tdt-core",
+          "sha256": "6550a5d8b3c15f93daf1d920312fe2911fc5d39bfc4de5b50e3ca473b618df6d"
+        },
+        {
+          "line_matches": 5,
+          "path": "src/tdt_core/fs_kernel.py",
+          "repository": "tdt-core",
+          "sha256": "09461751581ecae8469d3065ad7f64a25e6d70dd20a2b9e144eefc76d848a4b8"
+        },
+        {
+          "line_matches": 26,
+          "path": "src/tdt_core/migration_backup.py",
+          "repository": "tdt-core",
+          "sha256": "adc9125e05c7d5fa0ec9ba09b2992f822613e3fdb6975cc4fab156b854ea2647"
+        },
+        {
+          "line_matches": 91,
+          "path": "src/tdt_core/migration_executor.py",
+          "repository": "tdt-core",
+          "sha256": "cb246c28aef258b2c4b1f1cec05684b7ef82b7624e2199bd86cd97fafffd3563"
+        },
+        {
+          "line_matches": 14,
+          "path": "src/tdt_core/migration_journal.py",
+          "repository": "tdt-core",
+          "sha256": "87d1776bbb89381928c7a0117c9205b5be3031d310f22cc8afcba8b8eee31c19"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/tdt_core/provider_model_profile.py",
+          "repository": "tdt-core",
+          "sha256": "6c6ed65df96fc68b2bf8e9b9509ca77aefea05c3684c8b8ae840658edff78c71"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/tdt_core/source_audit.py",
+          "repository": "tdt-core",
+          "sha256": "37fd0262906a879e46fb34146b06f8fa09ea67445c2e44b411aeded23c95d572"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_env_profiles.py",
+          "repository": "tdt-core",
+          "sha256": "1b0942ff99128d529cbdae8d343d18fef92fa315ee6269f18f1a6fa2a60c3a50"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_fs_kernel.py",
+          "repository": "tdt-core",
+          "sha256": "b9224c3b0be905729dbfded2beb4dd7e245eebf870f638a91bb63bf4df1a4c1f"
+        },
+        {
+          "line_matches": 19,
+          "path": "tests/test_llm_profile_v2.py",
+          "repository": "tdt-core",
+          "sha256": "e225b9e9bd604ce907147447aa5e586e24095828afd1f99c6ee7acf64cee90d1"
+        },
+        {
+          "line_matches": 1,
+          "path": "tests/test_migration_backup.py",
+          "repository": "tdt-core",
+          "sha256": "9daa6456fd8224ca05c3f5e725db0d07909891da0a5715aa12f6b9544474d4e6"
+        },
+        {
+          "line_matches": 3,
+          "path": "tests/test_migration_executor.py",
+          "repository": "tdt-core",
+          "sha256": "27920cefeaceaf54908cef80a8edf77801f08dbab16d54e9df4dd3a9189683a2"
+        },
+        {
+          "line_matches": 4,
+          "path": "tests/test_migration_journal.py",
+          "repository": "tdt-core",
+          "sha256": "8ae81211b22d3acd01f3a798a3eb72d9dac525b6c6d79cf064a2138467198e6c"
+        },
+        {
+          "line_matches": 3,
+          "path": "tests/test_phase3_atomic_capture.py",
+          "repository": "tdt-core",
+          "sha256": "d6fe3791a450b0380368d5275072bd0bc5f70a5df4bf1cb2c1ae622dc292ef95"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/test_phase3_cli_selection.py",
+          "repository": "tdt-core",
+          "sha256": "4d21a7245ddec900302604150a71aab4e28c2b92be6a7ad396af363f2d911790"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/test_phase3_compatibility.py",
+          "repository": "tdt-core",
+          "sha256": "99f4207f8b0305c87162a4a7a02f87f2b7a8e0601aa8b87308459abbbcd10ed6"
+        },
+        {
+          "line_matches": 2,
+          "path": "tests/test_provider_model_profile.py",
+          "repository": "tdt-core",
+          "sha256": "3e177cafcc1af160784bd6b8c60a0d9f9935384ef89957a30f3f5e3045159a7b"
+        },
+        {
+          "line_matches": 12,
+          "path": "tests/test_resolver_precedence.py",
+          "repository": "tdt-core",
+          "sha256": "2f804a107438b322ebda7f980161638fe8cc3d4150d64e953170ba9d3df77dca"
+        }
+      ],
+      "line_match_count": 1047
+    },
+    "public_infer": {
+      "file_count": 9,
+      "files": [
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed.json",
+          "repository": "agent-core",
+          "sha256": "007f1d18fcf9691f73521ce1e7a1d6a1e349b0fdee1871c43b989b9072e104bd"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parse-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc.json",
+          "repository": "agent-core",
+          "sha256": "bc21adb7f3412f519041d98cf781b61547ac3c123b43045a96275630840695e5"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed/a77b2d90b4a055132992c310dd1bd186d48409f062174928a1531da7ed3b4bed-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "d6ffa71683692d539699d26a6c647c03236f020a3e18317d25a143da359d0026"
+        },
+        {
+          "line_matches": 1,
+          "path": ".gitnexus/parsedfile-cache/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc/eff624b1e94b04ec69b228eadadf7c5396cc9044d99b37c9843beb12c575babc-w1-0.json",
+          "repository": "agent-core",
+          "sha256": "ab3230e77086e31fb8692bb6d86037ddcdfb09a414597be9b604712fa177ed42"
+        },
+        {
+          "line_matches": 13,
+          "path": "src/agent_core/_ai/models.py",
+          "repository": "agent-core",
+          "sha256": "9fb2a566c3c0bd081abc6ba8aa8771803c238c103972bb7356b9b29c327127fa"
+        },
+        {
+          "line_matches": 2,
+          "path": "src/agent_core/sdk/__init__.py",
+          "repository": "agent-core",
+          "sha256": "54da41db35e9587a70ae4133911bbc5996886c7f575e0002407e139e66f8a055"
+        },
+        {
+          "line_matches": 6,
+          "path": "tests/_ai/test_model_loading.py",
+          "repository": "agent-core",
+          "sha256": "47f4aa84b7d26cb7bdd42331cc9612b05eae4123d66d9b7e1af4edfac7661227"
+        },
+        {
+          "line_matches": 7,
+          "path": "tests/_ai/test_snapshot_construction_contracts.py",
+          "repository": "agent-core",
+          "sha256": "b193d2c4fe1563c6acf5cd27d01abc45de2a4db2b34460f1bb62b671efca411e"
+        },
+        {
+          "line_matches": 8,
+          "path": "tests/ai/test_models.py",
+          "repository": "agent-core",
+          "sha256": "63a19be32b43680e52467082181553b837e523353b4b0b8fbcb3db7c378c47c7"
+        }
+      ],
+      "line_match_count": 40
+    }
+  },
+  "change": "restore-agent-llm-integration-contract-truth",
+  "schema_version": "1.0.0",
+  "scope": {
+    "active_surfaces": [
+      "src",
+      "tests",
+      "templates",
+      "examples",
+      "docs",
+      "README.md",
+      "AGENTS.md",
+      "CLAUDE.md",
+      "pyproject.toml",
+      "Makefile",
+      ".github"
+    ],
+    "excluded_directories": [
+      ".git",
+      ".graphify",
+      ".venv",
+      "__pycache__",
+      "build",
+      "dist",
+      "graphify-out",
+      "site-packages"
+    ],
+    "repositories": [
+      "tdt-core",
+      "agent-core",
+      "agent-harness",
+      "agent-docs-sync",
+      "ai-harness-skills",
+      "ai-review"
+    ]
+  }
+}

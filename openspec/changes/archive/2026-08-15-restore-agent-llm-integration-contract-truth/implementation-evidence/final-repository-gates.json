@@ -1,0 +1,68 @@
+{
+  "record_type": "final-repository-gates",
+  "observed_at": "2026-08-15T07:00:00Z",
+  "dependency_identity": {
+    "tdt-core": "a5cee90f20af0a20f7a1d2499884f713c1a29b2d",
+    "agent-core": "3742e858f77a629f8fb119f2388d36f4f6201041"
+  },
+  "repositories": {
+    "tdt-core": {
+      "commit": "a5cee90f20af0a20f7a1d2499884f713c1a29b2d",
+      "pytest": "534 passed, 6 skipped, 2 warnings",
+      "ruff_check": "PASS",
+      "ruff_format_check": "PASS (83 files already formatted)",
+      "mypy_strict": "PASS (43 source files)",
+      "diff_check": "PASS"
+    },
+    "agent-core": {
+      "commit": "3742e858f77a629f8fb119f2388d36f4f6201041",
+      "pytest": "692 passed, 19 skipped",
+      "ruff_check": "PASS",
+      "ruff_format_check": "PASS (181 files already formatted)",
+      "mypy_strict": "PASS (91 source files)",
+      "diff_check": "PASS"
+    },
+    "agent-harness": {
+      "commit": "70d0da2fbdfa15c1382cec6a09468dfc7e86e7c1",
+      "pytest": "358 passed",
+      "ruff_check": "PASS",
+      "ruff_format_check": "PASS (88 files already formatted)",
+      "mypy_strict": "PASS (52 source files)",
+      "diff_check": "PASS",
+      "origins": "tdt-core=a5cee90f20af0a20f7a1d2499884f713c1a29b2d; agent-core=3742e858f77a629f8fb119f2388d36f4f6201041"
+    },
+    "agent-docs-sync": {
+      "commit": "a189c50452015a06d4f63fc342fa22e7e31e34ad",
+      "pytest": "271 passed, 4 warnings",
+      "ruff_check": "PASS",
+      "ruff_format_check": "PASS (95 files already formatted)",
+      "mypy_strict": "PASS (49 source files)",
+      "diff_check": "PASS",
+      "origins": "tdt-core=a5cee90f20af0a20f7a1d2499884f713c1a29b2d; agent-core=3742e858f77a629f8fb119f2388d36f4f6201041"
+    },
+    "ai-harness-skills": {
+      "commit": "fb21b093f0207bd40f4fd0d7d9cffdce682b0089",
+      "pytest": "632 passed, 4 skipped",
+      "ruff_check": "PASS",
+      "ruff_format_check": "PASS (108 files already formatted)",
+      "mypy_strict": "PASS (58 source files)",
+      "diff_check": "PASS",
+      "origins": "tdt-core=a5cee90f20af0a20f7a1d2499884f713c1a29b2d; agent-core=3742e858f77a629f8fb119f2388d36f4f6201041"
+    },
+    "ai-review": {
+      "commit": "e71ce742cdb88b2a2c8c621eaed1c34f67f4a6ab",
+      "pytest": "209 passed",
+      "ruff_check": "PASS",
+      "ruff_format_check": "PASS (62 files already formatted)",
+      "mypy_strict": "PASS (40 source files)",
+      "diff_check": "PASS",
+      "origins": "tdt-core=a5cee90f20af0a20f7a1d2499884f713c1a29b2d; agent-core=3742e858f77a629f8fb119f2388d36f4f6201041"
+    }
+  },
+  "commands": {
+    "python": "uv run --frozen --no-sync",
+    "cross_worktree": "uv pip install --python .venv/bin/python --no-deps --force-reinstall -e <tdt-core> -e <agent-core>",
+    "validation": "All commands used set -euo pipefail; live-only TDT_HOME/GitLab variables were unset for repository tests."
+  },
+  "status": "PASS"
+}

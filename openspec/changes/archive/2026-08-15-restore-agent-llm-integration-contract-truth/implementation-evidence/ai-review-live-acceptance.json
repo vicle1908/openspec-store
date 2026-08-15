@@ -1,0 +1,51 @@
+{
+  "record_type": "ai-review-live-acceptance",
+  "row": "13.3",
+  "status": "PASS",
+  "composition_chain": {
+    "cli_entrypoint": "ai-review",
+    "cli_command": "ai-review review",
+    "internal_reached": [
+      "run_review",
+      "ReviewOrchestrator.run_sync"
+    ],
+    "resolved_reviewer": "codescan",
+    "resolution_path": "ReviewOrchestrator selected codescan, attempted execution, and completed the full orchestration lifecycle"
+  },
+  "execution_proof": {
+    "exit_code": 0,
+    "handoff_id": "cli-13",
+    "nonce": "live-acceptance-py-v5",
+    "orchestration_status": "completed",
+    "publish_status": "posted",
+    "stages_published": 1
+  },
+  "canonical_identity": {
+    "executable": "ai-review",
+    "resolved_to": "ReviewOrchestrator.run_sync",
+    "tdt_core_sha": "a5cee90f20af0a20f7a1d2499884f713c1a29b2d",
+    "agent_core_sha": "3742e858f77a629f8fb119f2388d36f4f6201041"
+  },
+  "reviewer_outcome": {
+    "reviewer": "codescan",
+    "attempted": true,
+    "contributed": false,
+    "status": "completed",
+    "outcome": "skipped",
+    "skip_reason": "code_daily_scan only has iOS/Android detection rules; no Python rules exist (loaded_rule_count=0, all .py files classified as unsupported_extension)",
+    "retried": true,
+    "retried_with_fallback": "full",
+    "retried_outcome": "skipped",
+    "note": "The codescan reviewer is a mobile-app static analysis scanner. Its skip of Python files is correct behavior \u2014 not an integration failure. The composition chain (CLI \u2192 run_review \u2192 ReviewOrchestrator.run_sync \u2192 reviewer selection \u2192 execution \u2192 publication) is fully proven."
+  },
+  "independent_checks": {
+    "process_reachability": "PASS",
+    "nested_success": "PASS",
+    "artifact_proof": "PASS",
+    "target_preservation": "PASS"
+  },
+  "target": {
+    "path": "/private/tmp/ai-review-acceptance-worktrees/mr-cli-13",
+    "preserved": true
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "planning_commit_sha": "804b4f68cdca6314bf714bade218218ef997a263",
+  "store_base_sha": "d666ff01e80bfb69b4e2d2f5810e7f8a9cdc06b5",
+  "superseded_evidence_commit_sha": "d442c3d57ab2d3dba4d1459566a434d162b70ee6",
+  "history_rewritten": false,
+  "historical_omission": "Earlier planning/evidence commits omitted required pre-commit GitNexus checks and later recorded a retrospective NOT_APPLICABLE result against the wrong identity/range.",
+  "current_remediation_status": "complete",
+  "pre_edit_product_impact": {
+    "tool": "GitNexus impact via MCP with exact repository and file hints, upstream direction, tests included, summary-only",
+    "high_or_critical_warning_reported_before_edit": true,
+    "results": [
+      {
+        "repository": "agent-core",
+        "symbol": "create_model",
+        "risk": "CRITICAL",
+        "direct_dependents": 3,
+        "impacted_symbols": 5,
+        "affected_process_groups": 5
+      },
+      {
+        "repository": "agent-core",
+        "symbol": "create_fallback_model",
+        "risk": "HIGH",
+        "direct_dependents": 2,
+        "impacted_symbols": 4,
+        "affected_process_groups": 4
+      },
+      {
+        "repository": "agent-core",
+        "symbol": "create_model_with_fallback",
+        "risk": "LOW",
+        "direct_dependents": 1,
+        "impacted_symbols": 1,
+        "affected_process_groups": 1
+      },
+      {
+        "repository": "agent-core",
+        "symbol": "infer_model",
+        "risk": "UNKNOWN",
+        "note": "No indexed agent-core symbol resolved; direct source confirmed it is a public re-export of imported library inference"
+      },
+      {
+        "repository": "agent-core",
+        "symbol": "build_agent",
+        "risk": "LOW",
+        "direct_dependents": 0,
+        "impacted_symbols": 0,
+        "affected_process_groups": 0
+      },
+      {
+        "repository": "agent-core",
+        "symbol": "BaseAgent",
+        "risk": "LOW",
+        "direct_dependents": 1,
+        "impacted_symbols": 11,
+        "affected_process_groups": 0
+      },
+      {
+        "repository": "agent-core",
+        "symbol": "_create_runtime_model",
+        "risk": "LOW",
+        "direct_dependents": 1,
+        "impacted_symbols": 1,
+        "affected_process_groups": 1
+      },
+      {
+        "repository": "agent-core",
+        "symbol": "CallerSnapshot",
+        "risk": "MEDIUM",
+        "direct_dependents": 5,
+        "impacted_symbols": 16,
+        "affected_process_groups": 0
+      },
+      {
+        "repository": "agent-core",
+        "symbol": "ConsumerRuntimeProfile",
+        "risk": "MEDIUM",
+        "direct_dependents": 5,
+        "impacted_symbols": 16,
+        "affected_process_groups": 0
+      },
+      {
+        "repository": "tdt-core",
+        "symbol": "ResolvedAgentProfile",
+        "risk": "LOW",
+        "direct_dependents": 3,
+        "impacted_symbols": 11,
+        "affected_process_groups": 0
+      },
+      {
+        "repository": "tdt-core",
+        "symbol": "resolve_agent_profile",
+        "risk": "HIGH",
+        "direct_dependents": 3,
+        "impacted_symbols": 3,
+        "affected_process_groups": 3
+      }
+    ],
+    "interpretation": "The high/critical blast radius is the intended coordinated break across tdt-core profile loading and agent-core factory/CLI/SDK composition; execution tasks migrate every affected public caller in dependency order."
+  },
+  "pre_commit_detect_changes": {
+    "tool": "GitNexus detect_changes via MCP",
+    "repository": "openspec-store",
+    "explicit_worktree": "/Users/androidteam/Developer/.worktrees/openspec-restore-agent-llm-integration-contract-truth",
+    "scope": "all",
+    "base_ref": "HEAD",
+    "status": "PASS",
+    "summary": {
+      "changed_count": 0,
+      "affected_count": 0,
+      "changed_files": 6,
+      "risk_level": "low",
+      "changed_symbols": [],
+      "affected_processes": []
+    },
+    "interpretation": "Immediately before planning commit, exactly six OpenSpec artifact files were dirty and no indexed source symbol or execution flow was affected."
+  },
+  "post_commit_compare": {
+    "tool": "GitNexus detect_changes via MCP",
+    "repository": "openspec-store",
+    "explicit_worktree": "/Users/androidteam/Developer/.worktrees/openspec-restore-agent-llm-integration-contract-truth",
+    "scope": "compare",
+    "base_ref": "main",
+    "status": "PASS",
+    "summary": {
+      "changed_count": 0,
+      "affected_count": 0,
+      "changed_files": 12,
+      "risk_level": "low",
+      "changed_symbols": [],
+      "affected_processes": []
+    },
+    "interpretation": "The branch-to-main comparison covers 12 change files (planning, metadata, and review evidence) and no indexed source symbols or flows."
+  },
+  "evidence_pre_commit_detect_changes": {
+    "tool": "GitNexus detect_changes via MCP",
+    "repository": "openspec-store",
+    "explicit_worktree": "/Users/androidteam/Developer/.worktrees/openspec-restore-agent-llm-integration-contract-truth",
+    "scope": "all",
+    "base_ref": "HEAD",
+    "status": "PASS",
+    "summary": {
+      "changed_count": 0,
+      "affected_count": 0,
+      "changed_files": 4,
+      "risk_level": "low",
+      "changed_symbols": [],
+      "affected_processes": []
+    },
+    "interpretation": "Immediately before the evidence commit, exactly four regenerated JSON evidence files were dirty and no indexed source symbol or execution flow was affected."
+  },
+  "corrective_diff_range": "d666ff01e80bfb69b4e2d2f5810e7f8a9cdc06b5..804b4f68cdca6314bf714bade218218ef997a263 plus evidence-only regeneration",
+  "corrective_diff_hash_source": "review-evidence/identity-manifest.json planning_diff.sha256",
+  "supersession_scope": "All prior 5-REMOVED/5-ADDED/3-MODIFIED evidence and the retrospective NOT_APPLICABLE governance claim are superseded by the 35-REMOVED/18-ADDED/3-MODIFIED clean-break planning commit and regenerated evidence.",
+  "recorded_at": "2026-08-14T17:45:22.656964+00:00",
+  "planning_correction_commit": "804b4f68cdca6314bf714bade218218ef997a263",
+  "planning_correction_scope": "Renamed 35 REMOVED guidance labels from Replacement to Migration; no normative body or scenario changed.",
+  "planning_correction_detect_changes": {
+    "tool": "GitNexus detect_changes via MCP",
+    "scope": "all",
+    "base_ref": "HEAD",
+    "changed_files": 3,
+    "changed_symbols": [],
+    "affected_processes": [],
+    "risk_level": "low",
+    "status": "PASS"
+  }
+}

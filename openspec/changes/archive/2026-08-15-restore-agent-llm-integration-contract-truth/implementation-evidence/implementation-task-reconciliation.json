@@ -1,0 +1,54 @@
+{
+  "record_type": "implementation-task-reconciliation",
+  "status": "PASS_FOR_TASKS_1_11",
+  "scenario_treatment": {
+    "removed_requirements": 35,
+    "added_requirements": 18,
+    "modified_requirements": 3,
+    "removed_baseline_scenarios": 142,
+    "all_old_scenarios_accounted": true,
+    "modified_baseline_scenarios": 14,
+    "modified_hashes_equal": 14,
+    "modified_hash_gate": "14/14"
+  },
+  "implementation_commits": {
+    "openspec-store": "7791792bc58a01168d5b2150ed499478742d5963",
+    "tdt-core": "a5cee90f20af0a20f7a1d2499884f713c1a29b2d",
+    "agent-core": "3742e858f77a629f8fb119f2388d36f4f6201041",
+    "agent-harness": "70d0da2fbdfa15c1382cec6a09468dfc7e86e7c1",
+    "agent-docs-sync": "a189c50452015a06d4f63fc342fa22e7e31e34ad",
+    "ai-harness-skills": "fb21b093f0207bd40f4fd0d7d9cffdce682b0089",
+    "ai-review": "e71ce742cdb88b2a2c8c621eaed1c34f67f4a6ab"
+  },
+  "public_surface_checks": {
+    "tdt_core": {
+      "canonical_validation": "PASS",
+      "legacy_schema_rejection": "PASS",
+      "context_is_slotted_non_dataclass": "PASS",
+      "resolve_model_construction_context_signature": "(agent_name: str, *, root: str | Path | None = None, canonical_alias: str | None = None) -> ModelConstructionContext",
+      "build_model_construction_context_signature": "(profile: ResolvedAgentProfile) -> ModelConstructionContext"
+    },
+    "agent_core": {
+      "create_model_signature": "(model: str | Model, *, context: ModelConstructionContext | None = None) -> Model",
+      "build_agent_signature": "(*, model: str | Model, context: ModelConstructionContext | None = None, profile: ConsumerRuntimeProfile | None = None, ...)",
+      "base_agent_requires_model": true,
+      "removed_public_exports_absent": ["create_fallback_model", "create_model_with_fallback", "infer_model"]
+    }
+  },
+  "active_surface_classifications": {
+    "agent_core._ai.config_loader.load_agent_config": "allowed separate agent-spec loader; not tdt-core LLM mapping projection",
+    "tdt_core.config_loader.api_key_env": "allowed explicit unsupported-schema/rejection validation",
+    "other_legacy_hits": "restricted to rejection tests, immutable evidence, or historical archive"
+  },
+  "task_mapping": {
+    "1.1-1.4": "review-evidence/identity-manifest.json, ownership-baseline.json, red-baseline.json",
+    "2.1-2.5": "review-evidence/scenario-preservation.json, governance-remediation.json, review-findings.json",
+    "3.1-4.10": "tdt-core commit plus public_surface_checks.tdt_core plus final-repository-gates.json",
+    "5.1-6.8": "agent-core commit plus public_surface_checks.agent_core plus final-repository-gates.json",
+    "7.1-7.6": "agent-harness commit plus final-repository-gates.json",
+    "8.1-8.7": "agent-docs-sync commit plus final-repository-gates.json",
+    "9.1-9.7": "ai-harness-skills/ai-review commits plus final-repository-gates.json",
+    "10.1-10.3": "live-preflight.json and final-repository-gates.json",
+    "11.1-11.3": "active_surface_classifications plus final-repository-gates.json"
+  }
+}

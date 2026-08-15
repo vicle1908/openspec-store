@@ -1,0 +1,32 @@
+{
+  "record_type": "harness-live-acceptance",
+  "row": "13.2",
+  "status": "PASS",
+  "composition_chain": {
+    "cli_entrypoint": "agent-harness",
+    "cli_command": "agent-harness run",
+    "internal_reached": ["_resolve_runner", "WorkflowRunner.run"],
+    "resolved_runner_class": "WorkflowRunner"
+  },
+  "execution_proof": {
+    "exit_code": 0,
+    "run_id": "run-de44ef952e48",
+    "nonce": "1d540cf7aab04869",
+    "status": "needs_input",
+    "status_interpretation": "WorkflowRunner.run() completed its first pass. 'needs_input' is the expected lifecycle state awaiting operator approval — not an exception."
+  },
+  "canonical_identity": {
+    "executable": "agent-harness",
+    "executable_resolved": "workflow.runner.WorkflowRunner",
+    "model_context_digest": "910ee9efa9b9836c9cdac8dd576340d1ff40452ce869168b84e1e326c75bde46",
+    "tdt_core_sha": "a5cee90f20af0a20f7a1d2499884f713c1a29b2d",
+    "agent_core_sha": "3742e858f77a629f8fb119f2388d36f4f6201041"
+  },
+  "independent_checks": {
+    "process_reachability": "PASS",
+    "nested_success": "PASS",
+    "artifact_proof": "PASS",
+    "target_preservation": "PASS"
+  },
+  "evidence_source": "/private/tmp/harness-acceptance-A/output-1d540cf7aab04869.json"
+}

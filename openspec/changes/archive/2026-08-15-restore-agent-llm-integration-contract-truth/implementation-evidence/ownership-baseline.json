@@ -1,0 +1,299 @@
+{
+  "active_openspec_snapshot": {
+    "changes": [
+      {
+        "completedTasks": 142,
+        "lastModified": "2026-08-14T18:08:42.815Z",
+        "name": "ecosystem-index-freshness-automation",
+        "status": "complete",
+        "totalTasks": 142
+      },
+      {
+        "completedTasks": 16,
+        "lastModified": "2026-08-11T06:33:36.021Z",
+        "name": "auto-start-claude-code-provider-adapter",
+        "status": "in-progress",
+        "totalTasks": 22
+      },
+      {
+        "completedTasks": 0,
+        "lastModified": "2026-08-10T11:59:32.590Z",
+        "name": "agent-harness-gate-boundary-hardening",
+        "status": "in-progress",
+        "totalTasks": 16
+      },
+      {
+        "completedTasks": 13,
+        "lastModified": "2026-08-10T10:47:29.986Z",
+        "name": "harden-goose-runtime-configuration",
+        "status": "in-progress",
+        "totalTasks": 32
+      },
+      {
+        "completedTasks": 6,
+        "lastModified": "2026-08-10T06:00:16.238Z",
+        "name": "align-jti-skill-runtime-contract",
+        "status": "in-progress",
+        "totalTasks": 35
+      },
+      {
+        "completedTasks": 1,
+        "lastModified": "2026-08-09T11:01:10.888Z",
+        "name": "integrate-grok-build-cli",
+        "status": "in-progress",
+        "totalTasks": 37
+      },
+      {
+        "completedTasks": 11,
+        "lastModified": "2026-08-06T03:18:21.572Z",
+        "name": "hermes-matrix-integration",
+        "status": "in-progress",
+        "totalTasks": 14
+      },
+      {
+        "completedTasks": 0,
+        "lastModified": "2026-08-06T00:24:02.524Z",
+        "name": "hermes-acp-zed-integration",
+        "status": "no-tasks",
+        "totalTasks": 0
+      },
+      {
+        "completedTasks": 15,
+        "lastModified": "2026-08-04T16:07:42.573Z",
+        "name": "scheduler-stale-workflow-hardening",
+        "status": "in-progress",
+        "totalTasks": 21
+      },
+      {
+        "completedTasks": 13,
+        "lastModified": "2026-08-04T16:06:13.961Z",
+        "name": "pmp-migration-phase-3",
+        "status": "in-progress",
+        "totalTasks": 73
+      },
+      {
+        "completedTasks": 9,
+        "lastModified": "2026-08-01T03:01:35.283Z",
+        "name": "complete-cloud-deployment-and-cicd-readiness",
+        "status": "in-progress",
+        "totalTasks": 18
+      },
+      {
+        "completedTasks": 22,
+        "lastModified": "2026-07-30T10:49:21.430Z",
+        "name": "optimize-hermes-agent-configuration",
+        "status": "in-progress",
+        "totalTasks": 59
+      }
+    ],
+    "root": {
+      "path": "/Users/androidteam/Developer/openspec-store",
+      "source": "store",
+      "store_id": "openspec-store"
+    }
+  },
+  "captured_at": "2026-08-14T18:22:02.309008+00:00",
+  "change": "restore-agent-llm-integration-contract-truth",
+  "ownership_rule": "One writer per repository; canonical dirt and existing Buzz worktrees are preserved and are not patch sources.",
+  "plan_head_sha": "36af210f7b727b60c6a9fe7a3447f203e9cd8426",
+  "plan_worktree": "/Users/androidteam/Developer/.worktrees/openspec-restore-agent-llm-integration-contract-truth",
+  "repositories": [
+    {
+      "base_sha": "36af210f7b727b60c6a9fe7a3447f203e9cd8426",
+      "branch": "openspec/restore-agent-llm-integration-contract-truth",
+      "canonical_head_sha": "baaf28fba8921e7b82ebfb4d2645359ad122311e",
+      "canonical_raw_dirt": [],
+      "canonical_root": "/Users/androidteam/Developer/openspec-store",
+      "closest_agents_md": "/Users/androidteam/Developer/openspec-store/AGENTS.md",
+      "head_sha": "36af210f7b727b60c6a9fe7a3447f203e9cd8426",
+      "id": "openspec-store",
+      "status": [],
+      "toolchain": "openspec-cli",
+      "writer_worktree": "/Users/androidteam/Developer/.worktrees/openspec-restore-agent-llm-integration-contract-truth"
+    },
+    {
+      "base_sha": "57fad4b972a3319997022e5d7f01221e9f142881",
+      "branch": "openspec/restore-agent-llm-tdt-core",
+      "canonical_head_sha": "57fad4b972a3319997022e5d7f01221e9f142881",
+      "canonical_raw_dirt": [
+        {
+          "kind": "directory_or_missing",
+          "path": "raphify-out/graph.json",
+          "sha256": null,
+          "status": "M "
+        },
+        {
+          "kind": "file",
+          "path": "graphify-out/manifest.json",
+          "sha256": "438a109bb7254e017097b6ced829ef3c16e0db1a90561e21d3b1003ddd987e73",
+          "status": " M"
+        }
+      ],
+      "canonical_root": "/Users/androidteam/Developer/tdt-core",
+      "closest_agents_md": "/Users/androidteam/Developer/tdt-core/AGENTS.md",
+      "head_sha": "57fad4b972a3319997022e5d7f01221e9f142881",
+      "id": "tdt-core",
+      "status": [],
+      "toolchain": "uv/python",
+      "writer_worktree": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-tdt-core"
+    },
+    {
+      "base_sha": "250be6b5b16a686a848cd14785de773edd226f62",
+      "branch": "openspec/restore-agent-llm-agent-core",
+      "canonical_head_sha": "250be6b5b16a686a848cd14785de773edd226f62",
+      "canonical_raw_dirt": [
+        {
+          "kind": "directory_or_missing",
+          "path": "raphify-out/.graphify_labels.json",
+          "sha256": null,
+          "status": "M "
+        },
+        {
+          "kind": "file",
+          "path": "graphify-out/.graphify_labels.json.sig",
+          "sha256": "23fc1afb68e665c1cc5e11b8c9ff3fcc08b098d335ca04d551f4e875d7289755",
+          "status": " M"
+        },
+        {
+          "kind": "file",
+          "path": "graphify-out/GRAPH_REPORT.md",
+          "sha256": "8719e9a6c82602a4aa22bb9641e7c17d64b0d378e0cba9daed9e9f837d4f7dbb",
+          "status": " M"
+        },
+        {
+          "kind": "directory_or_missing",
+          "path": "graphify-out/graph.html",
+          "sha256": null,
+          "status": " D"
+        },
+        {
+          "kind": "file",
+          "path": "graphify-out/graph.json",
+          "sha256": "679f2ed69e122332804eb4c59f881036951fb88e7f40150adf8b46a4568f014b",
+          "status": " M"
+        },
+        {
+          "kind": "file",
+          "path": "graphify-out/manifest.json",
+          "sha256": "1ea5fa4ea1f8932f98c55722a31807d9439ceaa41915c31ba100f74d96c91e5d",
+          "status": " M"
+        }
+      ],
+      "canonical_root": "/Users/androidteam/Developer/agent-core",
+      "closest_agents_md": "/Users/androidteam/Developer/agent-core/AGENTS.md",
+      "head_sha": "250be6b5b16a686a848cd14785de773edd226f62",
+      "id": "agent-core",
+      "status": [],
+      "toolchain": "uv/python",
+      "writer_worktree": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-agent-core"
+    },
+    {
+      "base_sha": "e39d152a5215f9bec213a463505c6afa980b353b",
+      "branch": "openspec/restore-agent-llm-agent-harness",
+      "canonical_head_sha": "e39d152a5215f9bec213a463505c6afa980b353b",
+      "canonical_raw_dirt": [
+        {
+          "kind": "directory_or_missing",
+          "path": "raphify-out/graph.json",
+          "sha256": null,
+          "status": "M "
+        },
+        {
+          "kind": "file",
+          "path": "graphify-out/manifest.json",
+          "sha256": "c728f9bb401df8d23a6192fb49250ef6c29e65f36afb7dfa167fde2c33cc7685",
+          "status": " M"
+        }
+      ],
+      "canonical_root": "/Users/androidteam/Developer/agent-harness",
+      "closest_agents_md": "/Users/androidteam/Developer/agent-harness/AGENTS.md",
+      "head_sha": "e39d152a5215f9bec213a463505c6afa980b353b",
+      "id": "agent-harness",
+      "status": [],
+      "toolchain": "uv/python",
+      "writer_worktree": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-agent-harness"
+    },
+    {
+      "base_sha": "e4576cd1f19ece6be447abb4f63a20e4455343e5",
+      "branch": "openspec/restore-agent-llm-agent-docs-sync",
+      "canonical_head_sha": "e4576cd1f19ece6be447abb4f63a20e4455343e5",
+      "canonical_raw_dirt": [
+        {
+          "kind": "directory_or_missing",
+          "path": "raphify-out/graph.json",
+          "sha256": null,
+          "status": "M "
+        },
+        {
+          "kind": "file",
+          "path": "graphify-out/manifest.json",
+          "sha256": "1a421226304934a1f4c7a3527b7685bfb095a19831326344cdbe43445fb70554",
+          "status": " M"
+        }
+      ],
+      "canonical_root": "/Users/androidteam/Developer/agent-docs-sync",
+      "closest_agents_md": "/Users/androidteam/Developer/agent-docs-sync/AGENTS.md",
+      "head_sha": "e4576cd1f19ece6be447abb4f63a20e4455343e5",
+      "id": "agent-docs-sync",
+      "status": [],
+      "toolchain": "uv/python",
+      "writer_worktree": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-agent-docs-sync"
+    },
+    {
+      "base_sha": "99001ec6dc16499e235ff43b82e0f9cbb7051ab4",
+      "branch": "openspec/restore-agent-llm-ai-harness-skills",
+      "canonical_head_sha": "99001ec6dc16499e235ff43b82e0f9cbb7051ab4",
+      "canonical_raw_dirt": [
+        {
+          "kind": "directory_or_missing",
+          "path": "vidence/phase7/evidence-record.json",
+          "sha256": null,
+          "status": "M "
+        },
+        {
+          "kind": "file",
+          "path": "evidence/phase7/handoff.json",
+          "sha256": "47348cc8761c42c96ddb2d22cc0884e81b329489f4d34613934b35a44d323a95",
+          "status": " M"
+        }
+      ],
+      "canonical_root": "/Users/androidteam/Developer/ai-harness-skills",
+      "closest_agents_md": "/Users/androidteam/Developer/ai-harness-skills/AGENTS.md",
+      "head_sha": "99001ec6dc16499e235ff43b82e0f9cbb7051ab4",
+      "id": "ai-harness-skills",
+      "status": [],
+      "toolchain": "uv/python",
+      "writer_worktree": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-ai-harness-skills"
+    },
+    {
+      "base_sha": "4fd0abfa99276ce3cd38b3996c0ff3713d6e2259",
+      "branch": "openspec/restore-agent-llm-ai-review",
+      "canonical_head_sha": "4fd0abfa99276ce3cd38b3996c0ff3713d6e2259",
+      "canonical_raw_dirt": [
+        {
+          "kind": "directory_or_missing",
+          "path": "i-review-handoff.md",
+          "sha256": null,
+          "status": "M "
+        }
+      ],
+      "canonical_root": "/Users/androidteam/Developer/ai-review",
+      "closest_agents_md": "/Users/androidteam/Developer/ai-review/AGENTS.md",
+      "head_sha": "4fd0abfa99276ce3cd38b3996c0ff3713d6e2259",
+      "id": "ai-review",
+      "status": [],
+      "toolchain": "uv/python",
+      "writer_worktree": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-ai-review"
+    }
+  ],
+  "schema_version": "1.0.0",
+  "stop_conditions": [
+    "unresolved ownership",
+    "overlapping dirt",
+    "new normative behavior",
+    "changed upstream identity",
+    "missing dependency origin",
+    "credential-bearing work without current authorization"
+  ],
+  "store_canonical_head_at_capture": "baaf28fba8921e7b82ebfb4d2645359ad122311e"
+}

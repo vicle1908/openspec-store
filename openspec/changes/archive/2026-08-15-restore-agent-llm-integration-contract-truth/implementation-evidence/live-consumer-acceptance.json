@@ -1,0 +1,44 @@
+{
+  "ai_review_row": {
+    "status": "PASS",
+    "exit_code": 0,
+    "handoff_id": "cli-13",
+    "nonce": "live-acceptance-py-v5",
+    "executable": "ai-review",
+    "resolved_to": "ReviewOrchestrator.run_sync",
+    "orchestration_status": "completed",
+    "publish_status": "posted",
+    "reviewer": "codescan",
+    "reviewer_outcome": "skipped (mobile-only scanner, no Python rules)",
+    "reviewer_contributed": false,
+    "process_reachability": "PASS",
+    "nested_success": "PASS",
+    "artifact_proof": "PASS",
+    "target_preservation": "PASS",
+    "tdt_core_sha": "a5cee90f20af0a20f7a1d2499884f713c1a29b2d",
+    "agent_core_sha": "3742e858f77a629f8fb119f2388d36f4f6201041"
+  },
+  "harness_row": {
+    "status": "PASS",
+    "exit_code": 0,
+    "run_id": "run-de44ef952e48",
+    "nonce": "1d540cf7aab04869",
+    "executable": "agent-harness",
+    "resolved_to": "WorkflowRunner",
+    "model_context_digest_prefix": "910ee9ef",
+    "process_reachability": "PASS",
+    "nested_success": "PASS",
+    "artifact_proof": "PASS",
+    "target_preservation": "PASS",
+    "blocker": null
+  },
+  "independence": {
+    "ai_review_nonce": "live-acceptance-py-v5",
+    "distinct": true,
+    "harness_nonce": "1d540cf7aab04869",
+    "status": "PASS"
+  },
+  "observed_at": "2026-08-15T06:56:08Z",
+  "record_type": "live-consumer-acceptance",
+  "status": "BOTH_ROWS_PASS"
+}

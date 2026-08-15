@@ -1,0 +1,243 @@
+{
+  "store_base_sha": "d666ff01e80bfb69b4e2d2f5810e7f8a9cdc06b5",
+  "store_base_commit_date": "2026-08-14",
+  "planning_commit_sha": "804b4f68cdca6314bf714bade218218ef997a263",
+  "planning_commit_tree_sha": "2588f82c866996a12f25da5ae2dcd880861c136c",
+  "planning_commit_message": "openspec(agent-llm): label removed-contract migration guidance",
+  "planning_branch": "openspec/restore-agent-llm-integration-contract-truth",
+  "planning_worktree": "/Users/androidteam/Developer/.worktrees/openspec-restore-agent-llm-integration-contract-truth",
+  "artifact_hashes": {
+    "proposal.md": "4697db96f2e5746e745a4ad52cb602e6bdc609aa12ba410e2382af8f4c12f14a",
+    "design.md": "e6b255c7314a3f1aacba381891c3ed8fc31351e6d5bec2894edea0ed4d0ae007",
+    "tasks.md": "27ef0561a555b7f64161c584243f9a0680df054df39883d11ccac0e55eae78e0",
+    "specs/agent-config-resolution/spec.md": "7e2c87f1ddf1ebc99e1505b847db42dbd99204c27a279a32d7eac43b3618813d",
+    "specs/agent-core-model-resolution/spec.md": "3fabc917f8a1164be1ae7a9cb64456de3de90e940d9472e977639ba68c0886b1",
+    "specs/cli-provider-profile-resolution/spec.md": "f2ce263e1c0bdf57c3dd5bbd591c8c81d0f7462d4475bb2b619d3c222dc013c9"
+  },
+  "repository_identities": {
+    "openspec-store-primary": {
+      "path": "/Users/androidteam/Developer/openspec-store",
+      "branch": "main",
+      "head_sha": "d666ff01e80bfb69b4e2d2f5810e7f8a9cdc06b5",
+      "dirty": true,
+      "raw_status": [
+        " M openspec/specs/developer-code-intelligence/spec.md",
+        " M scripts/knowledge-refresh/install-hooks.sh",
+        " M scripts/knowledge-refresh/knowledge-status.sh",
+        " M scripts/knowledge-refresh/refresh-knowledge-indexes.sh",
+        "?? scripts/knowledge-refresh/tests/fixtures/README.md"
+      ],
+      "tracked_worktree_diff_sha256": "a2e9a4ac951e3751eeb22b1063064782a504c28e9c08aa6594e0b039f845ed83",
+      "tracked_worktree_diff_excludes": [],
+      "staged_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runtime_import_origin": "not_run_during_planning_evidence_capture",
+      "identity_status": "external_content_drift_observed",
+      "path_drift_observed": true,
+      "content_drift_observations": [
+        {
+          "observed_at": "2026-08-14T16:49:21Z",
+          "tracked_worktree_diff_sha256": "1c97238fc9b633d77ad4af0938f52da34de5d25837f357a61f660e4087383be5"
+        },
+        {
+          "observed_at": "2026-08-14T16:51:50Z",
+          "tracked_worktree_diff_sha256": "364168976f2888e664f4dfd361d8e3b184a6e77a2b9249f6c8c964a83cbc1205"
+        },
+        {
+          "observed_at": "2026-08-14T16:53:25Z",
+          "tracked_worktree_diff_sha256": "a2e9a4ac951e3751eeb22b1063064782a504c28e9c08aa6594e0b039f845ed83"
+        }
+      ],
+      "path_drift_observations": [
+        {
+          "observed_at": "2026-08-14T16:49:21Z",
+          "path_count": 3
+        },
+        {
+          "observed_at": "2026-08-14T16:51:50Z",
+          "path_count": 4
+        },
+        {
+          "observed_at": "2026-08-14T16:54:22Z",
+          "path_count": 5,
+          "new_path": "scripts/knowledge-refresh/tests/fixtures/README.md"
+        }
+      ],
+      "execution_disposition": "External non-overlapping writer; recapture HEAD, raw status, and content-diff hash before any openspec-store mutation and stop if ownership or overlap is unresolved"
+    },
+    "openspec-store-corrective": {
+      "path": "/Users/androidteam/Developer/.worktrees/openspec-restore-agent-llm-integration-contract-truth",
+      "branch": "openspec/restore-agent-llm-integration-contract-truth",
+      "head_sha": "38be641953a278614d3c395402089fe847161b92",
+      "dirty": true,
+      "raw_status": [
+        " M openspec/changes/restore-agent-llm-integration-contract-truth/review-evidence/governance-remediation.json",
+        " M openspec/changes/restore-agent-llm-integration-contract-truth/review-evidence/identity-manifest.json",
+        " M openspec/changes/restore-agent-llm-integration-contract-truth/review-evidence/review-findings.json",
+        " M openspec/changes/restore-agent-llm-integration-contract-truth/review-evidence/scenario-preservation.json"
+      ],
+      "tracked_worktree_diff_sha256": "0a6ff608fc5613526aad53cd3c719a6d878983ebf0d97444644f10490951cdf5",
+      "tracked_worktree_diff_excludes": [
+        "openspec/changes/restore-agent-llm-integration-contract-truth/review-evidence/identity-manifest.json"
+      ],
+      "staged_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runtime_import_origin": "not_run_during_planning_evidence_capture"
+    },
+    "tdt-core": {
+      "path": "/Users/androidteam/Developer/tdt-core",
+      "branch": "main",
+      "head_sha": "57fad4b972a3319997022e5d7f01221e9f142881",
+      "dirty": true,
+      "raw_status": [
+        " M graphify-out/graph.json",
+        " M graphify-out/manifest.json"
+      ],
+      "tracked_worktree_diff_sha256": "0339a7590d849fe0175888c128567f89837106e25dbff0544e347850fdc1642a",
+      "tracked_worktree_diff_excludes": [],
+      "staged_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runtime_import_origin": "not_run_during_planning_evidence_capture"
+    },
+    "agent-core": {
+      "path": "/Users/androidteam/Developer/agent-core",
+      "branch": "main",
+      "head_sha": "250be6b5b16a686a848cd14785de773edd226f62",
+      "dirty": true,
+      "raw_status": [
+        " M graphify-out/.graphify_labels.json",
+        " M graphify-out/.graphify_labels.json.sig",
+        " M graphify-out/GRAPH_REPORT.md",
+        " D graphify-out/graph.html",
+        " M graphify-out/graph.json",
+        " M graphify-out/manifest.json"
+      ],
+      "tracked_worktree_diff_sha256": "1cc2172be2638501273ad4efcd6d8f8a980f2bdcc706d27ffd39493b5bd768e0",
+      "tracked_worktree_diff_excludes": [],
+      "staged_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runtime_import_origin": "not_run_during_planning_evidence_capture"
+    },
+    "agent-harness": {
+      "path": "/Users/androidteam/Developer/agent-harness",
+      "branch": "main",
+      "head_sha": "e39d152a5215f9bec213a463505c6afa980b353b",
+      "dirty": true,
+      "raw_status": [
+        " M graphify-out/graph.json",
+        " M graphify-out/manifest.json"
+      ],
+      "tracked_worktree_diff_sha256": "4d57db9b38232b2c7d42b7bbfebcedca1f534572a5bc76a870527ba15fab9f54",
+      "tracked_worktree_diff_excludes": [],
+      "staged_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runtime_import_origin": "not_run_during_planning_evidence_capture"
+    },
+    "agent-docs-sync": {
+      "path": "/Users/androidteam/Developer/agent-docs-sync",
+      "branch": "main",
+      "head_sha": "e4576cd1f19ece6be447abb4f63a20e4455343e5",
+      "dirty": true,
+      "raw_status": [
+        " M graphify-out/graph.json",
+        " M graphify-out/manifest.json"
+      ],
+      "tracked_worktree_diff_sha256": "35f54bdac6b05e5356d20e9b2b0d5d1f921862f2454eff662c679f8991f23b7b",
+      "tracked_worktree_diff_excludes": [],
+      "staged_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runtime_import_origin": "not_run_during_planning_evidence_capture"
+    },
+    "ai-harness-skills": {
+      "path": "/Users/androidteam/Developer/ai-harness-skills",
+      "branch": "main",
+      "head_sha": "99001ec6dc16499e235ff43b82e0f9cbb7051ab4",
+      "dirty": true,
+      "raw_status": [
+        " M evidence/phase7/evidence-record.json",
+        " M evidence/phase7/handoff.json"
+      ],
+      "tracked_worktree_diff_sha256": "97e856d05b8f6da36693bc01bc981a1591469311fa1602eaefac8fa9c4748315",
+      "tracked_worktree_diff_excludes": [],
+      "staged_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runtime_import_origin": "not_run_during_planning_evidence_capture"
+    },
+    "ai-review": {
+      "path": "/Users/androidteam/Developer/ai-review",
+      "branch": "main",
+      "head_sha": "4fd0abfa99276ce3cd38b3996c0ff3713d6e2259",
+      "dirty": true,
+      "raw_status": [
+        " M ai-review-handoff.md"
+      ],
+      "tracked_worktree_diff_sha256": "678f46ecc0072b09b0a664f739561aadd038e41c67dd36da1e1b7217ecf91d45",
+      "tracked_worktree_diff_excludes": [],
+      "staged_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runtime_import_origin": "not_run_during_planning_evidence_capture"
+    }
+  },
+  "registered_external_product_worktrees": {
+    "tdt-core-completion-goose-luna": {
+      "repository": "tdt-core",
+      "path": "/Users/androidteam/.buzz/REPOS/.worktrees/tdt-core-completion-goose-luna",
+      "branch": "work/tdt-core-v2-completion-goose-luna",
+      "head_sha": "dd762557e89cfdddd3832a71fe0966521341f64c",
+      "raw_status": [
+        "?? tdt-core-handoff.md"
+      ],
+      "disposition": "external_patch_forbidden; do not copy, stage, commit, clean, reset, prune, or use as implementation source"
+    },
+    "agent-docs-sync-completion-goose-luna": {
+      "repository": "agent-docs-sync",
+      "path": "/Users/androidteam/.buzz/REPOS/.worktrees/agent-docs-sync-completion-goose-luna",
+      "branch": "work/agent-docs-sync-v2-completion-goose-luna",
+      "head_sha": "e0ba6000476c724de748c64fced1161a323cb5ed",
+      "raw_status": [
+        " M src/agent_docs_sync/agents/discovery.py",
+        " M src/agent_docs_sync/agents/generation.py",
+        " M src/agent_docs_sync/agents/validation.py",
+        " M src/agent_docs_sync/config.py",
+        " M tests/test_config_contract.py"
+      ],
+      "disposition": "external_patch_forbidden; do not copy, stage, commit, clean, reset, prune, or use as implementation source"
+    }
+  },
+  "registered_worktree_inventory_captured_at": "2026-08-14T16:50:34Z",
+  "file_content_hashes": {
+    "tdt-core/src/tdt_core/provider_model_profile.py": "6c6ed65df96fc68b2bf8e9b9509ca77aefea05c3684c8b8ae840658edff78c71",
+    "tdt-core/src/tdt_core/agent_profile.py": "cfd6c91c38ce58503d4f7f0ae767d31ecf5ca241469f4f0c2157561cbd07a369",
+    "tdt-core/src/tdt_core/config_loader.py": "60af2eb84563c6cef61ac2090ab889f0f66f2d9d5552daf829535a11358be48d",
+    "tdt-core/src/tdt_core/__init__.py": "56ac00c18073f16530f08321a3aa45e7f7a20dc122caf655c87b6bbd0281d50c",
+    "agent-core/src/agent_core/_ai/models.py": "9fb2a566c3c0bd081abc6ba8aa8771803c238c103972bb7356b9b29c327127fa",
+    "agent-core/src/agent_core/sdk/config.py": "9f4850a3bca74114dcc53cbd399309f0b7fc1d7e740cb2aadb000db22efb8cdf",
+    "agent-core/src/agent_core/sdk/agents.py": "e7707e8e77a2fe12cd01fb90add3d5aaec36713b58019b258da31327c0abb255",
+    "agent-core/src/agent_core/sdk/__init__.py": "54da41db35e9587a70ae4133911bbc5996886c7f575e0002407e139e66f8a055",
+    "agent-core/src/agent_core/agent_base/agent.py": "3429f262cb4e10adbd67e3db4aca4d7888e7c0fc881532f932b3cdcdeb493eab",
+    "agent-core/src/agent_core/cli/utils.py": "1dfe5286771aeb27fe46d863283382823f5e96add57fd52c874c92ebb876953a",
+    "agent-harness/src/agent_harness/config.py": "7add46c72a07b4ee057048468369e6a874018c63eb655bc171a513b0b6069a79",
+    "agent-harness/src/agent_harness/agents/factory.py": "6629fbe84807a47a3133a598926f0ab80e3172c2c156baac2099beb787915f4f",
+    "agent-docs-sync/src/agent_docs_sync/config.py": "aced767bbdc8519fb6655a9c1da97191b61796e3853791e3fcd6ee8b3ead9807",
+    "agent-docs-sync/src/agent_docs_sync/operation_context.py": "b301084fa38564b0086480c61ba24813c638fc86d8c5e974f70f64d86f671c4b",
+    "agent-docs-sync/src/agent_docs_sync/agents/generation.py": "efbdb8d24822567677f996d16de666fd348490e998d863909f18b8440fa7181f",
+    "ai-harness-skills/src/ai_harness/runtime.py": "ad78b80ece30b7d8ebb4a4463311e368132b844226f0a536d88ab946922b266e",
+    "ai-review/src/ai_review/providers/tdt_projection.py": "f037684a449518c2ef5daf293bb00b7a754413b786b8526c8400c6832b2915b0"
+  },
+  "planning_diff": {
+    "range": "d666ff01e80bfb69b4e2d2f5810e7f8a9cdc06b5..38be641953a278614d3c395402089fe847161b92",
+    "excludes_review_evidence": true,
+    "file_count": 8,
+    "files": [
+      "openspec/changes/restore-agent-llm-integration-contract-truth/.openspec.yaml",
+      "openspec/changes/restore-agent-llm-integration-contract-truth/README.md",
+      "openspec/changes/restore-agent-llm-integration-contract-truth/design.md",
+      "openspec/changes/restore-agent-llm-integration-contract-truth/proposal.md",
+      "openspec/changes/restore-agent-llm-integration-contract-truth/specs/agent-config-resolution/spec.md",
+      "openspec/changes/restore-agent-llm-integration-contract-truth/specs/agent-core-model-resolution/spec.md",
+      "openspec/changes/restore-agent-llm-integration-contract-truth/specs/cli-provider-profile-resolution/spec.md",
+      "openspec/changes/restore-agent-llm-integration-contract-truth/tasks.md"
+    ],
+    "sha256": "f8f5d875775eb15541a879a69466d2fe4bf82481ccd6a81829d646f62817c59d",
+    "base_sha": "d666ff01e80bfb69b4e2d2f5810e7f8a9cdc06b5",
+    "head_sha": "804b4f68cdca6314bf714bade218218ef997a263",
+    "scope": "planning artifacts only; review-evidence excluded"
+  },
+  "working_tree_at_evidence_capture": "Planning commit is immutable; only review-evidence regeneration is dirty in the corrective worktree. All primary/product dirt is external and was neither read as a patch source nor modified.",
+  "credential_boundary": "Presence/path/hash metadata only; no credential value was read, printed, compared, copied, or retained",
+  "frozen_at": "2026-08-14T17:45:22.643430+00:00",
+  "external_state_refreshed_at": "2026-08-14T16:54:22Z",
+  "refreshed_for_planning_commit": "804b4f68cdca6314bf714bade218218ef997a263"
+}

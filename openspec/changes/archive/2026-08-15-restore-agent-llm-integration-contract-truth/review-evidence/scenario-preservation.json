@@ -1,0 +1,2066 @@
+{
+  "store_base_sha": "d666ff01e80bfb69b4e2d2f5810e7f8a9cdc06b5",
+  "planning_commit_sha": "804b4f68cdca6314bf714bade218218ef997a263",
+  "planning_commit_tree_sha": "2588f82c866996a12f25da5ae2dcd880861c136c",
+  "planning_commit_message": "openspec(agent-llm): finalize clean-break integration contract",
+  "superseded_evidence_commit": "d442c3d57ab2d3dba4d1459566a434d162b70ee6",
+  "working_tree_state": "Planning commit frozen; regenerated review-evidence files are the only candidate-worktree changes",
+  "artifact_hashes": {
+    "proposal.md": "4697db96f2e5746e745a4ad52cb602e6bdc609aa12ba410e2382af8f4c12f14a",
+    "design.md": "e6b255c7314a3f1aacba381891c3ed8fc31351e6d5bec2894edea0ed4d0ae007",
+    "tasks.md": "27ef0561a555b7f64161c584243f9a0680df054df39883d11ccac0e55eae78e0",
+    "specs/agent-config-resolution/spec.md": "7e2c87f1ddf1ebc99e1505b847db42dbd99204c27a279a32d7eac43b3618813d",
+    "specs/agent-core-model-resolution/spec.md": "3fabc917f8a1164be1ae7a9cb64456de3de90e940d9472e977639ba68c0886b1",
+    "specs/cli-provider-profile-resolution/spec.md": "f2ce263e1c0bdf57c3dd5bbd591c8c81d0f7462d4475bb2b619d3c222dc013c9"
+  },
+  "operation_matrix": {
+    "agent-config-resolution": {
+      "REMOVED": 12,
+      "ADDED": 7,
+      "MODIFIED": 0
+    },
+    "agent-core-model-resolution": {
+      "REMOVED": 18,
+      "ADDED": 6,
+      "MODIFIED": 0
+    },
+    "cli-provider-profile-resolution": {
+      "REMOVED": 5,
+      "ADDED": 5,
+      "MODIFIED": 3
+    }
+  },
+  "removed_requirements": [
+    {
+      "spec": "agent-config-resolution",
+      "old": "Agent-specific config files override global defaults",
+      "replacement": "Canonical agent selection precedence and overlay schema",
+      "old_requirement_sha256": "d2a4a13809d307d2549082dc34c3f43bdfb08c32a593d1fbd2d77ec203e6cea5",
+      "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+      "old_scenario_count": 4,
+      "old_scenarios": [
+        {
+          "old": "Agent-specific model override applied",
+          "old_sha256": "677e9b22b8bf49f8653c1b012edf8b5d7005a2e4487d70448143e0afdb5ffd6b",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Agent overlay selects a canonical alias` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Agent overlay selects a canonical alias",
+          "replacement_scenario_sha256": "f4b90ceea5c9427e749445d0b52a534170852563bd5ef0a2902c4d6790ee5d12"
+        },
+        {
+          "old": "No agent-specific file falls back to global",
+          "old_sha256": "b518e0a012f525c906042007b2e5202c041c790126cf81e9b834244743bfb51f",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Missing overlay uses canonical global defaults` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Missing overlay uses canonical global defaults",
+          "replacement_scenario_sha256": "d855ce9f9c51687ff238aed4a07d96c484feaebd8dedc05963404f017501aa68"
+        },
+        {
+          "old": "Partial agent-specific file merges with global",
+          "old_sha256": "6b536de472c47feff5f51487175804599f30f8c1b5c13479dee0a0ba286b0443",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Partial overlay changes selection only` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Partial overlay changes selection only",
+          "replacement_scenario_sha256": "c23791cd00f5065e43e8948c90795a6d03ac38a46bc6044cec00c92f084c9593"
+        },
+        {
+          "old": "Agent-harness resolves from agent-specific file",
+          "old_sha256": "46e22fa7bccd29aef9c4d040ffc0759e6e42df30bb48227153f19d4c8edc75da",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Agent overlay selects a canonical alias` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Agent overlay selects a canonical alias",
+          "replacement_scenario_sha256": "f4b90ceea5c9427e749445d0b52a534170852563bd5ef0a2902c4d6790ee5d12"
+        }
+      ]
+    },
+    {
+      "spec": "agent-config-resolution",
+      "old": "Standardized resolution precedence",
+      "replacement": "Canonical agent selection precedence and overlay schema",
+      "old_requirement_sha256": "c2c9e423c769a9e60a967637f215451bb344e7d673c126b67ff456e0395cae45",
+      "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+      "old_scenario_count": 5,
+      "old_scenarios": [
+        {
+          "old": "Explicit run override wins",
+          "old_sha256": "83d63080e3ec23f70eed4f5a8f44d3c9692df8550c0e23f7afb95b1d5452a71b",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical agent selection precedence and overlay schema` / `Explicit alias override wins` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Explicit alias override wins",
+          "replacement_scenario_sha256": "86c46468bd1b715d67d72dbf80cd2bcd08dca7cd7e2e17eded504508caa0d1cd"
+        },
+        {
+          "old": "Env var overrides agent-specific YAML",
+          "old_sha256": "28cab55a570dd42d3df359a0b7311aab8528f959953d7cfbba7cf2afc887d036",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical agent selection precedence and overlay schema` / `Consumer-specific alias selector wins over shared selector` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Consumer-specific alias selector wins over shared selector",
+          "replacement_scenario_sha256": "a61337d1cccf1c9c19176a6d29f67aa40aa067fd607a5e406fcaed2028d6a7a7"
+        },
+        {
+          "old": "Agent-specific env var overrides agent-specific YAML",
+          "old_sha256": "621439b44e771be8377b8b397d730e465c21391f54969da195f69c3b7e0cff7d",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical agent selection precedence and overlay schema` / `Consumer-specific alias selector wins over shared selector` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Consumer-specific alias selector wins over shared selector",
+          "replacement_scenario_sha256": "a61337d1cccf1c9c19176a6d29f67aa40aa067fd607a5e406fcaed2028d6a7a7"
+        },
+        {
+          "old": "Agent-specific YAML overrides global",
+          "old_sha256": "e122d681b41b008d91900eb6e731eea54bd7fc675c7e13d206f93eecd911cc0d",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical agent selection precedence and overlay schema` / `Partial overlay changes selection only` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Partial overlay changes selection only",
+          "replacement_scenario_sha256": "c23791cd00f5065e43e8948c90795a6d03ac38a46bc6044cec00c92f084c9593"
+        },
+        {
+          "old": "Invalid high-priority value fails closed",
+          "old_sha256": "2c437678986c661697076c181564261c1db5574ccbe119bf651995051dfe85b7",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical agent selection precedence and overlay schema` / `Registered selector must name a canonical alias` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Registered selector must name a canonical alias",
+          "replacement_scenario_sha256": "7da968caf6c184dac9c53a32e28eb95016d67757cf2b5f5391ce4612498aecef"
+        }
+      ]
+    },
+    {
+      "spec": "agent-config-resolution",
+      "old": "Config caching with test isolation",
+      "replacement": "Canonical profile caching with test isolation",
+      "old_requirement_sha256": "0d02e3120f686124340e9f92267e83b09aa63bb577d4fccca5e0740e7ecefdd7",
+      "replacement_requirement_sha256": "9a8cc966dc79fcb0f4cfb75115154583cda0ade90c3ca7e77c3969004db2ab2f",
+      "old_scenario_count": 6,
+      "old_scenarios": [
+        {
+          "old": "Relevant environment changes between resolutions",
+          "old_sha256": "eafe1e5342b76fdd329c348912444c087d8b3373d302d0182a5f4f41345bc97e",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical profile caching with test isolation",
+          "replacement_requirement_sha256": "9a8cc966dc79fcb0f4cfb75115154583cda0ade90c3ca7e77c3969004db2ab2f",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical profile caching with test isolation` / `Relevant selector changes between resolutions` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Relevant selector changes between resolutions",
+          "replacement_scenario_sha256": "2d91c8407b9a7b37f522594102338a4aa5a2e1fff1653a35cd6341373b5ead87"
+        },
+        {
+          "old": "Cache is populated on first access",
+          "old_sha256": "c5ca4c6ebb59471d1f8a3a18b0d158c098fb41ee4e1c82085860eabb5b8602a8",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical profile caching with test isolation",
+          "replacement_requirement_sha256": "9a8cc966dc79fcb0f4cfb75115154583cda0ade90c3ca7e77c3969004db2ab2f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical profile caching with test isolation` / `Source fingerprint participates in cache identity` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Source fingerprint participates in cache identity",
+          "replacement_scenario_sha256": "d777661fdd0593502707fcc8b29c79eeb594f060e5e185c9451420ef7f44b27f"
+        },
+        {
+          "old": "Cache is cleared by reset function",
+          "old_sha256": "ba34288400dca4106317a555bef78f998367626d96d15c1294bbb21510652982",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical profile caching with test isolation",
+          "replacement_requirement_sha256": "9a8cc966dc79fcb0f4cfb75115154583cda0ade90c3ca7e77c3969004db2ab2f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical profile caching with test isolation` / `Reset preserves unrelated environment` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Reset preserves unrelated environment",
+          "replacement_scenario_sha256": "2659f0bb7e3b0f4c8c425919acb05dfd9f48080644249721a9391fc358310296"
+        },
+        {
+          "old": "TDT_HOME changes between resolutions",
+          "old_sha256": "d88a3381155fd4c95c85d08780624167d985610495da5f11ddad9270c7bb2f17",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical profile caching with test isolation",
+          "replacement_requirement_sha256": "9a8cc966dc79fcb0f4cfb75115154583cda0ade90c3ca7e77c3969004db2ab2f",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical profile caching with test isolation` / `TDT root changes between resolutions` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "TDT root changes between resolutions",
+          "replacement_scenario_sha256": "a0929e75f450b43cc4ccd82e83d77dfc3cd4091dfe28c6ed00db068eb2107eda"
+        },
+        {
+          "old": "Reset preserves unrelated environment",
+          "old_sha256": "d55c3fa2c423c89fafabbf4786021a0ae20515b0943c5c359bfeec047a953d9d",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical profile caching with test isolation",
+          "replacement_requirement_sha256": "9a8cc966dc79fcb0f4cfb75115154583cda0ade90c3ca7e77c3969004db2ab2f",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical profile caching with test isolation` / `Reset preserves unrelated environment` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Reset preserves unrelated environment",
+          "replacement_scenario_sha256": "2659f0bb7e3b0f4c8c425919acb05dfd9f48080644249721a9391fc358310296"
+        },
+        {
+          "old": "Returned state cannot poison another consumer",
+          "old_sha256": "b3e170f7be4ae2417832a7066b98717b9784c61664f96b1d20e0c7da13fc70af",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical profile caching with test isolation",
+          "replacement_requirement_sha256": "9a8cc966dc79fcb0f4cfb75115154583cda0ade90c3ca7e77c3969004db2ab2f",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical profile caching with test isolation` / `Returned profile cannot poison cache` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Returned profile cannot poison cache",
+          "replacement_scenario_sha256": "6979bae4bda65225be328073a5b878a43b8ecb4ea3d1e9d7669a115247485c42"
+        }
+      ]
+    },
+    {
+      "spec": "agent-config-resolution",
+      "old": "Unknown top-level keys rejected",
+      "replacement": "Canonical agent selection precedence and overlay schema",
+      "old_requirement_sha256": "2be3ba5b1dbd4a9e5fac529512df22099044c924b03677440c17f2e741de2744",
+      "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+      "old_scenario_count": 5,
+      "old_scenarios": [
+        {
+          "old": "Unknown top-level key in agent YAML is rejected",
+          "old_sha256": "a8da69563b4b9e0e644eaf8a82c513321876363b902a7a782e8728dfefa59550",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Agent overlay cannot define routes` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Agent overlay cannot define routes",
+          "replacement_scenario_sha256": "610e4d967cccdeab51333a88bdc50ace1fe1d3fa50379608c74fe5a6792ba208"
+        },
+        {
+          "old": "Multiple unknown keys reported",
+          "old_sha256": "c964b67e1c2a1ab8c60a04321c4dfe5ed5f7b8ce329304e28c2c05e99d123335",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Unregistered overlay key fails` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Unregistered overlay key fails",
+          "replacement_scenario_sha256": "fa374519d8e25f006234f2770c750556a6bc20c0a9dfa29ef30ce5525800e47d"
+        },
+        {
+          "old": "Harness policy accepts owned domain keys",
+          "old_sha256": "e115424e4c1ed9ea2d84bfa38395dd60a80aba7eb4e8aee4da57c4b2d7deb249",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Agent overlay key policy preserves domain ownership` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Agent overlay key policy preserves domain ownership",
+          "replacement_scenario_sha256": "afe34057e193712c05378e45c0b85916564ed61e410633007f62a9dc7fcc2bf2"
+        },
+        {
+          "old": "Allowed-key policy cannot poison strict cache",
+          "old_sha256": "e3540ac6479960d92a3b62223e28a5e56d5cb60e466850847484770d60d27645",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Agent overlay key policy preserves domain ownership` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Agent overlay key policy preserves domain ownership",
+          "replacement_scenario_sha256": "afe34057e193712c05378e45c0b85916564ed61e410633007f62a9dc7fcc2bf2"
+        },
+        {
+          "old": "Allowed keys accepted without error",
+          "old_sha256": "c80bbc9526cc51ab1abd4ee69091ffe5c44f8de1abbfbd96017766b5afcc40ca",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Agent overlay key policy preserves domain ownership` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Agent overlay key policy preserves domain ownership",
+          "replacement_scenario_sha256": "afe34057e193712c05378e45c0b85916564ed61e410633007f62a9dc7fcc2bf2"
+        }
+      ]
+    },
+    {
+      "spec": "agent-config-resolution",
+      "old": "Single config loading function",
+      "replacement": "Canonical typed agent profile resolution",
+      "old_requirement_sha256": "bc58d9adde90764dd9b7cdf77beef8b0b8328f14588cd1586c4e81ca17aedf68",
+      "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+      "old_scenario_count": 18,
+      "old_scenarios": [
+        {
+          "old": "Resolved profile is internally consistent",
+          "old_sha256": "9b2d97abd23a7718a880c42b5ac334463e20e76f6910bf538ad15d07a2919d3a",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical typed agent profile resolution` / `Canonical profile is internally exact` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Canonical profile is internally exact",
+          "replacement_scenario_sha256": "9b6139519bf68f9f86db6a104ee1ad63de6b041eb11d6b022e21b31df044c24d"
+        },
+        {
+          "old": "Compatibility mapping uses the same sources",
+          "old_sha256": "93e5dd019f92cac20f49ee8a9d3d2059954b11220454a88b19a9849992859c9e",
+          "treatment": "reversed",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Canonical typed agent profile resolution` / `Mapping compatibility API is absent`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Mapping compatibility API is absent",
+          "replacement_scenario_sha256": "1c6d54027c0c3e9f6f1dc8ec05efe90ea325d0cc09205cbd39ee259c2a869440"
+        },
+        {
+          "old": "Function returns merged config",
+          "old_sha256": "c2938c3f305c3a020510136daa793c2a07bb612dbb3ea819c9ecdab6e9790bd9",
+          "treatment": "reversed",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Canonical typed agent profile resolution` / `Mapping compatibility API is absent`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Mapping compatibility API is absent",
+          "replacement_scenario_sha256": "1c6d54027c0c3e9f6f1dc8ec05efe90ea325d0cc09205cbd39ee259c2a869440"
+        },
+        {
+          "old": "Explicit agent config path overrides the standard overlay",
+          "old_sha256": "5fffdf161fb3bcf21eaaf1ff4c8e9192a34ebbd8cb2af4609eb014f7dd895f5d",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical typed agent profile resolution` / `Explicit source path remains one canonical source` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Explicit source path remains one canonical source",
+          "replacement_scenario_sha256": "ba9c9beb34fc1556546ce2189333a9fa1b2a08e583d2167f796725a78f121c41"
+        },
+        {
+          "old": "Function is idempotent within a process",
+          "old_sha256": "9d6b44d0f15abf1e92c1397e1d70ed8c563f8bc1bde3ebc15e30dc024a391f23",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical typed agent profile resolution` / `Cache reuse requires complete identity` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Cache reuse requires complete identity",
+          "replacement_scenario_sha256": "26dce0703e48702a1efe7205f5f9ee3a1302b380e6ab780e2b350a0b5275680a"
+        },
+        {
+          "old": "Unknown agent name returns global config only",
+          "old_sha256": "84ef7228ea4292798c5b2264669d031eed37bf415c48796cd2522e1e1ed34b28",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Missing overlay uses canonical global defaults` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Missing overlay uses canonical global defaults",
+          "replacement_scenario_sha256": "d855ce9f9c51687ff238aed4a07d96c484feaebd8dedc05963404f017501aa68"
+        },
+        {
+          "old": "Default strict key policy",
+          "old_sha256": "3a59bdabc7971db910dd9434eaff4a3280fa0f7f5145f456c1910f3534f446b5",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Agent overlay key policy preserves domain ownership` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Agent overlay key policy preserves domain ownership",
+          "replacement_scenario_sha256": "afe34057e193712c05378e45c0b85916564ed61e410633007f62a9dc7fcc2bf2"
+        },
+        {
+          "old": "Harness-expanded key policy accepts domain keys without error",
+          "old_sha256": "e04deb0458de31ea59b21faf240716a694290340d050755722527a4164d0b698",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Agent overlay key policy preserves domain ownership` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Agent overlay key policy preserves domain ownership",
+          "replacement_scenario_sha256": "afe34057e193712c05378e45c0b85916564ed61e410633007f62a9dc7fcc2bf2"
+        },
+        {
+          "old": "Cache isolation by allowed-key set",
+          "old_sha256": "af37d4026c91a16606e9a470ee81ff1f1a9addf162aa6fb5a8cf926124294760",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical typed agent profile resolution` / `Cache reuse requires complete identity` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Cache reuse requires complete identity",
+          "replacement_scenario_sha256": "26dce0703e48702a1efe7205f5f9ee3a1302b380e6ab780e2b350a0b5275680a"
+        },
+        {
+          "old": "Domain keys excluded from merged result",
+          "old_sha256": "9b12913c78938148e6464d866b645c7f081d32e83d853c97776911c350ba8d7a",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Agent overlay key policy preserves domain ownership` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Agent overlay key policy preserves domain ownership",
+          "replacement_scenario_sha256": "afe34057e193712c05378e45c0b85916564ed61e410633007f62a9dc7fcc2bf2"
+        },
+        {
+          "old": "Compatibility primary or fallback is invalid",
+          "old_sha256": "a86906a84a3ec87e82b3f3ac3eb9f4915d45f1b8e9ee6fbfaab5c434f16b1f84",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical typed agent profile resolution` / `Canonical relationships are complete` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Canonical relationships are complete",
+          "replacement_scenario_sha256": "63f0996fb2685d4228a1703f59e38f364081db5503839cdf1fedf5d3c535d789"
+        },
+        {
+          "old": "Captured snapshot remains coherent",
+          "old_sha256": "0f08cd604c91a85b58e20da8529d36b6a77987b2b36942ada4aaeac26fadf373",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical typed agent profile resolution` / `Canonical profile is internally exact` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Canonical profile is internally exact",
+          "replacement_scenario_sha256": "9b6139519bf68f9f86db6a104ee1ad63de6b041eb11d6b022e21b31df044c24d"
+        },
+        {
+          "old": "Registered environment inputs are captured once",
+          "old_sha256": "150df25ebf4bd5800b9e87621ed554914f399bd0271158de2fe670c10d1f1717",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical typed agent profile resolution` / `Registered inputs are captured once` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Registered inputs are captured once",
+          "replacement_scenario_sha256": "5b1a4b795927ba6ce0f284ea460cf1552a4d7e4f5f3daabba733c4077195199d"
+        },
+        {
+          "old": "Unregistered environment changes do not alter profile identity",
+          "old_sha256": "ca3dc67058c0e6c3e04616712eaabaa601ed483e7e8482b7db96382efc6cd96e",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical typed agent profile resolution` / `Cache reuse requires complete identity` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Cache reuse requires complete identity",
+          "replacement_scenario_sha256": "26dce0703e48702a1efe7205f5f9ee3a1302b380e6ab780e2b350a0b5275680a"
+        },
+        {
+          "old": "Explicit overrides are detached at capture",
+          "old_sha256": "b0ee04fd0265c5f5b80277d5b5207094c7ac7afc69d5b2a1cbc68005ec5d9171",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical typed agent profile resolution` / `Registered inputs are captured once` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Registered inputs are captured once",
+          "replacement_scenario_sha256": "5b1a4b795927ba6ce0f284ea460cf1552a4d7e4f5f3daabba733c4077195199d"
+        },
+        {
+          "old": "Protected inputs do not become source fingerprints",
+          "old_sha256": "ae773799463ebf6afe18a57ce270057205416f45592497dae68729bbcd2246ac",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical typed agent profile resolution` / `Protected values are excluded from identity` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Protected values are excluded from identity",
+          "replacement_scenario_sha256": "346f300404dbbd4220caf8f9dd7e56d5dfc70bbc0ca022be5b115aa33debc0e7"
+        },
+        {
+          "old": "Cache reuse requires complete effective identity",
+          "old_sha256": "d15e2cb98f95c4730410b128a723639887e8d1f1c676ea3689ef3e1e47f019c5",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical typed agent profile resolution` / `Cache reuse requires complete identity` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Cache reuse requires complete identity",
+          "replacement_scenario_sha256": "26dce0703e48702a1efe7205f5f9ee3a1302b380e6ab780e2b350a0b5275680a"
+        },
+        {
+          "old": "Concurrent resolutions keep captured inputs isolated",
+          "old_sha256": "5435f7beb9293e257719540b06e3e10bf478d72cdd5657ab336f7102c155d513",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical typed agent profile resolution",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical typed agent profile resolution` / `Concurrent resolutions remain isolated` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Concurrent resolutions remain isolated",
+          "replacement_scenario_sha256": "a6a0b824359864ecf14a2960048e709e1a198f43fb326631dfb9fb0ee9ff1a7b"
+        }
+      ]
+    },
+    {
+      "spec": "agent-config-resolution",
+      "old": "Model factory receives config dict",
+      "replacement": "Model factory receives caller-resolved construction context",
+      "old_requirement_sha256": "b807f0c929bf6c1a24a615972e3354a9e2cd47fd890e5cd2c59578010e4c43ea",
+      "replacement_requirement_sha256": "d82f137778a499f8e2aacafabeda32a96cbaf8410b8542cc054e840e57940a1d",
+      "old_scenario_count": 4,
+      "old_scenarios": [
+        {
+          "old": "Model factory uses passed config",
+          "old_sha256": "e33a0d98a50af1fd5c1dfcd13f3fcc85ab8dc169496b8ce09addc370cb30ff31",
+          "treatment": "replaced",
+          "replacement_requirement": "Model factory receives caller-resolved construction context",
+          "replacement_requirement_sha256": "d82f137778a499f8e2aacafabeda32a96cbaf8410b8542cc054e840e57940a1d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model factory receives caller-resolved construction context` / `Model factory uses exact passed routes` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Model factory uses exact passed routes",
+          "replacement_scenario_sha256": "676c7d5560a4ed1840ae8f9b202c896b1b3dabc486d2b136e27cfcfffacd1432"
+        },
+        {
+          "old": "Model factory without config falls through to native provider",
+          "old_sha256": "8a50a7fedc150517cc9bb740277e88c151200729fa774462aa7214461d7fa0bc",
+          "treatment": "reversed",
+          "replacement_requirement": "Model factory receives caller-resolved construction context",
+          "replacement_requirement_sha256": "d82f137778a499f8e2aacafabeda32a96cbaf8410b8542cc054e840e57940a1d",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Model factory receives caller-resolved construction context` / `Native provider route is explicit`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Native provider route is explicit",
+          "replacement_scenario_sha256": "453084f2b8968b0b24c8595625af3f124211c9b98df921a260dd6dbb68c61519"
+        },
+        {
+          "old": "Removed functions no longer exist",
+          "old_sha256": "f09f6846fc0569c3e9efb905f5112e3519eca481180d6c1b84586173d56c052b",
+          "treatment": "replaced",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "d82f137778a499f8e2aacafabeda32a96cbaf8410b8542cc054e840e57940a1d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model Resolution from Caller Context` / `Public fallback factories are absent` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Public fallback factories are absent",
+          "replacement_scenario_sha256": "ce47b48037baa7616c4e73d31f2c86bd08df506e4536e8e2a16cd64091974f41"
+        },
+        {
+          "old": "Model factory cannot change precedence",
+          "old_sha256": "1992a3d99c0eab57f975a9f2187cfc2eb336b7ad5095086170c4c82e41492703",
+          "treatment": "replaced",
+          "replacement_requirement": "Model factory receives caller-resolved construction context",
+          "replacement_requirement_sha256": "d82f137778a499f8e2aacafabeda32a96cbaf8410b8542cc054e840e57940a1d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model factory receives caller-resolved construction context` / `Factory preserves canonical selection` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Factory preserves canonical selection",
+          "replacement_scenario_sha256": "c37bcdb3e50393d62809095d4c0c18d649d8cc75a0f0b26e1af8a372c27f7cdc"
+        }
+      ]
+    },
+    {
+      "spec": "agent-config-resolution",
+      "old": "Consumers use load_agent_config for model resolution",
+      "replacement": "Composition roots resolve canonical model context",
+      "old_requirement_sha256": "f2860bb2e2c40bf60eea4f853fb0971fba1063b8a4ab3e70cb1b368dcc9511b5",
+      "replacement_requirement_sha256": "6925237eed66c7402a2e05383148dea1071c3adaa6ad5e675ac4f7f241fadae2",
+      "old_scenario_count": 4,
+      "old_scenarios": [
+        {
+          "old": "Direct consumer uses one profile",
+          "old_sha256": "9fe5b618ac0d61665f0e394671d0e679157df390fe92e9dd8b92575dce15dcec",
+          "treatment": "strengthened",
+          "replacement_requirement": "Composition roots resolve canonical model context",
+          "replacement_requirement_sha256": "6925237eed66c7402a2e05383148dea1071c3adaa6ad5e675ac4f7f241fadae2",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Composition roots resolve canonical model context` / `Direct consumer resolves once` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Direct consumer resolves once",
+          "replacement_scenario_sha256": "ebc856a016a48583c50e46e25a15b5ecded4d25605010d79142c66aa1eb33086"
+        },
+        {
+          "old": "Agent-core build_agent uses load_agent_config",
+          "old_sha256": "32e2ee867c823c80082c170034ede23db7ff4d8fc05bc40bb6ab2964ab70de4b",
+          "treatment": "replaced",
+          "replacement_requirement": "Composition roots resolve canonical model context",
+          "replacement_requirement_sha256": "6925237eed66c7402a2e05383148dea1071c3adaa6ad5e675ac4f7f241fadae2",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Composition roots resolve canonical model context` / `build_agent receives context from caller` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "build_agent receives context from caller",
+          "replacement_scenario_sha256": "42c47ab9592dfd6b923d17442490f7f512040c187a9fa72e7a6edf5249fde239"
+        },
+        {
+          "old": "Agent-docs-sync uses load_agent_config for model",
+          "old_sha256": "57800fa5cd4d1b03c401595c691895583fbee6c3ab8f9d05531f1c63035b1122",
+          "treatment": "replaced",
+          "replacement_requirement": "Composition roots resolve canonical model context",
+          "replacement_requirement_sha256": "6925237eed66c7402a2e05383148dea1071c3adaa6ad5e675ac4f7f241fadae2",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Composition roots resolve canonical model context` / `docs-sync preserves one operation identity` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "docs-sync preserves one operation identity",
+          "replacement_scenario_sha256": "34ccedb34f9ba4b236f3d6528f468af947d473ebebd49e11ed6595792848e819"
+        },
+        {
+          "old": "CLI-provider consumer preserves its execution boundary",
+          "old_sha256": "2f8bc7b27b4a0dc07b2469c110bc628c6972d0ba43a405394bc489cd5841522d",
+          "treatment": "replaced",
+          "replacement_requirement": "Composition roots resolve canonical model context",
+          "replacement_requirement_sha256": "6925237eed66c7402a2e05383148dea1071c3adaa6ad5e675ac4f7f241fadae2",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Composition roots resolve canonical model context` / `Enabled CLI consumer requires canonical mapping` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Enabled CLI consumer requires canonical mapping",
+          "replacement_scenario_sha256": "611673112f499f66206b7b7d085346c5b56fc7146101ad945c4a61e5c9b93d50"
+        }
+      ]
+    },
+    {
+      "spec": "agent-config-resolution",
+      "old": "Secure YAML mapping loader",
+      "replacement": "Canonical source mapping and overlay primitives",
+      "old_requirement_sha256": "e269506776a179889b76b84326a77f4cbc88a8321f90114f746a62b0eb15dac1",
+      "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+      "old_scenario_count": 8,
+      "old_scenarios": [
+        {
+          "old": "Valid YAML mapping loaded",
+          "old_sha256": "f9415f9055a227c802710da0f29f883146fc3d840a5e0833726c788e063039ca",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical source mapping and overlay primitives",
+          "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical source mapping and overlay primitives` / `Mapping reader is source-local` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Mapping reader is source-local",
+          "replacement_scenario_sha256": "2b6afc7dc560df73e47bc87de6bc97c9938b8021a33eb344b63cba68546347c9"
+        },
+        {
+          "old": "Empty YAML file returns empty dict",
+          "old_sha256": "bfaadbfd93ac6a6c9885d24f48eebad62c4330442b56425f772fe93d01b36265",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical source mapping and overlay primitives",
+          "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical source mapping and overlay primitives` / `Missing optional overlay is empty source input` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Missing optional overlay is empty source input",
+          "replacement_scenario_sha256": "1db11e32b4286d5752f7b431c68716b9da10e93d7f6962a93f4f28390d177e84"
+        },
+        {
+          "old": "Missing file returns empty dict",
+          "old_sha256": "fdcf72fb2b09ac9a52354b4956224465c0e529af53d4db575f784ef1c761b325",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical source mapping and overlay primitives",
+          "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical source mapping and overlay primitives` / `Missing optional overlay is empty source input` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Missing optional overlay is empty source input",
+          "replacement_scenario_sha256": "1db11e32b4286d5752f7b431c68716b9da10e93d7f6962a93f4f28390d177e84"
+        },
+        {
+          "old": "Malformed YAML raises ConfigError",
+          "old_sha256": "33f65da7c5ce2556aca5e195e1787d84f8ef0dd583e6435bedb81c33f0222345",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical source mapping and overlay primitives",
+          "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical source mapping and overlay primitives` / `Malformed or non-mapping YAML fails` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Malformed or non-mapping YAML fails",
+          "replacement_scenario_sha256": "03e654cd9a06db63ba4279735d1ce2aa214a7114ea5eac3418bbffa9a7ef2e46"
+        },
+        {
+          "old": "Non-mapping YAML raises ConfigError",
+          "old_sha256": "ccb362fc380da0d7f868011b036e4b8351d91ef59ab0d60fbf0bb77030349f90",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical source mapping and overlay primitives",
+          "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical source mapping and overlay primitives` / `Malformed or non-mapping YAML fails` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Malformed or non-mapping YAML fails",
+          "replacement_scenario_sha256": "03e654cd9a06db63ba4279735d1ce2aa214a7114ea5eac3418bbffa9a7ef2e46"
+        },
+        {
+          "old": "Secret-shaped value rejected",
+          "old_sha256": "9fc4572e3a3391d2a3df69830a713bcb868147b2d72e3b588ff8b426f6da08fe",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical source mapping and overlay primitives",
+          "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical source mapping and overlay primitives` / `Literal secret-shaped value fails` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Literal secret-shaped value fails",
+          "replacement_scenario_sha256": "0a641ae43ead8747c70467584fe988f14b730a64be2d729d0b92934494ef18f8"
+        },
+        {
+          "old": "api_key_env under providers accepted",
+          "old_sha256": "c5bb6d6d6a202eb18da139dcb3d4bff5c52ce9f4f4bcb68ec81c3a3a260505d6",
+          "treatment": "reversed",
+          "replacement_requirement": "Canonical source mapping and overlay primitives",
+          "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Canonical source mapping and overlay primitives` / `Unsupported api_key_env is rejected for LLM configuration`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Unsupported api_key_env is rejected for LLM configuration",
+          "replacement_scenario_sha256": "d5888283531713c71786c0af08dbadb75e37007fe9e18bc1be8c2388deeb3a6e"
+        },
+        {
+          "old": "api_key_env with invalid env var name rejected",
+          "old_sha256": "625cb2dee98c5afc96feba7c5eaaa05e7379b375bb5ca9e4f9a1cff24c16ef66",
+          "treatment": "reversed",
+          "replacement_requirement": "Canonical source mapping and overlay primitives",
+          "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Canonical source mapping and overlay primitives` / `Unsupported api_key_env is rejected for LLM configuration`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Unsupported api_key_env is rejected for LLM configuration",
+          "replacement_scenario_sha256": "d5888283531713c71786c0af08dbadb75e37007fe9e18bc1be8c2388deeb3a6e"
+        }
+      ]
+    },
+    {
+      "spec": "agent-config-resolution",
+      "old": "Agent overlay loader with key policy",
+      "replacement": "Canonical agent selection precedence and overlay schema",
+      "old_requirement_sha256": "5f693a9eb5285f7e7acbc75e89f4da2c6abe7bd71ee59fe34824e18ed5b2b13f",
+      "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+      "old_scenario_count": 4,
+      "old_scenarios": [
+        {
+          "old": "Agent overlay loaded without global merge",
+          "old_sha256": "1194258502249d7ae7b315673232371806eb8819503703a0d1c830638142b55d",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Partial overlay changes selection only` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Partial overlay changes selection only",
+          "replacement_scenario_sha256": "c23791cd00f5065e43e8948c90795a6d03ac38a46bc6044cec00c92f084c9593"
+        },
+        {
+          "old": "Unknown top-level key rejected",
+          "old_sha256": "633678c818ec80f8a36635481c0a0dffdd9a422692890c03bc6ad86f2309c1b1",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Agent overlay key policy preserves domain ownership` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Agent overlay key policy preserves domain ownership",
+          "replacement_scenario_sha256": "afe34057e193712c05378e45c0b85916564ed61e410633007f62a9dc7fcc2bf2"
+        },
+        {
+          "old": "allowed_keys=None uses default set",
+          "old_sha256": "9043bc39132a76241e23a890fd01b11ffcc3ccf76b1c8b2c1dd546505fe52ba0",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Agent overlay key policy preserves domain ownership` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Agent overlay key policy preserves domain ownership",
+          "replacement_scenario_sha256": "afe34057e193712c05378e45c0b85916564ed61e410633007f62a9dc7fcc2bf2"
+        },
+        {
+          "old": "Missing agent file returns empty dict",
+          "old_sha256": "3cb065131b78d3c31ce866b35a7cb316d46b4acdb6355677184205828cd6950a",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "bb32461d0950c53290fa707505cef11112ba2d5c0a019f3b2e208d51907f1b7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Missing overlay uses canonical global defaults` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Missing overlay uses canonical global defaults",
+          "replacement_scenario_sha256": "d855ce9f9c51687ff238aed4a07d96c484feaebd8dedc05963404f017501aa68"
+        }
+      ]
+    },
+    {
+      "spec": "agent-config-resolution",
+      "old": "Secure mapping and source-preserving overlay APIs",
+      "replacement": "Canonical source mapping and overlay primitives",
+      "old_requirement_sha256": "c1ee5ff9427c529a96b2edba170a7ab7eab863eb6fc6f9416cc5025c9c324685",
+      "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+      "old_scenario_count": 4,
+      "old_scenarios": [
+        {
+          "old": "Mapping reader does not merge sources",
+          "old_sha256": "83d8598c2e733f80b01a0dd753ccb0032571ee18cf1ab727ac3bb67290a5efcd",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical source mapping and overlay primitives",
+          "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical source mapping and overlay primitives` / `Mapping reader is source-local` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Mapping reader is source-local",
+          "replacement_scenario_sha256": "2b6afc7dc560df73e47bc87de6bc97c9938b8021a33eb344b63cba68546347c9"
+        },
+        {
+          "old": "Overlay reader preserves domain provenance",
+          "old_sha256": "37612cb8de44d9d5a139a6dcfbb4046ff35debec807f48800a143dc0600674b2",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical source mapping and overlay primitives",
+          "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical source mapping and overlay primitives` / `Explicit overlay path uses the same clean schema` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Explicit overlay path uses the same clean schema",
+          "replacement_scenario_sha256": "d0b8f48247b1eb4cb67343313d9171e7b31995a17ebc2ad9461da77c3a7c8484"
+        },
+        {
+          "old": "Strict policy rejects unregistered domain data",
+          "old_sha256": "3da0ae91bdb05003c99835f93d08b35a2442b08a455702ef23b3dca92b9b75b3",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Agent overlay key policy preserves domain ownership` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Agent overlay key policy preserves domain ownership",
+          "replacement_scenario_sha256": "afe34057e193712c05378e45c0b85916564ed61e410633007f62a9dc7fcc2bf2"
+        },
+        {
+          "old": "Explicit path uses canonical schema",
+          "old_sha256": "ee3db041759e55c339704ace9c15e7c6d1e08b5cc076525a0ea9c9800b874b9c",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical source mapping and overlay primitives",
+          "replacement_requirement_sha256": "12537137298ca25e0afb7be559134d37f60c4e1fc4ef6904135310f6e79d6e2f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical source mapping and overlay primitives` / `Explicit overlay path uses the same clean schema` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Explicit overlay path uses the same clean schema",
+          "replacement_scenario_sha256": "d0b8f48247b1eb4cb67343313d9171e7b31995a17ebc2ad9461da77c3a7c8484"
+        }
+      ]
+    },
+    {
+      "spec": "agent-config-resolution",
+      "old": "Canonical direct-model identifiers",
+      "replacement": "Canonical typed agent profile resolution",
+      "old_requirement_sha256": "a360741889fbb730c2433448ea005220426cf533f531a025eb1c11b09fbfb5d4",
+      "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+      "old_scenario_count": 2,
+      "old_scenarios": [
+        {
+          "old": "Registered canonical identifier is accepted",
+          "old_sha256": "a6f22888e04a0f51afe4591a607f33f76a5eca09c09c94f5d097ccd06ea9f6fe",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Registered selector must name a canonical alias` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Registered selector must name a canonical alias",
+          "replacement_scenario_sha256": "7da968caf6c184dac9c53a32e28eb95016d67757cf2b5f5391ce4612498aecef"
+        },
+        {
+          "old": "Localized alias is rejected",
+          "old_sha256": "d1f4410edcfc2a443b6908b159f0548602ace829b9e24ba461f5569741727297",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical agent selection precedence and overlay schema",
+          "replacement_requirement_sha256": "451427b6cd23fa04a2fd0e2432d680cb25ea76ae33f07743fcc66c10ea48459d",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical agent selection precedence and overlay schema` / `Registered selector must name a canonical alias` under the canonical clean-break contract.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Registered selector must name a canonical alias",
+          "replacement_scenario_sha256": "7da968caf6c184dac9c53a32e28eb95016d67757cf2b5f5391ce4612498aecef"
+        }
+      ]
+    },
+    {
+      "spec": "agent-config-resolution",
+      "old": "Redacted effective-config diagnostics",
+      "replacement": "Exact route diagnostics match canonical resolution",
+      "old_requirement_sha256": "955e88ad95ca8381986f64ab4fb729b77bf6652c6e6192a451c20104be0619d3",
+      "replacement_requirement_sha256": "941494c3ddc2111327c354f7fa5d24b2129616d9a718d9c6387f43ad27bda79e",
+      "old_scenario_count": 2,
+      "old_scenarios": [
+        {
+          "old": "Diagnostic explains precedence",
+          "old_sha256": "be06490baeb5e7de661747feab44432078bfbc3c36aed25694e5661685662925",
+          "treatment": "strengthened",
+          "replacement_requirement": "Exact route diagnostics match canonical resolution",
+          "replacement_requirement_sha256": "941494c3ddc2111327c354f7fa5d24b2129616d9a718d9c6387f43ad27bda79e",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Exact route diagnostics match canonical resolution` / `Diagnostic explains exact selection and precedence` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Diagnostic explains exact selection and precedence",
+          "replacement_scenario_sha256": "9008d26c86d393c75153ad447571d84cfc903543b873d86adeaf5e50ab9f4e6e"
+        },
+        {
+          "old": "Provider key is missing",
+          "old_sha256": "2180d2fca3bd8f926b09fc3e676337102393c0c7ed7f046ede08963a16ad3586",
+          "treatment": "strengthened",
+          "replacement_requirement": "Exact route diagnostics match canonical resolution",
+          "replacement_requirement_sha256": "941494c3ddc2111327c354f7fa5d24b2129616d9a718d9c6387f43ad27bda79e",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Exact route diagnostics match canonical resolution` / `Provider credential reference is unavailable` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-config-resolution",
+          "replacement_scenario": "Provider credential reference is unavailable",
+          "replacement_scenario_sha256": "a6103c91b544129e7041f78dae472fa77611bf16b1f7045ecec9d0ab5b34a170"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Model Resolution from Config",
+      "replacement": "Model Resolution from Caller Context",
+      "old_requirement_sha256": "b771b02b88cd8eeaa17be9f3ee924c32f2d5cee6dc04af52d36c3fb061f662dc",
+      "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+      "old_scenario_count": 11,
+      "old_scenarios": [
+        {
+          "old": "Config-based resolution",
+          "old_sha256": "7f45659b9e8aae2ce6978f7fb72c0c8f62395997de5aabb32096cdc1b62da753",
+          "treatment": "replaced",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model Resolution from Caller Context` / `Canonical alias constructs the complete chain` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Canonical alias constructs the complete chain",
+          "replacement_scenario_sha256": "b74f776ca891563a142d719901130036c8e39ae846086b19c1abc47cce5f8fd6"
+        },
+        {
+          "old": "Anthropic Messages API",
+          "old_sha256": "e864f01167b771ab584768ab514a0b208a59d5bd199bf04e66a558a9bf6ede27",
+          "treatment": "replaced",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model Resolution from Caller Context` / `Anthropic Messages route is exact` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Anthropic Messages route is exact",
+          "replacement_scenario_sha256": "1d7832fe5cfaa4b60c45eff8c2703872094300b9cef8124a3155f8cf17d214de"
+        },
+        {
+          "old": "Provider-specific factory",
+          "old_sha256": "8c46182779d70a14c2f7c8dabefa284ea974bc4cde354916f67a3c1998278722",
+          "treatment": "replaced",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model Resolution from Caller Context` / `Anthropic Messages route is exact` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Anthropic Messages route is exact",
+          "replacement_scenario_sha256": "1d7832fe5cfaa4b60c45eff8c2703872094300b9cef8124a3155f8cf17d214de"
+        },
+        {
+          "old": "Explicit kwargs override config",
+          "old_sha256": "00eaaf88b05aa811ec2d43ff5307d23679011673e50a20ad2343cebb30b7eac6",
+          "treatment": "reversed",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Model Resolution from Caller Context` / `Raw constructor authorities are absent`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Raw constructor authorities are absent",
+          "replacement_scenario_sha256": "fd1578c83454924763ec1207c303469218a1e569c8f032ab02a339e0bece5284"
+        },
+        {
+          "old": "Protocol routing via model kind prefix",
+          "old_sha256": "91d588c2c7b9675e3eba478131c34e7595c744423a27b0034dffae3aca2b1deb",
+          "treatment": "reversed",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Model Resolution from Caller Context` / `Route kind and protocol mismatch fails closed`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Route kind and protocol mismatch fails closed",
+          "replacement_scenario_sha256": "00175c6cd392be77edb417bee1384257c607f48ffdd7ce1ec9a55fff15375765"
+        },
+        {
+          "old": "OpenAI Chat via model kind prefix",
+          "old_sha256": "0ba326baf456ba687023ec6f389d413f8b6ea79c814024e3bed1b74ccf059dfe",
+          "treatment": "replaced",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model Resolution from Caller Context` / `OpenAI Chat and Responses routes remain distinct` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "OpenAI Chat and Responses routes remain distinct",
+          "replacement_scenario_sha256": "abf42117ee2f79992f7e5599201589682a6d233d4d2802749f1aa74a4fba5352"
+        },
+        {
+          "old": "No explicit protocol field needed",
+          "old_sha256": "37a64ee05227cd798b55eed29e82f9f1a1905e42524cf8d9c760e3da6b0b39e7",
+          "treatment": "reversed",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Model Resolution from Caller Context` / `Route kind and protocol mismatch fails closed`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Route kind and protocol mismatch fails closed",
+          "replacement_scenario_sha256": "00175c6cd392be77edb417bee1384257c607f48ffdd7ce1ec9a55fff15375765"
+        },
+        {
+          "old": "api_mode selects provider class only",
+          "old_sha256": "f9737939c3dc10b727e7545b5dbeae9944741f3b206bac18d33b96c501c0f844",
+          "treatment": "reversed",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Model Resolution from Caller Context` / `Route kind and protocol mismatch fails closed`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Route kind and protocol mismatch fails closed",
+          "replacement_scenario_sha256": "00175c6cd392be77edb417bee1384257c607f48ffdd7ce1ec9a55fff15375765"
+        },
+        {
+          "old": "api_mode/prefix mismatch produces incompatible pairing",
+          "old_sha256": "1dae3e9adf6dfd361c34408341f95e2216fad9b9612ab936769f28434c640ead",
+          "treatment": "strengthened",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Model Resolution from Caller Context` / `Route kind and protocol mismatch fails closed` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Route kind and protocol mismatch fails closed",
+          "replacement_scenario_sha256": "00175c6cd392be77edb417bee1384257c607f48ffdd7ce1ec9a55fff15375765"
+        },
+        {
+          "old": "Cockpit model-name routing",
+          "old_sha256": "80ad5e72ccfab007a4996930974c12a7c1e0afe3f408f607e84c5b555f3ab05e",
+          "treatment": "replaced",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model Resolution from Caller Context` / `Canonical alias constructs the complete chain` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Canonical alias constructs the complete chain",
+          "replacement_scenario_sha256": "b74f776ca891563a142d719901130036c8e39ae846086b19c1abc47cce5f8fd6"
+        },
+        {
+          "old": "Ambiguous model name is not a provider prefix",
+          "old_sha256": "45975afbd7486f9f675df91fa9476d32d6d23d09e80460e5aa1ec525bd32669b",
+          "treatment": "reversed",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Model Resolution from Caller Context` / `String must match selected canonical alias`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "String must match selected canonical alias",
+          "replacement_scenario_sha256": "af6397a411fa6b72ba4e8a6e40463a66e56c37818fcb8113d54664838ce5e8c0"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Dual API Support",
+      "replacement": "Supported typed provider protocols",
+      "old_requirement_sha256": "91f5dab47b47fe89e0cbf5fe43ba4e890ca28b379b0a1bb94a667d396444557a",
+      "replacement_requirement_sha256": "80d81ab14540d992f50750f267f1b037e1a0554b2cb73eb52332e718a1c7ec22",
+      "old_scenario_count": 3,
+      "old_scenarios": [
+        {
+          "old": "OpenAI Chat Completions",
+          "old_sha256": "18d6f0a668d9efd9f24b2da3a4f4cd24102c415ea1557845f0f6ebb422312f9e",
+          "treatment": "replaced",
+          "replacement_requirement": "Supported typed provider protocols",
+          "replacement_requirement_sha256": "80d81ab14540d992f50750f267f1b037e1a0554b2cb73eb52332e718a1c7ec22",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Supported typed provider protocols` / `OpenAI Chat construction` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "OpenAI Chat construction",
+          "replacement_scenario_sha256": "037aaa31c605d10d6859c1a6cc75e2ee00b273b4fd942f6146c1fd403046e16e"
+        },
+        {
+          "old": "Anthropic Messages",
+          "old_sha256": "5342dd63278c44c367f15a457c4c56793b66417cf43b00a467a799ccbda88488",
+          "treatment": "replaced",
+          "replacement_requirement": "Supported typed provider protocols",
+          "replacement_requirement_sha256": "80d81ab14540d992f50750f267f1b037e1a0554b2cb73eb52332e718a1c7ec22",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Supported typed provider protocols` / `Anthropic Messages construction` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Anthropic Messages construction",
+          "replacement_scenario_sha256": "a70d972262d2e7ef584b2b5c0eb2ebe74e655b526951f7138e595959e272fac8"
+        },
+        {
+          "old": "OpenAI Responses",
+          "old_sha256": "080462077f62c096cc14998e8cfa4c3a011ffdb7423198f0fb7f443803cbc47b",
+          "treatment": "replaced",
+          "replacement_requirement": "Supported typed provider protocols",
+          "replacement_requirement_sha256": "80d81ab14540d992f50750f267f1b037e1a0554b2cb73eb52332e718a1c7ec22",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Supported typed provider protocols` / `OpenAI Responses construction` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "OpenAI Responses construction",
+          "replacement_scenario_sha256": "03d744bdf357fe41d0c5afc5539b527aea516c2e00915a3551f65f5db0cf13c6"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Config Schema",
+      "replacement": "Canonical Model Selection Schema",
+      "old_requirement_sha256": "751266f85d058b149a28da3be0a7945e86b0ceb23973f2c4d45a7fe0c0a53f91",
+      "replacement_requirement_sha256": "723bf9bd355e2cefe41c7d6d80a4a8244358f35612649676b6f91c64acce4742",
+      "old_scenario_count": 3,
+      "old_scenarios": [
+        {
+          "old": "TDT model configuration",
+          "old_sha256": "1ccf0959a2f693b827d9a295d166d33f599c21a8fa39f19732941113e27a8d4f",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical Model Selection Schema",
+          "replacement_requirement_sha256": "723bf9bd355e2cefe41c7d6d80a4a8244358f35612649676b6f91c64acce4742",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical Model Selection Schema` / `Canonical config binds exact routes` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Canonical config binds exact routes",
+          "replacement_scenario_sha256": "6c35fec21c2a0ff2b22c77370f9b80f4d603d4046599d4eeeaf25f0fee2ce4d8"
+        },
+        {
+          "old": "Multi-provider with api_mode",
+          "old_sha256": "a6a53e586bfefe99f14c273f49f97628f4efdfbe1c09973a7ae850c7a378259a",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical Model Selection Schema",
+          "replacement_requirement_sha256": "723bf9bd355e2cefe41c7d6d80a4a8244358f35612649676b6f91c64acce4742",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical Model Selection Schema` / `Undefined relationships fail together` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Undefined relationships fail together",
+          "replacement_scenario_sha256": "181ff828421666d7b5203e859bc96acc5430364eb4a0ea1e6d742253b5e36dc7"
+        },
+        {
+          "old": "Exact provider model names",
+          "old_sha256": "412a74d7f9b9c0c492b4932f38a66cf3f2624d8916075a2261c259ebbd324acd",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical Model Selection Schema",
+          "replacement_requirement_sha256": "723bf9bd355e2cefe41c7d6d80a4a8244358f35612649676b6f91c64acce4742",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical Model Selection Schema` / `Alias and wire model remain distinct` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Alias and wire model remain distinct",
+          "replacement_scenario_sha256": "2160072d0062d53ba4ab7c15ef2a900675f34cbc7683006e2634d22b80d74d58"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Configured Fallback Loading",
+      "replacement": "Model Resolution from Caller Context",
+      "old_requirement_sha256": "a541e2c9fb496121e790bf9194f4db02fdb1b948dbff541f1c172111fd4baf5d",
+      "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+      "old_scenario_count": 2,
+      "old_scenarios": [
+        {
+          "old": "CLI consumes configured fallback",
+          "old_sha256": "2b99178cf41be5ce18b2152453ed9534f2694c15246e90c1a63835317df28a62",
+          "treatment": "replaced",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model Resolution from Caller Context` / `Canonical alias constructs the complete chain` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Canonical alias constructs the complete chain",
+          "replacement_scenario_sha256": "b74f776ca891563a142d719901130036c8e39ae846086b19c1abc47cce5f8fd6"
+        },
+        {
+          "old": "Environment-selected primary remains selected",
+          "old_sha256": "d41c2ae3ff17ab12544ba356ff5a13890295c653d78676e4a629e2359ec7d642",
+          "treatment": "replaced",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model Resolution from Caller Context` / `String must match selected canonical alias` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "String must match selected canonical alias",
+          "replacement_scenario_sha256": "af6397a411fa6b72ba4e8a6e40463a66e56c37818fcb8113d54664838ce5e8c0"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Verified Provider (giaoduc)",
+      "replacement": "Supported typed provider protocols",
+      "old_requirement_sha256": "2e47bcc0cab40d94690baa402e3758955a726cce80dd4e93b97221afb59f83e5",
+      "replacement_requirement_sha256": "80d81ab14540d992f50750f267f1b037e1a0554b2cb73eb52332e718a1c7ec22",
+      "old_scenario_count": 1,
+      "old_scenarios": [
+        {
+          "old": "giaoduc Anthropic verification",
+          "old_sha256": "88860b5bb46c9a6e56650d1b0cb471a4846eaba9297720cec80097d6c70f1359",
+          "treatment": "replaced",
+          "replacement_requirement": "Supported typed provider protocols",
+          "replacement_requirement_sha256": "80d81ab14540d992f50750f267f1b037e1a0554b2cb73eb52332e718a1c7ec22",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Supported typed provider protocols` / `Anthropic Messages construction` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Anthropic Messages construction",
+          "replacement_scenario_sha256": "a70d972262d2e7ef584b2b5c0eb2ebe74e655b526951f7138e595959e272fac8"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "API Mode Compatibility",
+      "replacement": "Supported typed provider protocols",
+      "old_requirement_sha256": "12d15d37f0c27e38e36ad6a24660afb2d0ebd28b2e11bc179848075f02be3611",
+      "replacement_requirement_sha256": "80d81ab14540d992f50750f267f1b037e1a0554b2cb73eb52332e718a1c7ec22",
+      "old_scenario_count": 2,
+      "old_scenarios": [
+        {
+          "old": "Compatible Anthropic mode",
+          "old_sha256": "4d3ef9d36f008f9f24dea5c9723d66f1f6adbcd8ec122745e5673bb68b29846a",
+          "treatment": "replaced",
+          "replacement_requirement": "Supported typed provider protocols",
+          "replacement_requirement_sha256": "80d81ab14540d992f50750f267f1b037e1a0554b2cb73eb52332e718a1c7ec22",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Supported typed provider protocols` / `Anthropic Messages construction` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Anthropic Messages construction",
+          "replacement_scenario_sha256": "a70d972262d2e7ef584b2b5c0eb2ebe74e655b526951f7138e595959e272fac8"
+        },
+        {
+          "old": "Incompatible mode is rejected",
+          "old_sha256": "36af1d0d9edbea9fb51d15a788734c8adfc0c0e75db72c465e7fc28eb87eb342",
+          "treatment": "replaced",
+          "replacement_requirement": "Supported typed provider protocols",
+          "replacement_requirement_sha256": "80d81ab14540d992f50750f267f1b037e1a0554b2cb73eb52332e718a1c7ec22",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Supported typed provider protocols` / `Unsupported pair is rejected` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Unsupported pair is rejected",
+          "replacement_scenario_sha256": "7136003bf9ffcf7b1bd7357ab4c996d64dcf36884962f268d0b4b6a3008fc5fa"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Configurable Thinking Effort",
+      "replacement": "Canonical route behavior and run settings",
+      "old_requirement_sha256": "887497cbcc71a081de04779e50c53a41a82af5087b4cbce703eea7850fb2c2e7",
+      "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+      "old_scenario_count": 5,
+      "old_scenarios": [
+        {
+          "old": "Config-driven thinking for Anthropic",
+          "old_sha256": "0715eeb0084b7d1b325f2fc6b246932fd37de3376977233780bfd38aa91c374c",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical route behavior and run settings` / `Canonical reasoning effort is projected` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Canonical reasoning effort is projected",
+          "replacement_scenario_sha256": "e3e5704292238a27ea1c2ae3c99774763d1f17707d50f4da909aec2c99544c1a"
+        },
+        {
+          "old": "Config-driven thinking for OpenAI",
+          "old_sha256": "d8167eecd8ae4ab4401881f96a6d4cb354c072d13c6b6f64c16ef992eb6ed218",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical route behavior and run settings` / `Canonical reasoning effort is projected` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Canonical reasoning effort is projected",
+          "replacement_scenario_sha256": "e3e5704292238a27ea1c2ae3c99774763d1f17707d50f4da909aec2c99544c1a"
+        },
+        {
+          "old": "Env var override",
+          "old_sha256": "94f4821ecfcb1cd7989d17d7112f41d0861dd9574b440b971ccb86f2f53d975b",
+          "treatment": "reversed",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Canonical route behavior and run settings` / `Typed run override changes behavior only`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Typed run override changes behavior only",
+          "replacement_scenario_sha256": "347e4e952c1c7bfdfd37c6f97f6a5ae048506ad0a588520e47a55305dc01985a"
+        },
+        {
+          "old": "Thinking disabled",
+          "old_sha256": "ec738ed69307b25e90d3b9f46268466e8506abcfdb3b3e1005f84fd857ba9d97",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical route behavior and run settings` / `Absent behavior uses provider-library defaults` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Absent behavior uses provider-library defaults",
+          "replacement_scenario_sha256": "bd87cb553c9180391763b7ac07023c9287c020f592b167f4bc91064b20965d6d"
+        },
+        {
+          "old": "Thinking override per-call",
+          "old_sha256": "11c04136a03a11bc195dcdd5463583ade603175ed81cff0aa9c3d145eef164d5",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical route behavior and run settings` / `Typed run override changes behavior only` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Typed run override changes behavior only",
+          "replacement_scenario_sha256": "347e4e952c1c7bfdfd37c6f97f6a5ae048506ad0a588520e47a55305dc01985a"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Model Behavior Defaults",
+      "replacement": "Canonical route behavior and run settings",
+      "old_requirement_sha256": "0659409a7b19ae5eac90f547f0e628097b00b72cdaf502fe4fdf8a45928297c3",
+      "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+      "old_scenario_count": 4,
+      "old_scenarios": [
+        {
+          "old": "Temperature from config",
+          "old_sha256": "b55fb292dce1570345d0f2f4c7139d39834dcd50a4d63ebb1aca24e66987e137",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical route behavior and run settings` / `Canonical numeric behavior is validated` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Canonical numeric behavior is validated",
+          "replacement_scenario_sha256": "b7fd785a5bfbda8b6de1bb2d1253ae94feaf5b6668443c326ad9dac129a77d1f"
+        },
+        {
+          "old": "Max tokens from config",
+          "old_sha256": "21a810f47c2e15d420d1abd983e029accacbfc8b6004a97e7ddac9680b7311f5",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical route behavior and run settings` / `Canonical numeric behavior is validated` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Canonical numeric behavior is validated",
+          "replacement_scenario_sha256": "b7fd785a5bfbda8b6de1bb2d1253ae94feaf5b6668443c326ad9dac129a77d1f"
+        },
+        {
+          "old": "Service tier selection",
+          "old_sha256": "97197c3a3f780ba340d8d753b34f3ac3f43822e8e3769f420d79208d64c77a61",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical route behavior and run settings` / `Model-specific behavior overrides canonical defaults` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Model-specific behavior overrides canonical defaults",
+          "replacement_scenario_sha256": "fabfae2464e33c62e8f6d55afb455d20424f1bf6bb0b62ac3bd1e88a38572a1d"
+        },
+        {
+          "old": "Per-call override",
+          "old_sha256": "6cb4f0cb5a739721c58b62807c7b6997f2e796cce7dad3dcbfd7efda266a96d9",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical route behavior and run settings` / `Typed run override changes behavior only` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Typed run override changes behavior only",
+          "replacement_scenario_sha256": "347e4e952c1c7bfdfd37c6f97f6a5ae048506ad0a588520e47a55305dc01985a"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Provider-Specific Settings Escape Hatch",
+      "replacement": "Canonical route behavior and run settings",
+      "old_requirement_sha256": "7a39a70d71faac6ad3c35a91f1eaede6a9596b63023bb2752d66a2dcb2b4b8ad",
+      "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+      "old_scenario_count": 2,
+      "old_scenarios": [
+        {
+          "old": "Anthropic thinking config",
+          "old_sha256": "8392862e397d5791b160b01fa96e1fd028f0aa75033e96abee2487cde1a39ff7",
+          "treatment": "reversed",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Canonical route behavior and run settings` / `Unsupported behavior field is rejected`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Unsupported behavior field is rejected",
+          "replacement_scenario_sha256": "616b9149d0fe494298b05ed6b943bfc61c199a3e3895e69e99df96199df09bac"
+        },
+        {
+          "old": "OpenAI reasoning summary",
+          "old_sha256": "e04ca9b329ae985aa0389f5729c08696f5c6857154fe9a916dd891c9add61916",
+          "treatment": "reversed",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Canonical route behavior and run settings` / `Unsupported behavior field is rejected`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Unsupported behavior field is rejected",
+          "replacement_scenario_sha256": "616b9149d0fe494298b05ed6b943bfc61c199a3e3895e69e99df96199df09bac"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "extra_model_settings Security Validation",
+      "replacement": "Canonical route behavior and run settings",
+      "old_requirement_sha256": "02041f34ab59a2b7b2878ccb2da9fc858be07226bf010b9b9e971ff358f335f7",
+      "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+      "old_scenario_count": 3,
+      "old_scenarios": [
+        {
+          "old": "Blocked dangerous keys",
+          "old_sha256": "f13ab56acb69133078ac5c984be83b7dd57429e7b8d6d4f292c84ef6bbf49ecc",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical Model Selection Schema",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical Model Selection Schema` / `Unsupported old schema fails closed` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Unsupported old schema fails closed",
+          "replacement_scenario_sha256": "acb155a3a1bad156aee8f9dc8d8334abcb76a8ecc049a46e3a6973347ffee39b"
+        },
+        {
+          "old": "Sensitive key rejection",
+          "old_sha256": "9c166894728c7c15988a14a1f151c9563c10438b88b52641d020398caad1ed69",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical Model Selection Schema",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical Model Selection Schema` / `Unsupported old schema fails closed` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Unsupported old schema fails closed",
+          "replacement_scenario_sha256": "acb155a3a1bad156aee8f9dc8d8334abcb76a8ecc049a46e3a6973347ffee39b"
+        },
+        {
+          "old": "Serialization exclusion",
+          "old_sha256": "3a8b6a414eacfbadbc914c0e5f7bcbef7c69570b801c3eeb3ca6d4a612d1e9c3",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical Model Selection Schema",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical Model Selection Schema` / `Credential values never enter serializable state` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Credential values never enter serializable state",
+          "replacement_scenario_sha256": "f7f9211ea6a4a14404dabc9003ecf92e88220a1e476c9c1406d7388634154381"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Model Settings Range Validation",
+      "replacement": "Canonical route behavior and run settings",
+      "old_requirement_sha256": "e3ecb4104bc2a89938d034182f1e3421b042558b297899faa8bc0bd877928427",
+      "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+      "old_scenario_count": 2,
+      "old_scenarios": [
+        {
+          "old": "Temperature in range",
+          "old_sha256": "c711ad95fe1d2fccad7bd496a22b6c45c14513d9135ea4fa7e7c7c934781f929",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical route behavior and run settings` / `Canonical numeric behavior is validated` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Canonical numeric behavior is validated",
+          "replacement_scenario_sha256": "b7fd785a5bfbda8b6de1bb2d1253ae94feaf5b6668443c326ad9dac129a77d1f"
+        },
+        {
+          "old": "Temperature out of range",
+          "old_sha256": "6395a1027501a96ebe545513875cf2f3354557157c672bb249da680e45d08250",
+          "treatment": "strengthened",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Canonical route behavior and run settings` / `Unsupported capability fails before provider access` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Unsupported capability fails before provider access",
+          "replacement_scenario_sha256": "8c0b0daf263112723d3a279ea83ce651ce4d493180e2fb7ff17df0a8b313a358"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "CLI Consumer Model Behavior Alignment",
+      "replacement": "Canonical route behavior and run settings",
+      "old_requirement_sha256": "356751d91f0145649921a247748a8c0f0c1f5ceaec5f7917d5d8a9c3de42a7e3",
+      "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+      "old_scenario_count": 4,
+      "old_scenarios": [
+        {
+          "old": "CLI applies unified model settings",
+          "old_sha256": "d6edf657ecbcaf055ec4ee7ec13d690fd9867a1b6878ccc7b04eba5d561cf796",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical route behavior and run settings` / `CLI and SDK apply identical behavior` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "CLI and SDK apply identical behavior",
+          "replacement_scenario_sha256": "299c2a1d6550a031fe23c6932365fd328ffb8cc0178a801cef1c3f58bf40425f"
+        },
+        {
+          "old": "CLI flattens provider-specific settings",
+          "old_sha256": "f9eb82cdabdd927f8013601859a386567a89f786a3b74a091721ed6f8ae0cbe5",
+          "treatment": "reversed",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Canonical route behavior and run settings` / `Unsupported behavior field is rejected`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Unsupported behavior field is rejected",
+          "replacement_scenario_sha256": "616b9149d0fe494298b05ed6b943bfc61c199a3e3895e69e99df96199df09bac"
+        },
+        {
+          "old": "CLI injects configured thinking",
+          "old_sha256": "e1e795583db2018f1a4a58fea3531846a68bba9039589bb27fa891f4d66dfe34",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical route behavior and run settings` / `CLI and SDK apply identical behavior` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "CLI and SDK apply identical behavior",
+          "replacement_scenario_sha256": "299c2a1d6550a031fe23c6932365fd328ffb8cc0178a801cef1c3f58bf40425f"
+        },
+        {
+          "old": "CLI uses pydantic-ai defaults when behavior settings are absent",
+          "old_sha256": "d43cb10efd823518d4898e249163fe393d07f90293a6a0ee11e200f5c1926032",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical route behavior and run settings` / `Absent behavior uses provider-library defaults` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Absent behavior uses provider-library defaults",
+          "replacement_scenario_sha256": "bd87cb553c9180391763b7ac07023c9287c020f592b167f4bc91064b20965d6d"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Canonical Model YAML Section",
+      "replacement": "Canonical Model Selection Schema",
+      "old_requirement_sha256": "50202bd35643413863c84472443a887ec66e979a3c5b374d0c5334b845004bf1",
+      "replacement_requirement_sha256": "723bf9bd355e2cefe41c7d6d80a4a8244358f35612649676b6f91c64acce4742",
+      "old_scenario_count": 2,
+      "old_scenarios": [
+        {
+          "old": "Legacy gateway section is ignored",
+          "old_sha256": "4dadfdf369d1137a99fddb75362ab6499449994cf9ddeb2126090d3aa07e8005",
+          "treatment": "reversed",
+          "replacement_requirement": "Canonical Model Selection Schema",
+          "replacement_requirement_sha256": "723bf9bd355e2cefe41c7d6d80a4a8244358f35612649676b6f91c64acce4742",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Canonical Model Selection Schema` / `Unsupported old schema fails closed`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Unsupported old schema fails closed",
+          "replacement_scenario_sha256": "acb155a3a1bad156aee8f9dc8d8334abcb76a8ecc049a46e3a6973347ffee39b"
+        },
+        {
+          "old": "Canonical model section is loaded",
+          "old_sha256": "f3accc979f94fd1523fcce4c416c051747e1d8aa6611c135757d06e7773f1867",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical Model Selection Schema",
+          "replacement_requirement_sha256": "723bf9bd355e2cefe41c7d6d80a4a8244358f35612649676b6f91c64acce4742",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical Model Selection Schema` / `Canonical config binds exact routes` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Canonical config binds exact routes",
+          "replacement_scenario_sha256": "6c35fec21c2a0ff2b22c77370f9b80f4d603d4046599d4eeeaf25f0fee2ce4d8"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "CLI Fallback Behavior Settings",
+      "replacement": "Canonical route behavior and run settings",
+      "old_requirement_sha256": "600fb4a5f82671791513f8374c67dc693729a1ca067aa1c3445fd5c7bb2dda10",
+      "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+      "old_scenario_count": 1,
+      "old_scenarios": [
+        {
+          "old": "Fallback chain uses configured agent-run settings",
+          "old_sha256": "27ff61d75243b44b4b79408fb91909cd96a81cfdf205531704a7877290eb5786",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical route behavior and run settings",
+          "replacement_requirement_sha256": "f27f65cfc33bf530aa48261307b12d1b6d4e21d5e6b4d7c6aea46453f79d2f77",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical route behavior and run settings` / `Fallback routes retain their own behavior` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Fallback routes retain their own behavior",
+          "replacement_scenario_sha256": "a302e06640da01c8cccd58c82e2a4de41632ede067aad14d89afaad257d345c9"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Streaming Responses model aggregation boundary",
+      "replacement": "Typed Responses streaming aggregation boundary",
+      "old_requirement_sha256": "e22252325a05a308351e8caf34de5d6adef75c60afd638ae5a67539baa589da0",
+      "replacement_requirement_sha256": "beed7c3e3cacc241a7a0fd5e837d4fb49d07d8b0b30937fc3c3357235a8b0339",
+      "old_scenario_count": 3,
+      "old_scenarios": [
+        {
+          "old": "SSE stream aggregation",
+          "old_sha256": "819e03ddc85baceebbe05e5b7d7e219f3bbf33e4d3006e1d8cabdb8f6edda9ba",
+          "treatment": "strengthened",
+          "replacement_requirement": "Typed Responses streaming aggregation boundary",
+          "replacement_requirement_sha256": "beed7c3e3cacc241a7a0fd5e837d4fb49d07d8b0b30937fc3c3357235a8b0339",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Typed Responses streaming aggregation boundary` / `SSE stream aggregation` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "SSE stream aggregation",
+          "replacement_scenario_sha256": "35da56bde3d195be2cf945595239f415f601d16acd03988f97d1512ee3a2a3f4"
+        },
+        {
+          "old": "Empty completion output normalization",
+          "old_sha256": "881fb578ab063692e2ff2292d335b6d04478a39b0dd9cecf2c5a746865976671",
+          "treatment": "strengthened",
+          "replacement_requirement": "Typed Responses streaming aggregation boundary",
+          "replacement_requirement_sha256": "beed7c3e3cacc241a7a0fd5e837d4fb49d07d8b0b30937fc3c3357235a8b0339",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Typed Responses streaming aggregation boundary` / `Empty completion output normalization` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Empty completion output normalization",
+          "replacement_scenario_sha256": "73a6e42e9797c92dd709f7e83bfa045550e50ed9a61514f958507640f10085d2"
+        },
+        {
+          "old": "Upstream exception propagated",
+          "old_sha256": "d6ec99ae17e4169331ea029a832bc17e0e34fb046eeefe6dae00d64c2fc0e1af",
+          "treatment": "strengthened",
+          "replacement_requirement": "Typed Responses streaming aggregation boundary",
+          "replacement_requirement_sha256": "beed7c3e3cacc241a7a0fd5e837d4fb49d07d8b0b30937fc3c3357235a8b0339",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Typed Responses streaming aggregation boundary` / `Upstream exception propagated` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Upstream exception propagated",
+          "replacement_scenario_sha256": "b9e1fc1494d3515f98870a4d724334d4f5457da4a549c2f44e697185addf3316"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Config-driven fallback chain construction",
+      "replacement": "Model Resolution from Caller Context",
+      "old_requirement_sha256": "13ecf7b3af6c4b7368068fe707a003051a16e28d56263c316ed011bc76257b78",
+      "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+      "old_scenario_count": 3,
+      "old_scenarios": [
+        {
+          "old": "Config-driven fallback",
+          "old_sha256": "90b59a972e8a428f777e7c3bd268f9f3454ecf86c6dce83c440d2ad02cbe1783",
+          "treatment": "replaced",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model Resolution from Caller Context` / `Canonical alias constructs the complete chain` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Canonical alias constructs the complete chain",
+          "replacement_scenario_sha256": "b74f776ca891563a142d719901130036c8e39ae846086b19c1abc47cce5f8fd6"
+        },
+        {
+          "old": "No fallback configured",
+          "old_sha256": "61525a87d8bb27d0333cb0be5f32018e5b613b4f77c32230abc277fdc06c93b0",
+          "treatment": "replaced",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model Resolution from Caller Context` / `Explicit Model is returned unchanged` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Explicit Model is returned unchanged",
+          "replacement_scenario_sha256": "8b6eba04ef6b4e878e7030432c03fab630e893d3aede2174f990f588c0f234ec"
+        },
+        {
+          "old": "Explicit Model instance bypasses fallback",
+          "old_sha256": "1e88553a4d23f9e5011431334adaf042dd82c0564645abdf158cbf667bf15d10",
+          "treatment": "replaced",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model Resolution from Caller Context` / `Explicit Model is returned unchanged` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Explicit Model is returned unchanged",
+          "replacement_scenario_sha256": "8b6eba04ef6b4e878e7030432c03fab630e893d3aede2174f990f588c0f234ec"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Model layer is configuration-input only",
+      "replacement": "Clean model and agent construction boundaries",
+      "old_requirement_sha256": "22e11b63be0d2b58613871dd7304674d8d1e2da6dca0f9ae5b306aef96c7b511",
+      "replacement_requirement_sha256": "1ea6ec92f983fa45fdc2140e46eff8c2da9ac4088a82147cf319c8a8c08d2c7c",
+      "old_scenario_count": 7,
+      "old_scenarios": [
+        {
+          "old": "Static source conformance",
+          "old_sha256": "47b3168608e687976952e11d231afd077f8471974f87b74b4e02f48713706ae0",
+          "treatment": "replaced",
+          "replacement_requirement": "Clean model and agent construction boundaries",
+          "replacement_requirement_sha256": "1ea6ec92f983fa45fdc2140e46eff8c2da9ac4088a82147cf319c8a8c08d2c7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Clean model and agent construction boundaries` / `build_agent explicit Model path is pure` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "build_agent explicit Model path is pure",
+          "replacement_scenario_sha256": "2b8d71fd75266054516865e25103bde4929905f990baac72cbabd463ceeacd87"
+        },
+        {
+          "old": "All construction entry points agree",
+          "old_sha256": "678d7d54706d741888a81ceb2c4aaf5ec787b58971142e01b0a1939a5b76b4ed",
+          "treatment": "replaced",
+          "replacement_requirement": "Clean model and agent construction boundaries",
+          "replacement_requirement_sha256": "1ea6ec92f983fa45fdc2140e46eff8c2da9ac4088a82147cf319c8a8c08d2c7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Clean model and agent construction boundaries` / `CLI composition resolves one context` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "CLI composition resolves one context",
+          "replacement_scenario_sha256": "84491b4646977f5c06bdd66ed780c6c9c0ab17c72444d143c0d1e9a7b776c957"
+        },
+        {
+          "old": "Caller-resolved snapshot is reused",
+          "old_sha256": "4ef104a1056cabf6888f68afaa0afc43774e82199d59b15abf04021ef5c61bff",
+          "treatment": "replaced",
+          "replacement_requirement": "Clean model and agent construction boundaries",
+          "replacement_requirement_sha256": "1ea6ec92f983fa45fdc2140e46eff8c2da9ac4088a82147cf319c8a8c08d2c7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Clean model and agent construction boundaries` / `build_agent string path delegates once` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "build_agent string path delegates once",
+          "replacement_scenario_sha256": "7dc2c8faee35a9ec113bb4c8d8f2c49a22db3162fc295127c3e4a58b40ac1583"
+        },
+        {
+          "old": "Model identifier without caller snapshot fails before discovery",
+          "old_sha256": "19fc0a24508cae28ba37074f07d4c76c0a100d82c78ed4351509b7043553ecd7",
+          "treatment": "reversed",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "1ea6ec92f983fa45fdc2140e46eff8c2da9ac4088a82147cf319c8a8c08d2c7c",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Model Resolution from Caller Context` / `Missing context fails before discovery`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Missing context fails before discovery",
+          "replacement_scenario_sha256": "742a2430f5502f3d1329ce5a76e97b8a0452e6f121e6b4a198a2d2cf1439d0f9"
+        },
+        {
+          "old": "Explicit Model performs zero source reads",
+          "old_sha256": "341ae06081161b0581ee0f3f374e315a7eef51be23e5aa4bc9dd6ccc24cc3269",
+          "treatment": "replaced",
+          "replacement_requirement": "Clean model and agent construction boundaries",
+          "replacement_requirement_sha256": "1ea6ec92f983fa45fdc2140e46eff8c2da9ac4088a82147cf319c8a8c08d2c7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Clean model and agent construction boundaries` / `build_agent explicit Model path is pure` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "build_agent explicit Model path is pure",
+          "replacement_scenario_sha256": "2b8d71fd75266054516865e25103bde4929905f990baac72cbabd463ceeacd87"
+        },
+        {
+          "old": "Explicit Model remains authoritative over conflicting selection",
+          "old_sha256": "5949db8c68036e97cd86351e18f99a9d51feb88a3c2a0b724af6549b3b8da014",
+          "treatment": "replaced",
+          "replacement_requirement": "Clean model and agent construction boundaries",
+          "replacement_requirement_sha256": "1ea6ec92f983fa45fdc2140e46eff8c2da9ac4088a82147cf319c8a8c08d2c7c",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Clean model and agent construction boundaries` / `build_agent explicit Model path is pure` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "build_agent explicit Model path is pure",
+          "replacement_scenario_sha256": "2b8d71fd75266054516865e25103bde4929905f990baac72cbabd463ceeacd87"
+        },
+        {
+          "old": "Concurrent constructions keep snapshots isolated",
+          "old_sha256": "8dc9a5db71164f20df7e9137750c79d3b4364b49a7f060c49c2102dd07d2cc88",
+          "treatment": "strengthened",
+          "replacement_requirement": "Clean model and agent construction boundaries",
+          "replacement_requirement_sha256": "1ea6ec92f983fa45fdc2140e46eff8c2da9ac4088a82147cf319c8a8c08d2c7c",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Clean model and agent construction boundaries` / `Concurrent construction remains isolated` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Concurrent construction remains isolated",
+          "replacement_scenario_sha256": "9391b70096af4d8fee50a4f8902eaf44c52922866bf3c842c55c31eeeff787b5"
+        }
+      ]
+    },
+    {
+      "spec": "agent-core-model-resolution",
+      "old": "Caller-owned fallback and identifier validation",
+      "replacement": "Model Resolution from Caller Context",
+      "old_requirement_sha256": "eb6d753db7d7092d83cc20c7eed8395336e3236e627f1ed024ba0f6d2a6673f4",
+      "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+      "old_scenario_count": 2,
+      "old_scenarios": [
+        {
+          "old": "Caller-owned fallback is preserved",
+          "old_sha256": "81807fd17ffe277878fd8a78cd077fbb7ebd8718961460dba1c2a385b5820c5a",
+          "treatment": "replaced",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model Resolution from Caller Context` / `Canonical alias constructs the complete chain` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "Canonical alias constructs the complete chain",
+          "replacement_scenario_sha256": "b74f776ca891563a142d719901130036c8e39ae846086b19c1abc47cce5f8fd6"
+        },
+        {
+          "old": "Unregistered live identifier is rejected",
+          "old_sha256": "466ac217f53aefb63515244a5d2eb1f6cf1d7463ed5996c880b7d1d4a60e0f4a",
+          "treatment": "replaced",
+          "replacement_requirement": "Model Resolution from Caller Context",
+          "replacement_requirement_sha256": "110b9ec5e32590c619c20adccbbb60b86660b22247662084e8f8f48b85a8071f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Model Resolution from Caller Context` / `String must match selected canonical alias` under the canonical clean-break contract.",
+          "replacement_spec": "agent-core-model-resolution",
+          "replacement_scenario": "String must match selected canonical alias",
+          "replacement_scenario_sha256": "af6397a411fa6b72ba4e8a6e40463a66e56c37818fcb8113d54664838ce5e8c0"
+        }
+      ]
+    },
+    {
+      "spec": "cli-provider-profile-resolution",
+      "old": "Provider CLI identity mapping",
+      "replacement": "Explicit provider CLI identity mapping",
+      "old_requirement_sha256": "ce252034db421b04b663b6d1dbf38b39268c7d2b465b3baa352db25c485a88c0",
+      "replacement_requirement_sha256": "18b4f9031387fc7a5e1f57da5d2319d93da0601589eb4dd5e53d60bb0a80c51b",
+      "old_scenario_count": 2,
+      "old_scenarios": [
+        {
+          "old": "Provider with cli_provider mapping",
+          "old_sha256": "cb237f3098d8724c45b18a16580b57a492c68f518a30445fbc10f03b8a0c4a40",
+          "treatment": "replaced",
+          "replacement_requirement": "Explicit provider CLI identity mapping",
+          "replacement_requirement_sha256": "18b4f9031387fc7a5e1f57da5d2319d93da0601589eb4dd5e53d60bb0a80c51b",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Explicit provider CLI identity mapping` / `Provider declares a CLI identity` under the canonical clean-break contract.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Provider declares a CLI identity",
+          "replacement_scenario_sha256": "388a74b64a46ce11becb5524198171cf2852b90599f261ffe2301eebef1472de"
+        },
+        {
+          "old": "Provider without cli_provider mapping",
+          "old_sha256": "6f4565d1ae3cbc2bd151faf0cc58eeecd559f710ec3b93ac9ae2d443df2e7a84",
+          "treatment": "replaced",
+          "replacement_requirement": "Explicit provider CLI identity mapping",
+          "replacement_requirement_sha256": "18b4f9031387fc7a5e1f57da5d2319d93da0601589eb4dd5e53d60bb0a80c51b",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Explicit provider CLI identity mapping` / `Provider has no CLI identity` under the canonical clean-break contract.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Provider has no CLI identity",
+          "replacement_scenario_sha256": "225567c32add7595b2ef4095d823eea7460c1bc91fe23381fc592602d10593d6"
+        }
+      ]
+    },
+    {
+      "spec": "cli-provider-profile-resolution",
+      "old": "Default CLI model mapping",
+      "replacement": "Required explicit CLI model mapping",
+      "old_requirement_sha256": "e4e33ffe6c9c57f85c8cca0495ab9440dc2bc91e3ea8c291c0136fefbf3635b4",
+      "replacement_requirement_sha256": "d225ae7616089fbad50dd668c0f8fcbeef29762afc558012267461a7c593d820",
+      "old_scenario_count": 3,
+      "old_scenarios": [
+        {
+          "old": "Explicit cli_models mapping",
+          "old_sha256": "3bcd57faa27fdf9dd5b9615f1f8c9c5b8a9616d119f787caea875d5b94c30231",
+          "treatment": "replaced",
+          "replacement_requirement": "Required explicit CLI model mapping",
+          "replacement_requirement_sha256": "d225ae7616089fbad50dd668c0f8fcbeef29762afc558012267461a7c593d820",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Required explicit CLI model mapping` / `Explicit mappings select independently` under the canonical clean-break contract.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Explicit mappings select independently",
+          "replacement_scenario_sha256": "524a619a0c13b6ef43e77bdbdb164cb0771effd5bcbed330c34443e8d5084125"
+        },
+        {
+          "old": "cli_models absent \u2014 compatibility fallback",
+          "old_sha256": "deb32e1f3dd3ce134516a0c244338dfb4cf69953e11da351c6084e7f1afdc497",
+          "treatment": "reversed",
+          "replacement_requirement": "Required explicit CLI model mapping",
+          "replacement_requirement_sha256": "d225ae7616089fbad50dd668c0f8fcbeef29762afc558012267461a7c593d820",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Required explicit CLI model mapping` / `Enabled provider has no mapping`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Enabled provider has no mapping",
+          "replacement_scenario_sha256": "dd25a931ab5ffebe8e98e419eef9fbfe48891eb46e9021d43e712f2ffad273d9"
+        },
+        {
+          "old": "Ambiguous aliases without cli_models",
+          "old_sha256": "6868dca0d0a535f83b9ab16666f7a05b335ac27ab40fe8ca6207af2e4f745783",
+          "treatment": "reversed",
+          "replacement_requirement": "Required explicit CLI model mapping",
+          "replacement_requirement_sha256": "d225ae7616089fbad50dd668c0f8fcbeef29762afc558012267461a7c593d820",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Required explicit CLI model mapping` / `Unique candidate does not imply selection`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Unique candidate does not imply selection",
+          "replacement_scenario_sha256": "c5de1c05b9c593561e0361968e3cecb49744480c90765f5f4f09311d6acef52f"
+        }
+      ]
+    },
+    {
+      "spec": "cli-provider-profile-resolution",
+      "old": "Selection failure modes",
+      "replacement": "Fail-closed canonical CLI selection",
+      "old_requirement_sha256": "b7206dbc3f6e04cc9a9a1ebb862abf5347e782fb7797d2760e7e40a349728de3",
+      "replacement_requirement_sha256": "9eae130cecff3d8d2e6dc8eea068f2f825b66a1f20a435f0f03e00a044d308c0",
+      "old_scenario_count": 6,
+      "old_scenarios": [
+        {
+          "old": "CLI provider absent from valid catalog",
+          "old_sha256": "06a1c80ab9d94de3a6999e025a74116d977fe7e92be17af5805c993625c4ebd8",
+          "treatment": "replaced",
+          "replacement_requirement": "Fail-closed canonical CLI selection",
+          "replacement_requirement_sha256": "9eae130cecff3d8d2e6dc8eea068f2f825b66a1f20a435f0f03e00a044d308c0",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Fail-closed canonical CLI selection` / `Unconfigured and disabled identity has no selection` under the canonical clean-break contract.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Unconfigured and disabled identity has no selection",
+          "replacement_scenario_sha256": "afa6e94f5a48bae5ef5b7a25fab1c73c7c0723d708c9a5f415fbe654c4b6549f"
+        },
+        {
+          "old": "Canonical config exists but is invalid",
+          "old_sha256": "100d2199797415623b9c8d5d57c57ca12c378b6f10af375bec3f111eb5ab1af6",
+          "treatment": "replaced",
+          "replacement_requirement": "Fail-closed canonical CLI selection",
+          "replacement_requirement_sha256": "9eae130cecff3d8d2e6dc8eea068f2f825b66a1f20a435f0f03e00a044d308c0",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Fail-closed canonical CLI selection` / `Invalid canonical source fails` under the canonical clean-break contract.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Invalid canonical source fails",
+          "replacement_scenario_sha256": "23245283c592f8621460a306ff5cfd2c0e19e23df8eb5ef6c8af5d7b5bf093d7"
+        },
+        {
+          "old": "Legacy-only profile returns None",
+          "old_sha256": "ecf1f1a46a30376dcac32032c0e542fe118cb8ed7502740911294e83530eb629",
+          "treatment": "reversed",
+          "replacement_requirement": "Fail-closed canonical CLI selection",
+          "replacement_requirement_sha256": "9eae130cecff3d8d2e6dc8eea068f2f825b66a1f20a435f0f03e00a044d308c0",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Fail-closed canonical CLI selection` / `Invalid canonical source fails`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Invalid canonical source fails",
+          "replacement_scenario_sha256": "23245283c592f8621460a306ff5cfd2c0e19e23df8eb5ef6c8af5d7b5bf093d7"
+        },
+        {
+          "old": "Declared provider has no valid model selection",
+          "old_sha256": "520ebcf92408ad526e42b2dc1566e069e8e49cf4f97c2c2e60b7819f5eb197d4",
+          "treatment": "replaced",
+          "replacement_requirement": "Fail-closed canonical CLI selection",
+          "replacement_requirement_sha256": "9eae130cecff3d8d2e6dc8eea068f2f825b66a1f20a435f0f03e00a044d308c0",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Fail-closed canonical CLI selection` / `Enabled identity without relationship fails` under the canonical clean-break contract.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Enabled identity without relationship fails",
+          "replacement_scenario_sha256": "6cfac9bc179ac7ea6565c617403d51560749d4d6c13f57ca4e17c13d3b77eff4"
+        },
+        {
+          "old": "Declared provider selection is ambiguous",
+          "old_sha256": "2515e697e36a5b3227fed484414dd281075f9860630ae764a0eb6ef95dd141ae",
+          "treatment": "replaced",
+          "replacement_requirement": "Fail-closed canonical CLI selection",
+          "replacement_requirement_sha256": "9eae130cecff3d8d2e6dc8eea068f2f825b66a1f20a435f0f03e00a044d308c0",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Fail-closed canonical CLI selection` / `Ambiguous relationship fails` under the canonical clean-break contract.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Ambiguous relationship fails",
+          "replacement_scenario_sha256": "fa03e7ebae736ec7cfcc536d4db9f50982c015769e0b8d8f7d1bbbdfc1956a6f"
+        },
+        {
+          "old": "Canonical provider and CLI adapter identities remain distinct",
+          "old_sha256": "fc3dbf08495480fa07388a91850dfbdb9e683a93c5768e0b116b834819e375cb",
+          "treatment": "strengthened",
+          "replacement_requirement": "Fail-closed canonical CLI selection",
+          "replacement_requirement_sha256": "9eae130cecff3d8d2e6dc8eea068f2f825b66a1f20a435f0f03e00a044d308c0",
+          "rationale": "Human-reviewed strengthening: the baseline invariant remains in `Fail-closed canonical CLI selection` / `Provider and adapter identities remain distinct` with canonical route, identity, and fail-closed constraints.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Provider and adapter identities remain distinct",
+          "replacement_scenario_sha256": "cb204ce74f5429593e3a83224ce767ba40b60867b2792abc19a2e9d2e60c9619"
+        }
+      ]
+    },
+    {
+      "spec": "cli-provider-profile-resolution",
+      "old": "Canonical precedence and provenance",
+      "replacement": "Canonical CLI override and provenance",
+      "old_requirement_sha256": "126c09a6ac36278f10472360e919cc11bf3aaafa687236c9fad83ca05afa6f25",
+      "replacement_requirement_sha256": "8e035a3313e61b515d7ec8965770240be03b8e5d3e6dfb272802eef98fccf401",
+      "old_scenario_count": 2,
+      "old_scenarios": [
+        {
+          "old": "Environment alias overrides YAML alias",
+          "old_sha256": "49a7e82c903548044ac3069ab64f7d5f5572f87d70c24db91bfda3932cbe6b33",
+          "treatment": "reversed",
+          "replacement_requirement": "Canonical CLI override and provenance",
+          "replacement_requirement_sha256": "8e035a3313e61b515d7ec8965770240be03b8e5d3e6dfb272802eef98fccf401",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Canonical CLI override and provenance` / `Undeclared environment alias has no authority`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Undeclared environment alias has no authority",
+          "replacement_scenario_sha256": "af1a250da4a7a66be737af8acfa423bc9ea56d9c6c79f65eb49107dfa97625e2"
+        },
+        {
+          "old": "Undeclared legacy key is ignored or rejected explicitly",
+          "old_sha256": "5f5db5fc519bc3b0419b7be68ef493bdaebf77496f9626b011310d088c1c7940",
+          "treatment": "reversed",
+          "replacement_requirement": "Canonical CLI override and provenance",
+          "replacement_requirement_sha256": "8e035a3313e61b515d7ec8965770240be03b8e5d3e6dfb272802eef98fccf401",
+          "rationale": "Human-reviewed reversal: the old authority/input behavior is abolished and replaced by `Canonical CLI override and provenance` / `Undeclared environment alias has no authority`; unsupported legacy behavior cannot remain normative.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Undeclared environment alias has no authority",
+          "replacement_scenario_sha256": "af1a250da4a7a66be737af8acfa423bc9ea56d9c6c79f65eb49107dfa97625e2"
+        }
+      ]
+    },
+    {
+      "spec": "cli-provider-profile-resolution",
+      "old": "Canonical direct-model boundary for CLI projections",
+      "replacement": "Canonical alias boundary for CLI and Pydantic models",
+      "old_requirement_sha256": "43e9e4233c2d67ffccacc35727fafabf3348ed2ee0675ffe591397974681231c",
+      "replacement_requirement_sha256": "8388ce06267656f84e4d81939f67875a8548ff66e6a4da4b752b253745b8f87f",
+      "old_scenario_count": 3,
+      "old_scenarios": [
+        {
+          "old": "Native alias remains adapter-local",
+          "old_sha256": "92d6f72c3410a4d622138e5c2f9a8368ceb9ed575fa0f8dd3c4c33f7ae608502",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical alias boundary for CLI and Pydantic models",
+          "replacement_requirement_sha256": "8388ce06267656f84e4d81939f67875a8548ff66e6a4da4b752b253745b8f87f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical alias boundary for CLI and Pydantic models` / `Native authentication remains adapter-local` under the canonical clean-break contract.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Native authentication remains adapter-local",
+          "replacement_scenario_sha256": "00b5aa5080ee2271ec65e59b4381fe5a3731ce0fbc9be58d1599dfdb430bb319"
+        },
+        {
+          "old": "Localized alias is rejected for direct live use",
+          "old_sha256": "34572b0b9694b91713405f38f9688ca5ba85d6934302d2723f15197877e220bc",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical alias boundary for CLI and Pydantic models",
+          "replacement_requirement_sha256": "8388ce06267656f84e4d81939f67875a8548ff66e6a4da4b752b253745b8f87f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical alias boundary for CLI and Pydantic models` / `Localized or native alias is rejected at direct boundary` under the canonical clean-break contract.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Localized or native alias is rejected at direct boundary",
+          "replacement_scenario_sha256": "0a646472eb5b60814d00a1db98eef7b2ef373a1277af4ee7de8755c796fdf602"
+        },
+        {
+          "old": "Native authentication remains isolated",
+          "old_sha256": "38431bc4edf81590a63b5baf0ce815949562d20944eb077a3f38bff55fd77189",
+          "treatment": "replaced",
+          "replacement_requirement": "Canonical alias boundary for CLI and Pydantic models",
+          "replacement_requirement_sha256": "8388ce06267656f84e4d81939f67875a8548ff66e6a4da4b752b253745b8f87f",
+          "rationale": "Human-reviewed replacement: old behavior is re-expressed by `Canonical alias boundary for CLI and Pydantic models` / `Native authentication remains adapter-local` under the canonical clean-break contract.",
+          "replacement_spec": "cli-provider-profile-resolution",
+          "replacement_scenario": "Native authentication remains adapter-local",
+          "replacement_scenario_sha256": "00b5aa5080ee2271ec65e59b4381fe5a3731ce0fbc9be58d1599dfdb430bb319"
+        }
+      ]
+    }
+  ],
+  "modified_scenario_preservation": [
+    {
+      "scenario": "ai-harness-skills canonical runtime wiring",
+      "requirement": "Consumer implementation claims require canonical API evidence",
+      "baseline_sha256": "7680b9bd6d859a0c4e5c5b9a0fca2fa669a009c35f5712f8aced48378ef78057",
+      "delta_sha256": "7680b9bd6d859a0c4e5c5b9a0fca2fa669a009c35f5712f8aced48378ef78057",
+      "verbatim": true
+    },
+    {
+      "scenario": "ai-review canonical reviewer wiring",
+      "requirement": "Consumer implementation claims require canonical API evidence",
+      "baseline_sha256": "ba7ba4c1ac7f8d58808bf787fc151fa8e759669011afcaade89146f637fab648",
+      "delta_sha256": "ba7ba4c1ac7f8d58808bf787fc151fa8e759669011afcaade89146f637fab648",
+      "verbatim": true
+    },
+    {
+      "scenario": "Consumer bridge preserves both provider identities",
+      "requirement": "Consumer implementation claims require canonical API evidence",
+      "baseline_sha256": "f1054ff505dad3c7244adcd8f9a352bdc7d917fc4bc18d9aa9a785f2b7636959",
+      "delta_sha256": "f1054ff505dad3c7244adcd8f9a352bdc7d917fc4bc18d9aa9a785f2b7636959",
+      "verbatim": true
+    },
+    {
+      "scenario": "Canonical resolution failure is not mapping absence",
+      "requirement": "Consumer implementation claims require canonical API evidence",
+      "baseline_sha256": "f731cb50163261ffacb4e93bc443de2c1a72787cf1266c3e06561e3687ec64a1",
+      "delta_sha256": "f731cb50163261ffacb4e93bc443de2c1a72787cf1266c3e06561e3687ec64a1",
+      "verbatim": true
+    },
+    {
+      "scenario": "Successful consumer-boundary acceptance is recorded",
+      "requirement": "Identity-bound live CLI acceptance evidence",
+      "baseline_sha256": "0e05831fc1e919925a0505ae6252730ab3f481dac0f4933d09ea6fe994339d1e",
+      "delta_sha256": "0e05831fc1e919925a0505ae6252730ab3f481dac0f4933d09ea6fe994339d1e",
+      "verbatim": true
+    },
+    {
+      "scenario": "Reachable process has an unsuccessful nested result",
+      "requirement": "Identity-bound live CLI acceptance evidence",
+      "baseline_sha256": "81130aa2b40ed3d648a4ccb98b97bbb9715a6e84ccc20867b20ef5dac32c49ab",
+      "delta_sha256": "81130aa2b40ed3d648a4ccb98b97bbb9715a6e84ccc20867b20ef5dac32c49ab",
+      "verbatim": true
+    },
+    {
+      "scenario": "Untracked script is not durable acceptance evidence",
+      "requirement": "Identity-bound live CLI acceptance evidence",
+      "baseline_sha256": "17f8abaf85eba98164dcd78508cc4a9a2e27717e597c06fe0dfd2600a68720c8",
+      "delta_sha256": "17f8abaf85eba98164dcd78508cc4a9a2e27717e597c06fe0dfd2600a68720c8",
+      "verbatim": true
+    },
+    {
+      "scenario": "Source identity changes after acceptance",
+      "requirement": "Identity-bound live CLI acceptance evidence",
+      "baseline_sha256": "7cd453299ea9b04f0b78ea3b729db818ce2c803a1a0c6e050da8d653157b1196",
+      "delta_sha256": "7cd453299ea9b04f0b78ea3b729db818ce2c803a1a0c6e050da8d653157b1196",
+      "verbatim": true
+    },
+    {
+      "scenario": "Two required consumer rows are retained independently",
+      "requirement": "Identity-bound live CLI acceptance evidence",
+      "baseline_sha256": "e6af3bd0ad66c2639e2f6c6b26c3bb1f2cece5c1f876372ba8d42ed7bebd0d81",
+      "delta_sha256": "e6af3bd0ad66c2639e2f6c6b26c3bb1f2cece5c1f876372ba8d42ed7bebd0d81",
+      "verbatim": true
+    },
+    {
+      "scenario": "Resolved dependency identity changes after acceptance",
+      "requirement": "Identity-bound live CLI acceptance evidence",
+      "baseline_sha256": "f954c518ff1439f9613ead7e125d1ff5aa844c3d448017186d3bf0b2c9029b07",
+      "delta_sha256": "f954c518ff1439f9613ead7e125d1ff5aa844c3d448017186d3bf0b2c9029b07",
+      "verbatim": true
+    },
+    {
+      "scenario": "Shell or provider prerequisite changes after acceptance",
+      "requirement": "Identity-bound live CLI acceptance evidence",
+      "baseline_sha256": "ecbd3dc89a623d6a81b994c61c673baaa33bc66c92f35519756b89dc39890c64",
+      "delta_sha256": "ecbd3dc89a623d6a81b994c61c673baaa33bc66c92f35519756b89dc39890c64",
+      "verbatim": true
+    },
+    {
+      "scenario": "Current retained evidence passes automated preflight",
+      "requirement": "Automated artifact and dependency drift validation",
+      "baseline_sha256": "d9f4b7f5fa3322953a82057ad676bb83eee69d50d743711bd6552c7857587043",
+      "delta_sha256": "d9f4b7f5fa3322953a82057ad676bb83eee69d50d743711bd6552c7857587043",
+      "verbatim": true
+    },
+    {
+      "scenario": "Artifact or dependency drift fails closed",
+      "requirement": "Automated artifact and dependency drift validation",
+      "baseline_sha256": "1a1fd6c79940ecd7f503d78963d6d20f4d1bdaef605eeb0a667f151a64565b32",
+      "delta_sha256": "1a1fd6c79940ecd7f503d78963d6d20f4d1bdaef605eeb0a667f151a64565b32",
+      "verbatim": true
+    },
+    {
+      "scenario": "Missing or indeterminate identity remains blocked",
+      "requirement": "Automated artifact and dependency drift validation",
+      "baseline_sha256": "1ee124d38654a4090c50fcb1b4411b9ca0f62b6ed36ce569554ef9c8f0a91b6a",
+      "delta_sha256": "1ee124d38654a4090c50fcb1b4411b9ca0f62b6ed36ce569554ef9c8f0a91b6a",
+      "verbatim": true
+    }
+  ],
+  "summary": {
+    "total_removed_requirements": 35,
+    "total_added_requirements": 18,
+    "total_modified_requirements": 3,
+    "total_removed_baseline_scenarios": 142,
+    "all_old_scenarios_accounted": true,
+    "treatment_breakdown": {
+      "replaced": 95,
+      "strengthened": 26,
+      "reversed": 21
+    },
+    "total_modified_baseline_scenarios": 14,
+    "verbatim_preserved": 14,
+    "modified_gate": "14/14",
+    "modified_gate_passes": true
+  },
+  "generated_from": "git show 38be641953a278614d3c395402089fe847161b92:<planning-artifact> and git show d666ff01e80bfb69b4e2d2f5810e7f8a9cdc06b5:openspec/specs/<spec>/spec.md",
+  "generation_method": "Exact section-bounded Markdown extraction, SHA-256 UTF-8 hashes, and explicit manually reviewed scenario-to-scenario mappings; no keyword-overlap matching.",
+  "generated_at": "2026-08-14T16:43:56.235962Z"
+}

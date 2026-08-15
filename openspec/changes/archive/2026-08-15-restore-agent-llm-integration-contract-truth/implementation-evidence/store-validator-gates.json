@@ -1,0 +1,27 @@
+{
+  "branch": "openspec/restore-agent-llm-openspec-store",
+  "captured_at": "2026-08-14T18:48:50.633462+00:00",
+  "change": "restore-agent-llm-integration-contract-truth",
+  "gates": {
+    "compile": "PASS",
+    "diff_check": "PASS",
+    "doctor": "PASS",
+    "gitnexus": "PASS: 9 files, 52 symbols, 4 expected flows, medium risk",
+    "openspec_full": "PASS: 374 passed, 0 failed",
+    "pyright": "PASS: 0 errors, 0 warnings, 0 informations",
+    "validator_unittest": "PASS: 69 tests"
+  },
+  "head_sha": "7791792",
+  "implementation_commit": "7791792",
+  "lifecycle_probe": "PASS: archived -> openspec/changes/archive/2026-08-14-complete-agent-llm-config-integration",
+  "repository": "openspec-store",
+  "schema_version": "1.0.0",
+  "side_effects": "PASS: fixtures patch subprocess/network/env and compare filesystem snapshots; no provider/dependency/credential access",
+  "tasks": [
+    "12.1",
+    "12.2",
+    "12.3",
+    "12.4"
+  ],
+  "worktree": "/Users/androidteam/Developer/.worktrees/restore-agent-llm-openspec-store"
+}
