@@ -30,4 +30,4 @@
 - [x] Run focused and full OpenSpec strict validation.
 - [x] Run stale-reference and current-path sweeps across active docs/scripts/specs/skills.
 - [x] Commit store-owned alignment artifacts.
-- [ ] Archive this change after all closure evidence is captured.
+- [x] Confirm pre-archive readiness: evidence is committed, strict validation passes, and the archive mutation is the next scoped operation.
