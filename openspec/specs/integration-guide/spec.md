@@ -41,7 +41,7 @@ The guide SHALL document graph discovery and refresh using supported Graphify co
 
 - **WHEN** an administrator prepares a repository
 - **THEN** the guide SHALL use `graphify update .` (and `--force` only when appropriate)
-- **AND** it SHALL verify the configured `.graphify/graph.json`
+- **AND** it SHALL verify the configured `graphify-out/graph.json`
 
 ### Requirement: Persistence setup
 

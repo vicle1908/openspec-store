@@ -11,7 +11,7 @@ The system SHALL index agent-docs-sync with gitnexus for symbol-level code intel
 #### Scenario: Initial indexing
 - **WHEN** `npx gitnexus analyze` is run from the agent-docs-sync root
 - **THEN** the system SHALL create `.gitnexus/` directory with gitnexus.json, meta.json, lbug, and run.cjs
-- **AND** it SHALL parse all 25 Python source files
+- **AND** it SHALL parse all tracked Python source files
 - **AND** it SHALL extract symbols, relationships, and execution flows
 - **AND** `npx gitnexus status` SHALL report the index as current
 
@@ -22,7 +22,7 @@ The system SHALL index agent-docs-sync with gitnexus for symbol-level code intel
 - **AND** it SHALL identify the pipeline execution flow (detect_changes → analyze_impact → generate_updates → validate → report)
 
 #### Scenario: Impact analysis works
-- **WHEN** `npx gitnexus impact "CheckLinksTool" -d upstream -r agent-docs-sync` is run
+- **WHEN** `gitnexus impact "CheckLinksTool" -d upstream -r agent-docs-sync` is run
 - **THEN** the system SHALL return callers of CheckLinksTool
 - **AND** it SHALL report risk level (LOW/MEDIUM/HIGH)
 - **AND** it SHALL list affected processes
@@ -33,8 +33,8 @@ The system SHALL generate an architecture-level knowledge graph for agent-docs-s
 
 #### Scenario: Graph generation
 - **WHEN** `graphify update .` is run from the agent-docs-sync root
-- **THEN** the system SHALL create `.graphify/graph.json` and `.graphify/manifest.json`
-- **AND** it SHALL create `.graphify/cache/` for analysis caching
+- **THEN** the system SHALL create `graphify-out/graph.json` and `graphify-out/manifest.json`
+- **AND** it SHALL create provider-managed cache state under `graphify-out/`
 - **AND** the graph SHALL contain nodes for all modules, classes, and key functions
 
 #### Scenario: Pipeline flow visible in graph
@@ -55,44 +55,34 @@ The system SHALL generate an architecture-level knowledge graph for agent-docs-s
 Both gitnexus and graphify tools SHALL be queryable for agent-docs-sync after setup.
 
 #### Scenario: GitNexus query
-- **WHEN** `npx gitnexus query "doc generation" -r agent-docs-sync` is run
+- **WHEN** `gitnexus query "doc generation" -r agent-docs-sync` is run
 - **THEN** it SHALL return relevant symbols from the agent-docs-sync codebase
 - **AND** results SHALL include the generation agent and related tools
 
 #### Scenario: Graphify query
-- **WHEN** `graphify query "documentation" --graph .graphify/graph.json` is run
+- **WHEN** `graphify query "documentation" --graph graphify-out/graph.json` is run
 - **THEN** it SHALL return nodes related to documentation sync functionality
 - **AND** results SHALL include workflow nodes and tool nodes
 
-### Requirement: Post-commit index refresh
+### Requirement: Workspace-managed index refresh
 
-The system SHALL refresh gitnexus and graphify indexes automatically after each git commit.
+The system SHALL refresh GitNexus and Graphify through the reviewed workspace inventory rather than claiming an unbounded per-commit hook.
 
-#### Scenario: Graphify incremental rebuild on commit
-- **WHEN** a commit is made in agent-docs-sync
-- **THEN** the graphify post-commit hook SHALL call `_rebuild_code()` for incremental AST-only rebuild
-- **AND** it SHALL NOT run a full `graphify update` (incremental is faster and sufficient)
-- **AND** the rebuild SHALL run in background via `nohup` + `disown` (non-blocking)
+#### Scenario: Local post-merge dispatch
+- **WHEN** a local merge or merge-based pull completes on the configured default branch
+- **THEN** the managed post-merge block SHALL dispatch the central refresh script asynchronously
+- **AND** it SHALL apply inventory, dirty-tree, lock, timeout, and revision checks
+- **AND** it SHALL not block the merge or pull operation
 
-#### Scenario: GitNexus full re-index on commit
-- **WHEN** a commit is made in agent-docs-sync
-- **THEN** the gitnexus refresh section SHALL run `npx gitnexus analyze` in background
-- **AND** it SHALL complete within 30 seconds for a 25-file repo
-- **AND** it SHALL NOT block the commit prompt
+#### Scenario: Scheduled refresh
+- **WHEN** the LaunchAgent fires
+- **THEN** it SHALL enumerate only approved inventory repositories
+- **AND** it SHALL run GitNexus and Graphify independently for clean eligible repositories
+- **AND** it SHALL report provider failures without modifying source files or credentials
 
-#### Scenario: Hook handles missing tools gracefully
-- **WHEN** gitnexus CLI is not available on PATH
-- **THEN** the gitnexus refresh section SHALL print a warning and skip
-- **AND** it SHALL NOT fail the commit
-- **AND** the graphify refresh SHALL still run independently
-
-#### Scenario: Hook is idempotent
-- **WHEN** `graphify hook install` is run multiple times
-- **THEN** it SHALL NOT duplicate hook sections (marker-based detection)
-- **AND** re-running SHALL produce the same result as first install
-
-#### Scenario: Hook does not commit generated files
-- **WHEN** the hook generates .gitnexus/ and .graphify/ artifacts
-- **THEN** these artifacts SHALL be in .gitignore
-- **AND** the hook SHALL NOT run `git add` on generated files
-- **AND** the working tree SHALL remain clean after hook completes
+#### Scenario: Hook and generated-state safety
+- **WHEN** the central refresh or managed hook runs
+- **THEN** it SHALL not run `git add` on generated files
+- **AND** Graphify output SHALL use `graphify-out/`
+- **AND** GitNexus state SHALL use `.gitnexus/`
+- **AND** dirty repositories, active Graphify watchers, and non-default branches SHALL be skipped explicitly
