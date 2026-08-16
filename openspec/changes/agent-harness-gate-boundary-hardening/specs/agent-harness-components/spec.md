@@ -60,3 +60,25 @@ AuthorityConfig fields `allowed_shell`, `allowed_code_execution`, `allowed_exter
 - **GIVEN** the `read_only_targets` field in `AuthorityConfig`
 - **WHEN** `"jira"` and `"gitlab"` are present in the list
 - **THEN** structural safety is enforced by code design, not by dedicated config fields
+
+### Requirement: Deny-only stage composition policy
+
+`StageCompositionContext` SHALL reject caller-supplied `CapabilityAuthorityPolicy` values that contain any filesystem roots, shell commands, network hosts, runtime-authoring roots, authority grants, or disabled audit mode. The default empty policy with audit enabled SHALL remain accepted.
+
+#### Scenario: Permissive capability policy rejected
+
+- **GIVEN** a stage composition context with a non-empty filesystem, shell, network, runtime-authoring, or grant policy
+- **WHEN** the context is constructed
+- **THEN** construction SHALL raise `ValueError` identifying the deny-only boundary
+
+#### Scenario: Disabled audit policy rejected
+
+- **GIVEN** a stage composition context with `audit_enabled=False`
+- **WHEN** the context is constructed
+- **THEN** construction SHALL raise `ValueError`
+
+#### Scenario: Default capability policy accepted
+
+- **GIVEN** a stage composition context with the default capability policy
+- **WHEN** the context is constructed
+- **THEN** construction SHALL succeed

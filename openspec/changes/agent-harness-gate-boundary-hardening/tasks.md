@@ -41,3 +41,13 @@
 - [ ] Run `uv run pytest tests/ -q` — all tests pass
 - [ ] Run `uv run ruff check src/ tests/` — clean
 - [ ] Run `uv run mypy src/agent_harness/ --strict` — clean
+
+## P1: Stage composition authority boundary
+
+- [ ] Add tests: non-empty filesystem, shell, network, and runtime-authoring policies are rejected
+- [ ] Add test: non-empty authority grants are rejected
+- [ ] Add test: disabled audit policy is rejected
+- [ ] Add test: default empty capability policy remains accepted
+- [ ] Implement `StageCompositionContext.__post_init__` deny-only guard
+- [ ] Verify exact-false fields reject `0` and `0.0` coercions
+- [ ] Verify parent `HarnessConfig` assignment cannot replace `authority` with an unvalidated permissive mapping

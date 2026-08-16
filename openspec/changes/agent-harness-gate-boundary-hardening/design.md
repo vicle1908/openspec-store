@@ -102,3 +102,7 @@ Jira mutation prevention is enforced structurally by `JiraTool` exposing only `g
 3. Verify all four fields reject coercion candidates: `True`, `1`, `"true"`, `"1"`.
 4. Verify `False` remains accepted.
 5. Verify post-construction assignment raises `ValidationError`.
+
+## 6. Stage composition authority boundary
+
+`StageCompositionContext` is a public harness composition boundary. The harness currently exposes only read-only toolsets and must not accept caller-supplied high-authority capability policy. Its `__post_init__` SHALL reject any non-empty filesystem, shell, network, runtime-authoring, or grant allowlist and SHALL reject disabled audit mode. The default empty policy remains valid. This is a harness-owned deny-only boundary; agent-core remains responsible for general capability-policy validation for consumers that explicitly opt into high-authority capabilities.
