@@ -22,6 +22,20 @@
 - [ ] Update .gitignore to exclude graphify label/sig files
 - [ ] Document regeneration command
 
+
+## P1: Authority invariant enforcement
+
+- [ ] Add RED test: `AuthorityConfig(allowed_shell=True)` rejects with `ValidationError`
+- [ ] Add RED test: `AuthorityConfig(allowed_code_execution=True)` rejects with `ValidationError`
+- [ ] Add RED test: `AuthorityConfig(allowed_external_mutation=True)` rejects with `ValidationError`
+- [ ] Add RED test: `AuthorityConfig(allowed_source_write=True)` rejects with `ValidationError`
+- [ ] Add RED test: `HarnessConfig(authority={"allowed_shell": True})` rejects with `ValidationError`
+- [ ] Implement `Literal[False]` for all four deny-only authority fields in `AuthorityConfig`
+- [ ] Add `validate_assignment=True` to `AuthorityConfig.model_config` if post-construction mutation is possible
+- [ ] Verify all 4 fields reject coercion candidates: `1`, `"true"`, `"1"`
+- [ ] Document Jira read-only structural boundary (not a config field)
+- [ ] Document GitLab structural boundary (not a config field)
+
 ## Verification
 
 - [ ] Run `uv run pytest tests/ -q` — all tests pass
