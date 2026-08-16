@@ -25,29 +25,29 @@
 
 ## P1: Authority invariant enforcement
 
-- [ ] Add RED test: `AuthorityConfig(allowed_shell=True)` rejects with `ValidationError`
-- [ ] Add RED test: `AuthorityConfig(allowed_code_execution=True)` rejects with `ValidationError`
-- [ ] Add RED test: `AuthorityConfig(allowed_external_mutation=True)` rejects with `ValidationError`
-- [ ] Add RED test: `AuthorityConfig(allowed_source_write=True)` rejects with `ValidationError`
-- [ ] Add RED test: `HarnessConfig(authority={"allowed_shell": True})` rejects with `ValidationError`
-- [ ] Implement `Literal[False]` for all four deny-only authority fields in `AuthorityConfig`
-- [ ] Add `validate_assignment=True` to `AuthorityConfig.model_config` if post-construction mutation is possible
-- [ ] Verify all 4 fields reject coercion candidates: `1`, `"true"`, `"1"`
-- [ ] Document Jira read-only structural boundary (not a config field)
-- [ ] Document GitLab structural boundary (not a config field)
+- [x] Add RED test: `AuthorityConfig(allowed_shell=True)` rejects with `ValidationError`
+- [x] Add RED test: `AuthorityConfig(allowed_code_execution=True)` rejects with `ValidationError`
+- [x] Add RED test: `AuthorityConfig(allowed_external_mutation=True)` rejects with `ValidationError`
+- [x] Add RED test: `AuthorityConfig(allowed_source_write=True)` rejects with `ValidationError`
+- [x] Add RED test: `HarnessConfig(authority={"allowed_shell": True})` rejects with `ValidationError`
+- [x] Implement `Literal[False]` for all four deny-only authority fields in `AuthorityConfig`
+- [x] Add `validate_assignment=True` to `AuthorityConfig.model_config` if post-construction mutation is possible
+- [x] Verify all 4 fields reject coercion candidates: `1`, `"true"`, `"1"`
+- [x] Document Jira read-only structural boundary (not a config field)
+- [x] Document GitLab structural boundary (not a config field)
 
 ## Verification
 
-- [ ] Run `uv run pytest tests/ -q` — all tests pass
-- [ ] Run `uv run ruff check src/ tests/` — clean
-- [ ] Run `uv run mypy src/agent_harness/ --strict` — clean
+- [x] Run `uv run pytest tests/ -q` — all tests pass
+- [x] Run `uv run ruff check src/ tests/` — clean
+- [x] Run `uv run mypy src/agent_harness/ --strict` — clean
 
 ## P1: Stage composition authority boundary
 
-- [ ] Add tests: non-empty filesystem, shell, network, and runtime-authoring policies are rejected
-- [ ] Add test: non-empty authority grants are rejected
-- [ ] Add test: disabled audit policy is rejected
-- [ ] Add test: default empty capability policy remains accepted
-- [ ] Implement `StageCompositionContext.__post_init__` deny-only guard
-- [ ] Verify exact-false fields reject `0` and `0.0` coercions
-- [ ] Verify parent `HarnessConfig` assignment cannot replace `authority` with an unvalidated permissive mapping
+- [x] Add tests: non-empty filesystem, shell, network, and runtime-authoring policies are rejected
+- [x] Add test: non-empty authority grants are rejected
+- [x] Add test: disabled audit policy is rejected
+- [x] Add test: default empty capability policy remains accepted
+- [x] Implement `StageCompositionContext.__post_init__` deny-only guard
+- [x] Verify exact-false fields reject `0` and `0.0` coercions
+- [x] Verify parent `HarnessConfig` assignment cannot replace `authority` with an unvalidated permissive mapping
