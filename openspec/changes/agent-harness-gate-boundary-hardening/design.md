@@ -57,3 +57,48 @@ A symlink could be created between the component scan and the `resolve()` call. 
 ## 4. Generated artifact cleanup
 
 `.graphify_labels.json` and `.graphify_labels.json.sig` are regenerable with no consumers. Remove from tracking, add to `.gitignore`.
+
+
+## 5. Authority invariant enforcement
+
+### Current behavior (misleading)
+
+```python
+class AuthorityConfig(BaseModel):
+    allowed_shell: bool = Field(default=False, description="Must remain False")
+    allowed_code_execution: bool = Field(default=False, description="Must remain False")
+    allowed_external_mutation: bool = Field(default=False, description="Must remain False")
+    allowed_source_write: bool = Field(default=False, description="Must remain False")
+    model_config = {"extra": "forbid"}
+```
+
+The `description` says "Must remain False" but Pydantic's `Field(default=...)` only sets the default value — it does not constrain the type. Construction with `True`, `1`, `"true"`, or `"1"` succeeds silently. Nested YAML overlays containing truthy values also pass validation.
+
+### Proposed fix
+
+```python
+from typing import Literal
+from pydantic import ConfigDict
+
+class AuthorityConfig(BaseModel):
+    allowed_shell: Literal[False] = False
+    allowed_code_execution: Literal[False] = False
+    allowed_external_mutation: Literal[False] = False
+    allowed_source_write: Literal[False] = False
+
+    model_config = ConfigDict(extra="forbid", validate_assignment=True)
+```
+
+`Literal[False]` restricts the accepted value to only `False`. Pydantic rejects `True`, `1`, `"true"`, `"1"`, and any other coercion candidate. `validate_assignment=True` also blocks post-construction reassignment.
+
+### Jira/GitLab structural boundaries (not config fields)
+
+Jira mutation prevention is enforced structurally by `JiraTool` exposing only `get_ticket`, `search`, `get_links`. GitLab has no mutation implementation. These are code-design guarantees — adding unused `allowed_jira_mutation` fields would provide misleading false assurance.
+
+### Implementation plan
+
+1. Add parametrized RED tests in `tests/test_authority.py` covering all four fields, nested `HarnessConfig`, coercion rejection, assignment rejection.
+2. Implement `Literal[False]` and `validate_assignment=True` in `AuthorityConfig`.
+3. Verify all four fields reject coercion candidates: `True`, `1`, `"true"`, `"1"`.
+4. Verify `False` remains accepted.
+5. Verify post-construction assignment raises `ValidationError`.

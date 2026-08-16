@@ -21,3 +21,42 @@
 - **GIVEN** an artifact root path with no symlink components
 - **WHEN** `validate_artifact_root()` is called
 - **THEN** the canonical resolved path SHALL be returned
+
+
+### Requirement: Deny-only authority profile
+
+AuthorityConfig fields `allowed_shell`, `allowed_code_execution`, `allowed_external_mutation`, and `allowed_source_write` SHALL accept only `False`. Construction with `True`, `1`, `"true"`, `"1"`, or any other coercion candidate SHALL raise `ValidationError`. Post-construction assignment SHALL also be rejected. Nested `HarnessConfig(authority={...})` overlays containing truthy values SHALL fail validation.
+
+#### Scenario: Literal False is accepted
+
+- **GIVEN** an `AuthorityConfig` instance with all deny-only fields set to `False`
+- **WHEN** the instance is constructed
+- **THEN** construction SHALL succeed
+
+#### Scenario: Truthy value rejected at construction
+
+- **GIVEN** a deny-only authority field
+- **WHEN** `AuthorityConfig` is constructed with value `True`, `1`, `"true"`, or `"1"` for that field
+- **THEN** a `ValidationError` SHALL be raised
+
+#### Scenario: Truthy value rejected in nested overlay
+
+- **GIVEN** a `HarnessConfig` with an authority overlay
+- **WHEN** the overlay contains `allowed_shell: true`
+- **THEN** a `ValidationError` SHALL be raised during nested construction
+
+#### Scenario: Post-construction assignment rejected
+
+- **GIVEN** an `AuthorityConfig` instance with all deny-only fields set to `False`
+- **WHEN** post-construction assignment `allowed_shell = True` is attempted
+- **THEN** a `ValidationError` SHALL be raised and the value SHALL remain `False`
+
+#### Scenario: Structural read-only boundaries (Jira, GitLab)
+
+- **GIVEN** the `JiraTool` class definition
+- **WHEN** inspecting its public method set
+- **THEN** it SHALL expose only `get_ticket`, `search`, and `get_links` — no mutation methods
+
+- **GIVEN** the `read_only_targets` field in `AuthorityConfig`
+- **WHEN** `"jira"` and `"gitlab"` are present in the list
+- **THEN** structural safety is enforced by code design, not by dedicated config fields
