@@ -52,7 +52,8 @@ Code closure: `4ba7478` (closure/gate-boundary-hardening branch)
 | Gitignore corrected | `4ba7478` | Negation lines removed, broad `.graphify_*` rule catches labels |
 | Regeneration documented | `4ba7478` | AGENTS.md updated with `graphify label` instruction |
 | `validate_contained` re-export preserved | `f132b6e` | Regression test passes |
-| Full suite green | `4ba7478` | 415+ passed, 0 failed |
+| Verified main | `2a5f327` (style commit: import-order-only, 0 semantic changes) |
+| Full suite green | `2a5f327` | 414 passed, 0 failed |
 
 ## Verification
 - [x] Run `uv run pytest tests/ -q` — all tests pass
