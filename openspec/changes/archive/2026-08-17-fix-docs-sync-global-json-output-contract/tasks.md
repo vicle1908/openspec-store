@@ -39,5 +39,5 @@
 - [x] 6.2 Fast-forward merge to agent-docs-sync main
 - [x] 6.3 Update tasks and evidence
 - [x] 6.4 OpenSpec validate → pass
-- [ ] 6.5 Archive with `--skip-specs --yes`
-- [ ] 6.6 Remove worktree and branch
+- [x] 6.5 Archive with `--skip-specs --yes`
+- [x] 6.6 Remove worktree and branch
