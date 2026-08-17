@@ -23,7 +23,15 @@
 - [x] 4.2 Verify Matrix store directory created at `~/.hermes/platforms/matrix/store/`
 - [x] 4.3 Send test DM from `@victory1908:matrix.org` and confirm bot responds
 
-## Phase 5: Cross-Signing (Optional)
+## Closure Disposition
+
+Phases 1–4 are complete: Matrix adapter initializes with E2EE, store directory
+created, and live DM round-trip verified. Phase 5 (cross-signing) tasks 5.1–5.3
+are explicitly optional enhancements deferred by design — they require manual
+recovery-key retrieval from Element and are not blockers for the integration.
+They remain unchecked as accepted deferred work.
+
+## Phase 5: Cross-Signing (Optional — deferred)
 
 - [ ] 5.1 Obtain recovery key from Element (Settings → Security & Privacy → Encryption)
 - [ ] 5.2 Set `MATRIX_RECOVERY_KEY` in `.env`
