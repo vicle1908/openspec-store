@@ -1,4 +1,9 @@
-## MODIFIED Requirements
+# infrastructure-postgresql Specification
+
+## Purpose
+TBD - created by archiving change postgresql-18-6-infrastructure-baseline. Update Purpose after archive.
+
+## Requirements
 
 ### Requirement: PostgreSQL 18.6 is the infrastructure baseline
 
