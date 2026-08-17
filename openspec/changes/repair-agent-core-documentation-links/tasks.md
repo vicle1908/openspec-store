@@ -7,21 +7,29 @@
   - `docs/README.md → model-resolution.md` (file does not exist)
   - `docs/extending.md → docs/scheduling.md` (double-path resolves to `docs/docs/scheduling.md`)
 
-## 2. Implementation
+## 2. Clickable link repairs
 
-- [ ] 2.1 Fix `docs/README.md` line 19: `model-resolution.md` → `architecture.md`
-- [ ] 2.2 Fix `docs/extending.md` lines 265–270: replace two paragraphs with one truthful `scheduling.md` link
-- [ ] 2.3 Verify no other references to `docs/scheduler/ARCHITECTURE.md` or `model-resolution.md`
+- [x] 2.1 Fix `docs/README.md` line 19: `model-resolution.md` → `architecture.md`
+- [x] 2.2 Fix `docs/extending.md` lines 265–270: replace two scheduling paragraphs with one truthful `scheduling.md` link
 
-## 3. Verification
+## 3. Stale plain-text reference repairs
 
-- [ ] 3.1 Run `docs-sync validate --repo <worktree>` → 0 broken links, exit 0
-- [ ] 3.2 Run `git diff --check` → clean
+- [x] 3.1 Fix `docs/scheduling.md` line 59: remove stale `docs/scheduler/ARCHITECTURE.md` backtick reference
+- [x] 3.2 Fix `docs/architecture.md` line 124: remove stale `docs/scheduler/ARCHITECTURE.md` backtick reference
+- [x] 3.3 Fix `docs/building-agents.md` line 370: remove stale `docs/scheduler/ARCHITECTURE.md` backtick reference
 
-## 4. Closure
+## 4. Verification
 
-- [ ] 4.1 Commit with conventional message
-- [ ] 4.2 Fast-forward merge to agent-core main (preserve graphify-out/ changes)
-- [ ] 4.3 OpenSpec validate → pass
-- [ ] 4.4 Archive with `--skip-specs --yes`
-- [ ] 4.5 Remove worktree and branch
+- [x] 4.1 Stale-reference grep → empty (clean)
+- [x] 4.2 `git diff --check` → clean
+- [x] 4.3 CLI `docs-sync validate --repo <worktree>` → 37 links checked, exit 0
+- [x] 4.4 Post-merge CLI validation → 37 links checked, exit 0
+
+## 5. Closure
+
+- [x] 5.1 Commit clickable repairs: `ded5fac`
+- [x] 5.2 Commit stale-reference repairs: `7a89372`
+- [x] 5.3 Fast-forward merge to agent-core main
+- [ ] 5.4 OpenSpec validate → pass
+- [ ] 5.5 Archive with `--skip-specs --yes`
+- [ ] 5.6 Remove worktree and branch
