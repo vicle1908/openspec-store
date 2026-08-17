@@ -5,53 +5,21 @@ Define a YAML-based provider/model/default configuration schema for TDT Python a
 
 **Status: IMPLEMENTED in tdt-core current main (`75cd519`). Consumer projections were completed and corrected through successor/corrective changes: ai-harness-skills `02d0410`, ai-review `f1b6e0f`.**
 ## Requirements
-### Requirement: Provider definitions
+### Requirement: Canonical transport-specific provider definitions
 
-Each provider in the `providers` section of `~/.tdt/config.yaml` SHALL declare a name, base URL, wire protocol, and credential environment variable reference. Credentials MUST NOT appear as literal values in YAML, JSON, profiles, provenance, or diagnostics.
+Every provider MUST declare its transport type (endpoint or native) and the corresponding configuration fields. Endpoint providers MUST include `base_url`. Native providers MUST include `cli_provider` and MUST NOT include `base_url`.
 
-#### Scenario: Provider definition accepted
+#### Scenario: Endpoint provider has base_url
 
-- **GIVEN** `~/.tdt/config.yaml` contains `providers.shopapikey` with `*** https://api.phanmemvip.shop/v1`, `protocol: messages`, and `auth_env: HERMES_CUSTOM_SHOPAPIKEY_API_KEY`
-- **WHEN** the YAML is loaded and validated
-- **THEN** the provider definition SHALL be accepted
-- **AND** the `auth_env` value SHALL be validated as a valid uppercase environment variable name
-- **AND** no credential value SHALL appear in the resolved profile or diagnostics
+- **WHEN** a provider is declared with `transport: endpoint`
+- **THEN** it MUST include a valid `base_url` field
+- **AND** it MUST NOT include a `cli_provider` field
 
-#### Scenario: auth_env validates as uppercase env name
+#### Scenario: Native provider has cli_provider
 
-- **GIVEN** a provider definition contains `auth_env: "lowercase_key"`
-- **WHEN** the YAML is loaded and validated
-- **THEN** validation SHALL fail with the provider name and the invalid field
-- **AND** the error SHALL not echo the invalid value
-
-#### Scenario: auth_env referenced env var missing at runtime
-
-- **GIVEN** a provider definition contains `auth_env: HERMES_CUSTOM_GIAODUC_API_KEY`
-- **AND** the referenced environment variable is not set
-- **WHEN** a consumer attempts to use that provider
-- **THEN** resolution SHALL fail with the provider name and the missing env var name
-- **AND** it SHALL NOT fall back to another provider's credential
-
-#### Scenario: Duplicate auth_env across providers
-
-- **GIVEN** two providers reference the same `auth_env` value
-- **WHEN** the YAML is loaded and validated
-- **THEN** validation SHALL fail with both provider names and the conflicting key
-- **AND** it SHALL NOT silently accept the duplicate
-
-#### Scenario: auth_env value is literal credential rejected
-
-- **GIVEN** a provider definition contains `auth_env: "sk-actual-key-value"`
-- **WHEN** the YAML is loaded and validated
-- **THEN** validation SHALL reject the value as a literal credential rather than an env var name
-
-#### Scenario: Provider binding from YAML replaces registry lookup
-
-- **GIVEN** the YAML defines `providers.giaoduc` with `auth_env: HERMES_CUSTOM_GIAODUC_API_KEY`
-- **WHEN** credential availability is resolved
-- **THEN** the provider association SHALL come from the YAML definition
-- **AND** the separate `environment-key-registry.json` SHALL NOT override it
-- **AND** credential availability SHALL be recorded with the provider from the YAML definition
+- **WHEN** a provider is declared with `transport: native`
+- **THEN** it MUST include a `cli_provider` field
+- **AND** it MUST NOT include a `base_url` field
 
 ### Requirement: Model profiles
 
@@ -108,76 +76,39 @@ The `defaults.model` field SHALL reference a defined model alias. Fallbacks MAY 
 - **THEN** each fallback alias SHALL resolve to a defined model profile
 - **AND** validation SHALL fail with all undefined aliases listed
 
-### Requirement: Referential integrity across defaults, models, and providers
+### Requirement: Canonical catalog referential integrity
 
-Every `defaults.model`, `defaults.fallback`, `models.*.provider`, and `providers.*.auth_env` reference SHALL resolve to a defined entry. Undefined references SHALL fail validation before any profile resolution or model construction.
+Every model alias referenced in `defaults.model`, `defaults.fallback`, or `defaults.cli_models` MUST resolve to a declared model. Every provider referenced by a model MUST be declared in `providers`. Referential integrity violations MUST fail before profile resolution.
 
-#### Scenario: Full referential integrity check
+#### Scenario: Undefined model alias fails
 
-- **GIVEN** the YAML defines 3 providers, 4 models, and a default
-- **WHEN** the YAML is loaded and validated
-- **THEN** every provider reference in models, every model reference in defaults/fallbacks, and every auth_env reference SHALL resolve
-- **AND** validation SHALL report all undefined references in one pass
+- **WHEN** a model alias in `defaults.model` or `defaults.fallback` is not declared in `models`
+- **THEN** configuration validation SHALL fail with the undefined alias identified
 
-#### Scenario: Migration compatibility with legacy schema
+#### Scenario: Undefined provider fails
 
-- **GIVEN** the YAML contains both legacy `model.primary`/`model.fallback` fields and new `defaults.model`/`models.*` fields
-- **WHEN** the YAML is loaded and validated
-- **THEN** validation SHALL fail with an explicit conflict error
-- **AND** it SHALL identify which fields are legacy and which are new
-- **AND** it SHALL not silently choose one set over the other
+- **WHEN** a model references a provider not declared in `providers`
+- **THEN** configuration validation SHALL fail with the undefined provider identified
 
-#### Scenario: Legacy-only schema remains supported during migration
+### Requirement: Explicit typed provider protocol
 
-- **GIVEN** the YAML contains only legacy `model.primary`/`model.fallback`/`api_key_env` fields
-- **WHEN** the YAML is loaded and validated
-- **THEN** the legacy schema SHALL be accepted without error
-- **AND** provenance SHALL record that the profile used the legacy resolution path
-- **AND** the target schema SHALL become authoritative only after an explicit migration gate
+Every provider MUST declare its protocol (`messages` or `responses`). The protocol determines the API format used for model requests. Inference or defaulting of protocol type SHALL NOT occur.
 
-### Requirement: Protocol enum
+#### Scenario: Protocol is explicitly declared
 
-Each provider SHALL declare an explicit wire protocol from a registered set: `messages` (Anthropic Messages API), `responses` (OpenAI Responses API), `openai_chat` (OpenAI Chat Completions API). Silent protocol inference from the base URL or model name SHALL NOT occur.
+- **WHEN** a provider is configured
+- **THEN** it MUST include an explicit `protocol` field
+- **AND** the protocol MUST be one of the declared types
 
-#### Scenario: Valid protocol accepted
+### Requirement: Explicit provider capability authority
 
-- **GIVEN** a provider definition contains `protocol: messages`
-- **WHEN** the YAML is loaded and validated
-- **THEN** the protocol SHALL be accepted
-- **AND** it SHALL be recorded in the resolved profile for CLI projection
+Provider capabilities (model support, context length, tool support) MUST be explicitly declared or discovered through the provider's API. Silent inference or assumption of capabilities SHALL NOT occur. Unknown capabilities MUST fail closed.
 
-#### Scenario: Invalid protocol rejected
+#### Scenario: Capability is explicitly declared
 
-- **GIVEN** a provider definition contains `protocol: unknown_backend`
-- **WHEN** the YAML is loaded and validated
-- **THEN** validation SHALL fail with the provider name and the unsupported protocol
-- **AND** it SHALL list the supported protocol values
-
-#### Scenario: Missing protocol defaults to error during migration
-
-- **GIVEN** the YAML contains only legacy provider fields without a `protocol` key
-- **WHEN** the YAML is loaded under the legacy schema path
-- **THEN** the protocol SHALL be inferred from the existing `api_mode` field for backward compatibility
-- **AND** provenance SHALL record that the protocol was inferred, not declared
-
-### Requirement: No silent inference of provider capabilities
-
-The resolver SHALL NOT infer provider capabilities (context window, supported features, model family) from the base URL, model name, or protocol. All capability metadata SHALL be explicit in the YAML or derived from the registered environment-key registry during the transition period.
-
-#### Scenario: Capabilities are explicit
-
-- **GIVEN** a provider definition does not declare `context_window`
-- **WHEN** the profile is resolved
-- **THEN** the context window SHALL be reported as unknown
-- **AND** the resolver SHALL NOT infer it from the base URL or model name
-
-#### Scenario: Legacy api_mode inference during migration
-
-- **GIVEN** the YAML contains a legacy `api_mode: anthropic_messages` field
-- **WHEN** the profile is resolved under the legacy path
-- **THEN** the protocol SHALL be inferred from the legacy field
-- **AND** provenance SHALL record that the protocol was inferred
-- **AND** after migration, the explicit `protocol` field SHALL take precedence
+- **WHEN** a provider is configured
+- **THEN** its capabilities MUST be either declared in configuration or discovered via API probing
+- **AND** undetermined capabilities SHALL NOT be assumed
 
 ### Requirement: Provider-bound credential access
 

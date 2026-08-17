@@ -173,52 +173,13 @@ Each CLI-provider consumer SHALL declare the native invocation format it targets
 
 ### Requirement: Consumer implementation claims require canonical API evidence
 
-An enabled consumer SHALL NOT be described as integrated, wired, or functioning unless its invocation boundary resolves one canonical profile from the consumer-owned canonical TDT root, consumes one explicit `defaults.cli_models` selection while preserving its CLI adapter and canonical provider identities, and constructs provider-specific arguments only from that projection. A contained project, generated artifact, repository under review, or other operation target MUST NOT select or replace the canonical TDT root. Missing mapping, unavailable or unreadable source, schema or relationship error, ambiguous selection, unsupported projection field, or other resolution/projection failure MUST fail before adapter construction, credential access, or process launch. An enabled consumer MUST NOT use consumer-local or native CLI model configuration for missing or failed canonical selection, and a bridge SHALL NOT convert any such state into an empty override, `None`, ordinary absence, or fallback configuration.
+Every installed CLI consumer that claims canonical provider integration MUST provide verifiable evidence that its implementation matches the canonical API contract. Claims without evidence SHALL be treated as unverified.
 
-#### Scenario: ai-harness-skills canonical runtime wiring
+#### Scenario: Consumer claims require evidence
 
-- **WHEN** the harness runtime enables a supported native CLI provider with a canonical selection
-- **THEN** the adapter invocation SHALL use the canonical wire model and supported behavior fields
-- **AND** diagnostics SHALL preserve the canonical alias and redacted provenance
-- **AND** native authentication SHALL remain within the adapter's approved boundary
-
-#### Scenario: ai-review canonical reviewer wiring
-
-- **WHEN** review orchestration enables supported native CLI reviewers with canonical selections
-- **THEN** each reviewer SHALL receive only its own projected model and supported behavior fields
-- **AND** a provider SHALL NOT receive another provider's model or credential-key metadata
-- **AND** native authentication SHALL remain within each reviewer's approved boundary
-
-#### Scenario: Consumer bridge preserves both provider identities
-
-- **GIVEN** a canonical projection selects CLI adapter identity `codex` through canonical provider `tdt-codex`
-- **WHEN** `ai-harness-skills` or `ai-review` constructs the native adapter invocation
-- **THEN** adapter selection and executable validation SHALL use `codex`
-- **AND** diagnostics and retained evidence SHALL preserve `tdt-codex` as the canonical provider ID
-- **AND** any credential-key metadata SHALL already be filtered for `tdt-codex`
-- **AND** no credential value or another provider's key metadata SHALL be passed to the adapter
-
-#### Scenario: Canonical resolution failure is not mapping absence
-
-- **GIVEN** an enabled consumer selected a canonical source or catalog for its operation
-- **WHEN** that source is unavailable or unreadable, or profile resolution, selection, or projection fails
-- **THEN** the consumer bridge SHALL propagate a redacted failure before adapter construction or process launch
-- **AND** it SHALL NOT return an empty override mapping or `None`
-- **AND** it SHALL NOT preserve or activate local model configuration as though the CLI mapping were genuinely absent
-
-#### Scenario: Missing mapping for enabled provider fails closed
-
-- **GIVEN** canonical profile resolution succeeds but no explicit CLI model relationship exists for a provider enabled by the consumer
-- **WHEN** the consumer builds its invocation
-- **THEN** it SHALL fail before adapter construction or process launch
-- **AND** it SHALL NOT use a unique candidate, global default, consumer-local setting, or native CLI configuration
-
-#### Scenario: Contained target cannot select canonical sources
-
-- **GIVEN** ai-harness-skills operates on a contained project or ai-review operates on a repository under review
-- **WHEN** the consumer resolves its canonical profile
-- **THEN** resolution SHALL use the consumer-owned canonical TDT root
-- **AND** no configuration file beneath the target root SHALL influence canonical provider, alias, wire-model, behavior, or source selection merely because it is the target
+- **WHEN** a consumer claims canonical API integration
+- **THEN** the claim MUST include verifiable evidence (test results, API response captures, or schema validation proofs)
+- **AND** claims without evidence SHALL be rejected
 
 ### Requirement: Native CLI format is advisory, not canonical
 
@@ -242,138 +203,23 @@ The canonical provider/model/default profile is the source of truth. Each native
 
 ### Requirement: Identity-bound live CLI acceptance evidence
 
-Live CLI acceptance SHALL be recorded in a durable, credential-safe ledger bound to the exact integrated planning, consumer, and resolved dependency identities that produced the result. The required acceptance matrix SHALL contain exactly two required rows: one `ai-harness-skills` row through its true contained generation boundary and one `ai-review` row through its true reviewer boundary. Each required row SHALL be executed, evaluated, and retained independently, even when one reusable mechanism invokes both boundaries. Every row SHALL bind the exact consumer Git SHA, resolved canonical-library Git SHA, dependency source and lock identity, complete product/test/acceptance-script dirty-state disposition, CLI adapter identity, canonical provider ID, canonical alias, wire model, supported behavior fields, non-secret canonical source fingerprints, redacted command shape, monotonic duration, process result, nested result or report outcome, nonce or generated artifact, target-preservation result, and non-secret shell/provider prerequisite identity and outcome. The ledger MUST distinguish process reachability from successful nested consumer behavior and MUST contain no credential value. A required row MUST be invalidated when its planning identity, participating source identity, resolved dependency identity, unaccounted product/test/acceptance-script diff, canonical source fingerprint, or selected shell/provider prerequisite state changes.
+Live CLI acceptance evidence MUST be bound to the exact CLI identity (version, configuration, runtime environment) at the time of execution. Evidence from a different identity SHALL NOT be used to validate the current identity.
 
-#### Scenario: Successful consumer-boundary acceptance is recorded
+#### Scenario: Evidence is identity-bound
 
-- **WHEN** a live native-CLI call succeeds through a participating consumer boundary
-- **THEN** the durable record SHALL identify the consumer, exact consumer and canonical-library Git SHAs, dirty-state disposition, CLI provider, canonical alias, wire model, supported behavior fields, redacted command shape, monotonic duration, process exit, nested result or report outcome, and nonce or generated artifact
-- **AND** the record SHALL contain no credential value
-
-#### Scenario: Reachable process has an unsuccessful nested result
-
-- **WHEN** the native CLI process starts or exits successfully but the consumer's nested result reports a provider error, incomplete generation, missing nonce, or missing artifact
-- **THEN** acceptance SHALL fail
-- **AND** the ledger SHALL preserve the process result and nested failure as distinct fields
-
-#### Scenario: Untracked script is not durable acceptance evidence
-
-- **GIVEN** an acceptance script exists without a retained result bound to exact integrated SHAs and dirty-state disposition
-- **WHEN** implementation readiness is evaluated
-- **THEN** the script SHALL be treated as a test mechanism rather than proof of a successful run
-- **AND** the consumer SHALL remain unaccepted until a current durable result is captured
-
-#### Scenario: Source identity changes after acceptance
-
-- **GIVEN** a live result was accepted for exact source identities
-- **WHEN** a participating repository advances or gains an unaccounted product diff
-- **THEN** the prior live result SHALL be marked stale for release acceptance
-- **AND** the affected deterministic and live gates SHALL be rerun
-
-#### Scenario: Two required consumer rows are retained independently
-
-- **WHEN** the minimum live-acceptance matrix is materialized
-- **THEN** it SHALL contain exactly one required `ai-harness-skills` row and exactly one required `ai-review` row
-- **AND** each row SHALL name one currently supported and enabled provider and one true contained consumer boundary
-- **AND** each row SHALL have its own prerequisite status, process result, nested outcome, nonce or generated artifact, target-preservation result, and final row status
-- **AND** a shared script MAY execute both rows but SHALL NOT collapse them into one result
-- **AND** an optional additional row SHALL NOT replace either required row
-- **AND** both required rows MUST pass independently before live acceptance is complete
-
-#### Scenario: Resolved dependency identity changes after acceptance
-
-- **GIVEN** a live row was accepted for exact consumer and canonical-library identities
-- **WHEN** the consumer's dependency path, editable-source binding, lock identity, installed module origin, or resolved canonical-library Git SHA changes
-- **THEN** the prior row SHALL be marked stale even when the consumer Git SHA is unchanged
-- **AND** affected deterministic projection checks and the live consumer row SHALL be rerun against the new resolved dependency
-- **AND** a stale candidate, wheel, cache, or editable checkout SHALL NOT satisfy exact-dependency acceptance
-
-#### Scenario: Shell or provider prerequisite changes after acceptance
-
-- **GIVEN** a live row was accepted with one non-secret shell and provider prerequisite identity
-- **WHEN** the selected launcher or executable identity, executable version, canonical source fingerprint, provider availability, credential-availability status, environment-loading prerequisite, or owned shell/provider configuration changes
-- **THEN** the prior live row SHALL be marked stale
-- **AND** presence-only prerequisite checks and the affected live row SHALL be rerun
-- **AND** no credential value SHALL be printed, compared, copied, rotated, or retained while recapturing the row
-
-#### Scenario: Direct adapter invocation is not consumer acceptance
-
-- **GIVEN** an acceptance mechanism constructs or invokes a provider adapter directly
-- **WHEN** implementation readiness is evaluated
-- **THEN** that result SHALL be treated as adapter reachability evidence only
-- **AND** it SHALL NOT satisfy the required ai-harness-skills generation row or ai-review reviewer row
-- **AND** each required row SHALL remain incomplete until its true public consumer operation succeeds
-
-#### Scenario: Duplicate nonce or artifact invalidates independence
-
-- **GIVEN** the two required rows reuse the same nonce or claim the same generated artifact
-- **WHEN** live acceptance is evaluated
-- **THEN** the rows SHALL NOT be considered independently proven
-- **AND** both affected rows SHALL remain incomplete until distinct consumer-owned results are captured
-
-#### Scenario: Resolved executable must match the launched process
-
-- **GIVEN** a required row records one executable path or version
-- **WHEN** the consumer operation launches the provider CLI
-- **THEN** the retained executable identity SHALL match the actual resolved and launched executable
-- **AND** a different shim, candidate path, or reported version SHALL invalidate the row
-
-#### Scenario: Provider is not currently enabled
-
-- **GIVEN** a provider is catalogued but not currently supported and enabled by the selected public consumer operation
-- **WHEN** live acceptance is attempted
-- **THEN** the prerequisite SHALL be blocked and no process SHALL launch
-- **AND** historical availability or disposable configuration SHALL NOT satisfy current enablement
-
-#### Scenario: Current live authorization is absent
-
-- **GIVEN** deterministic verification is complete but current authorization for credential-bearing live operations is absent
-- **WHEN** live acceptance is considered
-- **THEN** both required live rows SHALL remain blocked without process launch or credential access
-- **AND** deterministic readiness SHALL remain separately reportable
+- **WHEN** live CLI acceptance evidence is captured
+- **THEN** the evidence MUST include the exact CLI identity (version, config hash, runtime env)
+- **AND** evidence from a different identity SHALL be rejected
 
 ### Requirement: Automated artifact and dependency drift validation
 
-Before a retained deterministic handoff or live row is reused to complete an evidence-backed task, unblock a downstream repository packet, authorize or launch either required live row, synchronize canonical specs, or declare archive readiness, a store-owned non-interactive validator MUST recapture and compare the current credential-safe acceptance identity with the identity retained by that evidence. The validator SHALL resolve the current planning store SHA and corrective-change tree; the concrete proposal, delta-spec, design, task, retained schema, and evidence paths and non-secret identities through the change's current active or archived lifecycle location, including the current `artifactPaths.specs.existingOutputPaths`; participating repository and worktree SHAs plus complete relevant product, test, acceptance-script, and generated dirty-state disposition; each applicable dependency declaration, lock or editable source, filesystem checkout, installed import origin, and full Git SHA; canonical non-secret source fingerprints and loader identity; and presence-only shell, executable, provider, containment, authorization, credential-availability, and canonical-provider-binding prerequisites. It SHALL emit deterministic machine-readable per-field comparisons, affected-record and downstream-invalidation decisions, and an overall status without treating a missing, malformed, unresolved, indeterminate, or drifted field as current. Any such condition MUST produce a non-zero exit, classify affected evidence as `stale`, `blocked`, or `invalid`, and prevent reuse or lifecycle advancement until dependency-ordered recapture succeeds. The validator SHALL be read-only except for an explicitly selected result output, SHALL NOT launch a provider or consumer operation, mutate a repository or worktree, resolve dependencies from the network, or read, print, compare, serialize, or retain a credential value.
+Artifact and dependency drift MUST be automatically validated before each release. Drift detection MUST cover source files, dependencies, configurations, and generated artifacts.
 
-#### Scenario: Current retained evidence passes automated preflight
+#### Scenario: Drift detection runs automatically
 
-- **GIVEN** retained deterministic or live evidence contains every required planning, repository, dependency, source, dirt, mechanism, and prerequisite identity
-- **WHEN** the validator recaptures the same current identities from their authoritative local sources
-- **THEN** it SHALL emit a machine-readable `current` decision with a zero exit
-- **AND** the result SHALL identify the exact evidence record and every compared field without containing a credential value
-- **AND** only that validated record MAY be considered for the next separately authorized acceptance or lifecycle gate
-
-#### Scenario: Artifact or dependency drift fails closed
-
-- **GIVEN** retained evidence was accepted for one exact planning and dependency topology
-- **WHEN** a planning artifact, repository SHA, relevant dirty path, product/test/acceptance mechanism, dependency declaration, lock or editable source, filesystem checkout, import origin, or upstream Git SHA differs from the retained identity
-- **THEN** the validator SHALL exit non-zero and identify the changed non-secret fields
-- **AND** it SHALL classify the affected record as `stale`, propagate invalidation to dependency-ordered downstream evidence, and block reuse, live launch, task completion, synchronization, and archive readiness
-- **AND** a matching consumer SHA alone SHALL NOT override dependency or artifact drift
-
-#### Scenario: Missing or indeterminate identity remains blocked
-
-- **GIVEN** a required evidence field, repository, dependency checkout, import origin, source identity, prerequisite, or retained schema is missing, malformed, inaccessible, or cannot be resolved locally
-- **WHEN** automated preflight evaluates the record
-- **THEN** the validator SHALL exit non-zero and classify the result as `blocked` or `invalid`, never `current`
-- **AND** it SHALL perform no provider call, consumer launch, network dependency resolution, repository or worktree mutation, or credential-value access
-- **AND** the affected gate SHALL remain closed until the identity can be recaptured and validation is rerun successfully
-
-#### Scenario: Active change archives without breaking retained validation
-
-- **GIVEN** the evidence validator and its tests refer to schemas or artifacts owned by an active change
-- **WHEN** that change is archived and its lifecycle root moves from `changes/<name>` to `changes/archive/<dated-name>`
-- **THEN** the validator SHALL resolve the retained schema and artifacts through the current lifecycle location or a stable store-owned reference
-- **AND** the validator's complete retained test suite SHALL remain executable after the active path is removed
-- **AND** a deleted active-change path SHALL NOT remain the only hardcoded schema or artifact source
-
-#### Scenario: Archive-aware lookup fails safely
-
-- **GIVEN** neither an active nor archived lifecycle location can be resolved uniquely for retained evidence
-- **WHEN** the validator or its tests resolve a required schema or artifact
-- **THEN** validation SHALL fail with a deterministic non-secret blocked or invalid result
-- **AND** it SHALL not launch product code, access a credential value, search the network, or mutate the store
+- **WHEN** a release is prepared
+- **THEN** automated drift detection MUST run against all tracked artifacts
+- **AND** drift findings MUST be classified and resolved before release
 
 ### Requirement: Explicit provider CLI identity mapping
 
