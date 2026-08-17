@@ -32,7 +32,7 @@ across `docs/` returned empty — no stale references remain.
 
 ## What Was Repaired
 
-5 total defects:
+6 total repairs:
 1. `docs/README.md`: `model-resolution.md` → `architecture.md` (file not found)
 2. `docs/extending.md`: `docs/scheduling.md` → `scheduling.md` (double-path)
 3. `docs/extending.md`: removed `docs/scheduler/ARCHITECTURE.md` reference (file not found)
