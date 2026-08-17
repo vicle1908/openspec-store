@@ -17,7 +17,8 @@ SCHEMA_SOURCE = (
     ROOT
     / "openspec"
     / "changes"
-    / "complete-agent-llm-config-integration"
+    / "archive"
+    / "2026-08-14-complete-agent-llm-config-integration"
     / "evidence"
     / "schema"
     / "v1"
