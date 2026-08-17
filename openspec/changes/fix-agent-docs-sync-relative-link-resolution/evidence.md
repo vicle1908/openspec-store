@@ -37,7 +37,7 @@ src/agent_docs_sync/tools/check_links.py  ruff check passed
 | pytest (full suite) | 277 passed, 4 warnings |
 | mypy --strict (49 source files) | No issues |
 | ruff check (changed files only) | All passed |
-| ruff check (full repo src/ tests/) | 13 pre-existing I001 import-order findings in unrelated test files |
+| ruff check (full repo) | 13 I001 findings in files outside this change's diff; focused ruff validation for both changed files passes |
 | ruff format (full repo) | 95 files already formatted |
 | GitNexus impact (upstream) | CRITICAL — 8 affected processes |
 | GitNexus detect-changes (staged) | HIGH — 11 symbols, 10 affected processes |
