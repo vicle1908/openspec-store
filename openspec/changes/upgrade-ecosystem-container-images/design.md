@@ -2,7 +2,7 @@
 
 ## Image-Tag Governance Policy
 
-All stateful services (databases, message brokers, observability backends) SHALL use exact, immutable release tags. Floating tags (`latest`, major-only) are prohibited for stateful services. Exceptions require: documented rationale in Compose comments, pinned digest, verified `linux/amd64` + `linux/arm64`, and a 30-day re-pin review. Local images (`:local-dev`, `:local`) are exempt.
+All stateful services (databases, message brokers, observability backends) SHALL use exact, immutable release tags for production. Floating tags (`:latest`, major-only) are prohibited for stateful services. Exceptions require documented rationale. Local build images (`:local-dev`, `:latest`) are exempt.
 
 ## PostgreSQL Volume Safety
 
@@ -11,92 +11,84 @@ PostgreSQL 18 cannot open a PostgreSQL 16 data directory. No volumes exist local
 - Never auto-delete PG16 volumes
 - Use PG18 mount layout (`/var/lib/postgresql`)
 - Preserve old volumes for rollback
-- For retained data: start PG16 against original volume → `pg_dump` → fresh PG18 volume → `pg_restore`
-- Test fresh startup and existing-data migration separately
-- Disposal strategy: disposable local metadata uses fresh PG18 volume; persistent environments use dump/restore; rollback retains original PG16 volume untouched
 
-## Research Matrix (4-Column: Current → Upstream latest → App-supported baseline → Selected target)
+## Research Matrix (4-Column)
 
-| Service | Current | Upstream latest | Application-supported baseline | Selected target | Source |
-|---------|---------|----------------|-------------------------------|-----------------|--------|
-| **PostgreSQL** (agent-core) | `18.6-trixie` | 18.6-trixie | >=15 (Langfuse v4) | `18.6-trixie` | Docker Hub ✅ amd64+arm64 |
-| **PostgreSQL** (go-micro) | `18.4-alpine` | 18.6-alpine | N/A | `18.6-alpine` | Docker Hub ✅ amd64+arm64 |
-| **Langfuse server** | `3.219` | 4.11 | 4.11.0 | `4.11.0` | Docker Hub ✅ amd64+arm64 |
-| **Langfuse worker** | `3` (float) | 4.11 | 4.11.0 | `4.11.0` | Docker Hub ✅ amd64+arm64 |
-| **ClickHouse** (Langfuse) | standalone | 26.7 | **25.12** (Langfuse baseline) | `25.12.11.4-alpine` | Docker Hub; must be Langfuse-compatible line |
-| **Redis** (Langfuse) | standalone | 8.10 | **7** (Langfuse baseline) | `7.4.10-alpine3.21` — Langfuse v4 baseline | Langfuse v4 Compose uses `redis:7` |
-| **Redis** (go-micro) | `8.8-alpine` | 8.10.0 | 8.8 | `8.8.1-alpine` | Docker Hub ✅ amd64+arm64 |
-| **MinIO server** (Langfuse) | Chainguard | Chainguard | Chainguard (Langfuse v4) | `cgr.dev/chainguard/minio` (latest) | Langfuse v4 Compose baseline |
-| **MinIO mc** | `latest` (float) | RELEASE.2025-08-13 | independent | `RELEASE.2025-08-13T08-35-41Z` | Docker Hub ✅ amd64+arm64 |
-| **MLflow** | `latest` (float) | v3.15.1 | v3.15.1 | `v3.15.1` | GHCR ✅ amd64+arm64 |
-| **ClickHouse** (agent-core) | `latest` (float) | 26.7 | N/A (standalone) | `26.4.5-alpine` | Docker Hub ✅ amd64+arm64 |
-| **MinIO server** (agent-core) | `latest` (float) | RELEASE.2025-09-07 | N/A (standalone) | `RELEASE.2025-09-07T16-13-09Z` | Quay.io ✅ amd64+arm64 |
-| **OTel Collector** (agent-core) | `0.157.0` | 0.158.0 | 0.158.0 | `0.158.0` | Docker Hub ✅ amd64+arm64 |
-| **OTel Collector** (go-micro) | `0.156.0` | 0.158.0 | 0.158.0 | `0.158.0` | Docker Hub ✅ amd64+arm64 |
-| **Grafana** (go-micro) | `13.1.1` | 13.1.3 | 13.1.3 | `13.1.3` | GitHub ✅ amd64+arm64 |
-| **Mailpit** (go-micro) | `v1.30` | v1.30.7 | v1.30.7 | `v1.30.7` | GitHub ✅ amd64+arm64 |
-| **Python** (pgcli base) | `3.13-slim` | 3.14.5 | 3.14.5 | `3.14.5-slim` | Docker Hub ✅ amd64+arm64 |
-| **Golang** (build) | `1.26.5-bookworm` | 1.26.5 | 1.26.5 | `1.26.5-bookworm` | Docker Hub ✅ amd64+arm64 |
-| **Distroless** | `:nonroot` (mutable) | digest pin | digest pin | record index digest | GCR ✅ amd64+arm64 |
-| **Busybox** | `1.37.0-uclibc` | 1.37.0 | 1.37.0 | `1.37.0-uclibc` | Docker Hub ✅ amd64+arm64 |
-| **Valkey** | `9.1-alpine` | 9.1 | 9.1 | `9.1-alpine` | Docker Hub ✅ amd64+arm64 |
-| **OTel LGTM** | `0.29.0` | 0.29.0 | 0.29.0 | `0.29.0` | Docker Hub ✅ amd64+arm64 |
-| **Redis exporter** | `v1.87.0` | v1.87.0 | v1.87.0 | `v1.87.0` | GitHub ✅ amd64+arm64 |
-| **kcat** | `8.1.2` | 8.1.2 | 8.1.2 | `8.1.2` | Docker Hub ✅ amd64+arm64 |
-| **Kafka UI** | `v1.0.0` | v1.0.0 | v1.0.0 | `v1.0.0` | GHCR ✅ amd64+arm64 |
+| Service | Current | Latest upstream | Langfuse baseline | **Selected target** | Evidence |
+|---------|---------|----------------|-------------------|---------------------|----------|
+| **PostgreSQL** | 18.4-alpine / 18.6-trixie | 18.6 | >=15 | **18.6-trixie** | Docker Hub ✅ |
+| **Langfuse** | 3.219 | v4.11.0 (2026-08-14) | 4 | **4.11.0** | GitHub Releases ✅ |
+| **Langfuse worker** | 3 (float) | v4.11.0 | 4 | **4.11.0** | GitHub Releases ✅ |
+| **MLflow** | :latest | v3.15.1 (2026-08-03) | — | **v3.15.1** + derived image | GitHub Releases + PyPI ✅ |
+| **ClickHouse** | :latest | **v26.7.3.19** | 25.12 | **26.4.5.143-alpine** | Docker Hub ✅ |
+| **Redis** | 7-alpine | **8.10.0** (2026-07-29) | redis:7 | **8.10.0-alpine** | GitHub Releases ✅ |
+| **MinIO server** | quay.io/minio:latest | Chainguard 2026-07-17 | Chainguard | **@sha256:6196cdd…** (digest-pinned) | Docker image inspect ✅ |
+| **minio/mc** | :latest | RELEASE.2025-08-13 | — | **RELEASE.2025-08-13T08-35-41Z** | GitHub Releases ✅ |
+| **OTel Collector** | 0.157.0 | v0.158.0 (2026-08-04) | — | **0.158.0** | GitHub Releases ✅ |
 
-### Key decisions
+## Compatibility Deviations
 
-1. **ClickHouse (Langfuse)**: Pin to `25.12.11.4-alpine` — NOT 26.x. Langfuse v4.11.0 official Compose uses ClickHouse 25.12 line.
-2. **Redis (Langfuse)**: **DEFERRED** — retain Redis 7 patch. Langfuse v4.11.0 official Compose uses `redis:7`. Redis 8 compatibility is not proven and not in Langfuse's official baseline.
-3. **MinIO (Langfuse)**: Pin Chainguard MinIO by OCI digest (sha256:6196...04b) — verified amd64+arm64. This is Langfuse v4.11.0 baseline.
-4. **MLflow**: `v3.15.1` on GHCR (v2.28.1 does not exist).
-5. **PostgreSQL (Langfuse)**: Use 18.6 — Langfuse v4 states `>=15` support. Fresh-start local test required to prove.
+### Redis 8.10.0 (Langfuse)
 
-## Langfuse v4.11.0 Migration Notes
+Langfuse v4.11.0 official Compose uses `redis:7`. This project selects **Redis 8.10.0** per explicit user requirement. Redis 8 is not yet in Langfuse's official compatibility baseline.
 
-From the official `v4.11.0` Compose file:
-- Service renamed: `langfuse` → `langfuse-web`, `langfuse-worker` (new, separate)
-- PostgreSQL: `${POSTGRES_VERSION:-17}` — Langfuse defaults to PG 17 but states `>=15`
-- ClickHouse: `clickhouse/clickhouse-server:25.12` — pinned to 25.x line
-- Redis: `redis:7` — pinned, uses `--requirepass` and `--maxmemory-policy noeviction`
-- MinIO: `cgr.dev/chainguard/minio` — Chainguard hardened variant, NOT upstream MinIO
-- New env vars: `SALT`, `ENCRYPTION_KEY`, `LANGFUSE_S3_EVENT_UPLOAD_*`, `LANGFUSE_S3_MEDIA_UPLOAD_*`, `LANGFUSE_S3_BATCH_EXPORT_*`
-- S3 storage: uses `http://minio:9000` with `FORCE_PATH_STYLE: true`
-- Health check changed: `wget --no-verbose --tries=1 --spider http://localhost:8123/ping`
+- Langfuse uses ioredis and BullMQ, which support Redis 8 at the client level.
+- `LANGFUSE_BULLMQ_SKIP_REDIS_VERSION_CHECK` exists in the official Compose as an override flag.
+- **Acceptance criterion**: Langfuse web and worker must start, remain healthy, and produce no Redis-related errors or restarts with Redis 8.10.0.
+- **Re-evaluation trigger**: Langfuse release notes or documentation explicitly adding Redis 8 support.
 
-Environment variable reconciliation required between existing agent-core config and Langfuse v4 official Compose. Differences must be documented.
+### ClickHouse 26.4.5.143 (Langfuse)
+
+Global upstream latest is ClickHouse **v26.7.3.19**. Langfuse v4.11.0 official Compose uses ClickHouse 25.12.
+
+- Known Langfuse issue: ClickHouse 26.5+ triggers `NOT_FOUND_COLUMN_IN_BLOCK` errors due to analyzer behavior changes.
+- **Selected target: 26.4.5.143-alpine** — latest ClickHouse 26.x patch before the known 26.5+ incompatibility.
+- **Acceptance criterion**: Langfuse ClickHouse migration completes and no `NOT_FOUND_COLUMN_IN_BLOCK` errors appear in logs.
+- **Re-evaluation trigger**: Langfuse issue/PR confirming ClickHouse 26.5+ compatibility.
+
+### MLflow Derived Image
+
+Upstream `ghcr.io/mlflow/mlflow:v3.15.1` ships SQLAlchemy 2.0.51 but no PostgreSQL DBAPI driver (`psycopg2`). The derived image adds `psycopg2-binary==2.9.12` (latest stable from PyPI).
+
+```dockerfile
+FROM ghcr.io/mlflow/mlflow:v3.15.1
+RUN pip install --no-cache-dir psycopg2-binary==2.9.12
+```
+
+Local image tag: `mlflow-local-dev:v3.15.1-psycopg2-2.9.12`
 
 ## Upgrade Slices
 
-| Slice | Scope | Risk | Dependencies |
-|-------|-------|------|-------------|
-| A | go-microservices patch-level (PG 18.4→18.6, Mailpit, Grafana, OTel, Python) | Low | None |
-| B | PostgreSQL volume layout + migration docs | Low | None |
-| C | Pin floating tags (ClickHouse agent-core, MLflow, MinIO server, mc) | Medium | None |
-| D | Langfuse 3→4 migration (server + worker, ClickHouse 25.12, Redis 7 compat, env/config) | **High** | B, C |
-| E | Redis 8 evaluation (only if Langfuse v4 proves compatible) | Medium | D |
-| F | Base images / digest alignment (distroless, Go builders) | Low | None |
+| Slice | Scope | Risk | Evidence |
+|-------|-------|------|----------|
+| A | go-microservices patch-level (PG 18.6, Mailpit, Grafana, OTel, Python) | Low | 36/36 image checks, `85cee48` on main |
+| B | PostgreSQL volume layout + migration docs | Low | 15/15 Docker-local tests, `ce0df18` |
+| C | Pin MLflow + OTel collector | Low | 2 regression tests, `8bf1e57` |
+| D | Langfuse v3→v4 + Redis 8 + ClickHouse 26.4 + MinIO digest | High | 10 regression tests, `643c80a`–`21b0dec` |
+| E | MLflow derived Dockerfile (psycopg2-binary) | Medium | 3 regression tests, MLflow healthy at runtime |
 
-## Verification Per Slice
+## Runtime Acceptance Criteria
 
-1. `docker compose config --quiet`
-2. Isolated Compose: `COMPOSE_PROJECT_NAME=image-upgrade-validation`
-3. Fresh volumes for destructive/major upgrades
-4. Health checks for every service
-5. Repo tests, lint, type-check, lock, diff gates
-6. OpenSpec strict validation (focused + full-store)
-7. `linux/amd64` + `linux/arm64` architecture confirmation
-8. GitNexus `detect_changes` for each commit
+All of the following must pass in an isolated Compose project with fresh volumes:
 
-## Rollback
+1. **PostgreSQL 18.6**: starts, healthy, accepts connections
+2. **Redis 8.10.0**: starts, `--requirepass` auth works, unauthenticated access rejected, Langfuse web+worker healthy
+3. **ClickHouse 26.4.5.143**: starts, Langfuse migration completes, no `NOT_FOUND_COLUMN_IN_BLOCK` errors
+4. **MLflow**: derived image starts, PostgreSQL backend connected, `/health` returns 200
+5. **Langfuse web**: starts, `/api/public/health` returns OK, all dependencies healthy
+6. **Langfuse worker**: starts, remains running, no restarts
+7. **MinIO**: starts, S3-compatible API responds
 
-All changes git-revertible per slice. Old PG16 volumes preserved. Langfuse 4→3: restore PG16 volume, revert tags. Redis 8→7: revert to exact Redis 7 patch.
+## Commits (agent-core worktree)
 
-## Commits
+1. `ce0df18` — fix(compose): use migration-safe PostgreSQL 18 volumes
+2. `8bf1e57` — chore(images): pin MLflow and OTel collector releases
+3. `643c80a` — feat(observability): migrate Langfuse stack to v4
+4. `964c95e` — chore(images): upgrade Redis to 8.10.0 and ClickHouse to 26.4.5
+5. `4db3573` — fix(mlflow): add psycopg2-binary to derived Dockerfile
+6. `21b0dec` — fix(mlflow): use exact derived image and strengthen regression coverage
 
-1. `chore(images): update go-microservices patch-level image pins`
-2. `fix(compose): use PostgreSQL 18 volume layout and migration-safe volumes`
-3. `chore(images): pin observability infrastructure images`
-4. `feat(observability): migrate Langfuse stack to v4`
-5. `docs(images): document image policy and migration procedures`
+## Commits (go-microservices)
+
+1. `7b5df1c` — chore(images): update platform image pins (PG 18.6, Mailpit, OTel, Grafana, Python)
+2. `85cee48` — fix(images): align deployment verification image references

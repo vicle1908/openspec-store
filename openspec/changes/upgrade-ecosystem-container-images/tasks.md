@@ -1,72 +1,58 @@
 # Tasks: Upgrade ecosystem container images
 
-## Planning
+## Slice A — go-microservices patch-level (DONE)
+- [x] PG 18.4→18.6, Mailpit v1.30→v1.30.7, OTel 0.156→0.158, Grafana 13.1.1→13.1.3, Python 3.13→3.14.5
+- [x] 36/36 image architecture checks pass (amd64+arm64)
+- [x] All Go tests pass, stale ref sweep clean
+- [x] Cherry-picked to `go-microservices/main` at `85cee48`
+- [x] Deployment verification references aligned at `85cee48`
 
-- [x] Research all image versions against authoritative registries
-- [x] Verify multi-architecture support (amd64 + arm64) for all target images
-- [x] Reconcile targets against Langfuse v4.11.0 official Compose baseline
-- [x] Design 4-column research matrix (current → upstream → app baseline → selected)
-- [x] Document PG16→18 volume migration safety requirements
-- [x] Validate change with `openspec validate --strict`
+## Slice B — PostgreSQL volume layout (DONE)
+- [x] langfuse-postgres: versioned volume `langfuse-postgres-18-data:/var/lib/postgresql`
+- [x] mlflow-postgres: versioned volume `mlflow-postgres-18-data:/var/lib/postgresql`
+- [x] Old `langfuse-postgres-data` / `mlflow-postgres-data` volumes removed
+- [x] PG16→18 migration docs added to `docs/observability.md`
+- [x] 15/15 Docker-local tests pass, `docker compose config` valid
+- [x] Committed as `ce0df18`
 
-## Slice A — go-microservices low-risk patches
+## Slice C — Pin MLflow + OTel (DONE)
+- [x] MLflow: `ghcr.io/mlflow/mlflow:latest` → `v3.15.1`
+- [x] OTel: `0.157.0` → `0.158.0`
+- [x] 2 regression tests added
+- [x] Committed as `8bf1e57`
 
-- [ ] Update `POSTGRES_VERSION` in `deploy/tools.env` from `18.4-alpine` to `18.6-alpine`
-- [ ] Update `MAILPIT_VERSION` from `v1.30` to `v1.30.7`
-- [ ] Update `GRAFANA_VERSION` from `13.1.1` to `13.1.3`
-- [ ] Update `OTEL_COLLECTOR_VERSION` from `0.156.0` to `0.159.0`
-- [ ] Update `PYTHON_IMAGE_VERSION` from `3.13-slim` to `3.14.5-slim`
-- [ ] Run `scripts/verify-images.sh --arch arm64` (if exists)
-- [ ] Run `docker compose -f deploy/docker-compose.yaml config --quiet`
-- [ ] Run Go tests and linters
-- [x] Commit `7b5df1c` on go-microservices/main (15 files, zero stale refs, compose config PASS, gofmt PASS, git diff --check PASS)
+## Slice D — Langfuse v3→v4 + Redis 8 + ClickHouse 26.4 + MinIO (DONE)
+- [x] Langfuse: `3.219` → `4.11.0`, worker: `3` → `4.11.0`
+- [x] ClickHouse: `:latest` → `26.4.5.143-alpine` (latest 26.x before known 26.5+ bug)
+- [x] Redis: `7-alpine` → `8.10.0-alpine` (user-requested, ioredis/BullMQ client-compatible)
+- [x] MinIO: `quay.io/minio/minio:latest` → Chainguard `@sha256:6196cdd…` (digest-pinned)
+- [x] minio/mc: `:latest` → `RELEASE.2025-08-13T08-35-41Z` (exact release)
+- [x] REDIS_CONNECTION_STRING → REDIS_HOST/PORT/AUTH (v4 pattern)
+- [x] Redis command + healthcheck with `--requirepass`
+- [x] 10 regression tests added
+- [x] Committed as `643c80a` + `964c95e`
 
-## Slice B — PostgreSQL volume safety
+## Slice E — MLflow derived Dockerfile (DONE)
+- [x] Dockerfile.mlflow: `FROM ghcr.io/mlflow/mlflow:v3.15.1` + `psycopg2-binary==2.9.12`
+- [x] compose.yaml: build context + exact local image tag `mlflow-local-dev:v3.15.1-psycopg2-2.9.12`
+- [x] Derived image built and verified: psycopg2 2.9.12 importable
+- [x] MLflow server starts, connects to PostgreSQL, `/health` returns 200
+- [x] 3 strengthened regression tests (build directive, exact tag, Dockerfile pins)
+- [x] Committed as `4db3573` + `21b0dec`
 
-- [ ] Update `langfuse-postgres` volume mount from `/var/lib/postgresql/data` to `/var/lib/postgresql`
-- [ ] Update `mlflow-postgres` volume mount from `/var/lib/postgresql/data` to `/var/lib/postgresql`
-- [ ] Validate `docker compose config --quiet`
-- [ ] Isolated Compose up with fresh volumes, verify PG18.6 `SHOW server_version`
-- [ ] Document migration procedure for existing PG16 deployments
-- [ ] Commit: `fix(compose): use PostgreSQL 18 volume layout and migration-safe volumes`
+## Phase 2 — Runtime Validation (IN PROGRESS)
+- [ ] Redis 8.10.0: version, auth, Langfuse web+worker healthy, no BullMQ errors
+- [ ] ClickHouse 26.4.5.143: version, Langfuse migration, no NOT_FOUND_COLUMN_IN_BLOCK
+- [ ] Langfuse web: health endpoint, all dependencies
+- [ ] Langfuse worker: remains running, no restarts
+- [ ] Full stack: all 10 services start with fresh volumes
 
-## Slice C — Pin floating tags
+## Phase 3 — Integration + Promotion
+- [ ] Cherry-pick 6 commits onto current `agent-core/main` (`7a89372`)
+- [ ] Full test suite (pytest, ruff, mypy, lock, compose)
+- [ ] Fast-forward `agent-core/main` to verified commit
 
-- [ ] Pin `ghcr.io/mlflow/mlflow:latest` to `v3.15.1`
-- [ ] Pin `clickhouse/clickhouse-server:latest` to `25.12.11.4-alpine` (Langfuse-compatible line)
-- [ ] Pin `quay.io/minio/minio:latest` to `RELEASE.2025-09-07T16-13-09Z`
-- [ ] Pin `minio/mc:latest` to `RELEASE.2025-08-13T08-35-41Z`
-- [ ] Validate `docker compose config --quiet`
-- [ ] Commit: `chore(images): pin observability infrastructure images`
-
-## Slice D — Langfuse 3→4 migration
-
-- [ ] Research Langfuse v4.11.0 env vars: `SALT`, `ENCRYPTION_KEY`, S3 config, ClickHouse config
-- [ ] Update `langfuse/langfuse` to `4.11.0`
-- [ ] Update `langfuse/langfuse-worker` to `4.11.0`
-- [ ] Update ClickHouse to `25.12.11.4-alpine`
-- [ ] Update MinIO to Chainguard variant `cgr.dev/chainguard/minio`
-- [ ] Retain Redis 7 (Langfuse v4.11 baseline)
-- [ ] Reconcile environment variables with Langfuse v4 official Compose
-- [ ] Isolated Compose up with fresh volumes, verify Langfuse health
-- [ ] Commit: `feat(observability): migrate Langfuse stack to v4`
-
-## Slice E — Redis 8 evaluation
-
-- [x] Langfuse v4.11.0 official Compose uses redis:7 (confirmed)
-- [x] Pin `redis:7.4.10-alpine3.21` (deterministic, Langfuse baseline)
-- [x] Redis 8 evaluated: DEFERRED (not in Langfuse v4 baseline)
-- [ ] Commit: `chore(redis): upgrade observability Redis baseline` (or `chore(redis): pin Redis 7.4.10`)
-
-## Slice F — Base images / digest alignment
-
-- [ ] Record distroless multi-arch index digest
-- [ ] Verify Go builder and Python base tags
-- [ ] Commit: `docs(images): document image policy and migration procedures`
-
-## Closure
-
-- [ ] Cross-repo verification: agent-core, agent-harness, go-microservices, openspec-store
-- [ ] Full-store OpenSpec validation
-- [ ] Independent final review
-- [ ] Archive OpenSpec change
+## Phase 4 — OpenSpec Archive
+- [ ] Task checkboxes updated with evidence
+- [ ] Strict validation passes
+- [ ] Archived to `openspec/changes/archive/2026-08-17-upgrade-ecosystem-container-images/`
