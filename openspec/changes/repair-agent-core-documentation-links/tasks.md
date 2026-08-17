@@ -30,6 +30,6 @@
 - [x] 5.1 Commit clickable repairs: `ded5fac`
 - [x] 5.2 Commit stale-reference repairs: `7a89372`
 - [x] 5.3 Fast-forward merge to agent-core main
-- [ ] 5.4 OpenSpec validate → pass
+- [x] 5.4 OpenSpec validate → pass
 - [ ] 5.5 Archive with `--skip-specs --yes`
 - [ ] 5.6 Remove worktree and branch
