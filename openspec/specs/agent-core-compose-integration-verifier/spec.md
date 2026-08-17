@@ -1,7 +1,12 @@
 # agent-core-compose-integration-verifier Specification
 
 ## Purpose
-TBD - created by archiving change agent-core-compose-integration-verifier. Update Purpose after archive.
+
+Define the local agent-core Compose integration verifier: a platform binary
+(`platform/cmd/agent-core`) exposing `version` and `health` commands that
+parse Docker Compose JSON output fail-closed, a portable bounded integration
+script, and deterministic regression coverage that runs without Docker,
+credentials, or network access.
 
 ## Requirements
 

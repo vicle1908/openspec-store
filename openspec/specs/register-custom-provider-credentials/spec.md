@@ -1,7 +1,12 @@
 # register-custom-provider-credentials Specification
 
 ## Purpose
-TBD - created by archiving change register-custom-provider-credentials. Update Purpose after archive.
+
+Define registration of the three custom provider credential keys
+(shopapikey, giaoduc, cockpit) in the canonical environment-key-registry
+with secret classification, provider binding, cross-provider rejection,
+and preservation of existing credential entries.
+
 ## Requirements
 ### Requirement: Custom provider credentials SHALL be registered
 

@@ -1,7 +1,12 @@
 # claude-code-provider-routing Specification
 
 ## Purpose
-TBD - created by archiving change claude-code-model-effort-alias-routing. Update Purpose after archive.
+
+Define the Claude Code provider launcher routing contract: model alias
+selection with `[1m]` context-window suffix, per-provider effort levels,
+wire-model suffix stripping, cockpit adapter effort translation to OpenAI
+Responses, and evidence-gated provider acceptance.
+
 ## Requirements
 ### Requirement: Provider launchers SHALL use the documented model alias, `[1m]` suffix, and effort contract
 
