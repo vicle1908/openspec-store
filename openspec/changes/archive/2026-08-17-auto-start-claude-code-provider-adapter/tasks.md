@@ -30,7 +30,15 @@
 - [x] 4.3 Commit openspec-store change (`fb6432f`)
 - [x] 4.4 Final `openspec validate` → passed
 
-## Rollback
+## Closure Disposition
+
+Implementation and non-destructive live verification are complete (phases 1–4).
+Tasks 3.3 and 3.5 were intentionally not executed because they would stop or
+remove the active installation. Rollback tasks R.1–R.4 are documented rollback
+procedures, not completion criteria. All unchecked boxes are retained as honest
+historical evidence and are accepted residuals at closure.
+
+## Rollback (documented procedures — not executed during normal operation)
 
 - [ ] R.1 Remove LaunchAgent via `launchctl bootout` (not exercised — LaunchAgent left loaded; documented procedure only)
 - [ ] R.2 Remove plist from `~/Library/LaunchAgents/` (not exercised — documented procedure only)
