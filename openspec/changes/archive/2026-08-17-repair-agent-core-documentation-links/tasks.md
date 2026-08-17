@@ -31,5 +31,5 @@
 - [x] 5.2 Commit stale-reference repairs: `7a89372`
 - [x] 5.3 Fast-forward merge to agent-core main
 - [x] 5.4 OpenSpec validate → pass
-- [ ] 5.5 Archive with `--skip-specs --yes`
-- [ ] 5.6 Remove worktree and branch
+- [x] 5.5 Archive with `--skip-specs --yes`
+- [x] 5.6 Remove worktree and branch
