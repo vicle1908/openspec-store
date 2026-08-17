@@ -27,7 +27,7 @@ And it shall filter for relevant tags (e.g., `-alpine`, `-slim`)
 The system SHALL compare current image versions with latest available versions.
 
 #### Scenario: Compare Versions
-Given current version in `tools.env` (e.g., `POSTGRES_VERSION=18.4-alpine`)
+Given current version in `tools.env` (e.g., `POSTGRES_VERSION=18.6-alpine`)
 And latest version from Docker Hub API
 When the comparison is made
 Then it shall show current version, latest version, and whether upgrade is available

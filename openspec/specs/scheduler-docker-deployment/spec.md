@@ -8,7 +8,7 @@ Scheduler Docker deployment defines how the tdt-scheduler runs as a Docker servi
 _(Baseline: no requirements defined. All requirements are introduced by the `centralized-scheduling-module` change.)_
 
 ### Requirement: Docker scheduler service on the single ecosystem PostgreSQL server
-The system SHALL provide a Docker `scheduler` service (long-lived DBOS host) that owns every movable cron/interval workload (jira-daily-reports cron, `jira-run-all`, and the review-coverage scan). The `scheduler` SHALL connect to the **single ecosystem PostgreSQL server** — `agent-core`'s pinned `postgres:18.4-trixie` — using **its own logical database** (`tdt_scheduler`, with the auto-derived `tdt_scheduler_dbos_sys` system DB), and SHALL NOT stand up a second Postgres server/instance (Decision 8). It SHALL reuse `agent-core`'s pinned base images (`python:3.14.5-slim-trixie`, `uv==0.11.17`).
+The system SHALL provide a Docker `scheduler` service (long-lived DBOS host) that owns every movable cron/interval workload (jira-daily-reports cron, `jira-run-all`, and the review-coverage scan). The `scheduler` SHALL connect to the **single ecosystem PostgreSQL server** — `agent-core`'s pinned `postgres:18.6-trixie` — using **its own logical database** (`tdt_scheduler`, with the auto-derived `tdt_scheduler_dbos_sys` system DB), and SHALL NOT stand up a second Postgres server/instance (Decision 8). It SHALL reuse `agent-core`'s pinned base images (`python:3.14.5-slim-trixie`, `uv==0.11.17`).
 
 #### Scenario: Scheduler starts against the ecosystem Postgres server
 - **WHEN** `docker compose up -d` is run for the scheduler service

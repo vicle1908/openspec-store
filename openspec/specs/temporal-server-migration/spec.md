@@ -23,7 +23,7 @@ And it shall initialize fresh workflow environment
 The system SHALL use temporalio/admin-tools to set up the database schema before starting temporalio/server.
 
 #### Scenario: Schema Setup
-Given PostgreSQL 18.4 running fresh
+Given PostgreSQL 18.6 running fresh
 When temporalio/admin-tools runs
 Then it shall create temporal database
 And it shall create temporal_visibility database

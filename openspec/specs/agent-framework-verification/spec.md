@@ -132,7 +132,7 @@ version tuple.
 - **WHEN** `TDT_POSTGRES_TEST_URL` is explicitly supplied
 - **THEN** the lifecycle gate SHALL use that disposable backend
 - **AND** otherwise it SHALL start a Testcontainers
-  `postgres:18.4-trixie` backend and obtain a driverless psycopg 3-compatible
+  `postgres:18.6-trixie` backend and obtain a driverless psycopg 3-compatible
   connection URL
 - **AND** when neither an explicit backend nor Docker-daemon access is
   available, the required gate SHALL fail rather than skip or use memory

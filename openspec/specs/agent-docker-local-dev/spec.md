@@ -10,7 +10,7 @@ The system MUST provide a Docker Compose stack for local development that launch
 #### Scenario: Compose uses pinned current images
 - **WHEN** the local Docker stack is inspected
 - **THEN** the app image MUST build from `python:3.14.5-slim-trixie`
-- **AND** the database service MUST use `postgres:18.4-trixie`
+- **AND** the database service MUST use `postgres:18.6-trixie`
 - **AND** the Compose file MUST not use a floating `latest` tag for either service
 
 #### Scenario: Compose starts the app and database for local dev
