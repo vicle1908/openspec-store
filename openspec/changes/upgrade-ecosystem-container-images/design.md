@@ -23,16 +23,16 @@ PostgreSQL 18 cannot open a PostgreSQL 16 data directory. No volumes exist local
 | **PostgreSQL** (go-micro) | `18.4-alpine` | 18.6-alpine | N/A | `18.6-alpine` | Docker Hub ✅ amd64+arm64 |
 | **Langfuse server** | `3.219` | 4.11 | 4.11.0 | `4.11.0` | Docker Hub ✅ amd64+arm64 |
 | **Langfuse worker** | `3` (float) | 4.11 | 4.11.0 | `4.11.0` | Docker Hub ✅ amd64+arm64 |
-| **ClickHouse** (Langfuse) | standalone | 26.7 | **25.12** (Langfuse baseline) | `25.12` (exact patch TBD) | Docker Hub; must be Langfuse-compatible line |
-| **Redis** (Langfuse) | standalone | 8.10 | **7** (Langfuse baseline) | **Deferred** — retain Redis 7 patch | Langfuse v4 Compose uses `redis:7` |
+| **ClickHouse** (Langfuse) | standalone | 26.7 | **25.12** (Langfuse baseline) | `25.12.11.4-alpine` | Docker Hub; must be Langfuse-compatible line |
+| **Redis** (Langfuse) | standalone | 8.10 | **7** (Langfuse baseline) | `7.4.10-alpine3.21` — Langfuse v4 baseline | Langfuse v4 Compose uses `redis:7` |
 | **Redis** (go-micro) | `8.8-alpine` | 8.10.0 | 8.8 | `8.8.1-alpine` | Docker Hub ✅ amd64+arm64 |
 | **MinIO server** (Langfuse) | Chainguard | Chainguard | Chainguard (Langfuse v4) | `cgr.dev/chainguard/minio` (latest) | Langfuse v4 Compose baseline |
 | **MinIO mc** | `latest` (float) | RELEASE.2025-08-13 | independent | `RELEASE.2025-08-13T08-35-41Z` | Docker Hub ✅ amd64+arm64 |
 | **MLflow** | `latest` (float) | v3.15.1 | v3.15.1 | `v3.15.1` | GHCR ✅ amd64+arm64 |
 | **ClickHouse** (agent-core) | `latest` (float) | 26.7 | N/A (standalone) | `26.4.5-alpine` | Docker Hub ✅ amd64+arm64 |
 | **MinIO server** (agent-core) | `latest` (float) | RELEASE.2025-09-07 | N/A (standalone) | `RELEASE.2025-09-07T16-13-09Z` | Quay.io ✅ amd64+arm64 |
-| **OTel Collector** (agent-core) | `0.157.0` | 0.159.0 | 0.159.0 | `0.159.0` | Docker Hub ✅ amd64+arm64 |
-| **OTel Collector** (go-micro) | `0.156.0` | 0.159.0 | 0.159.0 | `0.159.0` | Docker Hub ✅ amd64+arm64 |
+| **OTel Collector** (agent-core) | `0.157.0` | 0.158.0 | 0.158.0 | `0.158.0` | Docker Hub ✅ amd64+arm64 |
+| **OTel Collector** (go-micro) | `0.156.0` | 0.158.0 | 0.158.0 | `0.158.0` | Docker Hub ✅ amd64+arm64 |
 | **Grafana** (go-micro) | `13.1.1` | 13.1.3 | 13.1.3 | `13.1.3` | GitHub ✅ amd64+arm64 |
 | **Mailpit** (go-micro) | `v1.30` | v1.30.7 | v1.30.7 | `v1.30.7` | GitHub ✅ amd64+arm64 |
 | **Python** (pgcli base) | `3.13-slim` | 3.14.5 | 3.14.5 | `3.14.5-slim` | Docker Hub ✅ amd64+arm64 |
@@ -47,9 +47,9 @@ PostgreSQL 18 cannot open a PostgreSQL 16 data directory. No volumes exist local
 
 ### Key decisions
 
-1. **ClickHouse (Langfuse)**: Pin to `25.12` exact patch — NOT `26.x`. Langfuse v4.11.0 official Compose explicitly uses `clickhouse/clickhouse-server:25.12`.
+1. **ClickHouse (Langfuse)**: Pin to `25.12.11.4-alpine` — NOT 26.x. Langfuse v4.11.0 official Compose uses ClickHouse 25.12 line.
 2. **Redis (Langfuse)**: **DEFERRED** — retain Redis 7 patch. Langfuse v4.11.0 official Compose uses `redis:7`. Redis 8 compatibility is not proven and not in Langfuse's official baseline.
-3. **MinIO (Langfuse)**: Switch to `cgr.dev/chainguard/minio` — this is what Langfuse v4.11.0 uses. Do NOT use `quay.io/minio/minio` for Langfuse.
+3. **MinIO (Langfuse)**: Pin Chainguard MinIO by OCI digest (sha256:6196...04b) — verified amd64+arm64. This is Langfuse v4.11.0 baseline.
 4. **MLflow**: `v3.15.1` on GHCR (v2.28.1 does not exist).
 5. **PostgreSQL (Langfuse)**: Use 18.6 — Langfuse v4 states `>=15` support. Fresh-start local test required to prove.
 

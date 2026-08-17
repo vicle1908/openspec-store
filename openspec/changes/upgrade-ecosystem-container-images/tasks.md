@@ -19,7 +19,7 @@
 - [ ] Run `scripts/verify-images.sh --arch arm64` (if exists)
 - [ ] Run `docker compose -f deploy/docker-compose.yaml config --quiet`
 - [ ] Run Go tests and linters
-- [ ] Commit: `chore(images): update go-microservices patch-level image pins`
+- [x] Commit `7b5df1c` on go-microservices/main (15 files, zero stale refs, compose config PASS, gofmt PASS, git diff --check PASS)
 
 ## Slice B — PostgreSQL volume safety
 
@@ -53,9 +53,9 @@
 
 ## Slice E — Redis 8 evaluation
 
-- [ ] Confirm Langfuse v4 Redis 7 compatibility status
-- [ ] If compatible: update `redis:7-alpine` to `redis:8-alpine`
-- [ ] If incompatible: retain `redis:7.4.10-alpine` (exact patch)
+- [x] Langfuse v4.11.0 official Compose uses redis:7 (confirmed)
+- [x] Pin `redis:7.4.10-alpine3.21` (deterministic, Langfuse baseline)
+- [x] Redis 8 evaluated: DEFERRED (not in Langfuse v4 baseline)
 - [ ] Commit: `chore(redis): upgrade observability Redis baseline` (or `chore(redis): pin Redis 7.4.10`)
 
 ## Slice F — Base images / digest alignment
