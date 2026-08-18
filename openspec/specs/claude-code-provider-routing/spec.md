@@ -8,6 +8,7 @@ wire-model suffix stripping, cockpit adapter effort translation to OpenAI
 Responses, and evidence-gated provider acceptance.
 
 ## Requirements
+
 ### Requirement: Provider launchers SHALL use the documented model alias, `[1m]` suffix, and effort contract
 
 Each provider launcher MUST use lowercase `[1m]` on its model selector to request the 1 million token context window, declare the capability needed for its requested effort, and set `CLAUDE_CODE_EFFORT_LEVEL` in its subshell. The shopapikey launcher MUST use the built-in `fable` alias pinned with `ANTHROPIC_DEFAULT_FABLE_MODEL=fable-5[1m]`; giaoduc and cockpit MUST use custom model options with `[1m]` for `Advance[1m]` and `gpt-5.6-luna[1m]` respectively.
@@ -61,3 +62,25 @@ The change MUST NOT be archived as complete until all three launchers have fresh
 
 - **WHEN** Claude Code accepts a `[1m]` selector and strips it before transmission
 - **THEN** the provider-side 1M context window capacity MUST be verified separately before claiming 1M support
+
+### Requirement: Launcher routing and profile resolution own distinct surfaces
+
+This capability SHALL own the per-provider launcher functions: each launcher selects a provider profile via `claude --settings <profile>` and passes a default model via `--model`, sets the provider base URL, and unsets `ANTHROPIC_AUTH_TOKEN` so that `apiKeyHelper` is the sole credential boundary. The `claude-code-provider-profile-resolution` capability SHALL own the persistent credential-free defaults surface: `~/.claude/settings.json` global defaults, `apiKeyHelper` credential retrieval, and per-provider profile files under `~/.claude/profiles/`. Model-selection precedence SHALL be: an explicit `--model` CLI flag, then the `--settings` profile file selected by the launcher, then the global `~/.claude/settings.json`. Neither capability SHALL claim authority over the other's surface.
+
+#### Scenario: Launcher selects a profile via --settings
+
+- **GIVEN** a provider launcher invokes `claude --settings <profile.json> --model <alias>`
+- **WHEN** Claude Code starts from that launcher
+- **THEN** the selected profile file SHALL take precedence over the global settings file for that session
+- **AND** the explicit `--model` flag SHALL take precedence over the profile's own model field
+- **AND** the global settings file SHALL remain unchanged
+
+#### Scenario: Profile file overrides global settings
+
+- **WHEN** Claude Code is invoked with `--settings` pointing at a provider profile
+- **THEN** the profile's model, base URL, effort, and apiKeyHelper SHALL take precedence over the global settings file
+
+#### Scenario: Bare invocation uses global defaults
+
+- **WHEN** Claude Code is invoked without a launcher or `--settings` profile
+- **THEN** the global settings file defaults SHALL apply

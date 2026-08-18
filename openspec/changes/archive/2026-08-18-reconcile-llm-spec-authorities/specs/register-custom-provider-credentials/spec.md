@@ -1,13 +1,4 @@
-# register-custom-provider-credentials Specification
-
-## Purpose
-
-Define registration of the three custom provider credential keys
-(shopapikey, giaoduc, cockpit) in the canonical environment-key-registry
-with secret classification, provider binding, cross-provider rejection,
-and preservation of existing credential entries.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Custom provider credentials SHALL be registered
 
@@ -51,38 +42,3 @@ Each registered custom credential entry SHALL have an explicit `provider` field 
 - **WHEN** `CredentialResolver.resolve()` is called
 - **THEN** it SHALL raise `ProfileResolutionError`
 - **AND** the error SHALL NOT reveal credential values
-
-### Requirement: Credential values SHALL NOT appear in registry or profiles
-
-The registry entries MUST NOT contain literal credential values. Resolved profiles MUST record only `key_name`, `available` (boolean), and `provider` — never the secret itself.
-
-#### Scenario: No secret in registry
-
-- **WHEN** the registry JSON is inspected
-- **THEN** no entry SHALL contain a literal API key, token, or password value
-- **AND** all credential entries SHALL have `"secret": true`
-
-#### Scenario: No secret in resolved profile
-
-- **WHEN** a resolved profile is serialized or diagnosed
-- **THEN** credential entries SHALL contain only `key_name`, `available`, and `provider`
-- **AND** no `value` or `secret_value` field SHALL appear
-
-### Requirement: Existing credential entries remain unchanged
-
-The three existing credential entries (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `MODEL_API_KEY`) SHALL NOT be modified by this change.
-
-#### Scenario: Anthropic entry preserved
-
-- **WHEN** the registry is loaded after the change
-- **THEN** `credential.anthropic.api_key` SHALL remain registered with `provider: "anthropic"` and `secret: true`
-
-#### Scenario: OpenAI entry preserved
-
-- **WHEN** the registry is loaded after the change
-- **THEN** `credential.openai.api_key` SHALL remain registered with `provider: "openai-chat"` and `secret: true`
-
-#### Scenario: Model entry preserved
-
-- **WHEN** the registry is loaded after the change
-- **THEN** `credential.model.api_key` SHALL remain registered with `provider: null` and `secret: true`

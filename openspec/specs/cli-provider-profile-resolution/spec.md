@@ -138,6 +138,13 @@ Runtimes with their own model registry or provider-infrastructure role SHALL not
 - **WHEN** claude-code-provider-adapter translates provider protocols
 - **THEN** it SHALL remain provider infrastructure rather than a per-agent CLI-profile consumer
 
+#### Scenario: omp boundary
+
+- **WHEN** omp (oh-my-pi) resolves models from its own `models.yml` provider blocks, role allocation, and credential env-var references
+- **THEN** it SHALL be treated as a separate runtime boundary governed by the `omp-provider-routing` capability
+- **AND** it SHALL NOT be forced through this CLI-profile contract
+- **AND** its credential env-var references SHALL NOT be redirected into TDT canonical configuration
+
 ### Requirement: Each CLI consumer declares its native invocation boundary
 
 Each CLI-provider consumer SHALL declare the native invocation format it targets and SHALL project only fields supported by that CLI. The projection SHALL preserve provider identity and canonical wire-model provenance, SHALL pass supported model/effort arguments for Claude/Codex, SHALL retain capability-safe defaults for Kimi/Pi when aliases/effort are unsupported, and SHALL NOT project credential values.

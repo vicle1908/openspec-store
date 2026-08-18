@@ -1,10 +1,12 @@
 # provider-model-profile-resolution Specification
 
 ## Purpose
-Define a YAML-based provider/model/default configuration schema for TDT Python agent consumers, aligned with the configuration patterns proven by Codex, Grok Build, and Kimi. This is the target architecture that replaces the current `model.primary`/`model.fallback`/`api_key_env` pattern and the separate packaged `environment-key-registry.json`.
+Define a YAML-based provider/model/default configuration schema for TDT Python agent consumers, aligned with the configuration patterns proven by Codex, Grok Build, and Kimi. This is the target architecture that replaces the legacy `model.primary`/`model.fallback`/`api_key_env` YAML pattern with the canonical `providers`/`models`/`defaults` schema and the `auth_env` credential field. The packaged `environment-key-registry.json` is NOT replaced by this schema; it persists as the credential-metadata authority (secret classification and provider binding), while `auth_env` replaces only the retired `api_key_env` YAML field.
 
 **Status: IMPLEMENTED in tdt-core current main (`75cd519`). Consumer projections were completed and corrected through successor/corrective changes: ai-harness-skills `02d0410`, ai-review `f1b6e0f`.**
+
 ## Requirements
+
 ### Requirement: Canonical transport-specific provider definitions
 
 Every provider MUST declare its transport type (endpoint or native) and the corresponding configuration fields. Endpoint providers MUST include `base_url`. Native providers MUST include `cli_provider` and MUST NOT include `base_url`.
@@ -92,13 +94,26 @@ Every model alias referenced in `defaults.model`, `defaults.fallback`, or `defau
 
 ### Requirement: Explicit typed provider protocol
 
-Every provider MUST declare its protocol (`messages` or `responses`). The protocol determines the API format used for model requests. Inference or defaulting of protocol type SHALL NOT occur.
+Every provider MUST declare its protocol. The closed protocol vocabulary is `messages` (Anthropic Messages), `openai_chat` (OpenAI Chat Completions), and `responses` (OpenAI Responses). The protocol determines the API format used for model requests. Inference or defaulting of protocol type SHALL NOT occur.
 
 #### Scenario: Protocol is explicitly declared
 
 - **WHEN** a provider is configured
 - **THEN** it MUST include an explicit `protocol` field
-- **AND** the protocol MUST be one of the declared types
+- **AND** the protocol MUST be one of `messages`, `openai_chat`, or `responses`
+
+#### Scenario: OpenAI Chat protocol is accepted
+
+- **GIVEN** a provider declared with `protocol: openai_chat`
+- **WHEN** the YAML is loaded and validated
+- **THEN** the provider SHALL be accepted
+- **AND** the protocol SHALL map to the OpenAI Chat Completions wire format
+
+#### Scenario: Unknown protocol is rejected
+
+- **GIVEN** a provider declared with a protocol value outside the closed vocabulary
+- **WHEN** the YAML is loaded and validated
+- **THEN** validation SHALL fail with the unsupported protocol value identified
 
 ### Requirement: Explicit provider capability authority
 
