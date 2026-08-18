@@ -2,7 +2,7 @@
 
 ### Requirement: Docker scheduler service on the single ecosystem PostgreSQL server
 
-The system SHALL provide a Docker `scheduler` service (long-lived DBOS host) that owns every movable cron/interval workload. The scheduler SHALL live in a dedicated `tdt-scheduler/` directory at the workspace root, with its own `compose.yaml` and build context. The scheduler SHALL connect to the **single ecosystem PostgreSQL server** — `agent-core`'s pinned `postgres:18.6-trixie` — using **its own logical database** (`tdt_scheduler`, with the auto-derived `tdt_scheduler_dbos_sys` system DB), and SHALL NOT stand up a second Postgres server/instance.
+The system SHALL provide a Docker `scheduler` service (long-lived DBOS host) that owns every movable cron/interval workload. The scheduler SHALL live in a dedicated `tdt-scheduler/` directory at the workspace root, with its own `compose.yaml` and build context. All Python execution in the scheduler container SHALL use `uv run` (not direct venv python calls) to ensure proper project resolution and dependency management. The scheduler SHALL connect to the **single ecosystem PostgreSQL server** — `agent-core`'s pinned `postgres:18.6-trixie` — using **its own logical database** (`tdt_scheduler`, with the auto-derived `tdt_scheduler_dbos_sys` system DB), and SHALL NOT stand up a second Postgres server/instance.
 
 #### Scenario: Scheduler starts against the ecosystem Postgres server
 

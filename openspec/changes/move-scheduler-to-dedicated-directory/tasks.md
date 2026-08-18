@@ -15,7 +15,7 @@
 - [x] 2.3 Set explicit `container_name: tdt-scheduler` for predictable naming
 - [x] 2.4 Add shared postgres network: `networks: { default: { external: true, name: agent-core-local_default } }`
 - [x] 2.5 Add postgres-backup service with `container_name: tdt-scheduler-backup`
-- [x] 2.6 Copy volume mounts from agent-core compose (paths remain `../sibling-repo` relative to workspace root — same as current)
+- [x] 2.6 Fix volume mount: `../agent-core:/workspace/agent-core` (not `..:/workspace/agent-core`) so pyproject.toml is at correct path for `uv run` project discovery
 - [x] 2.7 Keep `working_dir: /workspace/agent-core/src` (scheduler imports agent_core)
 - [x] 2.8 Add env_file reference to `.env.docker`
 - [x] 2.9 Copy environment block from agent-core compose (TDT_HOME, SCHEDULER_POSTGRES_DSN, TDT_SCHEDULER_SETUP_MODULE, etc.)
