@@ -64,17 +64,17 @@
 
 ## 8. Clean up old files
 
-- [ ] 8.1 Remove `agent-core/deployments/scheduler/Dockerfile`
-- [ ] 8.2 Remove `agent-core/deployments/scheduler/entrypoint.sh`
-- [ ] 8.3 Remove `agent-core/deployments/scheduler/generators/`
-- [ ] 8.4 Remove `agent-core/deployments/scheduler/dispatch_manifest_generation.py`
-- [ ] 8.5 Remove `agent-core/deployments/scheduler/dependency_integrity_gate.py`
-- [ ] 8.6 Remove `agent-core/deployments/scheduler/__pycache__/` if present
-- [ ] 8.7 Verify agent-core tests still pass
+- [x] 8.1 Remove `agent-core/deployments/scheduler/Dockerfile`
+- [x] 8.2 Remove `agent-core/deployments/scheduler/entrypoint.sh`
+- [x] 8.3 Remove `agent-core/deployments/scheduler/generators/`
+- [x] 8.4 Remove `agent-core/deployments/scheduler/dispatch_manifest_generation.py`
+- [x] 8.5 Remove `agent-core/deployments/scheduler/dependency_integrity_gate.py`
+- [x] 8.6 Remove `agent-core/deployments/scheduler/__pycache__/` if present
+- [x] 8.7 Verify agent-core tests still pass
 
 ## 9. Commit
 
-- [ ] 9.1 Commit tdt-scheduler/ changes (new directory with compose + deployment files)
-- [ ] 9.2 Commit agent-core changes (compose cleanup, script rewrite, file removals)
-- [ ] 9.3 Commit tdt-core README update
-- [ ] 9.4 Commit openspec-store change (proposal, specs, design, tasks)
+- [x] 9.1 Commit tdt-scheduler/ changes (new directory with compose + deployment files)
+- [x] 9.2 Commit agent-core changes (compose cleanup, script rewrite, file removals)
+- [x] 9.3 Commit tdt-core README update
+- [x] 9.4 Commit openspec-store change (proposal, specs, design, tasks)
