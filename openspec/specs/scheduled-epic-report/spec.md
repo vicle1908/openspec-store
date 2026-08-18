@@ -5,6 +5,7 @@
 Enable automated daily Jira epic report generation via the DBOS scheduler. Provides a `scheduled-run` CLI subcommand that reads configuration from `~/.tdt/epic-report-config.toml`, invokes the existing `epic-report generate` pipeline, and propagates the spreadsheet URL for managed output. The manifest generator produces a `daily-epic-report` schedule wired through `agent_core.scheduler_setup`, with backward-compatible configuration that defaults to disabled when no `[schedule]` section exists.
 
 ## Requirements
+
 ### Requirement: Scheduled run CLI subcommand
 
 The system SHALL provide an `epic-report scheduled-run` Typer subcommand that calls `AppConfig.from_env()` to read the `[schedule]` table from `~/.tdt/epic-report-config.toml`. When `schedule.enabled = false` (or the `[schedule]` section is absent), the subcommand SHALL log a `scheduled_run.disabled` message and exit 0 with no Jira API calls and no spreadsheet writes. When `schedule.enabled = true`, the subcommand SHALL invoke the existing `epic-report generate` Typer command internally with `epic_keys=schedule.epics` and `fmt=schedule.format`, propagate the generated spreadsheet URL by setting `EPIC_REPORT_SPREADSHEET_URL=schedule.spreadsheet_url` (resolved as `[schedule].spreadsheet_url` if present, falling back to `[output].spreadsheet_url`) in the subprocess environment, and exit with the same code `generate()` returns.
@@ -57,7 +58,9 @@ The system SHALL provide a `ScheduleConfig` dataclass in `epic_report.config` hy
 
 The system SHALL provide a manifest generator module at `agent-core/deployments/scheduler/generators/jira_epic_report.py`. The module MUST define a `jira_epic_report_manifest()` factory function returning a dict conforming to the `tdt-schedule/v1` schema (matching the structure of `code_daily_scan.py`'s `code_daily_scan_manifest()`), MUST call `register("jira-epic-report", jira_epic_report_manifest)` at module import time so the dispatcher in `generators.GENERATORS` can find it, and MUST be discoverable by adding `"jira_epic_report"` to the `_import_submodules()` list in `generators/__init__.py`.
 
-**Namespace clarification:** The manifest owner name (`jira-epic-report`) and the DBOS schedule name (`daily-epic-report`) are distinct namespaces. The `jira-` prefix in the owner identifies the codebase/repo; the `daily-*` prefix in the schedule name follows the scheduler naming convention (same shape as `daily-daily-scan`). These MUST NOT be conflated — the owner is for manifest routing, the schedule name is for DBOS registration.
+The manifest SHALL use the `register_fn` pattern: `workflow.register_fn = "jira_epic_report.dbos_scheduling:register_all_schedules"` instead of the previous `module:function` wiring through `agent_core.scheduler_setup`. This decouples workflow ownership from agent-core.
+
+**Namespace clarification:** The manifest owner name (`jira-epic-report`) and the DBOS schedule name (`daily-epic-report`) are distinct namespaces. The `jira-` prefix in the owner identifies the codebase/repo; the `daily-*` prefix in the schedule name follows the scheduler naming convention (same shape as `code-daily-scan` `daily-<platform>-scan`). These MUST NOT be conflated — the owner is for manifest routing, the schedule name is for DBOS registration.
 
 #### Scenario: Module registers itself on import
 
@@ -67,7 +70,7 @@ The system SHALL provide a manifest generator module at `agent-core/deployments/
 #### Scenario: Enabled — emits one schedule
 
 - **WHEN** `[schedule].enabled = true` with valid cron and timezone
-- **THEN** the generated manifest contains one `ScheduleSpec` named `daily-epic-report` whose `workflow.module = "agent_core.scheduler_setup"`, `workflow.function = "daily_epic_report"`, `cron` matches `schedule.cron`, `timezone` matches the resolved workspace timezone, and `automatic_backfill = False` (the latter per `scheduler-cron-migration`'s "Scheduled workflows disable automatic backfill (default policy)" requirement)
+- **THEN** the generated manifest contains one `ScheduleSpec` named `daily-epic-report` whose `workflow.register_fn = "jira_epic_report.dbos_scheduling:register_all_schedules"`, `cron` matches `schedule.cron`, `timezone` matches the resolved workspace timezone, and `automatic_backfill = False` (the latter per `scheduler-cron-migration`'s "Scheduled workflows disable automatic backfill (default policy)" requirement)
 
 #### Scenario: Schedule name follows the `daily-*` convention
 
@@ -77,12 +80,12 @@ The system SHALL provide a manifest generator module at `agent-core/deployments/
 #### Scenario: Disabled — emits zero schedules
 
 - **WHEN** `[schedule].enabled = false` or the section is absent
-- **THEN** the factory returns `{"apiVersion": "tdt-schedule/v1", "owner": "jira-epic-report", "version": "1.0.0", "schedules": []}` so the dispatcher's `len(schedules) == 0` skip-write path (see `dispatch_manifest_generation.py:81-86`) silently skips the file write — no stale `daily-epic-report` row remains in DBOS
+- **THEN** the factory returns `{"apiVersion": "tdt-schedule/v1", "owner": "jira-epic-report", "version": "1.0.0", "schedules": []}` so the dispatcher's `len(schedules) == 0` skip-write path silently skips the file write — no stale `daily-epic-report` row remains in DBOS
 
 #### Scenario: Manifest generator — Enabled with missing epics fails loudly
 
-- **WHEN** `[schedule].enabled = true` but `epics` is empty or missing at the **manifest generation** layer
-- **THEN** the factory raises `RuntimeError(...)` BEFORE returning the empty-schedules dict, so the dispatcher's outer `except Exception` (line 153-156) exits non-zero, `entrypoint.sh` aborts the container startup, and the container restart policy surfaces a visible loop instead of silently writing a zero-schedule manifest (this is the generator-layer pre-flight check, distinct from the CLI-layer check in the "Scheduled run CLI subcommand" requirement)
+- **WHEN** `[schedule].enabled = true` but `epics` is empty or missing
+- **THEN** the manifest generator SHALL raise a `ValueError` identifying the missing epics field, and no schedule manifest SHALL be written
 
 ### Requirement: DBOS workflow wiring
 
@@ -167,4 +170,3 @@ The system SHALL NOT introduce new direct `jira.jql(...)` call sites in this cha
 
 - **WHEN** the implementation adds new Jira-querying code paths in `epic_report`
 - **THEN** those paths SHALL delegate to a shared helper (either the existing `jira_daily_reports.client._jql_paginated` via an importable seam, or an internal `epic_report` helper that implements the same cursor protocol) instead of calling `jira.jql(...)` directly
-

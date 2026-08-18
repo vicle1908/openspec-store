@@ -53,7 +53,7 @@
 
 - [x] 7.1 Review `agent-core/deployments/scheduler/Dockerfile` for COPY blocks that can be removed now that agent-core no longer imports sibling repos. Keep bind-mount volumes in compose.yaml (generators still need them).
 - [x] 7.2 Update `agent-core/deployments/scheduler/entrypoint.sh` if any PYTHONPATH adjustments are needed after the cleanup.
-- [ ] 7.3 Build the scheduler Docker image (`docker compose build scheduler`) — confirm it builds successfully.
+- [ ] 7.3 Build the scheduler Docker image (`docker compose build scheduler`) — confirm it builds successfully. **BLOCKED: macOS keychain unlock required in interactive session.**
 
 ## 8. Update stale docstrings across repos
 
@@ -82,7 +82,7 @@
 - [x] 10.4 Commit agent-core changes with descriptive message.
 - [x] 10.5 Commit docstring updates in jira-daily-reports, webhook-receiver, ops-automation-suite.
 - [x] 10.6 Commit openspec-store change (proposal, specs, design, tasks).
-- [ ] 10.7 Validate the change: `openspec validate decouple-scheduler-workflows-from-agent-core --strict --store openspec-store`.
+- [x] 10.7 Validate the change: `openspec validate decouple-scheduler-workflows-from-agent-core --strict --store openspec-store`.
 - [ ] 10.8 Archive the change.
 
 ## Dependency order
