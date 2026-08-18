@@ -33,19 +33,15 @@ The `stale_workflow_cleaner` DBOS scheduled workflow SHALL be registered by `tdt
 
 ### Requirement: Scheduler setup module imports and exports
 
-The system SHALL NOT import `cancel_stale_error_workflows` or `cancel_stale_enqueued_workflows` in `agent-core/scheduler_setup.py`, since the stale workflow cleaner is no longer registered from that module. These functions are imported only by `tdt-core/scheduler/maintenance.py`.
+The system SHALL import the now-public `cancel_stale_error_workflows` and
+`cancel_stale_enqueued_workflows` functions from `tdt_core.scheduler.cli`
+in `agent-core/scheduler_setup.py`. The functions are used by the
+`_stale_workflow_cleaner` scheduled workflow body.
 
 #### Scenario: Imports resolve at module load
 
-- **WHEN** `src/agent_core/scheduler_setup.py` is imported by `tdt-scheduler serve`
-- **THEN** it SHALL NOT contain imports of `cancel_stale_error_workflows` or `cancel_stale_enqueued_workflows` (they are no longer needed since the cleaner moved to tdt-core)
-
-#### Scenario: agent-core scheduler_setup has no stale-cleaner imports
-
-- **WHEN** `src/agent_core/scheduler_setup.py` is read
-- **THEN** it SHALL NOT contain imports of `cancel_stale_error_workflows` or `cancel_stale_enqueued_workflows`
-
-#### Scenario: tdt-core maintenance imports the cleanup functions
-
-- **WHEN** `tdt-core/scheduler/maintenance.py` is loaded
-- **THEN** it SHALL import `cancel_stale_error_workflows` and `cancel_stale_enqueued_workflows` from `tdt_core.scheduler.cli`
+- **WHEN** `agent-core/scheduler_setup.py` is imported by
+  `tdt-scheduler serve`
+- **THEN** both `cancel_stale_error_workflows` and
+  `cancel_stale_enqueued_workflows` SHALL be importable from
+  `tdt_core.scheduler.cli` without an `ImportError`
