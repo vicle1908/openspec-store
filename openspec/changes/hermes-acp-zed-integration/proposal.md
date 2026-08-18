@@ -2,7 +2,7 @@
 
 ## Why
 
-Zed 1.13.2 is installed and configured with multiple ACP External Agents (fable-5, codex-acp, claude-acp, etc.). Hermes Agent v0.20.0 has ACP support installed and verified (`hermes acp --check` passes). Adding Hermes as a Zed External Agent gives the team a local-first, provider-agnostic AI coding agent with persistent memory, skills, and multi-platform gateway — running inside Zed's Agent Panel alongside existing agents.
+Zed 1.15.0 is installed and configured with multiple ACP External Agents (kimi, codex-acp, claude-acp, etc.). Hermes Agent v0.20.3 has ACP support installed and verified (`hermes acp --check` passes). Adding Hermes as a Zed External Agent gives the team a local-first, provider-agnostic AI coding agent with persistent memory, skills, and multi-platform gateway — running inside Zed's Agent Panel alongside existing agents.
 
 ## What Changes
 
@@ -16,6 +16,7 @@ Add to the existing `agent_servers` block:
 
 ```json
 "hermes-agent": {
+  "default_mode": "accept_edits",
   "type": "custom",
   "command": "hermes",
   "args": ["acp"]
@@ -66,6 +67,6 @@ Intentionally excluded: messaging delivery, cronjob management (not relevant for
 
 ## Compatibility
 
-- Zed 1.13.2 supports `type: "custom"` agent servers (confirmed in Zed docs)
-- Hermes v0.20.0 ACP adapter is installed and verified
+- Zed 1.15.0 supports `type: "custom"` agent servers (confirmed in Zed docs)
+- Hermes v0.20.3 ACP adapter is installed and verified
 - No breaking changes to existing Zed agent configuration

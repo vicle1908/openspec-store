@@ -4,7 +4,7 @@ The active Hermes Agent installation should operate as a fully capable local dev
 
 ## What Changes
 
-- Verify the now-current schema v33 configuration, use the supported migration path after future schema drift, and remove any deprecated configuration reported by diagnostics.
+- Verify the now-current schema configuration (reported as v37 on 2026-08-18, drifted from the v33 baseline; migration is gated by explicit approval), use the supported migration path after future schema drift, and remove any deprecated configuration reported by diagnostics.
 - Keep `default` as the single shared profile for CLI, Desktop, authorized Telegram, memory, skills, sessions, cron, credentials, and MCP; enable every installed platform-applicable toolset for CLI and Telegram and persist the Kanban exception.
 - Preserve the existing `mcp-router` server definition byte-for-byte and expose its currently configured complete tool surface; the change SHALL NOT pin, reinstall, reconfigure, filter, reload, or otherwise mutate that MCP server.
 - Permit parallel execution of independent built-in, plugin, and MCP tool calls, including setting the existing `mcp-router` server's parallel-call capability flag without changing its command, arguments, environment, credentials, filters, or protocol feature settings.
@@ -32,7 +32,7 @@ The active Hermes Agent installation should operate as a fully capable local dev
 
 ## Impact
 
-- **Primary target:** the existing `/Users/lekhanhvinh/.hermes/` default profile and its launchd-managed `ai.hermes.gateway` service during an explicitly authorized apply phase.
+- **Primary target:** the existing `/Users/androidteam/.hermes/` default profile and its launchd-managed `ai.hermes.gateway` service during an explicitly authorized apply phase.
 - **Planning repository:** `tdt-meta/openspec/changes/optimize-hermes-agent-configuration/`.
 - **Behavioral impact:** Both authorized Hermes surfaces can invoke destructive local commands, mutate files and repositories, access private network services, install supported optional dependencies, mutate memory and skills, manage cron jobs, and call every enabled MCP operation without Hermes approval prompts.
 - **Expected state changes:** default-profile `config.yaml`, CLI/Telegram tool settings, the single `mcp-router.supports_parallel_tool_calls` flag, restart of the existing launchd gateway, and backup/evidence artifacts. No profile is created and no Telegram-token ownership transfer occurs.

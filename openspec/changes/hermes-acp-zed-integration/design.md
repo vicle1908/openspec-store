@@ -2,7 +2,7 @@
 
 ## Context
 
-Zed 1.13.2 on macOS with existing ACP External Agents (fable-5, codex-acp, claude-acp, gemini, github-copilot-cli, goose, amp-acp, opencode, factory-droid, github-copilot). Hermes Agent v0.20.0 with ACP adapter installed. The team wants Hermes available as an External Agent in Zed's Agent Panel.
+Zed 1.15.0 on macOS with existing ACP External Agents (kimi, codex-acp, claude-acp, gemini, github-copilot-cli, goose, amp-acp, opencode, factory-droid, github-copilot). Hermes Agent v0.20.3 with ACP adapter installed. The team wants Hermes available as an External Agent in Zed's Agent Panel.
 
 ## Approach
 
@@ -14,10 +14,11 @@ The existing `agent_servers` block contains 10 entries (all `"type": "registry"`
 
 ```json
 "agent_servers": {
-  "fable-5": { "type": "registry" },
+  "kimi": { "type": "registry" },
   "codex-acp": { "type": "registry" },
   ...existing entries...
   "hermes-agent": {
+    "default_mode": "accept_edits",
     "type": "custom",
     "command": "hermes",
     "args": ["acp"]
@@ -57,7 +58,7 @@ When Zed spawns `hermes acp`:
 - [x] `hermes acp --check` passes
 - [x] `hermes-acp` launcher exists
 - [x] `agent-client-protocol` v0.9.0 installed in venv
-- [x] Zed 1.13.2 installed
+- [x] Zed 1.15.0 installed
 - [x] `~/.hermes/.env` exists with provider credentials
 
 ### Post-implementation

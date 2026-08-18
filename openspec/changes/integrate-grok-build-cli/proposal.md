@@ -6,8 +6,8 @@ The workspace already has three operational model gateways—`shopapikey`, `giao
 
 ## What Changes
 
-- Install the official stable Grok Build 1.0.0 release from `https://x.ai/cli/install.sh`, after capturing and reviewing the installer plus pre-install user state.
-- Configure four unique Grok catalog aliases backed by existing environment-only credentials: `shopapikey-fable-5`, `giaoduc-advance`, `cockpit-sol`, and `cockpit-luna`.
+- Install the official stable Grok Build CLI from `https://x.ai/cli/install.sh`, after capturing and reviewing the installer plus pre-install user state. (Live state 2026-08-18: `1.0.3` is already installed; the pinned-version plan is reconciled against the live binary rather than running the installer anew.)
+- Reconcile the live five-alias config (adds `cockpit-terra`) against the planned four env-referenced aliases: `shopapikey-fable-5`, `giaoduc-advance`, `cockpit-sol`, and `cockpit-luna`. Remediate the credential form per `tasks.md` §3.5.
 - Verify official configuration conformance, exact request URL construction, authentication behavior, bounded headless inference, workspace instructions and skills, ACP, permissions, and mcp-router integration.
 - Record sanitized evidence, explicit fail-closed gates, a touched-surface inventory, and a tested rollback procedure.
 
@@ -17,7 +17,7 @@ Collected 2026-08-09 before installation:
 
 - `https://docs.x.ai/build/overview` identifies the product as Grok Build, the binary as `grok`, the config as `~/.grok/config.toml`, and the headless form as `grok -p`.
 - `https://github.com/xai-org/grok-build` documents `[model_providers.<id>]`, `[model.<alias>]`, `model_provider`, `env_key`, and `api_backend` values `chat_completions`, `responses`, and `messages`.
-- `https://x.ai/cli/stable` returned `1.0.0`; `grok` was absent from PATH. No installer was executed during exploration or review.
+- `https://x.ai/cli/stable` returned `1.0.0` at exploration time; `grok` was absent from PATH. No installer was executed during exploration or review. (2026-08-18 addendum: stable now resolves to `1.0.3`; grok `1.0.3` is installed and on PATH; `~/.grok/config.toml` is populated with literal keys, pending §3.5 remediation.)
 - Authenticated `/v1/models` probes returned HTTP 200 and exposed the requested IDs: shopapikey `fable-5`, giaoduc `Advance`, cockpit `gpt-5.6-sol` and `gpt-5.6-luna`.
 - Direct `/v1/responses` and `/v1/messages` probes returned HTTP 200. These results establish only pre-install protocol compatibility; they do not prove Grok config parsing, URL joining, request shape, authentication, sentinel output, or clean process exit.
 

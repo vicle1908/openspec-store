@@ -374,3 +374,34 @@ message bodies, user identifiers, or chat identifiers. This closes the
 read-only inventory and shared-profile evidence tasks only; configuration,
 backup, permissions, service restart, provider/network, and reversible-write
 tasks remain independently gated.
+
+## Host reconciliation — 2026-08-18
+
+The dated sections above were recorded 2026-07-30 against a different host
+(`/Users/lekhanhvinh/`, Hermes v0.19.0, schema v33). The live machine is
+`/Users/androidteam/` running Hermes Agent v0.20.3 (2026.8.16.2) with schema
+v37 (`_config_version: 37`, confirmed by `hermes config check`). The prior
+sections remain accurate records of that earlier host and are retained unchanged.
+
+Live deviations observed on this host (read-only, 2026-08-18):
+
+- `terminal.cwd` is `/Users/androidteam/Developer` (exists, not a Git repository).
+- A second launchd unit `com.victory1908.hermes-webui` runs alongside
+  `ai.hermes.gateway` (outside the change's one-gateway model).
+- `browser.backend: 'off'` and `memory.provider: agentmemory` are active;
+  the earlier baseline's "no external memory provider / browser available"
+  statements do not describe this host.
+- The `moa` provider stack (5 custom providers, `model.provider: moa`,
+  4 presets) is present and unmentioned by the plan.
+- A plaintext credential-shaped value remains at
+  `mcp_servers.mcp-router.env.MCPR_TOKEN` pending rotation (task 1.2).
+
+Resulting task corrections applied to `tasks.md` on this date:
+
+- 1.1 host path corrected; kept `[x]` (record exists, host-scoped).
+- 2.1 unchecked and reworded: schema is v37, not v33; its own drift
+  conditional is triggered.
+- 5.3 checked: live config confirms `TELEGRAM_BOT_TOKEN` and
+  `TELEGRAM_ALLOWED_USERS` present with no allow-all flag.
+- 5.4 path corrected and checked: `terminal.backend=local`,
+  `terminal.home_mode=auto`, cwd exists and is not a Git repo.

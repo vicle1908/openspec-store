@@ -8,7 +8,7 @@ Every evidence file SHALL contain the command, native exit status, expected asse
   - Record presence, mode, and SHA-256 where applicable for `~/.grok/`, `~/.grok/config.toml`, `~/.zshrc`, `~/.bashrc`, and `~/.config/fish/config.fish`; record `command -v grok` and only presence/absence of the three credential variables.
   - Pass: no secret value appears; protected config hashes for `~/.tdt/config.yaml` and `~/.hermes/config.yaml` are recorded for later stability checks.
 - [ ] 1.2 Re-fetch `https://x.ai/cli/stable`, `https://x.ai/cli/install.sh`, `https://docs.x.ai/build/overview`, and the relevant `xai-org/grok-build` source at a recorded commit.
-  - Pass: stable still equals `1.0.0`; official fields/commands used by this plan remain present. Otherwise stop and amend the change.
+  - Pass: stable confirmed at `1.0.3` (installed); official fields/commands used by this plan remain present. Otherwise stop and amend the change.
 - [ ] 1.3 Record the current authenticated provider catalogs using metadata-only requests.
   - Pass: `fable-5`, `Advance`, `gpt-5.6-sol`, and `gpt-5.6-luna` are present; missing IDs fail closed before mutation.
 
@@ -17,11 +17,11 @@ Every evidence file SHALL contain the command, native exit status, expected asse
 - [ ] 2.1 Review the downloaded installer and produce a touched-surface manifest.
   - Include binary/download paths, symlinks, completions, `~/.grok/config.toml`, and installer-delimited shell blocks.
   - Pass: no unexpected path, credential collection, or unrelated mutation is present.
-- [ ] 2.2 Install explicit version `1.0.0` with the reviewed official installer.
-  - Use the installer's positional version mechanism and capture native installer status.
-  - Pass: downloaded executable runs; artifact URL, architecture, installed path, and executable SHA-256 are retained. Verify an official checksum/signature if one is published; otherwise record the limitation.
+- [ ] 2.2 Reconcile installed version `1.0.3` against the pinned plan version; record artifact URL, architecture, installed path, and executable SHA-256 for the 1.0.3 binary already present.
+  - Use the official installer's version evidence and capture native installer status.
+  - Pass: installed executable runs; artifact URL, architecture, installed path, and executable SHA-256 are retained. Verify an official checksum/signature if one is published; otherwise record the limitation.
 - [ ] 2.3 Capture installed CLI interfaces from `grok --version`, `grok --help`, and help for every planned subcommand.
-  - Pass: version is exactly `1.0.0`; later commands are used only when confirmed by installed help/source.
+  - Pass: version is exactly `1.0.3`; later commands are used only when confirmed by installed help/source.
 - [ ] 2.4 Compare pre/post user state and shell files.
   - Pass: every change matches the manifest and no protected surface changed.
 
@@ -29,12 +29,16 @@ Every evidence file SHALL contain the command, native exit status, expected asse
 
 - [ ] 3.1 Back up pre-existing Grok state with restrictive permissions.
   - Pass: backup path, mode, and hash are recorded; absence is recorded explicitly.
-- [ ] 3.2 Write only the approved three provider blocks and four unique aliases from `design.md` to `~/.grok/config.toml`.
-  - Pass: TOML parses; no literal key exists; unrelated pre-existing entries are preserved.
+- [ ] 3.2 Reconcile the live five-alias config (adds `cockpit-terra`) against the approved four aliases from `design.md`; decide keep or drop `cockpit-terra` and record the decision.
+  - Pass: TOML parses; credential form matches the §3.5 remediation decision; unrelated pre-existing entries are preserved.
 - [ ] 3.3 Run installed native config inspection and model listing using confirmed commands.
   - Pass: all aliases resolve to the exact upstream IDs; no unknown/invalid-entry warning; no session credential is selected for custom endpoints.
 - [ ] 3.4 Scan configuration, process arguments, logs, and retained output for secret leakage.
   - Pass: zero credential values or secret-shaped matches. Record only variable names and redacted presence.
+- [ ] 3.5 Credential-form remediation decision. Live config holds literal `api_key` values (shopapikey `pmv_…`, giaoduc `pmv_…`, cockpit `agt_…`) and a literal `MCPR_TOKEN`, contradicting the env-only claim. Decide and record one:
+  - (a) migrate each provider to `env_key = "HERMES_CUSTOM_*_API_KEY"` and `MCPR_TOKEN` to `${VAR}` expansion (grok supports `env_key` and `${VAR}`; the vars are SET), then re-run 3.4's secret scan to zero; or
+  - (b) formally accept literal keys and amend proposal/design to drop the "environment-only"/"no literal key" claims.
+  Do not archive until this decision and its evidence are recorded.
 
 ## 4. URL and authentication shape probes
 

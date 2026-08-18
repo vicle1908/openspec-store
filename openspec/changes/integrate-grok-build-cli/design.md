@@ -35,7 +35,7 @@ default = "shopapikey-fable-5"
 [model_providers.shopapikey]
 base_url = "https://api.phanmemvip.shop/v1"
 env_key = "HERMES_CUSTOM_SHOPAPIKEY_API_KEY"
-api_backend = "responses"
+api_backend = "messages"
 context_window = 1000000
 
 [model.shopapikey-fable-5]
@@ -44,7 +44,7 @@ name = "fable-5 (shopapikey)"
 model_provider = "shopapikey"
 
 [model_providers.giaoduc]
-base_url = "https://api.giaoduc.online"
+base_url = "https://api.giaoduc.online/v1"
 env_key = "HERMES_CUSTOM_GIAODUC_API_KEY"
 api_backend = "messages"
 context_window = 1000000
@@ -73,13 +73,15 @@ model_provider = "cockpit"
 
 This is a proposed baseline. Reasoning, tool-streaming, backend-search, and model-specific capability flags remain unset until native Grok evidence proves them.
 
+**2026-08-18 live-state reconciliation note:** the live `~/.grok/config.toml` differs from this baseline in several ways, each resolved by a `tasks.md` decision or edit: installed version `1.0.3` (not `1.0.0`); `default = "cockpit-terra"` (not `shopapikey-fable-5`); a fifth alias `cockpit-terra` → `gpt-5.6-terra`; shopapikey `api_backend = "messages"` (not the originally proposed `responses`); `base_url` includes `/v1` on all three providers; extra `anthropic-version` headers; literal `api_key` values instead of `env_key` (see §3.5); and unplanned `[cli]`/`[models]`/`[marketplace]`/`[ui]` sections including `yolo = true`.
+
 ## URL Construction Gate
 
 The direct probes succeeded at `/v1/responses` and `/v1/messages`, but native Grok URL joining has not been observed. Before provider inference, implementation MUST use official source inspection plus a redacted request observer to establish the exact final URL for each alias. Acceptance rejects missing `/v1`, duplicated `/v1/v1`, malformed trailing slashes, and unexpected paths. Base URLs SHALL be adjusted only from that evidence.
 
 ## Authentication and Secrets
 
-- Credentials remain referenced by environment-variable name; literal values SHALL NOT be written to config, commands, logs, process arguments, or evidence.
+- Credentials are intended to remain referenced by environment-variable name; literal values SHALL NOT be written to config, commands, logs, process arguments, or evidence. Live config currently violates this (literal `api_key` + `MCPR_TOKEN`); grok supports `env_key` and `${VAR}` expansion, so the remediation decision in `tasks.md` §3.5 MUST resolve this before archive.
 - Preflight records only presence/absence for all three variables.
 - The Giaoduc gateway accepted both Bearer and `x-api-key` in direct probes, but Grok's `messages` behavior is unresolved. Native verification records only header name/scheme and redacted presence.
 - If `env_http_headers` is required, it SHALL reference the existing variable name and SHALL be added only after proving that `env_key` is insufficient.
@@ -90,8 +92,8 @@ The direct probes succeeded at `/v1/responses` and `/v1/messages`, but native Gr
 The official installer supports a positional version and installs under `~/.grok/`. The apply phase SHALL:
 
 1. Fetch and retain a reviewed copy of `https://x.ai/cli/install.sh`.
-2. Confirm `https://x.ai/cli/stable` still resolves to `1.0.0` or stop for plan amendment.
-3. Run the reviewed installer with explicit `1.0.0`, not an unpinned moving channel.
+2. Confirm `https://x.ai/cli/stable` still resolves to `1.0.3` or stop for plan amendment.
+3. Reconcile against the already-installed `1.0.3`, not an unpinned moving channel.
 4. Record artifact URL, platform/architecture, installed binary path, executable hash, and `grok --version`.
 5. If xAI publishes a checksum/signature, verify it. If none is published, record that limitation and rely on TLS, installer review, explicit version, and post-download executable/hash evidence; do not fabricate a checksum.
 
@@ -146,9 +148,11 @@ Rollback SHALL be rehearsed first in an isolated temporary HOME. Real-user rollb
 
 ## Open Questions
 
-- Exact stable-1.0.0 URL-joining behavior for each backend.
+- Exact stable-1.0.3 URL-joining behavior for each backend.
 - Exact Giaoduc authentication emitted by the Grok `messages` backend.
-- Whether all planned MCP/ACP/worktree controls exist in stable 1.0.0 under the assumed names.
+- Whether all planned MCP/ACP/worktree controls exist in stable 1.0.3 under the assumed names.
+- Credential-form remediation decision (§3.5): env_key/`${VAR}` migration vs. accepted literal keys.
+- Fate of the live fifth alias `cockpit-terra` and the `[ui] yolo=true` section.
 - Whether xAI publishes a checksum/signature for the pinned artifact.
 
 These remain gates, not completion claims.

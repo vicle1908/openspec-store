@@ -1,6 +1,6 @@
 ## Context
 
-See `proposal.md` for motivation. The target is the up-to-date Hermes Agent v0.19.0 installation on macOS, a launchd-managed Telegram gateway, local terminal execution, a current v33 configuration, and one MCP router currently exposing all tools through an unpinned package reference. CLI and Telegram already expose most core capabilities. The final design intentionally expands this to every installed and platform-applicable capability and removes Hermes approval gates for the authorized user.
+See `proposal.md` for motivation. The target is the installed Hermes Agent v0.20.3 (2026.8.16.2) on macOS, a launchd-managed Telegram gateway, local terminal execution, a current v37 configuration, and one MCP router currently exposing all tools through an unpinned package reference. (2026-08-18 host reconciliation: this change was authored against a v0.19.0/schema-v33 baseline on `/Users/lekhanhvinh/`; the live machine is v0.20.3/schema-v37 on `/Users/androidteam/`. Scattered inline references to v0.19.0 remain from the original baseline and are superseded by this note where they describe version-specific behavior.) CLI and Telegram already expose most core capabilities. The final design intentionally expands this to every installed and platform-applicable capability and removes Hermes approval gates for the authorized user.
 
 Full access is a capability decision, not a public-access decision. Telegram remains restricted to the configured allowed user(s). Secrets stay in Hermes credential stores and remain redacted. Repository instructions, service permissions, platform authorization, and action-specific approvals remain authority even though Hermes' own shell approval prompt is disabled.
 
@@ -119,7 +119,7 @@ No gateway cutover occurs. After backup and read-only validation, configuration 
 
 Gateway long-turn/recovery settings remain explicit at bounded v0.19.0 values: `agent.gateway_timeout=1800`, `agent.gateway_timeout_warning=900`, `agent.gateway_notify_interval=180`, `agent.gateway_auto_continue_freshness=3600`, `agent.gateway_startup_restore_drain_timeout=30`, `agent.build_wait_timeout=600`, `agent.restart_drain_timeout=0`, and `gateway.delivery_ledger=true`. Active work receives periodic feedback; stale interruptions do not revive unrelated old tasks; startup restore cannot block every inbound channel indefinitely; restart interrupts rather than entering an unbounded drain; and a finalized response not acknowledged before a crash is retried at least once with duplicate ambiguity visible. Activation verifies these semantics through supported state/status surfaces and authorized round-trips, never by editing the ledger database or corrupting live state.
 
-The deterministic gateway starting directory is `/Users/lekhanhvinh/Developer`: it exists, is not itself a Git repository, and avoids running Git from the `/Users/lekhanhvinh/Developer/tdt` multi-repository aggregator. Each task MUST enter a verified target repository before running Git.
+The deterministic gateway starting directory is `/Users/androidteam/Developer`: it exists and is not itself a Git repository. Each task MUST enter a verified target repository before running Git.
 
 ### 11. Exact common configuration target
 
@@ -181,7 +181,7 @@ updates.pre_update_backup=quick
 updates.backup_keep=5
 terminal.backend=local
 terminal.home_mode=auto
-terminal.cwd=/Users/lekhanhvinh/Developer
+terminal.cwd=/Users/androidteam/Developer
 ```
 
 The common unset set is `approvals.deny`, `command_allowlist`, `agent.disabled_toolsets`, and the deprecated `delegation.max_async_children`. No MCP Router setup field is changed except `supports_parallel_tool_calls=true`; existing absence or presence of tool/resource/prompt filters, sampling, elicitation, timeouts, transport, and credentials is preserved exactly. The concrete configurable platform target is: `web browser terminal file code_execution vision video image_gen video_gen x_search tts skills todo memory context_engine session_search clarify delegation cronjob homeassistant spotify yuanbao computer_use`, plus installed plugin toolset names. After enabling it, apply inserts and preserves `kanban` as the one supported non-configurable exception. STT follows its separate provider-specific setup and MUST NOT be represented as a model toolset.
@@ -214,7 +214,7 @@ The apply workflow is not one blanket authorization. It pauses separately before
 1. Capture a redacted baseline of version, schema, profiles, gateway, tools, MCP, approvals, private URL settings, memory/skill gates, permissions, storage, and warning counts.
 2. Complete separately authorized rotation of any credential found outside the supported secret store.
 3. Create and verify both the pre-activation quick snapshot and full off-root backup described above; record exact restore commands before mutation.
-4. Verify v33 with the supported configuration checks, run migration only if the installed runtime later reports schema drift, and correct the invalid timezone and unsupported `service_tier: auto` value.
+4. Verify the installed schema (v37) with the supported configuration checks, run migration only if the installed runtime later reports further schema drift, and correct the invalid timezone and unsupported `service_tier: auto` value.
 5. Configure the default profile's full-access settings and explicitly enable every concrete platform-applicable CLI toolset and MCP operation; validate special GUI/dispatcher/context-engine surfaces only where supported.
 6. Enable the same full-access tool policy for CLI and Telegram in `default`, preserving shared memory, skills, credentials, cron, MCP, and source/chat-separated sessions.
 7. Discover unavailable capabilities and record their exact missing credential/binary/platform prerequisite. Stop before unapproved package installation or external credential provisioning.

@@ -54,7 +54,7 @@ The default profile SHALL use an explicitly verified working directory that is v
 
 #### Scenario: Agent starts from its declared directory
 - **WHEN** CLI or the gateway reports its terminal working directory
-- **THEN** it matches `/Users/lekhanhvinh/Developer`, and each coding task enters a verified target repository before Git operations
+- **THEN** it matches `/Users/androidteam/Developer`, and each coding task enters a verified target repository before Git operations
 
 #### Scenario: Declared directory is invalid
 - **WHEN** the configured directory is missing or violates repository policy

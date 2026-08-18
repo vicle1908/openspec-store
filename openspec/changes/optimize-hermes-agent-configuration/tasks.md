@@ -1,6 +1,6 @@
 ## 1. Baseline and prerequisites
 
-- [x] 1.1 Record a redacted baseline for `/Users/lekhanhvinh/.hermes`: Hermes version/schema, profiles, gateway/launchd status, CLI and Telegram tool inventories, MCP status, approval settings, private URL/browser settings, memory/skill gates, file modes, state size, and relevant warning counts; do not read or print credential-file contents.
+- [x] 1.1 Record a redacted baseline for `/Users/androidteam/.hermes`: Hermes version/schema, profiles, gateway/launchd status, CLI and Telegram tool inventories, MCP status, approval settings, private URL/browser settings, memory/skill gates, file modes, state size, and relevant warning counts; do not read or print credential-file contents.
 - [ ] 1.2 Complete the separately authorized rotation of any credential-like value found in non-secret settings, route the replacement through supported Hermes secret configuration, and verify only redacted presence and restrictive permissions.
 - [x] 1.3 Record the approved operating policy: CLI/Desktop and authorized Telegram receive full technical capability and all enabled MCP operations; Telegram user authorization, secret redaction, immutable Hermes blocks, service scopes, repository rules, and action-specific authority remain in force.
 - [ ] 1.4 With explicit local backup-generation approval, run `hermes backup --quick --label pre-full-access-activation`; verify its manifest contains expected critical files and has empty `failed_dbs` and `oversized_skipped`, and run SQLite integrity checks without reading secrets.
@@ -9,7 +9,7 @@
 
 ## 2. Schema and common full-access configuration
 
-- [x] 2.1 Confirm the default profile remains on schema v33 with `hermes config check`; if the installed runtime reports future schema drift, stop for explicit configuration-migration approval before running `hermes config migrate`, then inspect only the redacted result.
+- [ ] 2.1 Confirm the default profile's installed schema (reported as v37 on 2026-08-18, drifted from the v33 baseline) with `hermes config check`; schema drift has been reported by the installed runtime, so stop for explicit configuration-migration approval before running `hermes config migrate`, then inspect only the redacted result.
 - [x] 2.2 Verify `delegation.max_async_children` is removed and `delegation.max_concurrent_children` is the single effective concurrency setting.
 - [ ] 2.3 After explicit configuration-mutation approval, run `hermes config set timezone Asia/Ho_Chi_Minh` and `hermes config set agent.service_tier fast`; verify the invalid-zone and unsupported-tier warnings cease after activation.
 - [ ] 2.4 Set `approvals.mode=off`, `approvals.cron_mode=approve`, `approvals.mcp_reload_confirm=false`, `approvals.destructive_slash_confirm=false`, and `delegation.subagent_auto_approve=true`. Run `hermes config unset approvals.deny`, `hermes config unset command_allowlist`, and `hermes config unset agent.disabled_toolsets`; do not use `config set ... '[]'`, which would store a string for these list-valued keys.
@@ -51,8 +51,8 @@
 
 - [x] 5.1 Verify from official architecture, installed source, live profile inventory, gateway status, and session statistics that local CLI/Desktop do not require a gateway, `default` can serve CLI and Telegram concurrently, and source/chat-specific session records remain distinguishable in the shared database.
 - [x] 5.2 Verify `default` remains the sole active profile and `gateway.multiplex_profiles` remains unset/false; do not create, clone, activate, or install a gateway for a named Telegram profile.
-- [ ] 5.3 Preserve explicit Telegram allowed-user authorization and the existing bot-token reference; do not enable global/platform allow-all users or copy credentials to another profile.
-- [ ] 5.4 Set `terminal.backend=local`, `terminal.home_mode=auto`, and `terminal.cwd=/Users/lekhanhvinh/Developer`; verify the directory exists and is not a Git repository. Each coding task must enter a verified target repository before Git; the cwd is not a filesystem sandbox.
+- [x] 5.3 Preserve explicit Telegram allowed-user authorization and the existing bot-token reference; do not enable global/platform allow-all users or copy credentials to another profile.
+- [x] 5.4 Set `terminal.backend=local`, `terminal.home_mode=auto`, and `terminal.cwd=/Users/androidteam/Developer`; verify the directory exists and is not a Git repository. Each coding task must enter a verified target repository before Git; the cwd is not a filesystem sandbox.
 - [x] 5.5 Record intentional sharing of default-profile config, credentials, SOUL, memory, skills, cron, MCP, logs, backups, and `state.db`, plus source/chat separation of active sessions and the accepted shared-state blast radius.
 - [x] 5.6 Record the future split trigger: use a separate reviewed profile/gateway change only if identity, model/provider, credentials, tools, memory, skills, cron, users, or bot tokens must diverge.
 
