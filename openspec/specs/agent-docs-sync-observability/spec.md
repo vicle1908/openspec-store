@@ -29,11 +29,11 @@ The doc-sync agent SHALL register `langfuse_hooks` from `agent_core.agent_base.h
 - **THEN** a Langfuse trace is created with `success=0.0`
 
 ### Requirement: Cost tracking per run
-The doc-sync agent SHALL register `cost_tracker` from `agent_core.agent_base.hooks.builtins` with appropriate token rates. Each agent run SHALL record `prompt_tokens`, `completion_tokens`, `total_tokens`, and `cost_usd` in the CostTrackerState.
+The doc-sync agent SHALL use the `tdt-budget-enforcement` hook from `agent_core._ai.hooks` to record token usage. Each agent run SHALL emit a structured log entry with `input_tokens` (mapped from pydantic-ai's `RunUsage.input_tokens`), `output_tokens` (mapped from `RunUsage.output_tokens`), and estimated cost computed from token counts and provider-specific rates.
 
 #### Scenario: Cost recorded after generation
 - **WHEN** a doc generation agent completes
-- **THEN** the CostTrackerState contains the total cost in USD for that run
+- **THEN** the hook SHALL emit a `budget_usage_estimated` structured log entry containing `prompt_tokens` and `completion_tokens` (mapped from pydantic-ai's `input_tokens` and `output_tokens`) with non-zero values when LLM calls were made
 
 ### Requirement: Doc generation cost scorer
 A `DocGenerationCostScorer` SHALL be implemented using `agent_core.observability.scorers`. It SHALL score runs based on cost-per-document-generated ratio. Scoring: cost_per_doc < $0.01 → 1.0, < $0.05 → 0.8, < $0.20 → 0.5, >= $0.20 → 0.2.

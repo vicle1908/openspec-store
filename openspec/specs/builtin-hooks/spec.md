@@ -30,9 +30,9 @@ The system MUST ship reusable hook implementations that cover the four most comm
 - **WHEN** the `cost_tracker` hook pack is registered and LLM completions return usage data
 - **THEN** the hook accumulates input/output tokens and estimated cost, accessible via `cost_tracker.total_cost_usd`
 
-#### Scenario: Cost tracker reads canonical usage fields
+#### Scenario: Cost tracker reads pydantic-ai usage fields
 - **WHEN** usage data is available from the model response
-- **THEN** the hook computes totals from `prompt_tokens`, `completion_tokens`, `total_tokens`, and `cost_usd` without custom field-name mapping
+- **THEN** the hook reads `input_tokens` and `output_tokens` from pydantic-ai's `RunUsage`, maps them to `prompt_tokens` and `completion_tokens` in the structured log output, and computes estimated cost
 
 ### Requirement: Hook packs are composable and independently registerable
 The system MUST allow hook packs to be registered individually or combined without conflicts.
