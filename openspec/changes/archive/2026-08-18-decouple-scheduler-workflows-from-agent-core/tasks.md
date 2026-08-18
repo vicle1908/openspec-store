@@ -83,7 +83,7 @@
 - [x] 10.5 Commit docstring updates in jira-daily-reports, webhook-receiver, ops-automation-suite.
 - [x] 10.6 Commit openspec-store change (proposal, specs, design, tasks).
 - [x] 10.7 Validate the change: `openspec validate decouple-scheduler-workflows-from-agent-core --strict --store openspec-store`.
-- [ ] 10.8 Archive the change.
+- [x] 10.8 Archive the change.
 
 ## Dependency order
 
