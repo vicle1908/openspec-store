@@ -12,7 +12,7 @@ The `decouple-scheduler-workflows-from-agent-core` change decoupled the schedule
 - **Remove scheduler from `agent-core/compose.yaml`** — agent-core keeps: app, postgres, langfuse-*, minio, mlflow, otel-collector
 - **BREAKING**: `docker compose build scheduler` must now run from `tdt-scheduler/` instead of `agent-core/`
 - **BREAKING**: `docker compose up -d scheduler` must now run from `tdt-scheduler/` (or `-f tdt-scheduler/compose.yaml`)
-- **Update references**: tdt-core README, agent-core scripts, verify_scheduler_compose_up.sh
+- **Update references**: tdt-core README, verify_scheduler_compose_up.sh (substantial rewrite), generators/__init__.py docstring
 
 ## Capabilities
 
@@ -53,5 +53,5 @@ None — this is a deployment restructuring, not a behavior change.
 - **Code repos touched**: agent-core (compose cleanup, script updates), tdt-core (README update)
 - **New directory**: `~/Developer/tdt-scheduler/` (standalone, not a git repo — deployment files only)
 - **Docker network**: scheduler and agent-core postgres must share a network (via `external: true` or `docker network connect`)
-- **Scripts affected**: `agent-core/scripts/verify_scheduler_compose_up.sh`, `agent-core/scripts/docker-dev.sh` (if scheduler is referenced)
+- **Scripts affected**: `agent-core/scripts/verify_scheduler_compose_up.sh` (substantial rewrite needed — `docker compose down -v` must be scoped to scheduler only, not agent-core stack)
 - **Risk**: LOW — deployment restructuring only; no runtime behavior changes. Rollback: move files back and restore compose.yaml

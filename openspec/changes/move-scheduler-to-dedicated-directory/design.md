@@ -59,13 +59,19 @@ networks:
 
 **Alternative considered:** Keep in agent-core → rejected because the backup is scheduler-specific (backs up `tdt_scheduler_dbos_sys`, not `agent_core`).
 
-### D4: agent-core scripts updated, not removed
+### D4: verify_scheduler_compose_up.sh rewritten, not just path-updated
 
-**Decision:** Update `agent-core/scripts/verify_scheduler_compose_up.sh` and `agent-core/scripts/docker-dev.sh` to reference the new `tdt-scheduler/` location.
+**Decision:** Rewrite `agent-core/scripts/verify_scheduler_compose_up.sh` to work with the new `tdt-scheduler/compose.yaml`. The current script does `docker compose down -v` which would tear down ALL agent-core services including postgres data. The rewrite must:
+- Scope `down -v` to only the scheduler's compose project
+- Add a postgres-running precondition check
+- Use `-f tdt-scheduler/compose.yaml` or `cd tdt-scheduler` for scheduler commands
+- Restructure the verification flow
 
-**Rationale:** These scripts are in agent-core's git repo. They need to know where the scheduler compose lives. The verify script is especially important for post-deploy validation.
+**Rationale:** The script is in agent-core's git repo and is critical for post-deploy validation. A simple path update is insufficient — the `down -v` semantics change fundamentally when postgres is in a different compose project.
 
-**Alternative considered:** Move scripts to tdt-scheduler/ → rejected because they're part of agent-core's development workflow.
+**Alternative considered:** Move script to tdt-scheduler/ → rejected because it's part of agent-core's development workflow.
+
+**Note:** `agent-core/scripts/docker-dev.sh` does NOT reference the scheduler and needs no changes.
 
 ### D5: Container naming with explicit service names
 
@@ -101,14 +107,14 @@ services:
 ## Migration Plan
 
 1. Create `tdt-scheduler/` directory with Dockerfile, entrypoint.sh, generators/, dispatch_manifest_generation.py, dependency_integrity_gate.py
-2. Create `tdt-scheduler/compose.yaml` with scheduler + postgres-backup services, shared postgres network (external: true)
-3. Create `tdt-scheduler/.env.docker` with scheduler-specific env overrides
-4. Remove scheduler and postgres-backup from `agent-core/compose.yaml`
-5. Update `agent-core/scripts/verify_scheduler_compose_up.sh` to use `-f tdt-scheduler/compose.yaml`
-6. Update `agent-core/scripts/docker-dev.sh` if it references scheduler
+2. Ensure Docker network exists: `docker network inspect agent-core-local_default` — if not, start agent-core postgres first (`cd agent-core && docker compose up -d postgres`)
+3. Create `tdt-scheduler/compose.yaml` with scheduler + postgres-backup services, shared postgres network (external: true)
+4. Create `tdt-scheduler/.env.docker` with scheduler-specific env overrides
+5. Remove scheduler and postgres-backup from `agent-core/compose.yaml`
+6. Rewrite `agent-core/scripts/verify_scheduler_compose_up.sh` for new location (scope down -v, add postgres precondition)
 7. Update `tdt-core/src/tdt_core/scheduler/README.md` reference to compose location
-8. Verify agent-core compose still works: `cd agent-core && docker compose config`
-9. Ensure agent-core postgres is running: `cd agent-core && docker compose up -d postgres`
+8. Update `generators/__init__.py` docstring reference from `agent-core/compose.yaml` to `tdt-scheduler/compose.yaml`
+9. Verify agent-core compose still works: `cd agent-core && docker compose config`
 10. Build and verify: `cd tdt-scheduler && docker compose build scheduler && TDT_HOME=~/.tdt docker compose up -d scheduler`
 11. Verify health: `curl http://127.0.0.1:9100/scheduler/health`
 12. Verify schedules: `curl http://127.0.0.1:9100/scheduler/schedules`
