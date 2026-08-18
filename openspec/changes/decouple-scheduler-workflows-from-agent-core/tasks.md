@@ -76,12 +76,12 @@
 
 ## 10. Commit and archive
 
-- [ ] 10.1 Commit code-daily-scan changes with descriptive message.
-- [ ] 10.2 Commit jira-epic-report changes with descriptive message.
-- [ ] 10.3 Commit tdt-core changes with descriptive message.
-- [ ] 10.4 Commit agent-core changes with descriptive message.
-- [ ] 10.5 Commit docstring updates in jira-daily-reports, webhook-receiver, ops-automation-suite.
-- [ ] 10.6 Commit openspec-store change (proposal, specs, design, tasks).
+- [x] 10.1 Commit code-daily-scan changes with descriptive message.
+- [x] 10.2 Commit jira-epic-report changes with descriptive message.
+- [x] 10.3 Commit tdt-core changes with descriptive message.
+- [x] 10.4 Commit agent-core changes with descriptive message.
+- [x] 10.5 Commit docstring updates in jira-daily-reports, webhook-receiver, ops-automation-suite.
+- [x] 10.6 Commit openspec-store change (proposal, specs, design, tasks).
 - [ ] 10.7 Validate the change: `openspec validate decouple-scheduler-workflows-from-agent-core --strict --store openspec-store`.
 - [ ] 10.8 Archive the change.
 
