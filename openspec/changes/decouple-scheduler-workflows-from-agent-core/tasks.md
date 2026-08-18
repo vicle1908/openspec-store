@@ -1,6 +1,6 @@
 ## 1. tdt-core: Move stale_workflow_cleaner + Clean up scheduler CLI
 
-- [ ] 1.1 Create `tdt-core/src/tdt_core/scheduler/maintenance.py` with `stale_workflow_cleaner` registered via `@_ENGINE.scheduled_workflow(cron="*/30 * * * *", cron_timezone="UTC", name="stale_workflow_cleaner")`, importing `cancel_stale_error_workflows` and `cancel_stale_enqueued_workflows` from `tdt_core.scheduler.cli`.
+- [x] 1.1 Create `tdt-core/src/tdt_core/scheduler/maintenance.py` with `stale_workflow_cleaner` registered via `@_ENGINE.scheduled_workflow(cron="*/30 * * * *", cron_timezone="UTC", name="stale_workflow_cleaner")`, importing `cancel_stale_error_workflows` and `cancel_stale_enqueued_workflows` from `tdt_core.scheduler.cli`.
 - [ ] 1.2 Ensure `maintenance.py` is imported during scheduler bootstrap (add to `tdt_core/scheduler/__init__.py` or the `serve()` entrypoint's import chain).
 - [ ] 1.3 Update `tdt-core/scheduler/cli.py`: remove 3 hardcoded `"agent_core.scheduler_setup"` string literals (lines ~731, ~792, ~798) and 3 `sys.path.insert` blocks (lines ~763, ~770, ~785). The `serve` command should rely on the YAML manifest system for workflow discovery instead of dynamically importing a hardcoded module.
 - [ ] 1.4 Update `tdt-core/scheduler/cli.py` docstrings that reference `agent_core.scheduler_setup`.
