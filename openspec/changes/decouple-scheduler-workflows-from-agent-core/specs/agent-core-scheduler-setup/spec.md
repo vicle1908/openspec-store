@@ -12,7 +12,7 @@ The `stale_workflow_cleaner` DBOS scheduled workflow SHALL be registered by `tdt
 #### Scenario: Cleaner body calls both public cleanup functions
 
 - **WHEN** the `stale_workflow_cleaner` workflow is invoked by DBOS
-- **THEN** it SHALL call `cancel_stale_error_workflows(engine, current_version=<current>)` AND `cancel_stale_enqueued_workflows(engine, current_version=<current>)` exactly once each, passing the engine instance and current application version
+- **THEN** it SHALL call `cancel_stale_error_workflows(engine, current_version=<current>)` and `cancel_stale_enqueued_workflows(engine)` exactly once each, passing the engine instance. The error-workflow cleanup receives the current application version explicitly; the enqueued-workflow cleanup resolves it internally.
 
 #### Scenario: Cleaner logs results at INFO level
 

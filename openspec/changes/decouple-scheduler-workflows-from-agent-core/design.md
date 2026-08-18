@@ -52,11 +52,11 @@ A comprehensive audit (GitNexus + cross-repo grep + code reading) revealed addit
 
 **Rationale:** The generators live in agent-core/deployments/scheduler because they produce manifests during Docker entrypoint. Moving them would complicate the build; updating their output is simpler.
 
-### D5: Dockerfile simplifies but retains workspace-context safety net
+### D5: Dockerfile COPY scope retained, PYTHONPATH retained
 
-**Decision:** The Dockerfile can reduce COPY scope, but the compose.yaml volumes still bind-mount sibling repos for runtime. The `sys.path` insertions in scheduler_setup.py are removed, but the Docker PYTHONPATH for generators is retained as defense-in-depth.
+**Decision:** The Dockerfile COPY blocks for sibling repos are retained unchanged. The compose.yaml volumes still bind-mount sibling repos for runtime. The `sys.path` insertions in scheduler_setup.py are removed, but the Docker PYTHONPATH for generators is retained as defense-in-depth.
 
-**Rationale:** The generators still import sibling-repo modules at call time; removing the bind mounts would break them. The simplification is in agent-core's own code, not the Docker orchestration.
+**Rationale:** The generators still import sibling-repo modules at call time, and `uv pip install -e` needs the source trees. The simplification is in agent-core's own code (scheduler_setup.py reduced to ~40 lines), not in the Docker orchestration.
 
 ## Risks / Trade-offs
 

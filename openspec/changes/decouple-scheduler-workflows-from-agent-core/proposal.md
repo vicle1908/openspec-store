@@ -13,7 +13,7 @@ agent-core/scheduler_setup.py owns workflow functions that belong to code-daily-
 - **Update YAML manifests** for code-daily-scan and jira-epic-report to use `register_fn:`.
 - **Update manifest generators** (`generators/code_daily_scan.py`, `generators/jira_epic_report.py`) to produce `register_fn` YAML.
 - **Remove `scripts/generate_schedule_manifest.py`** — the `@_ENGINE` decorator parser is obsolete.
-- **Simplify Dockerfile** — reduce COPY scope for sibling repos no longer imported by agent-core.
+- **Dockerfile unchanged** — COPY scope retained because generators and `uv pip install -e` still need sibling repo source trees. The `sys.path.insert` removal in scheduler_setup.py reduces Python-level coupling; the Docker-level COPY is defense-in-depth.
 - **Update stale docstrings/comments** in jira-daily-reports, webhook-receiver, code-daily-scan, and ops-automation-suite.
 
 **BREAKING**: `agent-core/scheduler_setup.py` public API changes significantly (6 functions + stale_workflow_cleaner removed). `tdt-core/scheduler/cli.py` hardcoded default module changes. GitNexus confirms 0 upstream callers for moved functions.
