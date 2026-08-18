@@ -22,22 +22,32 @@ The test `tests/test_docker_local_dev.py::test_dockerfile_matches_compose_versio
 - **AND** the failure message identifies the missing dependency
 
 ### Requirement: agent-core provides a pinned local Docker development stack
-The system MUST provide a Docker Compose stack for local development that launches agent-core alongside Postgres with pinned image versions.
+
+The system SHALL provide a Docker Compose stack for local development that launches agent-core alongside Postgres with pinned image versions. The scheduler service SHALL NOT be part of agent-core's compose stack — it has its own `tdt-scheduler/compose.yaml`.
 
 #### Scenario: Compose uses pinned current images
+
 - **WHEN** the local Docker stack is inspected
 - **THEN** the app image MUST build from `python:3.14.5-slim-trixie`
 - **AND** the database service MUST use `postgres:18.6-trixie`
-- **AND** the Compose file MUST not use a floating `latest` tag for either service
 
 #### Scenario: Compose starts the app and database for local dev
-- **WHEN** a developer runs the local Docker startup command
-- **THEN** Postgres starts with a persistent volume
-- **AND** the Postgres 18 persistent volume is mounted at `/var/lib/postgresql`
-- **AND** the app container mounts the workspace source tree
-- **AND** the app container has the DBOS and memory DSNs needed for local durable execution
-- **AND** the app container runs local commands as a non-root user
-- **AND** the app image declares a lightweight healthcheck
+
+- **WHEN** `docker compose up -d` is run from `agent-core/`
+- **THEN** the `app` and `postgres` services SHALL start
+- **AND** the `scheduler` service SHALL NOT be started (it lives in `tdt-scheduler/`)
+
+#### Scenario: agent-core compose does not include scheduler
+
+- **WHEN** `docker compose -f agent-core/compose.yaml config --services` runs
+- **THEN** the output SHALL NOT list `scheduler`
+- **AND** the scheduler SHALL be managed separately via `tdt-scheduler/compose.yaml`
+
+#### Scenario: Postgres is shared between stacks
+
+- **WHEN** both `agent-core/compose.yaml` and `tdt-scheduler/compose.yaml` are running
+- **THEN** both SHALL connect to the same ecosystem PostgreSQL server
+- **AND** the scheduler SHALL use its own logical database (`tdt_scheduler`) distinct from agent-core's (`agent_core`)
 
 ### Requirement: agent-core documents the local Docker workflow
 The system MUST document how to start, stop, and test the local Docker stack.

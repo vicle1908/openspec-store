@@ -5,16 +5,12 @@ Defines the scheduler container entrypoint: atomic manifest generation, hot-relo
 ## Requirements
 ### Requirement: The scheduler container emits all manifests at startup
 
-The Docker `scheduler` service's `entrypoint.sh` MUST invoke a manifest generator for each `(repo, output_path)` pair before executing `tdt-scheduler serve`. The list of `(repo, output_path)` pairs MUST include at minimum:
-
-- `("jira-daily-reports", "/home/agent/.tdt/schedules/jira-daily-reports.yaml")`
-- `("code-daily-scan", "/home/agent/.tdt/schedules/code-daily-scan.yaml")`
-- `("tdt-observability", "/home/agent/.tdt/schedules/tdt-observability.yaml")`
+The Docker `scheduler` service's `entrypoint.sh` MUST invoke a manifest generator for each `(repo, output_path)` pair before executing `tdt-scheduler serve`. The entrypoint SHALL live at `tdt-scheduler/entrypoint.sh` (moved from `agent-core/deployments/scheduler/entrypoint.sh`).
 
 #### Scenario: All three manifests written on container start
 
-- **WHEN** the scheduler container is started via `docker compose up -d scheduler`
-- **THEN** `entrypoint.sh` exits 0 only AFTER all three manifest files exist and parse via `tdt_core.scheduler.schedule_manifest.ScheduleManifest.model_validate`
+- **WHEN** the scheduler container is started via `docker compose up -d` from `tdt-scheduler/`
+- **THEN** `entrypoint.sh` exits 0 only AFTER all manifest files exist and parse via `tdt_core.scheduler.schedule_manifest.ScheduleManifest.model_validate`
 - **AND** the container's `tdt-scheduler serve` process starts with the manifests already on disk
 
 ### Requirement: Manifest writes are atomic
@@ -39,55 +35,26 @@ After all manifests are written successfully, the entrypoint MUST touch `/home/a
 
 ### Requirement: Generator failures fail the entrypoint fast
 
-If any generator function raises an exception, the entrypoint MUST exit with a non-zero status, log the failure to `/home/agent/.tdt/logs/scheduler-entrypoint.log`, and **NOT** proceed to `tdt-scheduler serve`. The container's `restart: unless-stopped` policy MAY restart the container; each restart MUST re-attempt the same generators.
-
-The entrypoint MUST also make PID 1's stdout and stderr reachable through
-the Docker log driver (json-file by default) so that `docker logs`,
-`docker compose logs`, and any container-level log rotation or shipping
-pipeline can observe what the scheduler is emitting. The mechanism MUST
-write to both the host bind-mounted log file and the container stdout
-without introducing a single point of failure — the file write MUST NOT
-silently consume output that the container stdout would otherwise show.
+If any manifest generator exits non-zero, the entrypoint SHALL exit non-zero immediately. The Docker `restart: unless-stopped` policy restarts the container, re-running the full generation sequence.
 
 #### Scenario: Generator raises, container exits
 
-- **WHEN** `code_daily_scan_manifest()` raises (e.g., host config missing)
+- **WHEN** a manifest generator raises (e.g., host config missing)
 - **THEN** the entrypoint exits with code != 0
 - **AND** the scheduler service is reported as `unhealthy` by `docker compose ps`
 - **AND** the entrypoint log contains the exception traceback
 
 #### Scenario: Scheduler stdout is reachable via docker logs
 
-- **WHEN** the scheduler process emits any line to stdout or stderr (DBOS
-  startup banners, structlog events, dependency-integrity gate output, etc.)
-- **THEN** `docker logs agent-core-local-scheduler-1 --since <since>` SHALL
-  contain that line within milliseconds
-- **AND** the host bind-mounted file `$TDT_HOME/logs/scheduler-entrypoint.log`
-  SHALL contain the same line (preserving the cross-restart persistence
-  contract).
-
-The dual-sink pattern is `exec > >(stdbuf -oL tee -a "${LOG_FILE}") 2>&1`
-in the entrypoint script. `stdbuf -oL` forces line-buffering on tee so that
-every single-line output (structlog events, subprocess stdout/stderr, etc.)
-is flushed to both the terminal (which becomes the Docker json-file driver)
-and the file immediately — without it, tee's default 8 KB block buffer would
-delay all non-flush output until ~40 structlog lines accumulate.
+- **WHEN** the scheduler process emits any line to stdout or stderr
+- **THEN** `docker logs <scheduler-container> --since <since>` SHALL contain that line within milliseconds
+- **AND** the host bind-mounted file `$TDT_HOME/logs/scheduler-entrypoint.log` SHALL contain the same line
 
 #### Scenario: Scheduler log is rotated at startup if over 50 MB
 
-- **WHEN** the container starts and `~/.tdt/logs/scheduler-entrypoint.log`
-  exists with a size greater than 52,428,800 bytes (50 MB)
-- **THEN** the entrypoint SHALL rename the existing file to
-  `scheduler-entrypoint.log.1` before starting tee
-- **AND** tee SHALL start with a fresh (empty or zero-sized) file at the
-  original path
-- **AND** the entrypoint SHALL print a "Rotated" notice to stdout (which
-  reaches both docker logs and the new file).
-
-This matches the 50 MB cap used by `~/.tdt/scripts/rotate-logs.sh` for
-other service logs, making the rotation policy consistent. The `.1` file
-is kept on the host bind mount for manual cleanup; no automatic deletion
-policy is added here.
+- **WHEN** the container starts and `~/.tdt/logs/scheduler-entrypoint.log` exists with a size greater than 52,428,800 bytes (50 MB)
+- **THEN** the entrypoint SHALL rename the existing file to `scheduler-entrypoint.log.1` before starting tee
+- **AND** tee SHALL start with a fresh file at the original path
 
 ### Requirement: Generator output format
 
@@ -99,4 +66,3 @@ Each generator function MUST return a Python `dict` matching the `tdt-schedule/v
 - **THEN** `ScheduleManifest.model_validate(dict)` returns a `ScheduleManifest` instance with `len(manifest.schedules) >= 1`
 
 ---
-
