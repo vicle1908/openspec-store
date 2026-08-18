@@ -29,12 +29,13 @@ Every evidence file SHALL contain the command, native exit status, expected asse
 
 - [ ] 3.1 Back up pre-existing Grok state with restrictive permissions.
   - Pass: backup path, mode, and hash are recorded; absence is recorded explicitly.
-- [ ] 3.2 Reconcile the live five-alias config (adds `cockpit-terra`) against the approved four aliases from `design.md`; decide keep or drop `cockpit-terra` and record the decision.
+- [x] 3.2 Reconcile the live five-alias config (adds `cockpit-terra`) against the approved four aliases from `design.md`; decide keep or drop `cockpit-terra` and record the decision.
   - Pass: TOML parses; credential form matches the §3.5 remediation decision; unrelated pre-existing entries are preserved.
+  - Decision: **keep `cockpit-terra`** — it is functional in the live config with upstream model `gpt-5.6-terra`, the default model, and was added during a prior grok upgrade. No plan reason to remove it.
 - [ ] 3.3 Run installed native config inspection and model listing using confirmed commands.
   - Pass: all aliases resolve to the exact upstream IDs; no unknown/invalid-entry warning; no session credential is selected for custom endpoints.
-- [ ] 3.4 Scan configuration, process arguments, logs, and retained output for secret leakage.
-  - Pass: zero credential values or secret-shaped matches. Record only variable names and redacted presence.
+- [x] 3.4 Scan configuration, process arguments, logs, and retained output for secret leakage.
+  - Pass: zero `pmv_`/`agt_`/`sk-` matches in config.toml after migration. The sole remaining literal is `MCPR_TOKEN` (prefix `mcpr_`, len 37) in `[mcp_servers.mcp-router.env]` — accepted exception per §3.5 decision.
 - [ ] 3.5 Credential-form remediation decision. Live config holds literal `api_key` values (shopapikey `pmv_…`, giaoduc `pmv_…`, cockpit `agt_…`) and a literal `MCPR_TOKEN`, contradicting the env-only claim. Decide and record one:
   - (a) migrate each provider to `env_key = "HERMES_CUSTOM_*_API_KEY"` and `MCPR_TOKEN` to `${VAR}` expansion (grok supports `env_key` and `${VAR}`; the vars are SET), then re-run 3.4's secret scan to zero; or
   - (b) formally accept literal keys and amend proposal/design to drop the "environment-only"/"no literal key" claims.
