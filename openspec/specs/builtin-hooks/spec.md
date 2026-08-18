@@ -86,3 +86,18 @@ All consumer agent builder functions SHALL register at minimum the Tier 0 hook p
 - **THEN** the agent SHALL have no hooks registered (backwards compatible)
 - **AND** a deprecation warning SHALL be logged suggesting hooks be added
 
+### Requirement: Structured logs go to stderr, not stdout
+
+All structured log output (structlog, httpx, budget tracking) SHALL be routed to stderr via `logging.StreamHandler(sys.stderr)`. Stdout SHALL be reserved exclusively for command output (JSON, text reports). This separation ensures that piped stdout contains only the command's intended output, not log messages.
+
+#### Scenario: Sync command stdout is clean
+- **WHEN** `docs-sync sync --repo R` is run with stdout piped to a file
+- **THEN** the stdout file SHALL contain only the report output (text or JSON)
+- **AND** no structlog messages, HTTP request logs, or budget tracking entries SHALL appear in stdout
+- **AND** all log output SHALL appear in stderr
+
+#### Scenario: Check command stdout is clean
+- **WHEN** `docs-sync check --repo R --output json` is run with stdout piped
+- **THEN** the stdout SHALL contain only valid JSON
+- **AND** no log messages SHALL be mixed into the JSON output
+
