@@ -74,7 +74,16 @@ A comprehensive audit (GitNexus + cross-repo grep + code reading) revealed addit
 5. Update YAML manifests for both repos
 6. Remove workflow functions from `agent-core/scheduler_setup.py`
 7. Remove sys.path.insert blocks from agent-core
-8. Rebuild Docker image, restart scheduler, verify all schedules registered
-9. Run full tdt-core + code-daily-scan + jira-epic-report test suites
+8. Update `tdt-core/scheduler/cli.py` (hardcoded module refs + sys.path)
+9. Update stale docstrings in 5 repos
+10. Simplify Docker build
+11. Rebuild Docker image, restart scheduler, verify all schedules registered
+12. Run full test suites across all 4 code repos
 
-**Rollback:** Restore agent-core/scheduler_setup.py from git; revert YAML manifests to module:function; rebuild Docker image. No data loss — manifests are regenerated at container start.
+**Rollback (comprehensive):**
+1. `git checkout` all 4 code repo working trees (agent-core, tdt-core, code-daily-scan, jira-epic-report) to pre-change commits
+2. Revert `~/.tdt/schedules/code-daily-scan.yaml` and `~/.tdt/schedules/jira-epic-report.yaml` to old `module:function` format
+3. Revert `generators/code_daily_scan.py` and `generators/jira_epic_report.py`
+4. Rebuild Docker image: `docker compose build scheduler && docker compose up -d scheduler`
+5. Verify: `curl http://127.0.0.1:9100/scheduler/schedules` shows all schedules
+No data loss — manifests are regenerated at container start.

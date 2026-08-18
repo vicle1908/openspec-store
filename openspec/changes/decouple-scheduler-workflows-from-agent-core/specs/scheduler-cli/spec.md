@@ -27,4 +27,4 @@ The system SHALL provide a `tdt-scheduler serve` command that runs a long-lived 
 #### Scenario: serve shuts down gracefully on SIGTERM
 
 - **WHEN** the process receives `SIGTERM` (e.g. `docker stop`)
-- **THEN** it SHALL drain in-flight workflows and exit cleanly
+- **THEN** it SHALL call `shutdown()` to destroy the DBOS runtime and exit cleanly (exit code 0)

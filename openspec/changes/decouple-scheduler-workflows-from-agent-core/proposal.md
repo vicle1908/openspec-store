@@ -58,4 +58,4 @@ None.
 - **Specs modified**: agent-core-scheduler-setup, scheduled-epic-report, scheduler-cli (3 specs)
 - **Dead code removed**: ~180 lines from agent-core/scheduler_setup.py
 - **Runtime**: tdt-core/scheduler/cli.py no longer hardcodes agent_core.scheduler_setup as default module
-- **Risk**: LOW — GitNexus confirms 0 upstream callers; ownership contract satisfied; register_fn proven; dead code removal safe
+- **Risk**: MEDIUM — scheduler CLI (tdt-core), scheduler setup (agent-core), Docker build, and generators are all modified; register_fn proven by 2 repos but blast radius is wider than a single-file change; mitigate with integration verification (Group 9) and comprehensive rollback plan

@@ -44,7 +44,7 @@
 - [ ] 6.4 Remove `_current_application_version_for_cleanup` from `agent-core/src/agent_core/scheduler_setup.py` (moved to tdt-core maintenance).
 - [ ] 6.5 Remove `sys.path.insert` blocks for code-daily-scan/jira-daily-reports from `agent-core/src/agent_core/scheduler_setup.py`.
 - [ ] 6.6 Remove `cancel_stale_error_workflows` and `cancel_stale_enqueued_workflows` imports from `agent-core/src/agent_core/scheduler_setup.py`.
-- [ ] 6.7 Remove or simplify `agent-core/scripts/generate_schedule_manifest.py` (the `@_ENGINE` decorator parser).
+- [ ] 6.7 Remove `agent-core/scripts/generate_schedule_manifest.py` (the `@_ENGINE` decorator parser) — obsolete once stale_workflow_cleaner moves to tdt-core.
 - [ ] 6.8 Update the module docstring in `agent-core/src/agent_core/scheduler_setup.py` to reflect reduced scope (YAML manifest bootstrap only).
 - [ ] 6.9 Run ruff I001 + ruff format + mypy strict on agent-core — confirm clean.
 - [ ] 6.10 Run agent-core test suite — confirm green.
@@ -65,11 +65,12 @@
 - [ ] 8.6 Update `webhook-receiver/src/webhook_receiver/scan_recent_mr_cli.py` line ~3 docstring.
 - [ ] 8.7 Update `webhook-receiver/src/webhook_receiver/selftest_cli.py` line ~3 docstring.
 - [ ] 8.8 Update `ops-automation-suite/AGENTS.md` line ~8 referencing agent-core scheduler_setup patterns.
+- [ ] 8.9 Cross-repo verification: `grep -rn "agent_core.scheduler_setup" /Users/androidteam/Developer/` (excluding .venv, __pycache__, node_modules, archived OpenSpec changes) to confirm zero stale references remain.
 
 ## 9. Integration verification
 
 - [ ] 9.1 Start the scheduler container (`docker compose up -d scheduler`) and wait for health check.
-- [ ] 9.2 Verify via `curl http://127.0.0.1:9100/scheduler/schedules` that all expected schedules are registered (stale_workflow_cleaner, daily-android-scan, daily-ios-scan, daily-epic-report, plus jira-daily-reports and other existing schedules).
+- [ ] 9.2 Verify via `curl http://127.0.0.1:9100/scheduler/schedules` that all expected schedules are registered: `stale_workflow_cleaner`, `daily-android-scan`, `daily-ios-scan`, `daily-epic-report`, plus the existing jira-daily-reports schedules (`jira-standup`, `jira-run-all`, etc.) and other pre-existing schedules.
 - [ ] 9.3 Verify that `stale_workflow_cleaner` fires correctly by checking DBOS logs for its next run time.
 - [ ] 9.4 Run a manual scan test (`code-daily-scan scan --platform android`) to confirm the subprocess invocation still works through the register_fn path.
 
@@ -83,3 +84,24 @@
 - [ ] 10.6 Commit openspec-store change (proposal, specs, design, tasks).
 - [ ] 10.7 Validate the change: `openspec validate decouple-scheduler-workflows-from-agent-core --strict --store openspec-store`.
 - [ ] 10.8 Archive the change.
+
+## Dependency order
+
+Groups have implicit ordering constraints. The recommended execution order is:
+
+```
+Group 1 (tdt-core: stale_workflow_cleaner + CLI)
+  ↓
+Group 2 (code-daily-scan: dbos_scheduling)  ─┐
+Group 3 (jira-epic-report: dbos_scheduling) ─┤ (independent)
+                                              ↓
+Group 4 (manifest generators)              ← depends on 2-3
+Group 5 (YAML manifests)                   ← depends on 4
+Group 6 (agent-core cleanup)               ← depends on 1
+Group 7 (Docker build)                     ← depends on 4-5-6
+Group 8 (docstring updates)                ← independent
+Group 9 (integration verification)         ← depends on 7
+Group 10 (commit and archive)              ← depends on all
+```
+
+Critical path: 1 → 2/3 → 4 → 5 → 7 → 9 → 10
