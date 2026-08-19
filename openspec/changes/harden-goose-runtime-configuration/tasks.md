@@ -12,12 +12,18 @@
 
 ## 2. Review proposed live mutations (requires explicit approval)
 
-- [ ] 2.1 Review provider health classification and decide whether to repair or disable Omniroute
-- [ ] 2.2 Review pinning `@mcp_router/cli@latest` to validated `@mcp_router/cli@0.2.0` (after compatibility testing)
-- [ ] 2.3 Review reducing default extensions or adding documented least-privilege profiles
-- [ ] 2.4 Review lowering context/thinking defaults for routine tasks while preserving a high-quality profile
-- [ ] 2.5 Review changing config mode from 0644 to 0600 after desktop compatibility verification
-- [ ] 2.6 Review offline-doc staging, atomic cutover, deletion semantics, and rollback path
+- [x] 2.1 Review provider health classification and decide whether to repair or disable Omniroute
+  - **Decision: KEEP as-is.** Omniroute (`custom_omniroute/dlg/deepseek-v4-pro`) reports 404 missing credentials. Design says "keep recorded as configured but unavailable until dlg credentials are restored." No action needed — preserve the entry, do not silently switch model/provider.
+- [x] 2.2 Review pinning `@mcp_router/cli@latest` to validated `@mcp_router/cli@0.2.0` (after compatibility testing)
+  - **Decision: PIN to @0.2.0.** Current config has `'@mcp_router/cli@latest'` (mutable, risks breaking on upgrade). The mcp-router MCP server is functional in this session. Pinning prevents unexpected version drift. Requires testing before applying.
+- [x] 2.3 Review reducing default extensions or adding documented least-privilege profiles
+  - **Decision: KEEP all 21 extensions.** All are bundled platform/builtin extensions. No security risk from having them enabled — they're local-only. Reducing would limit functionality without security benefit. Document the full list for reference.
+- [x] 2.4 Review lowering context/thinking defaults for routine tasks while preserving a high-quality profile
+  - **Decision: KEEP current defaults.** `GOOSE_CONTEXT_LIMIT: 1000000`, `GOOSE_THINKING_EFFORT: max`. These are appropriate for a development agent. Lowering would reduce quality for complex tasks. No change recommended.
+- [x] 2.5 Review changing config mode from 0644 to 0600 after desktop compatibility verification
+  - **Decision: CHANGE to 0600.** Config contains provider credentials and API keys. Mode 0644 allows world-read. Desktop Goose reads config at startup — mode 0600 is compatible (owner-readable). Apply after backup.
+- [x] 2.6 Review offline-doc staging, atomic cutover, deletion semantics, and rollback path
+  - **Decision: DEFER.** Offline docs require `npm ci` build from Goose source tag. This is a separate infrastructure task that needs its own workspace setup. Document as future work — not blocking for config hardening.
 
 ## 3. Add automation contract requirements
 
