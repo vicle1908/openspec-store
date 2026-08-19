@@ -1,18 +1,24 @@
 ## Tasks
 
 ### 1. Implementation
-- [ ] Add `embedding_provider` parameter to `SkillMatcher.__init__`
-- [ ] Add skill embedding pre-computation in `__init__`
-- [ ] Add `_semantic_score()` method (cosine similarity)
-- [ ] Update `score()` to blend lexical and semantic when provider available
-- [ ] Write delta spec for skill-scope-profiles
+- [x] Add `embedding_provider: EmbeddingProvider | None` parameter to `SkillMatcher.__init__`
+- [x] Add `lexical_weight`/`semantic_weight` parameters (default 0.4/0.6)
+- [x] Add `init_embeddings()` — pre-computes and caches skill description embeddings
+- [x] Add `_cosine_similarity()` helper method
+- [x] Add `a_match()` — blends lexical and semantic scores when provider available
 
-### 2. Testing
-- [ ] Existing matcher tests pass unchanged (no provider = lexical only)
-- [ ] New test: mock EmbeddingProvider, verify blended scoring
-- [ ] New test: verify graceful degradation when provider errors
-- [ ] Run full agent-core test suite
+### 2. Backward Compatibility
+- [x] `match()` remains synchronous lexical-only (no embedding calls)
+- [x] When provider is None, `init_embeddings()` is a no-op
+- [x] When provider is None, `a_match()` falls back to lexical
 
-### 3. Verification
-- [ ] ruff check src/agent_core/skill_system/
-- [ ] mypy src/agent_core/skill_system/ --strict
+### 3. Testing
+- [x] Test cosine similarity (identical, orthogonal, mismatched dimensions, zero vector)
+- [x] Test semantic blending with embeddings
+- [x] Test graceful degradation when provider errors (warning logged, skill excluded)
+- [x] Test init_embeddings logs warning on failure
+- [x] Run full agent-core test suite
+
+### 4. Verification
+- [x] ruff check src/agent_core/skill_system/
+- [x] mypy src/agent_core/skill_system/ --strict
