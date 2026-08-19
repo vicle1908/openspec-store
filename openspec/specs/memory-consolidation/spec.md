@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+Defines automatic data movement across memory layers — promoting frequently-accessed scratch entries to long_term, demoting stale entries, and merging duplicates — so consumers don't need to manage cross-layer data flow manually.
+
+## Requirements
 
 ### Requirement: Consolidation trigger
 The memory system SHALL support automatic consolidation triggered by recall count threshold or explicit invocation.
