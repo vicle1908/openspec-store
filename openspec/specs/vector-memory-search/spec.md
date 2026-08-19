@@ -1,4 +1,8 @@
-## MODIFIED Requirements
+## Purpose
+
+Provides semantic similarity search for agent memory using pgvector, enabling recall of contextually relevant past observations.
+
+## Requirements
 
 ### Requirement: Vector search error classification
 Vector search failures SHALL be classified and logged, never silently discarded.
