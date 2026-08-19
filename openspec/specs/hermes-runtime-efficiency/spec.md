@@ -2,7 +2,7 @@
 
 Provides efficient runtime behavior for long-lived and unattended full-access Hermes conversations so prompt caching, compression, delegation, and recovery remain useful without allowing repeated failures or excessive fan-out to consume unbounded resources.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Prompt-cache-safe changes SHALL be staged at session boundaries
 

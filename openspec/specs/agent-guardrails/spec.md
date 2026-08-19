@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+Defines how MCP tool annotations (readOnlyHint, destructiveHint, openWorldHint, idempotentHint) are discovered, mapped to the existing guardrail authority classes, and enforced through input guards for authorized agent sessions.
+
+## Requirements
 
 ### Requirement: MCP tool annotation mapping to guardrails
 MCP tool annotations (readOnlyHint, destructiveHint, openWorldHint, idempotentHint) discovered via pydantic-ai's `ToolDefinition.metadata['annotations']` SHALL be mapped to the existing `InputGuard`/`OutputGuard` framework and `AuthorityClass` enum.

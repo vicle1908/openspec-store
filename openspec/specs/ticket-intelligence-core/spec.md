@@ -1,4 +1,10 @@
-## MODIFIED Requirements
+## Purpose
+
+Define the versioned ticket intelligence bundle contract, deterministic
+RCA enrichment catalog, and Classification Sheets output schema shared
+across Jira ecosystem tools.
+
+## Requirements
 
 ### Requirement: Produce a reusable ticket intelligence bundle
 The system SHALL produce a reusable ticket intelligence bundle for Jira issues that multiple ecosystem tools can consume without changing analysis semantics. The shipped contract for this change SHALL be explicitly versioned as `v2.0`, and consumers SHALL be able to inspect `BundleMeta.version` before interpreting breaking RCA or output-schema changes.
@@ -27,8 +33,6 @@ The system SHALL produce a reusable ticket intelligence bundle for Jira issues t
 #### Scenario: Evidence is attached
 - **WHEN** a normalized signal is emitted in the bundle
 - **THEN** the bundle SHALL carry evidence references or summaries that explain the signal source
-
-## ADDED Requirements
 
 ### Requirement: Runtime RCA catalog matches the v2.0 taxonomy
 The executable RCA catalog SHALL contain the seven concrete categories and the distinct `Other / Unclassified` sentinel in the priority order defined by the `ticket-intelligence-core` contract. The catalog SHALL preserve deterministic ticket/SCM evidence boundaries and SHALL NOT introduce a source-semantic or LLM dependency.

@@ -2,7 +2,7 @@
 
 Provides a safe, repeatable contract for migrating, storing, backing up, validating, and rolling back Hermes configuration without disclosing credentials or losing unrelated local state.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Configuration SHALL use the supported migration path
 

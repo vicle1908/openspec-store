@@ -1,4 +1,8 @@
-## MODIFIED Requirements
+## Purpose
+
+Defines standards-compliant MCP server connectivity, tool annotation to authority class mapping, and MCP 2026-07-28 specification compliance for the agent runtime. Covers pydantic-ai-based tool discovery, transport selection, server capability negotiation, and tool name disambiguation across multiple MCP servers.
+
+## Requirements
 
 ### Requirement: Standards-compliant MCP server connection
 The system SHALL connect to any standard MCP server using pydantic-ai's MCP capability/toolset, implementing the MCP 2026-07-28 specification. No server-specific customization SHALL be required.
@@ -18,8 +22,6 @@ The system SHALL connect to any standard MCP server using pydantic-ai's MCP capa
 - WHEN tools are discovered from multiple MCP servers
 - THEN tool names SHALL be prefixed with the server identifier to prevent collisions
 - AND the prefix format SHALL be `<server-host>:<tool-name>` per MCP spec recommendation
-
-## ADDED Requirements
 
 ### Requirement: MCP tool annotation to authority class mapping
 The system SHALL map MCP tool annotations to `AuthorityClass` values automatically.

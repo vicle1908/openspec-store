@@ -2,7 +2,7 @@
 
 Configuration-driven auto-approval for specific tools, bypassing manual approval while maintaining security constraints.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Auto-approve configuration
 

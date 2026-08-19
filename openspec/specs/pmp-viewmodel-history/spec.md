@@ -5,7 +5,7 @@ plus a new `pmpQueryToken: PMPQueryToken?` property. This enables
 `WatchListTab` to migrate its `setOnQueryCallback` (chart data) consumer
 to the `PMPViewModel.pmpDataFlow` pattern.
 
-## MODIFIED Requirements
+## Requirements
 
 ### Requirement: subscribe() SHALL preserve semantics for LIVE
 
@@ -71,8 +71,6 @@ lifecycle).
 - **THEN** `_queryToken` is nulled
 - **AND** the QUERY token's `close()` is invoked, decrementing the
   historical node's ref-counts
-
-## ADDED Requirements
 
 ### Requirement: subscribeForHistory opens a QUERY token
 

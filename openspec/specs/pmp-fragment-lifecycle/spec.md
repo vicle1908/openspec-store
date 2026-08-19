@@ -5,7 +5,7 @@ the legacy `PMPUtilViewModel` callback-wiring pattern with the new
 `PMPViewModel.pmpDataFlow` collection pattern. This applies to all 13
 fragments being migrated in this MR.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: onResume subscribes, onPause detaches, onDestroyView unsubscribes
 

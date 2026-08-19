@@ -1,4 +1,10 @@
-## ADDED Requirements
+## Purpose
+
+Define optional semantic skill matching that supplements the default
+lexical matcher with embedding-based similarity scoring when an
+`EmbeddingProvider` is configured.
+
+## Requirements
 
 ### Requirement: Optional semantic skill matching
 The skill matcher SHALL support optional embedding-based semantic matching when an EmbeddingProvider is configured.

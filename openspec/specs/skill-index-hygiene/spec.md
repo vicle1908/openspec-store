@@ -1,4 +1,11 @@
-## ADDED Requirements
+## Purpose
+
+Enforce skill description size limits, YAML frontmatter parsing, directory
+ownership, unique naming, and a single canonical index source so that
+skill metadata remains consistent and validation is continuously
+verifiable.
+
+## Requirements
 
 ### Requirement: Skill descriptions stay within the loader budget
 Every TDT `SKILL.md` frontmatter description SHALL be measured as UTF-8 bytes after scalar decoding and SHALL be no longer than 1,024 bytes. Descriptions above an advisory 800-byte threshold SHALL produce a non-failing warning so routing metadata remains concise.

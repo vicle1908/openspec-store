@@ -2,7 +2,7 @@
 
 Defines intentional shared-state governance for one default Hermes profile used by local CLI/Desktop and the authorized Telegram gateway, without adding an unnecessary profile or gateway.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: One default profile SHALL serve all current surfaces
 

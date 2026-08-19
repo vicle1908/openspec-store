@@ -1,4 +1,8 @@
-## MODIFIED Requirements
+## Purpose
+
+Defines evidence propagation, unclassified fallback behavior, v2 taxonomy coverage gap closure, and 4P lens multi-cause surfacing for the RCA classification engine. Specifies the seven-category concrete taxonomy, at-risk module provenance on the Classification sheet tab, and the accuracy regression gates that guard classification quality.
+
+## Requirements
 
 ### Requirement: RCA-2 — Evidence propagation
 `detect_rca()` MUST populate `RootCauseSignal.matched_text` with the regex match substring that triggered the classification, and `RootCauseSignal.evidence` MUST contain at least one entry with `rule_tag="rca_pattern_match"` whenever a pattern matches. The `IssueSummary.code_evidence` field MUST include the deterministic provenance entry `rca:match:<category>:<matched_text>` whenever an issue is RCA-classified. The Classification tab MUST render the extracted substring in `RCA Matched Text` at zero-indexed position 10 and MUST render the complete provenance entry in `Analysis Evidence` at zero-indexed position 13. The RCA evidence entry MUST appear before any worktree-commit or MR-reference evidence in the joined Analysis Evidence cell.

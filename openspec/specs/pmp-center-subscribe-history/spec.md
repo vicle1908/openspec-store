@@ -6,7 +6,7 @@ chart data subscriptions. This complements the existing `subscribe()` method
 PMP node, which is a separate `PMPNode` instance from the per-product URL
 nodes.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: subscribeForHistory public method
 
@@ -107,8 +107,6 @@ calls.
   the same 3 counters
 - **THEN** 2 distinct `PMPQueryToken` instances are returned (different `tokenId`)
 - **AND** the historical node's `topicRefCounts` has 3 entries (one per unique topic), not 6
-
-## MODIFIED Requirements
 
 ### Requirement: unsubscribeQuery for PMPQueryToken
 

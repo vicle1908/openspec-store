@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+Defines the structure and execution of pre-built evaluation datasets for core agent workflows, including dataset case schemas, registry exposure, and CLI-based evaluation runs with per-case pass/fail reporting.
+
+## Requirements
 
 ### Requirement: Evaluation dataset structure
 The system SHALL provide pre-built evaluation datasets for core agent workflows.

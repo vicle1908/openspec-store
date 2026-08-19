@@ -1,4 +1,8 @@
-## MODIFIED Requirements
+## Purpose
+
+Ensures comprehensive executable test coverage for the v2.0 RCA classification system, covering all seven concrete categories, the Other / Unclassified sentinel, taxonomy priority, confidence values, multi-cause deduplication, false-positive resistance, and preservation of fix-status detection tests.
+
+## Requirements
 
 ### Requirement: RCA Detection Test Coverage
 

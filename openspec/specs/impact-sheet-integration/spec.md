@@ -1,4 +1,8 @@
-## MODIFIED Requirements
+## Purpose
+
+Defines the integration of GitNexus impact analysis data into the JIRA ticket intelligence bundle and the v2 Classification sheet tab. Specifies the ImpactSnapshot model, module provenance tracking, issue-key stripping for accurate RCA classification, and high-precision RCA pattern coverage for the seven-category v2 taxonomy.
+
+## Requirements
 
 ### Requirement: ImpactSnapshot field on TicketIntelligenceBundle
 The `TicketIntelligenceBundle` model MUST expose `impact: ImpactSnapshot | None = None`. When `JIRA_SKILL_IMPACT_IN_SHEETS=true` and enrichment is requested, the field SHALL be populated by `ImpactEnricher.enrich_bundle()` inside `analyze_snapshot()` when dependencies are available; when disabled or unavailable, it SHALL remain `None`. Historical v1.0, v1.1, and v1.2 serialized bundles MUST remain valid migration inputs. Newly produced bundles after the complete RCA/model/Sheet migration MUST emit `meta.version == "v2.0"`.

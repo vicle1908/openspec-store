@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+Establishes that non-local deployment manifests are complete and immutable, release images are multi-architecture with evidence, deployment validation is a required CI gate, and Git-based promotion and rollback are rehearsed and evidenced for all eight services.
+
+## Requirements
 
 ### Requirement: Non-local manifests are complete and immutable
 

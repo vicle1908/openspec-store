@@ -7,7 +7,7 @@ accepts a `requestType` parameter; only the call sites at lines 370 and
 623 need lifting. Add a new public `PMPNode.subscribeForHistory()` method
 with a type-safe callback for chart data.
 
-## MODIFIED Requirements
+## Requirements
 
 ### Requirement: submitSubscribe renamed to submitRequest with requestType parameter
 
@@ -68,8 +68,6 @@ applied as follows:
 - **WHEN** `submitRequest(topics, fieldMap, STREAMING_QUERY)` is called
 - **AND** `connectionRef.get() == null` (e.g., the node was torn down)
 - **THEN** the request is skipped with a logged warning
-
-## ADDED Requirements
 
 ### Requirement: subscribeForHistory public method SHALL be added for chart data
 

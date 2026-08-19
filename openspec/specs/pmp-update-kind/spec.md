@@ -8,7 +8,7 @@ legacy callback variants (`mOnSubscribedCallback`,
 `onSubscribedUSSOCallback`) into a single typed event with a kind
 discriminator.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: PMPUpdate carries a kind discriminator
 

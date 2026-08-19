@@ -2,7 +2,7 @@
 
 Preserves the existing MCP Router setup while providing full-operation exposure and unrestricted parallel invocation to authorized sessions on the shared default profile.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Existing MCP Router setup SHALL remain unchanged
 
