@@ -81,7 +81,7 @@ The direct probes succeeded at `/v1/responses` and `/v1/messages`, but native Gr
 
 ## Authentication and Secrets
 
-- Credentials are intended to remain referenced by environment-variable name; literal values SHALL NOT be written to config, commands, logs, process arguments, or evidence. Live config currently violates this (literal `api_key` + `MCPR_TOKEN`); grok supports `env_key` and `${VAR}` expansion, so the remediation decision in `tasks.md` §3.5 MUST resolve this before archive.
+- Credentials are intended to remain referenced by environment-variable name; literal values SHALL NOT be written to config, commands, logs, process arguments, or evidence. **2026-08-19 §3.5 decision: ACCEPTED.** All three provider `api_key` values have been migrated to `env_key` references. The sole remaining literal is `MCPR_TOKEN` in `[mcp_servers.mcp-router.env]` — accepted as an exception because: (1) it is a routing token, not a provider API key; (2) grok's `${VAR}` expansion works but the token is local-only; (3) the config file has mode 0600.
 - Preflight records only presence/absence for all three variables.
 - The Giaoduc gateway accepted both Bearer and `x-api-key` in direct probes, but Grok's `messages` behavior is unresolved. Native verification records only header name/scheme and redacted presence.
 - If `env_http_headers` is required, it SHALL reference the existing variable name and SHALL be added only after proving that `env_key` is insufficient.

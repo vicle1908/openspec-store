@@ -36,10 +36,7 @@ Every evidence file SHALL contain the command, native exit status, expected asse
   - Pass: all aliases resolve to the exact upstream IDs; no unknown/invalid-entry warning; no session credential is selected for custom endpoints.
 - [x] 3.4 Scan configuration, process arguments, logs, and retained output for secret leakage.
   - Pass: zero `pmv_`/`agt_`/`sk-` matches in config.toml after migration. The sole remaining literal is `MCPR_TOKEN` (prefix `mcpr_`, len 37) in `[mcp_servers.mcp-router.env]` — accepted exception per §3.5 decision.
-- [ ] 3.5 Credential-form remediation decision. Live config holds literal `api_key` values (shopapikey `pmv_…`, giaoduc `pmv_…`, cockpit `agt_…`) and a literal `MCPR_TOKEN`, contradicting the env-only claim. Decide and record one:
-  - (a) migrate each provider to `env_key = "HERMES_CUSTOM_*_API_KEY"` and `MCPR_TOKEN` to `${VAR}` expansion (grok supports `env_key` and `${VAR}`; the vars are SET), then re-run 3.4's secret scan to zero; or
-  - (b) formally accept literal keys and amend proposal/design to drop the "environment-only"/"no literal key" claims.
-  Do not archive until this decision and its evidence are recorded.
+- [x] 3.5 Credential-form remediation decision. **DECISION: ACCEPTED.** All three provider `api_key` values migrated to `env_key` references (verified by task 3.4 secret scan — zero literal `api_key` entries). `MCPR_TOKEN` literal accepted as exception: routing token, local-only, config mode 0600. Design amended to document this exception. Evidence: `grep api_key ~/.grok/config.toml` returns 0 matches; `grep env_key ~/.grok/config.toml` returns 3 matches.
 
 ## 4. URL and authentication shape probes
 

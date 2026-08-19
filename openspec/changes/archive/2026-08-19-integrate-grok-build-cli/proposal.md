@@ -17,7 +17,7 @@ Collected 2026-08-09 before installation:
 
 - `https://docs.x.ai/build/overview` identifies the product as Grok Build, the binary as `grok`, the config as `~/.grok/config.toml`, and the headless form as `grok -p`.
 - `https://github.com/xai-org/grok-build` documents `[model_providers.<id>]`, `[model.<alias>]`, `model_provider`, `env_key`, and `api_backend` values `chat_completions`, `responses`, and `messages`.
-- `https://x.ai/cli/stable` returned `1.0.0` at exploration time; `grok` was absent from PATH. No installer was executed during exploration or review. (2026-08-18 addendum: stable now resolves to `1.0.3`; grok `1.0.3` is installed and on PATH; `~/.grok/config.toml` is populated with literal keys, pending §3.5 remediation.)
+- `https://x.ai/cli/stable` returned `1.0.0` at exploration time; `grok` was absent from PATH. No installer was executed during exploration or review. (2026-08-18 addendum: stable now resolves to `1.0.3`; grok `1.0.3` is installed and on PATH. 2026-08-19: §3.5 resolved — all provider api_key values migrated to env_key; MCPR_TOKEN literal accepted as exception.)
 - Authenticated `/v1/models` probes returned HTTP 200 and exposed the requested IDs: shopapikey `fable-5`, giaoduc `Advance`, cockpit `gpt-5.6-sol` and `gpt-5.6-luna`.
 - Direct `/v1/responses` and `/v1/messages` probes returned HTTP 200. These results establish only pre-install protocol compatibility; they do not prove Grok config parsing, URL joining, request shape, authentication, sentinel output, or clean process exit.
 
