@@ -186,6 +186,8 @@ Top-level `model`, `gateway`, `providers.*.api_key_env`, `api_mode`, legacy-only
 
 `BaseAgent` SHALL accept an already constructed `Model` only. It MUST NOT accept a string, profile, context, config mapping, provider mapping, or fallback input and MUST NOT call `create_model`, `load_settings`, `load_agent_config`, `resolve_agent_profile`, or another selection/resolution function. Agent-core CLI composition SHALL resolve one context before `build_agent` and SHALL not maintain an independent `_create_runtime_model` authority.
 
+`AgentRuntime` SHALL pass `deps_type=AgentRuntimeDeps` to pydantic-ai's `Agent` constructor, enabling pydantic-ai to properly type-check the `RunContext[AgentRuntimeDeps]` parameter in tool functions. Tool functions receiving an unexpected context type SHALL be handled gracefully via defensive `hasattr(ctx, "deps")` checks.
+
 `ModelConstructionContext` SHALL be a final slotted non-dataclass with a module-private factory-only construction path. Direct public construction MUST fail. It SHALL reject shallow/deep copy, pickle/reduction, `vars`, dataclass `asdict`/`astuple`/`replace`, Pydantic model/type-adapter dumping, and any advertised serialization hook. Its deterministic SHA-256 identity SHALL cover canonical JSON for agent identity, ordered primary/fallback canonical aliases, model kinds, wire models, provider IDs, transport kinds, protocols, normalized endpoint metadata, provider-bound credential-reference metadata, behavior, structured provenance identity, and source fingerprints. The digest MUST NOT include or derive from credential values.
 
 #### Scenario: build_agent explicit Model path is pure
@@ -254,6 +256,18 @@ Top-level `model`, `gateway`, `providers.*.api_key_env`, `api_mode`, legacy-only
 - **THEN** string construction SHALL occur only through `create_model` or `build_agent` with a complete context
 - **AND** direct `BaseAgent` examples SHALL pass an already constructed `Model`
 - **AND** removed factories, snapshots, compatibility properties, mapping loaders, raw kwargs, and local fallback examples SHALL be absent
+
+#### Scenario: AgentRuntime passes deps_type to pydantic-ai Agent
+
+- **WHEN** `AgentRuntime.__init__` constructs the pydantic-ai `Agent`
+- **THEN** it SHALL pass `deps_type=AgentRuntimeDeps` as a constructor argument
+- **AND** pydantic-ai SHALL be able to type-check `ctx: RunContext[AgentRuntimeDeps]` in tool functions
+
+#### Scenario: Type guard prevents AttributeError on ctx
+
+- **WHEN** `_prepare_tools` or `_run_via_registry` receives a `ctx` that lacks a `deps` attribute
+- **THEN** the function SHALL log a warning with the actual `ctx` type and return a safe fallback
+- **AND** the agent SHALL continue running without crashing
 
 ### Requirement: Canonical route behavior and run settings
 
