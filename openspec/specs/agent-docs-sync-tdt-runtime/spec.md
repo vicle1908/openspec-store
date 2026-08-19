@@ -27,10 +27,10 @@ The docs-sync runtime SHALL resolve model selection and consumer runtime limits 
 
 #### Scenario: Runtime limits are configured
 
-- **WHEN** `runtime.max_iterations` or `runtime.timeout_seconds` is set in repository configuration or the corresponding `DOCS_SYNC_*` environment variable is set
-- **THEN** generation SHALL use the effective resolved values from the flavor defaults (`doc_full_sync`: max_iterations=20, timeout=300s) unless an explicit profile is passed
+- **WHEN** `runtime.max_iterations` or `runtime.timeout_seconds` is set in repository configuration or the corresponding `DOCS_SYNC_*` environment variable is set (use `"none"` or `"unlimited"` in env vars to disable the limit)
+- **THEN** generation SHALL use the effective resolved values, where the base `ConsumerRuntimeProfile` defaults are `None` (unlimited) and flavor defaults override when no explicit profile is provided
 - **AND** hard-coded generation limits SHALL not replace them
-- **AND** flavor defaults SHALL take precedence over the base `ConsumerRuntimeProfile` defaults when no explicit profile is provided
+- **AND** `None`/unset SHALL mean unlimited (no iteration or timeout cap)
 
 #### Scenario: Secret boundary is preserved
 
