@@ -6,6 +6,7 @@
 - [x] Create `code_review.py` with 5 evaluation cases
 - [x] Create `docs_sync.py` with 3 evaluation cases
 - [x] Add `eval run` CLI command to agent-core Typer app
+- [x] Fix `eval run` stub — implement `_evaluate_case()` with structural validation, metadata checks, pass/fail reporting
 
 ### 2. Testing
 - [x] Add tests for dataset loading and case validation
