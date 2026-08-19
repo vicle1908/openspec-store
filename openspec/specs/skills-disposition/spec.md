@@ -28,12 +28,12 @@ The system SHALL record, for each skill, the evidence that drove its classificat
 
 ### Requirement: `redundant-to-tdt-skill` entries MUST cite a real TDT skill path
 
-The system SHALL verify that every skill classified as `redundant-to-tdt-skill:<tdt-skill-name>` references a skill file that exists under `tdt-meta/.agents/skills/<tdt-skill-name>/SKILL.md`.
+The system SHALL verify that every skill classified as `redundant-to-tdt-skill:<tdt-skill-name>` references a skill file that exists under `~/Developer/.agents/skills/<tdt-skill-name>/SKILL.md`.
 
 #### Scenario: TDT skill path is validated
 
 - **WHEN** a row is classified `redundant-to-tdt-skill:foo`
-- **THEN** the system SHALL fail-fast if `tdt-meta/.agents/skills/foo/SKILL.md` does not exist
+- **THEN** the system SHALL fail-fast if `~/Developer/.agents/skills/foo/SKILL.md` does not exist
 
 ### Requirement: `investigate` entries MUST be resolved before archive
 
@@ -50,6 +50,6 @@ The system SHALL prefer the TDT overlay over ECC equivalents when both cover the
 
 #### Scenario: TDT equivalent wins
 
-- **WHEN** a TDT skill at `tdt-meta/.agents/skills/<x>/SKILL.md` exists with overlapping description to an ECC skill `<y>`
+- **WHEN** a TDT skill at `~/Developer/.agents/skills/<x>/SKILL.md` exists with overlapping description to an ECC skill `<y>`
 - **THEN** ECC skill `<y>` SHALL be classified `redundant-to-tdt-skill:x`, regardless of which was authored first
 

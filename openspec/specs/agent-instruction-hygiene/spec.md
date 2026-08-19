@@ -7,10 +7,10 @@ Defines TDT's evidence-grounded, host-portable, safety-first policy for concise 
 
 ### Requirement: Root AGENTS.md size ceiling
 
-The canonical shared instruction file at `tdt-meta/AGENTS.md` MUST remain standard Markdown and MUST target no more than 150 lines as an internal TDT attention-budget policy. The 150-line value is not an AGENTS.md conformance limit. The root MUST retain concise load-bearing boundaries for secrets, factory-only clients, local scope, destructive and outward actions, blocked work, instruction provenance, the applicable OpenSpec pre-edit gate, and the applicable GitNexus impact-before-symbol-edit gate even when those boundaries consume the budget.
+The canonical shared instruction file at `~/Developer/AGENTS.md` MUST remain standard Markdown and MUST target no more than 150 lines as an internal TDT attention-budget policy. The 150-line value is not an AGENTS.md conformance limit. The root MUST retain concise load-bearing boundaries for secrets, factory-only clients, local scope, destructive and outward actions, blocked work, instruction provenance, the applicable OpenSpec pre-edit gate, and the applicable GitNexus impact-before-symbol-edit gate even when those boundaries consume the budget.
 
 #### Scenario: Root file exceeds the target
-- **WHEN** `wc -l tdt-meta/AGENTS.md` reports more than 150 lines
+- **WHEN** `wc -l ~/Developer/AGENTS.md` reports more than 150 lines
 - **THEN** verbose task-specific content SHALL move to a reviewed module or reference document while the root retains all load-bearing safety boundaries
 
 #### Scenario: Safety content cannot fit
@@ -23,7 +23,7 @@ The canonical shared instruction file at `tdt-meta/AGENTS.md` MUST remain standa
 
 ### Requirement: AGENTS.md v1.1 progressive-disclosure module index
 
-The root instruction file SHALL contain a human-readable index of canonical modules under `tdt-meta/.agents/modules/`. TDT MAY retain the `<!-- agents:module -->` marker, paths, descriptions, and trigger keywords as an internal routing convention. TDT SHALL NOT claim that this exact syntax, trigger algorithm, or automatic injection behavior is an AGENTS.md standard.
+The root instruction file SHALL contain a human-readable index of canonical modules under `~/Developer/.agents/modules/`. TDT MAY retain the `<!-- agents:module -->` marker, paths, descriptions, and trigger keywords as an internal routing convention. TDT SHALL NOT claim that this exact syntax, trigger algorithm, or automatic injection behavior is an AGENTS.md standard.
 
 #### Scenario: Module is added or renamed
 - **WHEN** a canonical module is added, renamed, or removed
@@ -55,7 +55,7 @@ Actionable instructions SHALL be action-oriented and SHALL prescribe commands on
 
 ### Requirement: Definition of Done — verifiable closure criteria
 
-The `## Definition of Done` section in `tdt-meta/AGENTS.md` SHALL list applicable closure checks with commands, working directories, side-effect classes, and success predicates. It SHALL require reporting skipped non-applicable checks and SHALL NOT imply that every task must execute every listed command.
+The `## Definition of Done` section in `~/Developer/AGENTS.md` SHALL list applicable closure checks with commands, working directories, side-effect classes, and success predicates. It SHALL require reporting skipped non-applicable checks and SHALL NOT imply that every task must execute every listed command.
 
 #### Scenario: Applicable check passes
 - **WHEN** a task is covered by a test, lint, type, OpenSpec, symlink, or static-policy check
@@ -119,7 +119,7 @@ Canonical symlinks and host-native bridges SHALL resolve within their declared w
 
 ### Requirement: Quarterly review cadence
 
-The `tdt-meta` policy owner SHALL review shared instructions, evidence sources, host behavior, module paths, symlinks, and safety boundaries at least once per UTC calendar quarter and after a material host or specification change. The evidence ledger SHALL record separate ISO `YYYY-MM-DD` values for `last_reviewed` and `next_review_due`. UTC quarter boundaries are January 1, April 1, July 1, and October 1.
+The `~/Developer` policy owner SHALL review shared instructions, evidence sources, host behavior, module paths, symlinks, and safety boundaries at least once per UTC calendar quarter and after a material host or specification change. The evidence ledger SHALL record separate ISO `YYYY-MM-DD` values for `last_reviewed` and `next_review_due`. UTC quarter boundaries are January 1, April 1, July 1, and October 1.
 
 #### Scenario: Review finds drift
 - **WHEN** commands, host behavior, evidence status, paths, or safety rules no longer match verified behavior

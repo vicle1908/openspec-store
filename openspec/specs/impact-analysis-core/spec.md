@@ -4,7 +4,7 @@
 TBD - created by archiving change jira-impact-analysis. Update Purpose after archive.
 ## Requirements
 ### Requirement: Feature Map Configuration
-The system SHALL resolve a changed file path to one or more `feature.<tag>` tags using a YAML feature map at `tdt-meta/feature-map.yaml`. The file MUST have a top-level `feature_map:` key mapping path prefixes (directories end with `/`) to lists of `[feature_tag, platform]` tags. Tags MUST be dot-separated identifiers (e.g. `feature.auth`); the second element MUST be one of `ios`, `android`, `python`. The file MUST also contain a `base_modules:` list whose entries trigger full-platform escalation.
+The system SHALL resolve a changed file path to one or more `feature.<tag>` tags using a YAML feature map at `~/Developer/feature-map.yaml`. The file MUST have a top-level `feature_map:` key mapping path prefixes (directories end with `/`) to lists of `[feature_tag, platform]` tags. Tags MUST be dot-separated identifiers (e.g. `feature.auth`); the second element MUST be one of `ios`, `android`, `python`. The file MUST also contain a `base_modules:` list whose entries trigger full-platform escalation.
 
 #### Scenario: Longest-prefix match wins
 - **WHEN** the resolver scans `feature_map` entries in document order

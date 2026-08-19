@@ -61,7 +61,7 @@ Module delivery SHALL confine source modules to the canonical shared module dire
 
 ### Requirement: Standalone clone behavior
 
-Registry validation and installer preview SHALL work from a standalone `tdt-meta` clone where sibling repositories are absent. Missing optional repositories SHALL be reported as skipped targets, and mutating modes SHALL NOT create sibling repository roots.
+Registry validation and installer preview SHALL work from a standalone `~/Developer` clone where sibling repositories are absent. Missing optional repositories SHALL be reported as skipped targets, and mutating modes SHALL NOT create sibling repository roots.
 
 #### Scenario: Optional sibling repository absent
 - **WHEN** a registry row is marked optional and its root does not exist

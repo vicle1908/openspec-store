@@ -6,17 +6,17 @@ Defines the first-class install flow for the `agent-device` skill into the TDT s
 NOTE: Implementation lives in the separate agent-device repository, not in agent-core.
 ## Requirements
 ### Requirement: First-class install into the TDT skills root via `npx skills add --copy`
-The TDT workspace SHALL install the `callstack/agent-device` bundled skill into the **first-class TDT skills root** (`tdt-meta/.agents/skills/agent-device/SKILL.md`) by running `npx skills add callstack/agent-device -a universal -a codex -a cursor --copy -y` from the `tdt-meta/` directory. The `--copy` flag SHALL be used so the installed `SKILL.md` is a regular file (not a symlink) and is committed to git alongside the 95 existing TDT skills.
+The TDT workspace SHALL install the `callstack/agent-device` bundled skill into the **first-class TDT skills root** (`~/Developer/.agents/skills/agent-device/SKILL.md`) by running `npx skills add callstack/agent-device -a universal -a codex -a cursor --copy -y` from the `~/Developer/` directory. The `--copy` flag SHALL be used so the installed `SKILL.md` is a regular file (not a symlink) and is committed to git alongside the 95 existing TDT skills.
 
 #### Scenario: Skill install succeeds with the canonical `.agents/skills/` path
-- **WHEN** the operator runs `npx skills add callstack/agent-device -a universal -a codex -a cursor --copy -y` from `tdt-meta/`
-- **THEN** the skill file is created at `tdt-meta/.agents/skills/agent-device/SKILL.md` as a regular file
+- **WHEN** the operator runs `npx skills add callstack/agent-device -a universal -a codex -a cursor --copy -y` from `~/Developer/`
+- **THEN** the skill file is created at `~/Developer/.agents/skills/agent-device/SKILL.md` as a regular file
 - **AND** the skill's `name` frontmatter field is `agent-device`
-- **AND** the file is committed to git (verifiable via `git ls-files tdt-meta/.agents/skills/agent-device/SKILL.md`)
+- **AND** the file is committed to git (verifiable via `git ls-files ~/Developer/.agents/skills/agent-device/SKILL.md`)
 
 #### Scenario: Skill install lands in `.claude/skills/` only (rejected)
-- **WHEN** the operator runs `npx skills add callstack/agent-device -a claude-code -y` from `tdt-meta/`
-- **THEN** the skill file is created at `tdt-meta/.claude/skills/agent-device/SKILL.md` instead of `.agents/skills/`
+- **WHEN** the operator runs `npx skills add callstack/agent-device -a claude-code -y` from `~/Developer/`
+- **THEN** the skill file is created at `~/Developer/.claude/skills/agent-device/SKILL.md` instead of `.agents/skills/`
 - **AND** `config/codex/scripts/build-skills-index.sh` does NOT discover the skill
 - **AND** the spec treats this as the wrong install location for TDT
 
@@ -33,7 +33,7 @@ The TDT workspace SHALL install the `callstack/agent-device` bundled skill into 
 #### Scenario: Skill is already installed and is refreshed
 - **WHEN** `npx skills add callstack/agent-device -a universal -a codex -a cursor --copy -y` is run and the skill already exists
 - **THEN** the skill file is overwritten with the latest version from the callstack registry without prompting
-- **AND** the operator can `git diff tdt-meta/.agents/skills/agent-device/SKILL.md` to inspect the upstream changes
+- **AND** the operator can `git diff ~/Developer/.agents/skills/agent-device/SKILL.md` to inspect the upstream changes
 
 ### Requirement: Operator-level CLI install with a pinned version is mandatory
 The operator SHALL install `agent-device` globally via `npm install -g agent-device@<pinned-version>` where `<pinned-version>` is a specific version chosen by the operator (the current latest is `0.17.6`; the version floor is `>= 0.14.0`). The agent MUST NOT run `npm install -g agent-device@<pinned-version>`, `npm install -g agent-device@latest`, or `npx -y agent-device@<latest|pinned-version>` without an explicit user prompt per turn. The version pin is the operator's choice; the agent's job is to verify (`agent-device --version` returns a string `>= 0.14.0`) and use it.
@@ -82,12 +82,12 @@ The TDT workspace SHALL NOT modify the installed Callstack skill file (it is an 
 - **THEN** the rule is added to `.agents/INDEX.md` as a supplemental bullet under the "Mobile Device Automation" section; the installed `SKILL.md` is not modified
 
 ### Requirement: Skill is discoverable by the TDT skills index builder
-The skill SHALL be discoverable by `config/codex/scripts/build-skills-index.sh` and SHALL appear in both the human-readable `.agents/SKILLS_INDEX.md` and the generated `.codex/skills-index.json` after a build run.
+The skill SHALL be discoverable by `config/codex/scripts/build-skills-index.sh` and SHALL appear in both the human-readable `.agents/SKILLS_INDEX.md` and the generated `~/.agents/skills-index.json` after a build run.
 
 #### Scenario: Index build picks up the new skill
-- **WHEN** the operator runs `bash config/codex/scripts/build-skills-index.sh` from `tdt-meta/` after the skill is installed
-- **THEN** `jq '.skills[] | select(.name == "agent-device")' tdt-meta/.codex/skills-index.json` returns the new entry
-- **AND** `tdt-meta/.agents/SKILLS_INDEX.md` lists `agent-device` under a "Mobile Device Automation" category
+- **WHEN** the operator runs `bash config/codex/scripts/build-skills-index.sh` from `~/Developer/` after the skill is installed
+- **THEN** `jq '.skills[] | select(.name == "agent-device")' ~/.agents/skills-index.json` returns the new entry
+- **AND** `~/Developer/.agents/SKILLS_INDEX.md` lists `agent-device` under a "Mobile Device Automation" category
 - **AND** the total count in `.agents/SKILLS_INDEX.md` increments from 95 to 96
 
 ### Requirement: Skill stays a thin router; TDT-specific rules live in TDT-owned files

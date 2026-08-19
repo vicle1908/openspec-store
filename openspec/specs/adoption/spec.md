@@ -19,7 +19,7 @@ The system SHALL evaluate each candidate feature against the question "does TDT 
 #### Scenario: Pre-adoption check
 
 - **WHEN** an ECC feature is under consideration
-- **THEN** the system SHALL first check `tdt-meta/.agents/skills/` and `tdt-meta/.agents/commands/` (when present) for an equivalent; if found, classify `redundant-to-tdt-skill` and skip
+- **THEN** the system SHALL first check `~/Developer/.agents/skills/` and `~/Developer/.agents/commands/` (when present) for an equivalent; if found, classify `redundant-to-tdt-skill` and skip
 
 ### Requirement: Orchestrator-family skills SHALL have explicit adoption status
 

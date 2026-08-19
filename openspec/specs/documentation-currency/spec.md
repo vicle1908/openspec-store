@@ -52,13 +52,13 @@ readiness.
 ### Requirement: Declared mirrored project skills remain identical
 The repository SHALL maintain an explicit mirrored-skill set whose canonical
 paths are under `.agents/skills` and whose mirror paths are under
-`.codex/skills`. Each declared pair SHALL remain byte-for-byte identical. The
+`~/.agents/skills`. Each declared pair SHALL remain byte-for-byte identical. The
 parity check MUST report the canonical and mirror paths without modifying either
 file.
 
 #### Scenario: Skill mirror is current
 - **WHEN** the documentation and governance check runs
-- **THEN** every declared mirrored skill has the same content hash in `.agents/skills` and `.codex/skills`
+- **THEN** every declared mirrored skill has the same content hash in `.agents/skills` and `~/.agents/skills`
 
 #### Scenario: Skill mirror drifts
 - **WHEN** a mirrored skill differs from its canonical source

@@ -12,7 +12,7 @@ The workspace SHALL maintain shared Agent Skills in canonical skill roots under 
 - **GIVEN** Codex starts inside a workspace Git repository that has no repository-local OpenSpec skill mirror
 - **WHEN** the user explicitly invokes `$openspec-explore`
 - **THEN** Codex SHALL load the selected skill through standard `.agents/skills` discovery
-- **AND** the invocation SHALL NOT require a copied OpenSpec directory under `.codex/skills`
+- **AND** the invocation SHALL NOT require a copied OpenSpec directory under `~/.agents/skills`
 
 #### Scenario: Standard user-level links bridge independent Git roots
 
@@ -30,7 +30,7 @@ The workspace SHALL maintain shared Agent Skills in canonical skill roots under 
 
 ### Requirement: Product-native skill surfaces MUST preserve distinct capabilities without shared-content drift
 
-Product-native directories MUST retain configuration or capabilities that are not provided by the shared Agent Skills surface. Claude-native OpenSpec skills and `/opsx:*` commands SHALL remain available through `.claude/`, while `.codex/` MUST retain Codex configuration, roles, hooks, automation, memories, system skills, and genuinely Codex-specific skills. Shared skill content MUST NOT be copied into `.codex/skills` when standard `.agents/skills` discovery has been verified.
+Product-native directories MUST retain configuration or capabilities that are not provided by the shared Agent Skills surface. Claude-native OpenSpec skills and `/opsx:*` commands SHALL remain available through `.claude/`, while `.codex/` MUST retain Codex configuration, roles, hooks, automation, memories, system skills, and genuinely Codex-specific skills. Shared skill content MUST NOT be copied into `~/.agents/skills` when standard `.agents/skills` discovery has been verified.
 
 #### Scenario: Claude loads its native OpenSpec workflow
 
@@ -41,7 +41,7 @@ Product-native directories MUST retain configuration or capabilities that are no
 
 #### Scenario: Codex-specific governance remains intact
 
-- **GIVEN** shared skills are removed from `.codex/skills`
+- **GIVEN** shared skills are removed from `~/.agents/skills`
 - **WHEN** the Codex workspace configuration is audited
 - **THEN** `config.toml`, custom roles, hooks, automation, memories, security constraints, and system or Codex-specific skills MUST remain intact
 - **AND** repository ownership, read-only role, non-overlapping-writer, credential-protection, and Context7 policies MUST remain documented

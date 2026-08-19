@@ -72,11 +72,11 @@ For every Python repo in the workspace inventory, `ruff check . --fix && ruff fo
 
 ### Requirement: The lint-config-baseline validator SHALL be a single script
 
-A single validator script at `tdt-meta/scripts/lint-config-baseline-check.sh` (or equivalent) SHALL exist and SHALL be invokable by name to verify every repo's `pyproject.toml` against the canonical set.
+A single validator script at `~/Developer/scripts/lint-config-baseline-check.sh` (or equivalent) SHALL exist and SHALL be invokable by name to verify every repo's `pyproject.toml` against the canonical set.
 
 #### Scenario: Validator finds a non-compliant repo
 
-- **WHEN** `bash tdt-meta/scripts/lint-config-baseline-check.sh` runs
+- **WHEN** `bash ~/Developer/scripts/lint-config-baseline-check.sh` runs
 - **THEN** the script SHALL list every repo that does not match the canonical config
 - **AND** it SHALL exit non-zero if any repo fails
 

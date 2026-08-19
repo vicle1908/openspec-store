@@ -91,7 +91,7 @@ under prefix `/scheduler` on `127.0.0.1:9100`. The Docker compose
 ### Requirement: Restore procedure is documented
 
 The system SHALL provide a runbook at
-`tdt-meta/docs/operations/postgres-restore.md` describing the
+`~/Developer/docs/operations/postgres-restore.md` describing the
 single-command restore flow.
 
 #### Scenario: Operator restores from a daily backup

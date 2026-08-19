@@ -32,16 +32,16 @@ The system SHALL generate `audit/next-actions.md` listing what changes the next 
 
 ### Requirement: The playbook SHALL be versioned with TDT-meta
 
-The system SHALL store the playbook at `tdt-meta/docs/ecc-harness/playbook.md`.
+The system SHALL store the playbook at `~/Developer/docs/ecc-harness/playbook.md`.
 
 #### Scenario: Playbook location
 
 - **WHEN** the agent looks for the playbook
-- **THEN** the path SHALL resolve to `tdt-meta/docs/ecc-harness/playbook.md` and the file SHALL exist with a `Last updated` header
+- **THEN** the path SHALL resolve to `~/Developer/docs/ecc-harness/playbook.md` and the file SHALL exist with a `Last updated` header
 
 ### Requirement: The playbook SHALL link to the source OpenSpec change
 
-The system SHALL include a pointer from `tdt-meta/docs/ecc-harness/playbook.md` back to `tdt-meta/openspec/changes/ecc-harness-alignment/` so future audits reference the same methodology.
+The system SHALL include a pointer from `~/Developer/docs/ecc-harness/playbook.md` back to `~/Developer/openspec/changes/ecc-harness-alignment/` so future audits reference the same methodology.
 
 #### Scenario: Back-reference
 
@@ -66,12 +66,12 @@ The system SHALL require a separate OpenSpec change when ECC ships a major-versi
 - **WHEN** `~/.claude/plugins/cache/everything-claude-code/ecc/<version>` shows a major version bump
 - **THEN** the playbook SHALL refuse to run in-place and SHALL instruct the agent to create a new OpenSpec change (e.g., `ecc-harness-alignment-v3`) referencing this playbook
 
-### Requirement: The playbook SHALL be cross-linked from `tdt-meta/AGENTS.md`
+### Requirement: The playbook SHALL be cross-linked from `~/Developer/AGENTS.md`
 
-The system SHALL add a reference in `tdt-meta/AGENTS.md` "Skills" section pointing to `tdt-meta/docs/ecc-harness/playbook.md`.
+The system SHALL add a reference in `~/Developer/AGENTS.md` "Skills" section pointing to `~/Developer/docs/ecc-harness/playbook.md`.
 
 #### Scenario: AGENTS.md cross-link
 
-- **WHEN** a reader of `tdt-meta/AGENTS.md` reaches the Skills section
+- **WHEN** a reader of `~/Developer/AGENTS.md` reaches the Skills section
 - **THEN** the section SHALL include a pointer to the ECC alignment playbook so future contributors know how to re-audit on the next release
 

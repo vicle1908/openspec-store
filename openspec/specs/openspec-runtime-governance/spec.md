@@ -34,7 +34,7 @@ TDT SHALL select an exact official OpenSpec release as the normative runtime, SH
 The migration SHALL inventory repository, ignored, and user-global OpenSpec surfaces before mutation, SHALL classify the owner of every affected path, and MUST stop when an overlapping dirty path or unresolved owner could be overwritten.
 
 #### Scenario: Unrelated OpenSpec work is present
-- **WHEN** `tdt-meta` contains pre-existing changes outside `upgrade-openspec-1-7-runtime`
+- **WHEN** `~/Developer` contains pre-existing changes outside `upgrade-openspec-1-7-runtime`
 - **THEN** the migration SHALL preserve and report them
 - **AND** it SHALL proceed only if no planned generated or configuration path overlaps
 
@@ -61,7 +61,7 @@ The migration SHALL preserve the explicit `core` profile, `delivery: both`, and 
 The migration SHALL establish and verify project-local Codex skills for every selected workflow before removing any OpenSpec-managed global Codex prompt, SHALL use `$openspec-*` as the Codex invocation contract, and MUST obtain explicit authorization before deleting user-global files.
 
 #### Scenario: Replacement skills are ready
-- **WHEN** all six selected `.codex/skills/openspec-*` files report generation by 1.7.0 and pass content inspection
+- **WHEN** all six selected `~/.agents/skills/openspec-*` files report generation by 1.7.0 and pass content inspection
 - **THEN** the migration MAY offer cleanup of the corresponding managed `~/.codex/prompts/opsx-*.md` files
 - **AND** cleanup SHALL occur only after explicit user confirmation
 
@@ -147,7 +147,7 @@ The migration SHALL record the complete pre-upgrade strict-validation baseline, 
 
 ### Requirement: Existing nearest-root topology remains authoritative
 
-The 1.7.0 migration SHALL retain `tdt-meta/openspec/` as the centralized planning root discovered through the workspace-root symlink and parent-directory traversal. It MUST NOT configure a store, project store pointer, machine-global `defaultStore`, or workset as a source of truth in this change.
+The 1.7.0 migration SHALL retain `~/Developer/openspec/` as the centralized planning root discovered through the workspace-root symlink and parent-directory traversal. It MUST NOT configure a store, project store pointer, machine-global `defaultStore`, or workset as a source of truth in this change.
 
 #### Scenario: Repository lacks a local OpenSpec symlink
 - **WHEN** a command runs from a TDT repository without its own `openspec` entry

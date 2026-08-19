@@ -22,12 +22,12 @@ Every GitNexus result SHALL identify the canonical installed CLI version, upstre
 - **THEN** the adapter SHALL validate its bounded ID-to-canonical-root map from digest-pinned configuration
 - **AND** implementation code SHALL NOT require a duplicate hard-coded repository list
 
-#### Scenario: tdt-meta policy and tooling changes
+#### Scenario: ~/Developer policy and tooling changes
 
-- **WHEN** an authorized change edits policy or tooling in `tdt-meta`
-- **THEN** `tdt-meta` SHALL remain absent from the GitNexus repository binding and GitNexus impact/change-scope gates
+- **WHEN** an authorized change edits policy or tooling in `~/Developer`
+- **THEN** `~/Developer` SHALL remain absent from the GitNexus repository binding and GitNexus impact/change-scope gates
 - **AND** the edit SHALL instead require an apply-ready OpenSpec change, exact repository-local static caller review, focused regression tests, applicable schema/policy checks, and scoped diff review
-- **AND** no `tdt-meta` index, bootstrap, or guessed provider alias SHALL authorize or block the edit
+- **AND** no `~/Developer` index, bootstrap, or guessed provider alias SHALL authorize or block the edit
 
 #### Scenario: Binding is ambiguous or stale
 

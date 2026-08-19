@@ -38,7 +38,7 @@ The system SHALL prefer TDT equivalents for documentation, code review, and veri
 
 #### Scenario: Documentation overlap
 
-- **WHEN** an ECC command overlaps with a TDT skill (e.g., `/docs` ↔ `tdt-meta/.agents/skills/ctx7/`)
+- **WHEN** an ECC command overlaps with a TDT skill (e.g., `/docs` ↔ `~/Developer/.agents/skills/ctx7/`)
 - **THEN** the ECC command SHALL be classified `redundant-to-tdt-skill:<name>`; otherwise `keep-default`
 
 Initial mapping:

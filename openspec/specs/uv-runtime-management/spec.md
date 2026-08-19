@@ -14,11 +14,11 @@ All active development SHALL run from `$HOME/Developer/tdt/`.
 - **AND** the legacy path under `~/Library/legacy-workspace/legacy-cloud-workspace/...` SHALL NOT be used for active development.
 
 ### Requirement: Git-backed workspace metadata
-Workspace-level metadata SHALL be versioned in `tdt-meta`.
+Workspace-level metadata SHALL be versioned in `~/Developer`.
 
 #### Scenario: Metadata source of truth
 - **WHEN** reading workspace-level docs/config/OpenSpec/skills/tools
-- **THEN** the source of truth SHALL be `$HOME/Developer/tdt/tdt-meta/`
+- **THEN** the source of truth SHALL be `~/Developer/`
 - **AND** root compatibility paths (for example `AGENTS.md`, `docs/`, `openspec/`, `.agents/`, `tools/`) SHALL resolve to that repo via symlink or equivalent mapping.
 
 ### Requirement: Repository-local uv environments
@@ -112,7 +112,7 @@ Secrets SHALL be loaded from machine-local config outside source repos.
 - **THEN** the launchd plist's `EnvironmentVariables` dict SHALL provide `PATH`, `HOME`, and any service-specific env vars the app needs at startup (e.g. `JIRA_GUARD_*`, `SSL_CERT_FILE`, `REQUESTS_CA_BUNDLE`)
 - **AND** the runtime launcher script SHALL NOT `source $HOME/.tdt/.env` (bash source is brittle when the file contains shell-unsafe content like unescaped `|`)
 - **AND** the Python app SHALL load `$HOME/.tdt/.env` via `tdt_core.env.load_tdt_env()` (which wraps `python-dotenv`; tolerant of malformed lines)
-- **AND** secrets SHALL NOT be committed to source repos or `tdt-meta`.
+- **AND** secrets SHALL NOT be committed to source repos or `~/Developer`.
 
 ### Requirement: Local tests isolate external health dependencies
 Unit tests SHALL mock external services for health-failure modes.
@@ -173,12 +173,12 @@ Propagation between machines SHALL use Git, not synchronized file systems.
 
 #### Scenario: Metadata propagation
 - **WHEN** workspace metadata changes (docs, OpenSpec, skills, config, tools)
-- **THEN** changes SHALL be committed in `tdt-meta` and pushed to GitLab
-- **AND** the receiving machine SHALL `git pull` `tdt-meta`.
+- **THEN** changes SHALL be committed in `~/Developer` and pushed to GitLab
+- **AND** the receiving machine SHALL `git pull` `~/Developer`.
 
 #### Scenario: New machine bootstrap
 - **WHEN** bootstrapping a new machine
 - **THEN** the operator SHALL clone every repo into `$HOME/Developer/tdt/` from GitLab
-- **AND** install the chpwd hook from `tdt-meta`'s documented snippet
+- **AND** install the chpwd hook from `~/Developer`'s documented snippet
 - **AND** run `uv sync` per repo
 - **AND** SHALL NOT enable legacy cloud sync over `$HOME/Developer/tdt/`.

@@ -14,7 +14,7 @@ The system SHALL have a CLAUDE.md file with project-specific instructions for AI
 - **AND** CLAUDE.md SHALL document the CLI commands (check, update, validate, sync, sync-all)
 - **AND** CLAUDE.md SHALL document the pipeline architecture (detect → analyze → generate → validate → report)
 - **AND** CLAUDE.md SHALL document the LLM configuration (OmniRoute proxy and model selection)
-- **AND** CLAUDE.md SHALL reference tdt-meta CLAUDE.md for workspace-wide conventions
+- **AND** CLAUDE.md SHALL reference ~/Developer/CLAUDE.md for workspace-wide conventions
 
 #### Scenario: CLAUDE.md does not duplicate workspace content
 - **WHEN** CLAUDE.md is written
