@@ -2,13 +2,13 @@
 
 ## Quick Snapshot (recommended first attempt)
 
-**Snapshot ID:** `20260819-142515-pre-update`
-**Location:** `~/.hermes/state-snapshots/20260819-142515-pre-update/`
+**Snapshot ID:** `20260819-153247-pre-mutation-correct`
+**Location:** `~/.hermes/state-snapshots/20260819-153247-pre-mutation-correct/`
 
 ### Steps
 1. Stop the gateway: `launchctl stop ai.hermes.gateway`
 2. Wait for processes to exit: `sleep 3`
-3. Restore from inside `~/.hermes/hermes-agent`: `/snapshot restore 20260819-142515-pre-update`
+3. Restore from inside `~/.hermes/hermes-agent`: `/snapshot restore 20260819-153247-pre-mutation-correct`
 4. Start gateway: `launchctl start ai.hermes.gateway`
 5. Verify: `curl -s http://127.0.0.1:8787/health` shows `status: ok`
 6. Verify Telegram: send a test message and confirm response
