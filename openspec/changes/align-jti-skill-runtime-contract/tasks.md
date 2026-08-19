@@ -5,7 +5,7 @@
 - [ ] 1.3 Replace the stale 65-case claim with an explicit v1.2-to-v2.0 mapping for the executable 45-case `TestRcaSurveyPrecision.SURVEY`; include all seven concrete categories, expected unclassified results, moved auth/network/silent-exit cases, multi-cause ordering, duplicate-pattern deduplication, the three-entry cap, empty input, and fixed confidence values.
 - [ ] 1.4 Add failing `SheetsWriter` tests for the exact 28-column schema, mapping-driven row materialization, positions 10/13/22–27, `" | "` secondary formatting, empty values, hyperlink column lookup, and a schema-derived Classification clear range resolving to `A1:AB1000` while Summary clearing remains unchanged.
 - [ ] 1.5 Confirm `jira-epic-report`, `jira-daily-reports`, and `webhook-receiver` still resolve editable `../jira-skill` sources in both `pyproject.toml` and `uv.lock`; record the sole current hardcoded v1 assertion in `webhook-receiver/tests/unit/test_analysis_adapter.py` and add explicit failing `BUNDLE_VERSION == "v2.0"` parity assertions in all three consumers.
-- [x] 1.6 Under `tdt-meta/config/codex/scripts/tests/`, add standard-library tests for all six description scalar forms, UTF-8 byte limits, the 800-byte warning, malformed frontmatter, root/nested placement, duplicate names, atomic failure, unchanged-write idempotence, three-index consistency, and matcher JSON-schema compatibility.
+- [ ] 1.6 Under `tdt-meta/config/codex/scripts/tests/`, add standard-library tests for all six description scalar forms, UTF-8 byte limits, the 800-byte warning, malformed frontmatter, root/nested placement, duplicate names, atomic failure, unchanged-write idempotence, three-index consistency, and matcher JSON-schema compatibility.
 
 ## 2. Implement the v2.0 runtime contract in `jira-skill`
 
@@ -27,12 +27,12 @@
 
 ## 4. Replace skill-index generation and repair JTI metadata
 
-- [x] 4.1 Implement `tdt-meta/config/codex/scripts/build_skills_index.py` with `--check` and `--write`, direct-child discovery, stray/nested and duplicate-name rejection, the six supported scalar forms, decoded UTF-8 byte validation, deterministic rendering, semantic comparison, atomic replacement, and unchanged-write idempotence using only the standard library.
-- [x] 4.2 Make `build-skills-index.sh` invoke the Python entry point through `uv run --no-project python`; make `skill-validation-check.sh` delegate to `--check` while preserving its hook-facing JSON output and surfacing all validation errors and advisory warnings.
+- [ ] 4.1 Implement `tdt-meta/config/codex/scripts/build_skills_index.py` with `--check` and `--write`, direct-child discovery, stray/nested and duplicate-name rejection, the six supported scalar forms, decoded UTF-8 byte validation, deterministic rendering, semantic comparison, atomic replacement, and unchanged-write idempotence using only the standard library.
+- [ ] 4.2 Make `build-skills-index.sh` invoke the Python entry point through `uv run --no-project python`; make `skill-validation-check.sh` delegate to `--check` while preserving its hook-facing JSON output and surfacing all validation errors and advisory warnings.
 - [ ] 4.3 Rewrite `.agents/skills/jira-ticket-intelligence/SKILL.md` with a routing-focused description below 1,024 bytes, nine signal families, one 28-column contract, Text/Font → Plant, the executable 45-case survey, current baseline-spec references, and only uv-backed executable permissions/examples.
-- [x] 4.4 Reconfirm no consumers reference `.agents/skills/_regenerate_index.py` or `config/codex/skills-index.json`; remove those files and the byte-identical root-level `.agents/skills/SKILL.md`, then update any documentation that presents them as active.
-- [x] 4.5 Run the new standard-library tests, run the builder in `--check` and `--write` modes, and verify an unchanged second write preserves file contents and mtimes.
-- [x] 4.6 Regenerate `.codex/skills-index.json`, `.agents/SKILLS_INDEX.md`, and `.agents/skills/SKILLS_INDEX.md`; verify all three contain the same 131 unique skills, the JTI description is normalized, no scalar marker is indexed as content, and both existing matcher scripts consume the unchanged JSON field schema.
+- [ ] 4.4 Reconfirm no consumers reference `.agents/skills/_regenerate_index.py` or `config/codex/skills-index.json`; remove those files and the byte-identical root-level `.agents/skills/SKILL.md`, then update any documentation that presents them as active.
+- [ ] 4.5 Run the new standard-library tests, run the builder in `--check` and `--write` modes, and verify an unchanged second write preserves file contents and mtimes.
+- [ ] 4.6 Regenerate `.codex/skills-index.json`, `.agents/SKILLS_INDEX.md`, and `.agents/skills/SKILLS_INDEX.md`; verify all three contain the same 131 unique skills, the JTI description is normalized, no scalar marker is indexed as content, and both existing matcher scripts consume the unchanged JSON field schema.
 
 ## 5. Align runtime documentation and all capability contracts
 
