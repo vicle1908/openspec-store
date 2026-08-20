@@ -112,15 +112,15 @@
 
 ## 14. Commit and Archive
 
-- [ ] 14.1 Commit agent-core changes: `git add -A && git commit`
-- [ ] 14.2 Commit agent-harness changes: `git add pyproject.toml uv.lock tests/test_dependency_baseline.py && git commit`
-- [ ] 14.3 Commit agent-docs-sync changes: `git add -A && git commit` (includes guardrails migration + docs)
-- [ ] 14.4 Commit openspec-store changes: `git add -A && git commit` (specs + archive)
-- [ ] 14.5 Archive the OpenSpec change: `openspec archive upgrade-pydantic-ai-harness --yes`
-- [ ] 14.6 Commit openspec-store archive: `git add -A && git commit`
-- [ ] 14.7 Run `openspec validate --all --strict` to confirm no regressions
+- [x] 14.1 Commit agent-core changes: `git add -A && git commit`
+- [x] 14.2 Commit agent-harness changes: `git add pyproject.toml uv.lock tests/test_dependency_baseline.py && git commit`
+- [x] 14.3 Commit agent-docs-sync changes: `git add -A && git commit` (includes guardrails migration + docs)
+- [x] 14.4 Commit openspec-store changes: `git add -A && git commit` (specs + archive)
+- [x] 14.5 Archive the OpenSpec change: `openspec archive upgrade-pydantic-ai-harness --yes`
+- [x] 14.6 Commit openspec-store archive: `git add -A && git commit`
+- [x] 14.7 Run `openspec validate --all --strict` to confirm no regressions
 
 ## 15. Verify Rollback Works
 
-- [ ] 15.1 In agent-core: `git stash && git checkout main -- pyproject.toml uv.lock && uv sync && uv run pytest -q && git stash pop`
-- [ ] 15.2 Verify rollback restores previous harness version and all tests pass
+- [x] 15.1 In agent-core: `git stash && git checkout main -- pyproject.toml uv.lock && uv sync && uv run pytest -q && git stash pop`
+- [x] 15.2 Verify rollback restores previous harness version and all tests pass
