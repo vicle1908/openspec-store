@@ -72,7 +72,7 @@ def main() -> int:
     results = [smoke(p, s) for p, s in providers]
 
     print(f"\n{'='*50}")
-    print(f"  SUMMARY")
+    print("  SUMMARY")
     print(f"{'='*50}")
     for (prov, _), ok in zip(providers, results):
         print(f"  {prov}: {'PASS' if ok else 'FAIL'}")

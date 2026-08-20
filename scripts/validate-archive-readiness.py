@@ -13,15 +13,12 @@ It enforces fail-closed archive readiness gates:
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
-import os
 import re
 import subprocess
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any
 
 TASK_UNCHECKED_PATTERN = re.compile(r"^\s*-\s*\[\s*\]\s+(.+)$", re.MULTILINE)
 TASK_CHECKED_PATTERN = re.compile(r"^\s*-\s*\[[xX]\]\s+(.+)$", re.MULTILINE)
