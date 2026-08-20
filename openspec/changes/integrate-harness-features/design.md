@@ -1,5 +1,32 @@
 ## Design: Harness Feature Integration (Maximized)
 
+### Verified Import Paths (Smoke-Tested Against 0.23.0)
+
+All import paths verified via `uv run --with pydantic-ai-harness==0.23.0 python -c "import ..."`:
+
+| Module | Import Path | Status |
+|---|---|---|
+| Compaction | `pydantic_ai_harness.compaction` | ✅ Verified |
+| SystemReminders | `pydantic_ai_harness` (root) | ✅ Verified |
+| GoalReanchor | `pydantic_ai_harness.system_reminders` | ✅ Verified |
+| ToolOutputLimits | `pydantic_ai_harness.tool_output_limits` | ✅ Verified |
+| WarnOnCacheBusts | `pydantic_ai_harness.warn_on_cache_busts` | ✅ Verified |
+| SpendLimits | `pydantic_ai_harness.spend` | ✅ Verified |
+| Planning | `pydantic_ai_harness.planning` | ✅ Verified |
+| ConversationSearch | `pydantic_ai_harness.conversation_search` | ✅ Verified |
+| Advisor | `pydantic_ai_harness.advisor` | ✅ Verified |
+| GuardrailResult | `pydantic_ai_harness.guardrails` | ✅ Verified |
+| ToolGuardrail | `pydantic_ai_harness.guardrails` | ✅ Verified |
+| redact_secrets | `pydantic_ai_harness.guardrails.detectors` | ✅ Verified |
+
+**Module renames in 0.23.0** (deprecated aliases still work):
+- `pydantic_ai_harness.context` → `pydantic_ai_harness.repo_context`
+- `pydantic_ai_harness.cache_stability` → `pydantic_ai_harness.warn_on_cache_busts`
+- `pydantic_ai_harness.overflowing_tool_output` → `pydantic_ai_harness.tool_output_limits`
+- `GuardResult` → `GuardrailResult`
+- `InputGuard` → `InputGuardrail`
+- `OutputGuard` → `OutputGuardrail`
+
 ### Feature Adoption Strategy
 
 Seven capabilities adopted in four batches, ordered by value/effort ratio:
