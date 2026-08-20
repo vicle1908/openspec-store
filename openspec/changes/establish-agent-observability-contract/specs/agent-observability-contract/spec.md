@@ -124,7 +124,7 @@ Evaluation records stored in `agent_memory.eval_metrics` SHALL include optional 
 
 - **WHEN** an evaluation runs while an OTel span is active
 - **THEN** `EvalRecord.trace_id` SHALL be set to the active trace ID
-- **AND** `EvalRecord.span_id` SHALL be set to the active root span ID
+- **AND** `EvalRecord.trace_id` and `span_id` SHALL be populated from `EvaluationReport.trace_id` and `EvaluationReport.span_id`
 
 #### Scenario: Evaluation without active trace
 
@@ -135,7 +135,7 @@ Evaluation records stored in `agent_memory.eval_metrics` SHALL include optional 
 
 ### Requirement: Privacy defaults
 
-Content capture (prompts, completions, tool arguments, tool results) SHALL be OFF by default. Secrets and PII SHALL always be redacted when `capture_sensitive_payloads` is True. Binary content SHALL be excluded by default.
+Content capture (prompts, completions, tool arguments, tool results) SHALL be OFF by default. Known credential patterns—API keys, tokens, and passwords—SHALL be redacted before export when `capture_sensitive_payloads` is True. Generalized PII classification is follow-up scope. Binary content SHALL be excluded by default.
 
 #### Scenario: Default privacy settings
 

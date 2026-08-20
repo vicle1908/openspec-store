@@ -67,9 +67,9 @@ A structlog processor SHALL inject `trace_id` and `span_id` from the active OTel
 
 `EvalRecord` SHALL include nullable `trace_id` and `span_id` fields. The database schema SHALL include corresponding columns. When a trace is active during evaluation, these fields SHALL be populated. This enables linking quality regressions to specific agent trajectories.
 
-### D10: Numeric evaluation aggregation
+### D10: Evaluation pass/fail semantics
 
-Pass-rate calculations SHALL use threshold comparison (`score >= threshold`), not identity comparison (`score is True`). This fixes the verified defect where numeric evaluators (e.g., `accuracy_score=0.8`) were incorrectly counted as failures.
+Pass-rate SHALL be derived from boolean assertions (`ReportCase.assertions`) and task/evaluator failures. Numeric scores (`ReportCase.scores`) SHALL be reported separately as measurements with per-evaluator mean and stddev. When no assertions exist, pass rate SHALL be reported as `null` — never defaulted to a universal threshold.
 
 ### D11: MLflow exception isolation
 
@@ -118,7 +118,7 @@ ALTER TABLE agent_memory.eval_metrics
 
 ```python
 trace_id: str | None = Field(default=None, description="OTel trace ID when available")
-span_id: str | None = Field(default=None, description="OTel root span ID when available")
+span_id: str | None = Field(default=None, description="Evaluation-report span ID when available")
 ```
 
 ## Failure handling
@@ -142,7 +142,55 @@ span_id: str | None = Field(default=None, description="OTel root span ID when av
 | Duplicate spans if both routes active | One-route-per-backend invariant enforced in `init_observability()` |
 | Flush timeout too short | Configurable timeout, generous default |
 
-## Open questions
+## Semantic Decision Record (2026-08-20)
+
+This section resolves all eight contradictions identified in the MoA review before implementation approval.
+
+### SD1: Langfuse route mode — `direct` default, `collector` deferred
+
+`get_client()` is a singleton factory that always returns a trace-enabled `Langfuse` instance. The `Langfuse` constructor supports `tracing_enabled`, `should_export_span`, `span_exporter`, and `tracer_provider` for filtering, but these are constructor-level controls — `get_client()` does not expose them.
+
+**Decision:** The documented current default is `direct` mode (Langfuse SDK span processor via `get_client()`). `Collector` mode is conditional on Phase 0 deployment validation proving the Collector can ingest Langfuse traces. Until then, `collector` mode SHALL NOT be implemented. `disabled` mode is supported by passing `tracing_enabled=False` to the `Langfuse` constructor.
+
+**Risk:** `LangfuseClient.create()` currently constructs a normal trace-enabled `Langfuse` client, so calling it for "manual scoring only" may itself register another span processor — a concrete duplicate-ingestion risk in `direct` mode. The implementation MUST verify that `LangfuseClient` and the OTel-registered client share the same underlying instance, or use `should_export_span` to prevent double-ingestion.
+
+### SD2: MLflow route mode — `autolog` default, `collector` deferred
+
+The existing spec mandates a Collector exporter. The change introduces `autolog`, `collector`, and `disabled` modes. Those behaviors conflict unless the old unconditional requirement is removed.
+
+**Decision:** Remove the unconditional Collector requirement from the existing MLflow spec. Replace with: "Exactly one trace-ingestion route SHALL be active." Default mode is `autolog` (SDK-based). `Collector` mode is deferred pending deployment validation of the MLflow OTLP endpoint. `Disabled` mode suppresses trace export.
+
+### SD3: Evaluation pass/fail semantics — assertions-based, not numeric
+
+pydantic-evals supports boolean, integer, float, string, structured mapping, and reason outputs. Numeric values belong in `ReportCase.scores`; boolean pass/fail belongs in `ReportCase.assertions`. There is no universal pass threshold for numeric scores.
+
+**Decision:** Pass rate SHALL be derived from boolean assertions and task/evaluator failures. Numeric scores SHALL be aggregated separately as measurements. Thresholds SHALL be evaluator-specific and explicitly configured — never globally assumed. When no assertions exist, pass rate SHALL be reported as undefined/null, not defaulted to a universal threshold. The current `result.value is True` check in `runners/runner.py` is correct for boolean assertions but must not apply to numeric scores. The `_log_to_mlflow` function SHALL report: (a) assertion pass rate (boolean only), (b) case success rate (task completed without exception), and (c) numeric score summary (mean/stddev per evaluator).
+
+### SD4: Trace linkage semantics — propagate report-level IDs to EvalRecord
+
+`EvaluationReport` already exposes `trace_id` and `span_id`. The remaining gap is in `EvalRecord` and Postgres persistence.
+
+**Decision:** `EvalRecord.trace_id` SHALL be populated from `EvaluationReport.trace_id` (the trace containing the evaluated execution). `EvalRecord.span_id` SHALL be populated from `EvaluationReport.span_id` (the span directly representing the evaluation run). These are report-level identifiers, not per-case or ambient-context identifiers. Multiple cases within one evaluation share one evaluation trace. When evaluations run concurrently, each gets its own trace ID from the active OTel context.
+
+### SD5: Service identity — stable, not variable per command
+
+**Decision:** `service.name` SHALL be `agent-core` for agent-core processes. Per-command identity SHALL be `agent_core.command.name` attribute on the root span. This prevents high-cardinality `service.name` values.
+
+### SD6: Consumer initialization — explicit migration, not implicit contradiction
+
+`agent-docs-sync/observability/__init__.py` currently performs initialization at import time. The plan requires no import-time side effects.
+
+**Decision:** Add `agent-docs-sync-observability` as a modified capability. Specify: "Observability initialization SHALL occur at the process composition root and SHALL NOT occur as an import side effect." The `agent-docs-sync` CLI callback SHALL call `init_observability(service_name="agent-docs-sync")`. The `observability/__init__.py` module SHALL export `get_tracer` and `get_meter` without side effects. This migration is a prerequisite for implementation tasks 2.6.
+
+### SD7: Privacy scope — minimum credential redaction only
+
+**Decision:** This change commits to: (a) content capture off by default, (b) binary content off by default, (c) explicit opt-in for prompt/tool payload capture, (d) minimum credential redaction (API keys, tokens, passwords) when `capture_sensitive_payloads=True`. Generalized PII classification, tenant-specific redaction, and field-level masking are explicit follow-up scope. Precedence rule: `include_content=False` means content is never captured; `include_content=True` permits capture; redaction always runs before export; `capture_sensitive_payloads` cannot bypass mandatory secret redaction.
+
+### SD8: Implementation gates — no code changes until decisions closed
+
+**Decision:** No exporter-route implementation until Collector/backend evidence is captured (Phase 0). No numeric pass-rate implementation until evaluator semantics are approved (this record). No database migration until trace/span ownership is defined (this record). No removal of import-time consumer initialization until consumer startup tests exist (task 0.6).
+
+## Open questions (deferred to Phase 0 evidence capture)
 
 1. What are the actual OTel Collector routes for Langfuse and MLflow?
 2. Is `mlflow.pydantic_ai.autolog()` compatible with the installed pydantic-ai v2?

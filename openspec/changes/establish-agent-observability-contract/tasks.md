@@ -12,8 +12,8 @@
 
 ## 1. Lock regression tests for confirmed defects
 
-- [ ] 1.1 Add a failing test proving MLflow wrapper exceptions currently propagate. **Repo:** agent-core. **File:** `tests/observability/test_mlflow_client.py`. **Validation:** test fails before fix. **Evidence:** pytest output.
-- [ ] 1.2 Add a failing test for numeric evaluation aggregation (pass-rate uses `is True`). **Repo:** agent-core. **File:** `tests/observability/scorers/test_runner.py`. **Validation:** test fails before fix. **Evidence:** pytest output.
+- [ ] 1.1 Add a failing test proving `MLflowClient` exceptions currently propagate. **Repo:** agent-core. **File:** `tests/observability/test_mlflow_client.py`. **Validation:** test fails before fix. **Evidence:** pytest output.
+- [ ] 1.2 Add a failing test proving current MLflow evaluation summary mishandles the distinction among assertions, numeric scores, and task failures. **Repo:** agent-core. **File:** `tests/observability/scorers/test_runner.py`. **Validation:** test fails before fix. **Evidence:** pytest output.
 - [ ] 1.3 Add a failing test proving agent-core CLI does not currently initialize tracing. **Repo:** agent-core. **File:** `tests/cli/test_cli_tracing_init.py`. **Validation:** test fails before fix. **Evidence:** pytest output.
 - [ ] 1.4 Add a test for repeated observability initialization (idempotency). **Repo:** agent-core. **File:** `tests/foundation/test_tracing_extended.py`. **Validation:** test passes with no-op provider, fails if duplicate processors. **Evidence:** pytest output.
 - [ ] 1.5 Run focused test suite and preserve pre-fix evidence. **Repo:** agent-core. **Validation:** `uv run pytest tests/observability/ tests/cli/ tests/foundation/test_tracing*.py -v`. **Evidence:** full pytest output.
@@ -38,11 +38,11 @@
 
 ## 4. Correct MLflow and evaluation behavior
 
-- [ ] 4.1 Fix MLflow exception suppression: replace `_Suppress.__exit__` returning `None` with correct behavior. **Repo:** agent-core. **File:** `src/agent_core/observability/mlflow_client.py`. **Validation:** test 1.1 passes after fix. **Evidence:** pytest output.
-- [ ] 4.2 Replace `result.value is True` with threshold-based numeric score aggregation. **Repo:** agent-core. **File:** `src/agent_core/observability/scorers/runner.py`. **Validation:** test 1.2 passes after fix. **Evidence:** pytest output.
+- [ ] 4.1 Fix MLflow exception isolation: replace `_Suppress.__exit__` returning `None` with correct behavior. **Repo:** agent-core. **File:** `src/agent_core/observability/mlflow_client.py`. **Validation:** test 1.1 passes after fix. **Evidence:** pytest output.
+- [ ] 4.2 Change `_log_to_mlflow()` reporting semantics: (a) assertion pass rate from `ReportCase.assertions`, (b) task success rate from completed versus failed cases, (c) numeric score summaries separately, (d) `pass_rate=null` when no boolean assertions exist. **Repo:** agent-core. **File:** `src/agent_core/observability/scorers/runner.py`. **Validation:** test 1.2 passes after fix. **Evidence:** pytest output.
 - [ ] 4.3 Add nullable `trace_id` and `span_id` fields to `EvalRecord`. **Repo:** agent-core. **File:** `src/agent_core/evaluation/types.py`. **Validation:** model accepts None and string values. **Evidence:** pytest output.
 - [ ] 4.4 Add additive SQL migration: `ALTER TABLE agent_memory.eval_metrics ADD COLUMN trace_id TEXT DEFAULT NULL, span_id TEXT DEFAULT NULL`. **Repo:** agent-core. **File:** migration file. **Validation:** migration runs cleanly, existing rows unaffected. **Evidence:** migration output.
-- [ ] 4.5 Populate trace/span identifiers from active OTel context in evaluation recording path. **Repo:** agent-core. **File:** `src/agent_core/evaluation/store.py`. **Validation:** `EvalRecord` inserted with trace_id when span is active. **Evidence:** pytest output.
+- [ ] 4.5 Populate `EvalRecord.trace_id` and `span_id` from `EvaluationReport.trace_id` and `EvaluationReport.span_id` in the evaluation recording path. **Repo:** agent-core. **File:** `src/agent_core/evaluation/store.py`. **Validation:** `EvalRecord` inserted with trace_id and span_id when EvaluationReport contains them. **Evidence:** pytest output.
 - [ ] 4.6 Add tests: migration backward-compat, round-trip write/read, null-context insert, active-context insert. **Repo:** agent-core. **File:** `tests/evaluation/test_store.py`. **Evidence:** pytest output.
 
 ## 5. Add trace-log correlation and privacy controls

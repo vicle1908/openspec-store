@@ -4,12 +4,15 @@
 
 `configure_tracing()` SHALL call `langfuse.get_client()` to initialize Langfuse's built-in OTel integration. The returned `Langfuse` instance automatically registers as an OTel span processor on the global `TracerProvider`. There is NO separate `langfuse.opentelemetry` module — OTel support is built into the `Langfuse` class.
 
-Langfuse trace ingestion SHALL use exactly one configured route mode: `direct` (Langfuse SDK span processor via `get_client()`), `collector` (OTel Collector exporter), or `disabled`. The selected mode SHALL be determined at configuration time and SHALL NOT change at runtime. The default mode SHALL be `direct` unless deployment validation proves Collector ingestion is authoritative.
+The `Langfuse` constructor supports filtering controls: `tracing_enabled`, `should_export_span`, `span_exporter`, `tracer_provider`, and `mask_otel_spans`. These are constructor-level controls — `get_client()` does not expose them.
+
+Langfuse trace ingestion SHALL use exactly one mode: `direct` (default, SDK span processor via `get_client()`), `collector` (deferred — conditional on Phase 0 deployment validation), or `disabled`. The mode SHALL be determined at configuration time and SHALL NOT change at runtime.
 
 #### Scenario: Langfuse receives agent traces via OTel
 
 - **WHEN** Langfuse env vars are set (LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, LANGFUSE_HOST) and an agent run completes
 - **THEN** the trace SHALL appear in Langfuse with nested spans for agent run, model requests, and tool executions
+- **AND** in `direct` mode, traces reach Langfuse via the SDK span processor registered by `get_client()`
 
 #### Scenario: Langfuse not configured — graceful degradation
 
@@ -21,22 +24,18 @@ Langfuse trace ingestion SHALL use exactly one configured route mode: `direct` (
 - **WHEN** Langfuse is configured but authentication fails
 - **THEN** `langfuse.auth_check()` SHALL return False and a warning SHALL be logged
 
-#### Scenario: Direct mode active
-
-- **WHEN** Langfuse is configured with mode `direct`
-- **THEN** traces SHALL reach Langfuse via the Langfuse SDK span processor registered during initialization
-- **AND** the `LangfuseClient` wrapper SHALL NOT duplicate trace ingestion
-
-#### Scenario: Collector mode active
+#### Scenario: Collector mode — deferred pending deployment validation
 
 - **WHEN** Langfuse is configured with mode `collector`
-- **THEN** traces SHALL reach Langfuse exclusively through the OTel Collector
-- **AND** the direct SDK span processor SHALL NOT be registered for ingestion
+- **THEN** trace ingestion via the Collector SHALL be validated in Phase 0 before implementation
+- **AND** until validated, `collector` mode SHALL NOT be implemented
+- **AND** `direct` mode SHALL be used as fallback
 
 #### Scenario: Disabled mode
 
 - **WHEN** Langfuse is configured with mode `disabled`
-- **THEN** no Langfuse trace export SHALL occur
+- **THEN** `Langfuse` SHALL be constructed with `tracing_enabled=False`
+- **AND** no Langfuse trace export SHALL occur
 - **AND** the application SHALL function normally
 
 ### Requirement: Langfuse agent graph view SHALL be available
@@ -50,17 +49,13 @@ With pydantic-ai's `Instrumentation` capability creating OTel spans, Langfuse SH
 
 ### Requirement: Existing LangfuseClient.score_trace() SHALL be preserved
 
-The manual `LangfuseClient` wrapper SHALL be retained for backward compatibility with hook-based scoring and shall remain available in all enabled Langfuse modes (`direct` and `collector`). Trace ingestion moves to the configured mode, but manual score recording via `score_trace()` continues to work independently.
+The manual `LangfuseClient` wrapper SHALL be retained for backward compatibility with hook-based scoring. In `direct` mode, the `LangfuseClient` SHALL share the same singleton instance returned by `get_client()` to prevent duplicate span processors. The implementation MUST verify that `LangfuseClient.create()` does not create a second trace-enabled client.
 
 #### Scenario: Hook-based scoring still works
 
 - **WHEN** `langfuse_hooks` in `builtins.py` calls `score_trace()`
 - **THEN** the score SHALL be recorded on the trace in Langfuse
-
-#### Scenario: Scoring in collector mode
-
-- **WHEN** `LangfuseClient.score_trace()` is called in `collector` mode
-- **THEN** the score SHALL be recorded on the existing trace in Langfuse
+- **AND** no duplicate span processors SHALL be registered
 
 ### Requirement: propagate_attributes SHALL be available for metadata
 
@@ -75,11 +70,11 @@ The `langfuse.propagate_attributes` context manager SHALL be available for attac
 
 ### Requirement: Langfuse duplicate prevention
 
-The system SHALL NOT allow the same trace to reach Langfuse via two different routes simultaneously. When `direct` mode is active, the Collector SHALL NOT export the same traces to Langfuse. When `collector` mode is active, the SDK span processor SHALL NOT ingest traces.
+The system SHALL NOT allow the same trace to reach Langfuse via two different routes simultaneously. In `direct` mode, the SDK span processor SHALL be the sole trace ingestion path. Manual scoring via `LangfuseClient.score_trace()` SHALL reuse the same underlying Langfuse instance to prevent duplicate processors.
 
-#### Scenario: Only one route active
+#### Scenario: Only one trace ingestion path active
 
-- **WHEN** Langfuse is configured in any enabled mode
+- **WHEN** Langfuse is configured in `direct` mode
 - **THEN** exactly one trace-ingestion path SHALL be active
 - **AND** no duplicate trace records SHALL appear in Langfuse
 

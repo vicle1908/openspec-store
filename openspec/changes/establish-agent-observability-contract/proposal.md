@@ -11,7 +11,7 @@ The agent ecosystem has multiple observability implementations and backend-speci
 - Define the authoritative relationship between explicit Pydantic AI `Instrumentation()` capability and global `Agent.instrument_all()` to prevent duplicate spans.
 - Define canonical OTel resource, agent, workflow, run, conversation, tool, and evaluation correlation attributes — reconciling existing `gen_ai.*` standard attributes with `agent_core.*` extensions.
 - Require trace identifiers to flow into structured logs (structlog) and evaluation records (`EvalRecord`).
-- Define content-capture and field-level redaction requirements, replacing the current coarse boolean controls.
+- Define content-off defaults and minimum credential redaction, replacing the current coarse boolean controls. Generalized PII classification is explicit follow-up scope.
 - Require deterministic exporter routing that prevents duplicate Langfuse or MLflow ingestion.
 - Correct verified defects: MLflow `_Suppress.__exit__` exception handling and MLflow evaluation pass-rate numeric score semantics.
 - Expand observability tests to validate activation, span hierarchy, shutdown flushing, redaction, propagation, and backend degradation.
@@ -58,7 +58,7 @@ The agent ecosystem has multiple observability implementations and backend-speci
 
 - **`evaluation`**
   - Adds `trace_id` and optional `span_id` fields to `EvalRecord`.
-  - Defines numeric-score pass/fail aggregation semantics (replacing `is True` check).
+  - Defines evaluation pass/fail semantics based on boolean assertions and task failures, with numeric scores reported separately.
   - Adds evaluator and dataset version provenance.
   - Adds production-trace-to-regression-dataset linkage expectation.
 

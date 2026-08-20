@@ -2,12 +2,13 @@
 
 ### Requirement: MLflow OTLP exporter SHALL be added to OTel Collector
 
-`otel-collector-config.yaml` SHALL include an `otlp/mlflow` exporter pointing at `mlflow-server:5000` and the traces pipeline SHALL route to both `otlp/langfuse` and `otlp/mlflow`. MLflow trace ingestion SHALL use exactly one configured route mode: `autolog` (MLflow pydantic-ai autolog), `collector` (OTel Collector exporter), or `disabled`. Autolog and Collector trace ingestion SHALL NOT be active simultaneously. The selected mode SHALL be determined at configuration time and SHALL NOT change at runtime.
+MLflow trace ingestion SHALL use exactly one configured route mode: `autolog` (MLflow pydantic-ai autolog), `collector` (OTel Collector exporter via `otlp/mlflow`), or `disabled`. The default mode SHALL be determined by Phase 0 deployment evidence, not assumed. Collector mode SHALL be implemented only after deployment validation confirms the OTel Collector and MLflow backend support OTLP trace ingestion. Autolog and Collector trace ingestion SHALL NOT be active simultaneously. The selected mode SHALL be determined at configuration time and SHALL NOT change at runtime.
 
 #### Scenario: Traces reach MLflow via OTel Collector
 
 - **WHEN** an agent run completes and the OTel Collector is configured with the MLflow exporter
 - **THEN** the trace SHALL appear in the MLflow tracing UI with spans for agent run, model requests, and tool executions
+- **AND** this route is conditional on Phase 0 deployment validation
 
 #### Scenario: MLflow not in Docker Compose — collector degrades gracefully
 
@@ -20,10 +21,11 @@
 - **THEN** traces SHALL reach MLflow via `mlflow.pydantic_ai.autolog()` SDK integration
 - **AND** no Collector MLflow exporter SHALL be registered for the same pipeline
 
-#### Scenario: Collector mode active
+#### Scenario: Collector mode active (deferred)
 
 - **WHEN** MLflow is configured with mode `collector`
-- **THEN** traces SHALL reach MLflow exclusively through the OTel Collector
+- **THEN** the OTel Collector SHALL include an `otlp/mlflow` exporter
+- **AND** traces SHALL reach MLflow exclusively through the Collector
 - **AND** `mlflow.pydantic_ai.autolog()` SHALL NOT be called
 
 #### Scenario: Disabled mode
@@ -34,7 +36,7 @@
 
 ### Requirement: MLflow pydantic-ai autolog SHALL be best-effort
 
-`configure_tracing()` SHALL attempt to call `mlflow.pydantic_ai.autolog()` if MLflow is configured with mode `autolog`. Failure (e.g., compatibility mismatch with pydantic-ai v2) SHALL be logged as a debug message and SHALL NOT block observability initialization. The MLflow mode SHALL be treated as `disabled` on failure.
+`configure_tracing()` SHALL attempt to call `mlflow.pydantic_ai.autolog()` if MLflow is configured with mode `autolog`. Failure (e.g., compatibility mismatch with pydantic-ai v2) SHALL be logged as a debug message and SHALL NOT block observability initialization. On failure, the MLflow mode SHALL be treated as `disabled`.
 
 #### Scenario: Autolog succeeds
 
@@ -44,7 +46,8 @@
 #### Scenario: Autolog fails — OTel pipeline still works
 
 - **WHEN** `mlflow.pydantic_ai.autolog()` raises an ImportError or compatibility error
-- **THEN** a debug message SHALL be logged and traces SHALL still reach MLflow via the OTel Collector (if collector mode is active)
+- **THEN** a debug message SHALL be logged
+- **AND** traces SHALL still reach other configured backends via the OTel pipeline
 
 ### Requirement: MLflow experiment logging SHALL be preserved
 

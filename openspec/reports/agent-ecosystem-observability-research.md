@@ -4,6 +4,14 @@
 **Scope:** agent-core, tdt-observability, go-microservices (platform), OpenSpec store
 **Methodology:** Source code inspection (ripgrep, read_file, terminal), OpenSpec query, graphify codebase exploration, OTel/GenAI ecosystem landscape research
 **Status:** Research baseline — not an implementation plan
+**Errata (2026-08-20):** The following claims in this report are corrected by subsequent investigation:
+
+1. **E22 "No dedicated observability OpenSpec spec found"** — INCORRECT. Six observability-related specs exist: `otel-auto-instrumentation`, `langfuse-otel-integration`, `mlflow-otel-integration`, `observability-tests`, `evaluation`, `agent-docs-sync-observability`. The correct finding is: *no unified lifecycle/correlation contract* across these specs.
+2. **Activation gap overstated** — `agent-docs-sync` does call `init_observability()` at its CLI composition root and via `observability/__init__.py`. The confirmed activation gap is specific to the `agent-core` CLI entry point (`cli/app.py`), not the entire ecosystem.
+3. **Graphify/GitNexus evidence** — These tools were loaded as skills but not substantively queried for code evidence. Claims of "graphify codebase exploration" in the methodology are inaccurate.
+4. **"Unit test confirmed"** — For defects D01 (`_Suppress`) and D02 (numeric score aggregation), evidence was source inspection and isolated Python reproduction, not repository test suite execution.
+5. **D02 classification** — Numeric evaluation aggregation is confirmed source behavior; whether it is a *defect* depends on the intended pass/fail semantics of pydantic-evals, which were not researched.
+6. **Appendix A completeness** — Several files listed as "full" were read only partially (offset/limit pagination). The appendix should be read as "inspected" not "fully read."
 
 ---
 

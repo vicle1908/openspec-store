@@ -1,3 +1,63 @@
+## MODIFIED Requirements
+
+### Requirement: LangfuseClient unit tests
+
+The system SHALL have unit tests for `LangfuseClient` covering: initialization with config, no-op fallback when unconfigured, score_trace() method, and context manager behavior.
+
+#### Scenario: Client initializes with config
+
+- **WHEN** `LangfuseClient.create({"host": "http://localhost:3000", "public_key": "pk", "secret_key": "sk"})` is called
+- **THEN** a client instance is returned (or no-op if SDK not installed)
+
+#### Scenario: No-op fallback
+
+- **WHEN** `LangfuseClient.create({})` is called with empty config
+- **THEN** a no-op client is returned that silently discards operations
+
+### Requirement: MLflowClient unit tests
+
+The system SHALL have unit tests for `MLflowClient` covering: initialization, no-op fallback, start_run(), log_params(), log_metrics(), log_tags(), and exception isolation.
+
+#### Scenario: Client initializes with URI
+
+- **WHEN** `MLflowClient.create("http://localhost:5000")` is called
+- **THEN** a client instance is returned (or no-op if SDK not installed)
+
+#### Scenario: Exception isolation
+
+- **WHEN** `MLflowClient.log_metrics()` raises an exception
+- **THEN** the exception SHALL be caught
+- **AND** a warning SHALL be logged
+- **AND** the calling code SHALL continue normally
+
+### Requirement: Scorer unit tests
+
+The system SHALL have unit tests for CostScorer and RegressionScorer covering: evaluate() return type, threshold behavior, edge cases.
+
+#### Scenario: CostScorer thresholds
+
+- **WHEN** `CostScorer().evaluate()` is called with cost_usd/tokens_total combinations
+- **THEN** scores are 1.0 (excellent), 0.8 (good), 0.5 (acceptable), 0.2 (expensive), 0.0 (zero tokens)
+
+#### Scenario: RegressionScorer detection
+
+- **WHEN** `RegressionScorer(baseline_latency_ms=5000).evaluate()` is called with latency_ms=3000 and success=True
+- **THEN** result is `{"passed": True, "rationale": "within baseline"}`
+
+### Requirement: Integration test
+
+The system SHALL have an integration test that runs the full evaluation pipeline using pydantic-evals Dataset: create Dataset with cases and evaluators → run evaluate_sync() → verify EvaluationReport returned with correct case count.
+
+#### Scenario: End-to-end evaluation
+
+- **WHEN** `run_evaluation(dataset=my_dataset, task_function=my_agent, targets=[])` is called
+- **THEN** pydantic-evals Dataset evaluation runs and EvaluationReport is returned
+
+#### Scenario: MLflow logging
+
+- **WHEN** `run_evaluation(dataset=my_dataset, task_function=my_agent, targets=["mlflow"])` is called with mocked MLflow
+- **THEN** `_log_to_mlflow()` is called with the report
+
 ## ADDED Requirements
 
 ### Requirement: Startup activation conformance test
@@ -6,14 +66,9 @@ Every supported process entry point SHALL have a test proving that observability
 
 #### Scenario: agent-core CLI initializes observability
 
-- **WHEN** `agent-core review`, `agent-core propose`, or any agent-core CLI subcommand is invoked
+- **WHEN** an agent-core CLI command executes
 - **THEN** `init_observability()` SHALL be called before the first agent is built
 - **AND** an OTel span SHALL be emitted proving activation
-
-#### Scenario: agent-docs-sync CLI initializes observability
-
-- **WHEN** the `docs-sync` CLI is invoked
-- **THEN** `init_observability(service_name="agent-docs-sync")` SHALL be called exactly once
 
 #### Scenario: No import-time initialization
 
@@ -38,17 +93,6 @@ Tests SHALL verify the expected parent-child span tree for a complete agent run 
 - **WHEN** an agent runs a single tool call
 - **THEN** the exported span tree SHALL contain: root `invoke_agent` span with one child `execute_tool` span
 - **AND** both spans SHALL carry the same `trace_id`
-- **AND** the root span SHALL carry `gen_ai.agent.name` and `agent_core.run.id`
-
-### Requirement: Duplicate-span detection test
-
-Tests SHALL prove that `Agent.instrument_all()` and an explicit `Instrumentation()` capability do not produce duplicate spans for the same logical operation.
-
-#### Scenario: Global and explicit instrumentation produce one span each
-
-- **WHEN** `Agent.instrument_all()` is active and an agent runs with an explicit `Instrumentation()` capability
-- **THEN** each logical operation SHALL produce exactly one span
-- **AND** no span SHALL appear twice in the exported trace
 
 ### Requirement: Short-lived process flush test
 
@@ -58,7 +102,6 @@ Tests SHALL verify that CLI commands flush all pending spans before process exit
 
 - **WHEN** an agent-core CLI command completes
 - **THEN** all pending OTel spans SHALL be exported before process exit
-- **AND** the test SHALL verify spans were received by a test collector
 
 ### Requirement: Trace-log correlation test
 
@@ -77,7 +120,6 @@ Tests SHALL prove that prompts and tool payloads are NOT included in exported sp
 
 - **WHEN** `init_observability()` is called with default settings
 - **THEN** exported spans SHALL NOT contain prompt text or completion text
-- **AND** tool arguments SHALL NOT appear in span attributes
 
 ### Requirement: Backend failure isolation test
 
@@ -89,9 +131,19 @@ Tests SHALL verify that an unavailable Langfuse or MLflow backend does not preve
 - **THEN** spans SHALL still be exported via the OTel Collector
 - **AND** the process SHALL exit without error
 
-### Requirement: Evaluation trace-linkage test
+### Requirement: Evaluation numeric score reporting test
 
-Tests SHALL verify that `EvalRecord` stores nullable `trace_id` and `span_id`.
+Tests SHALL prove that numeric evaluator scores are reported as measurements, not as pass/fail assertions.
+
+#### Scenario: Numeric scores reported as measurements
+
+- **WHEN** an evaluation produces `{scores: {accuracy: 0.8}}`
+- **THEN** the accuracy score SHALL be reported as a measurement
+- **AND** the pass rate SHALL be `null` (no assertions)
+
+### Requirement: Evaluation trace linkage test
+
+Tests SHALL verify that `EvalRecord` stores nullable `trace_id` and `span_id` populated from `EvaluationReport`.
 
 #### Scenario: Evaluation with active trace records trace IDs
 
@@ -102,34 +154,3 @@ Tests SHALL verify that `EvalRecord` stores nullable `trace_id` and `span_id`.
 
 - **WHEN** an evaluation runs outside any OTel span context
 - **THEN** the `EvalRecord` SHALL have `trace_id=None` and `span_id=None`
-
-### Requirement: Numeric evaluator aggregation test
-
-Tests SHALL prove that numeric evaluation scores (e.g., `0.8`) are correctly aggregated, not excluded by identity comparison.
-
-#### Scenario: Numeric score pass-rate is correct
-
-- **WHEN** an evaluation produces scores `{accuracy: 0.8, cost: 1.0}` with threshold 0.5
-- **THEN** the pass-rate SHALL reflect that both scores pass
-- **AND** the aggregation SHALL not use `result.value is True`
-
-### Requirement: MLflow exception isolation test
-
-Tests SHALL verify that MLflow client exceptions are caught and logged, not propagated to callers.
-
-#### Scenario: MLflow logging failure does not crash caller
-
-- **WHEN** `MLflowClient.log_metrics()` raises an exception
-- **THEN** the exception SHALL be caught
-- **AND** a warning SHALL be logged
-- **AND** the calling code SHALL continue normally
-
-### Requirement: Conformance evidence levels
-
-Each observability capability test SHALL declare its evidence level: specified, implemented, unit-tested, integration-tested, runtime-validated, or deployment-validated.
-
-#### Scenario: Capability evidence is accurately classified
-
-- **WHEN** an observability capability is tested
-- **THEN** its evidence level SHALL be recorded
-- **AND** runtime-validated SHALL only be claimed when verified against a running backend
