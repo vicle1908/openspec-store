@@ -1,5 +1,10 @@
 ## Purpose
 
+> **⚠️ Historical spec:** This spec describes the removed `harness_config`
+> dictionary-based interface. The current implementation uses typed capability
+> composition via `build_agent(capabilities=[...])`.
+> See `agent-core/docs/harness-integration.md` for the current API.
+
 This specification defines requirements for Harness Runtime Authoring.
 
 ## Requirements
