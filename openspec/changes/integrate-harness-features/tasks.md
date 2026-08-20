@@ -8,28 +8,28 @@
 
 ### Phase 1: Compaction (CRITICAL value, LOW effort)
 
-- [ ] 1.1 In `agent-core/src/agent_core/_ai/agent.py`: import `TieredCompaction`, `DeduplicateFileReads`, `ClearToolResults`, `SummarizingCompaction` from `pydantic_ai_harness.compaction`
-- [ ] 1.2 Add `TieredCompaction` to capabilities list with 3 tiers: DeduplicateFileReads → ClearToolResults → SummarizingCompaction
-- [ ] 1.3 Add configuration for compaction target_tokens (default 120_000) in agent config
-- [ ] 1.4 Write unit test: verify compaction does not trigger on short conversations (<10 turns)
-- [ ] 1.5 Write unit test: verify compaction triggers on long conversations (>50 turns) and preserves key facts
-- [ ] 1.6 Write unit test: verify compaction receipts visible in traces
+- [ ] 2.1 In `agent-core/src/agent_core/_ai/agent.py`: import `TieredCompaction`, `DeduplicateFileReads`, `ClearToolResults`, `SummarizingCompaction` from `pydantic_ai_harness.compaction`
+- [ ] 2.2 Add `TieredCompaction` to capabilities list with 3 tiers: DeduplicateFileReads → ClearToolResults → SummarizingCompaction
+- [ ] 2.3 Add configuration for compaction target_tokens (default 120_000) in agent config
+- [ ] 2.4 Write unit test: verify compaction does not trigger on short conversations (<10 turns)
+- [ ] 2.5 Write unit test: verify compaction triggers on long conversations (>50 turns) and preserves key facts
+- [ ] 2.6 Write unit test: verify compaction receipts visible in traces
 
 ### Phase 2: SystemReminders (HIGH value, VERY LOW effort)
 
-- [ ] 2.1 In `agent-core/src/agent_core/_ai/agent.py`: import `SystemReminders` from `pydantic_ai_harness` (root)
-- [ ] 2.2 In `agent-core/src/agent_core/_ai/agent.py`: import `GoalReanchor` from `pydantic_ai_harness.system_reminders`
-- [ ] 2.3 Add `SystemReminders(dynamic_reminders=[GoalReanchor()])` to capabilities list
-- [ ] 2.4 Write unit test: verify GoalReanchor re-injects original goal each request
-- [ ] 2.5 Write unit test: verify no duplicate reminders in context
-- [ ] 2.6 Write unit test: verify agent behavior consistent across long conversations
+- [ ] 2.7 In `agent-core/src/agent_core/_ai/agent.py`: import `SystemReminders` from `pydantic_ai_harness` (root)
+- [ ] 2.8 In `agent-core/src/agent_core/_ai/agent.py`: import `GoalReanchor` from `pydantic_ai_harness.system_reminders`
+- [ ] 2.9 Add `SystemReminders(dynamic_reminders=[GoalReanchor()])` to capabilities list
+- [ ] 2.10 Write unit test: verify GoalReanchor re-injects original goal each request
+- [ ] 2.11 Write unit test: verify no duplicate reminders in context
+- [ ] 2.12 Write unit test: verify agent behavior consistent across long conversations
 
 ## 3. Batch 2: Security + Cost — Guardrails + SpendLimits
 
-### Phase 3: Guardrails Upgrade (HIGH value, LOW-MEDIUM effort)
+### Phase 3: ToolGuardrail (HIGH value, LOW-MEDIUM effort)
 
-Note: Guardrails migration is done in `upgrade-pydantic-ai-harness` change (Phase 4).
-This phase adds NEW capabilities on top of the migrated API.
+Note: Guardrails migration is done in `upgrade-pydantic-ai-harness` change.
+This phase adds NEW ToolGuardrail capabilities on top of the migrated API.
 
 - [ ] 3.1 In `agent-docs-sync/src/agent_docs_sync/guardrails.py`: import `ToolGuardrail` from `pydantic_ai_harness.guardrails`
 - [ ] 3.2 In `agent-docs-sync/src/agent_docs_sync/guardrails.py`: import `redact_secrets`, `redact_personal_data` from `pydantic_ai_harness.guardrails.detectors`
@@ -55,8 +55,8 @@ This phase adds NEW capabilities on top of the migrated API.
 ### Phase 5: Planning (MEDIUM-HIGH value, LOW-MEDIUM effort)
 
 - [ ] 5.1 In `agent-core/src/agent_core/_ai/agent.py`: import `Planning` from `pydantic_ai_harness.planning`
-- [ ] 5.2 Add `Planning` to capabilities list with configurable max_tasks and enable_subtasks
-- [ ] 5.3 Add configuration for planning in agent config (default: max 10 tasks, subtasks enabled)
+- [ ] 5.2 Add `Planning` to capabilities list with configurable enable_subtasks
+- [ ] 5.3 Add configuration for planning in agent config (default: subtasks enabled)
 - [ ] 5.4 Write unit test: verify model creates task plan at start
 - [ ] 5.5 Write unit test: verify plan updated as tasks complete
 - [ ] 5.6 Write unit test: verify subtask decomposition works
@@ -66,7 +66,7 @@ This phase adds NEW capabilities on top of the migrated API.
 
 - [ ] 6.1 In `agent-core/src/agent_core/sdk/memory.py`: import `ConversationSearch`, `SnapshotHistorySource` from `pydantic_ai_harness.conversation_search`
 - [ ] 6.2 Add `ConversationSearch` to memory layer with existing StepPersistence store
-- [ ] 6.3 Add configuration for search in agent config (default: max 10 results, min score 0.3)
+- [ ] 6.3 Add configuration for search in agent config (default: max 10 results)
 - [ ] 6.4 Write unit test: verify search returns relevant history
 - [ ] 6.5 Write unit test: verify compacted turns searchable via pre-compaction snapshots
 - [ ] 6.6 Write unit test: verify BM25 ranking works correctly
@@ -74,6 +74,8 @@ This phase adds NEW capabilities on top of the migrated API.
 ## 5. Batch 4: Use-Case Specific — Advisor
 
 ### Phase 7: Advisor (MEDIUM value, LOW-MEDIUM effort)
+
+Note: Advisor is included because the workspace runs expensive models (Opus) and could benefit from cheaper models (Sonnet) executing while Opus reviews decisions. This is optional and can be disabled by removing from capabilities.
 
 - [ ] 7.1 In `agent-core/src/agent_core/_ai/agent.py`: import `Advisor` from `pydantic_ai_harness.advisor`
 - [ ] 7.2 Add `Advisor` to capabilities list with configurable model and max_uses
@@ -112,26 +114,26 @@ This phase adds NEW capabilities on top of the migrated API.
 
 ## 7. Verify All Tests Pass
 
-- [ ] 7.1 Run `uv run pytest` in agent-core — all tests pass including new capability tests
-- [ ] 7.2 Run `uv run pytest` in agent-docs-sync — all tests pass including new guardrail tests
-- [ ] 7.3 Run `uv run ruff check .` in all 3 repos — full lint pass
-- [ ] 7.4 Run `uv run mypy src/ --strict` in all 3 repos — no type errors
+- [ ] 11.1 Run `uv run pytest` in agent-core — all tests pass including new capability tests
+- [ ] 11.2 Run `uv run pytest` in agent-docs-sync — all tests pass including new guardrail tests
+- [ ] 11.3 Run `uv run ruff check .` in all 3 repos — full lint pass
+- [ ] 11.4 Run `uv run mypy src/ --strict` in all 3 repos — no type errors
 
 ## 8. Verify No Legacy Code Remains
 
-- [ ] 8.1 Run `grep -rn "GuardResult\|InputGuard\|OutputGuard" src/ tests/` in all repos — should return 0 matches
-- [ ] 8.2 Run `grep -rn "from pydantic_ai_harness.guardrails import GuardResult" src/ tests/` — should return 0 matches
-- [ ] 8.3 Run `grep -rn "from pydantic_ai_harness.guardrails import InputGuard" src/ tests/` — should return 0 matches
-- [ ] 8.4 Run `grep -rn "from pydantic_ai_harness.guardrails import OutputGuard" src/ tests/` — should return 0 matches
-- [ ] 8.5 Run `grep -rn "from pydantic_ai_harness.context import" src/ tests/` — should return 0 matches (use repo_context)
-- [ ] 8.6 Run `grep -rn "from pydantic_ai_harness.cache_stability import" src/ tests/` — should return 0 matches (use warn_on_cache_busts)
-- [ ] 8.7 Run `grep -rn "from pydantic_ai_harness.overflowing_tool_output import" src/ tests/` — should return 0 matches (use tool_output_limits)
-- [ ] 8.8 Run `grep -rn "from pydantic_ai_harness.control import" src/ tests/` — should return 0 matches (use spend)
+- [ ] 12.1 Run `grep -rn "GuardResult\|InputGuard\|OutputGuard" src/ tests/` in all repos — should return 0 matches
+- [ ] 12.2 Run `grep -rn "from pydantic_ai_harness.guardrails import GuardResult" src/ tests/` — should return 0 matches
+- [ ] 12.3 Run `grep -rn "from pydantic_ai_harness.guardrails import InputGuard" src/ tests/` — should return 0 matches
+- [ ] 12.4 Run `grep -rn "from pydantic_ai_harness.guardrails import OutputGuard" src/ tests/` — should return 0 matches
+- [ ] 12.5 Run `grep -rn "from pydantic_ai_harness.context import" src/ tests/` — should return 0 matches (use repo_context)
+- [ ] 12.6 Run `grep -rn "from pydantic_ai_harness.cache_stability import" src/ tests/` — should return 0 matches (use warn_on_cache_busts)
+- [ ] 12.7 Run `grep -rn "from pydantic_ai_harness.overflowing_tool_output import" src/ tests/` — should return 0 matches (use tool_output_limits)
+- [ ] 12.8 Run `grep -rn "from pydantic_ai_harness.control import" src/ tests/` — should return 0 matches (use spend)
 
 ## 9. Commit and Archive
 
-- [ ] 9.1 Commit agent-core changes: `git add -A && git commit`
-- [ ] 9.2 Commit agent-docs-sync changes: `git add -A && git commit`
-- [ ] 9.3 Archive the OpenSpec change: `openspec archive integrate-harness-features --yes`
-- [ ] 9.4 Commit openspec-store archive: `git add -A && git commit`
-- [ ] 9.5 Run `openspec validate --all --strict` to confirm no regressions
+- [ ] 13.1 Commit agent-core changes: `git add -A && git commit`
+- [ ] 13.2 Commit agent-docs-sync changes: `git add -A && git commit`
+- [ ] 13.3 Archive the OpenSpec change: `openspec archive integrate-harness-features --yes`
+- [ ] 13.4 Commit openspec-store archive: `git add -A && git commit`
+- [ ] 13.5 Run `openspec validate --all --strict` to confirm no regressions
