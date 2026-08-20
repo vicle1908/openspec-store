@@ -26,6 +26,12 @@ ToolGuardrail evaluation SHALL block unsafe arguments and redact sensitive resul
 - **THEN** the tool call SHALL be blocked with a stable redacted diagnostic
 - **AND** no write-capable tool SHALL execute
 
+#### Scenario: Valid write path
+
+- **WHEN** a write tool receives a path that resolves within an approved documentation root after canonical path and symlink checks
+- **THEN** the ToolGuardrail MAY allow the call to continue to approval and containment enforcement
+- **AND** the ToolGuardrail SHALL NOT create a second weaker path-normalization policy
+
 #### Scenario: Dangerous shell command
 
 - **WHEN** a shell tool receives a blocked command pattern

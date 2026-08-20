@@ -21,6 +21,8 @@ See proposal.md for the motivation. The current default checkouts are dirty, so 
 - **Explicit SDK export:** expose `AssuranceLevel` through the existing `agent_core.sdk` public export convention, including `__all__`, rather than weakening mypy or importing a private module in agent-harness.
 - **Mechanical import repair:** run Ruff’s import-order fixer only on the classified agent-harness and agent-docs-sync paths, review the resulting diff, and reject unrelated formatting churn.
 - **Evidence before completion:** record raw status, content fingerprint, module origins, full gate commands, exit codes, and prerequisite-conditioned skips in a named ledger before checking tasks.
+- **Execution coordination:** the integration coordinator works from `/Users/androidteam/Developer`, reads `openspec instructions apply` from the dedicated planning worktree, and treats each sibling repository as a separately authorized writer packet. OpenSpec's repo-local planning root does not itself grant sibling-repository write authority.
+- **Planning-time counts are non-normative:** use `32` harness and `28` docs-sync I001 findings only to explain the proposal; execution freezes and classifies the then-current Ruff output before fixing it.
 
 ## Risks / Trade-offs
 
@@ -34,4 +36,5 @@ See proposal.md for the motivation. The current default checkouts are dirty, so 
 1. Freeze repository identities and dirty fingerprints.
 2. Apply the SDK export and mechanical import repairs in separate repository worktrees.
 3. Run focused gates, then full pytest/Ruff/strict-mypy with immutable dependency origins.
-4. Commit each repository only after evidence review; retain rollback as per-repository Git revert plus cache regeneration.
+4. Commit one repository at a time after scoped diff/evidence review; retain rollback as per-repository Git revert plus cache regeneration.
+5. Commit the evidence ledger in the dedicated openspec-store worktree only after every repository result is frozen.

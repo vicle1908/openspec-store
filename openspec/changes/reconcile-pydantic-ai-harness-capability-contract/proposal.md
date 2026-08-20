@@ -5,11 +5,12 @@ The current Pydantic AI Harness 0.23 integration contradicts its public guidance
 ## What Changes
 
 - **BREAKING:** Make harness behavior explicit at the public `build_agent(..., capabilities=[...])` composition boundary; remove hidden default activation of TieredCompaction, SystemReminders, and SpendLimits unless an existing normative default is deliberately ratified in the delta specs.
-- Remove or replace unread `AgentConfig` capability dictionaries so configuration cannot claim to enable behavior that public construction ignores.
+- Remove the unread harness-capability dictionaries from `AgentConfig` and their compatibility tests/docs; keep supported declarative capability composition in Pydantic AI `AgentSpec` rather than introducing a second configuration projection.
 - Preserve caller-supplied capability identity, order, authority validation, and supported Pydantic AI composition semantics without private upstream access.
 - Make ConversationSearch consume the same caller-owned SnapshotStore/StepPersistence store used by the runtime; fail construction when a declared shared-history source is unavailable rather than substituting a disconnected store.
 - Install the bounded write-path, shell-command, and result-redaction ToolGuardrails in docs-sync generation/full-sync production composition while preserving containment hooks, approval gates, and exactly-once write authority as the controlling security layers.
 - Retain the `[dynamic-workflow]` extra only in agent-core, the capability-composition owner; remove it from agent-harness and agent-docs-sync unless a direct supported consumer is added with behavioral compatibility evidence.
+- Correct the DynamicWorkflow/Monty contract to the installed harness `0.23.0` requirement (`pydantic-monty>=0.0.19`) and eliminate stale `0.0.18` claims.
 - Replace import/constructibility checks with public-boundary behavioral tests for compaction, reminders, priced spend enforcement, planning, shared-store conversation search, advisor consultation/fallback, and ToolGuardrail execution.
 - Reconcile current historical compaction specs and harness documentation with the typed public API.
 - Maintain a corrective ledger that references the four inconsistent archived dependency/capability changes without rewriting their archived artifacts.
@@ -46,4 +47,5 @@ None. The upstream capabilities already exist; this change reconciles their work
 - **agent-harness owner:** dependency-extra cleanup and compatibility verification; no new runtime ownership of upstream harness capabilities.
 - **openspec-store owner:** seven delta-spec paths, corrective ledger, validation, sync, and archive evidence.
 - GitNexus currently reports LOW advisory blast radius, but its indexes are stale; apply must refresh or replace that evidence with current direct callers and focused tests before editing.
-- This change depends on `restore-agent-pydantic-quality-gates` and must not begin implementation until that prerequisite has an accepted immutable result.
+- This change depends on accepted results from `restore-agent-pydantic-quality-gates` and `enforce-openspec-archive-readiness-gates`; implementation begins only after both gates are available from the dedicated planning worktree.
+- **integration coordinator:** run from `/Users/androidteam/Developer`, load this change from `/Users/androidteam/Developer/.worktrees/pydantic-ai-openspec-followups`, and treat agent-core, docs-sync, harness, and store as separately authorized writer packets.

@@ -8,7 +8,7 @@ The current Pydantic AI consumer baseline cannot serve as an implementation prer
 - Resolve the current `AssuranceLevel` public-export/type-checking mismatch without widening production types or bypassing strict mode.
 - Normalize the current Ruff `I001` import-order findings in agent-harness and agent-docs-sync while preserving test behavior byte-for-byte apart from formatting.
 - Re-run focused and full Ruff, strict mypy, and pytest gates from dedicated repository worktrees with isolated caches and immutable dependency bindings.
-- Retain a named evidence ledger that distinguishes current passes, prerequisite-conditioned skips, infrastructure limitations, and unrelated dirty/generated state.
+- Retain a named evidence ledger that distinguishes current passes, prerequisite-conditioned skips, infrastructure limitations, and unrelated dirty/generated state; treat the planning-time `32`/`28` Ruff counts as comparison evidence that must be recaptured at execution.
 
 ## Non-goals
 
@@ -34,3 +34,4 @@ None. Existing quality and framework-verification requirements already require t
 - **agent-docs-sync owner:** mechanical test import ordering.
 - **openspec-store owner:** planning artifacts and immutable evidence ledger only.
 - Implementation must use one writer and one dedicated worktree per repository and must stop if the current dirty owner matrix is unresolved.
+- **integration coordinator:** run from `/Users/androidteam/Developer`, read change context from `/Users/androidteam/Developer/.worktrees/pydantic-ai-openspec-followups`, and obtain explicit per-repository write ownership before leaving the OpenSpec planning root.

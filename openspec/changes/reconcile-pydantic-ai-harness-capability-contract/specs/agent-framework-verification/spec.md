@@ -53,3 +53,25 @@ An archived dependency or capability change with incomplete behavior or unsuppor
 - **WHEN** a corrective task overlaps an existing active change
 - **THEN** exactly one change SHALL own implementation
 - **AND** the other change SHALL cross-reference it without duplicating ownership
+
+### Requirement: Optional harness dependency ownership is explicit
+
+The workspace SHALL declare an optional harness extra only in a repository that proves a supported production composition seam and a compatible dependency tuple. Consumer repositories without a direct supported use SHALL omit the extra from their root dependency declarations.
+
+#### Scenario: Capability owner retains DynamicWorkflow
+
+- **WHEN** agent-core retains the DynamicWorkflow extra for public typed composition
+- **THEN** a public import/construct test SHALL pass against the frozen harness tuple
+- **AND** the dependency baseline and documentation SHALL record the resolved Monty version required by that tuple
+
+#### Scenario: Consumer has no direct use
+
+- **WHEN** agent-harness or agent-docs-sync has no production import or behavioral contract for DynamicWorkflow
+- **THEN** its root dependency declaration SHALL omit the DynamicWorkflow extra
+- **AND** a baseline test SHALL prevent accidental reintroduction
+
+#### Scenario: Documented version conflicts with resolution
+
+- **WHEN** documentation names a Monty version that differs from the resolved lockfile or harness extra requirement
+- **THEN** framework verification SHALL fail
+- **AND** the conflicting documentation SHALL be corrected before compatibility is accepted

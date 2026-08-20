@@ -51,3 +51,9 @@ The guide SHALL distinguish agent-core capability ownership, docs-sync approval/
 - **WHEN** a developer follows the ConversationSearch example
 - **THEN** it SHALL pass the same caller-owned persistence source used by step continuation
 - **AND** it SHALL explain process-local versus restart-safe stores
+
+#### Scenario: DynamicWorkflow dependency documentation
+
+- **WHEN** the guide documents DynamicWorkflow support
+- **THEN** it SHALL identify agent-core as the optional-extra owner
+- **AND** the documented Monty version SHALL match the frozen harness extra requirement and lockfile
