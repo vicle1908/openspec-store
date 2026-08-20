@@ -132,8 +132,8 @@ Note: Advisor is included because the workspace runs expensive models (Opus) and
 
 ## 9. Commit and Archive
 
-- [ ] 13.1 Commit agent-core changes: `git add -A && git commit`
-- [ ] 13.2 Commit agent-docs-sync changes: `git add -A && git commit`
-- [ ] 13.3 Archive the OpenSpec change: `openspec archive integrate-harness-features --yes`
-- [ ] 13.4 Commit openspec-store archive: `git add -A && git commit`
-- [ ] 13.5 Run `openspec validate --all --strict` to confirm no regressions
+- [x] 13.1 Commit agent-core changes: `git add -A && git commit`
+- [x] 13.2 Commit agent-docs-sync changes: `git add -A && git commit`
+- [x] 13.3 Archive the OpenSpec change: `openspec archive integrate-harness-features --yes`
+- [x] 13.4 Commit openspec-store archive: `git add -A && git commit`
+- [x] 13.5 Run `openspec validate --all --strict` to confirm no regressions
