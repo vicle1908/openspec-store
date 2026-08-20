@@ -60,7 +60,7 @@ _ai/
     models.py     # Model backend factory functions
     agent.py      # AgentRuntime class
     tools.py      # Builtin tools as @agent.tool()
-    hooks.py      # HookAdapter class
+    hooks.py      # create_budget_hooks (pydantic-ai Hooks capability)
     deps.py       # AgentRuntimeDeps dataclass
     types.py      # Internal type aliases
 ```

@@ -1,5 +1,10 @@
 # agent-core-compose-integration-verifier Specification
 
+> **⚠️ Historical spec:** This spec describes a `platform/cmd/agent-core` Go binary
+> and `platform/` directory that no longer exist in agent-core. The integration
+> verifier infrastructure was not implemented or has been removed.
+> See `agent-core/docs/architecture.md` for the current architecture.
+
 ## Purpose
 
 Define the local agent-core Compose integration verifier: a platform binary

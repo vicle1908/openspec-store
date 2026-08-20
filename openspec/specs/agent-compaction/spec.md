@@ -1,5 +1,10 @@
 # agent-compaction
 
+> **⚠️ Partially historical:** This spec describes `_build_harness_capabilities()`
+> which has been removed. Compaction is now wired via typed capability composition
+> (`TieredCompaction` in `AgentRuntime.__init__`). Config fields in `_ai/config.py`
+> exist but are not read by AgentRuntime. See `agent-core/docs/harness-integration.md`.
+
 ## Purpose
 
 Manages context window size through configurable compaction strategies, tool result clearing, read deduplication, limit warnings, and output overflow handling.

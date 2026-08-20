@@ -1,5 +1,11 @@
 # public-api Specification
 
+> **⚠️ Historical spec:** This spec describes a pre-migration public API surface
+> including symbols that no longer exist (approval_gate, HookRegistry, HookPoint,
+> HookPhase, ModelConfigError, etc.). The current API surface is defined by
+> `agent_core.agent_base.__init__` exports and `agent_core.sdk` composition API.
+> See `agent-core/docs/building-agents.md` for the current public API.
+
 ## Purpose
 Freezes the agent-core public symbol signatures and consumer compatibility guarantees (ai-review, code-daily-scan) through the pydantic-ai v2 migration.
 ## Requirements
