@@ -1,9 +1,4 @@
-# agent-core-capabilities Specification
-
-## Purpose
-TBD - created by archiving change upgrade-harness-23. Update Purpose after archive.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: TieredCompaction in AgentRuntime
 
@@ -110,6 +105,8 @@ AgentRuntime SHALL compose SystemReminders only when the caller supplies a typed
 - **WHEN** conversation-scoped search runs without a stable conversation identity
 - **THEN** the search SHALL return no cross-conversation corpus
 - **AND** it SHALL not fall back to `scope="all"`
+
+## ADDED Requirements
 
 ### Requirement: One harness capability configuration boundary
 

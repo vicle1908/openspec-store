@@ -11,82 +11,33 @@ Manages context window size through configurable compaction strategies, tool res
 
 ## Requirements
 
-### Requirement: Compaction strategy selection
+### Requirement: Typed compaction is explicitly enabled
 
-When `AgentConfig.context_compaction` is set, `AgentRuntime` SHALL create the appropriate compaction capability based on the `strategy` field.
+The agent runtime SHALL add context compaction only when the caller supplies a typed compaction capability, and SHALL preserve the configured strategy and target without silently replacing it.
 
-#### Scenario: SummarizingCompaction (default)
-- **WHEN** `context_compaction={"strategy": "summarize", "max_messages": 50, "keep_messages": 20}`
-- **THEN** `SummarizingCompaction(max_messages=50, keep_messages=20)` SHALL be created
+#### Scenario: Compaction omitted
 
-#### Scenario: SlidingWindow
-- **WHEN** `context_compaction={"strategy": "sliding_window", "max_messages": 40}`
-- **THEN** `SlidingWindow(max_messages=40)` SHALL be created
+- **WHEN** an agent is constructed without a compaction capability
+- **THEN** no compaction capability SHALL be installed
+- **AND** the runtime SHALL not trim or summarize context because of an undocumented default
 
-#### Scenario: Tiered compaction
-- **WHEN** `context_compaction={"strategy": "tiered", "tiers": [...], "target_tokens": 80000}`
-- **THEN** `TieredCompaction(tiers=[...], target_tokens=80000)` SHALL be created
+#### Scenario: Tiered compaction supplied
 
-#### Scenario: No compaction
-- **WHEN** `context_compaction` is `None`
-- **THEN** no compaction capability SHALL be added
+- **WHEN** a caller supplies a tiered compaction with a target and ordered strategies
+- **THEN** the runtime SHALL preserve the target and strategy order
+- **AND** the capability SHALL execute through the supported upstream capability API
 
-### Requirement: ClampOversizedMessages
+### Requirement: Compaction behavior is publicly verifiable
 
-When `AgentConfig.context_compaction` includes `clamp_oversized: true`, a `ClampOversizedMessages` capability SHALL be added alongside the primary compaction strategy.
+Compaction acceptance SHALL execute through the public agent boundary and SHALL prove both the below-threshold and threshold-exceeded paths.
 
-#### Scenario: Clamp enabled
-- **WHEN** `context_compaction={"clamp_oversized": true, "max_part_tokens": 4000}`
-- **THEN** `ClampOversizedMessages(max_part_tokens=4000)` SHALL be created
+#### Scenario: Conversation remains below target
 
-### Requirement: ClearToolResults
+- **WHEN** a deterministic conversation remains below the configured target
+- **THEN** no compaction receipt or synthetic summary SHALL be inserted
 
-When `AgentConfig.context_compaction` includes `clear_tool_results: true`, a `ClearToolResults` capability SHALL be added. `ClearToolResults` requires at least one of `max_messages` or `max_tokens`.
+#### Scenario: Conversation exceeds target
 
-#### Scenario: Clear enabled with message limit
-- **WHEN** `context_compaction={"clear_tool_results": true, "max_messages": 10, "keep_pairs": 3}`
-- **THEN** `ClearToolResults(max_messages=10, keep_pairs=3)` SHALL be created
-
-#### Scenario: Clear enabled with token limit
-- **WHEN** `context_compaction={"clear_tool_results": true, "max_tokens": 5000, "keep_pairs": 3}`
-- **THEN** `ClearToolResults(max_tokens=5000, keep_pairs=3)` SHALL be created
-
-#### Scenario: Missing both limits
-- **WHEN** `context_compaction={"clear_tool_results": true}` without `max_messages` or `max_tokens`
-- **THEN** a `ValueError` SHALL be raised at capability creation time
-
-### Requirement: DeduplicateFileReads
-
-When `AgentConfig.context_compaction` includes `deduplicate_reads: true`, a `DeduplicateFileReads` capability SHALL be added.
-
-#### Scenario: Dedup enabled
-- **WHEN** `context_compaction={"deduplicate_reads": true}`
-- **THEN** `DeduplicateFileReads(file_key=...)` SHALL be created with a default file key extractor
-
-### Requirement: LimitWarner
-
-When `AgentConfig.limit_warnings` is set, a `LimitWarner` capability SHALL be created.
-
-#### Scenario: Limit warner enabled
-- **WHEN** `limit_warnings={"max_iterations": 10, "warning_threshold": 0.7}`
-- **THEN** `LimitWarner(max_iterations=10, warning_threshold=0.7)` SHALL be created
-
-### Requirement: OverflowingToolOutput
-
-When `AgentConfig.output_overflow` is set, an `OverflowingToolOutput` capability SHALL be created. `Band` uses `over` (token count threshold) and `action` ("summarize" | "truncate" | "spill").
-
-#### Scenario: Band-based overflow
-- **WHEN** `output_overflow={"bands": [{"over": 1000, "action": "summarize"}]}`
-- **THEN** `OverflowingToolOutput(bands=[Band(over=1000, action="summarize")])` SHALL be created
-
-#### Scenario: Per-tool overflow config
-- **WHEN** `output_overflow={"per_tool": {"shell_execute": [{"over": 500, "action": "truncate"}]}}`
-- **THEN** per-tool bands SHALL be applied only to the specified tools
-
-### Requirement: CacheStabilityMonitor
-
-When `AgentConfig.cache_monitoring` is set, a `CacheStabilityMonitor` capability SHALL be created.
-
-#### Scenario: Cache monitoring enabled
-- **WHEN** `cache_monitoring={"collapse_ratio": 0.5}`
-- **THEN** `CacheStabilityMonitor(collapse_ratio=0.5)` SHALL be created
+- **WHEN** a deterministic conversation exceeds the configured target
+- **THEN** compaction SHALL reduce the active context according to the supplied strategy
+- **AND** protected facts and any configured receipt/evidence SHALL remain observable

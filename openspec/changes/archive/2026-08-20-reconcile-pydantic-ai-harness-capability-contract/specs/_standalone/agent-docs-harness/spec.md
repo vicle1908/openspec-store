@@ -1,36 +1,24 @@
-## Purpose
+## REMOVED Requirements
 
-This specification defines requirements for Agent Docs Harness.
+### Requirement: Context compaction documentation
 
-## Requirements
+**Reason**: The requirement documents removed dictionary fields and strategies rather than the current typed public composition.
 
-### Requirement: Harness integration documentation
+**Migration**: Document the typed capability path, explicit defaults, and public behavioral examples.
 
-The system SHALL provide documentation for all pydantic-ai-harness capabilities wired via `agent_core.sdk.build_agent(..., capabilities=[...])`.
+### Requirement: Guardrails documentation
 
-#### Scenario: Harness guide exists
-- **WHEN** a developer opens `agent-core/docs/harness-integration.md`
-- **THEN** it SHALL document all capabilities with module paths and class references
+**Reason**: The requirement documents an obsolete `guardrails` dictionary contract and does not describe production ToolGuardrail composition.
 
-#### Scenario: Each capability documented
-- **WHEN** a developer reads `harness-integration.md`
-- **THEN** it SHALL have entries for: TieredCompaction, SpendLimits, Advisor, SystemReminders, ConversationSearch, guardrails, planning, subagents, step_persistence, repo_context, tool_output_limits, cache_monitoring, limit_warnings, docs_access, dynamic_workflow, filesystem, shell
+**Migration**: Document Input/OutputGuardrail and ToolGuardrail construction, mode boundaries, containment, approval, and redaction.
 
-### Requirement: Other capabilities documentation
+### Requirement: Step persistence documentation
 
-`harness-integration.md` SHALL document TieredCompaction, SpendLimits, Advisor, SystemReminders, ConversationSearch, subagents, planning, repo_context, tool_output_limits, cache_monitoring, limit_warnings, docs_access, dynamic_workflow, filesystem, and shell.
+**Reason**: The requirement documents obsolete dictionary stores and does not describe caller-owned shared history.
 
-#### Scenario: Each capability has example
-- **WHEN** a developer reads each capability section
-- **THEN** it SHALL show the public module path, representative classes, and usage pattern
+**Migration**: Document typed StepPersistence and ConversationSearch composition using one explicit snapshot source.
 
-### Requirement: Configuration docs harness section
-
-`configuration.md` SHALL include a section summarizing available harness capabilities.
-
-#### Scenario: Summary table
-- **WHEN** a developer reads `configuration.md`
-- **THEN** it SHALL have a table listing harness capabilities with one-line descriptions and link to `harness-integration.md`
+## ADDED Requirements
 
 ### Requirement: Harness documentation reflects the public typed contract
 
