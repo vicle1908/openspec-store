@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-08-20
+skip_specs: true
+goal: "Add 2 undocumented Python repos (claude-code-provider-adapter, hermes-webui) to workspace layout and GDrive sync"
