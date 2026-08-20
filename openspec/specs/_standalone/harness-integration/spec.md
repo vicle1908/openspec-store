@@ -42,7 +42,7 @@ This specification defines requirements for Harness Integration.
 #### Scenario: New upstream capability
 
 - **WHEN** a future public Harness capability satisfies the supported capability protocol
-- **THEN** a consumer SHALL be able to compose it without modifying `_build_harness_capabilities`
+- **THEN** a consumer SHALL be able to pass it via `build_agent(capabilities=[...])` without modifying agent-core internals
 
 #### Scenario: TDT secure-profile factory
 
