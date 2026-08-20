@@ -15,7 +15,7 @@ This change is needed now because:
 
 - **MODIFIED**: Update `pydantic-ai-harness` pin from `==0.11.0` to `>=0.23.0,<0.24` in agent-core, agent-harness, and agent-docs-sync
 - **MODIFIED**: Remove `[dynamic-workflow]` extra from all 3 repos (not used in production)
-- **MODIFIED**: Update dependency baseline tests to reflect new harness version
+- **MODIFIED**: Create/update dependency baseline tests to reflect new harness version
 - Run full test suites in all 3 repos to verify API compatibility
 - Resolve updated lockfiles via `uv sync`
 
@@ -36,7 +36,7 @@ This change is needed now because:
 ## Impact
 
 - **Runtime:** No runtime behavior changes — dependency bounds are widened, not contract changes
-- **Testing:** Full test suite verification required in agent-core (79 tests), agent-harness (38 tests), agent-docs-sync (285 tests)
-- **Lockfiles:** `uv.lock` files will be regenerated in all 3 repos with new harness version and its dependencies (genai-prices, httpx2, pydantic-graph)
+- **Testing:** Full test suite verification required in agent-core (79 tests), agent-harness (38 tests), agent-docs-sync (285 test cases across 41 test files)
+- **Lockfiles:** `uv.lock` files will be regenerated in all 3 repos with new harness version and its dependencies (genai-prices, httpx2, pydantic-graph, logfire-api)
 - **Blast radius:** LOW — changes are additive version bound widening with full test verification
-- **Rollback:** Git revert per repo; OpenSpec change preserved in archive
+- **Rollback:** Git revert per repo (both pyproject.toml and uv.lock together); OpenSpec change preserved in archive
