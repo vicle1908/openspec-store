@@ -10,7 +10,8 @@ TBD - created by archiving change upgrade-harness-23. Update Purpose after archi
 AgentRuntime SHALL compose a default `TieredCompaction` capability with a
 120,000-token target when the caller omits compaction. A caller-supplied typed
 compaction capability SHALL override that default while preserving its target
-and ordered strategies. Any retained internal convenience keyword SHALL
+and ordered strategies. The supported explicit disablement SHALL be
+`compaction_enabled=false`. Any retained internal convenience keyword SHALL
 remain compatibility-only, undocumented, and unreachable through `BaseAgent`
 or `build_agent`.
 
@@ -36,7 +37,7 @@ or `build_agent`.
 
 #### Scenario: Explicit compaction disablement is not implicit
 
-- **WHEN** a caller supplies an explicit supported disablement for compaction
+- **WHEN** a caller supplies `compaction_enabled=false` through the supported public runtime boundary
 - **THEN** the runtime SHALL honor that disablement
 - **AND** it SHALL not silently replace the caller's choice with a second capability
 
@@ -175,7 +176,7 @@ typed objects and supported runtime options supplied through `BaseAgent` or
 `build_agent`. Internal compatibility keywords MAY remain temporarily for
 migration or focused tests, but they SHALL not be projected from `AgentConfig`,
 AgentSpec compatibility metadata, or public consumer constructors, and SHALL
-not be confused with the supported public options listed above.
+not be confused with the supported public options listed in this contract.
 
 #### Scenario: Public typed boundary
 
@@ -194,11 +195,11 @@ not be confused with the supported public options listed above.
 The public agent-core capability contract SHALL accept supported runtime options
 through `BaseAgent` and `build_agent`, including caller-supplied capabilities and
 authority policy, `target_tokens`, `spend_limit_per_run_usd`,
-`spend_limit_per_day_usd`, `enable_planning`, `advisor_model`, and
-`advisor_max_uses`. Private legacy aliases and configuration-only keys MAY be
-retained for migration or internal compatibility, but SHALL not be documented
-as public consumer construction inputs, projected by public consumers, or used
-to reconstruct private upstream agent state.
+`spend_limit_per_day_usd`, `enable_planning`, `advisor_model`,
+`advisor_max_uses`, and `compaction_enabled`. Private legacy aliases and
+configuration-only keys MAY be retained for migration or internal compatibility,
+but SHALL not be documented as public consumer construction inputs, projected by
+public consumers, or used to reconstruct private upstream agent state.
 
 #### Scenario: Supported public runtime options are forwarded
 
