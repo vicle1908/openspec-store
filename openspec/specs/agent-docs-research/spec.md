@@ -36,7 +36,7 @@ The upgrade opportunities docs SHALL have accurate capability statuses.
 
 #### Scenario: Stable capabilities
 - **WHEN** a developer reads `research/upgrade-opportunities.md`
-- **THEN** these capabilities SHALL be marked as "Stable": CodeMode, FileSystem, Shell, RepoContext, PyaiDocs, SlidingWindow, Compaction, LimitWarner, OverflowingToolOutput, CacheStabilityMonitor, Memory, StepPersistence, Checkpointing, SubAgents, DynamicWorkflow, Planning, RuntimeAuthoring, InputGuard, OutputGuard, ManagedPrompt, ExaSearch
+- **THEN** these capabilities SHALL be marked as "Stable": CodeMode, FileSystem, Shell, RepoContext, PyaiDocs, SlidingWindow, Compaction, LimitWarner, OverflowingToolOutput, CacheStabilityMonitor, Memory, StepPersistence, Checkpointing, SubAgents, DynamicWorkflow, Planning, RuntimeAuthoring, InputGuardrail, OutputGuardrail, ManagedPrompt, ExaSearch
 
 #### Scenario: In-progress capabilities
 - **WHEN** a developer reads `research/upgrade-opportunities.md`

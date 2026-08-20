@@ -30,7 +30,7 @@ The system SHALL provide documentation for all 10 pydantic-ai-harness capabiliti
 
 ### Requirement: Guardrails documentation
 
-`harness-integration.md` SHALL document InputGuard with configurable guard functions.
+`harness-integration.md` SHALL document InputGuardrail with configurable guard functions.
 
 #### Scenario: Default guard
 - **WHEN** a developer reads the guardrails section

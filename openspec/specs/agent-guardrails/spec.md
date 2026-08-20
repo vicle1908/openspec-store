@@ -5,7 +5,7 @@ Defines how MCP tool annotations (readOnlyHint, destructiveHint, openWorldHint, 
 ## Requirements
 
 ### Requirement: MCP tool annotation mapping to guardrails
-MCP tool annotations (readOnlyHint, destructiveHint, openWorldHint, idempotentHint) discovered via pydantic-ai's `ToolDefinition.metadata['annotations']` SHALL be mapped to the existing `InputGuard`/`OutputGuard` framework and `AuthorityClass` enum.
+MCP tool annotations (readOnlyHint, destructiveHint, openWorldHint, idempotentHint) discovered via pydantic-ai's `ToolDefinition.metadata['annotations']` SHALL be mapped to the existing `InputGuardrail`/`OutputGuardrail` framework and `AuthorityClass` enum.
 
 #### Scenario: Read-only MCP tool
 - WHEN an MCP tool has `ToolDefinition.metadata['annotations']['readOnlyHint'] == true`
@@ -32,14 +32,14 @@ MCP tool annotations (readOnlyHint, destructiveHint, openWorldHint, idempotentHi
 - THEN the tool SHALL default to `AuthorityClass.READ` (conservative)
 - AND the conservative default SHALL be logged at debug level
 
-### Requirement: MCP annotations flow into InputGuard
+### Requirement: MCP annotations flow into InputGuardrail
 MCP tool annotations SHALL be used to enhance input guardrail decisions.
 
 #### Scenario: Guard reads MCP annotations
-- WHEN an `InputGuard` evaluates a tool call
+- WHEN an `InputGuardrail` evaluates a tool call
 - THEN the guard SHALL have access to `ToolDefinition.metadata['annotations']` for MCP tools
 - AND the guard MAY use annotation hints to inform its allow/block decision
 
 #### Scenario: Guard blocks destructive MCP tool without approval
 - WHEN a destructive MCP tool is called AND no approval has been granted
-- THEN the `InputGuard` SHALL return `GuardResult.block(message="Destructive MCP tool requires approval")`
+- THEN the `InputGuardrail` SHALL return `GuardrailResult.block(message="Destructive MCP tool requires approval")`
