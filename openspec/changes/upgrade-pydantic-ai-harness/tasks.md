@@ -69,7 +69,10 @@
 
 - [ ] 9.1 In `openspec/specs/agent-framework-verification/spec.md`: update harness version references
 - [ ] 9.2 In `openspec/specs/configuration/spec.md`: update harness path references if needed
-- [ ] 9.3 Verify all specs pass validation after migration
+- [ ] 9.3 In `openspec/specs/agent-guardrails/spec.md`: update `InputGuard` → `InputGuardrail`, `OutputGuard` → `OutputGuardrail`, `GuardResult` → `GuardrailResult`
+- [ ] 9.4 In `openspec/specs/_standalone/agent-docs-harness/spec.md`: update `InputGuard` → `InputGuardrail`
+- [ ] 9.5 In `openspec/specs/agent-docs-research/spec.md`: update `InputGuard` → `InputGuardrail`, `OutputGuard` → `OutputGuardrail`
+- [ ] 9.6 Verify all specs pass validation after migration
 
 ## 10. Verify Compatibility
 
@@ -83,9 +86,9 @@
 
 ## 11. Update Dependency Baseline Tests
 
-- [ ] 11.1 Update `agent-core/tests/test_dependency_baseline.py`: change harness version from `"0.11.0"` to `"0.23.0"` and remove `DynamicWorkflow` import assertion if present
-- [ ] 11.2 Create `agent-harness/tests/test_dependency_baseline.py` if it doesn't exist: add harness version assertion for `"0.23.0"`
-- [ ] 11.3 Create `agent-docs-sync/tests/test_dependency_baseline.py` if it doesn't exist: add harness version assertion for `"0.23.0"`
+- [ ] 11.1 Update `agent-core/tests/test_dependency_baseline.py`: change harness version from `"0.11.0"` to `"0.23.0"`, remove `DynamicWorkflow` import line (line 9) AND assertion (line 20)
+- [ ] 11.2 Update `agent-harness/tests/test_dependency_baseline.py`: change `"0.11.0"` → `"0.23.0"` in version tuple
+- [ ] 11.3 Update `agent-docs-sync/tests/test_dependency_baseline.py`: change `"0.11.0"` → `"0.23.0"` in version tuple
 - [ ] 11.4 Re-run dependency baseline tests to verify they pass
 
 ## 12. Verify No Legacy Code Remains
@@ -97,6 +100,8 @@
 - [ ] 12.5 Run `grep -rn "GuardResult\|InputGuard\|OutputGuard" docs/` in all repos — should return 0 matches
 - [ ] 12.6 Run `grep -rn "pydantic-ai-harness==0.11.0" docs/` in all repos — should return 0 matches
 - [ ] 12.7 Run `grep -rn "InputGuard\|OutputGuard" openspec/specs/` — should return 0 matches
+- [ ] 12.8 Run `grep -rn "pydantic_ai_harness.context" src/ tests/` in all repos — should return 0 matches (use repo_context)
+- [ ] 12.9 Run `grep -rn "pydantic_ai_harness.cache_stability" src/ tests/` in all repos — should return 0 matches (use warn_on_cache_busts)
 
 ## 13. Fix Any Issues
 
