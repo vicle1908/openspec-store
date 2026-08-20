@@ -32,7 +32,7 @@ None. The upstream capabilities already exist; this change reconciles their work
 
 ### Modified Capabilities
 
-- `agent-runtime`: Define explicit typed capability composition, default behavior, identity/order preservation, and public configuration ownership.
+- `agent-core-capabilities`: Replace the newly archived default-on AgentRuntime capability requirements with explicit typed composition, shared persistence, and public behavioral acceptance.
 - `agent-compaction`: Replace historical dictionary-based requirements with typed opt-in compaction and executable behavior requirements.
 - `_standalone/harness-compaction`: Remove the obsolete `harness_config` contract and retain only typed composition and layering requirements.
 - `agent-step-persistence`: Require ConversationSearch and continuation to share the caller-owned persistence source when shared history is declared.
@@ -45,7 +45,7 @@ None. The upstream capabilities already exist; this change reconciles their work
 - **agent-core owner:** `sdk.build_agent`, `BaseAgent`, `AgentRuntime`, capability factories, dependency extras, docs, and behavioral tests.
 - **agent-docs-sync owner:** production capability assembly, ToolGuardrail factories/call sites, dependency extras, docs, and containment-aware behavioral tests.
 - **agent-harness owner:** dependency-extra cleanup and compatibility verification; no new runtime ownership of upstream harness capabilities.
-- **openspec-store owner:** seven delta-spec paths, corrective ledger, validation, sync, and archive evidence.
+- **openspec-store owner:** seven delta-spec paths, corrective ledger, validation, sync, and archive evidence, including the current `agent-core-capabilities` main-spec correction.
 - GitNexus currently reports LOW advisory blast radius, but its indexes are stale; apply must refresh or replace that evidence with current direct callers and focused tests before editing.
 - This change depends on accepted results from `restore-agent-pydantic-quality-gates` and `enforce-openspec-archive-readiness-gates`; implementation begins only after both gates are available from the dedicated planning worktree.
 - **integration coordinator:** run from `/Users/androidteam/Developer`, load this change from `/Users/androidteam/Developer/.worktrees/pydantic-ai-openspec-followups`, and treat agent-core, docs-sync, harness, and store as separately authorized writer packets.

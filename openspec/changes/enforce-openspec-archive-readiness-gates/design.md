@@ -35,6 +35,6 @@ See proposal.md for the incident. Existing `agent-framework-verification`, `read
 ## Migration Plan
 
 1. Add the uv-managed store tooling environment, validator, and unit fixtures.
-2. Run the validator against the four reviewed archived changes to produce a corrective baseline without modifying them.
+2. Run the validator against the five reviewed archived changes to produce a corrective baseline without modifying them.
 3. Add the GitHub Actions invocation and update `.agents/skills/openspec-{archive,bulk-archive}-change`, the matching `.claude/skills` surfaces, and `opsx/{archive,bulk-archive}.md` without touching `.codex/skills`.
 4. Verify clean success, each failure class, rollback of the validator itself, and no mutation of unrelated active changes.

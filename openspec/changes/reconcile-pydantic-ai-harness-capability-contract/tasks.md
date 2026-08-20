@@ -5,7 +5,7 @@
 - [ ] 1.3 From `/Users/androidteam/Developer`, load apply context from `/Users/androidteam/Developer/.worktrees/pydantic-ai-openspec-followups` and publish separate writer packets for agent-core, agent-docs-sync, agent-harness, and openspec-store; verify repo-local planning context is not treated as sibling-repository write authority.
 - [ ] 1.4 Publish exact base SHAs, raw dirty inventories, content fingerprints, selected paths, and preservation boundaries for every writer packet; verify default-checkout dirt and active observability/JTI work are not selected.
 - [ ] 1.5 Refresh GitNexus only through the reviewed single-writer workflow or record current Graphify/direct-call-site fallback evidence; verify no stale index risk count is used as acceptance evidence.
-- [ ] 1.6 Create the corrective evidence ledger mapping the four reviewed archived changes to this change’s exact tasks and closure gates; verify archived files remain byte-identical to the accepted store base.
+- [ ] 1.6 Create the corrective evidence ledger mapping the five reviewed archived changes to this change’s exact tasks and closure gates; verify archived files remain byte-identical to the accepted store base.
 
 ## 2. Reconcile Agent-Core Public Composition
 
@@ -61,7 +61,7 @@
 ## 8. Integrate Repositories, Sync Specs, and Archive Safely
 
 - [ ] 8.1 Run strict validation for this change and the full store before synchronization; verify all seven delta paths come only from `artifactPaths.specs.existingOutputPaths`.
-- [ ] 8.2 Sync all seven delta capabilities and verify removed historical requirements are absent, added requirements are present, and unrelated main-spec scenarios are preserved.
+- [ ] 8.2 Sync all seven delta capabilities, update the `agent-core-capabilities` Purpose from its archive placeholder, and verify removed historical requirements are absent, modified requirements are present, and unrelated main-spec scenarios are preserved.
 - [ ] 8.3 Complete the corrective ledger and immutable integrated evidence manifest, verify every task has a reproducible closure artifact, and keep any failed/skipped/stale requirement open.
 - [ ] 8.4 Review and commit the scoped agent-core result and record its full 40-character SHA.
 - [ ] 8.5 Review and commit the scoped agent-docs-sync result and record its full 40-character SHA.

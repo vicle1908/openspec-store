@@ -4,7 +4,7 @@
 
 **Reason**: `harness_config` and `_build_harness_capabilities()` were removed; retaining this requirement makes the main contract normatively false.
 
-**Migration**: Use typed public capability composition described by the current agent-runtime and agent-compaction requirements.
+**Migration**: Use typed public capability composition described by the current agent-core-capabilities and agent-compaction requirements.
 
 ### Requirement: Optional compaction sub-features are configurable
 

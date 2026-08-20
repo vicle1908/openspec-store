@@ -4,7 +4,7 @@
 - [ ] 1.2 Publish the sole openspec-store writer, dedicated worktree, 40-character base SHA, raw dirty inventory, content fingerprint, and preserved active/untracked paths; verify observability and JTI changes are not selected.
 - [ ] 1.3 Add a minimal store-tooling `pyproject.toml` and `uv.lock` for Python 3.14 plus pytest, and verify a clean `uv sync --frozen` followed by `uv run --frozen pytest --version` succeeds without relying on the existing local `.venv`.
 - [ ] 1.4 Define a redacted machine-readable archive-readiness evidence schema covering repository identity, dirty inventory, content hash, dependency origins, commands/exits, gate classification, authoritative spec paths/sync, rollback, and owner; verify valid/invalid fixtures parse deterministically.
-- [ ] 1.5 Create a corrective ledger for the four reviewed archives with exact archived paths, incomplete or unsupported claims, owning corrective tasks, and closure gates; verify the archives themselves remain unchanged.
+- [ ] 1.5 Create a corrective ledger for the five reviewed archives with exact archived paths, incomplete or unsupported claims, owning corrective tasks, and closure gates; verify the archives themselves remain unchanged.
 
 ## 2. Implement Active-Change Preflight
 
@@ -24,7 +24,7 @@
 - [ ] 4.1 Update `.agents/skills/openspec-archive-change/SKILL.md` and `.agents/skills/openspec-bulk-archive-change/SKILL.md` to require the validator before mutation and to block incomplete tasks/evidence; verify inline spec sync and user confirmation remain intact.
 - [ ] 4.2 Update the matching `.claude/skills/openspec-{archive,bulk-archive}-change/SKILL.md` and `.claude/commands/opsx/{archive,bulk-archive}.md` through their store-owned workflow, and verify standard/Claude invocation semantics remain intentionally distinct.
 - [ ] 4.3 Add `.github/workflows/validate-openspec-store.yml` to install uv and `@fission-ai/openspec@1.10.0`, print versions, run `uv sync --frozen`, strict store validation, `uv run --frozen pytest -q`, the managed-skill check, and the archive range audit against the PR base; verify a raw-CLI incomplete archive fixture fails the workflow commands locally.
-- [ ] 4.4 Run `python3 scripts/sync-workspace-agent-skills.py` followed by `python3 scripts/sync-workspace-agent-skills.py --check` and verify workspace/user symlinks point to the reviewed store-owned targets without touching `.codex/skills`.
+- [ ] 4.4 Run `python3 scripts/sync-workspace-agent-skills.py --check` and verify workspace/user symlinks point to the reviewed store-owned targets without mutating skill links or touching `.codex/skills`.
 
 ## 5. Validate, Roll Back, and Commit
 

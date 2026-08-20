@@ -7,7 +7,7 @@ Recent Pydantic AI changes were moved into the archive with incomplete tasks and
 - Add a repository-owned archive-readiness validator that checks task completion, required artifact presence, authoritative delta-spec paths, exact source/evidence identities, required gate results, and rollback evidence before a change can be reported ready.
 - Add a minimal uv-managed `pyproject.toml`/`uv.lock` for reproducible store validator tests; the existing untracked local `.venv` SHALL not be treated as CI evidence.
 - Add deterministic checks for archived changes that still contain incomplete tasks or whose completion-only task edits occurred after the archive move.
-- Produce a corrective ledger for the four reviewed dependency/capability archives and cross-reference the owning active corrective change instead of rewriting archived artifacts.
+- Produce a corrective ledger for the five reviewed dependency/capability archives and cross-reference the owning active corrective change instead of rewriting archived artifacts.
 - Integrate the validator into a tracked GitHub Actions store gate and the store-owned standard/Claude single and bulk archive workflows so incomplete readiness is blocked before agent-driven mutation and raw-CLI violations are caught before integration.
 - Require archive evidence to bind source HEADs, raw dirty inventories, content-diff fingerprints, imported dependency origins, prerequisite-aware passes/skips, spec-sync results, and final store identity.
 - Add tests covering no-delta changes, skipped specs, missing evidence, incomplete tasks, source drift, failed or unavailable gates, post-archive mutation detection, and clean successful archive readiness.
