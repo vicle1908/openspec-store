@@ -1,8 +1,8 @@
 ## 1. Verify Harness Upgrade Complete
 
-- [ ] 1.1 Confirm `upgrade-pydantic-ai-harness` change is archived and all 3 repos have harness >=0.23.0
-- [ ] 1.2 Verify `uv pip show pydantic-ai-harness` shows 0.23.0+ in all 3 repos
-- [ ] 1.3 Verify no deprecated imports remain: `grep -rn "GuardResult\|InputGuard\|OutputGuard" src/ tests/` should return 0 matches
+- [x] 1.1 Confirm `upgrade-pydantic-ai-harness` change is archived and all 3 repos have harness >=0.23.0
+- [x] 1.2 Verify `uv pip show pydantic-ai-harness` shows 0.23.0+ in all 3 repos
+- [x] 1.3 Verify no deprecated imports remain: `grep -rn "GuardResult\|InputGuard\|OutputGuard" src/ tests/` should return 0 matches
 
 ## 2. Batch 1: Quick Wins — Compaction + SystemReminders
 
