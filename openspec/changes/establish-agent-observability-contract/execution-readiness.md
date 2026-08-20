@@ -64,8 +64,8 @@ Before any backend routing implementation:
 |----------|:-:|:-:|:-:|---------|
 | agent-core CLI (`agent-core`) | — | No | — | In scope (primary target) |
 | agent-docs-sync (`docs-sync`) | Yes | Yes, including import side effect | CLI callback calls `init_observability()` | In scope migration |
-| agent-harness (`agent-harness`) | Yes | Not found | No observability files | Decision required |
-| code-daily-scan (`code-daily-scan`) | Yes | Not found | No observability files | Decision required |
+| agent-harness (`agent-harness`) | Yes | Not found | No observability files | Task 0.8 |
+| code-daily-scan (`code-daily-scan`) | Yes | Not found | No observability files | Task 0.8 |
 | tdt-observability (`tdt-observability`) | No | No | Operational dashboards only | Out of scope |
 | webhook-receiver (`webhook-receiver`) | No | No | structlog only | Out of scope |
 | DBOS scheduler workers | Indirect | Unknown | — | Phase 0 inventory |

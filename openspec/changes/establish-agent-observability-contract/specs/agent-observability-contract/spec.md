@@ -84,7 +84,7 @@ The system SHALL use the following authoritative attribute names. Backend-specif
 | Workflow | `agent_core.workflow.id` | Workflow/orchestration identifier |
 | Run | `agent_core.run.id` | Unique run identifier |
 | Budget | `agent_core.budget.id` | Budget or cost-control identifier |
--| Tool name | `gen_ai.tool.name` | Canonical tool name for agent tool executions |
+| Tool name | `gen_ai.tool.name` | Canonical tool name for agent tool executions |
 | Tool success | `agent_core.tool.success` | Boolean: tool call succeeded |
 | Tool duration | `agent_core.tool.duration_ms` | Tool execution wall-clock time |
 | Operation name | `gen_ai.operation.name` | One of: `invoke_agent`, `chat`, `execute_tool`, `invoke_workflow` |
@@ -123,8 +123,8 @@ Evaluation records stored in `agent_memory.eval_metrics` SHALL include optional 
 #### Scenario: Evaluation with active trace
 
 - **WHEN** an evaluation runs while an OTel span is active
-- **THEN** `EvalRecord.trace_id` SHALL be set to the active trace ID
-- **AND** `EvalRecord.trace_id` and `span_id` SHALL be populated from `EvaluationReport.trace_id` and `EvaluationReport.span_id`
+- **THEN** `EvalRecord.trace_id` SHALL be populated from `EvaluationReport.trace_id`
+- **AND** `EvalRecord.span_id` SHALL be populated from `EvaluationReport.span_id`
 
 #### Scenario: Evaluation without active trace
 

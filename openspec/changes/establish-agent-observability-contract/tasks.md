@@ -9,6 +9,7 @@
 - [ ] 0.5 Verify compatibility of `mlflow.pydantic_ai.autolog()` with installed pydantic-ai v2. **Repo:** agent-core. **Validation:** `uv run python -c "from mlflow.pydantic_ai import autolog; autolog()"` exits 0. **Evidence:** captured output.
 - [ ] 0.6 Record selected authoritative route for each backend (direct SDK or Collector) based on evidence. **Evidence:** route decision documented in design.md addendum.
 - [ ] 0.7 Reconcile Langfuse and MLflow delta specs with route evidence before implementation. If deployment validation proves Collector is not available, modify deltas to retain direct SDK as default.
+- [ ] 0.8 Disposition consumer repos `agent-harness` and `code-daily-scan`: inspect entry points, determine whether each requires composition-root initialization. **Repo:** agent-harness, code-daily-scan. **Validation:** document whether each has standalone CLI/worker processes that need `init_observability()`. **Evidence:** consumer inventory updated in design.md.
 
 ## 1. Lock regression tests for confirmed defects
 
