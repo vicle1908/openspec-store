@@ -2,128 +2,122 @@
 
 ### Feature Adoption Strategy
 
-Eight capabilities adopted in two tiers, each with independent verification:
+Seven capabilities adopted in four batches, ordered by value/effort ratio:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │              FEATURE ADOPTION SEQUENCE                      │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│  TIER 1: Adopt with upgrade (high value, low effort)        │
+│  BATCH 1: Quick wins (same commit, biggest bang)            │
 │  ─────────────────────────────────────────────────────      │
-│  Phase 1: Compaction (highest impact)                       │
-│  ├── Add to agent-core agent construction                   │
-│  ├── Configure anchored incremental strategy                │
-│  └── Verify context trimming works                          │
+│  Phase 1: Compaction (CRITICAL value, LOW effort)           │
+│  ├── TieredCompaction with 3 tiers                          │
+│  ├── DeduplicateFileReads → ClearToolResults → Summarizing  │
+│  └── Prevents context overflow (most common failure mode)   │
 │                                                             │
-│  Phase 2: SpendLimits (cost visibility)                     │
-│  ├── Add to agent-core agent construction                   │
-│  ├── Configure per-model budgets                            │
-│  └── Verify cost tracking in OTel traces                    │
+│  Phase 2: SystemReminders (HIGH value, VERY LOW effort)     │
+│  ├── GoalReanchor — zero-cost, one line of code             │
+│  └── Prevents instruction fade in long runs                 │
 │                                                             │
-│  Phase 3: SystemReminders (instruction persistence)         │
-│  ├── Add to agent-core agent construction                   │
-│  ├── Configure reminder schedule                            │
-│  └── Verify instructions persist                            │
-│                                                             │
-│  Phase 4: Tool Output Limits (context overflow prevention)  │
-│  ├── Add to agent-core agent construction                   │
-│  ├── Configure truncation thresholds                        │
-│  └── Verify large tool results truncated                    │
-│                                                             │
-│  TIER 2: Adopt shortly after (medium value, medium effort)  │
+│  BATCH 2: Security + Cost (independent, can parallel)       │
 │  ─────────────────────────────────────────────────────      │
-│  Phase 5: ToolGuard (guardrail enhancement)                 │
-│  ├── Add to agent-docs-sync guardrails                      │
-│  ├── Configure tool-specific validation rules               │
-│  └── Verify invalid tool args blocked                       │
+│  Phase 3: Guardrails upgrade (HIGH value, LOW-MEDIUM)       │
+│  ├── Migrate GuardResult → GuardrailResult (drop-in)        │
+│  ├── Add ToolGuardrail for tool call validation             │
+│  ├── Add hidden tools (zero-cost security)                  │
+│  └── Add ready-made detectors (redact_secrets, etc.)        │
 │                                                             │
-│  Phase 6: Warn On Cache Busts (performance)                 │
-│  ├── Add to agent-core agent construction                   │
-│  ├── Configure cache monitoring                             │
-│  └── Verify cache invalidation detected                     │
+│  Phase 4: SpendLimits (HIGH value, LOW-MEDIUM)              │
+│  ├── Cross-window USD/token budgets                         │
+│  ├── Per-tenant scoped budgets                              │
+│  └── Redis store for multi-process                          │
 │                                                             │
-│  Phase 7: Planning (task decomposition)                     │
-│  ├── Add to agent-core agent construction                   │
-│  ├── Configure planning strategy                            │
-│  └── Verify model creates task plans                        │
+│  BATCH 3: Build on compaction                               │
+│  ─────────────────────────────────────────────────────      │
+│  Phase 5: Planning (MEDIUM-HIGH value, LOW-MEDIUM)          │
+│  ├── Replaces test-only dynamic_workflow                    │
+│  ├── Planner/executor split for cost optimization           │
+│  └── Production-ready task tracking                         │
 │                                                             │
-│  Phase 8: Conversation Search (history retrieval)           │
-│  ├── Add to agent-core memory layer                         │
-│  ├── Configure BM25 search                                  │
-│  └── Verify history search works including compacted turns  │
+│  Phase 6: ConversationSearch (MEDIUM-HIGH value, LOW)       │
+│  ├── BM25 search over persisted history                     │
+│  ├── Recovers compaction-dropped messages                   │
+│  └── Requires StepPersistence (already have)                │
+│                                                             │
+│  BATCH 4: Use-case specific                                 │
+│  ─────────────────────────────────────────────────────      │
+│  Phase 7: Advisor (MEDIUM value, LOW-MEDIUM)                │
+│  ├── Multi-model consultation (cheap executes, expensive    │
+│  │   reviews)                                               │
+│  └── Best for high-stakes decision agents                   │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Feature 1: Compaction
+### Feature 1: Compaction (CRITICAL)
 
-**What it does:** Automatically trims conversation context when approaching model limits, preserving critical information through anchored incremental strategy.
+**What it does:** Automatically trims conversation context when approaching model limits using a tiered strategy that escalates from zero-cost to LLM-based compaction.
 
-**Configuration:**
+**Recommended configuration:**
 ```python
-from pydantic_ai_harness.compaction import Compaction, AnchoredCompaction
+from pydantic_ai_harness.compaction import (
+    TieredCompaction,
+    DeduplicateFileReads,
+    ClearToolResults,
+    SummarizingCompaction,
+)
 
-compaction = Compaction(
-    strategy=AnchoredCompaction(
-        keep_user_messages=True,      # Never drop user messages
-        pin_last_n=5,                 # Keep last 5 exchanges intact
-        receipt_prefix="[compacted]", # Mark compacted sections
-    ),
-    threshold=0.8,  # Trigger at 80% of context window
+compaction = TieredCompaction(
+    tiers=[
+        DeduplicateFileReads(file_key=lambda msg: msg.content),  # Zero cost
+        ClearToolResults(max_tokens=1, keep_pairs=3),            # Zero cost
+        SummarizingCompaction(max_messages=1, keep_messages=20), # 1 LLM call
+    ],
+    target_tokens=120_000,  # Trigger at 80% of 150K context
 )
 ```
+
+**Available strategies (9 total):**
+- `SlidingWindowCompaction` — drops oldest messages (zero cost)
+- `SummarizingCompaction` — LLM summarizes older messages (1 call)
+- `TieredCompaction` — chains strategies, escalates until fit (recommended)
+- `ClearToolResults` — replaces old tool results with placeholder
+- `DeduplicateFileReads` — blanks superseded file reads
+- `ClampOversizedMessages` — truncates oversized parts
+- `WarnNearLimits` — injects URGENT/CRITICAL warnings
+- `ReportContextUsage` — reports context usage metrics
+- `FallbackCompaction` — tries strategies in order on failure
+
+**Also available:** `pin()` to protect content through compaction, `compact_now()` for manual compaction, receipts, tracing.
 
 **Integration point:** `agent-core/_ai/agent.py` — add to capabilities list
 
 **Verification:**
 - Short conversations (< 10 turns): no compaction triggered
 - Long conversations (> 50 turns): compaction preserves key facts
-- Compacted sections marked with receipt prefix
+- Compaction receipts visible in traces
 
-### Feature 2: SpendLimits
-
-**What it does:** Tracks and enforces USD/token budgets across agent runs, with per-model and per-tenant breakdowns.
-
-**Configuration:**
-```python
-from pydantic_ai_harness.control import SpendLimits
-
-spend_limits = SpendLimits(
-    max_usd_per_run=1.00,           # $1 per run
-    max_tokens_per_run=100_000,     # 100K tokens per run
-    max_usd_per_day=10.00,          # $10 per day (cross-run)
-    per_model_limits={
-        "anthropic:claude-sonnet-4-6": {"max_usd": 0.50},
-        "anthropic:claude-opus-4-7": {"max_usd": 0.80},
-    },
-)
-```
-
-**Integration point:** `agent-core/_ai/agent.py` — add to capabilities list
-
-**Verification:**
-- Cost tracked in OTel spans (existing instrumentation)
-- Budget exceeded → agent raises `SpendLimitExceeded`
-- Per-model breakdown visible in traces
-
-### Feature 3: SystemReminders
+### Feature 2: SystemReminders (HIGH)
 
 **What it does:** Re-injects critical instructions mid-run to counter context drift, using cache-safe mechanisms.
 
-**Configuration:**
+**Recommended configuration:**
 ```python
-from pydantic_ai_harness.context import SystemReminders
+from pydantic_ai_harness.context import SystemReminders, GoalReanchor
 
 reminders = SystemReminders(
-    reminders=[
-        "You are a documentation agent. Only write to docs/ paths.",
-        "Use Diátaxis framework: tutorials, how-to, reference, explanation.",
-        "Never modify source code.",
-    ],
-    every_n_tool_calls=5,  # Re-inject every 5 tool calls
+    dynamic_reminders=[GoalReanchor()],  # Zero-cost, one line
 )
 ```
+
+**Available options:**
+- `Reminder` — fires on fixed cadence (every N model requests)
+- `GoalReanchor` — zero-cost, restates original goal each request (recommended)
+- `LLMReminder` — model-generated stay-on-task nudge
+- Dynamic reminders — callable evaluated every request
+
+**Configuration:** `max_fires`, `first_after`, `trigger` predicate, `tag`, `on_fire` callback
 
 **Integration point:** `agent-core/_ai/agent.py` — add to capabilities list
 
@@ -132,120 +126,147 @@ reminders = SystemReminders(
 - No duplicate reminders in context
 - Agent behavior consistent across long conversations
 
-### Feature 4: Tool Output Limits
+### Feature 3: Guardrails Upgrade (HIGH)
 
-**What it does:** Truncates, spills to file, or summarizes oversized tool returns at the source.
+**What it does:** Enhances existing guardrails with ToolGuardrail, ready-made detectors, and new outcomes (replace, retry, approve).
 
-**Configuration:**
+**Migration path:**
 ```python
-from pydantic_ai_harness.context import ToolOutputLimits
+# Old (0.11.0)                    # New (0.23.0)
+GuardResult                       GuardrailResult
+InputGuard                        InputGuardrail
+OutputGuard                       OutputGuardrail
+```
 
-tool_limits = ToolOutputLimits(
-    max_chars=10_000,           # Truncate at 10K chars
-    spill_to_file=True,         # Save full output to file
-    spill_directory="/tmp/tool-outputs",  # Where to save
-    summarize=True,             # Summarize truncated content
+**New capabilities:**
+```python
+from pydantic_ai_harness.guardrails import (
+    ToolGuardrail,
+    redact_secrets,
+    redact_personal_data,
+    blocked_keywords,
+)
+
+# Tool call validation
+tool_guard = ToolGuardrail(
+    guard=lambda ctx, args: args["path"].startswith("docs/"),
+    tools=["write_file"],  # Only apply to specific tools
+)
+
+# Hidden tools (zero-cost security — model never sees the tool)
+hidden_guard = ToolGuardrail(
+    hidden=True,  # Tool completely invisible to model
+    tools=["dangerous_tool"],
+)
+
+# Ready-made detectors
+secret_guard = redact_secrets(only=["api_key", "password"])
+pii_guard = redact_personal_data(only=["email", "phone"])
+keyword_guard = blocked_keywords(["rm -rf", "sudo"])
+```
+
+**Integration point:** `agent-docs-sync/guardrails.py` — migrate existing guards, add ToolGuardrail
+
+**Verification:**
+- Existing InputGuard/OutputGuard work after migration
+- ToolGuardrail blocks invalid tool args
+- Hidden tools invisible to model
+- Ready-made detectors redact sensitive content
+
+### Feature 4: SpendLimits (HIGH)
+
+**What it does:** Tracks and enforces USD/token budgets across agent runs, with per-model and per-tenant breakdowns.
+
+**Recommended configuration:**
+```python
+from pydantic_ai_harness.control import SpendLimits, Budget
+from decimal import Decimal
+
+spend_limits = SpendLimits(
+    budgets=[
+        Budget(usd=Decimal("5"), window="run"),
+        Budget(usd=Decimal("100"), window="day"),
+        Budget(usd=Decimal("2000"), window="month", warn_at=0.8),
+    ],
+    per_model_limits={
+        "anthropic:claude-sonnet-4-6": Budget(usd=Decimal("2"), window="run"),
+        "anthropic:claude-opus-4-7": Budget(usd=Decimal("4"), window="run"),
+    },
+    scope=lambda ctx: ctx.deps.tenant_id,  # Per-tenant budgets
+    expose_tools=True,  # Give agent a get_spend tool
 )
 ```
+
+**Available options:**
+- Cross-window budgets: per-run, per-conversation, per-day, per-month, per-total
+- Scoped budgets (per-tenant, per-user via `scope` callable)
+- Pure counters (no ceiling, just accounting)
+- Custom pricing functions
+- `on_spend` callback with `SpendSnapshot`
+- `warn_at` threshold for advance warning
+- Stores: `InMemorySpendStore`, `RedisSpendStore`
+- `status()` and `exhausted()` for programmatic checks
 
 **Integration point:** `agent-core/_ai/agent.py` — add to capabilities list
 
 **Verification:**
-- Large tool results truncated at threshold
-- Full output saved to spill directory
-- Summarized content provided to agent
+- Cost tracked in OTel spans (existing instrumentation)
+- Budget exceeded → agent raises `SpendLimitExceeded`
+- Per-model breakdown visible in traces
 
-### Feature 5: ToolGuard
+### Feature 5: Planning (MEDIUM-HIGH)
 
-**What it does:** Validates tool arguments and results against schemas, blocking invalid calls.
+**What it does:** Model-owned task plans with persistence and planner/executor split.
 
-**Configuration:**
-```python
-from pydantic_ai_harness.guardrails import ToolGuard
-
-# Guard for write_file tool
-write_guard = ToolGuard(
-    tool_name="write_file",
-    validate_args=lambda args: args["path"].startswith("docs/"),
-    block_message="Write path must start with docs/",
-)
-
-# Guard for shell commands
-shell_guard = ToolGuard(
-    tool_name="run_shell",
-    validate_args=lambda args: any(
-        cmd in args["command"]
-        for cmd in ["rm -rf", "sudo", "chmod 777"]
-    ),
-    block_message="Dangerous command blocked",
-)
-```
-
-**Integration point:** `agent-docs-sync/guardrails.py` — add to guardrail construction
-
-**Verification:**
-- Invalid tool args blocked with clear message
-- Valid tool args pass through unchanged
-- Audit trail of blocked attempts
-
-### Feature 6: Warn On Cache Busts
-
-**What it does:** Detects prompt-cache prefix collapses between requests, from the provider's own numbers.
-
-**Configuration:**
-```python
-from pydantic_ai_harness.context import WarnOnCacheBusts
-
-cache_busts = WarnOnCacheBusts(
-    enabled=True,
-    log_warnings=True,  # Log to structlog
-    alert_threshold=0.5,  # Alert if >50% of cache busted
-)
-```
-
-**Integration point:** `agent-core/_ai/agent.py` — add to capabilities list
-
-**Verification:**
-- Cache invalidation events logged
-- Performance degradation detected
-- Cost impact visible in traces
-
-### Feature 7: Planning
-
-**What it does:** Model-owned task plans with a cache-safe live reminder.
-
-**Configuration:**
+**Recommended configuration:**
 ```python
 from pydantic_ai_harness.reasoning import Planning
 
 planning = Planning(
-    max_tasks=10,           # Maximum tasks in plan
-    reminder_interval=3,    # Remind every 3 tool calls
-    auto_update=True,       # Update plan as tasks complete
+    max_tasks=10,
+    enable_subtasks=True,  # Allow subtask decomposition
+    store=SqlitePlanStore(database=":memory:"),  # Persistent plans
 )
 ```
 
-**Integration point:** `agent-core/_ai/agent.py` — add to capabilities list
+**Available options:**
+- Tools: `write_plan`, `read_plan`, `add_task`, `update_task_status`, `remove_task`
+- Subtasks and dependencies with `enable_subtasks=True`
+- Statuses: pending, in_progress, completed, cancelled, blocked
+- Persistence: `InMemoryPlanStore`, `SqlitePlanStore`, `PostgresPlanStore`, `RedisPlanStore`
+- Separate planner/executor runs (planner writes plan, executor follows it)
+- Plan events for UI integration
+
+**Integration point:** `agent-core/_ai/agent.py` — replace dynamic_workflow with Planning
 
 **Verification:**
 - Model creates task plan at start
 - Plan updated as tasks complete
 - Plan visible in agent context
+- Planner/executor split works correctly
 
-### Feature 8: Conversation Search
+### Feature 6: ConversationSearch (MEDIUM-HIGH)
 
-**What it does:** BM25 search over stored history, including turns compaction dropped.
+**What it does:** BM25 search over persisted conversation history, including compaction-dropped messages.
 
-**Configuration:**
+**Recommended configuration:**
 ```python
-from pydantic_ai_harness.memory import ConversationSearch
+from pydantic_ai_harness.memory import ConversationSearch, SnapshotHistorySource
 
 search = ConversationSearch(
-    store=memory_store,     # Use existing memory store
-    max_results=10,         # Return top 10 matches
-    min_score=0.3,          # Minimum relevance score
+    history_source=SnapshotHistorySource(store),  # Use existing StepPersistence store
+    scope="conversation",  # Search within current conversation
+    max_results=10,
+    min_score=0.3,
 )
 ```
+
+**Available options:**
+- BM25 full-text search over persisted conversation history
+- Recovers compaction-dropped messages (reads pre-compaction snapshots)
+- Cross-run or run-scoped search
+- Tunable BM25 parameters (k1, b)
+- Provenance metadata on results
 
 **Integration point:** `agent-core/sdk/memory.py` — add to memory layer
 
@@ -254,15 +275,44 @@ search = ConversationSearch(
 - Compacted turns searchable
 - BM25 ranking works correctly
 
+### Feature 7: Advisor (MEDIUM)
+
+**What it does:** Executor model consults a separate advisor model before decisions.
+
+**Recommended configuration:**
+```python
+from pydantic_ai_harness.reasoning import Advisor
+
+advisor = Advisor(
+    model="anthropic:claude-opus-4-7",  # Expensive model reviews
+    max_uses=3,  # Max consultations per executor request
+    max_tokens=4096,  # Max tokens per consultation
+    forward_history=True,  # Pass executor context to advisor
+)
+```
+
+**Available options:**
+- Native path (Anthropic/OpenRouter) — zero latency overhead
+- Local fallback — runs separate Pydantic AI agent
+- `max_uses`, `max_tokens`, `forward_history` configuration
+- Streaming: executor pauses during consultation
+- Caching for Anthropic native path
+
+**Integration point:** `agent-core/_ai/agent.py` — add to capabilities list (if use case fits)
+
+**Verification:**
+- Advisor consulted before high-stakes decisions
+- Consultation logged in traces
+- Graceful fallback on advisor failure
+
 ### Risk Assessment
 
 | Feature | Risk | Mitigation |
 |---|---|---|
-| Compaction | Medium — could drop critical context | Anchored strategy preserves key messages; receipts allow verification |
-| SpendLimits | Low — additive cost tracking | Budget limits are configurable; default to generous limits |
-| SystemReminders | Low — re-injection of instructions | Every N tool calls; no duplicate injection |
-| Tool Output Limits | Low — truncation at source | Spill to file preserves full output; summarize provides summary |
-| ToolGuard | Low — validation layer | Additive; invalid calls blocked with clear messages |
-| Warn On Cache Busts | Low — monitoring only | Log warnings; no behavioral change |
+| Compaction | Medium — could drop critical context | TieredCompaction with pin() for critical content; receipts allow verification |
+| SystemReminders | Low — re-injection of instructions | GoalReanchor is zero-cost; no behavioral change |
+| Guardrails | Low — validation layer | Additive; invalid calls blocked with clear messages |
+| SpendLimits | Low — additive cost tracking | Budget limits configurable; default to generous limits |
 | Planning | Low — model-owned plans | Cache-safe reminder; auto-update on completion |
-| Conversation Search | Low — search over history | BM25 is well-tested; max results bounded |
+| ConversationSearch | Low — search over history | BM25 is well-tested; max results bounded |
+| Advisor | Low — consultation only | Graceful fallback; max_uses cap |
