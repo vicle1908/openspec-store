@@ -1,0 +1,49 @@
+## Why
+
+The current Pydantic AI Harness 0.23 integration contradicts its public guidance and archived acceptance claims: several capabilities are silently default-on, configuration fields are unread, conversation search is detached from runtime persistence, docs ToolGuardrails are not installed, and retained tests prove construction rather than production behavior. A single corrective contract is needed now so source, docs, specs, dependencies, and executable evidence describe the same supported behavior.
+
+## What Changes
+
+- **BREAKING:** Make harness behavior explicit at the public `build_agent(..., capabilities=[...])` composition boundary; remove hidden default activation of TieredCompaction, SystemReminders, and SpendLimits unless an existing normative default is deliberately ratified in the delta specs.
+- Remove or replace unread `AgentConfig` capability dictionaries so configuration cannot claim to enable behavior that public construction ignores.
+- Preserve caller-supplied capability identity, order, authority validation, and supported Pydantic AI composition semantics without private upstream access.
+- Make ConversationSearch consume the same caller-owned SnapshotStore/StepPersistence store used by the runtime; fail construction when a declared shared-history source is unavailable rather than substituting a disconnected store.
+- Install the bounded write-path, shell-command, and result-redaction ToolGuardrails in docs-sync generation/full-sync production composition while preserving containment hooks, approval gates, and exactly-once write authority as the controlling security layers.
+- Retain the `[dynamic-workflow]` extra only in agent-core, the capability-composition owner; remove it from agent-harness and agent-docs-sync unless a direct supported consumer is added with behavioral compatibility evidence.
+- Replace import/constructibility checks with public-boundary behavioral tests for compaction, reminders, priced spend enforcement, planning, shared-store conversation search, advisor consultation/fallback, and ToolGuardrail execution.
+- Reconcile current historical compaction specs and harness documentation with the typed public API.
+- Maintain a corrective ledger that references the four inconsistent archived dependency/capability changes without rewriting their archived artifacts.
+- Treat `establish-agent-observability-contract` as the sole owner of telemetry activation, trace/log correlation, and evaluation linkage; this change only proves capability behavior and emits compatible evidence.
+
+## Non-goals
+
+- No upgrade beyond the frozen `pydantic-ai==2.32.0` and `pydantic-ai-harness==0.23.0` compatibility tuple.
+- No LLM provider, credential, `TDT_HOME`, model-selection, or canonical profile precedence change.
+- No replacement of LangGraph orchestration, DBOS scheduling, approval state, or docs-sync lifecycle identity.
+- No implementation of the active observability change.
+- No edits to archived change artifacts and no reuse of stale GitNexus risk counts as acceptance evidence.
+
+## Capabilities
+
+### New Capabilities
+
+None. The upstream capabilities already exist; this change reconciles their workspace contract.
+
+### Modified Capabilities
+
+- `agent-runtime`: Define explicit typed capability composition, default behavior, identity/order preservation, and public configuration ownership.
+- `agent-compaction`: Replace historical dictionary-based requirements with typed opt-in compaction and executable behavior requirements.
+- `_standalone/harness-compaction`: Remove the obsolete `harness_config` contract and retain only typed composition and layering requirements.
+- `agent-step-persistence`: Require ConversationSearch and continuation to share the caller-owned persistence source when shared history is declared.
+- `agent-guardrails`: Require docs-sync ToolGuardrails to be installed through production composition without weakening containment or approval authority.
+- `_standalone/agent-docs-harness`: Align documentation requirements with the actual public module paths, supported extras, defaults, and composition examples.
+- `agent-framework-verification`: Require behavioral, public-boundary, exact-identity evidence for each claimed harness capability and corrective archive ledger entry.
+
+## Impact
+
+- **agent-core owner:** `sdk.build_agent`, `BaseAgent`, `AgentRuntime`, capability factories, dependency extras, docs, and behavioral tests.
+- **agent-docs-sync owner:** production capability assembly, ToolGuardrail factories/call sites, dependency extras, docs, and containment-aware behavioral tests.
+- **agent-harness owner:** dependency-extra cleanup and compatibility verification; no new runtime ownership of upstream harness capabilities.
+- **openspec-store owner:** seven delta-spec paths, corrective ledger, validation, sync, and archive evidence.
+- GitNexus currently reports LOW advisory blast radius, but its indexes are stale; apply must refresh or replace that evidence with current direct callers and focused tests before editing.
+- This change depends on `restore-agent-pydantic-quality-gates` and must not begin implementation until that prerequisite has an accepted immutable result.
