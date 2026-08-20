@@ -29,7 +29,7 @@
 - [ ] 3.6 Run `uv sync` in agent-docs-sync to resolve updated lockfile
 - [ ] 3.7 Review `uv.lock` diff in all 3 repos: verify no unexpected new packages (expect: genai-prices, httpx2, pydantic-graph, logfire-api)
 
-## 4. Migrate Deprecated Guardrails API
+## 4. Migrate Deprecated Guardrails API (Source Code)
 
 - [ ] 4.1 In `agent-docs-sync/src/agent_docs_sync/guardrails.py`: replace `GuardResult` → `GuardrailResult`
 - [ ] 4.2 In `agent-docs-sync/src/agent_docs_sync/guardrails.py`: replace `InputGuard` → `InputGuardrail`
@@ -38,51 +38,84 @@
 - [ ] 4.5 In `agent-docs-sync/src/agent_docs_sync/guardrails.py`: update `GuardResult.allow()` → `GuardrailResult.allow()`
 - [ ] 4.6 In `agent-docs-sync/src/agent_docs_sync/guardrails.py`: update `InputGuard(guard=_guard)` → `InputGuardrail(guard=_guard)`
 - [ ] 4.7 In `agent-docs-sync/src/agent_docs_sync/guardrails.py`: update return type annotations
-- [ ] 4.8 In `agent-docs-sync/tests/test_guardrails_integration.py`: replace all deprecated imports
-- [ ] 4.9 In `agent-docs-sync/tests/test_tools/test_guardrails.py`: replace all deprecated imports
-- [ ] 4.10 In `agent-core/src/agent_core/_ai/config.py`: update docstring comment mentioning `InputGuard/OutputGuard`
+- [ ] 4.8 In `agent-core/src/agent_core/_ai/config.py`: update docstring comment mentioning `InputGuard/OutputGuard`
 
-## 5. Verify Compatibility
+## 5. Migrate Deprecated Guardrails API (Tests)
 
-- [ ] 5.1 Run `uv run pytest` in agent-core — all tests pass, compare count to baseline
-- [ ] 5.2 Run `uv run pytest` in agent-harness — all tests pass, compare count to baseline
-- [ ] 5.3 Run `uv run pytest` in agent-docs-sync — all tests pass, compare count to baseline
-- [ ] 5.4 Run `uv run ruff check .` in all 3 repos — full lint pass (not just I001)
-- [ ] 5.5 Run `uv run ruff check . --select I001` in all 3 repos — import ordering clean
-- [ ] 5.6 Run `uv run ruff format --check .` in all 3 repos — format clean
-- [ ] 5.7 Run `uv run mypy src/ --strict` in all 3 repos — no type errors
+- [ ] 5.1 In `agent-docs-sync/tests/test_guardrails_integration.py`: replace all deprecated imports
+- [ ] 5.2 In `agent-docs-sync/tests/test_tools/test_guardrails.py`: replace all deprecated imports
+- [ ] 5.3 Verify all tests pass after migration
 
-## 6. Update Dependency Baseline Tests
+## 6. Migrate Documentation (agent-core)
 
-- [ ] 6.1 Update `agent-core/tests/test_dependency_baseline.py`: change harness version from `"0.11.0"` to `"0.23.0"` and remove `DynamicWorkflow` import assertion if present
-- [ ] 6.2 Create `agent-harness/tests/test_dependency_baseline.py` if it doesn't exist: add harness version assertion for `"0.23.0"`
-- [ ] 6.3 Create `agent-docs-sync/tests/test_dependency_baseline.py` if it doesn't exist: add harness version assertion for `"0.23.0"`
-- [ ] 6.4 Re-run dependency baseline tests to verify they pass
+- [ ] 6.1 In `agent-core/docs/harness-integration.md`: update `InputGuard` → `InputGuardrail` references
+- [ ] 6.2 In `agent-core/docs/harness-integration.md`: update `pydantic_ai_harness.context` → `pydantic_ai_harness.repo_context` references
+- [ ] 6.3 In `agent-core/docs/framework-integration.md`: update `pydantic-ai-harness==0.11.0` → `pydantic-ai-harness>=0.23.0,<0.24`
+- [ ] 6.4 In `agent-core/docs/research/feature-mapping.md`: update `InputGuard` → `InputGuardrail` references
+- [ ] 6.5 In `agent-core/docs/research/pydanticai-langgraph.md`: update `InputGuard` → `InputGuardrail` references
+- [ ] 6.6 In `agent-core/docs/research/upgrade-opportunities.md`: update harness version and `InputGuard` references
 
-## 7. Verify No Legacy Imports Remain
+## 7. Migrate Documentation (agent-docs-sync)
 
-- [ ] 7.1 Run `grep -rn "GuardResult\|InputGuard\|OutputGuard" src/ tests/` in agent-docs-sync — should return 0 matches
-- [ ] 7.2 Run `grep -rn "from pydantic_ai_harness.guardrails import GuardResult" src/ tests/` in all repos — should return 0 matches
-- [ ] 7.3 Run `grep -rn "from pydantic_ai_harness.guardrails import InputGuard" src/ tests/` in all repos — should return 0 matches
-- [ ] 7.4 Run `grep -rn "from pydantic_ai_harness.guardrails import OutputGuard" src/ tests/` in all repos — should return 0 matches
+- [ ] 7.1 In `agent-docs-sync/docs/configuration.md`: update harness version references
+- [ ] 7.2 In `agent-docs-sync/docs/framework-integration.md`: update `pydantic-ai-harness==0.11.0` → `pydantic-ai-harness>=0.23.0,<0.24`
+- [ ] 7.3 In `agent-docs-sync/docs/reference/discovery-api.md`: update `InputGuard` → `InputGuardrail` references
 
-## 8. Fix Any Issues
+## 8. Migrate Documentation (wiki)
 
-- [ ] 8.1 Fix any type errors from harness version upgrade (if any)
-- [ ] 8.2 Fix any test failures from harness version upgrade (if any)
-- [ ] 8.3 Fix any ruff/mypy findings introduced by version changes
-- [ ] 8.4 Re-run full verification suite until all gates pass
+- [ ] 8.1 In `~/Developer/wiki/references/agent-ecosystem-evaluation-2026-08.md`: update `pydantic-ai-harness==0.11.0` → `pydantic-ai-harness>=0.23.0,<0.24`
 
-## 9. Commit and Archive
+## 9. Migrate OpenSpec Specs
 
-- [ ] 9.1 Commit agent-core changes: `git add pyproject.toml uv.lock tests/test_dependency_baseline.py && git commit`
-- [ ] 9.2 Commit agent-harness changes: `git add pyproject.toml uv.lock tests/test_dependency_baseline.py && git commit`
-- [ ] 9.3 Commit agent-docs-sync changes: `git add -A && git commit` (includes guardrails migration)
-- [ ] 9.4 Archive the OpenSpec change: `openspec archive upgrade-pydantic-ai-harness --yes`
-- [ ] 9.5 Commit openspec-store archive: `git add -A && git commit`
-- [ ] 9.6 Run `openspec validate --all --strict` to confirm no regressions
+- [ ] 9.1 In `openspec/specs/agent-framework-verification/spec.md`: update harness version references
+- [ ] 9.2 In `openspec/specs/configuration/spec.md`: update harness path references if needed
+- [ ] 9.3 Verify all specs pass validation after migration
 
-## 10. Verify Rollback Works
+## 10. Verify Compatibility
 
-- [ ] 10.1 In agent-core: `git stash && git checkout main -- pyproject.toml uv.lock && uv sync && uv run pytest -q && git stash pop`
-- [ ] 10.2 Verify rollback restores previous harness version and all tests pass
+- [ ] 10.1 Run `uv run pytest` in agent-core — all tests pass, compare count to baseline
+- [ ] 10.2 Run `uv run pytest` in agent-harness — all tests pass, compare count to baseline
+- [ ] 10.3 Run `uv run pytest` in agent-docs-sync — all tests pass, compare count to baseline
+- [ ] 10.4 Run `uv run ruff check .` in all 3 repos — full lint pass (not just I001)
+- [ ] 10.5 Run `uv run ruff check . --select I001` in all 3 repos — import ordering clean
+- [ ] 10.6 Run `uv run ruff format --check .` in all 3 repos — format clean
+- [ ] 10.7 Run `uv run mypy src/ --strict` in all 3 repos — no type errors
+
+## 11. Update Dependency Baseline Tests
+
+- [ ] 11.1 Update `agent-core/tests/test_dependency_baseline.py`: change harness version from `"0.11.0"` to `"0.23.0"` and remove `DynamicWorkflow` import assertion if present
+- [ ] 11.2 Create `agent-harness/tests/test_dependency_baseline.py` if it doesn't exist: add harness version assertion for `"0.23.0"`
+- [ ] 11.3 Create `agent-docs-sync/tests/test_dependency_baseline.py` if it doesn't exist: add harness version assertion for `"0.23.0"`
+- [ ] 11.4 Re-run dependency baseline tests to verify they pass
+
+## 12. Verify No Legacy Code Remains
+
+- [ ] 12.1 Run `grep -rn "GuardResult\|InputGuard\|OutputGuard" src/ tests/` in agent-docs-sync — should return 0 matches
+- [ ] 12.2 Run `grep -rn "from pydantic_ai_harness.guardrails import GuardResult" src/ tests/` in all repos — should return 0 matches
+- [ ] 12.3 Run `grep -rn "from pydantic_ai_harness.guardrails import InputGuard" src/ tests/` in all repos — should return 0 matches
+- [ ] 12.4 Run `grep -rn "from pydantic_ai_harness.guardrails import OutputGuard" src/ tests/` in all repos — should return 0 matches
+- [ ] 12.5 Run `grep -rn "GuardResult\|InputGuard\|OutputGuard" docs/` in all repos — should return 0 matches
+- [ ] 12.6 Run `grep -rn "pydantic-ai-harness==0.11.0" docs/` in all repos — should return 0 matches
+- [ ] 12.7 Run `grep -rn "InputGuard\|OutputGuard" openspec/specs/` — should return 0 matches
+
+## 13. Fix Any Issues
+
+- [ ] 13.1 Fix any type errors from harness version upgrade (if any)
+- [ ] 13.2 Fix any test failures from harness version upgrade (if any)
+- [ ] 13.3 Fix any ruff/mypy findings introduced by version changes
+- [ ] 13.4 Re-run full verification suite until all gates pass
+
+## 14. Commit and Archive
+
+- [ ] 14.1 Commit agent-core changes: `git add -A && git commit`
+- [ ] 14.2 Commit agent-harness changes: `git add pyproject.toml uv.lock tests/test_dependency_baseline.py && git commit`
+- [ ] 14.3 Commit agent-docs-sync changes: `git add -A && git commit` (includes guardrails migration + docs)
+- [ ] 14.4 Commit openspec-store changes: `git add -A && git commit` (specs + archive)
+- [ ] 14.5 Archive the OpenSpec change: `openspec archive upgrade-pydantic-ai-harness --yes`
+- [ ] 14.6 Commit openspec-store archive: `git add -A && git commit`
+- [ ] 14.7 Run `openspec validate --all --strict` to confirm no regressions
+
+## 15. Verify Rollback Works
+
+- [ ] 15.1 In agent-core: `git stash && git checkout main -- pyproject.toml uv.lock && uv sync && uv run pytest -q && git stash pop`
+- [ ] 15.2 Verify rollback restores previous harness version and all tests pass
