@@ -10,7 +10,7 @@ The framework comparison docs SHALL reflect accurate version numbers and feature
 
 #### Scenario: Version accuracy
 - **WHEN** a developer reads `research/framework-comparison.md`
-- **THEN** version numbers SHALL match PyPI latest releases (pydantic-ai v2.16.0, harness v0.10.0, langgraph v1.2.9)
+- **THEN** version numbers SHALL match PyPI latest releases (pydantic-ai v2.32.0, harness v0.23.0, langgraph v1.2.9)
 
 ### Requirement: Durable execution documented
 

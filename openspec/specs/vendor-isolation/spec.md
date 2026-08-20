@@ -5,7 +5,7 @@ Confines pydantic-ai imports to `src/agent_core/_ai/` via ruff TC002 enforcement
 ## Requirements
 ### Requirement: VI-1: pydantic-ai Import Confinement
 
-pydantic-ai v2.9 types SHALL be imported only inside `src/agent_core/_ai/`.
+pydantic-ai v2.31+ types SHALL be imported only inside `src/agent_core/_ai/`.
 
 All runtime imports of `pydantic_ai` outside `src/agent_core/_ai/` SHALL cause a lint failure.
 

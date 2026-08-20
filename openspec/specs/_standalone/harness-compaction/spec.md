@@ -1,5 +1,10 @@
 # Harness Compaction Specification
 
+> **⚠️ Historical spec:** This spec describes the removed `harness_config`
+> dictionary-based interface. The current implementation uses typed capability
+> composition via `build_agent(capabilities=[TieredCompaction(...)])`.
+> See `agent-core/docs/harness-integration.md` for the current API.
+
 ## Purpose
 
 Context window management via pydantic-ai-harness compaction capabilities (SlidingWindow, SummarizingCompaction, ClampOversizedMessages, ClearToolResults, DeduplicateFileReads).

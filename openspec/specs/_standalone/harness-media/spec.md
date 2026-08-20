@@ -16,7 +16,7 @@ The `pydantic_ai_harness.media` module SHALL provide `DiskMediaStore`, `S3MediaS
 - **THEN** it SHALL implement the `MediaStore` protocol and store binary content in S3/MinIO
 
 ### Requirement: Media offloading SHALL be deferred to a future change
-Since there is no built-in `Media` capability class in harness v0.10.0, media offloading SHALL NOT be automatically applied in this change. A custom Media capability using `externalize_media` and a `MediaStore` implementation SHALL be built in a future change.
+Since there is no built-in `Media` capability class in harness v0.23.0, media offloading SHALL NOT be automatically applied in this change. A custom Media capability using `externalize_media` and a `MediaStore` implementation SHALL be built in a future change.
 
 #### Scenario: Media offloading not applied
 - **WHEN** the agent processes tool outputs containing large `BinaryContent`

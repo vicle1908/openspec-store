@@ -44,14 +44,14 @@ Consumer repos `ai-review/` and `code-daily-scan/` SHALL run their test suites a
 
 #### Scenario: ai-review test suite passes
 
-- **GIVEN** `agent-core` is migrated to pydantic-ai v2.9
+- **GIVEN** `agent-core` is migrated to pydantic-ai v2.31+
 - **WHEN** `pytest` runs against `ai-review/`
 - **THEN** all tests pass
 - **AND** no files in `ai-review/src/` are modified
 
 #### Scenario: code-daily-scan test suite passes
 
-- **GIVEN** `agent-core` is migrated to pydantic-ai v2.9
+- **GIVEN** `agent-core` is migrated to pydantic-ai v2.31+
 - **WHEN** `pytest` runs against `code-daily-scan/`
 - **THEN** all tests pass
 - **AND** no files in `code-daily-scan/src/` are modified
