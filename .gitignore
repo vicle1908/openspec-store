@@ -7,3 +7,11 @@ __pycache__/
 
 graphify-out/
 .claude/
+
+# Python
+.venv/
+.env
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
