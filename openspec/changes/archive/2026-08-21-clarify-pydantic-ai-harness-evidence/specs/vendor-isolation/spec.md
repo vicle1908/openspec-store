@@ -1,9 +1,8 @@
-# vendor-isolation Specification
-
 ## Purpose
-Defines the pydantic-ai vendor boundary as intentional public SDK runtime-type forwarding plus internal adapter isolation, with focused checks that match those supported import paths.
 
-## Requirements
+Defines the pydantic-ai vendor boundary as intentional public SDK forwarding plus internal adapter isolation, with focused checks that match those supported import paths.
+
+## MODIFIED Requirements
 
 ### Requirement: VI-1: pydantic-ai Import Confinement
 
@@ -71,64 +70,3 @@ forbids intentional public runtime-type forwarding.
 - **WHEN** the vendor-boundary check is run
 - **THEN** it SHALL contain only rules compatible with intentional public SDK forwarding
 - **AND** it SHALL not assert the obsolete blanket TC002 prohibition
-
-### Requirement: VI-3: Composition over Inheritance
-
-No class in `src/agent_core/_ai/` SHALL subclass `pydantic_ai.Agent` or any other pydantic-ai class.
-
-All pydantic-ai primitives SHALL be held as private instance attributes.
-
-#### Scenario: AgentRuntime uses composition
-
-- **GIVEN** `AgentRuntime` is instantiated
-- **WHEN** `type(agent_runtime)._agent` is accessed
-- **THEN** the value is a `pydantic_ai.Agent` instance
-- **AND** `AgentRuntime` does not inherit from `pydantic_ai.Agent`
-
-### Requirement: VI-4: _ai/ Package Structure
-
-The `_ai/` package SHALL be located at `src/agent_core/_ai/` and SHALL contain at minimum:
-
-```
-_ai/
-    __init__.py   # Re-exports all _ai public types
-    models.py     # Model backend factory functions
-    agent.py      # AgentRuntime class
-    tools.py      # Builtin tools as @agent.tool()
-    hooks.py      # create_budget_hooks (pydantic-ai Hooks capability)
-    deps.py       # AgentRuntimeDeps dataclass
-    types.py      # Internal type aliases
-```
-
-#### Scenario: Package imports succeed
-
-- **GIVEN** the `_ai/` package is created with the required files
-- **WHEN** each module is imported in isolation
-- **THEN** no import errors occur
-
-### Requirement: Actual dependency and optional-extra boundaries
-
-The ecosystem SHALL document and preserve its package dependency boundary for
-the dynamic workflow extra. `agent-core` SHALL be the only repository that
-directly declares `pydantic-ai-harness[dynamic-workflow]`; `agent-docs-sync` and
-`agent-harness` SHALL depend on the base `pydantic-ai-harness` package without
-that extra, SHALL not directly declare `pydantic-monty`, and SHALL not import or
-use `DynamicWorkflow` as part of their public contract.
-
-#### Scenario: Agent-core owns the optional extra
-
-- **WHEN** package dependency metadata is inspected
-- **THEN** only agent-core SHALL directly request the `dynamic-workflow` extra
-- **AND** its runtime use SHALL remain within agent-core's documented boundary
-
-#### Scenario: Consumers retain the base dependency boundary
-
-- **WHEN** agent-docs-sync and agent-harness dependency metadata and imports are inspected
-- **THEN** each SHALL declare only the base pydantic-ai-harness dependency for this contract
-- **AND** neither SHALL directly declare pydantic-monty or import/use DynamicWorkflow
-
-#### Scenario: Shared lock does not widen a public contract
-
-- **WHEN** a shared environment lock contains an optional dependency transitively through editable agent-core
-- **THEN** that lock presence SHALL not be treated as a direct docs-sync or harness dependency
-- **AND** consumer acceptance SHALL report dependency provenance separately from environment availability
