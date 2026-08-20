@@ -6,7 +6,11 @@ gitnexus-debugging
 gitnexus-exploring
 gitnexus-guide
 gitnexus-impact-analysis
+gitnexus-pdg-query
+gitnexus-pr-review
 gitnexus-refactoring
+gitnexus-taint-analysis
+graphify
 handoff
 openspec-apply-change
 openspec-archive-change
