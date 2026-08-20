@@ -105,10 +105,10 @@
 
 ## 13. Fix Any Issues
 
-- [ ] 13.1 Fix any type errors from harness version upgrade (if any)
-- [ ] 13.2 Fix any test failures from harness version upgrade (if any)
-- [ ] 13.3 Fix any ruff/mypy findings introduced by version changes
-- [ ] 13.4 Re-run full verification suite until all gates pass
+- [x] 13.1 Fix any type errors from harness version upgrade (if any)
+- [x] 13.2 Fix any test failures from harness version upgrade (if any)
+- [x] 13.3 Fix any ruff/mypy findings introduced by version changes
+- [x] 13.4 Re-run full verification suite until all gates pass
 
 ## 14. Commit and Archive
 
