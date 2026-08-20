@@ -27,6 +27,63 @@ All import paths verified via `uv run --with pydantic-ai-harness==0.23.0 python 
 - `InputGuard` → `InputGuardrail`
 - `OutputGuard` → `OutputGuardrail`
 
+### Verified API Signatures (Smoke-Tested Against 0.23.0)
+
+All configuration examples verified against actual class signatures:
+
+**TieredCompaction** — Required: `tiers: Sequence[CompactionStrategy]`
+```python
+TieredCompaction(
+    tiers=[DeduplicateFileReads(...), ClearToolResults(...), SummarizingCompaction(...)],
+    target_tokens=120_000,  # Optional: trigger threshold
+)
+```
+
+**SystemReminders** — Required: none (all optional)
+```python
+SystemReminders(
+    dynamic_reminders=[GoalReanchor(fallback='Stay on task.')],  # Optional
+)
+```
+
+**SpendLimits** — Required: none (all optional)
+```python
+SpendLimits(
+    budgets=[
+        Budget(usd=Decimal('5'), window='run'),  # Budget is keyword-only
+        Budget(usd=Decimal('100'), window='day'),
+    ],
+)
+```
+
+**Planning** — Required: none (all optional)
+```python
+Planning(
+    enable_subtasks=True,  # Optional
+)
+```
+
+**ConversationSearch** — Required: `source: HistorySource`
+```python
+ConversationSearch(
+    source=SnapshotHistorySource(store),  # Required positional
+    max_matches=10,
+)
+```
+
+**Advisor** — Required: `model: ModelSelection` (positional)
+```python
+Advisor(model='anthropic:claude-opus-4-7')  # Required
+```
+
+**ToolGuardrail** — Required: none (guard or result_guard optional)
+```python
+ToolGuardrail(
+    guard=lambda ctx, args: args.get('path', '').startswith('docs/'),
+    tools=['write_file'],
+)
+```
+
 ### Feature Adoption Strategy
 
 Seven capabilities adopted in four batches, ordered by value/effort ratio:
