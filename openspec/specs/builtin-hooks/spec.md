@@ -1,5 +1,10 @@
 # builtin-hooks Specification
 
+> **⚠️ Historical spec:** This spec describes the `HookRegistry` / `register_pack`
+> pattern that was removed during the pydantic-ai v2 migration. Hook behavior is
+> now provided by pydantic-ai's `Hooks` capability and harness capabilities like
+> `Instrumentation` and `SpendLimits`. See `agent-core/docs/architecture.md`.
+
 ## Purpose
 Ships standard hook packs for observability (OTel metrics), structured audit, approval gating, and cost tracking that are composable and independently registerable.
 ## Requirements
