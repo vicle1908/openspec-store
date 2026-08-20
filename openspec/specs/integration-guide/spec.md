@@ -12,7 +12,7 @@ The integration guide SHALL document and verify the reviewed framework family.
 
 - **WHEN** the harness environment is synchronized
 - **THEN** it SHALL use `uv sync --frozen`
-- **AND** the version probe SHALL report Pydantic AI 2.18.0, Harness 0.11.0, Monty 0.0.19, and LangGraph 1.2.9
+- **AND** the version probe SHALL report Pydantic AI 2.32.0, Harness 0.23.0, Monty 0.0.18, and LangGraph 1.2.9
 
 ### Requirement: Framework prerequisite verification
 
