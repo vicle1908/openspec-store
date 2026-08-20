@@ -1,9 +1,4 @@
-# agent-core-capabilities Specification
-
-## Purpose
-TBD - created by archiving change upgrade-harness-23. Update Purpose after archive.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: TieredCompaction in AgentRuntime
 
@@ -144,42 +139,3 @@ through `BaseAgent` or `build_agent`.
 - **WHEN** a caller supplies SystemReminders(dynamic_reminders=[GoalReanchor()])
 - **THEN** the reminder SHALL be preserved at the supported request boundary
 - **AND** a multi-request test SHALL prove the goal is re-anchored without duplicate implicit reminders
-
-### Requirement: ConversationSearch factory
-
-`agent_core.sdk.memory` SHALL provide a ConversationSearch composition helper only when it receives a caller-owned snapshot store. The helper SHALL not allocate a disconnected default store and SHALL construct conversation-scoped search by default. An all-store search SHALL require direct explicit upstream composition under a caller-owned single-tenant policy rather than an agent-core helper default.
-
-#### Scenario: Default factory
-
-- **WHEN** `create_conversation_search(store=<caller-owned-store>)` is called
-- **THEN** it SHALL return a ConversationSearch backed by SnapshotHistorySource over that exact store
-- **AND** the capability SHALL use `scope="conversation"`
-- **AND** snapshots written by StepPersistence SHALL be searchable
-
-#### Scenario: Store omitted or unavailable
-
-- **WHEN** shared history is requested without an available caller-owned store
-- **THEN** construction SHALL fail before model or tool execution
-- **AND** the helper SHALL not substitute a fresh InMemoryStepStore
-
-#### Scenario: Conversation identity is unavailable
-
-- **WHEN** conversation-scoped search runs without a stable conversation identity
-- **THEN** the search SHALL return no cross-conversation corpus
-- **AND** it SHALL not fall back to `scope="all"`
-
-### Requirement: One harness capability configuration boundary
-
-The workspace SHALL expose one public harness-capability configuration boundary: typed objects supplied through `BaseAgent` or `build_agent`. Internal compatibility keywords MAY remain temporarily for migration or focused tests, but they SHALL not be projected from `AgentConfig`, AgentSpec compatibility metadata, or public consumer constructors.
-
-#### Scenario: Public typed boundary
-
-- **WHEN** a consumer supplies a typed harness capability through `BaseAgent` or `build_agent`
-- **THEN** the capability SHALL be passed through with its identity and configuration preserved
-- **AND** no parallel dictionary or convenience-key projection SHALL be required
-
-#### Scenario: Compatibility-only internal keyword
-
-- **WHEN** an internal test or migration shim uses a retained AgentRuntime convenience keyword
-- **THEN** the keyword SHALL remain outside public consumer construction and documentation
-- **AND** public capability acceptance SHALL not rely on that keyword

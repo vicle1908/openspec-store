@@ -1,9 +1,4 @@
-# vendor-isolation Specification
-
-## Purpose
-Confines pydantic-ai imports to `src/agent_core/_ai/` via ruff TC002 enforcement, composition over inheritance, and a defined package structure.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: VI-1: pydantic-ai Import Confinement
 
@@ -72,39 +67,7 @@ forbids intentional public runtime-type forwarding.
 - **THEN** it SHALL contain only rules compatible with intentional public SDK forwarding
 - **AND** it SHALL not assert the obsolete blanket TC002 prohibition
 
-### Requirement: VI-3: Composition over Inheritance
-
-No class in `src/agent_core/_ai/` SHALL subclass `pydantic_ai.Agent` or any other pydantic-ai class.
-
-All pydantic-ai primitives SHALL be held as private instance attributes.
-
-#### Scenario: AgentRuntime uses composition
-
-- **GIVEN** `AgentRuntime` is instantiated
-- **WHEN** `type(agent_runtime)._agent` is accessed
-- **THEN** the value is a `pydantic_ai.Agent` instance
-- **AND** `AgentRuntime` does not inherit from `pydantic_ai.Agent`
-
-### Requirement: VI-4: _ai/ Package Structure
-
-The `_ai/` package SHALL be located at `src/agent_core/_ai/` and SHALL contain at minimum:
-
-```
-_ai/
-    __init__.py   # Re-exports all _ai public types
-    models.py     # Model backend factory functions
-    agent.py      # AgentRuntime class
-    tools.py      # Builtin tools as @agent.tool()
-    hooks.py      # create_budget_hooks (pydantic-ai Hooks capability)
-    deps.py       # AgentRuntimeDeps dataclass
-    types.py      # Internal type aliases
-```
-
-#### Scenario: Package imports succeed
-
-- **GIVEN** the `_ai/` package is created with the required files
-- **WHEN** each module is imported in isolation
-- **THEN** no import errors occur
+## ADDED Requirements
 
 ### Requirement: Actual dependency and optional-extra boundaries
 

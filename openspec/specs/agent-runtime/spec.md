@@ -1,7 +1,9 @@
 ## Purpose
 
 Defines supported runtime tool, instruction, and continuation controls for consumers.
+
 ## Requirements
+
 ### Requirement: AR-3: AgentRuntime Tool Restriction
 
 `AgentRuntime` SHALL apply run-scoped tool visibility through supported Pydantic AI toolsets, `PrepareTools`, or supported agent overrides. It SHALL NOT inspect `_function_toolset`, extract private tool objects, or reconstruct the underlying agent to enforce allow/deny policy.
@@ -88,3 +90,29 @@ The public `agent-core` composition boundary SHALL distinguish an omitted tool a
 - **WHEN** static and run-scoped allowlists are both present
 - **THEN** effective visibility SHALL be their intersection after deny rules
 - **AND** an explicit empty policy at either scope SHALL remain deny-all
+
+### Requirement: Public runtime-option forwarding
+
+The public runtime composition boundary SHALL forward supported runtime options
+from `BaseAgent` and `build_agent` to `AgentRuntime` and the upstream run API
+without private-agent reconstruction. Omitted options SHALL receive documented
+runtime defaults, while explicitly supplied typed options SHALL take precedence
+and retain their identity and configuration.
+
+#### Scenario: Omitted options receive runtime defaults
+
+- **WHEN** a consumer constructs a public agent without optional runtime capabilities
+- **THEN** AgentRuntime SHALL apply only the documented defaults for that option
+- **AND** the public construction path SHALL not require compatibility-only keywords
+
+#### Scenario: Explicit option overrides a default
+
+- **WHEN** a consumer supplies a typed runtime capability or supported run option
+- **THEN** the public construction and run path SHALL forward that exact option
+- **AND** the supplied configuration SHALL override the corresponding default
+
+#### Scenario: Unsupported private mutation is unavailable
+
+- **WHEN** a consumer uses the public runtime-option path
+- **THEN** the runtime SHALL use supported agent and run APIs
+- **AND** it SHALL not inspect or reconstruct private upstream agent state
