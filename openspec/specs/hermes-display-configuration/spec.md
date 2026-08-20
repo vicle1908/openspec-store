@@ -1,28 +1,30 @@
 # hermes-display-configuration Specification
 
 ## Purpose
-TBD - created by archiving change align-hermes-balanced-display-profile. Update Purpose after archive.
+
+Defines display settings for the Hermes Agent default profile, balancing operational visibility with output clarity. Reasoning blocks are shown to provide transparency into model thinking. Per-platform overrides keep shared channels (Slack) clean while enabling full reasoning on Telegram and CLI.
 
 ## Requirements
 
-### Requirement: Balanced low-noise display profile
+### Requirement: Reasoning-visible display profile
 
-The Hermes display configuration SHALL set six supported display settings to their balanced low-noise values: `show_reasoning` to `false`, `interim_assistant_messages` to `false`, `busy_steer_ack_enabled` to `false`, `turn_summary` to `false`, `tool_preview_length` to `60`, and `platforms.slack.show_reasoning` to `false`.
+The Hermes display configuration SHALL enable reasoning visibility while retaining the existing low-noise operational settings. Specifically: `show_reasoning` to `true`, `reasoning_full` to `true`, `reasoning_style` to `code`, `interim_assistant_messages` to `false`, `busy_steer_ack_enabled` to `false`, `turn_summary` to `false`, and `tool_preview_length` to `60`.
 
-#### Scenario: Balanced display values after mutation
+#### Scenario: Reasoning-enabled display values after mutation
 
 - **WHEN** `~/.hermes/config.yaml` is parsed with `yaml.safe_load`
-- **THEN** `display.show_reasoning` SHALL be `false`
+- **THEN** `display.show_reasoning` SHALL be `true`
+- **AND** `display.reasoning_full` SHALL be `true`
+- **AND** `display.reasoning_style` SHALL be `code`
 - **AND** `display.interim_assistant_messages` SHALL be `false`
 - **AND** `display.busy_steer_ack_enabled` SHALL be `false`
 - **AND** `display.turn_summary` SHALL be `false`
 - **AND** `display.tool_preview_length` SHALL be `60`
-- **AND** `display.platforms.slack.show_reasoning` SHALL be `false`
 
 #### Scenario: Supported key names
 
 - **WHEN** `hermes config set` is used to set display values
-- **THEN** all six setting names SHALL be recognized by the Hermes CLI without warnings
+- **THEN** all setting names SHALL be recognized by the Hermes CLI without warnings
 - **AND** `hermes config check` SHALL report no errors
 
 ### Requirement: Operational visibility preservation
@@ -54,37 +56,51 @@ The `agent.verbose` key SHALL NOT exist in the `agent` section. The `display.bus
 - **WHEN** `~/.hermes/config.yaml` is parsed with `yaml.safe_load`
 - **THEN** `display.busy_ack_detail` SHALL NOT be present as a key under `display`
 
-### Requirement: Display-only suppression
+### Requirement: Reasoning display is presentation-only
 
-Disabling `show_reasoning` SHALL suppress visible reasoning/thinking blocks only. It SHALL NOT lower the configured model `reasoning_effort`, reduce provider token usage, or change the model's actual reasoning depth.
+Enabling `show_reasoning` and `reasoning_full` SHALL display visible reasoning/thinking blocks in the output. This SHALL NOT lower the configured model `reasoning_effort`, reduce provider token usage, or change the model's actual reasoning depth. The `reasoning_style` setting (`code`) controls the visual format of reasoning blocks but does not affect model behavior.
 
-#### Scenario: Reasoning suppression is presentation-only
+#### Scenario: Reasoning display does not change model behavior
 
-- **WHEN** `display.show_reasoning` is `false`
+- **WHEN** `display.show_reasoning` is `true` and `display.reasoning_full` is `true`
 - **THEN** `agent.reasoning_effort` SHALL remain at its configured value (`xhigh`)
 - **AND** `agent.reasoning_overrides` SHALL remain unchanged
+- **AND** the model SHALL produce identical output regardless of display settings
 
-### Requirement: Per-platform consistency
+#### Scenario: Reasoning blocks appear in output
 
-When the top-level `display.show_reasoning` is `false`, the `display.platforms.slack.show_reasoning` override SHALL also be `false`.
+- **WHEN** a model turn completes with reasoning content
+- **THEN** reasoning blocks SHALL be visible in the conversation output
+- **AND** the `reasoning_style` format SHALL be applied to rendering
 
-#### Scenario: Slack reasoning aligned with top-level
+### Requirement: Per-platform reasoning override
 
-- **WHEN** `display.show_reasoning` is `false` and `display.platforms.slack.show_reasoning` is inspected
+The top-level `display.show_reasoning: true` setting SHALL apply to Telegram, CLI, Discord, and other platforms. The `display.platforms.slack.show_reasoning` override SHALL remain `false` because shared Slack channels are too noisy for reasoning blocks.
+
+#### Scenario: Slack reasoning stays suppressed
+
+- **WHEN** `display.show_reasoning` is `true` and `display.platforms.slack.show_reasoning` is inspected
 - **THEN** the Slack override SHALL be `false`
+- **AND** reasoning blocks SHALL NOT appear in Slack messages
+
+#### Scenario: Telegram reasoning is enabled
+
+- **WHEN** `display.show_reasoning` is `true` and a Telegram session is active
+- **THEN** reasoning blocks SHALL appear in Telegram responses
 
 ### Requirement: Validation and rollback
 
-A rollback backup SHALL exist under `~/.hermes/backups/` and its SHA-256 SHALL match. Rollback restores this backup atomically and verifies with `hermes config check` and `hermes config get display`.
+Before any display configuration mutation, a pre-change backup SHALL be created. The operator SHALL verify the mutation with `hermes config check` and `hermes config get display` after application.
 
-#### Scenario: Backup integrity
+#### Scenario: Pre-change backup exists
 
-- **WHEN** the pre-change backup file is inspected
-- **THEN** its path SHALL contain `config-before-balanced-display`
-- **AND** its SHA-256 SHALL match `758e26008eb94f05682f932fa36074b0a571899b337aee63f05e5859fc76d28c`
+- **WHEN** a display configuration change is prepared
+- **THEN** a pre-change snapshot SHALL be created via `hermes backup --quick`
+- **AND** the snapshot ID SHALL be recorded for rollback
 
-#### Scenario: Rollback path
+#### Scenario: Post-mutation verification
 
-- **WHEN** the operator restores the backup and runs `hermes config check`
-- **THEN** the check SHALL pass with no errors
-- **AND** `hermes config get display` SHALL show the restored values
+- **WHEN** the display configuration is mutated
+- **THEN** `hermes config check` SHALL pass with no errors
+- **AND** `hermes config get display.show_reasoning` SHALL return `true`
+- **AND** `hermes config get display.reasoning_full` SHALL return `true`
