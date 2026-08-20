@@ -197,3 +197,52 @@ pydantic-evals supports boolean, integer, float, string, structured mapping, and
 3. Does the deployed Langfuse accept OTLP Collector traces?
 4. Who owns the DBOS scheduler process lifecycle for observability initialization?
 5. Should sampling be configurable in this change, or deferred?
+
+## Phase 0 Evidence Addendum (2026-08-20)
+
+### Collector Configuration Inventory
+
+| Config File | Exporters | Pipelines | Status |
+|-------------|-----------|-----------|--------|
+| `agent-core/otel-collector-config.yaml` | `otlp/langfuse` (langfuse-web:4317), `otlp/mlflow` (mlflow-server:5000) | traces→[langfuse, mlflow], metrics→[langfuse], logs→[langfuse] | Production-like, backends unreachable locally |
+| `go-microservices/deploy/otel-collector-config.yaml` | `debug` only | traces/metrics/logs→[debug] | Local-dev config, no backend exporters |
+
+**Divergence:** The two configs are intentionally different — agent-core routes to Langfuse/MLflow for observability, go-microservices uses debug for local development. Cross-language trace correlation is NOT possible with current configs (different Collector instances, no shared backend).
+
+### Backend Reachability
+
+| Backend | Local Endpoint | Status | OTLP Verified |
+|---------|---------------|--------|:---:|
+| Langfuse | `localhost:3000` | Unreachable (no container) | No |
+| MLflow | `localhost:5000` | 403 (no container or auth required) | No |
+
+### Route Decisions
+
+| Backend | Default Mode | Collector Mode | Rationale |
+|---------|-------------|----------------|-----------|
+| Langfuse | `direct` (SDK span processor via `get_client()`) | Deferred | OTLP endpoint unverified; `get_client()` confirmed working |
+| MLflow | `autolog` (`mlflow.pydantic_ai.autolog()`) | Deferred | autolog() confirmed compatible with pydantic-ai v2; OTLP endpoint unverified |
+
+### autolog Compatibility
+
+`mlflow.pydantic_ai.autolog()` succeeds with non-fatal warning: `Error importing pydantic_ai.mcp.MCPServer: module 'pydantic_ai.mcp' has no attribute 'MCPServer'`. This does not block trace export.
+
+## Phase 2 Composition-Root Addendum (2026-08-20)
+
+### DBOS and worker ownership
+
+The current topology has one DBOS scheduler worker and several consumers; the
+consumer repositories do not own a second scheduler worker process.
+
+| Process / role | Composition root | DBOS responsibility | Observability disposition |
+|---|---|---|---|
+| agent-core CLI | `agent-core/src/agent_core/cli/app.py:main` | The `schedules` subcommands are client/inspection calls through `tdt_core.scheduler`; they do not run a worker loop. | Initialize `init_observability(service_name="agent-core")` in the callback before subcommand dispatch. |
+| Central scheduler worker | `tdt-scheduler/compose.yaml:17` launches `uv run tdt-scheduler serve`; the long-lived loop is `tdt-core/src/tdt_core/scheduler/cli.py:_serve` | Sole process allowed to call `SchedulerEngine.apply_schedules()` and own DBOS scheduled-workflow ticks. | This worker's own initialization is outside agent-core; no DBOS spans are added in this change. |
+| agent-core scheduler adapter | `agent-core/src/agent_core/scheduler_setup.py:_apply_yaml_manifests` | Loads schedule manifests when explicitly imported; it is not a worker or process entry point. | No initialization side effect is added here. |
+| agent-harness consumer | `agent-harness/src/agent_harness/cli.py:app` | Durable state is LangGraph/Postgres; optional DBOS scheduling may trigger the runner but does not replace its checkpoint root. | Consumer lifecycle remains separately scoped; no DBOS spans are added here. |
+| code-daily-scan consumer | `code-daily-scan/src/code_daily_scan/dbos_scheduling.py:register_all_schedules` | Registers manifest schedules for the central scheduler; it does not own the worker loop. | No DBOS spans are added here. |
+
+The central `tdt-scheduler` process is therefore the DBOS worker composition
+root. The agent-core CLI composition root is the only root changed in this
+phase; adding scheduler-worker observability initialization or DBOS spans is a
+separate follow-up concern.
