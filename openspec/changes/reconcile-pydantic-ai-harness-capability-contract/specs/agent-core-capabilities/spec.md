@@ -12,14 +12,9 @@ AgentRuntime SHALL compose TieredCompaction through the public typed capability 
 
 #### Scenario: Custom target
 
-- **WHEN** a caller supplies TieredCompaction with target_tokens=120,000
-- **THEN** TieredCompaction SHALL use 120,000 as the target token count
-- **AND** the runtime SHALL preserve the supplied strategy order
-
-#### Scenario: Custom target supplied explicitly
-
 - **WHEN** a caller supplies TieredCompaction with target_tokens=50,000
 - **THEN** TieredCompaction SHALL use 50,000 as the target token count
+- **AND** the runtime SHALL preserve the supplied strategy order
 - **AND** public-boundary behavior tests SHALL prove the below-target and exceeded-target paths
 
 ### Requirement: SpendLimits in AgentRuntime
@@ -34,14 +29,9 @@ AgentRuntime SHALL compose SpendLimits through the public typed capability bound
 
 #### Scenario: Custom budgets
 
-- **WHEN** a caller supplies SpendLimits with per-run $5.00 and per-day $100.00 budgets
+- **WHEN** a caller supplies SpendLimits with per-run $10.00 and per-day $100.00 budgets
 - **THEN** SpendLimits SHALL enforce those caps using a deterministic or approved pricing function
 - **AND** unpriced acceptance models SHALL raise or be explicitly priced
-
-#### Scenario: Custom budget supplied explicitly
-
-- **WHEN** a caller supplies a per-run budget of $10.00
-- **THEN** SpendLimits SHALL enforce the $10.00 cap
 
 #### Scenario: Disabled budgets
 
@@ -95,12 +85,13 @@ AgentRuntime SHALL compose SystemReminders only when the caller supplies a typed
 
 ### Requirement: ConversationSearch factory
 
-`agent_core.sdk.memory` SHALL provide a ConversationSearch composition helper only when it receives a caller-owned snapshot store. The helper SHALL not allocate a disconnected default store.
+`agent_core.sdk.memory` SHALL provide a ConversationSearch composition helper only when it receives a caller-owned snapshot store. The helper SHALL not allocate a disconnected default store and SHALL construct conversation-scoped search by default. An all-store search SHALL require direct explicit upstream composition under a caller-owned single-tenant policy rather than an agent-core helper default.
 
 #### Scenario: Default factory
 
 - **WHEN** `create_conversation_search(store=<caller-owned-store>)` is called
 - **THEN** it SHALL return a ConversationSearch backed by SnapshotHistorySource over that exact store
+- **AND** the capability SHALL use `scope="conversation"`
 - **AND** snapshots written by StepPersistence SHALL be searchable
 
 #### Scenario: Store omitted or unavailable
@@ -108,6 +99,12 @@ AgentRuntime SHALL compose SystemReminders only when the caller supplies a typed
 - **WHEN** shared history is requested without an available caller-owned store
 - **THEN** construction SHALL fail before model or tool execution
 - **AND** the helper SHALL not substitute a fresh InMemoryStepStore
+
+#### Scenario: Conversation identity is unavailable
+
+- **WHEN** conversation-scoped search runs without a stable conversation identity
+- **THEN** the search SHALL return no cross-conversation corpus
+- **AND** it SHALL not fall back to `scope="all"`
 
 ### Requirement: One harness capability configuration boundary
 

@@ -61,7 +61,8 @@ The workspace SHALL declare an optional harness extra only in a repository that 
 #### Scenario: Capability owner retains DynamicWorkflow
 
 - **WHEN** agent-core retains the DynamicWorkflow extra for public typed composition
-- **THEN** a public import/construct test SHALL pass against the frozen harness tuple
+- **THEN** `build_agent(..., capabilities=[DynamicWorkflow(...)])` SHALL construct and execute a deterministic bounded workflow against the frozen harness tuple
+- **AND** public authority validation SHALL classify DynamicWorkflow as runtime authoring and fail closed without the required bounded runtime-authoring grant and audit policy
 - **AND** the dependency baseline and documentation SHALL record the resolved Monty version required by that tuple
 
 #### Scenario: Consumer has no direct use
