@@ -6,15 +6,15 @@ This specification defines requirements for Agent Docs Harness.
 
 ### Requirement: Harness integration documentation
 
-The system SHALL provide documentation for all 10 pydantic-ai-harness capabilities wired via `harness_config`.
+The system SHALL provide documentation for all pydantic-ai-harness capabilities wired via `agent_core.sdk.build_agent(..., capabilities=[...])`.
 
 #### Scenario: Harness guide exists
 - **WHEN** a developer opens `agent-core/docs/harness-integration.md`
-- **THEN** it SHALL document all 10 capabilities with config examples
+- **THEN** it SHALL document all capabilities with module paths and class references
 
 #### Scenario: Each capability documented
 - **WHEN** a developer reads `harness-integration.md`
-- **THEN** it SHALL have sections for: context_compaction, guardrails, step_persistence, subagents, planning, repo_context, output_overflow, cache_monitoring, limit_warnings, docs_access
+- **THEN** it SHALL have entries for: TieredCompaction, SpendLimits, Advisor, SystemReminders, ConversationSearch, guardrails, planning, subagents, step_persistence, repo_context, tool_output_limits, cache_monitoring, limit_warnings, docs_access, dynamic_workflow, filesystem, shell
 
 ### Requirement: Context compaction documentation
 
@@ -54,16 +54,16 @@ The system SHALL provide documentation for all 10 pydantic-ai-harness capabiliti
 
 ### Requirement: Other capabilities documentation
 
-`harness-integration.md` SHALL document subagents, planning, repo_context, output_overflow, cache_monitoring, limit_warnings, and docs_access.
+`harness-integration.md` SHALL document TieredCompaction, SpendLimits, Advisor, SystemReminders, ConversationSearch, subagents, planning, repo_context, tool_output_limits, cache_monitoring, limit_warnings, docs_access, dynamic_workflow, filesystem, and shell.
 
 #### Scenario: Each capability has example
 - **WHEN** a developer reads each capability section
-- **THEN** it SHALL show the config key and a minimal example
+- **THEN** it SHALL show the public module path, representative classes, and usage pattern
 
 ### Requirement: Configuration docs harness section
 
-`configuration.md` SHALL include a `harness_config` section summarizing available capabilities.
+`configuration.md` SHALL include a section summarizing available harness capabilities.
 
 #### Scenario: Summary table
 - **WHEN** a developer reads `configuration.md`
-- **THEN** it SHALL have a table listing all 10 harness capabilities with one-line descriptions and link to `harness-integration.md`
+- **THEN** it SHALL have a table listing harness capabilities with one-line descriptions and link to `harness-integration.md`
