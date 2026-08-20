@@ -1,37 +1,57 @@
-## Design: Harness Feature Integration
+## Design: Harness Feature Integration (Maximized)
 
 ### Feature Adoption Strategy
 
-Each feature is adopted incrementally with its own verification cycle. Features are independent and can be adopted in any order.
+Eight capabilities adopted in two tiers, each with independent verification:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │              FEATURE ADOPTION SEQUENCE                      │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
+│  TIER 1: Adopt with upgrade (high value, low effort)        │
+│  ─────────────────────────────────────────────────────      │
 │  Phase 1: Compaction (highest impact)                       │
 │  ├── Add to agent-core agent construction                   │
 │  ├── Configure anchored incremental strategy                │
-│  ├── Verify no context loss on short conversations          │
-│  └── Verify context trimming on long conversations          │
+│  └── Verify context trimming works                          │
 │                                                             │
 │  Phase 2: SpendLimits (cost visibility)                     │
 │  ├── Add to agent-core agent construction                   │
 │  ├── Configure per-model budgets                            │
-│  ├── Verify cost tracking in OTel traces                    │
-│  └── Verify budget enforcement                              │
+│  └── Verify cost tracking in OTel traces                    │
 │                                                             │
 │  Phase 3: SystemReminders (instruction persistence)         │
 │  ├── Add to agent-core agent construction                   │
 │  ├── Configure reminder schedule                            │
-│  ├── Verify instructions persist across 10+ tool calls      │
-│  └── Verify no duplicate reminders                          │
+│  └── Verify instructions persist                            │
 │                                                             │
-│  Phase 4: ToolGuard (guardrail enhancement)                 │
+│  Phase 4: Tool Output Limits (context overflow prevention)  │
+│  ├── Add to agent-core agent construction                   │
+│  ├── Configure truncation thresholds                        │
+│  └── Verify large tool results truncated                    │
+│                                                             │
+│  TIER 2: Adopt shortly after (medium value, medium effort)  │
+│  ─────────────────────────────────────────────────────      │
+│  Phase 5: ToolGuard (guardrail enhancement)                 │
 │  ├── Add to agent-docs-sync guardrails                      │
 │  ├── Configure tool-specific validation rules               │
-│  ├── Verify invalid tool args are blocked                   │
-│  └── Verify valid tool args pass through                    │
+│  └── Verify invalid tool args blocked                       │
+│                                                             │
+│  Phase 6: Warn On Cache Busts (performance)                 │
+│  ├── Add to agent-core agent construction                   │
+│  ├── Configure cache monitoring                             │
+│  └── Verify cache invalidation detected                     │
+│                                                             │
+│  Phase 7: Planning (task decomposition)                     │
+│  ├── Add to agent-core agent construction                   │
+│  ├── Configure planning strategy                            │
+│  └── Verify model creates task plans                        │
+│                                                             │
+│  Phase 8: Conversation Search (history retrieval)           │
+│  ├── Add to agent-core memory layer                         │
+│  ├── Configure BM25 search                                  │
+│  └── Verify history search works including compacted turns  │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -112,7 +132,30 @@ reminders = SystemReminders(
 - No duplicate reminders in context
 - Agent behavior consistent across long conversations
 
-### Feature 4: ToolGuard
+### Feature 4: Tool Output Limits
+
+**What it does:** Truncates, spills to file, or summarizes oversized tool returns at the source.
+
+**Configuration:**
+```python
+from pydantic_ai_harness.context import ToolOutputLimits
+
+tool_limits = ToolOutputLimits(
+    max_chars=10_000,           # Truncate at 10K chars
+    spill_to_file=True,         # Save full output to file
+    spill_directory="/tmp/tool-outputs",  # Where to save
+    summarize=True,             # Summarize truncated content
+)
+```
+
+**Integration point:** `agent-core/_ai/agent.py` — add to capabilities list
+
+**Verification:**
+- Large tool results truncated at threshold
+- Full output saved to spill directory
+- Summarized content provided to agent
+
+### Feature 5: ToolGuard
 
 **What it does:** Validates tool arguments and results against schemas, blocking invalid calls.
 
@@ -120,10 +163,21 @@ reminders = SystemReminders(
 ```python
 from pydantic_ai_harness.guardrails import ToolGuard
 
-tool_guard = ToolGuard(
+# Guard for write_file tool
+write_guard = ToolGuard(
     tool_name="write_file",
     validate_args=lambda args: args["path"].startswith("docs/"),
     block_message="Write path must start with docs/",
+)
+
+# Guard for shell commands
+shell_guard = ToolGuard(
+    tool_name="run_shell",
+    validate_args=lambda args: any(
+        cmd in args["command"]
+        for cmd in ["rm -rf", "sudo", "chmod 777"]
+    ),
+    block_message="Dangerous command blocked",
 )
 ```
 
@@ -134,6 +188,72 @@ tool_guard = ToolGuard(
 - Valid tool args pass through unchanged
 - Audit trail of blocked attempts
 
+### Feature 6: Warn On Cache Busts
+
+**What it does:** Detects prompt-cache prefix collapses between requests, from the provider's own numbers.
+
+**Configuration:**
+```python
+from pydantic_ai_harness.context import WarnOnCacheBusts
+
+cache_busts = WarnOnCacheBusts(
+    enabled=True,
+    log_warnings=True,  # Log to structlog
+    alert_threshold=0.5,  # Alert if >50% of cache busted
+)
+```
+
+**Integration point:** `agent-core/_ai/agent.py` — add to capabilities list
+
+**Verification:**
+- Cache invalidation events logged
+- Performance degradation detected
+- Cost impact visible in traces
+
+### Feature 7: Planning
+
+**What it does:** Model-owned task plans with a cache-safe live reminder.
+
+**Configuration:**
+```python
+from pydantic_ai_harness.reasoning import Planning
+
+planning = Planning(
+    max_tasks=10,           # Maximum tasks in plan
+    reminder_interval=3,    # Remind every 3 tool calls
+    auto_update=True,       # Update plan as tasks complete
+)
+```
+
+**Integration point:** `agent-core/_ai/agent.py` — add to capabilities list
+
+**Verification:**
+- Model creates task plan at start
+- Plan updated as tasks complete
+- Plan visible in agent context
+
+### Feature 8: Conversation Search
+
+**What it does:** BM25 search over stored history, including turns compaction dropped.
+
+**Configuration:**
+```python
+from pydantic_ai_harness.memory import ConversationSearch
+
+search = ConversationSearch(
+    store=memory_store,     # Use existing memory store
+    max_results=10,         # Return top 10 matches
+    min_score=0.3,          # Minimum relevance score
+)
+```
+
+**Integration point:** `agent-core/sdk/memory.py` — add to memory layer
+
+**Verification:**
+- Search returns relevant history
+- Compacted turns searchable
+- BM25 ranking works correctly
+
 ### Risk Assessment
 
 | Feature | Risk | Mitigation |
@@ -141,4 +261,8 @@ tool_guard = ToolGuard(
 | Compaction | Medium — could drop critical context | Anchored strategy preserves key messages; receipts allow verification |
 | SpendLimits | Low — additive cost tracking | Budget limits are configurable; default to generous limits |
 | SystemReminders | Low — re-injection of instructions | Every N tool calls; no duplicate injection |
+| Tool Output Limits | Low — truncation at source | Spill to file preserves full output; summarize provides summary |
 | ToolGuard | Low — validation layer | Additive; invalid calls blocked with clear messages |
+| Warn On Cache Busts | Low — monitoring only | Log warnings; no behavioral change |
+| Planning | Low — model-owned plans | Cache-safe reminder; auto-update on completion |
+| Conversation Search | Low — search over history | BM25 is well-tested; max results bounded |
