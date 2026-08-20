@@ -246,3 +246,30 @@ The central `tdt-scheduler` process is therefore the DBOS worker composition
 root. The agent-core CLI composition root is the only root changed in this
 phase; adding scheduler-worker observability initialization or DBOS spans is a
 separate follow-up concern.
+
+## Closure Evidence Addendum (2026-08-21)
+
+### Integrated implementation commits
+
+| Repository | Commit | Scope |
+|---|---|---|
+| `agent-core` | `f1642f9` | Global/explicit Pydantic AI instrumentation ownership and behavioral span-tree matrix |
+| `agent-core` | `4107df8` | Typed backend route modes, deferred Collector handling, route/settings tests |
+| `agent-core` | `3b9583f` | Neutral debug-only Collector topology and singleton-safe Langfuse scoring client |
+| `agent-core` | `1c8cf12` | Command identity, bounded lifecycle shutdown, evaluation recording seam, scheduler wrapper, OTLP gRPC dependency and subprocess probe |
+| `agent-core` | `25e3280` | Checkout-stable lint evidence annotations for editable `tdt-core` classification |
+| `agent-docs-sync` | `c6c5b1f` | Side-effect-free observability module and startup-order activation tests |
+| `tdt-scheduler` | `4a73580` | Container entrypoint/Compose delegation to `agent-core-scheduler` composition root |
+
+### Current evidence levels
+
+- Specified: OpenSpec validation passes for the selected change and full store.
+- Implemented: integrated source commits above are present in the default repositories.
+- Unit-tested: full agent-core pytest passes with only declared environment-dependent skips; docs-sync focused lifecycle tests pass.
+- Integration-tested: local OTLP gRPC receiver accepted a real `agent-core health` subprocess span before exit.
+- Runtime-validated: the local transport, bounded exit flush, command identity, and scheduler composition ordering are validated.
+- Deployment-validated: not claimed. Langfuse and MLflow endpoints were not reachable locally; real backend UI/OTLP acceptance remains outstanding.
+
+### Remaining follow-up scope
+
+`agent-harness` and `code-daily-scan` still do not own observability initialization and remain follow-up consumer changes. Cross-language propagation, memory/MCP/DBOS/handoff span instrumentation, sampling policy, and real Langfuse/MLflow deployment acceptance remain outside this change.
