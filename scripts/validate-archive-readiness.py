@@ -88,8 +88,11 @@ def validate_delta_spec(spec_path: Path) -> list[str]:
     if not has_normative_header:
         errors.append(f"{spec_path.name}: missing standard OpenSpec section headers (## ADDED/MODIFIED/REMOVED Requirements)")
 
-    if "### Requirement:" in content and "#### Scenario:" not in content:
-        errors.append(f"{spec_path.name}: requirement definitions must contain at least one #### Scenario block")
+    if "### Requirement:" in content:
+        if "#### Scenario:" not in content:
+            errors.append(f"{spec_path.name}: requirement definitions must contain at least one #### Scenario block")
+        if "SHALL" not in content and "MUST" not in content:
+            errors.append(f"{spec_path.name}: normative requirements must use SHALL or MUST keywords")
 
     return errors
 
@@ -136,11 +139,10 @@ def check_change_readiness(change_dir: Path, store_root: Path) -> ReadinessRepor
 
     delta_specs: list[Path] = []
     if specs_dir.exists():
-        delta_specs = [p for p in specs_dir.rglob("*.md") if p.is_file()]
+        delta_specs = [p for p in specs_dir.rglob("*.md")]
 
     delta_specs_count = len(delta_specs)
     if not skip_specs and delta_specs_count == 0:
-        # Check if change has delta specs declared or is an implementation-only change
         warnings.append("No delta specs found in specs/ (ensure skip_specs is set if no spec delta is needed)")
     elif delta_specs_count > 0:
         for spec_file in delta_specs:
@@ -201,12 +203,10 @@ def audit_git_range(git_range: str, store_root: Path) -> int:
     violations = 0
     for archive_name in sorted(archived_changes):
         archive_dir = store_root / "openspec" / "changes" / "archive" / archive_name
-        tasks_file = archive_dir / "tasks.md"
-        if tasks_file.exists():
-            summary = parse_tasks_md(tasks_file)
-            if summary.remaining > 0:
-                print(f"VIOLATION: Archive {archive_name} was archived with {summary.remaining} unchecked tasks!", file=sys.stderr)
-                violations += 1
+        report = check_change_readiness(archive_dir, store_root)
+        if report.exit_code != 0:
+            print(f"VIOLATION: Archive {archive_name} failed readiness checks: {report.errors}", file=sys.stderr)
+            violations += 1
 
     if violations > 0:
         print(f"Range audit FAILED: {violations} integrity violations detected.", file=sys.stderr)
