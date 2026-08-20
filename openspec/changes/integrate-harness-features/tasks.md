@@ -82,28 +82,56 @@ This phase adds NEW capabilities on top of the migrated API.
 - [ ] 7.5 Write unit test: consultation logged in traces
 - [ ] 7.6 Write unit test: graceful fallback on advisor failure
 
-## 6. Verify All Tests Pass
+## 6. Integration Testing
 
-- [ ] 6.1 Run `uv run pytest` in agent-core — all tests pass including new capability tests
-- [ ] 6.2 Run `uv run pytest` in agent-docs-sync — all tests pass including new guardrail tests
-- [ ] 6.3 Run `uv run ruff check .` in all 3 repos — full lint pass
-- [ ] 6.4 Run `uv run mypy src/ --strict` in all 3 repos — no type errors
+### Phase 8: End-to-End Integration Tests
 
-## 7. Verify No Legacy Code Remains
+- [ ] 8.1 Create `agent-core/tests/test_harness_features_integration.py`: integration test that creates agent with all 7 capabilities and runs a multi-turn conversation
+- [ ] 8.2 Verify compaction triggers correctly in integration test (mock long conversation)
+- [ ] 8.3 Verify SystemReminders persist instructions across 20+ tool calls in integration test
+- [ ] 8.4 Verify SpendLimits tracks costs correctly in integration test (mock LLM calls)
+- [ ] 8.5 Verify Planning creates and updates task plan in integration test
+- [ ] 8.6 Verify ConversationSearch retrieves relevant history in integration test
+- [ ] 8.7 Verify ToolGuardrail blocks invalid tool calls in integration test
+- [ ] 8.8 Verify Advisor consultation works in integration test (mock advisor model)
 
-- [ ] 7.1 Run `grep -rn "GuardResult\|InputGuard\|OutputGuard" src/ tests/` in all repos — should return 0 matches
-- [ ] 7.2 Run `grep -rn "from pydantic_ai_harness.guardrails import GuardResult" src/ tests/` — should return 0 matches
-- [ ] 7.3 Run `grep -rn "from pydantic_ai_harness.guardrails import InputGuard" src/ tests/` — should return 0 matches
-- [ ] 7.4 Run `grep -rn "from pydantic_ai_harness.guardrails import OutputGuard" src/ tests/` — should return 0 matches
-- [ ] 7.5 Run `grep -rn "from pydantic_ai_harness.context import" src/ tests/` — should return 0 matches (use repo_context)
-- [ ] 7.6 Run `grep -rn "from pydantic_ai_harness.cache_stability import" src/ tests/` — should return 0 matches (use warn_on_cache_busts)
-- [ ] 7.7 Run `grep -rn "from pydantic_ai_harness.overflowing_tool_output import" src/ tests/` — should return 0 matches (use tool_output_limits)
-- [ ] 7.8 Run `grep -rn "from pydantic_ai_harness.control import" src/ tests/` — should return 0 matches (use spend)
+### Phase 9: CLI Verification
 
-## 8. Commit and Archive
+- [ ] 9.1 Run `uv run agent-core --help` — verify CLI works with new capabilities
+- [ ] 9.2 Run `uv run agent-docs-sync --help` — verify CLI works with new guardrails
+- [ ] 9.3 Run `uv run agent-docs-sync discover --help` — verify discovery command works
+- [ ] 9.4 Run `uv run agent-docs-sync sync --help` — verify sync command works
+- [ ] 9.5 Run `uv run agent-harness --help` — verify CLI works
 
-- [ ] 8.1 Commit agent-core changes: `git add -A && git commit`
-- [ ] 8.2 Commit agent-docs-sync changes: `git add -A && git commit`
-- [ ] 8.3 Archive the OpenSpec change: `openspec archive integrate-harness-features --yes`
-- [ ] 8.4 Commit openspec-store archive: `git add -A && git commit`
-- [ ] 8.5 Run `openspec validate --all --strict` to confirm no regressions
+### Phase 10: Real-World Usage Verification
+
+- [ ] 10.1 Run `uv run agent-docs-sync discover --repo ~/Developer/agent-core --json` — verify discovery works end-to-end
+- [ ] 10.2 Run `uv run agent-docs-sync validate --repo ~/Developer/agent-core --json` — verify validation works end-to-end
+- [ ] 10.3 Run `uv run agent-harness status --json` — verify harness status works
+- [ ] 10.4 Verify no regressions in existing workflows
+
+## 7. Verify All Tests Pass
+
+- [ ] 7.1 Run `uv run pytest` in agent-core — all tests pass including new capability tests
+- [ ] 7.2 Run `uv run pytest` in agent-docs-sync — all tests pass including new guardrail tests
+- [ ] 7.3 Run `uv run ruff check .` in all 3 repos — full lint pass
+- [ ] 7.4 Run `uv run mypy src/ --strict` in all 3 repos — no type errors
+
+## 8. Verify No Legacy Code Remains
+
+- [ ] 8.1 Run `grep -rn "GuardResult\|InputGuard\|OutputGuard" src/ tests/` in all repos — should return 0 matches
+- [ ] 8.2 Run `grep -rn "from pydantic_ai_harness.guardrails import GuardResult" src/ tests/` — should return 0 matches
+- [ ] 8.3 Run `grep -rn "from pydantic_ai_harness.guardrails import InputGuard" src/ tests/` — should return 0 matches
+- [ ] 8.4 Run `grep -rn "from pydantic_ai_harness.guardrails import OutputGuard" src/ tests/` — should return 0 matches
+- [ ] 8.5 Run `grep -rn "from pydantic_ai_harness.context import" src/ tests/` — should return 0 matches (use repo_context)
+- [ ] 8.6 Run `grep -rn "from pydantic_ai_harness.cache_stability import" src/ tests/` — should return 0 matches (use warn_on_cache_busts)
+- [ ] 8.7 Run `grep -rn "from pydantic_ai_harness.overflowing_tool_output import" src/ tests/` — should return 0 matches (use tool_output_limits)
+- [ ] 8.8 Run `grep -rn "from pydantic_ai_harness.control import" src/ tests/` — should return 0 matches (use spend)
+
+## 9. Commit and Archive
+
+- [ ] 9.1 Commit agent-core changes: `git add -A && git commit`
+- [ ] 9.2 Commit agent-docs-sync changes: `git add -A && git commit`
+- [ ] 9.3 Archive the OpenSpec change: `openspec archive integrate-harness-features --yes`
+- [ ] 9.4 Commit openspec-store archive: `git add -A && git commit`
+- [ ] 9.5 Run `openspec validate --all --strict` to confirm no regressions
