@@ -10,7 +10,7 @@
 ## 2. Reconcile Agent-Core Public Composition
 
 - [ ] 2.1 Add public-boundary RED tests showing omitted optional capabilities do not install compaction, reminders, spend, planning, advisor, conversation search, or ToolGuardrail; verify the tests fail against the frozen pre-change agent-core SHA.
-- [ ] 2.2 Remove implicit optional TieredCompaction, SystemReminders, and SpendLimits creation from the internal runtime while preserving instrumentation, tool preparation, hooks, and classified fallback StepPersistence; verify omitted and explicitly supplied capability tests pass.
+- [ ] 2.2 Remove implicit optional TieredCompaction, SystemReminders, and SpendLimits creation from the internal runtime while preserving instrumentation, tool preparation, hooks, and classified fallback StepPersistence; retain any necessary internal convenience kwargs only as undocumented compatibility shims unreachable through `BaseAgent`/`build_agent`, and verify omitted and explicitly supplied public capability tests pass.
 - [ ] 2.3 Preserve caller-supplied capability object identity and relative order through `build_agent` → `BaseAgent` → runtime composition, and verify authority/tool visibility regression tests pass.
 - [ ] 2.4 Delete the unread harness-capability dictionaries from `AgentConfig`, update its characterization tests and stale docs, and verify supported `AgentSpec` capability composition still passes without adding a second registry or generic builder layer.
 - [ ] 2.5 Characterize the existing `create_conversation_search` helper as non-exported, change it to require a caller-owned snapshot store, and verify no other generic capability builders are introduced.

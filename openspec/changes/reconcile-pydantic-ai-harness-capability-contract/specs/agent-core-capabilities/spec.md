@@ -2,7 +2,7 @@
 
 ### Requirement: TieredCompaction in AgentRuntime
 
-AgentRuntime SHALL compose TieredCompaction only when the caller supplies a typed compaction capability through the public composition boundary. The runtime SHALL preserve the supplied target and ordered strategies and SHALL NOT inject a default compaction capability.
+AgentRuntime SHALL compose TieredCompaction through the public typed capability boundary. The runtime SHALL preserve a supplied target and ordered strategies and SHALL NOT inject a default compaction capability. Any retained internal convenience keyword SHALL remain compatibility-only, undocumented, and unreachable through `BaseAgent` or `build_agent`.
 
 #### Scenario: Default compaction
 
@@ -24,7 +24,7 @@ AgentRuntime SHALL compose TieredCompaction only when the caller supplies a type
 
 ### Requirement: SpendLimits in AgentRuntime
 
-AgentRuntime SHALL compose SpendLimits only when the caller supplies a typed spend capability through the public composition boundary. Any USD budgets SHALL use caller-owned pricing or fail closed for unpriced models; the runtime SHALL NOT inject hidden default caps.
+AgentRuntime SHALL compose SpendLimits through the public typed capability boundary. Any USD budgets SHALL use caller-owned pricing or fail closed for unpriced models; the runtime SHALL NOT inject hidden default caps. Any retained internal convenience keyword SHALL remain compatibility-only, undocumented, and unreachable through `BaseAgent` or `build_agent`.
 
 #### Scenario: Default budgets
 
@@ -50,7 +50,7 @@ AgentRuntime SHALL compose SpendLimits only when the caller supplies a typed spe
 
 ### Requirement: Planning in AgentRuntime
 
-AgentRuntime SHALL optionally compose Planning with caller-selected subtask and store settings through public typed capability composition.
+AgentRuntime SHALL optionally compose Planning with caller-selected subtask and store settings through public typed capability composition. Any retained internal enablement keyword SHALL remain compatibility-only, undocumented, and unreachable through `BaseAgent` or `build_agent`.
 
 #### Scenario: Planning enabled
 
@@ -65,7 +65,7 @@ AgentRuntime SHALL optionally compose Planning with caller-selected subtask and 
 
 ### Requirement: Advisor in AgentRuntime
 
-AgentRuntime SHALL optionally compose Advisor only when the caller supplies an explicit advisor model through typed capability composition. Advisor construction SHALL not reopen global provider precedence.
+AgentRuntime SHALL optionally compose Advisor only when the caller supplies an explicit advisor capability through typed composition. Advisor construction SHALL not reopen global provider precedence. Any retained internal advisor keyword SHALL remain compatibility-only, undocumented, and unreachable through `BaseAgent` or `build_agent`.
 
 #### Scenario: Advisor enabled
 
@@ -80,7 +80,7 @@ AgentRuntime SHALL optionally compose Advisor only when the caller supplies an e
 
 ### Requirement: SystemReminders in AgentRuntime
 
-AgentRuntime SHALL compose SystemReminders only when the caller supplies a typed reminder capability. The runtime SHALL NOT add GoalReanchor implicitly.
+AgentRuntime SHALL compose SystemReminders only when the caller supplies a typed reminder capability. The runtime SHALL NOT add GoalReanchor implicitly; any retained internal compatibility path SHALL remain undocumented and unreachable through `BaseAgent` or `build_agent`.
 
 #### Scenario: SystemReminders always active
 
@@ -108,3 +108,19 @@ AgentRuntime SHALL compose SystemReminders only when the caller supplies a typed
 - **WHEN** shared history is requested without an available caller-owned store
 - **THEN** construction SHALL fail before model or tool execution
 - **AND** the helper SHALL not substitute a fresh InMemoryStepStore
+
+### Requirement: One harness capability configuration boundary
+
+The workspace SHALL expose one public harness-capability configuration boundary: typed objects supplied through `BaseAgent` or `build_agent`. Internal compatibility keywords MAY remain temporarily for migration or focused tests, but they SHALL not be projected from `AgentConfig`, AgentSpec compatibility metadata, or public consumer constructors.
+
+#### Scenario: Public typed boundary
+
+- **WHEN** a consumer supplies a typed harness capability through `BaseAgent` or `build_agent`
+- **THEN** the capability SHALL be passed through with its identity and configuration preserved
+- **AND** no parallel dictionary or convenience-key projection SHALL be required
+
+#### Scenario: Compatibility-only internal keyword
+
+- **WHEN** an internal test or migration shim uses a retained AgentRuntime convenience keyword
+- **THEN** the keyword SHALL remain outside public consumer construction and documentation
+- **AND** public capability acceptance SHALL not rely on that keyword

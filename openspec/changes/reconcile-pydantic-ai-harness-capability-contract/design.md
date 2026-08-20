@@ -19,7 +19,7 @@ See proposal.md for the current source/spec mismatch. The implementation must pr
 
 ## Decisions
 
-- **Optional capability boundary:** `BaseAgent`/`build_agent` pass caller-owned `capabilities` through unchanged. `AgentRuntime` stops creating optional TieredCompaction, SystemReminders, and SpendLimits implicitly. Existing mandatory platform composition remains explicit and documented.
+- **Optional capability boundary:** `BaseAgent`/`build_agent` pass caller-owned `capabilities` through unchanged. `AgentRuntime` stops creating optional TieredCompaction, SystemReminders, and SpendLimits implicitly. Existing mandatory platform composition remains explicit and documented. Retained internal convenience kwargs, if needed for migration tests, are compatibility-only and never projected through public construction or docs.
 - **Configuration ownership:** delete the unread harness-capability dictionaries from `AgentConfig`, its compatibility tests, and stale docs. Supported file-based composition remains Pydantic AI `AgentSpec`; live non-serializable capabilities remain caller-owned objects passed through `capabilities=[...]`. No new wrapper registry or generic builder layer is introduced.
 - **Spend accounting:** when a USD budget is enabled, configure the upstream capability to raise on unpriced models in acceptance fixtures; production may supply an approved price function. A model counted as zero is not enforcement evidence.
 - **Shared history:** change the existing non-exported conversation-search helper to require a caller-owned `SnapshotStore`/StepStore, or remove it if the public-surface characterization proves direct upstream composition is simpler. Do not add builders for capabilities already constructible upstream.
