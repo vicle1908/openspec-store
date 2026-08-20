@@ -6,7 +6,12 @@ __pycache__/
 *.tmp
 
 graphify-out/
-.claude/
+
+# Claude local config (not workspace commands/skills)
+.claude/settings.local.json
+.claude/projects/
+.claude/todos/
+.claude/statsig/
 
 # Python
 .venv/
