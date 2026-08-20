@@ -73,18 +73,17 @@ Archive a completed change in the experimental workflow.
    - Ask the user to confirm they want to proceed
    - Proceed if user confirms
 
-3. **Check task completion status**
+3. **Enforce archive-readiness validation gate**
 
-   Read the tasks file (typically `tasks.md`) to check for incomplete tasks.
+   Run the archive readiness validator to verify all tasks, required artifacts, and delta specs:
+   ```bash
+   python3 ~/Developer/openspec-store/scripts/validate-archive-readiness.py --change "<name>" --json
+   ```
 
-   Count tasks marked with `- [ ]` (incomplete) vs `- [x]` (complete).
-
-   **If incomplete tasks found:**
-   - Display warning showing count of incomplete tasks
-   - Ask the user to confirm they want to proceed
-   - Proceed if user confirms
-
-   **If no tasks file exists:** Proceed without task-related warning.
+   **Fail-closed rules:**
+   - **Exit code 0 (`ready`):** All tracked tasks are checked (`- [x]`), required artifacts exist, and delta specs are valid. Proceed to spec sync assessment.
+   - **Exit code 3 (`blocked`):** Incomplete tasks found in `tasks.md`. Archiving MUST be blocked until all tasks are implemented and marked `- [x]`. Display the list of unchecked tasks and stop.
+   - **Exit code 4 (`invalid`):** Missing required artifacts (`proposal.md`, `design.md`, `tasks.md`) or malformed delta specs. Stop and report the validation errors.
 
 4. **Assess delta spec sync state**
 
