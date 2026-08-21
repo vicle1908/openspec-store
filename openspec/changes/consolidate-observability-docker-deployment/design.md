@@ -39,6 +39,8 @@ The go-microservices repo has a proven pattern: `deploy/docker-compose.yaml` (ba
 
 **Divergence from go-microservices**: go-microservices runs its own separate collector (v0.158.0) on top of LGTM's built-in collector (v0.156.0). This is intentional for their production topology (agent→gateway). For TDT's local dev use case, the built-in collector is sufficient. The Langfuse/MLflow overlays add a separate collector only when fan-out is needed.
 
+**Critical constraint**: When the Langfuse overlay is activated, the separate OTel Collector MUST NOT block LGTM tracing. The collector uses `depends_on: langfuse-web: condition: service_started` (not `service_healthy`) so it can buffer while Langfuse initializes. LGTM traces continue via the base stack's built-in collector until the separate collector is ready.
+
 **Alternatives considered**:
 - Always use separate collector: Simpler mental model, but adds a container and config for no benefit in the common case
 - Use LGTM's built-in collector with custom config: Possible via volume mount, but the built-in config is correct and well-tested
@@ -49,9 +51,9 @@ LGTM-only (base):
   Services → LGTM :4317 (built-in collector) → Tempo/Loki/Prometheus
 
 With Langfuse/MLflow overlay:
-  Services → Separate Collector :4317 → LGTM :4318
-                               → Langfuse (otlphttp)
-                               → MLflow (otlphttp)
+  Services → LGTM :4317 (built-in) → LGTM backends (always works)
+             Separate Collector :4317 → LGTM :4318 + Langfuse + MLflow
+             (separate collector starts async, doesn't block base)
 ```
 
 ### Decision 2: Overlay Pattern vs Monolithic Compose
@@ -73,11 +75,13 @@ With Langfuse/MLflow overlay:
 
 **Migration**: tdt-scheduler changes `external: true, name: agent-core-local_default` → `external: true, name: tdt-observability`.
 
+**Network creation**: The `tdt-observability` network must be created before any service starts. Task 1.2 includes `docker network create tdt-observability` as a prerequisite.
+
 ### Decision 4: Grafana Datasource Provisioning
 
 **Choice**: Remove custom `datasources.yaml` override. Use LGTM built-in datasources.
 
-**Rationale**: The LGTM image ships with pre-configured datasources (Prometheus, Tempo, Loki, Pyroscope) that are cross-linked (metrics→traces, traces→logs). The current `tdt-observability/grafana/provisioning/datasources/datasources.yaml` overrides these with localhost URLs — wrong for Docker.
+**Rationale**: The LGTM image ships with pre-configured datasources (Prometheus uid: `prometheus`, Tempo uid: `tempo`, Loki uid: `loki`, Pyroscope uid: `pyroscope`) that are cross-linked (metrics→traces, traces→logs). The current `tdt-observability/grafana/provisioning/datasources/datasources.yaml` overrides these with localhost URLs — wrong for Docker.
 
 **What changes**: Remove `grafana/provisioning/datasources/datasources.yaml`. Keep `grafana/provisioning/dashboards/dashboards.yaml` (points to custom dashboard JSON files). Update dashboard JSON datasource UIDs: `mimir` → `prometheus` (LGTM built-in Prometheus datasource uses uid `prometheus`). The `tempo` and `loki` UIDs already match.
 
@@ -93,7 +97,9 @@ With Langfuse/MLflow overlay:
 1. Volume-mount a config file at `~/.tdt/observability/config/config.yaml` with Docker-network URLs (e.g., `http://webhook-receiver:8080/health`)
 2. Keep the health-poller on the host (via launchd) and only containerize the log-collector
 
-**Chosen approach**: Option 1 — the health-poller config file (`~/.tdt/observability/config/config.yaml`) is mounted into the container. If the file doesn't exist, the health-poller falls back to defaults (which won't work in Docker). The task includes creating this config file with Docker-network service URLs.
+**Chosen approach**: Option 1 — the health-poller config file (`~/.tdt/observability/config/config.yaml`) is mounted into the container. If the file doesn't exist, the health-poller falls back to defaults (which won't work in Docker). The task includes creating this config file with Docker-network service URLs. A startup log warning is added if the config file is missing.
+
+**Dockerfile build context**: The tdt-observability Dockerfile needs `tdt-core` as a dependency (`tdt-core = { path = "../tdt-core", editable = true }` in pyproject.toml). The build context MUST be the workspace root (`~/Developer/`), not `tdt-observability/`. The compose file uses `context: ..` and `dockerfile: tdt-observability/Dockerfile` to include sibling repos.
 
 ### Decision 6: LGTM Version Alignment
 
@@ -101,10 +107,39 @@ With Langfuse/MLflow overlay:
 
 **Rationale**: go-microservices has verified v0.29.0 for `linux/arm64`. Using the same version avoids divergence.
 
+### Decision 7: Migration Atomicity
+
+**Choice**: Execute all 4 phases atomically in a single PR. Phases are NOT independently reversible.
+
+**Rationale**: Phase 2 changes the scheduler's network, which breaks if Phase 1 hasn't created the new network. Phase 3 removes services that Phase 2's scheduler may still reference. The migration must be atomic: stop old stack → apply all changes → start new stack.
+
+**Migration sequence**:
+1. Stop all running containers: `cd agent-core && docker compose down; cd ../tdt-scheduler && docker compose down`
+2. Unload launchd agents (task 7.4)
+3. Apply all file changes (Phases 1-4)
+4. Start new stack: `cd tdt-observability && docker compose -f deploy/docker-compose.yaml -f deploy/docker-compose.services.yaml up -d`
+5. Verify
+
+### Decision 8: postgres-backup Service Handling
+
+**Choice**: Keep `postgres-backup` in `tdt-scheduler/compose.yaml` but add `depends_on` for the LGTM stack.
+
+**Rationale**: The backup service references `postgres` hostname, which resolves via the `tdt-observability` external network. The scheduler compose must be started AFTER the base stack (which defines `postgres`). The `depends_on` ensures correct startup order.
+
+**Alternative considered**: Moving `postgres-backup` to `tdt-observability` — rejected because it's scheduler-specific functionality.
+
+### Decision 9: OTel Collector Port Binding
+
+**Choice**: Bind OTel Collector ports to `127.0.0.1` (not `0.0.0.0`) in all compose files.
+
+**Rationale**: All other services (Postgres, Grafana, Langfuse, MLflow) bind to `127.0.0.1`. The OTel Collector should follow the same pattern for consistency and security. Services on the Docker network resolve `otel-lgtm:4317` via Docker DNS — no need to expose to the host.
+
+**Exception**: The LGTM base stack's built-in collector is internal to the container and not published to the host. The separate OTel Collector (Langfuse overlay) binds `127.0.0.1:4317:4317` for host-side debugging.
+
 ## Risks / Trade-offs
 
 **[Risk] Launchd → Docker migration breaks health-poller/log-collector on macOS dev**
-→ Mitigation: Docker Desktop runs on macOS. The health-poller and log-collector work identically in containers. The `~/.tdt/logs/` and `~/.tdt/observability/` directories are mounted as volumes.
+→ Mitigation: Docker Desktop runs on macOS. The health-poller and log-collector work identically in containers. The `~/.tdt/logs/` and `~/.tdt/observability/` directories are mounted as volumes. Known limitation: Docker Desktop must be running for the full observability stack.
 
 **[Risk] Langfuse data loss during migration**
 → Mitigation: Local dev only — no production data. Fresh `docker compose up` creates new volumes. Old agent-core volumes can be pruned with explicit `docker volume rm` commands.
@@ -113,36 +148,49 @@ With Langfuse/MLflow overlay:
 → Mitigation: Langfuse web binds to `127.0.0.1:3001:3000` (host port 3001) when the Langfuse overlay is activated. Grafana remains on `:3000`. The LGTM base and Langfuse overlay can coexist.
 
 **[Risk] tdt-scheduler fails to connect if tdt-observability stack isn't running**
-→ Mitigation: Document dependency. The scheduler's `depends_on` can reference LGTM healthcheck. The scheduler already has graceful degradation when OTEL endpoint is unavailable.
+→ Mitigation: Add `depends_on: otel-lgtm: condition: service_healthy` to scheduler in services overlay. The scheduler already has graceful degradation when OTEL endpoint is unavailable.
 
 **[Risk] Dashboard queries break after datasource UID change**
 → Mitigation: The current dashboards use `mimir` uid for the Prometheus datasource. The LGTM built-in uses `prometheus` uid. Task 2.3 updates the dashboard JSON to match. Verify panel queries after migration.
 
 **[Risk] DuckDB lock contention between Docker health-poller and host processes**
-→ Mitigation: If health-poller runs in Docker, it uses the same `~/.tdt/observability/health.duckdb` via volume mount. The existing retry/backoff logic in the retention module handles this.
+→ Mitigation: Task 7.4 (unload launchd) MUST complete before task 3.4 (verify health-poller container). The existing retry/backoff logic in the retention module handles any remaining contention.
+
+**[Risk] Langfuse overlay breaks LGTM tracing during startup**
+→ Mitigation: The separate OTel Collector uses `depends_on: langfuse-web: condition: service_started` (not `service_healthy`). The base stack's built-in collector continues serving LGTM traces until the separate collector is ready. LGTM tracing is never interrupted.
+
+**[Risk] Health-poller silent fallback to wrong URLs**
+→ Mitigation: Task 1.4 creates the config file with Docker-network URLs. Task 3.3 mounts it. A startup log warning is emitted if the config file is missing. The health-poller container has a Docker HEALTHCHECK to detect silent failures.
 
 ## Migration Plan
+
+### Phase 0: Pre-flight
+1. Verify Docker Compose 2.20+ is installed: `docker compose version`
+2. Stop all running containers: `docker compose -f agent-core/compose.yaml down; docker compose -f tdt-scheduler/compose.yaml down`
+3. Unload launchd agents: `launchctl unload ~/Library/LaunchAgents/com.tdt.observability-*.plist`
+4. Verify no active DBOS workflows in scheduler
 
 ### Phase 1: Foundation (tdt-observability only)
 1. Create `deploy/docker-compose.yaml` (LGTM + Postgres)
 2. Create `deploy/tools.env` (pinned versions)
-3. Create `Dockerfile` (health-poller + log-collector image)
-4. Remove `deploy/lgtm/run-lgtm.sh`
-5. Remove `deploy/launchd/*.plist`
-6. Verify: `docker compose up` → Grafana accessible, LGTM healthy
+3. Create `Dockerfile` (build context: workspace root `..`, dockerfile: `tdt-observability/Dockerfile`)
+4. Create `deploy/health-poller-config.yaml` (Docker-network service URLs)
+5. Remove `deploy/lgtm/run-lgtm.sh`
+6. Remove `deploy/launchd/*.plist`
+7. Verify: `docker compose up` → Grafana accessible, LGTM healthy
 
 ### Phase 2: Network Migration
-1. Update `tdt-scheduler/compose.yaml` network to `tdt-observability`
+1. Update `tdt-scheduler/compose.yaml` network to `tdt-observability` (external)
 2. Update `tdt-scheduler/compose.yaml` OTEL endpoint to `http://otel-lgtm:4317`
-3. Create `deploy/docker-compose.services.yaml` (scheduler + agent-core + health-poller + log-collector)
-4. Remove `tdt-scheduler/tdt-scheduler-verification.override.yaml` (update to new network)
+3. Add `depends_on: otel-lgtm: condition: service_healthy` to scheduler service
+4. Create `deploy/docker-compose.services.yaml` (scheduler + agent-core + health-poller + log-collector)
 5. Verify: scheduler starts, health endpoint responds, traces visible in Grafana
 
 ### Phase 3: Agent-Core Cleanup
 1. Remove 10 services from `agent-core/compose.yaml` (Langfuse, MLflow, MinIO, OTel Collector)
 2. Remove 5 named volumes from `agent-core/compose.yaml`
 3. Remove `agent-core/otel-collector-config.yaml`
-4. Update `agent-core/config.yaml.example` — change `otel_collector_endpoint` default
+4. Update `agent-core/config.yaml.example` — change `otel_collector_endpoint` and `langfuse.host` (port 3000→3001)
 5. Verify: `agent-core/compose.yaml` starts with just Postgres + app
 
 ### Phase 4: Optional Backends
@@ -151,14 +199,19 @@ With Langfuse/MLflow overlay:
 3. Create `deploy/otel-collector-config.yaml` (fan-out collector config)
 4. Verify: `docker compose -f deploy/docker-compose.yaml -f deploy/docker-compose.langfuse.yaml up` → Langfuse receives traces
 
+### Phase 5: Cleanup
+1. Remove orphaned Docker volumes: `docker volume rm langfuse-clickhouse-data langfuse-postgres-18-data langfuse-redis-data minio-data mlflow-postgres-18-data`
+2. Remove orphaned network: `docker network rm agent-core-local_default` (if exists)
+3. Remove old LGTM image: `docker rmi grafana/otel-lgtm:v0.28.0` (if exists)
+4. Remove old bind-mount directory: `rm -rf ~/.tdt/observability/lgtm-data` (old run-lgtm.sh data)
+
 ### Rollback
-Each phase is independently reversible:
-- Phase 1: Remove tdt-observability deploy files, restore launchd plists
-- Phase 2: Revert tdt-scheduler network to `agent-core-local_default`
-- Phase 3: Restore agent-core/compose.yaml from git history
-- Phase 4: Remove overlay files
+The migration is atomic — all phases execute in one PR. Rollback:
+- `git checkout <commit-before-migration> -- agent-core/compose.yaml tdt-scheduler/compose.yaml`
+- `docker compose -f agent-core/compose.yaml up -d` (restores old stack)
+- Re-load launchd agents if needed
 
 ## Open Questions
 
-1. Should the tdt-scheduler `compose.yaml` keep its own `postgres-backup` service, or should backup be handled by the tdt-observability stack? (Currently scheduler has its own backup container.)
-2. Should the verification override (`tdt-scheduler-verification.override.yaml`) be updated in this change or deferred to the `local-compose-observability-deployment` change?
+1. Should the tdt-scheduler `compose.yaml` keep its own `postgres-backup` service, or should backup be handled by the tdt-observability stack? (Currently scheduler has its own backup container.) **Recommendation:** Keep in scheduler — it's scheduler-specific.
+2. Should the verification override (`tdt-scheduler-verification.override.yaml`) be updated in this change or deferred? **Recommendation:** Update in this change — it's a simple network inheritance fix.

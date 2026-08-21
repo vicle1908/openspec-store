@@ -99,8 +99,16 @@ None. The `skip_specs: true` flag is set — no OpenSpec capability specificatio
 ### Backward Compatibility
 
 - agent-core `config.yaml` users must update `otel_collector_endpoint` (old value deprecated, not removed)
+- agent-core `config.yaml` users must update `langfuse.host` from port 3000 to 3001 (Langfuse moves in overlay)
 - tdt-scheduler compose must be started with the tdt-observability stack running first
-- The `tdt-scheduler-verification.override.yaml` must be updated to use the new network
+- The `tdt-scheduler-verification.override.yaml` inherits the new network from base compose
+
+### Migration Atomicity
+
+This change MUST be executed atomically (all phases in one PR). Phases are NOT independently reversible because:
+- Phase 2 changes the scheduler's network, which breaks if Phase 1 hasn't created the new network
+- Phase 3 removes services that Phase 2's scheduler may still reference
+- The migration sequence: stop old stack → unload launchd → apply all changes → start new stack
 
 ### Data Migration
 
