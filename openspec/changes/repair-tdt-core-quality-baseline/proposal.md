@@ -49,7 +49,7 @@ None (`skip_specs: true` declared; no functional requirement changes).
 - **Target Files**:
   - `src/tdt_core/scheduler/health.py` (`TC003` fix).
   - `tests/scheduler/test_cli.py`, `tests/scheduler/test_health.py`, `tests/scheduler/test_serve_health_listener.py`, `tests/scheduler/test_engine.py`, `tests/scheduler/test_scheduling.py`, `tests/scheduler/test_registry_loader.py`, `tests/scheduler/test_schedule_manifest.py`, `tests/scheduler/test_settings.py`.
-  - 12 root test files for import formatting (`tests/test_canonical_agent_contract.py`, `tests/test_manifest_cli.py`, etc.).
+  - 13 root import-only test files (`tests/test_canonical_agent_contract.py`, `tests/test_manifest_cli.py`, etc.).
 - **Downstream Consumers**: Zero breaking changes; all public interfaces and runtime behavior remain identical.
 - **CI / Developer Gating**: Restores strict Ruff and mypy gates to fully passing status.
 
