@@ -79,9 +79,17 @@ The change SHALL include regression and real-runtime acceptance that exercise a 
 #### Scenario: Fresh PostgreSQL control preserves the verified baseline
 
 - **WHEN** the scheduler starts with fresh `tdt_scheduler` and `tdt_scheduler_dbos_sys` databases and is observed for at least 150 seconds
-- **THEN** the scheduler SHALL remain healthy, report `dbos_connected=true`, generate the verified `20` schedule / `19` applied baseline (or record and justify an intentional manifest-count change), contain no `webhook-selftest` manifest entry, and emit no unregistered-workflow error
+- **THEN** the scheduler SHALL remain healthy, report `dbos_connected=true`, generate the canonical `19` schedule / `19` applied baseline after the persisted legacy `stale_workflow_cleaner` is retired, contain no retired manifest entry, and emit no unregistered-workflow error
 
 #### Scenario: Regression fixtures cover safe boundaries
 
 - **WHEN** automated tests exercise stale schedule rows, stale workflow-status rows, current rows, ambiguous ownership, repeated reconciliation, dry-run, rollback, and injected database or registry failures
 - **THEN** the tests SHALL demonstrate the required mutation, protection, idempotence, fail-closed, and recovery behavior without requiring an ambient developer database
+
+## REMOVED Requirements
+
+### Requirement: Stale workflow cleaner scheduled workflow
+
+**Reason:** Accepted source does not register a periodic `_stale_workflow_cleaner`; the row was persisted legacy state and inflated the old health count. The added startup/state reconciliation requirements replace it with a fail-closed, transactional, reversible lifecycle boundary before DBOS scheduler activation.
+
+**Migration:** Reconciliation snapshots and removes the persisted `stale_workflow_cleaner` schedule while preserving historical successful workflow rows. Operators use `reconcile-stale-state --rollback-id <id>` to restore the captured schedule only if current-registry conflict checks still pass.

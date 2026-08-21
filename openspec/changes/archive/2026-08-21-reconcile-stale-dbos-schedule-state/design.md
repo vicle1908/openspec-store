@@ -119,8 +119,9 @@ Tests SHALL use a fixture that seeds an owned retired schedule/workflow row and
 a fresh fixture with both `tdt_scheduler` and `tdt_scheduler_dbos_sys`. The
 runtime gate SHALL run the real `tdt-scheduler:local` container against both,
 verify health/schedule counts, and search bounded logs for the retired workflow
-error. The fresh control must preserve the observed 20/19 baseline over at
-least 150 seconds.
+error. The original 20-count included the persisted legacy
+`stale_workflow_cleaner`; the accepted current baseline is therefore 19 current
+schedules / 19 applied over at least 150 seconds.
 
 **Rationale:** The clean-start control distinguishes stale database state from
   current manifest registration and prevents a deterministic unit test from
@@ -156,3 +157,15 @@ least 150 seconds.
 None. The DBOS API/schema details are implementation inspection tasks, not
 unresolved product decisions; they must be resolved in the source worktree
 before code is edited.
+
+## Implementation disposition
+
+Implementation inspection resolved the lifecycle boundary without modifying
+the CRITICAL `SchedulerEngine.initialize()` method or HIGH-risk
+`apply_schedules()`/`apply_from_yaml()` methods. The canonical `serve` path now
+loads YAML/register-function state, quarantines explicit retired names,
+transactionally reconciles persisted DBOS rows, quiesces sibling pollers,
+performs a late-row sweep, and only then launches DBOS and applies current
+schedules. A one-file pre-existing Docker filesystem-capability fix was merged
+as a prerequisite after the first real container rehearsal exposed the Linux
+`F_FULLFSYNC` incompatibility.

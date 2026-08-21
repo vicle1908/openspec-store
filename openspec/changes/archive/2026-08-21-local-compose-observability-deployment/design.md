@@ -83,3 +83,13 @@ The `agent-core` runbook shall document how its local Compose integration enviro
 ### 3. Deferred source-defect handoff
 
 The separate implementation change begins from the captured minimal reproduction of the unregistered `webhook-selftest` workflow. It must identify the implementation owner, run GitNexus impact analysis before source edits, add a regression that proves the workflow is registered, and distinguish successful registration from any independent public-edge/Tailscale timeout. This planning change neither creates that change nor patches its source.
+
+### 4. Archive disposition and later ownership changes
+
+The separate `reconcile-stale-dbos-schedule-state` implementation completed the
+gate with source, rollback, stale/shared runtime, fresh runtime, and 170-second
+monitoring evidence. This archived change records the deployment ownership that
+applied to its own documentation scope. Any later consolidation or transfer of
+Docker ownership is governed by the newer active
+`consolidate-observability-docker-deployment` change and is not rewritten into
+this historical runbook change.

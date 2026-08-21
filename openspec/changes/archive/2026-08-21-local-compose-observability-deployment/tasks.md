@@ -21,4 +21,4 @@
 
 - [x] 4.1 In `openspec-store`, validate this planning change with `openspec doctor --store openspec-store` and `openspec validate local-compose-observability-deployment --strict --store openspec-store`; verify both commands exit 0 and `specs` remains skipped.
 - [x] 4.2 Stage and commit only the existing `proposal.md`, `design.md`, and `tasks.md` for this change; verify the staged path list contains exactly those three files and no documentation-writer worktree paths.
-- [ ] 4.3 Archive only after the separately owned documentation updates, owned unique-stack acceptance, and deferred source-defect implementation change have their own evidence; verify archive review does not treat this planning commit or structural validation as implementation acceptance.
+- [x] 4.3 Archive only after the separately owned documentation updates, owned unique-stack acceptance, and deferred source-defect implementation change have their own evidence; verify archive review does not treat this planning commit or structural validation as implementation acceptance.

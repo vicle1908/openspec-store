@@ -25,7 +25,7 @@ A shared DBOS system database can retain a `webhook-selftest` schedule/workflow 
 
 - **tdt-core scheduler ownership**: implementation is expected to inspect the current `SchedulerEngine.initialize()`, `apply_schedules()`, `ScheduleRegistryLoader.apply_from_yaml()`, and scheduler serve/bootstrap symbols before selecting the exact hook. The canonical scheduler must reconcile before DBOS schedule ticks can enqueue persisted stale references.
 - **DBOS system database**: the affected shared database is `tdt_scheduler_dbos_sys`, including persisted schedule and workflow-status state. The change must not truncate or reset the database and must not mutate rows belonging to other DBOS consumers.
-- **tdt-scheduler runtime acceptance**: the Docker `tdt-scheduler:local` service remains the real acceptance surface. The existing runbook records a healthy fresh control of `dbos_connected=true`, `schedule_count=20`, and `schedules_applied=19`; that baseline must remain intact while the stale-state case is repaired.
+- **tdt-scheduler runtime acceptance**: the Docker `tdt-scheduler:local` service remains the real acceptance surface. The original `20` total / `19` applied reading included the persisted legacy `stale_workflow_cleaner` schedule. After reconciliation retires that row, both the stale/shared and fresh controls SHALL expose the canonical `19` total / `19` applied baseline.
 - **agent-core, tdt-observability, and other workload repositories**: no source change is authorized by this planning change unless a later implementation plan proves a symbol-level dependency after inspection. Declarative manifests remain owned by their implementing repositories.
 
 ## Non-Goals
@@ -39,5 +39,5 @@ A shared DBOS system database can retain a `webhook-selftest` schedule/workflow 
 
 ## Evidence
 
-- `tdt-scheduler/docs/tdt-scheduler-compose-verification.md` records the actionable persisted/scheduled `webhook-selftest` reference and the fresh-control baseline (`20` schedules, `19` applied) while distinguishing it from expected sandbox warnings.
-- Current scheduler symbols include `SchedulerEngine.initialize()`/`apply_schedules()`, `ScheduleRegistryLoader.apply_from_yaml()`, and `tdt_core.scheduler.maintenance.stale_workflow_cleaner`; the implementation must verify their ordering and DBOS API compatibility rather than assume a specific code fix.
+- `tdt-scheduler/docs/tdt-scheduler-compose-verification.md` records the actionable persisted/scheduled `webhook-selftest` reference and the original fresh-control reading while distinguishing it from expected sandbox warnings.
+- Implementation inspection proved accepted `tdt-core/main` had no current `maintenance.py`; `stale_workflow_cleaner` existed only as persisted legacy state. The implementation therefore reconciles before DBOS launch, removes that obsolete schedule together with `webhook-selftest`/`dlq-reaper`, and preserves the 19 current manifest-owned schedules.
