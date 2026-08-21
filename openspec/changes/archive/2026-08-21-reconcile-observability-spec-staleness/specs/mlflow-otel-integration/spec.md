@@ -1,8 +1,35 @@
-## Purpose
+## REMOVED Requirements
 
-This specification defines requirements for Mlflow Otel Integration.
+### Requirement: MLflow OTLP exporter SHALL be added to OTel Collector
 
-## Requirements
+**Reason:** Unconditional Collector routing conflicts with the implemented exclusive route-mode model.
+
+**Migration:** Configure exactly one MLflow route: `autolog`, `collector`, or `disabled`. `autolog` is the default; `collector` remains explicitly configured and deployment-gated.
+
+## ADDED Requirements
+
+### Requirement: MLflow trace ingestion SHALL use an exclusive route mode
+
+MLflow tracing SHALL use exactly one of `autolog`, `collector`, or `disabled`. The selected mode SHALL be determined at configuration time and SHALL NOT change at runtime.
+
+#### Scenario: Autolog mode is the default
+
+- **WHEN** no explicit MLflow route mode is configured
+- **THEN** the system SHALL use `autolog`
+- **AND** it SHALL NOT configure Collector export to MLflow
+
+#### Scenario: Collector mode is explicitly selected
+
+- **WHEN** `mlflow_mode=collector`
+- **THEN** autolog SHALL NOT be enabled
+- **AND** Collector export SHALL remain subject to deployment validation
+
+#### Scenario: MLflow tracing is disabled
+
+- **WHEN** `mlflow_mode=disabled`
+- **THEN** neither autolog nor Collector trace export SHALL be enabled
+
+## MODIFIED Requirements
 
 ### Requirement: MLflow pydantic-ai autolog SHALL be best-effort
 
@@ -35,24 +62,3 @@ The existing `MLflowClient` wrapper SHALL continue to work for experiment loggin
 - **THEN** the exception SHALL be caught
 - **AND** a warning SHALL be logged
 - **AND** the calling code SHALL continue normally
-
-### Requirement: MLflow trace ingestion SHALL use an exclusive route mode
-
-MLflow tracing SHALL use exactly one of `autolog`, `collector`, or `disabled`. The selected mode SHALL be determined at configuration time and SHALL NOT change at runtime.
-
-#### Scenario: Autolog mode is the default
-
-- **WHEN** no explicit MLflow route mode is configured
-- **THEN** the system SHALL use `autolog`
-- **AND** it SHALL NOT configure Collector export to MLflow
-
-#### Scenario: Collector mode is explicitly selected
-
-- **WHEN** `mlflow_mode=collector`
-- **THEN** autolog SHALL NOT be enabled
-- **AND** Collector export SHALL remain subject to deployment validation
-
-#### Scenario: MLflow tracing is disabled
-
-- **WHEN** `mlflow_mode=disabled`
-- **THEN** neither autolog nor Collector trace export SHALL be enabled
