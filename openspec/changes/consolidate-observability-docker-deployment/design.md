@@ -37,6 +37,8 @@ The go-microservices repo has a proven pattern: `deploy/docker-compose.yaml` (ba
 
 **Rationale**: The LGTM image bundles an OTel Collector that routes traces→Tempo, metrics→Prometheus, logs→Loki. Running a separate collector adds complexity with no benefit for the LGTM-only case. When Langfuse/MLflow are needed, a separate collector fans out to all backends.
 
+**Divergence from go-microservices**: go-microservices runs its own separate collector (v0.158.0) on top of LGTM's built-in collector (v0.156.0). This is intentional for their production topology (agent→gateway). For TDT's local dev use case, the built-in collector is sufficient. The Langfuse/MLflow overlays add a separate collector only when fan-out is needed.
+
 **Alternatives considered**:
 - Always use separate collector: Simpler mental model, but adds a container and config for no benefit in the common case
 - Use LGTM's built-in collector with custom config: Possible via volume mount, but the built-in config is correct and well-tested
@@ -87,6 +89,12 @@ With Langfuse/MLflow overlay:
 
 **Trade-off**: Launchd had `KeepAlive` and PID management. Docker Compose has `restart: unless-stopped` which provides equivalent behavior. The PID file management in the Python code becomes a no-op (process is always PID 1 in container).
 
+**Health poller URL migration**: The default service URLs in `health_poller/__init__.py` use `http://localhost:8080/health` etc. Inside a Docker container, `localhost` refers to the container itself. Two options:
+1. Volume-mount a config file at `~/.tdt/observability/config/config.yaml` with Docker-network URLs (e.g., `http://webhook-receiver:8080/health`)
+2. Keep the health-poller on the host (via launchd) and only containerize the log-collector
+
+**Chosen approach**: Option 1 — the health-poller config file (`~/.tdt/observability/config/config.yaml`) is mounted into the container. If the file doesn't exist, the health-poller falls back to defaults (which won't work in Docker). The task includes creating this config file with Docker-network service URLs.
+
 ### Decision 6: LGTM Version Alignment
 
 **Choice**: Pin to v0.29.0 (matching go-microservices), not v0.28.0 (current tdt-observability).
@@ -99,7 +107,10 @@ With Langfuse/MLflow overlay:
 → Mitigation: Docker Desktop runs on macOS. The health-poller and log-collector work identically in containers. The `~/.tdt/logs/` and `~/.tdt/observability/` directories are mounted as volumes.
 
 **[Risk] Langfuse data loss during migration**
-→ Mitigation: Local dev only — no production data. Fresh `docker compose up` creates new volumes. Old agent-core volumes can be pruned with `docker volume prune`.
+→ Mitigation: Local dev only — no production data. Fresh `docker compose up` creates new volumes. Old agent-core volumes can be pruned with explicit `docker volume rm` commands.
+
+**[Risk] Port conflict: Grafana :3000 vs Langfuse :3000**
+→ Mitigation: Langfuse web binds to `127.0.0.1:3001:3000` (host port 3001) when the Langfuse overlay is activated. Grafana remains on `:3000`. The LGTM base and Langfuse overlay can coexist.
 
 **[Risk] tdt-scheduler fails to connect if tdt-observability stack isn't running**
 → Mitigation: Document dependency. The scheduler's `depends_on` can reference LGTM healthcheck. The scheduler already has graceful degradation when OTEL endpoint is unavailable.
@@ -128,16 +139,16 @@ With Langfuse/MLflow overlay:
 5. Verify: scheduler starts, health endpoint responds, traces visible in Grafana
 
 ### Phase 3: Agent-Core Cleanup
-1. Remove 9 services from `agent-core/compose.yaml` (Langfuse, MLflow, MinIO, OTel Collector)
-2. Remove 6 named volumes from `agent-core/compose.yaml`
+1. Remove 10 services from `agent-core/compose.yaml` (Langfuse, MLflow, MinIO, OTel Collector)
+2. Remove 5 named volumes from `agent-core/compose.yaml`
 3. Remove `agent-core/otel-collector-config.yaml`
 4. Update `agent-core/config.yaml.example` — change `otel_collector_endpoint` default
 5. Verify: `agent-core/compose.yaml` starts with just Postgres + app
 
 ### Phase 4: Optional Backends
-1. Create `deploy/docker-compose.langfuse.yaml` (Langfuse overlay)
+1. Create `deploy/docker-compose.langfuse.yaml` (Langfuse overlay) with `otel-collector` service
 2. Create `deploy/docker-compose.mlflow.yaml` (MLflow overlay)
-3. Create `deploy/otel-collector-config.yaml` (fan-out collector)
+3. Create `deploy/otel-collector-config.yaml` (fan-out collector config)
 4. Verify: `docker compose -f deploy/docker-compose.yaml -f deploy/docker-compose.langfuse.yaml up` → Langfuse receives traces
 
 ### Rollback

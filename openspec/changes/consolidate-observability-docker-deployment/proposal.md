@@ -47,7 +47,7 @@ Move observability stack ownership from agent-core to tdt-observability:
 - Create `deploy/otel-collector-config.yaml` — fan-out collector (for Langfuse/MLflow routing)
 - Create `Dockerfile` — tdt-observability image (health-poller + log-collector)
 - Update `grafana/provisioning/datasources/datasources.yaml` — remove (use LGTM built-in)
-- Update `grafana/dashboards/*.json` — verify panel queries work with LGTM datasources
+- Update `grafana/dashboards/tdt-service-health.json` — change datasource UID from `mimir` to `prometheus` (LGTM built-in)
 - Remove `deploy/lgtm/run-lgtm.sh` — replaced by Docker Compose
 - Remove `deploy/launchd/*.plist` — replaced by Docker services
 

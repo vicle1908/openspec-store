@@ -2,33 +2,33 @@
 
 ## 1. Create tdt-observability Docker Foundation
 
-- [ ] 1.1 Create `tdt-observability/deploy/tools.env` with pinned image versions: `POSTGRES_VERSION=18.6-trixie`, `OTEL_LGTM_VERSION=0.29.0`, `LANGFUSE_VERSION=4.11.0`, `MLFLOW_VERSION=v3.15.1`. Verify versions match go-microservices `deploy/tools.env`.
-- [ ] 1.2 Create `tdt-observability/deploy/docker-compose.yaml` — base stack: `otel-lgtm` (grafana/otel-lgtm), `postgres` (postgres:18.6-trixie). Network: `tdt-observability` (bridge). LGTM ports: `127.0.0.1:3000:3000` (Grafana), `127.0.0.1:9009:9009` (Prometheus). Postgres port: `127.0.0.1:5432:5432`. LGTM healthcheck: `curl http://localhost:3000/api/health`. Postgres healthcheck: `pg_isready`. Volume: `lgtm-data:/data`, `postgres-data:/var/lib/postgresql`.
-- [ ] 1.3 Create `tdt-observability/Dockerfile` — Python 3.14-slim base, install uv, copy `pyproject.toml` + `uv.lock` + `src/`, run `uv sync`, install system deps (curl, ca-certificates). Expose no ports (background services). CMD: configurable via `HEALTH_POLLER_ENABLED` and `LOG_COLLECTOR_ENABLED` env vars.
-- [ ] 1.4 Verify base stack: `cd tdt-observability && docker compose -f deploy/docker-compose.yaml up -d` → Grafana accessible at `localhost:3000` (admin/admin), LGTM healthy, Postgres accepts connections.
+- [ ] 1.1 Create `tdt-observability/deploy/tools.env` with pinned image versions: `POSTGRES_VERSION=18.6-alpine` (matching go-microservices), `OTEL_LGTM_VERSION=0.29.0`, `LANGFUSE_VERSION=4.11.0`, `MLFLOW_VERSION=v3.15.1`. Note: go-microservices uses `18.6-alpine` not `18.6-trixie`.
+- [ ] 1.2 Create `tdt-observability/deploy/docker-compose.yaml` — base stack: `otel-lgtm` (grafana/otel-lgtm), `postgres` (postgres:18.6-alpine). Network: `tdt-observability` (bridge). LGTM ports: `127.0.0.1:3000:3000` (Grafana), `127.0.0.1:9009:9009` (Prometheus). Postgres port: `127.0.0.1:5432:5432`. LGTM healthcheck: `curl http://localhost:3000/api/health`. Postgres healthcheck: `pg_isready`. Volume: `lgtm-data:/data`, `postgres-data:/var/lib/postgresql`.
+- [ ] 1.3 Create `tdt-observability/Dockerfile` — Python 3.14-slim base, install uv, copy `pyproject.toml` + `uv.lock` + `src/`, run `uv sync`, install system deps (curl, ca-certificates). Expose no ports (background services). Support both health-poller and log-collector via CMD override.
+- [ ] 1.4 Create `tdt-observability/deploy/health-poller-config.yaml` — Docker-network service URLs for health-poller: `webhook-receiver:8080`, `ai-review:8090`, `tdt-scheduler:9100`. Mount into health-poller container at `~/.tdt/observability/config/config.yaml`.
+- [ ] 1.5 Verify base stack: `cd tdt-observability && docker compose -f deploy/docker-compose.yaml up -d` → Grafana accessible at `localhost:3000` (admin/admin), LGTM healthy, Postgres accepts connections.
 
 ## 2. Update Grafana Dashboard Provisioning
 
 - [ ] 2.1 Remove `tdt-observability/grafana/provisioning/datasources/datasources.yaml` — LGTM image ships with pre-configured datasources (Prometheus uid: `prometheus`, Tempo uid: `tempo`, Loki uid: `loki`). The current file overrides with `localhost` URLs which don't work in Docker.
 - [ ] 2.2 Update `tdt-observability/grafana/provisioning/dashboards/dashboards.yaml` — verify the provider path matches the LGTM image mount point (`/otel-lgtm/grafana/conf/provisioning/dashboards/custom`). Update if needed.
-- [ ] 2.3 Update `tdt-observability/grafana/dashboards/tdt-service-health.json` — change datasource UID from `mimir` to `prometheus` (LGTM built-in Prometheus datasource uses uid `prometheus`). The current dashboard has 3 panels: Service Availability, Response Time p95, Error Rate.
-- [ ] 2.4 Update `tdt-observability/grafana/dashboards/tdt-distributed-traces.json` — verify Trace Explorer panel uses `tempo` datasource UID. The current dashboard has 1 panel: Trace Explorer with 2 template variables.
+- [ ] 2.3 Update `tdt-observability/grafana/dashboards/tdt-service-health.json` — change all `"uid": "mimir"` references to `"uid": "prometheus"` to match LGTM built-in Prometheus datasource. The current dashboard has 3 panels: Service Availability, Response Time p95, Error Rate. All panels reference the Mimir uid which won't exist after removing the override.
+- [ ] 2.4 Verify `tdt-observability/grafana/dashboards/tdt-distributed-traces.json` — confirm it already uses `"uid": "tempo"` (no change needed). The current dashboard has 1 panel: Trace Explorer with 2 template variables.
 - [ ] 2.5 Verify dashboards render: `docker compose -f deploy/docker-compose.yaml up -d` → Grafana → Dashboards → TDT → panels show data (after traces are generated).
 
 ## 3. Create tdt-observability Dockerfile for Health Poller + Log Collector
 
-- [ ] 3.1 Create `tdt-observability/Dockerfile` with multi-stage build: builder stage installs dependencies, runtime stage runs health-poller or log-collector. The image should support both via CMD override.
-- [ ] 3.2 Add `HEALTH_POLLER_ENABLED=true` env var support — when set, container runs `python -m tdt_observability.health_poller --interval 30`.
-- [ ] 3.3 Add `LOG_COLLECTOR_ENABLED=true` env var support — when set, container runs `python -m tdt_observability.log_collector`.
-- [ ] 3.4 Mount `~/.tdt/logs` as `/var/log/tdt:ro` for log collector, `~/.tdt/observability` as `/data` for DuckDB storage.
-- [ ] 3.5 Verify health-poller container starts and polls services (check stdout for poll cycle output).
-- [ ] 3.6 Verify log-collector container starts and watches log files (check stdout for file watch output).
+- [ ] 3.1 Add `HEALTH_POLLER_ENABLED=true` env var support to Dockerfile entrypoint — when set, container runs `python -m tdt_observability.health_poller --interval 30`.
+- [ ] 3.2 Add `LOG_COLLECTOR_ENABLED=true` env var support to Dockerfile entrypoint — when set, container runs `python -m tdt_observability.log_collector`.
+- [ ] 3.3 Mount `~/.tdt/logs` as `/var/log/tdt:ro` for log collector, `~/.tdt/observability` as `/data` for DuckDB storage, `deploy/health-poller-config.yaml` as config mount.
+- [ ] 3.4 Verify health-poller container starts and polls services (check stdout for poll cycle output).
+- [ ] 3.5 Verify log-collector container starts and watches log files (check stdout for file watch output).
 
 ## 4. Create tdt-scheduler Services Overlay
 
 - [ ] 4.1 Create `tdt-observability/deploy/docker-compose.services.yaml` — overlay with: `scheduler` (build from `../tdt-scheduler`, command: `agent-core-scheduler serve`), `agent-core` (build from `../agent-core`, command: `sleep infinity`), `health-poller` (build from `..`, command: health-poller), `log-collector` (build from `..`, command: log-collector). All services join `tdt-observability` network as external.
 - [ ] 4.2 Update `tdt-scheduler/compose.yaml` — change network from `agent-core-local_default` to `tdt-observability` (external). Update `OTEL_OTEL_COLLECTOR_ENDPOINT` from `http://otel-collector:4317` to `http://otel-lgtm:4317`.
-- [ ] 4.3 Update `tdt-scheduler/tdt-scheduler-verification.override.yaml` — change network reference if needed. Verify the override still works with the new network.
+- [ ] 4.3 Verify `tdt-scheduler/tdt-scheduler-verification.override.yaml` — inherits network from base compose, no explicit change needed. Verify the override still works with the new `tdt-observability` network.
 - [ ] 4.4 Verify services stack: `docker compose -f deploy/docker-compose.yaml -f deploy/docker-compose.services.yaml up -d` → scheduler health endpoint responds, agent-core container running, health-poller polling, log-collector watching.
 
 ## 5. Migrate Agent-Core Compose Cleanup
@@ -37,14 +37,14 @@
 - [ ] 5.2 Remove `agent-core/otel-collector-config.yaml` — this debug-only config is replaced by tdt-observability's LGTM routing.
 - [ ] 5.3 Update `agent-core/config.yaml.example` — change `otel_collector_endpoint` default from `"http://otel-collector:4317"` to `"http://otel-lgtm:4317"`. Add comment noting the old value is deprecated.
 - [ ] 5.4 Verify agent-core stack: `cd agent-core && docker compose up -d` → Postgres + app start successfully. No references to removed services remain.
-- [ ] 5.5 Run `docker volume prune` to clean up orphaned agent-core observability volumes.
+- [ ] 5.5 Clean up orphaned agent-core observability volumes: `docker volume rm langfuse-clickhouse-data langfuse-postgres-18-data langfuse-redis-data minio-data mlflow-postgres-18-data` (explicit removal, not `docker volume prune` which is too broad).
 
 ## 6. Create Optional Backend Overlays
 
-- [ ] 6.1 Create `tdt-observability/deploy/docker-compose.langfuse.yaml` — Langfuse overlay with: `langfuse-clickhouse`, `langfuse-postgres`, `langfuse-redis`, `minio`, `minio-init`, `langfuse-web`, `langfuse-worker`. All join `tdt-observability` network. Langfuse web port: `127.0.0.1:3000:3000`. Use `LANGFUSE_VERSION` from `tools.env`.
+- [ ] 6.1 Create `tdt-observability/deploy/docker-compose.langfuse.yaml` — Langfuse overlay with: `langfuse-clickhouse`, `langfuse-postgres`, `langfuse-redis`, `minio`, `minio-init`, `langfuse-web`, `langfuse-worker`, `otel-collector` (fan-out). All join `tdt-observability` network. Langfuse web port: `127.0.0.1:3001:3000` (host 3001 to avoid conflict with Grafana on 3000). OTel Collector port: `127.0.0.1:4317:4317` (gRPC), `127.0.0.1:4318:4318` (HTTP). Use `LANGFUSE_VERSION` from `tools.env`.
 - [ ] 6.2 Create `tdt-observability/deploy/docker-compose.mlflow.yaml` — MLflow overlay with: `mlflow-postgres`, `mlflow-server`. MLflow server port: `127.0.0.1:5000:5000`. Use `MLFLOW_VERSION` from `tools.env`.
 - [ ] 6.3 Create `tdt-observability/deploy/otel-collector-config.yaml` — fan-out collector config: receives OTLP gRPC/HTTP, exports to LGTM (`otlphttp/lgtm`), Langfuse (`otlphttp/langfuse` with Basic Auth + `x-langfuse-ingestion-version: 4`), MLflow (`otlphttp/mlflow` with `x-mlflow-experiment-id` header). Processors: `memory_limiter`, `batch`.
-- [ ] 6.4 Verify Langfuse overlay: `docker compose -f deploy/docker-compose.yaml -f deploy/docker-compose.langfuse.yaml up -d` → Langfuse web accessible at `localhost:3000`, ClickHouse healthy.
+- [ ] 6.4 Verify Langfuse overlay: `docker compose -f deploy/docker-compose.yaml -f deploy/docker-compose.langfuse.yaml up -d` → Langfuse web accessible at `localhost:3001`, ClickHouse healthy, OTel Collector receiving traces.
 - [ ] 6.5 Verify MLflow overlay: `docker compose -f deploy/docker-compose.yaml -f deploy/docker-compose.mlflow.yaml up -d` → MLflow server accessible at `localhost:5000`, health endpoint responds.
 
 ## 7. Remove Legacy Files
