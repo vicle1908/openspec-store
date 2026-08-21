@@ -1,21 +1,24 @@
-## 1. Runbook and Override Templates Specification
+## 1. Confirm Ownership and Documentation Boundaries
 
-- [ ] 1.1 Create `tdt-scheduler` Compose verification runbook documenting unique project invocation (`-p tdt-scheduler-verification`), port mapping (`127.0.0.1:19100:9100`), and disposable configuration directory setup (`TDT_HOME=/tmp/tdt-scheduler-verification-home`). Verify by reviewing runbook markdown structure and checking CLI commands.
-- [ ] 1.2 Create `agent-core` Compose observability integration runbook detailing shared bridge network attachment (`agent-core-local_default`), OTel Collector endpoints, and PostgreSQL database connections. Verify documentation references match actual service names in compose definitions.
-- [ ] 1.3 Standardize reusable Docker Compose verification override template (`tdt-scheduler-verification.override.yaml`) with container name overrides and isolated volume bindings. Verify syntax using `docker compose -f compose.yaml -f tdt-scheduler-verification.override.yaml config`.
+- [ ] 1.1 In `tdt-scheduler` only, document the scheduler deployment/runbook ownership for the scheduler Dockerfile, entrypoint, Compose runtime, port `9100`, and `/scheduler/health`; verify the runbook names no other repository as the Compose runtime owner.
+- [ ] 1.2 In `agent-core` only, document the observability Compose integration environment for PostgreSQL, OTel Collector, Langfuse, and MLflow; verify each referenced service, network, and environment name against the `agent-core` Compose configuration.
+- [ ] 1.3 Record `tdt-observability` as a library/dashboard source owner and integration dependency, not a current deployment Compose owner; verify no implementation or documentation task assigns it scheduler/runtime ownership.
+- [ ] 1.4 Keep documentation writers restricted to their respective repositories (`tdt-scheduler` and `agent-core`); verify their staged changes contain no paths in another repository or `openspec-store`.
 
-## 2. Health Probing, Bounded Monitoring, and Teardown Procedures
+## 2. Preserve an Owned Unique-Stack Verification Procedure
 
-- [ ] 2.1 Document non-disturbing health inspection procedures using HTTP curl checks against `http://127.0.0.1:19100/scheduler/health`, parsing JSON attributes (`schedule_count`, `schedules_applied`, `dbos_connected`). Verify command executes synchronously and exits 0 on healthy service.
-- [ ] 2.2 Document container state verification commands using formatted `docker inspect` (`.State.Status`, `.State.Health.Status`, `.State.Health.FailingStreak`) and bounded log extraction (`docker logs --tail 30`). Verify that commands complete without continuous streaming or blocking agent execution.
-- [ ] 2.3 Document safe teardown and resource cleanup procedures (`docker compose -p tdt-scheduler-verification down -v` and removal of `/tmp/tdt-scheduler-verification-home`) guaranteeing ambient running developer containers remain untouched. Verify by confirming container lists before and after execution.
+- [ ] 2.1 In the `tdt-scheduler` runbook, document a collision-resistant Compose project, initial resource inventory, source/image identity capture, run-scoped `TDT_HOME`, and a non-default loopback mapping; verify the procedure identifies `tdt-scheduler-verification`, `127.0.0.1:19100:9100`, and `/tmp/tdt-scheduler-verification-home` only as reproduced evidence, not mandatory reusable names.
+- [ ] 2.2 Document bounded scheduler verification of `http://127.0.0.1:19100/scheduler/health`, formatted `docker inspect`, and `docker logs --tail`; verify all commands terminate and health acceptance is based on the active HTTP endpoint rather than a stopped-container snapshot.
+- [ ] 2.3 Document diagnostics-before-teardown and cleanup filtered to the unique Compose project; verify the procedure cannot remove an ambient container, volume, or network that lacks the run identity.
 
-## 3. Warning Classification and Decision Gate Protocol
+## 3. Classify Warnings and Defer the Source Defect
 
-- [ ] 3.1 Publish the expected warnings triage matrix documenting Tailscale webhook self-test timeouts (network isolation artifact), sprint switch spreadsheet warnings (configurable integration notice), and unconfigured telemetry sink messages. Verify that triage entries provide clear diagnostic guidance for each expected log pattern.
-- [ ] 3.2 Formalize the defect remediation decision gate in documentation: any source-code defect or startup bug discovered during verification must be isolated, reproduced with a minimal test script, and escalated to a separate implementation change. Verify the decision gate section is explicitly present in the runbook.
+- [ ] 3.1 Document the preconditions and triage for bridge-network/Tailscale reachability timeouts, missing spreadsheet configuration, and optional Langfuse/MLflow credentials; verify the text does not classify all webhook failures as benign.
+- [ ] 3.2 Capture the minimal reproduction showing `webhook-selftest` absent from the registered scheduler workflow/run list, including expected versus actual registration, source identity, and bounded diagnostics; verify the artifact is sufficient to open a separate implementation OpenSpec change.
+- [ ] 3.3 Record the handoff requirements for a separate source implementation OpenSpec change for the unregistered `webhook-selftest` workflow: GitNexus impact analysis before source edits, a registration regression, and real scheduler acceptance separate from public-edge/Tailscale reachability. Verify this change neither creates that implementation change nor patches its source.
 
-## 4. End-to-End Operational Verification and Validation
+## 4. Store Validation and Archive Gate
 
-- [ ] 4.1 Execute end-to-end verification rehearsal using the documented runbook commands in a temporary test directory, verifying container start, healthy status on `127.0.0.1:19100`, manifest reload (~19 schedules), and clean teardown. Verify all commands succeed without error.
-- [ ] 4.2 Validate OpenSpec change status and strict store validation (`openspec validate local-compose-observability-deployment --strict --store openspec-store`). Verify validation passes with exit code 0.
+- [ ] 4.1 In `openspec-store`, validate this planning change with `openspec doctor --store openspec-store` and `openspec validate local-compose-observability-deployment --strict --store openspec-store`; verify both commands exit 0 and `specs` remains skipped.
+- [ ] 4.2 Stage and commit only the existing `proposal.md`, `design.md`, and `tasks.md` for this change; verify the staged path list contains exactly those three files and no documentation-writer worktree paths.
+- [ ] 4.3 Archive only after the separately owned documentation updates, owned unique-stack acceptance, and deferred source-defect implementation change have their own evidence; verify archive review does not treat this planning commit or structural validation as implementation acceptance.

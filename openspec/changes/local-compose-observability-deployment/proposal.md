@@ -1,39 +1,40 @@
 ## Why
 
-Local Docker Compose deployment and verification for `tdt-scheduler` and `agent-core` observability services require standardized operational procedures, isolated project execution patterns, and clear warning classifications to ensure reliable testing without disrupting running workloads. This change establishes the runbook updates, verification workflows, and diagnostic taxonomies needed for safe, non-colliding Compose operations across local developer environments.
+Local Compose verification crosses three repositories, so an operational plan must make the deployment owner, integration owner, and library dependency explicit. The verified isolated scheduler stack shows that a unique project, loopback mapping, and disposable state can exercise the runtime without disturbing ambient services, while a separate reproduction found that the `webhook-selftest` workflow is unregistered; neither result authorizes source changes in this documentation-only change.
 
 ## What Changes
 
-- Document standardized Docker Compose verification procedures for `tdt-scheduler` and `agent-core` observability stacks.
-- Define isolated execution patterns leveraging unique Compose project names (e.g., `-p tdt-scheduler-verification`), dedicated loopback port mappings (e.g., `127.0.0.1:19100:9100`), and disposable configuration directories (`TDT_HOME=/tmp/...`).
-- Document bounded, non-disturbing health check and monitoring commands (`curl http://127.0.0.1:19100/scheduler/health`, formatted `docker inspect`, and bounded log inspection).
-- Establish formal classification and triage guide for expected local-environment warnings:
-  - `Tailscale / Webhook Self-Test Timeout`: Network isolation artifact (bridge network lacks host Tailscale interface); expected one-shot background event that does not impair scheduler execution.
-  - `Sprint Switch / No Spreadsheet ID`: Configurable integration warning when Google Sheets ID is not configured; expected in local test environments.
-  - `Langfuse / MLflow Credential Warnings`: Optional OTel / tracking sink notices when credentials are unset in local test sandboxes.
-- Document explicit cleanup and teardown procedures to safely dismantle verification containers without affecting ambient developer services.
-- Establish an explicit decision gate: any source-code defect identified during Compose verification must be documented, reproduced in isolation, and remediated under a separate implementation change.
+- Define the `tdt-scheduler` deployment/runbook scope: its scheduler Dockerfile and entrypoint, container port `9100`, `/scheduler/health`, Compose runtime, isolated-stack verification procedure, and scheduler runbook.
+- Define the `agent-core` integration scope: its observability Compose integration runbook and environment guidance for PostgreSQL, the OTel Collector, Langfuse, and MLflow.
+- Record `tdt-observability` as the owner of its library and dashboard source and as an integration dependency; it is not the deployment Compose owner for this change.
+- Record `openspec-store` as the owner of planning, validation, and later archive governance only.
+- Retain the unique-stack evidence: project `tdt-scheduler-verification`, loopback `127.0.0.1:19100:9100`, disposable `TDT_HOME=/tmp/tdt-scheduler-verification-home`, and a healthy `/scheduler/health` response.
+- Distinguish expected configuration/network-isolation notices from the reproduced `webhook-selftest` registration defect. The latter must be carried by a separate implementation OpenSpec change after its minimal reproduction is attached; this change only records and defers it.
+- Limit each documentation writer to documentation in its own repository: `tdt-scheduler` for the scheduler runbook and `agent-core` for the observability integration runbook. No documentation writer edits `tdt-observability` or `openspec-store` implementation content.
 
 ### Non-Goals
 
-- Modifying core application source code or runtime logic in `tdt-core`, `agent-core`, or `tdt-scheduler` within this change.
-- Creating or synchronizing normative OpenSpec capability specifications (`skip_specs: true`).
-- Changing default production port assignments or modifying live production compose networks.
-- Storing unencrypted production credentials or API tokens in versioned runbooks.
+- Modifying application, library, dashboard, scheduler, Dockerfile, entrypoint, Compose, or runtime source in `tdt-scheduler`, `agent-core`, `tdt-observability`, or any other repository.
+- Fixing the unregistered `webhook-selftest` workflow within this change; that requires a distinct implementation OpenSpec change.
+- Creating or synchronizing normative OpenSpec capability specifications (`skip_specs: true` remains in effect).
+- Changing default production ports, live production networks, or storing production credentials in runbooks.
 
 ## Capabilities
 
 ### New Capabilities
-None. This change focuses on operational verification, runbooks, and documentation without introducing new system capabilities.
+
+None. This change clarifies ownership and operational documentation; it does not change normative system behavior.
 
 ### Modified Capabilities
-None. System behavior and normative specifications remain unchanged (`skip_specs: true`).
+
+None. Specifications remain skipped (`skip_specs: true`), because any source repair is deliberately deferred to a separately scoped implementation change.
 
 ## Impact
 
-- **Affected Systems**: `tdt-scheduler` deployment configs and runbooks, `agent-core` local compose documentation, developer verification environments.
-- **Ownership Boundaries**:
-  - `openspec-store`: Planning governance and verification task tracking.
-  - `tdt-scheduler`: Compose definitions (`compose.yaml`, override templates) and local operations runbooks.
-  - `agent-core`: Observability integration runbooks and multi-service Docker networking guides.
-- **Operational Risk**: Zero. Verification is conducted in isolated projects with non-overlapping port bindings and disposable storage volumes.
+- **Affected systems:** `tdt-scheduler` local deployment/runbook, `agent-core` observability integration documentation/environment, and isolated developer verification environments.
+- **Ownership boundaries:**
+  - `tdt-scheduler` owns the scheduler Dockerfile, entrypoint, port `9100`, `/scheduler/health`, Compose runtime, and scheduler runbook.
+  - `agent-core` owns the observability Compose integration runbook/environment, including PostgreSQL, OTel Collector, Langfuse, and MLflow integration guidance.
+  - `tdt-observability` owns library/dashboard source and remains an integration dependency, not the current deployment Compose owner.
+  - `openspec-store` owns this plan, its validation, and archive governance.
+- **Operational risk:** Verification stays bounded and isolated by an explicit Compose project, loopback port, and disposable state. The separate source-defect change must establish its own impact analysis and acceptance evidence.

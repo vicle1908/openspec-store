@@ -1,89 +1,85 @@
 ## Context
 
-This design provides the operational architecture, runbook specifications, and validation procedures for local Docker Compose deployments of `tdt-scheduler` and `agent-core` observability services. See `proposal.md` for background and problem motivation.
+This is a documentation and operational-planning change for a multi-repository local Compose deployment. It does not grant this store or either documentation writer authority to edit runtime source. The change keeps `skip_specs: true`; its existing proposal, design, and task artifacts are the complete planning surface.
 
-Operational audits (`/tmp/local-compose-observability-openspec-audit.md` and `/tmp/tdt-scheduler-compose-grok-audit.md`) and direct empirical evidence established the following operational baseline:
-- **Verified Isolated Runtime**: `tdt-scheduler-verification` successfully executed on `127.0.0.1:19100:9100` using project `-p tdt-scheduler-verification` and disposable `TDT_HOME=/tmp/tdt-scheduler-verification-home`.
-- **Health Verification**: `/scheduler/health` returned healthy JSON status (`enabled: true`, `dbos_connected: true`, `schedule_count: 20`, `schedules_applied: 19`, 3 manifests loaded) with startup reload duration ~87ms.
-- **Healthcheck Precedence**: The `compose.yaml` HTTP curl healthcheck against `/scheduler/health` effectively overrides the Dockerfile Python import check.
-- **Warning Classification**: Identifies expected log events (Tailscale webhook self-test timeout, sprint switch unconfigured spreadsheet ID, unconfigured telemetry sinks) resulting from container network isolation and test environments.
+The audited isolated runtime provides reusable evidence, not an instruction to reuse a stack name blindly:
+
+- Project `tdt-scheduler-verification` ran with `-p tdt-scheduler-verification`, loopback mapping `127.0.0.1:19100:9100`, and disposable `TDT_HOME=/tmp/tdt-scheduler-verification-home`.
+- `/scheduler/health` returned healthy JSON, including `enabled: true`, `dbos_connected: true`, `schedule_count: 20`, `schedules_applied: 19`, and three loaded manifests; the observed startup reload was about 87 ms.
+- The Compose HTTP healthcheck for `/scheduler/health` took precedence over the Dockerfile Python import check.
+- A minimal scheduler inspection reproduced that `webhook-selftest` is absent from the registered workflow/run list. This is a source-level defect, not a completed deployment finding or an allowed patch in this change.
 
 ## Goals / Non-Goals
 
 **Goals:**
-- Provide clear, reproducible Docker Compose runbooks for `tdt-scheduler` and `agent-core` verification.
-- Establish strict isolation standards: dedicated Compose project names, unique non-default loopback port bindings (`127.0.0.1:19100`), and disposable host directories (`/tmp/...`).
-- Document non-disturbing, bounded monitoring procedures (`curl /scheduler/health`, `docker inspect`, `docker logs --tail`).
-- Define the warning triage matrix to prevent false alarms on benign local development logs.
-- Formalize a decision gate protocol for defect remediation: runtime bugs must be reproduced in isolation and fixed under separate OpenSpec changes.
-- Provide safe teardown and cleanup command templates.
+
+- Make the repository and documentation-writer boundary mechanically reviewable.
+- Preserve the unique-stack proof pattern: a collision-resistant project identity, its exact resource inventory, loopback port, disposable state root, bounded checks, and owned-only teardown.
+- Provide `tdt-scheduler` with a runbook scope for its scheduler runtime and provide `agent-core` with a distinct observability-integration runbook scope.
+- Record a reproducible handoff for the unregistered `webhook-selftest` workflow without obscuring it among benign warning classes.
 
 **Non-Goals:**
-- Modifying production runtime logic or default container network topologies.
-- Creating delta specification files (`skip_specs: true`).
-- Fixing discovered application source bugs directly within this documentation/verification change.
+
+- Reassigning `tdt-observability` from its library/dashboard ownership or making it a Compose deployment owner.
+- Editing Docker, Compose, application, scheduler, library, dashboard, or documentation files in this planning change.
+- Treating structural OpenSpec validation as proof that an isolated Compose runtime or a source-defect fix works.
 
 ## Decisions
 
-### Decision 1: Project and Port Isolation via Compose Overrides
-- **Choice**: Use dedicated Compose project name (`-p tdt-scheduler-verification`), dedicated loopback port mapping (`127.0.0.1:19100:9100`), and temporary storage root (`TDT_HOME=/tmp/tdt-scheduler-verification-home`).
-- **Rationale**: Ensures zero collision with running developer daemons or default port 9100 services; guarantees all disk writes stay in ephemeral directories.
-- **Alternatives Considered**:
-  - Running directly on port 9100: Rejected due to immediate conflict with ambient long-running scheduler containers.
-  - Host networking mode (`network_mode: host`): Rejected because it bypasses container network isolation and introduces port collisions.
+### Decision 1: Explicit runtime and documentation ownership
 
-### Decision 2: Documentation and Operational Runbook Scope (`skip_specs: true`)
-- **Choice**: Track this change with `skip_specs: true` and produce runbook documentation and verification tasks.
-- **Rationale**: The change establishes operational procedures and documentation; it introduces no new product capabilities or normative contract deltas.
-- **Alternatives Considered**: Modifying main capability specs: Rejected because runtime interfaces and system behaviors remain unchanged.
+- **Choice:** `tdt-scheduler` owns the scheduler Dockerfile, entrypoint, port `9100`, `/scheduler/health`, Compose runtime, and scheduler runbook. Its documentation writer may change only `tdt-scheduler` documentation.
+- **Choice:** `agent-core` owns the observability Compose integration runbook/environment, including guidance for PostgreSQL, OTel Collector, Langfuse, and MLflow. Its documentation writer may change only `agent-core` documentation.
+- **Choice:** `tdt-observability` owns library/dashboard source and is an integration dependency; it is not the owner of the current deployment Compose work.
+- **Choice:** `openspec-store` owns planning, validation, and archive governance; it does not own implementation or cross-repository documentation writes.
+- **Rationale:** A separate owner for each mutable surface prevents one deployment result from silently becoming authority to change another repository.
+- **Alternative rejected:** A shared “observability stack” owner. This is ambiguous about Docker runtime, service environment, and library/dashboard source ownership.
 
-### Decision 3: Warning Classification Taxonomy
-- **Choice**: Standardize the categorization of known startup and background warnings:
-  - `Tailscale / Webhook Self-Test`: Classified as **Network Isolation Artifact** (benign background timeout; container lacks Tailscale interface).
-  - `Sprint Switch / No Spreadsheet ID`: Classified as **Configurable Integration Notice** (benign warning when Google Sheets integration is unconfigured).
-  - `Langfuse / MLflow Absence`: Classified as **Optional Telemetry Sink Notice** (benign notices when local tracking endpoints are unconfigured).
-- **Rationale**: Prevents engineers and automated agents from mistaking expected test-sandbox warnings for service health failures.
-- **Alternatives Considered**: Suppressing container log output: Rejected because log suppression masks legitimate runtime errors.
+### Decision 2: Unique-stack verification is an owned-resource protocol
 
-### Decision 4: Mandatory Decision Gate for Source Defect Remediation
-- **Choice**: Enforce a strict decision gate: any source-level defect discovered during operational verification (e.g., startup reloader sequence or handler defects) must be recorded as an isolated finding and addressed in a dedicated implementation change.
-- **Rationale**: Preserves change boundaries, prevents scope creep, and adheres to GitNexus blast-radius and impact-analysis requirements.
-- **Alternatives Considered**: Immediate in-tree bug patching: Rejected because it bypasses isolated worktree verification and strict spec governance.
+- **Choice:** A verification run creates a collision-resistant Compose project name, records the initial resource inventory and source/image identities, binds only a non-default loopback port (the reproduced example is `127.0.0.1:19100:9100`), and uses a run-scoped temporary `TDT_HOME`. It uses bounded health, inspect, and log commands, then removes only resources bearing that run identity.
+- **Rationale:** The existing `tdt-scheduler-verification` result proves the pattern is viable; a future run must prove it owns its resources rather than relying on an ambient container, volume, or network.
+- **Alternatives rejected:** Port `9100` directly and host networking, because both create ambient collision and attribution risk.
+
+### Decision 3: Warning taxonomy must not hide the reproduced defect
+
+- **Choice:** Keep Tailscale/bridge-network reachability timeouts, absent spreadsheet configuration, and unset optional Langfuse/MLflow credentials as separately documented diagnostic classes when their expected preconditions hold.
+- **Choice:** Treat the reproduced absence of `webhook-selftest` from the registered scheduler workflow/run list as a source defect. Capture the minimal reproduction, expected registration, actual registration result, source identity, and diagnostics for a new implementation OpenSpec change.
+- **Rationale:** A network timeout and an unregistered workflow have different causes and remediations. Calling both “expected local warnings” would wrongly mask a scheduling defect.
+- **Alternative rejected:** Repairing registration, the Dockerfile, entrypoint, or scheduler source in this change. It exceeds the documentation/planning scope and lacks a separately approved implementation change.
+
+### Decision 4: Validation remains structural and repository-scoped
+
+- **Choice:** `openspec-store` runs `openspec doctor --store openspec-store` and strict validation for this change, stages only these three existing planning artifacts, and archives only after separate implementation/acceptance evidence is complete. The `.openspec.yaml` setting remains untouched with `skip_specs: true`.
+- **Rationale:** Doctor and strict validation prove store/change structure and coherence, not source repair, Compose reachability, or other repositories’ worktree state.
+- **Alternative rejected:** Treating checked planning tasks or a successful validator as end-to-end operational acceptance.
 
 ## Risks / Trade-offs
 
-- **[Risk] Accidental modification or termination of ambient developer containers** → **Mitigation**: All runbook CLI commands mandate explicit `-p <project>` and container name qualifiers.
-- **[Risk] Confusion over "unhealthy" status in stopped container inspection** → **Mitigation**: Runbook explicitly documents that Docker inspect reports post-exit snapshots, and instructs verification against active runtime HTTP endpoints.
-- **[Risk] Ephemeral test data lingering on host filesystem** → **Mitigation**: Provide automated cleanup commands targeting `/tmp/tdt-scheduler-verification*` and Docker volume pruning.
+- **Ambient-resource collision or accidental teardown** — Require a unique project identity, before/after resource inventory, loopback-only port, and cleanup filtered to that identity.
+- **Cross-repository writer overreach** — Keep scheduler documentation in `tdt-scheduler` and observability integration documentation in `agent-core`; do not dispatch either writer into another repository.
+- **Masked defect** — The unregistered `webhook-selftest` result is a blocker for a claim that the self-test workflow is deployed; it must be carried into a separate source implementation change.
+- **False completion from planning validation** — Report strict validation and doctor separately from the later isolated runtime acceptance and source-defect repair.
 
-## Migration & Operational Runbook Structure
+## Operational Runbook Structure
 
-### 1. Unique-Project Deployment Execution
+### 1. Scheduler-owned isolated deployment
+
+The `tdt-scheduler` runbook shall describe its Dockerfile/entrypoint/Compose runtime and its public local contract: container port `9100` and `GET /scheduler/health`. A verification invocation shall use a new run identity rather than copying an existing one verbatim. The previously verified shape was:
+
 ```bash
-# 1. Prepare disposable environment and schedules directory
-mkdir -p /tmp/tdt-scheduler-verification-home/schedules /tmp/tdt-scheduler-verification-home/credentials
-
-# 2. Start container in dedicated verification project
-docker compose -p tdt-scheduler-verification -f compose.yaml -f /tmp/tdt-scheduler-verification.override.yaml up -d scheduler
-
-# 3. Verify runtime health via bounded HTTP check
+TDT_HOME=/tmp/tdt-scheduler-verification-home \
+  docker compose -p tdt-scheduler-verification -f compose.yaml \
+  -f /tmp/tdt-scheduler-verification.override.yaml up -d scheduler
 curl -fsS http://127.0.0.1:19100/scheduler/health | python3 -m json.tool
 ```
 
-### 2. Bounded Non-Disturbing Monitoring
-```bash
-# Check container state and health streak
-docker inspect tdt-scheduler-verification --format 'Status={{.State.Status}} Health={{.State.Health.Status}} FailingStreak={{.State.Health.FailingStreak}}'
+The runbook shall use bounded inspection such as `docker logs --tail 30`, record the named project/container identities, and perform a project-filtered teardown only after diagnostics have been captured.
 
-# Inspect bounded recent logs (no streaming/hanging)
-docker logs tdt-scheduler-verification --tail 30
-```
+### 2. Agent-core-owned observability integration
 
-### 3. Clean Teardown
-```bash
-# Stop and dismantle verification project without touching other containers
-docker compose -p tdt-scheduler-verification -f compose.yaml -f /tmp/tdt-scheduler-verification.override.yaml down -v
+The `agent-core` runbook shall document how its local Compose integration environment connects to PostgreSQL, the OTel Collector, Langfuse, and MLflow. It shall state the required service/network/environment names from the `agent-core` Compose configuration at implementation time, and it shall identify `tdt-observability` as a dependency without transferring Compose deployment ownership to it.
 
-# Clean disposable temporary home
-rm -rf /tmp/tdt-scheduler-verification-home
-```
+### 3. Deferred source-defect handoff
+
+The separate implementation change begins from the captured minimal reproduction of the unregistered `webhook-selftest` workflow. It must identify the implementation owner, run GitNexus impact analysis before source edits, add a regression that proves the workflow is registered, and distinguish successful registration from any independent public-edge/Tailscale timeout. This planning change neither creates that change nor patches its source.
