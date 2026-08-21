@@ -11,7 +11,7 @@
 
 - [ ] 2.1 Remove `tdt-observability/grafana/provisioning/datasources/datasources.yaml` — LGTM image ships with pre-configured datasources (Prometheus uid: `prometheus`, Tempo uid: `tempo`, Loki uid: `loki`). The current file overrides with `localhost` URLs which don't work in Docker.
 - [ ] 2.2 Update `tdt-observability/grafana/provisioning/dashboards/dashboards.yaml` — verify the provider path matches the LGTM image mount point (`/otel-lgtm/grafana/conf/provisioning/dashboards/custom`). Update if needed.
-- [ ] 2.3 Update `tdt-observability/grafana/dashboards/tdt-service-health.json` — verify panel queries use correct datasource UIDs (`prometheus` for metrics, `tempo` for traces). The current dashboard has 3 panels: Service Availability, Response Time p95, Error Rate.
+- [ ] 2.3 Update `tdt-observability/grafana/dashboards/tdt-service-health.json` — change datasource UID from `mimir` to `prometheus` (LGTM built-in Prometheus datasource uses uid `prometheus`). The current dashboard has 3 panels: Service Availability, Response Time p95, Error Rate.
 - [ ] 2.4 Update `tdt-observability/grafana/dashboards/tdt-distributed-traces.json` — verify Trace Explorer panel uses `tempo` datasource UID. The current dashboard has 1 panel: Trace Explorer with 2 template variables.
 - [ ] 2.5 Verify dashboards render: `docker compose -f deploy/docker-compose.yaml up -d` → Grafana → Dashboards → TDT → panels show data (after traces are generated).
 
@@ -33,7 +33,7 @@
 
 ## 5. Migrate Agent-Core Compose Cleanup
 
-- [ ] 5.1 Remove from `agent-core/compose.yaml`: services `langfuse-clickhouse`, `langfuse-postgres`, `langfuse-redis`, `minio`, `minio-init`, `langfuse-web`, `langfuse-worker`, `mlflow-postgres`, `mlflow-server`, `otel-collector` (9 services). Remove named volumes: `langfuse-clickhouse-data`, `langfuse-postgres-18-data`, `langfuse-redis-data`, `minio-data`, `mlflow-postgres-18-data` (6 volumes). Keep: `postgres`, `app`, `agent-core-postgres-data`.
+- [ ] 5.1 Remove from `agent-core/compose.yaml`: services `langfuse-clickhouse`, `langfuse-postgres`, `langfuse-redis`, `minio`, `minio-init`, `langfuse-web`, `langfuse-worker`, `mlflow-postgres`, `mlflow-server`, `otel-collector` (10 services). Remove named volumes: `langfuse-clickhouse-data`, `langfuse-postgres-18-data`, `langfuse-redis-data`, `minio-data`, `mlflow-postgres-18-data` (5 volumes). Keep: `postgres`, `app`, `agent-core-postgres-data`.
 - [ ] 5.2 Remove `agent-core/otel-collector-config.yaml` — this debug-only config is replaced by tdt-observability's LGTM routing.
 - [ ] 5.3 Update `agent-core/config.yaml.example` — change `otel_collector_endpoint` default from `"http://otel-collector:4317"` to `"http://otel-lgtm:4317"`. Add comment noting the old value is deprecated.
 - [ ] 5.4 Verify agent-core stack: `cd agent-core && docker compose up -d` → Postgres + app start successfully. No references to removed services remain.

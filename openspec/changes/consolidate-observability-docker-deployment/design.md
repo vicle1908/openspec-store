@@ -77,7 +77,7 @@ With Langfuse/MLflow overlay:
 
 **Rationale**: The LGTM image ships with pre-configured datasources (Prometheus, Tempo, Loki, Pyroscope) that are cross-linked (metrics→traces, traces→logs). The current `tdt-observability/grafana/provisioning/datasources/datasources.yaml` overrides these with localhost URLs — wrong for Docker.
 
-**What changes**: Remove `grafana/provisioning/datasources/datasources.yaml`. Keep `grafana/provisioning/dashboards/dashboards.yaml` (points to custom dashboard JSON files). Update dashboard JSON queries to use LGTM datasource UIDs (`prometheus`, `tempo`, `loki`).
+**What changes**: Remove `grafana/provisioning/datasources/datasources.yaml`. Keep `grafana/provisioning/dashboards/dashboards.yaml` (points to custom dashboard JSON files). Update dashboard JSON datasource UIDs: `mimir` → `prometheus` (LGTM built-in Prometheus datasource uses uid `prometheus`). The `tempo` and `loki` UIDs already match.
 
 ### Decision 5: Health Poller and Log Collector as Docker Services
 
@@ -105,7 +105,7 @@ With Langfuse/MLflow overlay:
 → Mitigation: Document dependency. The scheduler's `depends_on` can reference LGTM healthcheck. The scheduler already has graceful degradation when OTEL endpoint is unavailable.
 
 **[Risk] Dashboard queries break after datasource UID change**
-→ Mitigation: The current dashboards use `Tempo` and `Prometheus` datasource names. The LGTM built-in datasources use the same names (`tempo`, `prometheus`). Verify panel queries after migration.
+→ Mitigation: The current dashboards use `mimir` uid for the Prometheus datasource. The LGTM built-in uses `prometheus` uid. Task 2.3 updates the dashboard JSON to match. Verify panel queries after migration.
 
 **[Risk] DuckDB lock contention between Docker health-poller and host processes**
 → Mitigation: If health-poller runs in Docker, it uses the same `~/.tdt/observability/health.duckdb` via volume mount. The existing retry/backoff logic in the retention module handles this.

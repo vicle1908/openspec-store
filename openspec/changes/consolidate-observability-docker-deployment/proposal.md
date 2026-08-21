@@ -52,7 +52,7 @@ Move observability stack ownership from agent-core to tdt-observability:
 - Remove `deploy/launchd/*.plist` — replaced by Docker services
 
 **agent-core:**
-- Remove from `compose.yaml`: langfuse-clickhouse, langfuse-postgres, langfuse-redis, minio, minio-init, langfuse-web, langfuse-worker, mlflow-postgres, mlflow-server, otel-collector (9 services + 6 volumes)
+- Remove from `compose.yaml`: langfuse-clickhouse, langfuse-postgres, langfuse-redis, minio, minio-init, langfuse-web, langfuse-worker, mlflow-postgres, mlflow-server, otel-collector (10 services + 5 volumes)
 - Remove `otel-collector-config.yaml` — moved to tdt-observability
 - Update `config.yaml.example` — change `otel_collector_endpoint` default from `http://otel-collector:4317` to `http://otel-lgtm:4317`
 
@@ -86,7 +86,7 @@ None. The `skip_specs: true` flag is set — no OpenSpec capability specificatio
 | Repo | Change Type | Risk |
 |------|------------|------|
 | tdt-observability | New Docker files, remove legacy | LOW — additive, old files replaced |
-| agent-core | Remove 9 services from compose | MEDIUM — compose structure changes |
+| agent-core | Remove 10 services from compose | MEDIUM — compose structure changes |
 | tdt-scheduler | Update network + env vars | LOW — two-line change |
 
 ### Breaking Changes
