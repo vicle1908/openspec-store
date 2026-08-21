@@ -1,0 +1,5 @@
+schema: spec-driven
+skip_specs: true
+created: 2026-08-21
+goal: Eliminate non-store openspec directories without losing store resolution,
+  managed resources, or repository history.

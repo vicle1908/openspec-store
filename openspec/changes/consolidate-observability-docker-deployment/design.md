@@ -48,12 +48,13 @@ The go-microservices repo has a proven pattern: `deploy/docker-compose.yaml` (ba
 **Architecture**:
 ```
 LGTM-only (base):
-  Services → LGTM :4317 (built-in collector) → Tempo/Loki/Prometheus
+  Services → LGTM :4317 (built-in collector, internal to Docker network) → Tempo/Loki/Prometheus
+  Note: 4317/4318 are NOT published to host — only accessible from Docker network
 
 With Langfuse/MLflow overlay:
   Services → LGTM :4317 (built-in) → LGTM backends (always works)
-             Separate Collector :4317 → LGTM :4318 + Langfuse + MLflow
-             (separate collector starts async, doesn't block base)
+             Separate Collector :4317 (published to host 127.0.0.1) → LGTM :4318 + Langfuse + MLflow
+             (separate collector starts async via service_started, doesn't block base)
 ```
 
 ### Decision 2: Overlay Pattern vs Monolithic Compose
