@@ -123,9 +123,9 @@ With Langfuse/MLflow overlay:
 
 ### Decision 8: postgres-backup Service Handling
 
-**Choice**: Keep `postgres-backup` in `tdt-scheduler/compose.yaml` but add `depends_on` for the LGTM stack.
+**Choice**: Keep `postgres-backup` in `tdt-scheduler/compose.yaml`, while keeping startup ordering for the LGTM stack in the observability services overlay.
 
-**Rationale**: The backup service references `postgres` hostname, which resolves via the `tdt-observability` external network. The scheduler compose must be started AFTER the base stack (which defines `postgres`). The `depends_on` ensures correct startup order.
+**Rationale**: The backup service references the `postgres` hostname, which resolves via the `tdt-observability` external network. The standalone scheduler Compose project must be started AFTER the base stack (which defines `postgres` and `otel-lgtm`) and cannot declare `depends_on` for services defined by another Compose project. The combined `docker-compose.services.yaml` overlay defines the health-gated dependencies because it is the Compose project that also defines `otel-lgtm` and `postgres`.
 
 **Alternative considered**: Moving `postgres-backup` to `tdt-observability` — rejected because it's scheduler-specific functionality.
 
@@ -183,7 +183,7 @@ With Langfuse/MLflow overlay:
 ### Phase 2: Network Migration
 1. Update `tdt-scheduler/compose.yaml` network to `tdt-observability` (external)
 2. Update `tdt-scheduler/compose.yaml` OTEL endpoint to `http://otel-lgtm:4317`
-3. Add `depends_on: otel-lgtm: condition: service_healthy` to scheduler service
+3. Keep `depends_on: otel-lgtm: condition: service_healthy` and the Postgres health gate in the services overlay; do not add cross-project dependencies to standalone `tdt-scheduler/compose.yaml`
 4. Create `deploy/docker-compose.services.yaml` (scheduler + agent-core + health-poller + log-collector)
 5. Verify: scheduler starts, health endpoint responds, traces visible in Grafana
 
