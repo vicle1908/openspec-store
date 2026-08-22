@@ -1,0 +1,20 @@
+schema: spec-driven
+created: 2026-08-22
+repos:
+  - openspec-store
+  - agent-core
+  - tdt-scheduler
+  - tdt-observability
+  - tdt-core
+  - agent-harness
+read_only_inputs:
+  - tdt-core
+  - jira-daily-reports
+  - jira-skill
+  - webhook-receiver
+  - ai-review
+  - code-daily-scan
+  - tdt-sheets
+  - jira-epic-report
+  - poems-mobile3-android
+  - poems-mobile3-ios
