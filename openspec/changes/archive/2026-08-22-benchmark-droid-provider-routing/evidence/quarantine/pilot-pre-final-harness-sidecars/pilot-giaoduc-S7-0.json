@@ -1,0 +1,22 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 46370,
+  "num_turns": 5,
+  "result": "Here are the security findings in `patch-review/auth.py`:\n\nFINDING: Hardcoded credential \u2014 `ADMIN_PASSWORD = \"supersecret123\"` is a plaintext secret embedded in source code. It will be committed to version control and visible to anyone with repo access. Use environment variables or a secrets manager.\n\nFINDING: Weak hash algorithm (MD5) \u2014 `hashlib.md5()` is cryptographically broken. It is vulnerable to collision attacks and is trivially brute-forced with rainbow tables. Use `bcrypt`, `scrypt`, or `argon2` for password hashing.\n\nFINDING: No salt \u2014 Both password hashes are computed without a salt, making them susceptible to precomputed rainbow table attacks. Each password should use a unique random salt.\n\nFINDING: Timing attack on hash comparison \u2014 `password_hash == stored_hash` uses Python's `==` operator which short-circuits on the first differing byte. An attacker can infer the hash byte-by-byte by measuring response time. Use `hmac.compare_digest()` for constant-time comparison.\n\nFINDING: SQL injection \u2014 `get_user_profile` builds a SQL query via f-string interpolation (`f\"SELECT * FROM users WHERE name = '{username}'\"`). An attacker can inject arbitrary SQL (e.g., `'; DROP TABLE users; --`). Use parameterized queries (`cursor.execute(\"SELECT * FROM users WHERE name = %s\", (username,))`).\n\nFINDING: Query returned as a raw string \u2014 `get_user_profile` returns the SQL string rather than executing it through a parameterized cursor. This makes it easy for callers to forget safe execution, and the design implies string concatenation at the call site, compounding the injection risk.",
+  "session_id": "ca1c9dd0-9fd6-4bb8-96fc-37a26470406a",
+  "usage": {
+    "input_tokens": 3013,
+    "output_tokens": 1170,
+    "cache_read_input_tokens": 80256,
+    "cache_creation_input_tokens": 0,
+    "factory_credits": 0,
+    "thinking_tokens": 551,
+    "ttft_ms": 2873.2
+  },
+  "status": "parsed",
+  "_raw_stdout": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":35986,\"num_turns\":5,\"result\":\"Here are the security findings in `patch-review/auth.py`:\\n\\nFINDING: Hardcoded credential \u2014 `ADMIN_PASSWORD = \\\"supersecret123\\\"` is a plaintext secret embedded in source code. It will be committed to version control and visible to anyone with repo access. Use environment variables or a secrets manager.\\n\\nFINDING: Weak hash algorithm (MD5) \u2014 `hashlib.md5()` is cryptographically broken. It is vulnerable to collision attacks and is trivially brute-forced with rainbow tables. Use `bcrypt`, `scrypt`, or `argon2` for password hashing.\\n\\nFINDING: No salt \u2014 Both password hashes are computed without a salt, making them susceptible to precomputed rainbow table attacks. Each password should use a unique random salt.\\n\\nFINDING: Timing attack on hash comparison \u2014 `password_hash == stored_hash` uses Python's `==` operator which short-circuits on the first differing byte. An attacker can infer the hash byte-by-byte by measuring response time. Use `hmac.compare_digest()` for constant-time comparison.\\n\\nFINDING: SQL injection \u2014 `get_user_profile` builds a SQL query via f-string interpolation (`f\\\"SELECT * FROM users WHERE name = '{username}'\\\"`). An attacker can inject arbitrary SQL (e.g., `'; DROP TABLE users; --`). Use parameterized queries (`cursor.execute(\\\"SELECT * FROM users WHERE name = %s\\\", (username,))`).\\n\\nFINDING: Query returned as a raw string \u2014 `get_user_profile` returns the SQL string rather than executing it through a parameterized cursor. This makes it easy for callers to forget safe execution, and the design implies string concatenation at the call site, compounding the injection risk.\",\"session_id\":\"ca1c9dd0-9fd6-4bb8-96fc-37a26470406a\",\"usage\":{\"input_tokens\":3013,\"output_tokens\":1170,\"cache_read_input_tokens\":80256,\"cache_creation_input_tokens\":0,\"factory_credits\":0,\"thinking_tokens\":551,\"ttft_ms\":2873.2}}",
+  "_stderr": "",
+  "exit_code": 0
+}

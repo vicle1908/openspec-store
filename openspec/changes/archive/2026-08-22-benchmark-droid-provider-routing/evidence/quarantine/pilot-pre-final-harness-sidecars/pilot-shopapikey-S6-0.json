@@ -1,0 +1,22 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 31027,
+  "num_turns": 5,
+  "result": "All 3 tests pass. The fix was changing `.upper()` to `.title()` \u2014 `.upper()` uppercased every character (e.g. \"Hello World\" \u2192 \"HELLO WORLD\"), while `.title()` correctly capitalizes only the first letter of each word.",
+  "session_id": "e6b27a56-6dfb-4c00-a2e5-700a85be4491",
+  "usage": {
+    "input_tokens": 3624,
+    "output_tokens": 654,
+    "cache_read_input_tokens": 82752,
+    "cache_creation_input_tokens": 0,
+    "factory_credits": 0,
+    "thinking_tokens": 98,
+    "ttft_ms": 3081.2
+  },
+  "status": "parsed",
+  "_raw_stdout": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":16757,\"num_turns\":5,\"result\":\"All 3 tests pass. The fix was changing `.upper()` to `.title()` \u2014 `.upper()` uppercased every character (e.g. \\\"Hello World\\\" \u2192 \\\"HELLO WORLD\\\"), while `.title()` correctly capitalizes only the first letter of each word.\",\"session_id\":\"e6b27a56-6dfb-4c00-a2e5-700a85be4491\",\"usage\":{\"input_tokens\":3624,\"output_tokens\":654,\"cache_read_input_tokens\":82752,\"cache_creation_input_tokens\":0,\"factory_credits\":0,\"thinking_tokens\":98,\"ttft_ms\":3081.2}}",
+  "_stderr": "",
+  "exit_code": 0
+}

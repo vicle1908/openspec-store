@@ -1,0 +1,22 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 35797,
+  "num_turns": 6,
+  "result": "FINDING: Hardcoded administrator password (`supersecret123`) exposes privileged credentials to anyone with source access (`auth.py:4`).\n\nFINDING: Passwords are hashed with MD5, an obsolete, fast, unsalted algorithm vulnerable to brute-force and rainbow-table attacks (`auth.py:7-8`).\n\nFINDING: `get_user_profile` directly interpolates `username` into SQL, enabling SQL injection when the returned query is executed (`auth.py:11-12`).",
+  "session_id": "7506ab91-c4db-4777-8a62-faaa5e873d5c",
+  "usage": {
+    "input_tokens": 10165,
+    "output_tokens": 645,
+    "cache_read_input_tokens": 104960,
+    "cache_creation_input_tokens": 0,
+    "factory_credits": 0,
+    "thinking_tokens": 366,
+    "ttft_ms": 2110.5
+  },
+  "status": "parsed",
+  "_raw_stdout": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":25369,\"num_turns\":6,\"result\":\"FINDING: Hardcoded administrator password (`supersecret123`) exposes privileged credentials to anyone with source access (`auth.py:4`).\\n\\nFINDING: Passwords are hashed with MD5, an obsolete, fast, unsalted algorithm vulnerable to brute-force and rainbow-table attacks (`auth.py:7-8`).\\n\\nFINDING: `get_user_profile` directly interpolates `username` into SQL, enabling SQL injection when the returned query is executed (`auth.py:11-12`).\",\"session_id\":\"7506ab91-c4db-4777-8a62-faaa5e873d5c\",\"usage\":{\"input_tokens\":10165,\"output_tokens\":645,\"cache_read_input_tokens\":104960,\"cache_creation_input_tokens\":0,\"factory_credits\":0,\"thinking_tokens\":366,\"ttft_ms\":2110.5}}",
+  "_stderr": "",
+  "exit_code": 0
+}

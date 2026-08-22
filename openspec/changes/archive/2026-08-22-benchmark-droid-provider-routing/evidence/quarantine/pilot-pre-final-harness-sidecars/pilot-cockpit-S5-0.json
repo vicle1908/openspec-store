@@ -1,0 +1,22 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 22563,
+  "num_turns": 3,
+  "result": "BUG: `divide(a, b)` returns `b / a` instead of `a / b`.\n\nBUG: `accumulate(items)` replaces `result` with each item instead of adding each item to the running total.",
+  "session_id": "dd88eb50-5e57-419a-a105-351b7084aa86",
+  "usage": {
+    "input_tokens": 1091,
+    "output_tokens": 157,
+    "cache_read_input_tokens": 42240,
+    "cache_creation_input_tokens": 0,
+    "factory_credits": 0,
+    "thinking_tokens": 41,
+    "ttft_ms": 1566.3333333333333
+  },
+  "status": "parsed",
+  "_raw_stdout": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":8778,\"num_turns\":3,\"result\":\"BUG: `divide(a, b)` returns `b / a` instead of `a / b`.\\n\\nBUG: `accumulate(items)` replaces `result` with each item instead of adding each item to the running total.\",\"session_id\":\"dd88eb50-5e57-419a-a105-351b7084aa86\",\"usage\":{\"input_tokens\":1091,\"output_tokens\":157,\"cache_read_input_tokens\":42240,\"cache_creation_input_tokens\":0,\"factory_credits\":0,\"thinking_tokens\":41,\"ttft_ms\":1566.3333333333333}}",
+  "_stderr": "",
+  "exit_code": 0
+}

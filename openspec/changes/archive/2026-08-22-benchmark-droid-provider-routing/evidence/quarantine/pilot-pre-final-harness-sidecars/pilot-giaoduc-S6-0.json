@@ -1,0 +1,22 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 30577,
+  "num_turns": 5,
+  "result": "All 3 tests pass.\n\n**Fix:** Changed `text.upper()` to `text.title()` in `capitalize_words`. The original `upper()` converted every character to uppercase (e.g., \"hello world\" \u2192 \"HELLO WORLD\"), while `title()` correctly capitalizes only the first letter of each word (e.g., \"hello world\" \u2192 \"Hello World\").",
+  "session_id": "e1ad7633-39d5-4152-a414-faf56845f8f9",
+  "usage": {
+    "input_tokens": 3109,
+    "output_tokens": 781,
+    "cache_read_input_tokens": 80768,
+    "cache_creation_input_tokens": 0,
+    "factory_credits": 0,
+    "thinking_tokens": 133,
+    "ttft_ms": 1854.6
+  },
+  "status": "parsed",
+  "_raw_stdout": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":20600,\"num_turns\":5,\"result\":\"All 3 tests pass.\\n\\n**Fix:** Changed `text.upper()` to `text.title()` in `capitalize_words`. The original `upper()` converted every character to uppercase (e.g., \\\"hello world\\\" \u2192 \\\"HELLO WORLD\\\"), while `title()` correctly capitalizes only the first letter of each word (e.g., \\\"hello world\\\" \u2192 \\\"Hello World\\\").\",\"session_id\":\"e1ad7633-39d5-4152-a414-faf56845f8f9\",\"usage\":{\"input_tokens\":3109,\"output_tokens\":781,\"cache_read_input_tokens\":80768,\"cache_creation_input_tokens\":0,\"factory_credits\":0,\"thinking_tokens\":133,\"ttft_ms\":1854.6}}",
+  "_stderr": "",
+  "exit_code": 0
+}

@@ -1,0 +1,22 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 20163,
+  "num_turns": 2,
+  "result": "1. Add a `GET /health` route to `planning-project/app.py`.\n2. Implement the handler to return a simple status response, such as `{\"status\": \"ok\"}`.\n3. Add or run a FastAPI test confirming `/health` returns HTTP 200 with the expected JSON.",
+  "session_id": "e38eb19a-952e-41c3-8079-353e045d4adb",
+  "usage": {
+    "input_tokens": 14517,
+    "output_tokens": 113,
+    "cache_read_input_tokens": 14080,
+    "cache_creation_input_tokens": 0,
+    "factory_credits": 0,
+    "thinking_tokens": 16,
+    "ttft_ms": 1558
+  },
+  "status": "parsed",
+  "_raw_stdout": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":5702,\"num_turns\":2,\"result\":\"1. Add a `GET /health` route to `planning-project/app.py`.\\n2. Implement the handler to return a simple status response, such as `{\\\"status\\\": \\\"ok\\\"}`.\\n3. Add or run a FastAPI test confirming `/health` returns HTTP 200 with the expected JSON.\",\"session_id\":\"e38eb19a-952e-41c3-8079-353e045d4adb\",\"usage\":{\"input_tokens\":14517,\"output_tokens\":113,\"cache_read_input_tokens\":14080,\"cache_creation_input_tokens\":0,\"factory_credits\":0,\"thinking_tokens\":16,\"ttft_ms\":1558}}",
+  "_stderr": "",
+  "exit_code": 0
+}

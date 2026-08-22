@@ -1,0 +1,7 @@
+b2ff4e561e5b86305b00702fe6444a3b8ca408a54da4e2b8e745e8d48c2e3c34  ./patch-review/auth.py
+acbb36864ddc5a00b8b8e2b8f109e7f18551aeaf93a4c78661fb8f2e42f06206  ./planning-project/requirements.txt
+0b591ca98764d622909fd190b5513db52facb7e150a9fa5497371046d135fd71  ./planning-project/app.py
+c998c878258ea54d30ba7ef378dc98b05e94063e2ffbebec46d9cb1e7ab9d3f2  ./edit-task/test_string_utils.py
+9b31707c67507c965515007938e023e14aef850d26cb6cea03f18f9b8f56ef41  ./edit-task/string_utils.py
+9003222be8b679ff42845a9be56bb1dbcd7bc831a3c5661e56cfe4136e0e5f93  ./buggy-module/test_calculator.py
+dd6e88981a07d067eb0c0b436ec6df2703be2e77ccd90e27a07b0fbeba7410e1  ./buggy-module/calculator.py

@@ -1,0 +1,22 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 37742,
+  "num_turns": 8,
+  "result": "Updated `capitalize_words()` to use `text.title()`.\n\nValidation: all 3 tests pass with `python3 -m unittest -v test_string_utils.py`.",
+  "session_id": "5404654d-0995-48e3-a3bd-66c9c3d9505b",
+  "usage": {
+    "input_tokens": 19987,
+    "output_tokens": 773,
+    "cache_read_input_tokens": 99584,
+    "cache_creation_input_tokens": 0,
+    "factory_credits": 0,
+    "thinking_tokens": 162,
+    "ttft_ms": 1852.875
+  },
+  "status": "parsed",
+  "_raw_stdout": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":27073,\"num_turns\":8,\"result\":\"Updated `capitalize_words()` to use `text.title()`.\\n\\nValidation: all 3 tests pass with `python3 -m unittest -v test_string_utils.py`.\",\"session_id\":\"5404654d-0995-48e3-a3bd-66c9c3d9505b\",\"usage\":{\"input_tokens\":19987,\"output_tokens\":773,\"cache_read_input_tokens\":99584,\"cache_creation_input_tokens\":0,\"factory_credits\":0,\"thinking_tokens\":162,\"ttft_ms\":1852.875}}",
+  "_stderr": "",
+  "exit_code": 0
+}

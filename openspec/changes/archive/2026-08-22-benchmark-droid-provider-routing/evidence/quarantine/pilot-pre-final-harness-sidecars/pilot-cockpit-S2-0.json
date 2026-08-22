@@ -1,0 +1,21 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 19440,
+  "num_turns": 2,
+  "result": "EMPTY_DIR",
+  "session_id": "c00f5270-8e8e-47d0-931b-2cfe1375deff",
+  "usage": {
+    "input_tokens": 9525,
+    "output_tokens": 34,
+    "cache_read_input_tokens": 18944,
+    "cache_creation_input_tokens": 0,
+    "factory_credits": 0,
+    "ttft_ms": 1704
+  },
+  "status": "parsed",
+  "_raw_stdout": "{\"type\":\"result\",\"subtype\":\"success\",\"is_error\":false,\"duration_ms\":4710,\"num_turns\":2,\"result\":\"EMPTY_DIR\",\"session_id\":\"c00f5270-8e8e-47d0-931b-2cfe1375deff\",\"usage\":{\"input_tokens\":9525,\"output_tokens\":34,\"cache_read_input_tokens\":18944,\"cache_creation_input_tokens\":0,\"factory_credits\":0,\"ttft_ms\":1704}}",
+  "_stderr": "",
+  "exit_code": 0
+}
