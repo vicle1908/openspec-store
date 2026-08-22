@@ -1,7 +1,7 @@
 # infrastructure-postgresql Specification
 
 ## Purpose
-TBD - created by archiving change postgresql-18-6-infrastructure-baseline. Update Purpose after archive.
+PostgreSQL infrastructure is federated across owner-defined projects: agent-core owns the single shared runtime PostgreSQL 18.6 service, its PostgreSQL-18-versioned volume, initialization, and rollback, while optional Langfuse and MLflow profiles own isolated PostgreSQL 18.6 services and versioned volumes. Existing volumes remain preserved until data is classified and an explicitly authorized fresh start, retained-data migration, or later retirement is evidenced; no deployment step implicitly deletes or rewrites PostgreSQL data.
 
 ## Requirements
 

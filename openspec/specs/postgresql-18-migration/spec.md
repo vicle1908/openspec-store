@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Migrate PostgreSQL from 17-alpine to 18.6-alpine with fresh start (no data migration).
+PostgreSQL migration is a staged, operator-authorized handoff from preserved source volumes to PostgreSQL 18.6 owner-managed targets. A fresh start uses a new PostgreSQL-18-versioned volume only after data classification; retained data requires writer quiescence, an immutable dump and checksum, staged restore with schema, representative-data, and consumer verification, one bounded DSN or network-alias cutover, preserved source state, and rollback and retirement evidence.
 
 ## Requirements
 
