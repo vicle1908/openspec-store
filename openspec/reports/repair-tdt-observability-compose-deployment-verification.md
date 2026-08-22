@@ -1,6 +1,6 @@
 # repair-tdt-observability-compose-deployment verification
 
-Date: 2026-08-22
+Date: 2026-08-23 (updated)
 Verdict: **partial / blocked for runtime execution**
 
 This report records the current OpenSpec apply state for
@@ -17,13 +17,13 @@ schema: spec-driven
 planning artifacts: complete
 
 openspec instructions apply --change repair-tdt-observability-compose-deployment --json --store openspec-store
-41/89 tasks complete; 48 remain
+48/89 tasks complete; 41 remain
 
 openspec validate repair-tdt-observability-compose-deployment --strict --store openspec-store
 valid
 
 openspec validate --all --strict --store openspec-store
-376 passed, 0 failed
+377 passed, 0 failed
 
 openspec doctor --store openspec-store
 root/store references healthy
@@ -99,6 +99,22 @@ Accepted candidate commits:
 - `b5975a1` agent-core runtime report: fresh/retained PostgreSQL, app imports,
   non-root health, and owner-only teardown.
 - `dbc9938` scheduler external-worktree build/layout repair and runtime report.
+- `56cc275` (2026-08-23) removed the broken `wget` healthcheck from the
+  distroless `otel-gateway` service in both `docker-compose.yaml` (base,
+  affects all 4 profiles) and `docker-compose.mlflow.yaml` (mlflow + full
+  overlays). The `otel/opentelemetry-collector-contrib:0.159.0` image has no
+  `/bin/sh`, `wget`, or `curl`, so the exec-based healthcheck could never
+  succeed. Gateway readiness MUST be proven at runtime by an external probe of
+  the Collector `health_check` extension on `0.0.0.0:13133`; the coordinator's
+  bounded owner-health wait treats absent Docker health as passing, which is
+  necessary but NOT sufficient. No service depends on `otel-gateway` via
+  `service_healthy`. Post-fix evidence: 4/4 daemon-free Compose renders pass,
+  89 model tests pass, 75 coordinator contract tests pass, `git diff --check`
+  clean. GitNexus default `detect_changes`: no uncommitted tracked changes
+  (untracked `graphify-out/graph.html` excluded). GitNexus `main...HEAD`
+  compare: 35 files / 849 symbols / 29 processes / critical risk — expected
+  branch-level impact for this broad candidate branch, not evidence that the
+  two-file healthcheck fix itself is critical.
 
 Static evidence:
 
@@ -177,24 +193,47 @@ services, or unrelated reports were changed.
 
 Read-only Docker CLI, socket, process, launchd, recent-log, Orca UI, and
 daemon-free Compose checks were completed in candidate commit
-`1eaa3a09a6401130bc44e8eb995bfa063916bb21`:
+`1eaa3a09a6401130bc44e8eb995bfa063916bb21`. The diagnostic evidence is retained
+on the `docker-desktop-diagnostics` branch (HEAD `2b5de12`) in the
+tdt-observability repository:
 
-[`docker-desktop-diagnostics.md`](/Users/androidteam/Developer/tdt-observability/docker-desktop-diagnostics/deploy/evidence/docker-desktop-diagnostics.md)
+- `git show docker-desktop-diagnostics:deploy/evidence/docker-desktop-diagnostics.md`
+- `git show docker-desktop-diagnostics:deploy/evidence/docker-desktop-runtime-flap.md`
 
 The selected `desktop-linux` context is coherent, Docker CLI 29.7.2 and Compose
-5.4.0 are installed, and all Compose configuration merges return exit 0. The
-operator subsequently started Docker Desktop, but the runtime flap follow-up
-shows repeated five-minute Desktop/VM/Engine restarts with orderly terminated-
-signal shutdowns, no OOM/fatal/dockerd-crash markers, and a strong correlation
-with `autoPauseTimeoutSeconds=300`. The current host may run only supervised,
-checkpointed, retryable Docker work until the session remains stable beyond the
-observed timeout. See:
+5.4.0 are installed, and all Compose configuration merges return exit 0.
 
-[`docker-desktop-runtime-flap.md`](/Users/androidteam/Developer/tdt-observability/docker-desktop-diagnostics/deploy/evidence/docker-desktop-runtime-flap.md)
+### 2026-08-23 flap follow-up
+
+The operator started Docker Desktop multiple times. Each session lasted
+approximately 4–5 minutes before an orderly terminated-signal shutdown. The
+latest bounded snapshot (2026-08-23T03:30+07:00) shows:
+
+- Docker daemon unavailable: socket absent, no Docker Desktop or backend
+  processes running.
+- Backend log: `engine linux/virtualization-framework shutdown requested
+  (cancel cause: terminated signal received)` followed by `starting graceful
+  shutdown` and `init POST /shutdown`.
+- Electron log: `AbortError: Request aborted` in `createWindowManager`
+  immediately preceding each backend shutdown.
+- No OOM, fatal, or dockerd-crash markers found.
+- The initiating component remains undetermined; neither daemon crash nor OOM
+  is supported by the evidence.
+
+Settings changes attempted during this session (autoPauseTimeoutSeconds,
+UseResourceSaver, AllowBetaFeatures, AllowExperimentalFeatures) were all
+restored to their original values. These raw-JSON edits are an unsupported
+approach — Docker Desktop may ignore or overwrite them — and the flap persisted
+identically across every combination tried, so they did not remediate the issue.
+No persistent Docker Desktop remediation was retained. The flap root cause
+remains unresolved.
+
+**Runtime acceptance (tasks 8–10) remains blocked until Docker Desktop
+maintains a stable session beyond the observed ~5-minute window.**
 
 ## Disposition
 
-Keep the active change open at `41/89`. The candidate observability commits are
+Keep the active change open at `48/89`. The candidate observability commits are
 ready for a controlled canonical integration once the dirty checkout owner
 authorizes conflict reconciliation. Do not archive or claim global success until
 Docker Desktop is available, the runtime gates are recaptured against the same
