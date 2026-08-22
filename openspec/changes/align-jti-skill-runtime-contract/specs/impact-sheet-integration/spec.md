@@ -20,11 +20,6 @@ The `TicketIntelligenceBundle` model MUST expose `impact: ImpactSnapshot | None 
 #### Scenario: Version bump occurs after the complete v2 surface
 - **WHEN** the taxonomy, summary fields, fixed confidence mapping, and 28-column writer are not all implemented and passing contract tests
 - **THEN** `BundleVersion.current()` MUST NOT be changed to `v2.0`
-#### Scenario: Bundle v1.2 carries an ImpactSnapshot with provenance
-- **WHEN** `analyze_snapshot()` is called with `enrich_impact=True` against a Jira filter containing at least one merged-MR-bearing ticket
-- **THEN** the returned `TicketIntelligenceBundle` MUST contain `meta.version == "v1.2"`
-- **AND** `bundle.impact` MUST NOT be `None`
-- **AND** each `ImpactRow` MUST include `at_risk_modules_provenance: dict[str, str]` keyed by module name
 #### Scenario: Bundle v1.0 / v1.1 deserializes unchanged
 - **WHEN** a serialized v1.0 or v1.1 bundle JSON is loaded via `TicketIntelligenceBundle.from_json()`
 - **THEN** `bundle.impact` MUST default to `None` for v1.0
