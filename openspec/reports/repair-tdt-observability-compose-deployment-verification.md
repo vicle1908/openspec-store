@@ -558,3 +558,12 @@ manifest records clean source `3a0d800d8be541edfad0057544a9cc475b597f8d`,
 This completes the exact owner-staging and host-redeploy evidence for task
 11.3. Tasks 11.1, 11.2, 11.4, 11.9, all profile-runtime tasks, and all
 migration/retirement tasks remain open. The verdict remains `partial / blocked`.
+
+Closing runtime snapshot: both Colima profiles (`tdt-observability` and
+`tdt-observability-qemu`) report `Stopped`. The selected Docker context changed
+concurrently to `orbstack`, whose configured socket
+`$HOME/.orbstack/run/docker.sock` is absent and `docker version` cannot reach an
+engine. This context/profile churn occurred after the bounded Colima evidence
+windows and is not attributed to the candidate source. No further runtime retry
+or cleanup is authorized until one owning lane selects and stabilizes a single
+engine identity.
