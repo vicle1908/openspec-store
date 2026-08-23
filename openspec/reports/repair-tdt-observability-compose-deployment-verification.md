@@ -17,7 +17,7 @@ schema: spec-driven
 planning artifacts: complete
 
 openspec instructions apply --change repair-tdt-observability-compose-deployment --json --store openspec-store
-50/90 tasks complete; 40 remain
+51/90 tasks complete; 39 remain
 
 openspec validate repair-tdt-observability-compose-deployment --strict --store openspec-store
 valid
@@ -386,7 +386,7 @@ network, image, or volume was removed or restarted by the coordinator.
 
 ## Disposition
 
-Keep the active change open at `50/90` (`40` remain). The candidate observability commits are
+Keep the active change open at `51/90` (`39` remain). The candidate observability commits are
 ready for a controlled canonical integration once the dirty checkout owner
 authorizes conflict reconciliation. Do not archive or claim global success until
 Docker Desktop is available, the runtime gates are recaptured against the same
@@ -474,7 +474,82 @@ records pre-commit `baa49981`; ai-review owner HEAD is
 separate legacy source tree at `033de308` and port `8090` has no listener (launchd
 exit `126`). No redeploy was authorized or performed.
 
-The active change therefore remains `50/90` with `40` open tasks and a
+The active change therefore remains `51/90` with `39` open tasks and a
 `partial / blocked` verdict. The static coordinator commit is not a runtime
 acceptance or archive-readiness claim. Preserve the unrelated active
 `repair-mcp-router-servers` state, untracked store worktrees, and Graphify dirt.
+
+## 2026-08-23 Colima and host-provenance continuation
+
+The selected Docker context changed from the unavailable Docker Desktop engine
+to the separate `colima-tdt-observability` profile. This is a distinct runtime
+identity: Docker `29.5.2`, `linux/arm64`, four CPUs, and 6 GiB configured memory.
+The pre-existing `tdt-obs-colima-base` project was classified as
+`existing / foreign stable runtime — preserve`; its four containers, network
+`tdt-obs-colima`, volume `tdt-obs-colima-base_lgtm-data`, and host state binds
+were never selected as run-owned or removed.
+
+Read-only base measurement retained 30 complete samples over 60.641 seconds:
+
+| Evidence | p95 | p99 |
+| --- | ---: | ---: |
+| Aggregate CPU | 0.317 cores | 0.849 cores |
+| Aggregate memory | 1583.8 MiB | 1588.0 MiB |
+
+Base p99 plus 20% is 1.018 cores and 1905.64 MiB, within the Colima capacity.
+The measurement is base-only; optional-profile and load evidence remain open.
+Reports:
+
+- `/tmp/tdt-obs-colima-base-runtime-audit-task_4ed7887ce066.md`
+- `/tmp/tdt-obs-colima-base-measurement-20260823.md`
+- `/tmp/tdt-obs-colima-base-runtime-acceptance-task_4ed7887ce066.md`
+- `/tmp/tdt-obs-colima-run-b3dffbd/runtime-acceptance-report.md`
+- `/tmp/tdt-obs-colima-base-runtime-retry-888fe24.md`
+
+Runtime exploration exposed and corrected two coordinator defects without
+claiming runtime acceptance:
+
+- integrated `b3dffbd5557ff52c4cf871ba5c746218cfb74e84` probes mandatory
+  webhook `http://host.docker.internal:8080/health`, treats ai-review
+  `:8090/health/full` as optional/degraded, rejects implicit port 80 and
+  credential-bearing URLs, and preserves the pinned Alpine DNS/HTTP probe;
+- integrated `888fe24efb348bab9b757d1948406776648a5979` derives profile ports
+  from explicit CLI values, then the selected env file, then loopback defaults;
+  it rejects public/malformed/duplicate ports and reuses the exact snapshot for
+  preflight, Compose, and evidence.
+
+The first collision-free run stopped before mutation on the now-fixed default
+port check. The next exact-`888fe24` run was interrupted when a concurrent
+process from the integrated deployment worktree ran
+`colima -p tdt-observability stop` / `systemctl stop docker.service`.
+At handoff the target profile/context was stopped, only the unrelated QEMU
+profile remained running, and no new run-owned project, network, volume,
+container, image, owner record, or manifest existed. Runtime tasks remain open.
+
+### Exact host-service post-commit provenance
+
+Ai-review deployment-contract and lock commits are canonical at
+`c35ee68e520d4eccf25cf712802d8b3dbc4fb649`. The deployment used a separately
+authorized clean external source, passed 231-package lock verification, wrote
+`/Users/androidteam/Developer/tdt/deployments/ai-review/state/deployment-manifest.json`,
+and now runs one listener on `127.0.0.1:8090`; `/health` returns `status=ok` and
+the manifest records source `c35ee68e520d4eccf25cf712802d8b3dbc4fb649`.
+
+Webhook-receiver deployment/source/lock/runtime-fix commits are canonical at
+`3a0d800d8be541edfad0057544a9cc475b597f8d`. The deploy contract explicitly
+authorizes only a clean exact Git source and the canonical external root
+`/Users/androidteam/.tdt/deployments/webhook-receiver`. Two retained source
+defects were repaired during the bounded rollout: optional missing Jira-guard
+imports now fail isolated, and the launcher uses
+`webhook_receiver.api.app:create_app --factory` while preserving host-native
+optional-feature health defaults. The final deployment passed 130-package lock
+verification, health after nine seconds, unique listener/provenance checks, and
+wrote the deployment manifest. It now runs one listener on `127.0.0.1:8080`;
+`/health` returns `healthy`, reports ai-review reachable with HTTP 200, and the
+manifest records clean source `3a0d800d8be541edfad0057544a9cc475b597f8d`,
+`source_authorization=canonical_external`, and
+`deployment_root_authorization=canonical_external`.
+
+This completes the exact owner-staging and host-redeploy evidence for task
+11.3. Tasks 11.1, 11.2, 11.4, 11.9, all profile-runtime tasks, and all
+migration/retirement tasks remain open. The verdict remains `partial / blocked`.
