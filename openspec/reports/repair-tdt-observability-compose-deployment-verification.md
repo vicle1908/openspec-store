@@ -1,13 +1,14 @@
 # repair-tdt-observability-compose-deployment verification
 
-Date: 2026-08-23 (updated)
-Verdict: **partial / blocked for runtime execution**
+Date: 2026-08-23 (current finalization pass)
+Verdict: **partial / not-ready for full release and archive**
 
 This report records the current OpenSpec apply state for
-`repair-tdt-observability-compose-deployment`. Structural validation and the
-static implementation slices are green, but the Docker daemon is unavailable,
-the observability candidate is isolated from the canonical dirty checkout, and
-several runtime/migration/rollback tasks remain intentionally unchecked.
+`repair-tdt-observability-compose-deployment`. Structural validation, static
+implementation slices, the current Docker Desktop base profile, and the
+MLflow-only profile are evidenced. Langfuse/full profiles, degraded-target
+acceptance, full resource measurements, rollback/cutover, data migration, and
+archive-readiness tasks remain intentionally unchecked.
 
 ## OpenSpec state
 
@@ -17,7 +18,7 @@ schema: spec-driven
 planning artifacts: complete
 
 openspec instructions apply --change repair-tdt-observability-compose-deployment --json --store openspec-store
-51/90 tasks complete; 39 remain
+58/90 tasks complete; 32 remain
 
 openspec validate repair-tdt-observability-compose-deployment --strict --store openspec-store
 valid
@@ -474,10 +475,69 @@ records pre-commit `baa49981`; ai-review owner HEAD is
 separate legacy source tree at `033de308` and port `8090` has no listener (launchd
 exit `126`). No redeploy was authorized or performed.
 
-The active change therefore remains `51/90` with `39` open tasks and a
+The active change therefore remains `50/90` with `40` open tasks and a
 `partial / blocked` verdict. The static coordinator commit is not a runtime
 acceptance or archive-readiness claim. Preserve the unrelated active
 `repair-mcp-router-servers` state, untracked store worktrees, and Graphify dirt.
+
+## 2026-08-23 alternative-runtime investigation and final disposition
+
+The Docker Desktop failure was not remediated locally. Docker Desktop 4.87.0
+on macOS 26.6.2 repeatedly terminated its backend within approximately 1–5
+minutes; earlier sessions captured the AppKit `NSEvent.m:2132` /
+`Unrecognized event type 0` exception. Docker Desktop was stopped with the
+official CLI after the final comparison and no Docker Desktop resource was
+removed.
+
+The following independent runtime paths were tested without deleting the
+existing Colima disks or Docker Desktop data:
+
+- **Colima 0.10.3 / Lima 2.2.0, VZ:** the guest VM and `dockerd` stayed alive,
+  but the host Docker Unix-socket and guest-agent forwarding disappeared
+  during the 15-minute gate. A socket-only repair restored `_ping` temporarily;
+  the subsequent deterministic T+5/T+10/T+15 soak failed at T+15.
+- **Colima 0.10.3 / Lima 2.2.0, QEMU:** an independent QEMU profile started,
+  built the base stack, and initially passed the engine/socket/gateway gates.
+  Its deterministic soak failed at T+5. The QEMU hostagent log records
+  `guest agent events closed unexpectedly`, repeated failure to re-establish
+  `ga.sock`, and `exit status 255` while the QEMU VM and guest `dockerd`
+  remained alive.
+- **OrbStack 2.2.3:** the Docker context and base stack started successfully.
+  One explicit-context T+5/T+10/T+15 run passed with four containers, zero
+  restarts, and the external gateway probe passing. Host Grafana forwarding was
+  initially absent while `setup.use_admin=false`. After restoring the official
+  default `setup.use_admin=true`, Grafana returned HTTP 200, but the latest
+  explicit-context soak failed at T+5 with the OrbStack service stopped. This
+  latest result supersedes the earlier passing run; OrbStack is not accepted as
+  a stable runtime.
+
+Upstream evidence matches the Colima/Lima failure class:
+
+- Lima issue #2227: <https://github.com/lima-vm/lima/issues/2227>
+- Colima issue #994: <https://github.com/abiosoft/colima/issues/994>
+- Docker Desktop issue #441: <https://github.com/docker/desktop-feedback/issues/441>
+
+Final host state after the bounded investigation:
+
+```text
+Docker Desktop: stopped; desktop-linux socket unavailable
+Colima VZ: stopped
+Colima QEMU: stopped
+OrbStack: stopped after latest failed T+5 gate
+Docker context: orbstack
+OrbStack config: memory_mib=4096, k8s.enable=false, setup.use_admin=true,
+                 app.start_at_login=false
+Docker Desktop settings-store.json: AutoStart=false
+Docker Desktop settings.json: absent at final snapshot
+```
+
+The corrected base Compose stack and external gateway readiness contract were
+proven under the alternative runtimes in bounded windows, but no runtime path
+passed the final currentness gate. Runtime acceptance, rollback, hosted-workload,
+full-profile, and archive tasks remain unchecked. No task checkbox, active-change
+ledger, credential, stateful volume, unrelated report, or unrelated worktree was
+modified by this investigation. Temporary runtime environment files and soak
+scripts were removed.
 
 ## 2026-08-23 Colima and host-provenance continuation
 
@@ -567,3 +627,226 @@ engine. This context/profile churn occurred after the bounded Colima evidence
 windows and is not attributed to the candidate source. No further runtime retry
 or cleanup is authorized until one owning lane selects and stabilizes a single
 engine identity.
+
+## 2026-08-23 final runtime lane reconciliation
+
+A later, context-pinned OrbStack lane was run after the concurrent Colima
+closure. OrbStack 2.2.3 was configured with `memory_mib=4096`,
+`k8s.enable=false`, and `setup.use_admin=true`; Docker Desktop was explicitly
+stopped before the final comparison and its `settings-store.json` reported
+`AutoStart=false` (the secondary `settings.json` file was absent).
+
+The explicit OrbStack soak from `16:07:45` through `16:22:47` passed T+5, T+10,
+and T+15 with Docker 29.4.0, four base containers, zero restart counts, the
+external Alpine gateway probe passing, and `orbctl=Running`. A later run after
+restoring host-port administration failed at T+5: `orbctl` reported `Stopped`
+and the explicit OrbStack Docker socket disappeared, even after Docker Desktop
+had been stopped. The later result supersedes the earlier pass for currentness.
+
+The final state is therefore **runtime blocked**: Docker Desktop, Colima VZ,
+Colima QEMU, and OrbStack were all stopped after their bounded experiments.
+The base Compose model and gateway readiness contract have valid bounded
+runtime evidence, but no currently stable engine passed the latest gate. No
+runtime, rollback, hosted workload, optional profile, migration, or archive task
+was checked by this lane. Temporary OrbStack/Colima environment files and
+monitor scripts were removed; no credentials, volumes, images, networks,
+source worktrees, or unrelated OpenSpec artifacts were deleted.
+
+## 2026-08-23 local Linux-over-SSH runtime resolution
+
+The user selected localhost as the remote-engine target. The selected runtime is
+a local Linux guest, not the macOS Docker socket: a fresh Colima QEMU profile
+`tdt-observability-qemu-9p` with `mount_type=9p`, 4 CPUs, 6 GiB memory, and a
+100 GiB disk. Docker is reached through the persistent context
+`local-qemu-9p-ssh` (`ssh://colima-tdt-observability-qemu-9p`), bypassing Lima's
+unstable host Unix-socket and guest-agent forwarding path.
+
+The first SSH-context trial exposed a separate file-sharing defect: the old
+reverse-SSHFS profile lost `/Users/androidteam`, and the containers then saw an
+empty root-owned bind source. The fresh 9p profile mapped the macOS home with
+UID 502, while the application runs as UID 1000. Runtime state was therefore
+moved to guest-native `/var/lib/tdt/{state,logs,deployments}` owned by UID 1000
+through the temporary deployment env only; no host ownership or source Compose
+file was changed. The log collector and health poller then started healthy with
+zero restarts.
+
+The final explicit SSH-context soak ran from `17:17:40` to `17:32:42` and
+passed all three checkpoints:
+
+- T+5 `17:22:40`: Docker 29.5.2 / Ubuntu 24.04.4 LTS, four containers healthy,
+  all restart counts `0`, gateway probe `PASS`, Grafana `200`;
+- T+10 `17:27:40`: the same healthy state, all restart counts `0`, gateway
+  probe `PASS`, Grafana `200`;
+- T+15 `17:32:40`: the same healthy state, all restart counts `0`, gateway
+  probe `PASS`, Grafana `200`;
+- soak process exited `0` with `result=PASS` at `17:32:42`.
+
+Because the SSH TCP session can be closed by Lima independently of the Docker
+SSH context, host ports 3000 and 9009 are maintained by a reconnect watchdog.
+The durable files are:
+
+- `~/Library/LaunchAgents/com.tdt-observability.qemu9p.plist` — starts the
+  QEMU-9p profile at login with an explicit Homebrew PATH;
+- `~/Library/LaunchAgents/com.tdt-observability.qemu9p-ports.plist` — keeps the
+  reconnecting port-forward watchdog alive;
+- `~/Library/Application Support/tdt-observability/qemu9p-port-forward-watchdog.sh`
+  — direct SSH forwards for Grafana and OTLP.
+
+Both plists passed `plutil -lint`; `launchctl list` reports the Colima start
+job with exit `0` and the ports watchdog loaded with a live PID. The selected
+Docker context is `local-qemu-9p-ssh`, Docker Desktop is stopped, the old VZ,
+old QEMU, and OrbStack profiles are stopped, and the QEMU-9p stack is running.
+This supersedes the earlier runtime-blocked disposition for the selected base
+profile, but optional profiles, rollback, hosted-workload, migration, and
+archive gates remain open and unchecked.
+
+## 2026-08-23 owner-service acceptance continuation
+
+The QEMU-9p SSH Docker context was extended with the committed canonical owner
+Compose trees without modifying their source files:
+
+- agent-core source HEAD `d390ae0e281a139906b8c56af5eb8d4c4ea3a0c6`;
+- tdt-scheduler source HEAD `cb1746e0e6f3a54ab057e96a7db76b389912f746`;
+- tdt-observability source HEAD `88146f31a59679844baff8dfb51fc9ea0a3b8c5d`.
+
+Both owner models rendered cleanly with run-scoped runtime network
+`tdt-runtime-qemu9p` and observability network `tdt-obs-qemu9p`. Agent-core's
+image built successfully with Python 3.14.7/uv 0.12.5 and the explicit tdt-core
+context. Scheduler's image built successfully and its build-time dependency
+integrity gate verified seven workloads.
+
+Agent-core owner acceptance evidence:
+
+- `postgres:18.6-trixie` reported PostgreSQL `18.6 (Debian 18.6-1.pgdg13+2)`;
+- `agent_core`, `agent_harness`, `tdt_scheduler`, and
+  `tdt_scheduler_dbos_sys` were present;
+- the app container ran as UID/GID `1000:1000`, imported `agent_core`, and
+  emitted `AGENT_CORE_IMPORT_OK`;
+- PostgreSQL and app restart counts were both `0`.
+
+Scheduler owner acceptance evidence:
+
+- PostgreSQL readiness passed on the stable `postgres` runtime-network alias;
+- DBOS application/system migrations completed, DBOS launched, three schedule
+  manifests loaded, and 19 schedules were applied;
+- `/scheduler/health` returned HTTP `200`, the container became healthy, and its
+  restart count was `0`;
+- the runtime used a temporary `UV_NO_SYNC=1` Compose override so the verified
+  image venv was not replaced by an automatic sync against host-mounted source;
+  this was a runtime-only override and no committed entrypoint was changed.
+
+The scheduler `postgres-backup` initializer exited `0` and wrote a custom dump,
+TOC, and SHA-256 file under guest-native `/var/lib/tdt/backups`. A separate
+`pg_restore --list` probe exited `0` and reported PostgreSQL dump version 18.6,
+custom format, and nine TOC entries. This proves the backup/readability portion
+of task 8.7; its hosted workload and full dependency-matrix portions remain
+open.
+
+Health/readiness evidence:
+
+- health-poller persisted `config_loaded=true`, a fresh cycle timestamp, and
+  `target_statuses` of `webhook-receiver=healthy`, `ai-review=healthy`, and
+  `tdt-scheduler=healthy`; its container health and restart count were healthy/0;
+- the live config retained `host.docker.internal` for host-native webhook and
+  ai-review plus Docker DNS `scheduler:9100`;
+- log-collector readiness reported `watched_files=2` and no flush error;
+- task 8.6 is checked with sentinel
+  `qemu9p-log-test-ff44ae2f4c7e4d6cbc0af3e05a4fdcb6`, one normalized DuckDB event,
+  and count `[(1,)]` after a second collector restart.
+
+Remaining runtime gates include trace/metric/log delivery into LGTM (8.4), the
+full mixed-health/degraded-outcome matrix (8.5), the hosted workload and full
+scheduler handoff in 8.7, owned diagnostics/teardown (8.8), all optional
+Langfuse/MLflow/full profiles, cutover/migration, and final archive readiness.
+
+### Final consolidated live snapshot
+
+At the closure read, Docker context `local-qemu-9p-ssh` reported Docker 29.5.2
+on Ubuntu 24.04.4 LTS with eight containers. The four observability services,
+agent-core PostgreSQL/app, and scheduler were healthy/running with restart count
+`0`; the scheduler backup container was `Exited (0)`. The external gateway
+probe exited `0`, Grafana returned HTTP `200`, scheduler health returned HTTP
+`200`, both QEMU-9p LaunchAgents were loaded (`qemu9p` exit `0`, ports watchdog
+PID live), and the report/task diff passed `git diff --check`. Docker Desktop
+remained stopped. No optional profile or archive claim is implied by this
+snapshot.
+
+## 2026-08-23 Docker Desktop for Mac finalization pass
+
+This section is the current disposition and supersedes earlier runtime-lane
+sections where their engine identity, task count, or verdict differs. The
+authoritative current runtime was Docker Desktop for Mac, context
+`desktop-linux`, Docker Server `29.7.2`, arm64, 8 CPUs, 5920 MiB reported, and
+`overlay2`. Docker Desktop was available throughout the accepted base and
+MLflow runs.
+
+### Owner fixes and commits
+
+- `tdt-scheduler` commit
+  `c0ef24bfde96eb909878d43c555b0270c24ad397` adds the default
+  `UV_NO_SYNC=1` runtime contract so host-mounted source cannot replace the
+  locked image venv; explicit `UV_NO_SYNC=0` remains available for intentional
+  development syncs.
+- `tdt-observability` integrated candidate commit
+  `47f2dedfdb2b19625fe6e34b792189af72a29e8e` extends the owner-health wait to a
+  bounded 120-second window, allows `verify` to reuse ports only when the
+  matching run-owned Compose project is live, and adds the MLflow derived image
+  layer from exact `ghcr.io/mlflow/mlflow:v3.15.1` with pinned
+  `psycopg2-binary==2.9.10`.
+- Graphify output was refreshed in both repositories and remains unstaged.
+  Scheduler Graphify rebuilt 830 nodes/931 edges; observability rebuilt 1764
+  nodes/3047 edges and reported three zero-node JSON fixtures for future retry.
+- Repository-scoped GitNexus staged detection was unavailable because the MCP
+  service was disconnected. Direct staged name/status inventories, focused
+  tests, diff checks, and final dirty-state inspections were used as fallback;
+  no GitNexus pass is claimed.
+
+### Current accepted runtime evidence
+
+- Base run `tdt-obs-mac-20260823t142246zr4` passed coordinator `up`, coordinator
+  `verify`, gateway readiness, Grafana HTTP 200, fresh PostgreSQL 18.6 and all
+  four logical database probes, agent-core import, scheduler DBOS health, 19
+  applied schedules, readable PostgreSQL backup/checksum, current health-poller
+  readiness, and log-collector restart-safe single-event ingestion.
+- The same base run sent one unique trace, metric, and log through
+  `otel-gateway:4317`. Tempo returned trace
+  `6de95dfcf55ce8ac3511295a72979ebf`; Grafana Prometheus returned one
+  `codex_base_unique_metric_total`; Grafana Loki returned one
+  `codex-base-unique-log`. Value-free details are retained in
+  `/tmp/tdt-obs-mac-20260823t142246zr4/base-acceptance-evidence.md`.
+- Base teardown passed through the coordinator. All run containers and networks
+  were removed, diagnostics were captured first, and both stateful volumes
+  remained preserved.
+- MLflow-only run `tdt-obs-mac-20260823t142246zmlflow3` passed with no
+  Langfuse/MinIO/S3 services. MLflow 3.15.1 used the derived first-party image,
+  SQL-backed trace ingestion returned trace
+  `tr-9e1c404dd4945ad440b1761162c33550`, and artifact upload/list/download
+  preserved SHA-256
+  `d8589d65547a9e2ed1f03fd7b9b1e5683b8d56b3677c56aad229bfb1ab7a3241`.
+  Evidence is retained in
+  `/tmp/tdt-obs-mac-20260823t142246zmlflow3/mlflow-acceptance-evidence.md`.
+- MLflow teardown also passed with run-owned containers/networks removed and
+  stateful volumes preserved.
+
+### Verification summary
+
+- Scheduler focused unittest suite: 10 passed.
+- Observability focused deployment suite after fixes: 119 passed.
+- Observability compose-model suite after MLflow changes: 108 passed.
+- Combined current static deployment/Compose/Collector suite: 332 passed.
+- Deployment Ruff and changed-file diff checks: passed.
+- The normal full `uv sync`/full-suite path remains environment-limited because
+  this nested candidate's editable `../tdt-core` resolves to a nonexistent
+  `/Users/androidteam/Developer/tdt-observability/tdt-core`; the Docker build
+  uses the explicit absolute `tdt-core` context successfully. No full-suite
+  pass is claimed from the system-Python fallback.
+
+### Remaining 32 open tasks
+
+The remaining work is concentrated in scheduler hosted-workload completion,
+health-poller degraded-target coverage, all-profile p95/p99 measurements,
+Langfuse credentials/project initialization, base/optional failure-isolation
+matrices, amd64 first-party image evidence, compatibility rollback/cutover,
+PostgreSQL migration/retirement governance, full deterministic acceptance, and
+archive handoff. The change remains `partial` and `not-ready`; do not archive
+until those independent gates agree and task 11.9 is complete.
