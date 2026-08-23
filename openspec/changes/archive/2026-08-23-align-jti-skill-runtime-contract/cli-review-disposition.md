@@ -1,5 +1,7 @@
 # CLI Review Disposition — align-jti-skill-runtime-contract
 
+> **Superseded (2026-08-23):** This disposition records the pre-scope-reconciliation review state (6/35 tasks). Current planning status is governed by proposal.md, design.md, specs/, and tasks.md. The change has since been narrowed: skill-index/tdt-meta scope removed, evidence re-verified.
+
 Captured: 2026-08-10 12:59 +0700
 
 ## Evidence
