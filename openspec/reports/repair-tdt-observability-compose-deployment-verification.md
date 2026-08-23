@@ -1,7 +1,34 @@
 # repair-tdt-observability-compose-deployment verification
 
-Date: 2026-08-23 (current finalization pass)
+Date: 2026-08-24 (current finalization pass)
 Verdict: **partial / not-ready for full release and archive**
+
+## Current finalization update (2026-08-24)
+
+The earlier report sections below are historical snapshots. The current apply
+state is 71/90 tasks complete and 19 remain. Docker Desktop is currently stable
+enough for fresh base, Langfuse, MLflow, and full profile acceptance. The
+accepted observability owner is now commit `2fd60e9`; agent-core is
+`3a2fe3b256fc920dc904eaea74d308f51af75aec`; scheduler is
+`c0ef24bfde96eb909878d43c555b0270c24ad397`; the other read-only inputs retain
+their exact SHAs in the run reports.
+
+Fresh Docker Desktop evidence:
+
+- Langfuse run: `/tmp/tdt-obs-mac-20260823t170031z-langfuse-3553r1`, final
+  manifest success, six stateful volumes preserved.
+- Full run: `/tmp/tdt-obs-mac-20260823t180410z-full-f14d`, final manifest
+  success, eight stateful volumes preserved.
+- Base resource run: `/tmp/tdt-obs-mac-20260823t184114z-base-af16`.
+- MLflow resource run: `/tmp/tdt-obs-mac-20260823t184114z-mlflow-fbe1`.
+- Full report: `/tmp/tdt-obs-mac-20260823t180410z-full-f14d/full-acceptance-evidence.md`.
+
+Completed in this finalization pass: 5.6, 6.4, 6.8, 7.2, 7.3, 8.5, 9.1,
+9.2, 9.3, 9.4, 9.6, 9.7, 9.9, and refreshed 11.3. The remaining release
+blockers are scheduler/owner independent acceptance tasks, first-party amd64
+build evidence, final exact-commit four-profile acceptance after the last
+reservation commit, PostgreSQL disposition/cutover, the full focused test
+matrix, and archive readiness. No archive was started.
 
 This report records the current OpenSpec apply state for
 `repair-tdt-observability-compose-deployment`. Structural validation, static
@@ -18,7 +45,7 @@ schema: spec-driven
 planning artifacts: complete
 
 openspec instructions apply --change repair-tdt-observability-compose-deployment --json --store openspec-store
-58/90 tasks complete; 32 remain
+71/90 tasks complete; 19 remain
 
 openspec validate repair-tdt-observability-compose-deployment --strict --store openspec-store
 valid
@@ -191,13 +218,13 @@ than the Debian `redis:latest` alias.
 | MinIO Client | `minio/mc:RELEASE.2025-08-13T08-35-41Z` | `sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727` |
 | MLflow | `ghcr.io/mlflow/mlflow:v3.15.1` | `sha256:ea84a0b879f08b35a6f22f22b294024413e780b8fc978eecf5f760ac16cc9ce5` |
 
-## Blockers and open worker evidence
+## Historical blockers and open worker evidence
 
-Docker Compose is `v5.4.0`, but the Docker daemon is unavailable at
-`unix:///Users/androidteam/.docker/run/docker.sock`. Image builds, database
-bootstrap/migrations, health probes, Langfuse/MLflow ingestion, ClickHouse
-queries, duplicate bounds, hosted workload, backup/restore, rollback liveness,
-and cleanup runtime evidence remain blocked.
+The earlier Docker-socket blocker is historical. The current `desktop-linux`
+Docker Desktop session supported the fresh profile evidence recorded in the
+current-finalization section. Independent image-build/amd64 compatibility,
+scheduler workload, migration/cutover, and final exact-commit sequence gates
+remain open.
 
 Agy’s preflight report is now present at
 `openspec/reports/repair-tdt-observability-compose-deployment-preflight.md` and
