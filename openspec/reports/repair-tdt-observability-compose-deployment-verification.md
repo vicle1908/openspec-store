@@ -98,8 +98,12 @@ Accepted candidate commits:
   service smoke.
 - `3cc856e` observability entrypoint supervision evidence: same image digest for
   both services and non-zero child-failure propagation.
-- `b5975a1` agent-core runtime report: fresh/retained PostgreSQL, app imports,
-  non-root health, and owner-only teardown.
+- `581e458f41b0b65462f78e83c25c455593809495` agent-core runtime report, sourced
+  from `d390ae0e281a139906b8c56af5eb8d4c4ea3a0c6`: fresh/retained PostgreSQL,
+  app imports, non-root health, four logical-database probes, and owner-only
+  teardown were verified in that isolated historical runtime window. Current
+  cross-project gateway delivery and fresh exact-matrix rerun remain blocked by
+  Docker Desktop state.
 - `dbc9938` scheduler external-worktree build/layout repair and runtime report.
 - `56cc275` (2026-08-23) removed the broken `wget` healthcheck from the
   distroless `otel-gateway` service in both `docker-compose.yaml` (base,
