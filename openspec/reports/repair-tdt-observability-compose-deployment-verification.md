@@ -296,6 +296,88 @@ The current authoritative Docker settings store still reports
 `docker info` cannot connect. This is a current runtime blocker, not proof that
 the Compose models or image inventory are invalid.
 
+## 2026-08-23 static-readiness and Docker-diagnosis follow-up
+
+The integrated candidate static readiness work is preserved on branch
+`observability-static-readiness` through commits
+`bef9a34f97129be252e1b8d3833fefb3ebf798ca`,
+`c48a62f104b685d2bfb0f488d0bc47761c1bcbb5`, and
+`f42b4c5d1872e792533acbe483a338f84b51ff2b`. The latest static slice adds
+atomic poller/config-cycle readiness, idle-safe collector scan/flush heartbeats,
+offset/inode rotation handling, explicit executable `/entrypoint.sh
+--readiness` healthchecks, the supported `LANGFUSE_INIT_*` bootstrap/preflight
+contract, Redis 8.10.1 documentation, and focused regressions. The worker
+reported 224 focused tests, four daemon-free Compose renders, Ruff, and clean
+diff checks; Docker image/runtime, authenticated Langfuse trace, and lock/mypy
+environment gaps remain open. Generated Graphify output is intentionally
+unstaged.
+
+The scheduler static hardening was integrated into canonical `tdt-scheduler` as
+`cb1746e0e6f3a54ab057e96a7db76b389912f746` from the integration-clean source
+commit `d52375519e8bb1579aded35ec23f1392e39445d6`. It hardens bounded,
+redacted PostgreSQL readiness before DBOS initialization and preserves the
+Pydantic pin repair; static tests, nine lock checks, Compose renders, syntax,
+and diff checks passed. Docker image build stopped during dependency download
+with BuildKit `Unavailable/EOF`; live scheduler health/workload/backup remain
+blocked.
+
+The ai-review source health correction is canonical at
+`706a46e21cbcf0b8ddf9caadd3ba9518532b00e5`; focused health tests and Ruff pass.
+Disabled optional reviewers now report `not needed` and healthy, while enabled
+but failing providers remain degraded through shared CLI/HTTP classification.
+The launchd service still runs the old deployment source `033de308` because the
+documented deploy script defaults to the separate `$HOME/Developer/tdt/ai-review`
+checkout; exact post-commit redeploy remains blocked by that workspace-root
+containment/provenance mismatch.
+
+Docker Desktop recovered twice after transient Virtualization.framework storage
+attachment failures and supplied the official diagnostic bundle
+`/var/folders/zw/k5ybx0c55rs88r9d09kxly8w0000gp/T/6501AB09-CA89-4DF7-ADE9-9E13CCBC244B/20260823015935.zip`.
+The Docker.raw sparse disk was inspected as structurally intact; no prune,
+reset, volume deletion, or resource cleanup was performed. A live inventory
+captured four existing integrated observability containers, 23 images, 8 CPUs,
+and 16 GiB configured memory. Those containers auto-restarted from the stale
+integrated Compose file and still carry the invalid `wget` gateway healthcheck
+(`tdt-observability-otel-gateway-1`), so they are evidence of a previously
+started stack, not acceptance of the corrected readiness contract. Do not
+restart or remove them until the corrected candidate project identity,
+healthcheck, and exact resource ownership are reviewed.
+
+Official Docker documentation confirms `docker desktop diagnose` is the
+supported CLI diagnostic path and warns that Docker.raw backup does not replace
+separate named-volume backups; the documented macOS Docker.raw path is
+`$HOME/Library/Containers/com.docker.docker/Data/vms/0/data/Docker.raw`.
+
+The latest static/readiness commits are now reconciled as follows:
+
+- tdt-observability integrated candidate: `120d769c32b79b4f2e66835a068b897da1c56d69`
+  plus readiness-command/flush-error follow-up `8a9e73fe1095b517096a0e559ac97567586f6210`
+  and evidence clarification `f42b4c5d1872e792533acbe483a338f84b51ff2b`. Static
+  tests, Ruff, four renders, and diff checks pass; the integrated project-name
+  correction and authoritative image-fallback/owner-startup wiring remain in
+  the dependent coordinator task.
+- tdt-scheduler canonical commit: `cb1746e0e6f3a54ab057e96a7db76b389912f746`,
+  reproduced from allowlisted integration commit `d52375519e8bb1579aded35ec23f1392e39445d6`.
+  This commit contains bounded redacted database readiness, DBOS ordering
+  tests, Pydantic pins, scheduler documentation, and no Graphify paths. The
+  Docker image build still failed with BuildKit `Unavailable/EOF` while Docker
+  Desktop flapped.
+- ai-review canonical commits: `bbceaa2`, `706a46e21cbcf0b8ddf9caadd3ba9518532b00e5`.
+  Focused health tests pass and optional-provider semantics are now honest, but
+  the launchd runtime still reflects old source `033de308`; exact post-commit
+  redeploy remains blocked because the deployment script defaults to the
+  separate `$HOME/Developer/tdt/ai-review` checkout.
+
+The current live Docker inventory, when the engine briefly recovered, contained
+four existing `tdt-observability` containers from the integrated candidate:
+`otel-gateway`, `otel-lgtm`, `health-poller`, and `log-collector`; 23 images,
+8 CPUs, and approximately 16 GiB configured memory. The gateway container was
+still using the stale `wget` healthcheck from the old running Compose model,
+while the corrected source contract now uses an explicit `/entrypoint.sh
+--readiness` command for first-party daemons and an external probe for the
+distroless gateway. This inventory is preserved evidence only; no container,
+network, image, or volume was removed or restarted by the coordinator.
+
 ## Disposition
 
 Keep the active change open at `49/90` (`41` remain). The candidate observability commits are
