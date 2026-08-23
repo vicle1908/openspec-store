@@ -92,6 +92,13 @@ The deployment SHALL use the exact release tags verified on 2026-08-22: `python:
 - **THEN** the deployment SHALL retain the newest pullable official exact image tag
 - **AND** the evidence SHALL record the newer unavailable source release and the selected image exception
 
+#### Scenario: Canonical root requires reconciliation to Redis 8.10.1
+
+- **GIVEN** the approved deployment baseline requires `redis:8.10.1-alpine`
+- **WHEN** unpromoted or dirty canonical checkouts retaining older Redis 8.10.0 images are evaluated
+- **THEN** they SHALL be classified as unpromoted implementation state
+- **AND** the deployment SHALL NOT be promoted or accepted until the canonical root is reconciled to `redis:8.10.1-alpine`
+
 ### Requirement: Redis 8 and ClickHouse 26 compatibility is proven with Langfuse
 
 Because Langfuse `4.16.0` publishes Redis 7 and ClickHouse 25.12 as its default Compose baseline, the selected Redis `8.10.1` and ClickHouse `26.7.5.10` images SHALL be treated as explicit compatibility deviations. Promotion MUST require fresh Langfuse migration, queue, ingestion, worker, and no-error evidence under those exact images.
@@ -201,8 +208,9 @@ The containerized health-poller SHALL reach launchd-owned webhook-receiver and a
 
 #### Scenario: Polling mixed host and container targets
 
-- **WHEN** webhook-receiver and ai-review run on the host and scheduler runs in Docker
+- **WHEN** webhook-receiver (`127.0.0.1:8080`) and ai-review (`127.0.0.1:8090`) run on the host and scheduler runs in Docker
 - **THEN** one health-poller cycle SHALL record all three configured outcomes using their supported address classes
+- **AND** missing optional ai-review providers SHALL be recorded as degraded target status without causing poller process failure
 
 #### Scenario: Host gateway is unavailable
 

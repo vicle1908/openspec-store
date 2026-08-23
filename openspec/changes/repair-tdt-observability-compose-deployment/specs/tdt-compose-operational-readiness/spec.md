@@ -24,6 +24,12 @@ Every acceptance run SHALL retain a machine-readable manifest containing the run
 - **WHEN** the scheduler image copies or mounts a sibling repository or mobile workspace whose absolute path, revision or content fingerprint, and dirt classification are absent from the manifest
 - **THEN** build and runtime readiness SHALL remain failed
 
+#### Scenario: Deployed host service and image provenance requires post-commit redeploy
+
+- **WHEN** host services or container images are evaluated for acceptance
+- **THEN** deployment reports and acceptance manifests SHALL capture post-commit source revisions
+- **AND** host services with pre-commit report identities SHALL be redeployed after the commit is finalized before acceptance is marked passed
+
 ### Requirement: Every supported model renders and every owner-local image builds
 
 Readiness SHALL render `base`, `langfuse`, `mlflow`, and `full` observability profiles plus the coordinated owner services. It SHALL build each first-party image through its owning repository and verify its runtime import and non-root identity before starting integration acceptance.

@@ -7,11 +7,12 @@ That topology currently has these design constraints:
 - `agent-core` already owns the shared runtime PostgreSQL service, its durable volume, and initializers for `agent_core`, `tdt_scheduler`, `tdt_scheduler_dbos_sys`, and `agent_harness`.
 - `tdt-scheduler` has an owner-maintained image and Compose definition with a workspace-root build context and host-coupled workload inputs.
 - `tdt-observability` owns health polling, log collection, dashboards, and the intended observability backend deployment, but its committed image context is not buildable and its current uncommitted repair mixes project-venv and system-Python installs.
-- Host-native webhook-receiver and ai-review remain launchd-owned; the containerized poller must cross the Docker host boundary to reach them.
+- Host-native webhook-receiver and ai-review remain launchd-owned (`com.tdt.webhook-receiver` running on `127.0.0.1:8080` from `$HOME/.tdt/deployments/webhook-receiver` and `com.tdt.ai-review` running on `127.0.0.1:8090` from `$HOME/Developer/tdt/deployments/ai-review`); the containerized poller must cross the Docker host boundary via supported host gateway mappings.
 - The canonical TDT filesystem layout is kind-first: `$TDT_HOME/<kind>/<app>/<name>`.
 - Docker Compose cannot provide `depends_on` health ordering across independent projects.
 - The repositories cannot be updated atomically by one PR, and unrelated dirty Graphify output plus current tdt-observability Docker edits must be preserved.
 - The exact image baseline was resolved from primary upstream releases and registry manifests on 2026-08-22. Every selected tag except the unavailable newer MinIO source release has a pullable official image with both `linux/amd64` and `linux/arm64` manifests.
+- Authoritative Docker Desktop settings confirm `UseResourceSaver=false`, `AutoPauseTimeoutSeconds=300`, and `AutoPauseTimedActivitySeconds=30`, but the Docker socket (`unix:///Users/androidteam/.docker/run/docker.sock`) remains absent due to observed ~4–5 minute session flap terminations; runtime acceptance remains blocked without invalidating static planning models.
 
 The following main-spec patterns are reused rather than reinvented: agent-core ownership of runtime PostgreSQL, scheduler ownership of its image and service, exact stateful image pins, versioned PostgreSQL volumes, one authoritative trace route, canonical TDT home resolution, non-root Python images, one-shot initializer completion gates, and run-scoped readiness evidence.
 
@@ -117,7 +118,7 @@ OTLP export is retrying and therefore at-least-once. The contract guarantees one
 
 **Alternative considered:** Keeping LGTM's built-in collector as the producer endpoint cannot cleanly add optional fan-out without modifying bundled configuration. Optional standalone collectors repeat the current disconnected-route defect.
 
-**Alternative considered:** Relying on Docker container health status is insufficient for the distroless Collector image, which has no `/bin/sh`, `wget`, or `curl`. An external disposable probe container querying the Collector's own `health_check` extension on `http://otel-gateway:13133/` is the only reliable readiness signal. The probe uses a pinned multi-architecture image (e.g. `alpine:3.20`), runs on the run-scoped observability network, retries with bounded attempts and explicit per-attempt timeout, and records structured redacted evidence in the acceptance manifest.
+**Alternative considered:** Relying on Docker container health status is insufficient for the distroless Collector image, which has no `/bin/sh`, `wget`, or `curl`. A completed normative external readiness probe (`9f4c54e`) runs a disposable pinned probe container (`alpine:3.20`, OCI index digest `sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc` with `linux/amd64` and `linux/arm64` manifests) on the run-scoped observability network to query the Collector's own `health_check` extension on `http://otel-gateway:13133/` with bounded retries and explicit per-attempt timeouts. The probe command, endpoint, retry count, and redacted structured result are recorded under `gateway_readiness` in the acceptance manifest without relying on Docker container health status.
 
 ### Decision 5: MLflow-only uses a local artifact volume
 
@@ -149,6 +150,8 @@ The selected inventory is:
 | MLflow | `ghcr.io/mlflow/mlflow:v3.15.1` | latest release |
 
 Every manifest was confirmed to expose both required architectures. Implementation evidence will additionally retain immutable digests rather than writing digests into planning artifacts that may be superseded before implementation.
+
+**Redis 8.10.1 candidate vs canonical root baseline:** The approved latest inventory in the integrated candidate worktree (`/Users/androidteam/Developer/tdt-observability/tdt-observability-integrated` at `56cc275`/`9f4c54e`) specifies `redis:8.10.1-alpine` (digest `sha256:becdda6c7f4b3fb42e42fd7f120bbf5c54c4caaaf16f26da24e4563d2c1f0576`). Any older canonical root state retaining `redis:8.10.0-alpine` (e.g. on branch `obs-compose-correction`) is preserved dirty/historical implementation state that cannot be promoted or accepted until reconciled to the approved `redis:8.10.1-alpine` target baseline.
 
 **Compatibility deviations:** Langfuse 4.16.0 ships Redis 7 and ClickHouse 25.12 in its upstream Compose baseline. The user's latest-image decision selects Redis 8.10.1 and ClickHouse 26.7.5.10. Langfuse 4.16 includes ClickHouse 26 compatibility logic, but both deviations remain promotion gates requiring exact runtime evidence. The profile keeps `LANGFUSE_BULLMQ_SKIP_REDIS_VERSION_CHECK=false` for the first Redis 8 run so acceptance tests the real BullMQ gate. Setting it to `true` is allowed only as a separately recorded compatibility exception after queue behavior passes and the manifest explains why the version gate alone is being bypassed.
 
@@ -184,7 +187,9 @@ The complete TDT root and `credentials` subtree are not mounted into those servi
 
 Health-poller configuration uses:
 
-- a supported host-gateway name for launchd-owned webhook-receiver and ai-review;
+- a supported host-gateway address (e.g. `http://host.docker.internal:8080` and `http://host.docker.internal:8090`) for launchd-owned services:
+  - `webhook-receiver`: `com.tdt.webhook-receiver` running from `$HOME/.tdt/deployments/webhook-receiver` on `127.0.0.1:8080`, returning HTTP 200 `/health`;
+  - `ai-review`: `com.tdt.ai-review` running from `$HOME/Developer/tdt/deployments/ai-review` on `127.0.0.1:8090`, returning `status=degraded` on `/health/full` when optional OmniRoute/Kimi providers are absent;
 - `scheduler:9100` on the observability network for the Docker scheduler.
 
 Poller health means the intended configuration loaded and a cycle completed within a bounded freshness window. Target outages remain observed data and do not masquerade as poller process death.
@@ -194,6 +199,8 @@ Log-collector health means its last scan/flush heartbeat is current. Acceptance 
 ### Decision 10: Resource limits are profile budgets, not incidental hints
 
 Every long-lived service and initializer receives reviewed CPU and memory limits and reservations. Before final budgets are accepted, implementation measures startup and steady-state CPU/memory for each profile, records p95/p99 values, sets reservations at no less than observed p95 plus 20%, and sets limits at no less than observed p99 plus 20% unless an owner documents a stricter safe ceiling. The coordinator computes the selected profile's aggregate reservation plus 20% host headroom and fails before startup when Docker resources are insufficient. Until this measurement artifact exists, runtime profile acceptance remains blocked rather than guessing arbitrary budgets.
+
+Authoritative Docker settings confirm `UseResourceSaver=false`, `AutoPauseTimeoutSeconds=300`, and `AutoPauseTimedActivitySeconds=30`. However, because the Docker daemon socket remains absent after repeated ~4–5 minute runtime session flaps, runtime acceptance gates (tasks 8–10) remain strictly blocked until a persistent Docker session is available.
 
 **Why:** Langfuse, ClickHouse, LGTM, and latest-image migration tests are memory intensive. Unchecked host exhaustion produces false compatibility failures and non-actionable restarts.
 
@@ -210,11 +217,11 @@ Implementation uses separate worktrees and commits per repository. The compatibi
 7. Promote the target files and remove duplicate tdt-observability runtime services and stale documentation only after exact-SHA acceptance and any authorized data handoff.
 8. Leave old data resources preserved until separately authorized retirement.
 
-**Transaction boundaries:** A producer endpoint switch is complete only when the producer restart, gateway receipt, direct-route disablement, and old-route rollback liveness are evidenced. A data cutover is complete only when writer quiescence, dump checksum, staged restore, consumer probes, cutover, and rollback rehearsal states are retained and the source remains intact. No cleanup is part of either transaction.
+**Transaction boundaries & redeploy-after-commit provenance:** A producer endpoint switch is complete only when the producer restart, gateway receipt, direct-route disablement, and old-route rollback liveness are evidenced. A data cutover is complete only when writer quiescence, dump checksum, staged restore, consumer probes, cutover, and rollback rehearsal states are retained and the source remains intact. For host-deployed services (e.g. `webhook-receiver` whose deployment report recorded pre-commit identity `baa49981` while source commit is `f3f904ded6d14108227cb198967e3b85963be685`) and container images, exact-commit provenance requires that services be redeployed after the source commit is finalized so that deployment reports and acceptance manifests reflect exact post-commit provenance. No cleanup is part of either transaction.
 
 ### Decision 12: One machine-readable readiness manifest gates archive
 
-The coordinator validates and writes `artifacts/tdt-compose/<run-id>/manifest.json` against `tdt-observability/deploy/evidence/tdt-compose-acceptance-v1.schema.json`. The manifest contains writable repository identities, every read-only scheduler build/mount input path and identity, initial dirt, exact Compose inputs, profile, networks, ports, state root, image tags/digests/platforms, first-party build provenance, resource measurements/budgets, builds, Collector validation, database migration phases, health/log/trace/artifact operations, duplicate-detection results, failure isolation, diagnostics, and cleanup.
+The coordinator validates and writes `artifacts/tdt-compose/<run-id>/manifest.json` against `tdt-observability/deploy/evidence/tdt-compose-acceptance-v1.schema.json`. The manifest contains writable repository identities, every read-only scheduler build/mount input path and identity, initial dirt, exact Compose inputs, profile, networks, ports, state root, image tags/digests/platforms, first-party build provenance, post-commit redeploy provenance, resource measurements/budgets, builds, Collector validation, external gateway readiness probe results, database migration phases, health/log/trace/artifact operations, duplicate-detection results, failure isolation, diagnostics, and cleanup.
 
 Focused checks remain useful but cannot replace the profile integration run. The report presents structural, build, runtime, data, and cleanup results independently and derives `success`, `partial`, or `blocked` without promoting a structural-only pass.
 
