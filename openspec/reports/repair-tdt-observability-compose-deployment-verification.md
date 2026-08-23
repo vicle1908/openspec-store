@@ -380,7 +380,7 @@ network, image, or volume was removed or restarted by the coordinator.
 
 ## Disposition
 
-Keep the active change open at `49/90` (`41` remain). The candidate observability commits are
+Keep the active change open at `50/90` (`40` remain). The candidate observability commits are
 ready for a controlled canonical integration once the dirty checkout owner
 authorizes conflict reconciliation. Do not archive or claim global success until
 Docker Desktop is available, the runtime gates are recaptured against the same
@@ -468,7 +468,7 @@ records pre-commit `baa49981`; ai-review owner HEAD is
 separate legacy source tree at `033de308` and port `8090` has no listener (launchd
 exit `126`). No redeploy was authorized or performed.
 
-The active change therefore remains `49/90` with `41` open tasks and a
+The active change therefore remains `50/90` with `40` open tasks and a
 `partial / blocked` verdict. The static coordinator commit is not a runtime
 acceptance or archive-readiness claim. Preserve the unrelated active
 `repair-mcp-router-servers` state, untracked store worktrees, and Graphify dirt.
