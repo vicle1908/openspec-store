@@ -386,3 +386,89 @@ authorizes conflict reconciliation. Do not archive or claim global success until
 Docker Desktop is available, the runtime gates are recaptured against the same
 commit matrix, the Agy preflight/matrix evidence is recovered, and task 11.8
 reviews and commits only the approved store paths.
+
+## 2026-08-23 post-restart static coordinator candidate
+
+The preserved coordinator worktree
+`/Users/androidteam/Developer/tdt-observability/observability-coordinator-readiness`
+produced and independently rechecked the following owner commits:
+
+- `bda825ba66ac3cc618cfc81f3234226ec41d5350` — fail-closed coordinator
+  evidence, required image/credential interpolation, real Git dirt and
+  read-only input file identities, scoped Compose commands, owner-project
+  rendering, and manifest roots/resources/images/networks.
+- `c5ef814a32970e8ceeabd651e77d39f22c89c651` — reject pre-existing runtime or
+  observability networks whose Docker labels do not match the current owner and
+  project.
+- `456592f226ae09156f55b5c0473c7aa2f5347fda` — cleanup of changed-test Ruff
+  diagnostics and import/style drift.
+
+These commits were cherry-picked into the isolated integration candidate
+`/Users/androidteam/Developer/tdt-observability/tdt-observability-integrated`,
+whose current HEAD is `a3188df7c038472ec2484d7a753c36b98474b964`. The candidate
+has exactly the expected source, Compose, and test commits plus preserved
+unstaged Graphify output; no Graphify path was staged by the coordinator.
+
+Fresh daemon-free verification against the integrated candidate:
+
+```text
+PYTHONPATH=src uv run --no-project pytest \
+  tests/deployment/test_coordinator_evidence_contract.py \
+  tests/test_compose_models.py -q
+203 passed in 6.97s
+
+PYTHONPATH=src uv run --no-project ruff check \
+  src/tdt_observability/deployment/__main__.py \
+  src/tdt_observability/deployment/evidence.py \
+  src/tdt_observability/deployment/stack.py \
+  tests/deployment/test_coordinator_evidence_contract.py \
+  tests/test_compose_models.py
+All checks passed
+
+python3 -m compileall -q src
+exit 0
+
+env TDT_OBSERVABILITY_NETWORK=tdt-observability-static-verify \
+  TDT_CORE_CONTEXT=/Users/androidteam/Developer/tdt-core \
+  TDT_HOST_HOME=/Users/androidteam/.tdt \
+  GRAFANA_ADMIN_USER=<redacted-test-user> \
+  GRAFANA_ADMIN_PASSWORD=<redacted-test-password> \
+  docker compose --env-file deploy/tools.env \
+  -f deploy/docker-compose.yaml config --quiet
+base_render_exit=0
+```
+
+After the report/task reconciliation, the selected change validated strictly,
+the full store validated at `375 passed, 0 failed`, and `openspec doctor` reported
+healthy root/store references. These are structural OpenSpec gates only and do
+not promote the active implementation to runtime readiness.
+
+The full profile render also passed in the worker’s explicit-scope verification;
+its output contained no secret values. This is structural/static evidence only.
+It does not satisfy p95/p99 resource measurement, Docker host-gateway HTTP
+reachability, owner-project startup, rerun/partial-start recovery, image pull or
+build, backend migration, authenticated Langfuse trace, duplicate-detection,
+rollback, cleanup, or post-commit host-service provenance.
+
+Current Docker recheck after the restart is `blocked`: `docker context show`
+returns `desktop-linux`, but `$HOME/.docker/run/docker.sock` is absent,
+`docker info`, `docker ps`, network/volume/image inventory calls fail with
+daemon `ENOENT`, `docker desktop status` reports that Docker Desktop is not
+running, no Docker backend process is present, and
+`launchctl print gui/502/com.docker.helper` reports `state = not running`.
+The prior stale `wget` gateway-healthcheck observation remains historical and
+cannot be recaptured while the daemon is down. No Docker resource, network,
+volume, image, launchd service, or credential was mutated.
+
+The post-restart host-service read-only review also remains blocked for exact
+post-commit provenance: webhook-receiver owner HEAD is
+`f3f904ded6d14108227cb198967e3b85963be685` but its retained deployment report
+records pre-commit `baa49981`; ai-review owner HEAD is
+`706a46e21cbcf0b8ddf9caadd3ba9518532b00e5` while launchd still resolves the
+separate legacy source tree at `033de308` and port `8090` has no listener (launchd
+exit `126`). No redeploy was authorized or performed.
+
+The active change therefore remains `49/90` with `41` open tasks and a
+`partial / blocked` verdict. The static coordinator commit is not a runtime
+acceptance or archive-readiness claim. Preserve the unrelated active
+`repair-mcp-router-servers` state, untracked store worktrees, and Graphify dirt.
