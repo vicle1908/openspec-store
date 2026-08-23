@@ -850,3 +850,50 @@ matrices, amd64 first-party image evidence, compatibility rollback/cutover,
 PostgreSQL migration/retirement governance, full deterministic acceptance, and
 archive handoff. The change remains `partial` and `not-ready`; do not archive
 until those independent gates agree and task 11.9 is complete.
+
+## 2026-08-23 Orca multi-agent continuation
+
+Orca Run `run_60923b1bb41f` coordinated the user-requested Goose, Kimi,
+Prime-agent, Pi, OMP, and Agy wave under the OpenSpec apply contract. The wave
+kept repository, runtime, and store ownership disjoint.
+
+- Goose completed the static Langfuse bootstrap/preflight owner work in commit
+  `80e3062140f37e4fa4082025978814cc09f99ad0` plus documentation refinement
+  `28cf71e680f5e80439db1380d7f41a66e4c51a4a`. The integration owner reviewed
+  and cherry-picked those as `e8ccea2` and final candidate
+  `9bd9c807bcab1849cc1bcddae29e332613707776`. The current focused suite passed
+  337 tests; Ruff and diff checks passed; Graphify output remains unstaged.
+- The Langfuse contract now selects one idempotent `LANGFUSE_INIT_*` mechanism,
+  rejects blank/placeholders/unresolved markers, requires exact seeded/gateway
+  key matching and distinct public/secret keys, and reports field names without
+  credential values. This closes additional static scope only; tasks 6.4 and
+  9.4 remain unchecked because authenticated runtime trace proof is absent.
+- OMP attempted fresh collision-resistant Langfuse and full coordinator runs on
+  Docker Desktop and retained redacted evidence at
+  `/tmp/tdt-obs-langfuse-full-runtime-20260823.md`. Both stopped before Docker
+  mutation because no real initialized Langfuse key material was available;
+  post-run filters found no run containers, networks, or volumes. No runtime
+  checkbox became eligible.
+- Pi retained read-only Docker/host evidence at
+  `/tmp/task_32a055516749/report.md`: the current engine was healthy but no
+  stack was running, so profile p95/p99 sampling was impossible. Fifteen host
+  samples also showed high non-Docker load; task 6.8 remains incomplete.
+- Prime-agent retained checkpoint/bootstrap provenance at
+  `/tmp/agent-harness-postgres-checkpoint-provenance-report.md`: exact HEAD
+  `35aedbd4cdcda281a3fd7ca5f639b60bf4e51c74`, 57/57 focused tests passed, and
+  one unrelated full-suite lifecycle test failed. No live database checkpoint
+  connection probe was available, so this is static provenance support only.
+- Agy retained the read-only reconciliation report at
+  `/tmp/agy-openspec-reconciliation.md` and confirmed 58/90 complete, 32 open,
+  and `PARTIAL / NOT READY FOR ARCHIVE`.
+- Kimi was assigned through both Orca agent-first and tracked prompt-mode paths,
+  but the provider exited immediately with `Bye!` before accepting task input.
+  Its replacement Dispatch was explicitly abandoned with no process or
+  filesystem action; no Kimi result is claimed.
+
+The multi-agent continuation therefore improves the exact owner candidate and
+static Langfuse contract but does not broaden runtime readiness. Real Langfuse
+credentials/project initialization, all-profile resource measurements,
+full-profile fan-out/failure isolation, hosted-workload completion, cutover,
+migration authorization, final exact-commit acceptance, and archive handoff
+remain open.
