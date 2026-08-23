@@ -517,6 +517,11 @@ claiming runtime acceptance:
   from explicit CLI values, then the selected env file, then loopback defaults;
   it rejects public/malformed/duplicate ports and reuses the exact snapshot for
   preflight, Compose, and evidence.
+- integrated `88146f31a59679844baff8dfb51fc9ea0a3b8c5d` makes the copied
+  Grafana credential example fail closed and updates the final stale
+  `TDT_CORE_CONTEXT` fallback assertion; the complete static suite reports
+  `466 passed`, Ruff/compile/lock gates pass, and all four daemon-free renders
+  remain green.
 
 The first collision-free run stopped before mutation on the now-fixed default
 port check. The next exact-`888fe24` run was interrupted when a concurrent
