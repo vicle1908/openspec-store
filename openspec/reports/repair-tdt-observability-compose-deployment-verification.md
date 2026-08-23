@@ -17,20 +17,22 @@ schema: spec-driven
 planning artifacts: complete
 
 openspec instructions apply --change repair-tdt-observability-compose-deployment --json --store openspec-store
-49/90 tasks complete; 41 remain
+50/90 tasks complete; 40 remain
 
 openspec validate repair-tdt-observability-compose-deployment --strict --store openspec-store
 valid
 
 openspec validate --all --strict --store openspec-store
-376 passed, 0 failed
+375 passed, 0 failed
 
 openspec doctor --store openspec-store
 root/store references healthy
 ```
 
 The active change directory and the two corrected PostgreSQL Purpose specs are
-uncommitted store work. The unrelated pre-existing report
+committed store artifacts. The current uncommitted store state is unrelated
+`repair-mcp-router-servers` work, untracked store worktrees, and preserved
+generated review material; the unrelated pre-existing report
 `openspec/reports/openspec-store-verification-2026-08-21.md` remains untouched.
 
 ## Accepted repository evidence
