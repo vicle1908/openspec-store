@@ -117,6 +117,8 @@ OTLP export is retrying and therefore at-least-once. The contract guarantees one
 
 **Alternative considered:** Keeping LGTM's built-in collector as the producer endpoint cannot cleanly add optional fan-out without modifying bundled configuration. Optional standalone collectors repeat the current disconnected-route defect.
 
+**Alternative considered:** Relying on Docker container health status is insufficient for the distroless Collector image, which has no `/bin/sh`, `wget`, or `curl`. An external disposable probe container querying the Collector's own `health_check` extension on `http://otel-gateway:13133/` is the only reliable readiness signal. The probe uses a pinned multi-architecture image (e.g. `alpine:3.20`), runs on the run-scoped observability network, retries with bounded attempts and explicit per-attempt timeout, and records structured redacted evidence in the acceptance manifest.
+
 ### Decision 5: MLflow-only uses a local artifact volume
 
 The MLflow profile uses its own PostgreSQL-18 volume and a versioned named `mlflow-artifacts-3-data` volume mounted at `/mlartifacts`. The server runs with `--artifacts-destination /mlartifacts --serve-artifacts`. It does not select MinIO or set an S3 endpoint.

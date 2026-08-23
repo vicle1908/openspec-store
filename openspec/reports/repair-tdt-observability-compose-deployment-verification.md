@@ -17,13 +17,13 @@ schema: spec-driven
 planning artifacts: complete
 
 openspec instructions apply --change repair-tdt-observability-compose-deployment --json --store openspec-store
-48/89 tasks complete; 41 remain
+49/90 tasks complete; 41 remain
 
 openspec validate repair-tdt-observability-compose-deployment --strict --store openspec-store
 valid
 
 openspec validate --all --strict --store openspec-store
-377 passed, 0 failed
+376 passed, 0 failed
 
 openspec doctor --store openspec-store
 root/store references healthy
@@ -115,6 +115,16 @@ Accepted candidate commits:
   compare: 35 files / 849 symbols / 29 processes / critical risk — expected
   branch-level impact for this broad candidate branch, not evidence that the
   two-file healthcheck fix itself is critical.
+- `9f4c54e` (2026-08-23) adds the external gateway readiness contract. The
+  coordinator runs a disposable pinned Alpine 3.20 probe on the run-scoped
+  observability network and queries `http://otel-gateway:13133/` with bounded
+  retries and explicit timeouts; readiness does not rely on Docker health
+  status. `gateway_readiness` is recorded in the acceptance manifest with a
+  closed JSON-schema contract and redacted structured evidence. The Alpine OCI
+  index digest is `sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc`,
+  with linux/amd64 and linux/arm64 manifests. Evidence: 79 deployment tests,
+  deployment Ruff, owned test lint, schema parse, and four daemon-free Compose
+  renders passed.
 
 Static evidence:
 
@@ -231,9 +241,64 @@ remains unresolved.
 **Runtime acceptance (tasks 8–10) remains blocked until Docker Desktop
 maintains a stable session beyond the observed ~5-minute window.**
 
+## 2026-08-23 coordinated worker wave
+
+The bounded follow-up worker wave produced these additional, independently
+verified results without changing OpenSpec task checkboxes:
+
+- `tdt-observability`: isolated source commit
+  `4a1d25ff3861455094ada0535224e0fb9b033eb8` is preserved on branch
+  `obs-compose-correction`. It removes the root Compose `name:` override and
+  adds 11 focused project-name/Collector-readiness tests; uv tests, Ruff,
+  mypy, daemon-free profile renders, Graphify update, and low-risk GitNexus
+  detection passed. The durable report is
+  `openspec/reports/tdt-observability-compose-correction.md`. This narrow
+  canonical-root slice intentionally retains its existing Redis
+  `8.10.0-alpine`; the integrated candidate's approved latest inventory remains
+  Redis `8.10.1-alpine` at `56cc275`, so latest-image promotion is still not
+  complete for the canonical root.
+- `tdt-scheduler`: source commit
+  `54203800f29ab594223ea6546b0d8b870194f348` is preserved on branch
+  `scheduler-pydantic-import`. Its Dockerfile now constrains
+  `pydantic>=2.13.4,<2.14` and `pydantic-settings>=2.14.1,<2.15` after the
+  `code_daily_scan.cli` serializer import failure; the seven-workload
+  integrity gate and owner layout remain intact. Docker build/runtime evidence
+  remains unavailable.
+- `webhook-receiver`: source commit
+  `f3f904ded6d14108227cb198967e3b85963be685` adds side-effect-free circuit
+  breaker and session health snapshots with two focused tests. The launchd
+  label `com.tdt.webhook-receiver` is running from the canonical
+  `$HOME/.tdt/deployments/webhook-receiver` root, listens only on
+  `127.0.0.1:8080`, and `/health` returned HTTP 200 healthy with ai-review
+  reachable. Evidence is retained at
+  `$HOME/.tdt/deployments/webhook-receiver/state/deployment-report.md`;
+  pre-existing uv.lock/Graphify dirt remains uncommitted. The deployment
+  report captured the pre-commit source identity `baa49981`; the current source
+  commit is `f3f904ded6d14108227cb198967e3b85963be685`, so an exact-commit
+  provenance acceptance run must redeploy this service after the source commit.
+- `ai-review`: the launchd label `com.tdt.ai-review` is running on
+  `127.0.0.1:8090` from the repository-documented
+  `$HOME/Developer/tdt/deployments/ai-review` root. `/health/full` returned
+  `status=degraded` because optional OmniRoute/Kimi providers are unavailable;
+  the deployment manifest is retained at
+  `$HOME/Developer/tdt/deployments/ai-review/state/deployment-manifest.json`.
+  The deploy script also generated a broad TDT dependency workspace and
+  unrelated lockfile dirt; those paths are preserved and are not treated as
+  change-owned commits.
+
+The temporary Orca worktrees were removed after preserving their source
+commits/reports. No Docker resources, stateful volumes, unrelated launchd
+labels, or unrelated OpenSpec reports were removed.
+
+The current authoritative Docker settings store still reports
+`UseResourceSaver=false`, `AutoPauseTimeoutSeconds=300`, and
+`AutoPauseTimedActivitySeconds=30`, but the Docker socket remains absent and
+`docker info` cannot connect. This is a current runtime blocker, not proof that
+the Compose models or image inventory are invalid.
+
 ## Disposition
 
-Keep the active change open at `48/89`. The candidate observability commits are
+Keep the active change open at `49/90` (`41` remain). The candidate observability commits are
 ready for a controlled canonical integration once the dirty checkout owner
 authorizes conflict reconciliation. Do not archive or claim global success until
 Docker Desktop is available, the runtime gates are recaptured against the same

@@ -55,6 +55,21 @@ The gate SHALL start the agent-core-owned PostgreSQL service on a fresh run-scop
 - **WHEN** any required database or connection probe is missing or failed
 - **THEN** dependent service readiness SHALL fail with the missing database and owning initializer identified
 
+### Requirement: Gateway readiness is proven by an external network-scoped probe
+
+The gate SHALL run a disposable pinned probe container attached to the run-scoped observability network and query the Collector `health_check` extension at `http://otel-gateway:13133/`. The probe SHALL use bounded retries with a finite per-attempt timeout. The probe SHALL fail closed on timeout, connection failure, non-success HTTP response, or malformed result. The probe SHALL NOT rely on Docker container health status. The probe container SHALL use the run-scoped observability network name as its explicit `--network` argument. The probe command and result SHALL be recorded in the acceptance manifest using redacted structured fields; credential values or credential-bearing environment values SHALL NOT appear in evidence.
+
+#### Scenario: Gateway readiness probe succeeds
+
+- **WHEN** the `otel-gateway` service has started and its Collector `health_check` extension is ready
+- **THEN** the probe container SHALL reach `http://otel-gateway:13133/` and the gate SHALL record `gateway_readiness.status=passed`
+
+#### Scenario: Gateway readiness probe fails
+
+- **WHEN** the `otel-gateway` service is not reachable at `http://otel-gateway:13133/` within the bounded retry window
+- **THEN** the gate SHALL record `gateway_readiness.status=failed` with the error class and SHALL fail readiness
+- **AND** the manifest SHALL retain the probe endpoint, network, attempt count, timeout, and redacted error summary
+
 ### Requirement: Stable gateway routing is proven for every profile
 
 The gate SHALL emit uniquely identified telemetry through `otel-gateway:4317` for every supported profile and SHALL prove one configured route per selected backend using trace identity, Collector receiver/export metrics, and a bounded duplicate-detection window. It SHALL fail if a duplicate backend record is observed without claiming that OTLP transport provides exactly-once delivery.
