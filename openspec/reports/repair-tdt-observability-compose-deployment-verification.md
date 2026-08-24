@@ -7,13 +7,15 @@ snapshots below. Historical sections remain retained for audit context and MUST
 NOT be read as the current deployment state.
 
 Current verdict: **success / implementation accepted / archived with retained
-warnings / final deployment intentionally running**.
+warnings / final deployment intentionally running**. Deployment-owned cleanup
+is complete within the verified allowlist; one merged integration worktree is
+retained because a foreign running scheduler still bind-mounts its source.
 
 ### Exact source and deployment identities
 
-- `tdt-observability` implementation:
-  `9a5f7c28b08609952468af67e35022b38f4549de` on committed branch
-  `tdt-observability-integrated`.
+- `tdt-observability` accepted implementation:
+  `9a5f7c28b08609952468af67e35022b38f4549de`, now an ancestor of canonical
+  `main` at `d891275d75c77db578e561ad3723f4cb98a768d9`.
 - `agent-core`: `468140192725e81246223c37f3b0a37573eaba3e`.
 - `tdt-scheduler`: `489100d5fcafec8c6b85e4b22093fb8bd75a2edc`.
 - `webhook-receiver`: `d999ebfcdcb251f9771a010f314dd136bdedf787`;
@@ -31,12 +33,59 @@ warnings / final deployment intentionally running**.
   `tdt-final-green-20260824t085909z-observability-agent-core`, and
   `tdt-final-green-20260824t085909z-observability-tdt-scheduler`.
 
-The canonical `tdt-observability/main` checkout remains at
-`a41cfbee1c44166f893cbffe726319b05ce9e647` with unrelated overlapping
-Dockerfile/Compose and generated-worktree dirt. It was deliberately not
-overwritten or fast-forwarded. The accepted implementation and running
-deployment therefore remain bound to the dedicated committed integration
-worktree above.
+Canonical `tdt-observability/main` was promoted by a fast-forward-only merge:
+the accepted runtime commit `9a5f7c28b08609952468af67e35022b38f4549de`
+is followed by deployment documentation commit
+`58ff94820cffc3ec320ac930130aeb196f94b7a6` and canonical re-home evidence
+commit `d891275d75c77db578e561ad3723f4cb98a768d9`. The three pre-merge local
+deployment edits were preserved in a named stash, reviewed as superseded, and
+the exact stash was dropped only after canonical promotion and re-home passed.
+Generated Graphify output and unrelated worktrees remain uncommitted and
+untouched.
+
+### Canonical re-home and cleanup evidence
+
+- The intentionally running `tdt-final-green-20260824t085909z` project family
+  retained the same three Compose project names, networks, state volumes, and
+  loopback ports. `otel-lgtm`, `otel-gateway`, `health-poller`, and `scheduler`
+  were recreated from canonical source without rebuilding dependencies or
+  deleting volumes.
+- Post-re-home checks passed for all three projects, all running-container
+  restart counts remained zero, and direct HTTP checks returned 200 for
+  Grafana, Langfuse, MLflow, scheduler, webhook-receiver, and ai-review. The
+  network-scoped `otel-gateway:13133` check also passed.
+- The scheduler now mounts canonical
+  `/Users/androidteam/Developer/tdt-observability/src`; all 16 `/workspace`
+  content mounts remain read-only. No container in the final-green family has
+  a bind mount into `tdt-observability-integrated`.
+- The cumulative accepted manifest remains immutable at the path and SHA-256
+  below. Run-owned operational pointers were updated to canonical
+  `/Users/androidteam/Developer/tdt-observability`; this did not rewrite the
+  accepted behavioral evidence captured at implementation commit `9a5f7c28...`.
+- Exact Git/Orca cleanup removed the clean merged worktrees
+  `observability-gap-review`, `omp-optional-supervised`, and
+  `verify-image-provenance-8-2-9-8`; Orca also removed their local branches.
+  `tdt-observability-backends` remains because its tip is not an ancestor of
+  canonical `main`. `goose-langfuse-supervised` and
+  `pi-resources-supervised` remain because they have live unfinished agent
+  terminals.
+- The merged `tdt-observability-integrated` worktree has no remaining Orca
+  terminal, but it is not removable yet: the foreign running
+  `tdt-obs-task11-4-20260824t00051787529904z-12023-full` scheduler still
+  bind-mounts its `src` directory. That foreign project was preserved and no
+  forced worktree or branch deletion was attempted.
+- Exactly 32 unreferenced volumes from failed run families
+  `tdt-final-release-20260824t065243z`,
+  `tdt-final-proof-20260824t073808z`,
+  `tdt-final-live-20260824t080819z`, and
+  `tdt-accepted-stable-20260824t083042z` were removed only after an exact-count
+  check, per-volume Compose project-label match, and zero-container-reference
+  check. Zero volumes with those prefixes remain. No prune command was used;
+  all final-green and foreign resources were preserved.
+- The post-cleanup full-store strict validation reported `376 passed, 1
+  failed`; the failure is the unrelated concurrent active change
+  `repair-hermes-cron-run-reliability`, which was preserved and not modified.
+  `openspec store doctor` reported no store issues.
 
 ### Cumulative acceptance manifest
 
