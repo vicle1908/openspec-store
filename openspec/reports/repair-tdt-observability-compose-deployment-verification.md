@@ -8,8 +8,9 @@ NOT be read as the current deployment state.
 
 Current verdict: **success / implementation accepted / archived with retained
 warnings / final deployment intentionally running**. Deployment-owned cleanup
-is complete within the verified allowlist; one merged integration worktree is
-retained because a foreign running scheduler still bind-mounts its source.
+is complete within the verified allowlist. No running container references the
+merged integration worktree; its separate Git/Orca removal is now eligible but
+was not part of the Docker-only single-set cleanup.
 
 ### Exact source and deployment identities
 
@@ -69,11 +70,10 @@ untouched.
   canonical `main`. `goose-langfuse-supervised` and
   `pi-resources-supervised` remain because they have live unfinished agent
   terminals.
-- The merged `tdt-observability-integrated` worktree has no remaining Orca
-  terminal, but it is not removable yet: the foreign running
-  `tdt-obs-task11-4-20260824t00051787529904z-12023-full` scheduler still
-  bind-mounts its `src` directory. That foreign project was preserved and no
-  forced worktree or branch deletion was attempted.
+- At this initial checkpoint, the merged `tdt-observability-integrated`
+  worktree remained mounted by the historical task11 scheduler. A later,
+  explicitly authorized single-set Docker cleanup removed that duplicate;
+  current running mount references are zero.
 - Exactly 32 unreferenced volumes from failed run families
   `tdt-final-release-20260824t065243z`,
   `tdt-final-proof-20260824t073808z`,
@@ -81,7 +81,7 @@ untouched.
   `tdt-accepted-stable-20260824t083042z` were removed only after an exact-count
   check, per-volume Compose project-label match, and zero-container-reference
   check. Zero volumes with those prefixes remain. No prune command was used;
-  all final-green and foreign resources were preserved.
+  all final-green and unrelated resources were preserved at that checkpoint.
 - The post-cleanup full-store strict validation reported `376 passed, 1
   failed`; the failure is the unrelated concurrent active change
   `repair-hermes-cron-run-reliability`, which was preserved and not modified.
@@ -136,6 +136,25 @@ The accepted cumulative manifest and its SHA-256 below remain immutable
 behavioral evidence for the earlier accepted implementation matrix. The newer
 exact-main closure is additive runtime provenance and is recorded durably in
 `tdt-observability/deploy/evidence/final-full-deployment-acceptance.md`.
+
+### Single-set Docker cleanup
+
+The operator authorized removal of every superseded TDT Docker set and old
+data while retaining the exact-main final-green family. After diagnostics and
+exact ownership/reference checks, cleanup removed four historical task11
+containers, two task11 networks, 145 unreferenced old TDT-labeled volumes, 59
+superseded TDT image tags, two untagged duplicate-container image IDs, and the
+two exited-zero final-green one-shot container records. No global prune was
+used, and unrelated Omniroute resources plus unlabeled anonymous volumes were
+preserved.
+
+Final inventory is one normalized TDT family with 15 healthy/running
+long-lived containers and five first-party TDT image tags. Together with two
+healthy unrelated Omniroute containers, Docker has 17 running containers and
+no exited container records. Zero old TDT containers, image tags, or labeled
+volumes remain; zero running mounts reference `tdt-observability-integrated`.
+Final-green healthchecks remain healthy with restart counts zero. Available
+host space increased from approximately 14 GiB to 31 GiB.
 
 ### Cumulative acceptance manifest
 
