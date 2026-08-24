@@ -156,6 +156,32 @@ volumes remain; zero running mounts reference `tdt-observability-integrated`.
 Final-green healthchecks remain healthy with restart counts zero. Available
 host space increased from approximately 14 GiB to 31 GiB.
 
+### Stable operator-facing stack identity
+
+The final-green project name is retained only as historical acceptance
+identity. The permanent Docker Desktop family now uses primary project
+`tdt-local-full`, owner projects `tdt-local-full-agent-core` and
+`tdt-local-full-tdt-scheduler`, and networks `tdt-local-full-runtime` plus
+`tdt-local-full-observability`. Separate owner projects preserve safe lifecycle
+boundaries while the common prefix presents one meaningful full-stack family.
+
+Stable projects were started on fresh project-scoped volumes under the
+no-old-data decision and verified before the old final-green volumes and image
+aliases were removed. Final inventory has 15 healthy/running TDT containers,
+two unrelated healthy Omniroute containers, zero exited records, and exactly
+five first-party TDT image tags. All seven published TDT ports bind to
+`127.0.0.1`; six direct service probes plus network-scoped gateway returned
+HTTP 200. No timestamp-named TDT project, volume, image, or network remains.
+
+Scheduler runs `tdt-scheduler:main-60f7f81`, image
+`sha256:324f4495d55ca9b5d816c4be5b0ab62a479ba23dd7113282657fdcaa652b0db2`,
+with OCI labels exactly matching scheduler main
+`60f7f810150c60023539b1d8e27231825c09521b`, agent-core main
+`326be559738959bf7f8da5fef9be320c8dbaf09f`, and tdt-core main
+`772265e4beb113a02c7aaa687a37ef1cfe0dee0a`. Run-owned replay pointers use
+the stable projects/networks and current image tag. Host free space is now
+approximately 53 GiB.
+
 ### Cumulative acceptance manifest
 
 - Manifest:
