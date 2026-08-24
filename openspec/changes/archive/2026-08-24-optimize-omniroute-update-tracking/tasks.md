@@ -24,5 +24,5 @@
 ## 5. Archive
 
 - [x] 5.1 `openspec validate optimize-omniroute-update-tracking --type change --strict --store openspec-store`
-- [ ] 5.2 `openspec archive optimize-omniroute-update-tracking --store openspec-store --yes`
-- [ ] 5.3 Commit archived change dir + config.yaml only
+- [x] 5.2 `openspec archive optimize-omniroute-update-tracking --store openspec-store --yes`
+- [x] 5.3 Commit archived change dir + config.yaml only
