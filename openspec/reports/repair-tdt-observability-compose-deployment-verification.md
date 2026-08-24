@@ -167,22 +167,40 @@ boundaries while the common prefix presents one meaningful full-stack family.
 
 Stable projects were started on fresh project-scoped volumes under the
 no-old-data decision and verified before the old final-green volumes and image
-aliases were removed. Final inventory has 15 healthy/running TDT containers,
-two unrelated healthy Omniroute containers, zero exited records, and exactly
-five first-party TDT image tags. All seven published TDT ports bind to
-`127.0.0.1`; six direct service probes plus network-scoped gateway returned
-HTTP 200. No timestamp-named TDT project, volume, image, or network remains.
+aliases were removed. Final current inventory is 15 running TDT containers,
+exactly FOUR first-party TDT image tags, 12 configured Docker healthchecks
+healthy, 3 services without Docker healthchecks, and restart count 0 for all 15.
+Together with two unrelated healthy Omniroute containers, zero exited records
+remain. All seven published TDT ports bind to `127.0.0.1`; seven direct host
+service probes plus the network-scoped OTel gateway return HTTP 200. No
+timestamp-named TDT project, volume, image, or network remains.
 
-Scheduler runs `tdt-scheduler:main-60f7f81`, image
-`sha256:324f4495d55ca9b5d816c4be5b0ab62a479ba23dd7113282657fdcaa652b0db2`,
-with OCI labels exactly matching scheduler main
-`60f7f810150c60023539b1d8e27231825c09521b`, agent-core main
-`326be559738959bf7f8da5fef9be320c8dbaf09f`, and canonical tdt-core main
-`772265e4beb113a02c7aaa687a37ef1cfe0dee0a` (`/Users/androidteam/orca/workspaces/tdt-core/tdt-main`).
-The feature checkout at `/Users/androidteam/Developer/tdt-core` (`fix/remove-api-key-env-loader-exemption`
-at `3043854a006ddccd71270073409a7b94f058cd67`) is preserved feature history, not deployment provenance.
-Canonical deployment documentation and identity resolve to `tdt-observability` main `4db3858786daace9b8c7416a6b4947e4c10eb6f7`.
-Run-owned replay pointers use the stable projects/networks and current image tag. Host free space is now
+First-party container images and OCI metadata provenance:
+
+- **Scheduler:** `tdt-scheduler:main-900a886`, image ID
+  `sha256:9e8a21c5be019094323f1905bec25cf94ad3be7b86ef274839648a5ad6142f09`;
+  OCI labels bind scheduler `900a886a24dd9cd9a73eab8c5cd463637359d44c`,
+  agent-core `3eaa7c842ef8ec7bbac8a6b74d4b187309c2b041`, and tdt-core
+  `703d0af29d215298e55a301098fc44f2dcfe07bd`.
+- **Agent-core:** `agent-core:local-dev`, image ID
+  `sha256:4d09fdc941d1bfec38c0327b053971777503ecd92b8d65079a26518fdf9f4069`;
+  OCI labels bind agent-core `3eaa7c842ef8ec7bbac8a6b74d4b187309c2b041` and
+  tdt-core `703d0af29d215298e55a301098fc44f2dcfe07bd`.
+- **Shared process image:** `tdt-observability:local-20260825`, image ID
+  `sha256:0a0456464e4deedcafd7c631bb5c9fec76015c714a8c933cfe406ea6559684bb`;
+  OCI labels bind observability `edca8570e3498c8261ee6587d52ba83e104864a4` and
+  tdt-core `703d0af29d215298e55a301098fc44f2dcfe07bd`. Both health-poller and
+  log-collector use this same shared image ID, are healthy with restart count 0,
+  and no floating latest first-party tags remain.
+- **MLflow:** `tdt-observability-mlflow:v3.15.1` completes the set of four
+  first-party image tags.
+
+Canonical `tdt-core` path is `/Users/androidteam/orca/workspaces/tdt-core/tdt-main`
+(with feature checkout notice remaining: `/Users/androidteam/Developer/tdt-core`
+is preserved feature history at `3043854a006ddccd71270073409a7b94f058cd67` and
+not deployment provenance). Canonical `tdt-observability` current identity is
+`edca8570e3498c8261ee6587d52ba83e104864a4`. Run-owned replay pointers use the
+stable projects/networks and current image tags. Host free space is now
 approximately 53 GiB.
 
 ### Cumulative acceptance manifest
