@@ -75,5 +75,5 @@
 ## 10. Archive
 
 - [x] 10.1 `openspec validate standardize-omniroute-docker-deployment --type change --strict --store openspec-store`
-- [ ] 10.2 `cd ~/Developer && openspec archive standardize-omniroute-docker-deployment --store openspec-store --yes`
-- [ ] 10.3 Commit ONLY the archived change dir + config.yaml: `cd ~/Developer/openspec-store && git add openspec/changes/archive/<date>-standardize-omniroute-docker-deployment openspec/config.yaml && git diff --cached --name-status` (inspect before commit; leave other uncommitted work untouched)
+- [x] 10.2 `cd ~/Developer && openspec archive standardize-omniroute-docker-deployment --store openspec-store --yes`
+- [x] 10.3 Commit ONLY the archived change dir + config.yaml: `cd ~/Developer/openspec-store && git add openspec/changes/archive/<date>-standardize-omniroute-docker-deployment openspec/config.yaml && git diff --cached --name-status` (inspect before commit; leave other uncommitted work untouched)
