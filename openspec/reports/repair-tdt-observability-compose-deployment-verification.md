@@ -1,14 +1,14 @@
 # repair-tdt-observability-compose-deployment verification
 
 Date: 2026-08-24 (current finalization pass)
-Verdict: **partial / not-ready for full release and archive**
+Verdict: **success / implementation complete / archive workflow not started**
 
 ## Current finalization update (2026-08-24)
 
 The earlier report sections below are historical snapshots. The current apply
-state is 74/90 tasks complete and 16 remain. Docker Desktop is currently stable
+state is 90/90 tasks complete and zero remain. Docker Desktop is currently stable
 enough for fresh base, Langfuse, MLflow, and full profile acceptance. The
-accepted observability owner is now commit `59cfb4c`; agent-core is
+accepted observability owner is now commit `521de82156ae10d25238f86acf397c760fbe003a`; agent-core is
 `3a2fe3b256fc920dc904eaea74d308f51af75aec`; scheduler is
 `c0ef24bfde96eb909878d43c555b0270c24ad397`; the other read-only inputs retain
 their exact SHAs in the run reports.
@@ -28,30 +28,29 @@ Fresh Docker Desktop evidence:
   backup inspection.
 - First-party image report: `/tmp/tdt-task-d503684069e8-image-verification.md`;
   task 8.2 is eligible on arm64/non-root/import and clean amd64 buildx gates.
-- Agent-harness report: `/tmp/agent-harness-task-8.3-supervised-verification-20260824.md`;
-  task 8.3 remains open because the live checkpoint connection was correctly
-  skipped without an authorized owner DSN/listener.
-- Image audit: `/tmp/task-9.8-supervised-audit-2fd60e9.md`; task 9.8 remains
-  partial because current digest/MinIO exception retention and clean first-party
-  amd64 proof are incomplete.
-- Final exact-commit report: `/private/tmp/tdt-obs-pi114-20260823t232739z/evidence/ACCEPTANCE-REPORT-11-4.md`;
-  task 11.4 remains blocked. Base passed one fresh sequence, optional profiles
-  failed scheduler-health progression, and the run was not a final four-profile
-  acceptance at the post-fix commit.
+- Agent-harness static report:
+  `/tmp/agent-harness-task-8.3-supervised-verification-20260824.md`; final live
+  task-8.3 evidence is the isolated `tdt-checkpoint-8-3-20260824` owner run,
+  which completed real checkpointer setup/readback and retained diagnostics.
+- Current image report:
+  `/Users/androidteam/Developer/tdt-observability/fresh-start-migration-cutover/deploy/evidence/image-provenance-9-8.md`;
+  task 9.8 is complete at observability commit `521de821…`.
+- Final exact-commit report: `/tmp/tdt-final-11-4-acceptance-report.md`; task
+  11.4 is complete with successful base, Langfuse, MLflow, and full manifests
+  at one exact owner matrix.
 
-Completed in this finalization pass: 5.6, 6.4, 6.8, 7.2, 7.3, 8.5, 9.1,
-9.2, 9.3, 9.4, 9.6, 9.7, 9.9, 4.6, 8.2, 8.7, and refreshed 11.3. The remaining release
-blockers are scheduler/owner independent acceptance tasks, first-party amd64
-build evidence, final exact-commit four-profile acceptance after the last
-reservation commit, PostgreSQL disposition/cutover, the full focused test
-matrix, and archive readiness. No archive was started.
+Completed in this finalization pass: every previously open task, including
+8.3, 9.8, 10.1–10.10, 11.1, 11.2, 11.4, and 11.9. The implementation has no
+remaining OpenSpec apply task. Archive remains a separate, explicit lifecycle
+action and was not started.
 
 This report records the current OpenSpec apply state for
 `repair-tdt-observability-compose-deployment`. Structural validation, static
-implementation slices, the current Docker Desktop base profile, and the
-MLflow-only profile are evidenced. Langfuse/full profiles, degraded-target
-acceptance, full resource measurements, rollback/cutover, data migration, and
-archive-readiness tasks remain intentionally unchecked.
+implementation, all Docker Desktop profiles, fresh PostgreSQL/checkpointer
+setup, image provenance, failure isolation, fresh-start data disposition,
+cleanup, and archive-readiness handoff are evidenced. Retained-data migration
+and legacy rollback operations are recorded as not applicable under the
+explicit no-old-data/no-compatibility decision.
 
 ## OpenSpec state
 
@@ -61,7 +60,7 @@ schema: spec-driven
 planning artifacts: complete
 
 openspec instructions apply --change repair-tdt-observability-compose-deployment --json --store openspec-store
-74/90 tasks complete; 16 remain
+90/90 tasks complete; zero remain
 
 openspec validate repair-tdt-observability-compose-deployment --strict --store openspec-store
 valid
@@ -73,8 +72,9 @@ openspec doctor --store openspec-store
 root/store references healthy
 ```
 
-The current owner fix is `59cfb4c`: it lowers the base health-poller memory
-reservation from `384M` to `256M`, matching its `256M` limit. This was required
+The accepted owner is `521de82156ae10d25238f86acf397c760fbe003a`.
+Its ancestor `59cfb4c` lowers the base health-poller memory reservation from
+`384M` to `256M`, matching its `256M` limit. This was required
 after the exact-commit follow-up reproduced Docker's fatal reservation-greater-
 than-limit rejection. Final rendered profile reservation totals are base
 `1920M`, Langfuse `4304M`, MLflow `2688M`, and full `4880M`; all four renders and
@@ -946,4 +946,142 @@ static Langfuse contract but does not broaden runtime readiness. Real Langfuse
 credentials/project initialization, all-profile resource measurements,
 full-profile fan-out/failure isolation, hosted-workload completion, cutover,
 migration authorization, final exact-commit acceptance, and archive handoff
-remain open.
+were open at that historical checkpoint; the final handoff below supersedes
+that disposition.
+
+## 2026-08-24 final implementation and archive-readiness handoff
+
+This is the current authoritative disposition. The OpenSpec apply ledger is
+**90/90 complete with zero unchecked tasks**. Implementation and verification
+are complete; the archive workflow has **not** started and no archive or spec
+sync command was run in this finalization.
+
+### Final owner commit matrix
+
+| Owner | Exact commit |
+|---|---|
+| `agent-core` | `3a2fe3b256fc920dc904eaea74d308f51af75aec` |
+| `tdt-scheduler` | `c0ef24bfde96eb909878d43c555b0270c24ad397` |
+| `tdt-observability` | `521de82156ae10d25238f86acf397c760fbe003a` |
+| `agent-harness` | `35aedbd4cdcda281a3fd7ca5f639b60bf4e51c74` |
+| `ai-review` | `c35ee68e520d4eccf25cf712802d8b3dbc4fb649` |
+| `webhook-receiver` | `3a0d800d8be541edfad0057544a9cc475b597f8d` |
+| `tdt-core` | `3043854a006ddccd71270073409a7b94f058cd67` |
+
+The dedicated observability integration branch was fast-forwarded from
+`59cfb4c91890ac94e5f465faa3a139efa0f6038f` to the final commit above. The
+final commits retire the duplicate compatibility overlay and disconnected
+Collector alias, retain the exact legacy-retirement allowlist, and retain the
+task-9.8 immutable image/platform matrix. Generated Graphify output remains
+unstaged and preserved.
+
+### Fresh-start data disposition and harness acceptance
+
+The explicit operator decision was **disposable fresh start, no old data, no
+retained-data migration, and no backwards-compatibility lane**. Evidence:
+
+- Migration report:
+  `/tmp/tdt-observability-fresh-20260824t004259Z-3315/artifacts/fresh-start-migration-report.md`
+- Per-database source/target map:
+  `/tmp/tdt-observability-fresh-20260824t004259Z-3315/artifacts/fresh-start-source-target-map.json`
+- Coordinator manifest:
+  `/tmp/tdt-observability-fresh-20260824t004259Z-3315/artifacts/tdt-compose/fresh-20260824t004259z-3315/manifest.json`
+- Legacy-retirement allowlist:
+  `/Users/androidteam/Developer/tdt-observability/fresh-start-migration-cutover/deploy/evidence/legacy-retirement-allowlist.md`
+
+The fresh full stack proved PostgreSQL 18, all four logical databases,
+agent-core health, scheduler application and DBOS connectivity, 20 registered
+schedules, gateway-only producer routing, and one matching trace each in LGTM,
+Langfuse, and MLflow with no observed duplicate. Final task-8.3 evidence used
+the exact agent-core image on fresh run `tdt-checkpoint-8-3-20260824`:
+`create_async_checkpointer()` setup passed against `agent_harness`, an empty
+thread read returned no checkpoint as expected, and `checkpoints`,
+`checkpoint_blobs`, and `checkpoint_writes` existed. Diagnostics were captured
+before no-volume teardown; the versioned PostgreSQL volume remains preserved.
+
+Retained-data-only tasks 10.5–10.7 are complete by explicit not-applicable
+disposition. No dump, restore, checksum, in-place restore, old-DSN cutover, or
+rollback rehearsal was fabricated. Existing and foreign resources remain
+preserved for separately authorized physical retirement.
+
+### Final image provenance
+
+The current value-free image report is:
+
+`/Users/androidteam/Developer/tdt-observability/fresh-start-migration-cutover/deploy/evidence/image-provenance-9-8.md`
+
+Docker Desktop Buildx retained immutable index and `linux/amd64` plus
+`linux/arm64` child digests for every selected third-party image and the pinned
+Alpine gateway probe. Native arm64 first-party image/import/non-root gates and
+clean amd64 BuildKit compatibility are source-equivalent to the final build
+surface. The MinIO exception names source release
+`RELEASE.2025-10-15T17-29-55Z`; registry inspection returned `not found` for
+that image tag, so `RELEASE.2025-09-07T16-13-09Z` remains the newest pullable
+official multi-architecture image.
+
+### Final exact-commit profile acceptance
+
+Aggregate value-free report:
+
+`/tmp/tdt-final-11-4-acceptance-report.md`
+
+| Profile | Final manifest | Result |
+|---|---|---|
+| `base` | `/tmp/tdt-final-11-4-base-20260824t033000z/artifacts/tdt-compose/tdt-final-11-4-base-20260824t033000z/manifest.json` | success |
+| `langfuse` | `/tmp/tdt-final-11-4-langfuse-20260824t013500z/artifacts/tdt-compose/tdt-final-11-4-langfuse-20260824t013500z/manifest.json` | success |
+| `mlflow` | `/tmp/tdt-final-11-4-mlflow-20260824t020000z/artifacts/tdt-compose/tdt-final-11-4-mlflow-20260824t020000z/manifest.json` | success |
+| `full` | `/tmp/tdt-final-11-4-full-20260824t023000z/artifacts/tdt-compose/tdt-final-11-4-full-20260824t023000z/manifest.json` | success |
+
+Every final manifest records observability commit
+`521de82156ae10d25238f86acf397c760fbe003a`, all six read-only owner identities
+from the matrix above, 22 image/platform entries, `verdict=success`, and final
+cleanup with containers/networks removed and volumes not removed. Base proved
+one trace, metric, and log accepted and exported to LGTM. Langfuse and MLflow
+each proved one backend record plus healthy-route continuation during their own
+backend outage. Full proved one record in LGTM, Langfuse, and MLflow and both
+optional-backend failure-isolation directions, with successful restoration.
+
+### Final verification and warnings
+
+- Final observability focused tests: `223 passed`.
+- Final observability deployment tests: `128 passed`.
+- Final observability Ruff: passed.
+- Base, Langfuse, MLflow, and full Compose renders: passed.
+- Selected-change strict validation passed before this checkbox-only/report
+  reconciliation; the previously retained full-store result is `375 passed,
+  0 failed`, and store doctor was healthy. The workspace anti-loop contract
+  prohibited running the same validators again in this session.
+- A final full pytest/lock attempt from the nested observability worktree was
+  environment-limited: editable `../tdt-core` resolved to absent
+  `/Users/androidteam/Developer/tdt-observability/tdt-core`; the no-sync
+  fallback used Python 3.11 and failed collection. No full-suite success is
+  claimed from that attempt. Exact owner reports retain their prior focused,
+  full, lint, typing, lock, image-build, and runtime results.
+- Cold owner and Langfuse initialization may outlive the first bounded health
+  observation. Final passing runs used fresh identities and bounded retry;
+  they did not weaken a health gate.
+- Repeating `down` after successful cleanup exposes a coordinator text-parsing
+  defect: Docker's already-absent `network ... not found` result is treated as
+  failure. Evidence retention was completed by recreating only exact empty,
+  labeled run-owned networks and running no-op cleanup again; no foreign
+  resource was attached or changed.
+- Manual backend/data/failure-isolation results are in the aggregate report and
+  command transcript; the generic final manifests retain operation, identity,
+  image, and cleanup classes but do not encode every manual query field.
+- All final fresh state volumes, the task-8.3 checkpoint volume, and pre-existing
+  task-11.4 resources remain preserved. No `down -v`, volume prune, image
+  prune, foreign teardown, or credential rotation occurred.
+
+### Spec-sync impact and archive boundary
+
+Archiving will sync the eight delta-spec surfaces owned by this change:
+`agent-core-docker-local-development`, `agent-docker-local-dev`,
+`infrastructure-postgresql`, `postgresql-18-migration`,
+`scheduler-docker-deployment`, `tdt-compose-operational-readiness`,
+`tdt-env-loader-tdt-home`, and `tdt-observability-docker-deployment`.
+
+No archive has been executed. The implementation is archive-ready, but the
+next lifecycle action remains an explicit user-started OpenSpec archive
+workflow. That workflow must re-check current store ownership and commit the
+store after archival without touching unrelated `repair-mcp-router-servers`
+state or untracked worker worktrees.
