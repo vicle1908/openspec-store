@@ -1,5 +1,157 @@
 # repair-tdt-observability-compose-deployment verification
 
+## Final archive evidence (2026-08-24)
+
+This section supersedes earlier identity, runtime, and archive-eligibility
+snapshots below. Historical sections remain retained for audit context and MUST
+NOT be read as the current deployment state.
+
+Current verdict: **success / implementation accepted / archived with retained
+warnings / final deployment intentionally running**.
+
+### Exact source and deployment identities
+
+- `tdt-observability` implementation:
+  `9a5f7c28b08609952468af67e35022b38f4549de` on committed branch
+  `tdt-observability-integrated`.
+- `agent-core`: `468140192725e81246223c37f3b0a37573eaba3e`.
+- `tdt-scheduler`: `489100d5fcafec8c6b85e4b22093fb8bd75a2edc`.
+- `webhook-receiver`: `d999ebfcdcb251f9771a010f314dd136bdedf787`;
+  the canonical launchd deployment manifest and live service bind this same
+  source revision.
+- `agent-harness`: `35aedbd4cdcda281a3fd7ca5f639b60bf4e51c74`.
+- `tdt-core`: `3043854a006ddccd71270073409a7b94f058cd67`.
+- `ai-review`: `c35ee68e520d4eccf25cf712802d8b3dbc4fb649`.
+- OpenSpec store at acceptance capture:
+  `91cdfb4d7ceed329879f991a4c5c7f9eb0d54d61`.
+- Final Docker run: `tdt-final-green-20260824t085909z`.
+- Runtime network: `tdt-final-green-20260824t085909z-runtime`.
+- Observability network: `tdt-final-green-20260824t085909z-observability`.
+- Projects: `tdt-final-green-20260824t085909z-observability`,
+  `tdt-final-green-20260824t085909z-observability-agent-core`, and
+  `tdt-final-green-20260824t085909z-observability-tdt-scheduler`.
+
+The canonical `tdt-observability/main` checkout remains at
+`a41cfbee1c44166f893cbffe726319b05ce9e647` with unrelated overlapping
+Dockerfile/Compose and generated-worktree dirt. It was deliberately not
+overwritten or fast-forwarded. The accepted implementation and running
+deployment therefore remain bound to the dedicated committed integration
+worktree above.
+
+### Cumulative acceptance manifest
+
+- Manifest:
+  `/tmp/tdt-final-green-20260824t085909z/artifacts/tdt-compose/tdt-final-green-20260824t085909z/manifest.json`.
+- SHA-256:
+  `2637e44355ae8049ca31162c9002f7fc5cddb3526d13f5c6c7615659d0f352f0`.
+- Closed-schema validation: passed against
+  `deploy/evidence/tdt-compose-acceptance-v1.schema.json` at the accepted
+  implementation revision.
+- Manifest verdict: `success`.
+- Finalization: `accepted`; zero unmet invariants.
+- Retained lifecycle classes: `up`, `verify`, `runtime`, `manual-evidence`,
+  and `diagnostics`.
+- Read-only identities: 15 manifest inputs, including all scheduler sibling
+  repositories/mobile content fingerprints and the distinct
+  `tdt-observability` scheduler mount identity.
+- Passing result checks: 9.
+- Final deployment: intentionally left running; no final `down` was executed.
+
+### Live functional acceptance
+
+- Supported coordinator verification passed with all 15 long-lived owner
+  services healthy after the failure-isolation and collector-restart tests.
+- Exactly one matching record was retained for each of three unique traces in
+  Tempo, Langfuse ClickHouse `events_core`, and MLflow PostgreSQL
+  `trace_info`.
+- Gateway sent-span counters were retained for LGTM, Langfuse, and MLflow.
+- Langfuse-down isolation preserved Tempo and MLflow delivery, then recovered
+  the queued Langfuse record.
+- MLflow-down isolation preserved Tempo and Langfuse delivery, then recovered
+  the queued MLflow record with one MLflow worker.
+- MLflow artifact upload/list/download/digest round-trip passed.
+- Scheduler backup checksum and `pg_restore --list` readability passed.
+- Health-poller loaded the intended mixed host/Docker target configuration and
+  retained fresh healthy observations for webhook-receiver, ai-review, and
+  scheduler.
+- A value-free supported log record was ingested exactly once; the run-owned
+  log collector restarted healthy and did not duplicate it.
+- All 16 scheduler `/workspace` content mounts were verified read-only. The
+  separate `/home/agent/tdt` mount is intentionally writable owner state.
+- PostgreSQL reported 18.6 and contained `agent_core`, `tdt_scheduler`,
+  `tdt_scheduler_dbos_sys`, and `agent_harness`.
+- Live task 8.3 used `agent_harness.checkpointing.create_async_checkpointer()`
+  at agent-harness revision `35aedbd4...`; setup, write, readback, close/reopen,
+  and second readback all passed for thread
+  `tdt-final-green-20260824t085909z-task-8-3`. No DSN or credential value was
+  retained.
+
+Runtime ports remain loopback-only: Grafana `52208`, Prometheus `52209`, OTLP
+gRPC `52210`, OTLP HTTP `52211`, Langfuse `52212`, MinIO console `52213`,
+MLflow `52214`, agent-core PostgreSQL `52215`, and scheduler `52216`.
+
+### Independent verification and archive readiness
+
+Independent value-free report:
+`/tmp/repair-tdt-observability-final-independent-verification.md`.
+
+The independent review found no CRITICAL issue: 90/90 tasks were complete;
+36 requirements and 99 scenarios were present across the eight delta specs;
+the selected change, exact implementation identity, cumulative manifest,
+live projects, scheduler mounts, host deployment provenance, and task-8.3
+durability reconciled. Archive readiness validation returned `ready` with 90
+completed tasks, zero remaining tasks, all required artifacts present, and
+eight delta specs.
+
+All eight delta capabilities were intelligently synchronized before the change
+moved. Two main specs were created: `tdt-compose-operational-readiness` and
+`tdt-observability-docker-deployment`. Six existing main specs received
+scenario-preserving merges. Every delta requirement matched its synchronized
+main requirement, both new specs matched after the main-spec header
+transformation, all authoritative Purpose sections were preserved, and no
+delta-operation headings remained. `openspec validate --specs --strict
+--store openspec-store` passed 376/376 specs.
+
+Supported archive command:
+
+```text
+openspec archive repair-tdt-observability-compose-deployment --yes --json --store openspec-store
+```
+
+Archive result:
+
+- Archived as `2026-08-24-repair-tdt-observability-compose-deployment`.
+- Archive path:
+  `openspec/changes/archive/2026-08-24-repair-tdt-observability-compose-deployment`.
+- CLI `specsUpdated=false` with zero added/modified/removed/renamed operations,
+  proving the prior inline sync was already complete and idempotent.
+- The final accepted Docker deployment remained running throughout sync and
+  archive; no final `down` was executed.
+
+### Retained warnings
+
+- Store-wide strict validation currently reports 375 passed and 1 unrelated
+  failed item: active change `repair-hermes-cron-run-reliability`. The selected
+  TDT change passes; the unrelated change is outside this archive scope and
+  must not be repaired or staged here.
+- Docker Desktop was under severe external host load during cold starts.
+  Fresh Langfuse initialization required datastore-first sequencing to avoid
+  dirty migration state. Final backend restart counts are zero and the accepted
+  lane remained healthy through the final evidence capture.
+- Docker free space fell to approximately 9 GiB after repeated builds. The
+  already-built accepted lane used an explicit finite 8 GiB verification floor;
+  no global prune, volume deletion, or foreign-resource deletion was performed.
+- Full observability pytest after the earlier MLflow one-worker change reached
+  481 passed and 13 environment-only disk-budget fixture failures; focused
+  Compose/MLflow tests passed 116/116 after the final MLflow health-budget
+  change. This is not reported as a globally green full suite.
+- The accepted implementation worktree contains preserved unrelated
+  `AGENTS.md`, `CLAUDE.md`, and generated `graphify-out/` dirt. None belongs in
+  the store archive commit.
+- Stateful volumes, foreign Docker resources, unrelated branches/worktrees,
+  and credentials remain preserved. Cleanup is a separate exact-allowlist
+  action and must not stop the final accepted deployment.
+
 Date: 2026-08-24 (current finalization pass)
 Verdict: **success / implementation complete / archive workflow not started**
 

@@ -5,22 +5,33 @@ This specification defines requirements for Agent Docker Local Dev.
 ## Requirements
 
 ### Requirement: agent-core provides a pinned local Docker development stack
-The system MUST provide a Docker Compose stack for local development that launches agent-core alongside Postgres with pinned image versions.
+
+The system MUST provide a repository-owned Docker Compose stack for local development that launches agent-core alongside the agent-core-owned shared runtime PostgreSQL server with exact image versions. The app image MUST build from `python:3.14.7-slim-trixie` with uv `0.12.5`, and PostgreSQL MUST use `postgres:18.6-trixie` with a PostgreSQL-18-versioned named volume mounted at `/var/lib/postgresql`. The app SHALL join configurable runtime and observability networks without redefining scheduler or observability backend services.
 
 #### Scenario: Compose uses pinned current images
+
 - **WHEN** the local Docker stack is inspected
-- **THEN** the app image MUST build from `python:3.14.5-slim-trixie`
+- **THEN** the app image MUST build from `python:3.14.7-slim-trixie`
+- **AND** build tooling MUST use uv `0.12.5`
 - **AND** the database service MUST use `postgres:18.6-trixie`
-- **AND** the Compose file MUST not use a floating `latest` tag for either service
+- **AND** the Compose file MUST not use a floating `latest` or major-only tag for either service
 
 #### Scenario: Compose starts the app and database for local dev
-- **WHEN** a developer runs the local Docker startup command
-- **THEN** Postgres starts with a persistent volume
-- **AND** the Postgres 18 persistent volume is mounted at `/var/lib/postgresql`
-- **AND** the app container mounts the workspace source tree
-- **AND** the app container has the DBOS and memory DSNs needed for local durable execution
-- **AND** the app container runs local commands as a non-root user
-- **AND** the app image declares a lightweight healthcheck
+
+- **WHEN** a developer runs the owner-local Docker startup command
+- **THEN** PostgreSQL SHALL start with a PostgreSQL-18-versioned persistent volume
+- **AND** the volume SHALL be mounted at `/var/lib/postgresql`
+- **AND** the app container SHALL mount only the intended workspace source and runtime paths
+- **AND** the app container SHALL have the DBOS and memory DSNs needed for local durable execution
+- **AND** the app container SHALL run local commands as a non-root user
+- **AND** the app image SHALL declare a lightweight import healthcheck
+
+#### Scenario: Coordinated deployment attaches agent-core without redefining it
+
+- **WHEN** the TDT coordinator starts agent-core with observability
+- **THEN** it SHALL use the owner-defined agent-core image and services
+- **AND** the app SHALL join the selected runtime and observability networks
+- **AND** tdt-observability SHALL not contain a duplicate agent-core service definition
 
 ### Requirement: agent-core documents the local Docker workflow
 The system MUST document how to start, stop, and test the local Docker stack.
