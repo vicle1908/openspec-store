@@ -200,10 +200,13 @@ First-party container images and OCI metadata provenance:
 Canonical `tdt-core` path is `/Users/androidteam/orca/workspaces/tdt-core/tdt-main`
 (with feature checkout notice remaining: `/Users/androidteam/Developer/tdt-core`
 is preserved feature history at `3043854a006ddccd71270073409a7b94f058cd67` and
-not deployment provenance). Canonical `tdt-observability` current identity is
-`edca8570e3498c8261ee6587d52ba83e104864a4`. Run-owned replay pointers use the
-stable projects/networks and current image tags. Host free space is now
-approximately 53 GiB.
+not deployment provenance). The deployed `tdt-observability` source/config
+identity is `edca8570e3498c8261ee6587d52ba83e104864a4`. The repository's current
+`main` HEAD is `7e58f79629f24520dae8add5c403c9d1ab933507`; its later `f25f40e` and
+`7e58f79` commits update only durable current-runtime evidence and do not alter
+the built process image. Run-owned replay pointers use the stable
+projects/networks and current image tags. Host free space is now approximately
+53 GiB.
 
 ### Cumulative acceptance manifest
 
