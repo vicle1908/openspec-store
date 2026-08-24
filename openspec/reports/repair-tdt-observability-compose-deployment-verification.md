@@ -87,6 +87,56 @@ untouched.
   `repair-hermes-cron-run-reliability`, which was preserved and not modified.
   `openspec store doctor` reported no store issues.
 
+### Exact canonical-main closure
+
+The running final-green family was recaptured after the initial re-home so the
+required code, image metadata, Compose labels, bind mounts, and operational
+replay pointers all resolve to canonical `main` revisions:
+
+- `tdt-observability/main` source/config revision:
+  `d891275d75c77db578e561ad3723f4cb98a768d9`; exact-main evidence commit:
+  `cc778b76a86084ed3bfd08ed4546afb42c273fe6`.
+- `agent-core/main`: `df4df21e487154d0e55c38de9771d13a4f98bc3b`.
+- `tdt-scheduler/main`: `dbe4198cdb74d6a04a8ddd8872e67984b4afba56`.
+- `tdt-core/main`: `772265e4beb113a02c7aaa687a37ef1cfe0dee0a`.
+- `webhook-receiver/main`, `agent-harness/main`, and `ai-review/main` remain at
+  the exact accepted revisions listed above.
+
+The required tdt-core change was reconciled selectively onto its newer main:
+the retired `providers.*.api_key_env` exemption and hardcoded
+`agent_core.scheduler_setup` paths were removed without deleting main's newer
+persisted-state reconciliation. The focused config plus full scheduler suite
+passed 166 tests; targeted Ruff and strict mypy passed.
+
+Agent-core image `sha256:ea2c245c3f10647a32f7d9893dac576bf9c6691c01942e77ddf49428fbd1f5db`
+was freshly built from agent-core main with a named tdt-core main context. A
+full scheduler main build passed its fatal seven-workload integrity gate, but
+Docker Desktop failed during the large image export (first BuildKit EOF, then
+read-only Docker data storage), so no failed image was promoted. After a
+supported Docker Desktop force-stop/start on the same context and a successful
+disposable write probe, the bounded main-overlay image
+`tdt-scheduler:main-dbe4198` was built and deployed. Its image ID is
+`sha256:d05c8e5c38aab7ef7b04abc3524ce9e6d7ef2ce36972adcf09fc20ca3951caad`;
+its OCI labels bind the three exact main revisions and declare
+`com.tdt.runtime.provenance=canonical-main-overlay`.
+
+All containers in the three final-green projects were recreated from canonical
+Compose paths while retaining project names, networks, ports, and named
+volumes. Zero final-green labels or mounts reference the integration worktree
+or former owner-input snapshots. All 16 scheduler workspace mounts are
+read-only and include canonical agent-core, tdt-core, and tdt-observability
+main sources. The scheduler completed startup integrity, launched DBOS,
+registered 21 workflows, applied 19 schedules, and became healthy. Grafana,
+Langfuse, MLflow, scheduler, webhook-receiver, ai-review, and network-scoped
+OTel gateway probes all returned HTTP 200; every declared healthcheck is
+healthy, every long-lived restart count is zero, and both one-shot containers
+exited zero.
+
+The accepted cumulative manifest and its SHA-256 below remain immutable
+behavioral evidence for the earlier accepted implementation matrix. The newer
+exact-main closure is additive runtime provenance and is recorded durably in
+`tdt-observability/deploy/evidence/final-full-deployment-acceptance.md`.
+
 ### Cumulative acceptance manifest
 
 - Manifest:
