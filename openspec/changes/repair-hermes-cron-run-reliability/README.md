@@ -13,7 +13,8 @@ Three-track cron job reliability repair:
 
 ## Decision Gates
 
-- **Script ownership** (BLOCKS tasks 1.1/2.1): Proposed: ops-automation-suite/scripts/hermes-cron/ + wiki/scripts/wiki-lint.py. Requires cross-repository acceptance before implementation.
+- **Script ownership** (BLOCKS tasks 1.1, 2.1, 3.6): Proposed: ops-automation-suite/scripts/hermes-cron/ + wiki/scripts/wiki-lint.py. Requires explicit user approval before implementation. See design.md Ownership section.
+- **knowledge-refresh ownership** (BLOCKS Track 2 `operation_status` extension): `~/Developer/scripts/knowledge-refresh/` is untracked. Requires resolution before Track 2 can extend status fields.
 - **Graphify version pin**: Out of scope (0.9.42→0.9.46/0.9.48 needs separate compatibility review)
 
 ## Files

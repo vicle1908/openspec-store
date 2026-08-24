@@ -32,14 +32,22 @@ Empty stdout = delivery suppressed. Verified from existing `weekly-skills-update
 The weekly job consumes `knowledge-status.sh --json` (generated nightly by LaunchAgent at 02:30). It reports staleness classification, timeout occurrences, and dirty-tree skips. Exit 0 = report generated. Exit 1 = canonical script missing or inventory rejected. `STALE` is a report condition, not a cron failure.
 
 ### AD5: Wiki lint is a deterministic no-agent validator
-All three tracks are cron-run reliability fixes discovered in the same investigation. Keeping them together reduces coordination overhead. Reviewers may recommend splitting; the delta specs are independent enough to separate.
+Clean result: zero-byte stdout, exit 0. Findings: report content, exit 0. Validator/runtime error: diagnostic output, nonzero exit. Canonical source at `wiki/scripts/wiki-lint.py`.
 
 ## Trade-offs
-- **Single vs. three changes:** Together = less overhead. Separate = cleaner ownership. Respecting reviewer guidance.
+- **Single vs. three changes:** Together = less overhead. Separate = cleaner ownership. Respecting reviewer guidance. The delta specs are independent enough to split if ownership is resolved at different times.
 - **Wrapper location:** Proposed canonical sources are `ops-automation-suite/scripts/hermes-cron/` and `wiki/scripts/wiki-lint.py`, pending cross-repository acceptance. Runtime copies deployed to `~/.hermes/scripts/` are not canonical.
 - **Read-only freshness:** Loses cron-initiated refresh. The nightly LaunchAgent already handles this. The cron job's role is reporting, not mutation.
 
 ## Ownership
-- Watchdog wrapper: proposed at ops-automation-suite/scripts/hermes-cron/ (pending cross-repo acceptance)
-- Freshness reporter: uses existing `~/Developer/scripts/knowledge-refresh/` infrastructure
-- Wiki lint: proposed at wiki/scripts/wiki-lint.py (pending acceptance)
+
+### Accepted (no gate)
+- Wiki content corrections (tasks 3.1–3.5): pure mechanical fixes in the wiki repo. No script ownership needed.
+
+### Open gate — requires user approval
+- **Track 1** (watchdog wrapper): canonical source proposed at `ops-automation-suite/scripts/hermes-cron/`
+- **Track 2** (freshness reporter): canonical wrapper source proposed at `ops-automation-suite/scripts/hermes-cron/`. The existing `~/Developer/scripts/knowledge-refresh/` infrastructure is a runtime dependency, NOT the canonical source for the wrapper.
+- **Track 3 script** (wiki validator): canonical source proposed at `wiki/scripts/wiki-lint.py`
+- **knowledge-refresh ownership**: `~/Developer/scripts/knowledge-refresh/` is untracked. Extending `knowledge-status.sh` with `operation_status` fields remains blocked until its own tracked owner is identified.
+
+Do NOT unblock tasks 1.1, 2.1, or 3.6 without explicit user approval.
