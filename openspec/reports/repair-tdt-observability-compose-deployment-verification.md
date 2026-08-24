@@ -115,8 +115,8 @@ Docker Desktop failed during the large image export (first BuildKit EOF, then
 read-only Docker data storage), so no failed image was promoted. After a
 supported Docker Desktop force-stop/start on the same context and a successful
 disposable write probe, the bounded main-overlay image
-`tdt-scheduler:main-dbe4198` was built and deployed. Its image ID is
-`sha256:d05c8e5c38aab7ef7b04abc3524ce9e6d7ef2ce36972adcf09fc20ca3951caad`;
+`tdt-scheduler:main-dbe4198-r2` was built and deployed. Its image ID is
+`sha256:1a73a69c0b35573621cd73d5b07e7f29547cb08c62d5154a234c7e8047168c58`;
 its OCI labels bind the three exact main revisions and declare
 `com.tdt.runtime.provenance=canonical-main-overlay`.
 
