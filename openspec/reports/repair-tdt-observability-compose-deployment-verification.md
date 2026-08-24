@@ -177,9 +177,12 @@ Scheduler runs `tdt-scheduler:main-60f7f81`, image
 `sha256:324f4495d55ca9b5d816c4be5b0ab62a479ba23dd7113282657fdcaa652b0db2`,
 with OCI labels exactly matching scheduler main
 `60f7f810150c60023539b1d8e27231825c09521b`, agent-core main
-`326be559738959bf7f8da5fef9be320c8dbaf09f`, and tdt-core main
-`772265e4beb113a02c7aaa687a37ef1cfe0dee0a`. Run-owned replay pointers use
-the stable projects/networks and current image tag. Host free space is now
+`326be559738959bf7f8da5fef9be320c8dbaf09f`, and canonical tdt-core main
+`772265e4beb113a02c7aaa687a37ef1cfe0dee0a` (`/Users/androidteam/orca/workspaces/tdt-core/tdt-main`).
+The feature checkout at `/Users/androidteam/Developer/tdt-core` (`fix/remove-api-key-env-loader-exemption`
+at `3043854a006ddccd71270073409a7b94f058cd67`) is preserved feature history, not deployment provenance.
+Canonical deployment documentation and identity resolve to `tdt-observability` main `4db3858786daace9b8c7416a6b4947e4c10eb6f7`.
+Run-owned replay pointers use the stable projects/networks and current image tag. Host free space is now
 approximately 53 GiB.
 
 ### Cumulative acceptance manifest
