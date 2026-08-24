@@ -6,9 +6,9 @@ Verdict: **partial / not-ready for full release and archive**
 ## Current finalization update (2026-08-24)
 
 The earlier report sections below are historical snapshots. The current apply
-state is 71/90 tasks complete and 19 remain. Docker Desktop is currently stable
+state is 74/90 tasks complete and 16 remain. Docker Desktop is currently stable
 enough for fresh base, Langfuse, MLflow, and full profile acceptance. The
-accepted observability owner is now commit `2fd60e9`; agent-core is
+accepted observability owner is now commit `59cfb4c`; agent-core is
 `3a2fe3b256fc920dc904eaea74d308f51af75aec`; scheduler is
 `c0ef24bfde96eb909878d43c555b0270c24ad397`; the other read-only inputs retain
 their exact SHAs in the run reports.
@@ -22,9 +22,25 @@ Fresh Docker Desktop evidence:
 - Base resource run: `/tmp/tdt-obs-mac-20260823t184114z-base-af16`.
 - MLflow resource run: `/tmp/tdt-obs-mac-20260823t184114z-mlflow-fbe1`.
 - Full report: `/tmp/tdt-obs-mac-20260823t180410z-full-f14d/full-acceptance-evidence.md`.
+- Scheduler owner report: `/tmp/tdt-sched-sup-6270360-daa3-evidence.md`;
+  tasks 4.6 and 8.7 are eligible from exact HEAD `c0ef24bf…` with focused
+  tests, clean image build, seven-workload integrity, health, telemetry, and
+  backup inspection.
+- First-party image report: `/tmp/tdt-task-d503684069e8-image-verification.md`;
+  task 8.2 is eligible on arm64/non-root/import and clean amd64 buildx gates.
+- Agent-harness report: `/tmp/agent-harness-task-8.3-supervised-verification-20260824.md`;
+  task 8.3 remains open because the live checkpoint connection was correctly
+  skipped without an authorized owner DSN/listener.
+- Image audit: `/tmp/task-9.8-supervised-audit-2fd60e9.md`; task 9.8 remains
+  partial because current digest/MinIO exception retention and clean first-party
+  amd64 proof are incomplete.
+- Final exact-commit report: `/private/tmp/tdt-obs-pi114-20260823t232739z/evidence/ACCEPTANCE-REPORT-11-4.md`;
+  task 11.4 remains blocked. Base passed one fresh sequence, optional profiles
+  failed scheduler-health progression, and the run was not a final four-profile
+  acceptance at the post-fix commit.
 
 Completed in this finalization pass: 5.6, 6.4, 6.8, 7.2, 7.3, 8.5, 9.1,
-9.2, 9.3, 9.4, 9.6, 9.7, 9.9, and refreshed 11.3. The remaining release
+9.2, 9.3, 9.4, 9.6, 9.7, 9.9, 4.6, 8.2, 8.7, and refreshed 11.3. The remaining release
 blockers are scheduler/owner independent acceptance tasks, first-party amd64
 build evidence, final exact-commit four-profile acceptance after the last
 reservation commit, PostgreSQL disposition/cutover, the full focused test
@@ -45,7 +61,7 @@ schema: spec-driven
 planning artifacts: complete
 
 openspec instructions apply --change repair-tdt-observability-compose-deployment --json --store openspec-store
-71/90 tasks complete; 19 remain
+74/90 tasks complete; 16 remain
 
 openspec validate repair-tdt-observability-compose-deployment --strict --store openspec-store
 valid
@@ -56,6 +72,13 @@ openspec validate --all --strict --store openspec-store
 openspec doctor --store openspec-store
 root/store references healthy
 ```
+
+The current owner fix is `59cfb4c`: it lowers the base health-poller memory
+reservation from `384M` to `256M`, matching its `256M` limit. This was required
+after the exact-commit follow-up reproduced Docker's fatal reservation-greater-
+than-limit rejection. Final rendered profile reservation totals are base
+`1920M`, Langfuse `4304M`, MLflow `2688M`, and full `4880M`; all four renders and
+242 focused deployment/Compose tests pass after the fix.
 
 The active change directory and the two corrected PostgreSQL Purpose specs are
 committed store artifacts. The current uncommitted store state is unrelated
