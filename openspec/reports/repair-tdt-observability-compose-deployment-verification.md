@@ -1,5 +1,98 @@
 # repair-tdt-observability-compose-deployment verification
 
+## Round-2 current-main reconciliation (2026-08-25)
+
+This section is the current authoritative disposition for the Docker Desktop
+deployment. All older sections below are retained historical evidence and MUST
+not override these current identities or verdicts.
+
+The archived change remains archived at
+`openspec/changes/archive/2026-08-24-repair-tdt-observability-compose-deployment`;
+no duplicate active change was created and no re-archive or spec-sync operation
+is required. The OpenSpec store was at `33c64368939b82d684581943658500354968951a`
+before this report-only correction.
+
+### Current source and image identities
+
+| Surface | Current `main`/canonical revision or image ID |
+|---|---|
+| `tdt-observability` implementation | `1f32ffed5a03aeac4647e1639d44a7e08cd593c4` |
+| `tdt-observability` current evidence docs | `73d2b26` (`docs: record current main observability deployment`) |
+| `agent-core` | `7b8d070823ddf6fa5ea5db6e117b9c120a59bd0a` |
+| `tdt-scheduler` | `c6a0fd452d85ef8e7c20730deaad63e387d7ebb2` |
+| canonical `tdt-core` (`/Users/androidteam/orca/workspaces/tdt-core/tdt-main`) | `42c8c2f70a6a0cb6a4e59a588d873108ae4b1e7d` |
+| `agent-core:local-dev` | `sha256:8a2962e2da90e8367967e6c6513ee81078e5f64938d669d3c2396d24439678fa` |
+| `tdt-scheduler:main-c6a0fd4` | `sha256:a803eb04c7f0d1d9ed1a8c7cb4dfd4970208f4bc56e556343c4ca6a818f3f420` |
+| `tdt-observability:local-20260825` | `sha256:72257085908697a5d099f5c2a1c8b6f76f26a819fd00754a6e095ea1769aa61f` |
+| `tdt-observability-mlflow:v3.15.1` | `sha256:8f4a7fa3cffc9d1210046d4bee11a460a80c8fe4d7d5faf4d55891506805c315` |
+
+All first-party images passed their non-root/import gates. The scheduler image
+has `canonical-main-overlay` and exact scheduler, agent-core, and tdt-core
+labels. The MLflow wrapper has the exact source revision, the immutable base
+digest
+`sha256:ea84a0b879f08b35a6f22f22b294024413e780b8fc978eecf5f760ac16cc9ce5`,
+and empty inherited Compose project/service/version labels.
+
+### Current Docker Desktop runtime
+
+Stable Compose projects are `tdt-local-full`, `tdt-local-full-agent-core`,
+and `tdt-local-full-tdt-scheduler`, with shared networks
+`tdt-local-full-observability` and `tdt-local-full-runtime`. The current
+inventory is exactly 15 TDT containers: 15 running, 12/12 configured Docker
+healthchecks healthy, three intentionally healthcheck-less services
+(`otel-gateway`, MinIO, and Langfuse worker), and zero restarts. PostgreSQL,
+ClickHouse, Redis, MinIO, Langfuse, MLflow, and state volumes were preserved;
+only owner/image surfaces were selectively recreated. Omniroute was untouched.
+
+The stable loopback publications are Grafana `52208`, Prometheus query API
+`52209` to container port `9090`, OTLP gRPC/HTTP `52210`/`52211`, Langfuse
+`52212`, MinIO console `52213`, MLflow `52214`, agent-core PostgreSQL `52215`,
+and scheduler `52216`. The Prometheus target correction is intentional: the
+LGTM image listens on container port `9090`; the stable host port remains
+`52209`.
+
+Eight direct/network probes returned HTTP 200: Grafana, Langfuse, MinIO,
+MLflow, scheduler, webhook-receiver, ai-review, and the gateway health
+extension. Scheduler health reports `initialized=true`, `dbos_connected=true`,
+four manifests, and 19 applied schedules. Health-poller readiness reports a
+current cycle; log-collector reports a heartbeat flush and persisted offset
+resumption for 110 files.
+
+### Current signal delivery
+
+The run-labeled final trace, metric, and log were emitted through
+`otel-gateway:4317` and independently read back in Tempo, Prometheus, and
+Loki. MLflow PostgreSQL contains trace
+`tr-a745207d08b74121883edb3ac1806c4f` for `round2-final-acceptance`.
+Langfuse ClickHouse contains the same run-labeled event in both
+`default.events_core` and `default.events_full`; its derived `default.traces`
+projection is asynchronous and was not used as the receipt gate. Gateway
+exporter queues for LGTM and Langfuse were empty after delivery; MLflow's queue
+drained after the server became ready.
+
+The Langfuse worker is running and its authenticated Redis endpoint responds,
+but it continues to emit recurring upstream queue socket-timeout messages for
+some idle executors. This is a runtime warning requiring follow-up, not a
+container-health failure and not a failure of the run-labeled event receipt.
+
+### Current OpenSpec validation
+
+| Gate | Result |
+|---|---|
+| Eight selected target specs, strict | pass |
+| Specs-wide strict | `376 passed, 0 failed` |
+| Full-store strict | `377 passed, 1 failed` |
+| Store doctor | pass |
+
+The sole full-store failure is unrelated active change
+`repair-hermes-cron-run-reliability`, which lacks a delta or
+`skip_specs: true`. It was preserved and not modified. The archived target
+itself remains complete at 90/90 tasks, 36/36 delta requirements synchronized,
+and 99/99 scenarios synchronized.
+
+**Current verdict: READY-WITH-WARNINGS for the running Docker Desktop stack;
+OpenSpec archive complete; Langfuse worker queue-timeout warning remains open.**
+
 ## Final archive evidence (2026-08-24)
 
 This section supersedes earlier identity, runtime, and archive-eligibility
@@ -300,7 +393,7 @@ Archive result:
 
 ### Retained warnings
 
-- Store-wide strict validation currently reports 375 passed and 1 unrelated
+- Store-wide strict validation currently reports 377 passed and 1 unrelated
   failed item: active change `repair-hermes-cron-run-reliability`. The selected
   TDT change passes; the unrelated change is outside this archive scope and
   must not be repaired or staged here.
@@ -322,8 +415,8 @@ Archive result:
   and credentials remain preserved. Cleanup is a separate exact-allowlist
   action and must not stop the final accepted deployment.
 
-Date: 2026-08-24 (current finalization pass)
-Verdict: **success / implementation complete / archive workflow not started**
+Date: 2026-08-24 (historical finalization pass; superseded above)
+Verdict: **historical success / implementation complete / archive now exists**
 
 ## Current finalization update (2026-08-24)
 
@@ -363,8 +456,8 @@ Fresh Docker Desktop evidence:
 
 Completed in this finalization pass: every previously open task, including
 8.3, 9.8, 10.1–10.10, 11.1, 11.2, 11.4, and 11.9. The implementation has no
-remaining OpenSpec apply task. Archive remains a separate, explicit lifecycle
-action and was not started.
+remaining OpenSpec apply task. The archive was subsequently completed and is
+recorded by the final archive evidence at the top of this report.
 
 This report records the current OpenSpec apply state for
 `repair-tdt-observability-compose-deployment`. Structural validation, static
@@ -388,7 +481,7 @@ openspec validate repair-tdt-observability-compose-deployment --strict --store o
 valid
 
 openspec validate --all --strict --store openspec-store
-375 passed, 0 failed
+377 passed, 1 failed (unrelated active repair-hermes-cron-run-reliability)
 
 openspec doctor --store openspec-store
 root/store references healthy
@@ -818,7 +911,8 @@ base_render_exit=0
 ```
 
 After the report/task reconciliation, the selected change validated strictly,
-the full store validated at `375 passed, 0 failed`, and `openspec doctor` reported
+the specs-wide gate validated at `376 passed, 0 failed`, the full store reported
+`377 passed, 1 failed` for the unrelated active change, and `openspec doctor` reported
 healthy root/store references. These are structural OpenSpec gates only and do
 not promote the active implementation to runtime readiness.
 
@@ -1275,8 +1369,8 @@ that disposition.
 
 This is the current authoritative disposition. The OpenSpec apply ledger is
 **90/90 complete with zero unchecked tasks**. Implementation and verification
-are complete; the archive workflow has **not** started and no archive or spec
-sync command was run in this finalization.
+are complete; the archive workflow has since completed and the change is
+archived. No duplicate active change was created.
 
 ### Final owner commit matrix
 
@@ -1370,8 +1464,9 @@ optional-backend failure-isolation directions, with successful restoration.
 - Final observability Ruff: passed.
 - Base, Langfuse, MLflow, and full Compose renders: passed.
 - Selected-change strict validation passed before this checkbox-only/report
-  reconciliation; the previously retained full-store result is `375 passed,
-  0 failed`, and store doctor was healthy. The workspace anti-loop contract
+  reconciliation; the current full-store result is `377 passed, 1 failed`
+  for the unrelated active change, while specs-wide validation is `376 passed,
+  0 failed`, and store doctor is healthy. The workspace anti-loop contract
   prohibited running the same validators again in this session.
 - A final full pytest/lock attempt from the nested observability worktree was
   environment-limited: editable `../tdt-core` resolved to absent
