@@ -8,9 +8,9 @@
 
 # OpenSpec Change Review: `repair-hermes-cron-run-reliability`
 
-**Reviewer Lens:** Architecture, Ownership Boundaries, and Canonical Automation Paths (`agy`)  
-**Frozen SHA:** `7c9ceac6e35b5019622be98dfb5788610e2514b3`  
-**Worktree:** [`/Users/androidteam/orca/workspaces/openspec-store/review-hermes-cron`](file:///Users/androidteam/orca/workspaces/openspec-store/review-hermes-cron)  
+**Reviewer Lens:** Architecture, Ownership Boundaries, and Canonical Automation Paths (`agy`)
+**Frozen SHA:** `7c9ceac6e35b5019622be98dfb5788610e2514b3`
+**Worktree:** [`/Users/androidteam/orca/workspaces/openspec-store/review-hermes-cron`](file:///Users/androidteam/orca/workspaces/openspec-store/review-hermes-cron)
 **Target Change:** [`openspec/changes/repair-hermes-cron-run-reliability`](file:///Users/androidteam/orca/workspaces/openspec-store/review-hermes-cron/openspec/changes/repair-hermes-cron-run-reliability)
 
 ---
