@@ -177,11 +177,13 @@ timestamp-named TDT project, volume, image, or network remains.
 
 First-party container images and OCI metadata provenance:
 
-- **Scheduler:** `tdt-scheduler:main-900a886`, image ID
-  `sha256:9e8a21c5be019094323f1905bec25cf94ad3be7b86ef274839648a5ad6142f09`;
-  OCI labels bind scheduler `900a886a24dd9cd9a73eab8c5cd463637359d44c`,
+- **Scheduler:** `tdt-scheduler:main-c6a0fd4`, image ID
+  `sha256:5c958520c47bc56fd155519f15e3fc9c6efa3962561c8d665664f0a6ea71c35d`;
+  OCI labels bind scheduler `c6a0fd452d85ef8e7c20730deaad63e387d7ebb2`,
   agent-core `3eaa7c842ef8ec7bbac8a6b74d4b187309c2b041`, and tdt-core
-  `703d0af29d215298e55a301098fc44f2dcfe07bd`.
+  `703d0af29d215298e55a301098fc44f2dcfe07bd`. Container is healthy with
+  restart count 0 under Compose project `tdt-local-full-tdt-scheduler`;
+  inherited image-level `com.docker.compose.project/service/version` values are empty.
 - **Agent-core:** `agent-core:local-dev`, image ID
   `sha256:4d09fdc941d1bfec38c0327b053971777503ecd92b8d65079a26518fdf9f4069`;
   OCI labels bind agent-core `3eaa7c842ef8ec7bbac8a6b74d4b187309c2b041` and
