@@ -26,7 +26,8 @@ context: |
   - OmniRoute — AI gateway with 290+ providers, 90+ free tiers (image tracks `latest`; was v3.8.49 at migration 2026-08-24)
   - Location: ~/Omniroute (upstream source checkout that doubles as the deployment dir; not a workspace repo)
   - Deployment: Docker Compose `base` profile via Docker Hub image (`diegosouzapw/omniroute:latest`), run from ~/Omniroute
-  - Ports: 20128 (dashboard), 20129 (API bridge), 20132 (LiveWS) — upstream three-port Docker mode (`API_PORT=20129` in .env)
+  - Ports: 20128 (dashboard), 20129 (API bridge), 20132 (LiveWS) — bound to 127.0.0.1 ONLY (official hardened pattern per README quick-run + VM guide; not LAN-accessible)
+  - Security: OMNIROUTE_WS_BRIDGE_SECRET set in .env (official guide: required in production); redis not host-published
   - Redis: compose `redis:7-alpine` service, internal network only (NOT published to host; `ports: !reset []` in override)
   - Persistence: Docker named volume `omniroute-data` → /app/data (SQLite, UID 1000). NOT a bind mount — Docker Desktop virtiofs bind mounts corrupt SQLite WAL DBs. Access via `docker cp` / in-container sqlite3. `restart: unless-stopped`
   - Reboot survival: Docker Desktop is a login item — recovers after user LOGIN (not bare boot)
