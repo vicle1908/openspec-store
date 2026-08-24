@@ -26,16 +26,16 @@
 
 ## Track 3: Wiki Lint Corrections
 
-- [ ] 3.1 Add `status: active` to 17 pages missing it (source: wiki-lint report 2026-08-24). The current lint contract checks `title`, `tags`, `created`, `updated`, and `status` — `type` is NOT part of the current audit.
-- [ ] 3.2 Set `created: 2026-08-23` + `date: 2026-08-20` on references page; update SCHEMA.md to document optional `date` field
-- [ ] 3.3 Fix 16 broken relative links (source: wiki-lint 2026-08-24):
+- [x] 3.1 Add `status: active` to 17 pages missing it (source: wiki-lint report 2026-08-24). The current lint contract checks `title`, `tags`, `created`, `updated`, and `status` — `type` is NOT part of the current audit.
+- [x] 3.2 Set `created: 2026-08-23` + `date: 2026-08-20` on references page; update SCHEMA.md to document optional `date` field
+- [x] 3.3 Fix 16 broken relative links (source: wiki-lint 2026-08-24):
   - `comparisons/knowledge-tools.md`: 7 links → `../entities/...` or `../concepts/...`
   - `concepts/mcp-transport-layer.md`: 5 links → `../entities/...`
   - `entities/mcp-router.md`: 4 links — cross-directory concept link needs `../concepts/...`, same-directory entity links stay as bare filenames
-- [ ] 3.4 Update `SCHEMA.md` frontmatter template to include `status: active|draft|archived`
-- [ ] 3.5 Commit wiki fixes in wiki repo (scoped commit: "fix: wiki frontmatter and link integrity")
+- [x] 3.4 Update `SCHEMA.md` frontmatter template to include `status: active|draft|archived`
+- [x] 3.5 Commit wiki fixes in wiki repo (scoped commit: "fix: wiki frontmatter and link integrity")
 - [ ] 3.6 BLOCKED on ownership acceptance — Create `wiki/scripts/wiki-lint.py` — deterministic validator (no-agent mode, zero-byte stdout when clean)
-- [ ] 3.7 Acceptance: lint tick produces valid report (exit 0 = report generated; findings are success, not failure)
+^- [ ] 3.7 BLOCKED on 3.6 — Acceptance: lint tick produces valid report (exit 0 = report generated; findings are success, not failure)
 
 ## Closure
 
