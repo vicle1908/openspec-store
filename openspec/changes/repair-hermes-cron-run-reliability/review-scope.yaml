@@ -1,0 +1,50 @@
+change: repair-hermes-cron-run-reliability
+worktree: /Users/androidteam/orca/workspaces/openspec-store/review-hermes-cron
+frozen_commit: HEAD of review-hermes-cron branch
+
+specs:
+  added:
+    - hermes-cron-run-reliability
+    - workspace-wiki-integrity
+  modified:
+    - workspace-index-freshness
+  referenced:
+    - hermes-runtime-efficiency
+    - hermes-configuration-safety
+    - developer-code-intelligence
+    - freshness-reporting-contract
+
+repos:
+  - openspec-store (change artifacts only)
+  - wiki (lint targets, read-only)
+
+scripts:
+  - ~/.hermes/scripts/mcp-router-health.sh (existing, read-only)
+  - ~/Developer/scripts/knowledge-refresh/ (existing, read-only)
+
+edges:
+  - spec ↔ code
+  - code ↔ docs
+  - docs ↔ skills
+  - skills ↔ specs
+  - spec ↔ docs
+  - code ↔ skills
+  - spec ↔ tests
+  - code ↔ tests
+  - knowledge ↔ code
+
+reviewers:
+  - provider: codex
+    lens: "Requirements completeness, task-test traceability, rollback coverage"
+  - provider: claude
+    lens: "Security, credential handling, unattended recovery, secret leakage"
+  - provider: agy
+    lens: "Architecture, ownership boundaries, canonical automation paths"
+  - provider: pi
+    lens: "Shell robustness, JSON parsing, exit codes, POSIX portability"
+  - provider: omp
+    lens: "Provider routing, model-independent behavior, config safety"
+  - provider: prime-agent
+    lens: "Operations, deployment, observability, failure recovery"
+  - provider: kimi
+    lens: "Scope, usability, report semantics, ambiguity, missing cases"
