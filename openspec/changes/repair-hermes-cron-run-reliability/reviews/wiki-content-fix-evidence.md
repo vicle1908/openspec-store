@@ -26,7 +26,7 @@ Pages: architecture/agent-core-llm-loading-and-cli-verification, comparisons/kno
 
 ### Task 3.5: Committed and integrated
 - Committed on branch `review-hermes-cron-wiki-fixes` at `f926254`
-- Cherry-picked into wiki `main` via fast-forward merge
+- Fast-forward merged branch `review-hermes-cron-wiki-fixes` into wiki `main`
 - No conflicts
 
 ## Post-integration deterministic audit

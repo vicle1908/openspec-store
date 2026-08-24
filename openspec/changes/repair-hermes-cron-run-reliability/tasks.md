@@ -35,7 +35,7 @@
 - [x] 3.4 Update `SCHEMA.md` frontmatter template to include `status: active|draft|archived`
 - [x] 3.5 Commit wiki fixes in wiki repo (scoped commit: "fix: wiki frontmatter and link integrity")
 - [ ] 3.6 BLOCKED on ownership acceptance — Create `wiki/scripts/wiki-lint.py` — deterministic validator (no-agent mode, zero-byte stdout when clean)
-^- [ ] 3.7 BLOCKED on 3.6 — Acceptance: lint tick produces valid report (exit 0 = report generated; findings are success, not failure)
+- [ ] 3.7 BLOCKED on 3.6 — Acceptance: lint tick produces valid report (exit 0 = report generated; findings are success, not failure)
 
 ## Closure
 
