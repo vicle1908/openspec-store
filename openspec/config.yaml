@@ -28,9 +28,9 @@ context: |
   - Deployment: Docker Compose `base` profile via Docker Hub image (`diegosouzapw/omniroute:latest`), run from ~/Omniroute
   - Ports: 20128 (dashboard), 20129 (API bridge), 20132 (LiveWS) — upstream three-port Docker mode (`API_PORT=20129` in .env)
   - Redis: compose `redis:7-alpine` service, internal network only (NOT published to host; `ports: !reset []` in override)
-  - Persistence: `~/Omniroute/data` bind mount (SQLite, owned by container UID 1000), `restart: unless-stopped`
+  - Persistence: Docker named volume `omniroute-data` → /app/data (SQLite, UID 1000). NOT a bind mount — Docker Desktop virtiofs bind mounts corrupt SQLite WAL DBs. Access via `docker cp` / in-container sqlite3. `restart: unless-stopped`
   - Reboot survival: Docker Desktop is a login item — recovers after user LOGIN (not bare boot)
-  - Override: untracked `docker-compose.override.yml` = deployment infrastructure (Hub image + redis port reset); verify before every start
+  - Override: untracked `docker-compose.override.yml` = deployment infrastructure (Hub image + redis port reset + named-volume override via `!override`); verify before every start
   - Update (on-demand, ~30s): `cd ~/Omniroute && docker compose --profile base pull && docker compose --profile base up -d --no-build`
   - Password: bcrypt hash in SQLite is authoritative; `INITIAL_PASSWORD` in .env only seeds first boot. Reset via `node bin/reset-password.mjs --password-stdin`
   - History: migrated 2026-08-24 from launchd (crash-looping server + hourly source-rebuild updater, both removed); data migrated from ~/.omniroute (kept as pre-cutover rollback copy)
