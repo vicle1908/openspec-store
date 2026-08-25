@@ -6,6 +6,7 @@ Schema: `spec-driven`
 Implementation repository: `/Users/androidteam/Developer/tdt-observability`
 Implementation commit: `3516db0dc2652f0d8d1465bc5b83e7cfecad7585`
 Durable evidence commit: `272a6d5cbe480c0755f444ab90ef25323a55c130`
+Current documentation/knowledge head: `474b25bd3cb9fee1f4a8786db9d3db0acbe69901`
 Independent exact-commit review: `PASS / MERGE` (the ephemeral review source was summarized into this ledger before post-archive cleanup)
 
 ## Summary
@@ -16,7 +17,10 @@ Independent exact-commit review: `PASS / MERGE` (the ephemeral review source was
 | Correctness | **PASS** — 5/5 delta requirements and 21/21 scenarios map to source, tests, durable documentation, and current runtime evidence |
 | Coherence | **PASS** — proposal, design, deltas, implementation, Docker Desktop deployment, incident exception, and retained-stack evidence agree |
 
-Final assessment: **ready for archive after the selected strict-validation and archive-readiness gates pass**. There are no critical implementation, test, documentation, or runtime issues.
+Final assessment: **archived and verified at the accepted runtime checkpoint**.
+There are no critical implementation, test, documentation, or runtime issues.
+The later operator resource pause described below changes current process state,
+not the accepted behavior or archive result.
 
 ## Evidence index
 
@@ -43,7 +47,7 @@ Final assessment: **ready for archive after the selected strict-validation and a
 - **D2 — final acceptance:** `deploy/evidence/final-full-deployment-acceptance.md:402-487`, committed as `272a6d5cbe480c0755f444ab90ef25323a55c130`, records exact source/image identities, tests, paired literals, composite inputs and budgets, primary recreation scope, resource diagnosis, the value-free security exception, disposable and retained fault/recovery, exact trace fan-out, two clean windows, restart counts, and final retained identities.
 - **D3 — planning coherence:** the proposal and design distinguish the ordinary web/worker correction and Redis fault proof from the later ClickHouse credential-incident response. They require in-place credential rotation first and permit a fresh affected-backend reset only under explicit no-old-data authority.
 
-### Current runtime evidence
+### Accepted runtime evidence (historical checkpoint)
 
 - **R1 — final composite:** strict endpoint HTTP 200, `enabled=true`, `registeredWorkerCount=32`, `stuck=false`, authenticated same-worker Redis PING, healthy Redis/worker container states, and three consecutive passes. Representative elapsed times were 20.531199 seconds, 17.902537 seconds, and 57.105312 seconds while the fresh backend settled.
 - **R2 — primary correction scope:** the implementation correction recreated only `langfuse-web` and `langfuse-worker`. Redis, gateway, PostgreSQL, ClickHouse, MinIO, networks, credentials, and volumes were not recreated for that correction.
@@ -52,7 +56,14 @@ Final assessment: **ready for archive after the selected strict-validation and a
 - **R5 — exact event fan-out:** trace `a44fd3f4ee7f4dcb59173bb2cb18f430` produced exactly one row in `default.events_core`, exactly one row in `default.events_full`, one Tempo receipt, and MLflow trace `tr-a44fd3f4ee7f4dcb59173bb2cb18f430`. Collector HTTP accepted spans increased 1→2; independent Langfuse, LGTM, and MLflow sent-span counters each increased 4→5; receiver failed/refused counters remained zero.
 - **R6 — final clean cohort:** the first 20/20-sample, 600-second clean window passed. After credential rotation and fresh ClickHouse initialization, a second final 20/20-sample, 600-second window also passed with web, worker, Redis, ClickHouse, and LGTM continuously running/healthy, restart counts zero, and relevant Redis-version, Redis-command, BullMQ, socket-timeout, lock-renewal, stalled-job, and reconnect lines zero.
 - **R7 — ClickHouse incident response:** a local diagnostic exposed the then-current ClickHouse application credential. No value is retained. The application user could not alter itself, so explicit greenfield/no-old-data authority was used to replace only ClickHouse and its versioned volume with a fresh unprinted credential, recreate web/worker against it, rerun all 46 migrations, verify `events_core` and `events_full`, and rerun composite, fan-out, restart, and final clean-window gates. Every other stateful volume was preserved.
-- **R8 — retained deployment:** the final `tdt-local-full`, `tdt-local-full-agent-core`, and `tdt-local-full-tdt-scheduler` projects remain running. Final recorded identities are web `673a675f65d5`, worker `e95473b326f0`, Redis `f2609d5470f2`, ClickHouse `afcd577b1cc4`, LGTM `d4e7cf33f2c0`, gateway `bfe1b1bfc689`, and MLflow `5404f1c2f4d5`; every recorded restart count is zero. Omniroute was not touched.
+- **R8 — retained deployment at acceptance:** the final `tdt-local-full`, `tdt-local-full-agent-core`, and `tdt-local-full-tdt-scheduler` projects were left running at the accepted checkpoint. Final recorded identities were web `673a675f65d5`, worker `e95473b326f0`, Redis `f2609d5470f2`, ClickHouse `afcd577b1cc4`, LGTM `d4e7cf33f2c0`, gateway `bfe1b1bfc689`, and MLflow `5404f1c2f4d5`; every recorded restart count was zero. Omniroute was not touched.
+
+### Current operator state after archive
+
+- **O1 — intentional resource pause:** on 2026-08-25 the operator authorized shutdown of the three stable TDT projects after implementation, archive, documentation, and cleanup completed. Diagnostics immediately before shutdown showed all 15 TDT containers running, every configured healthcheck healthy, and restart counts zero.
+- **O2 — ownership-scoped teardown:** scheduler, observability/backends, and agent-core were brought down in reverse dependency order with exact Docker-recorded Compose inputs, `down --remove-orphans`, and no `-v`. No `tdt-local-full*` container or network remains.
+- **O3 — state retained:** all eight named TDT volumes, pinned images, the protected operator environment, and Omniroute remain preserved. No image, volume, credential file, build cache, or foreign resource was removed.
+- **O4 — interpretation:** R1–R8 remain authoritative evidence for their dated accepted cohort. O1–O3 supersede only claims that those processes are currently running. A later restart requires a fresh current-state verification; retained volumes and cached images alone are not readiness evidence.
 
 ## Requirement and scenario mapping
 
@@ -122,8 +133,8 @@ These are ordered lifecycle operations, not implementation gaps. Tasks 4.1 and 4
 2. **Security reset exception:** no volume was removed during the ordinary timeout correction or either Redis fault proof. One ClickHouse volume was intentionally reset only for credential-incident response under explicit no-old-data authority; this is not generalized into a claim that every volume was preserved.
 3. **Pre-existing mypy diagnostics:** module-wide diagnostics outside changed lines remain in `stack.py` and `evidence.py`; changed-line strict mypy was clean.
 4. **Initial Docker resource starvation:** early runtime delays were diagnosed as contention from unbounded LGTM and ClickHouse work on the 8-vCPU Docker Desktop baseline. The final 1.0/1.5 CPU limits, bounded ClickHouse healthcheck, final composite, and two clean windows close this change's readiness risk without making a general production-sizing claim.
-5. **Graphify generated state:** generated Graphify output remains separately dirty and is intentionally excluded from source and store commits. It is preserved for ownership review rather than discarded.
+5. **Knowledge tooling:** canonical Graphify output was refreshed, de-duplicated, and committed at `1094a9ed06a2597350ab33d325cc9677cc37f88d`. GitNexus remains stale because incremental analysis hit duplicate embedding primary key `Function:src/tdt_observability/cli.py:main:0`; its bounded FTS repair succeeded, but no fresh GitNexus pass is claimed.
 
 ## Archive disposition
 
-Implementation, documentation, runtime verification, selected strict validation, archive readiness, spec synchronization, and supported archive are **PASS**. The archived change is retained at `openspec/changes/archive/2026-08-25-harden-langfuse-worker-readiness`; the final store commit is limited to that archive move, the two synchronized main specs, and this report. The retained Docker Desktop deployment must remain running, and neither Omniroute nor any unrelated change, worktree, Graphify output, temporary branch, or Docker volume is in scope.
+Implementation, documentation, accepted runtime verification, selected strict validation, archive readiness, spec synchronization, and supported archive are **PASS**. The archived change is retained at `openspec/changes/archive/2026-08-25-harden-langfuse-worker-readiness`. Its behavioral conclusions remain valid after the separately authorized operator pause because teardown followed the normative volume-preserving ownership boundary. Current runtime readiness is intentionally not claimed while the TDT projects are stopped; a later restart requires fresh verification. Omniroute, unrelated changes/worktrees, credentials, images, and all TDT volumes remain outside retirement scope.
