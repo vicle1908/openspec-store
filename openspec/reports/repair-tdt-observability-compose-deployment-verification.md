@@ -1,5 +1,36 @@
 # repair-tdt-observability-compose-deployment verification
 
+## Round-3 Langfuse readiness apply blocker (2026-08-25)
+
+The follow-up OpenSpec change `harden-langfuse-worker-readiness` is active and
+governs the Langfuse worker/Redis readiness corrections committed in
+`tdt-observability` at `23f47b46dec45d5c359ccac6c134575dca026bb7` with
+evidence commit `f67d945b7bfe54af1471e96291033982a77deb2f`.
+
+Static verification passes: 340 focused tests, Ruff, four daemon-free profile
+renders, pinned Langfuse/full Collector validation, strict selected-change
+validation, and store doctor are green. Redis and the Langfuse worker are
+Docker healthy; strict worker readiness returns HTTP 200 with queue consumption
+enabled, 32 registered workers, and `stuck=false`; affected restart counts are
+zero. Fresh trace `2b19f3b56803f23b20e8a0fb703a297c` produced exactly one
+row in both Langfuse ingestion tables, Tempo returned HTTP 200, MLflow retained
+one matching span, and Collector fan-out counters include all three backends.
+
+However, the fresh continuous observation from `2026-08-25T01:35:16Z` lasted
+699 seconds and accumulated 616 Langfuse worker error matches of the recurring
+form `Queue job ... errored: Error: Socket timeout. Expecting data, but didn't
+receive any in 30000ms.` Web errors and restarts remained zero. This violates
+the follow-up change's Redis 8 and latest-dependency-cohort no-error scenarios.
+Queue-aware health and functional receipt therefore do not close compatibility.
+
+Current disposition: **BLOCKED / active follow-up change not archive-ready**.
+Task 3.4 remains unchecked. See
+`openspec/reports/harden-langfuse-worker-readiness-verification.md` for the
+current completeness/correctness/coherence scorecard. Historical acceptance
+sections below remain valid only for the identities and narrower gates they
+name; they MUST NOT override this current compatibility blocker.
+
+
 ## Round-2 current-main reconciliation (2026-08-25)
 
 This section is the current authoritative disposition for the Docker Desktop
