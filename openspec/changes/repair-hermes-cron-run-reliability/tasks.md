@@ -34,8 +34,8 @@
   - `entities/mcp-router.md`: 4 links — cross-directory concept link needs `../concepts/...`, same-directory entity links stay as bare filenames
 - [x] 3.4 Update `SCHEMA.md` frontmatter template to include `status: active|draft|archived`
 - [x] 3.5 Commit wiki fixes in wiki repo (scoped commit: "fix: wiki frontmatter and link integrity")
-- [ ] 3.6 Create `wiki/scripts/wiki-lint.py` — deterministic validator (no-agent mode, zero-byte stdout when clean) (approved 2026-08-25)
-- [ ] 3.7 Acceptance: lint tick produces valid report (exit 0 = report generated; findings are success, not failure)
+- [x] 3.6 — Create `wiki/scripts/wiki-lint.py` — deterministic validator (no-agent mode, zero-byte stdout when clean) (approved 2026-08-25)
+- [x] 3.7 Acceptance: lint tick produces valid report (exit 0 = report generated; findings are success, not failure)
 
 ## Track 2a: Knowledge-Refresh Source Migration
 
