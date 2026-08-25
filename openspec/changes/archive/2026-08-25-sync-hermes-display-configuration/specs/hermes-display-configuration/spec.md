@@ -1,10 +1,10 @@
-# hermes-display-configuration Specification
+# hermes-display-configuration
 
-## Purpose
+## Purpose (updated)
 
-Defines display settings for the Hermes Agent default profile, balancing operational visibility with output clarity. Reasoning blocks are shown to provide transparency into model thinking. Per-platform overrides keep shared channels (Slack) clean while enabling full reasoning on Telegram and CLI.
+Defines display settings for the Hermes Agent default profile, maximizing operational visibility across all surfaces. Reasoning blocks are shown to provide transparency into model thinking. Full detail is enabled across all platforms. Per-platform overrides allow targeted reduction where needed.
 
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Reasoning-visible display profile
 
@@ -128,6 +128,8 @@ Before any display configuration mutation, a pre-change backup SHALL be created.
 - **THEN** `hermes config check` SHALL pass with no errors
 - **AND** `hermes config get display.show_reasoning` SHALL return `true`
 - **AND** `hermes config get display.reasoning_full` SHALL return `true`
+
+## ADDED Requirements
 
 ### Requirement: Gateway streaming is distinct from CLI streaming
 
