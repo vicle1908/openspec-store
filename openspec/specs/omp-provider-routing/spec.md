@@ -35,15 +35,15 @@ And `cockpit.api` SHALL be `openai-responses`.
 ### Requirement: Canonical model IDs
 
 Model IDs in `models.yml` SHALL use the canonical upstream identifiers
-(`fable-5`, `gpt-5.6-sol`, `gpt-5.6-luna`) confirmed by response metadata.
+(`Claude-Fable`, `gpt-5.6-sol`, `gpt-5.6-luna`) confirmed by response metadata.
 The `[1m]` suffixed variants SHALL NOT be used until isolated-profile
 testing proves omp parses bracket notation correctly.
 
 #### Scenario: model ID in response
 
-Given `shopapikey/fable-5` is selected
+Given `shopapikey/Claude-Fable` is selected
 When a prompt is sent
-Then the response `model` field SHALL contain `fable-5`.
+Then the response `model` field SHALL contain `Claude-Fable`.
 
 #### Scenario: phanmemvip model ID in response
 
@@ -144,7 +144,7 @@ Then the response SHALL contain "pong" and exit 0.
 
 #### Scenario: lightweight model works
 
-Given `shopapikey/fable-5` is assigned to `smol` and `commit`
+Given `shopapikey/Claude-Fable` is assigned to `smol` and `commit`
 When invoked through omp
 Then the response SHALL contain "pong" and exit 0, subject to provider-side rate limits.
 
@@ -284,3 +284,19 @@ Given the migrated `models.yml`
 When inspected programmatically
 Then no provider block named `giaoduc` SHALL exist
 And no model selector SHALL reference `giaoduc`.
+
+### Requirement: phanmemvip SHALL be consumed via the OpenAI Responses API only
+
+Every consumer that routes the phanmemvip provider SHALL use the OpenAI Responses API (`POST /v1/responses`, or the consumer's equivalent Responses dialect). No consumer SHALL route phanmemvip through the Anthropic Messages protocol.
+
+#### Scenario: OMP phanmemvip uses Responses
+
+Given the phanmemvip provider block in `models.yml`
+Then its `api` SHALL be `openai-responses`
+And its `baseUrl` SHALL be `https://api.phanmemvip.shop/v1`.
+
+#### Scenario: goose phanmemvip uses the OpenAI engine
+
+Given `~/.config/goose/custom_providers/custom_phanmemvip.json`
+Then its `engine` SHALL be `openai`
+And goose SHALL route `gpt-5.6-sol` through the Responses format.

@@ -2,7 +2,9 @@
 
 ## Purpose
 Ensures fresh zsh shells receive the five HERMES_CUSTOM_*_API_KEY credentials through an allowlisted loader wired via .zshenv, with 1M context windows declared for omp custom models with giaoduc/Advance preserved as the default role.
+
 ## Requirements
+
 ### Requirement: Fresh-shell custom credentials
 
 A fresh zsh shell SHALL source the shared allowlisted loader at
@@ -45,7 +47,7 @@ integration metadata unrelated to credential loading.
 
 ### Requirement: One-million-token custom model contexts
 
-The omp model entries for `shopapikey/fable-5`, `giaoduc/Advance`, and
+The omp model entries for `shopapikey/Claude-Fable`, `phanmemvip/gpt-5.6-sol`, and
 `cockpit/gpt-5.6-luna` SHALL declare `contextWindow: 1000000`.
 
 #### Scenario: custom model context metadata
@@ -64,7 +66,7 @@ The current `default` role SHALL resolve to `cockpit/gpt-5.6-luna:max`.
 
 Given the corrected fresh-shell environment
 When each explicit selector is run through omp
-Then `cockpit/gpt-5.6-luna`, `shopapikey/fable-5`, and `giaoduc/Advance`
+Then `cockpit/gpt-5.6-luna`, `shopapikey/Claude-Fable`, and `phanmemvip/gpt-5.6-sol`
 SHALL return `pong` with exit code 0, subject to provider-side rate limits.
 
 #### Scenario: current default uses native Cockpit

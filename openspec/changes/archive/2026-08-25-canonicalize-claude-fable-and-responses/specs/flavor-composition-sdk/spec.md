@@ -1,8 +1,6 @@
-## Purpose
+# flavor-composition-sdk Delta
 
-This specification defines requirements for Flavor Composition Sdk.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: build_agent SHALL accept flavors parameter
 `build_agent()` SHALL accept an optional `flavors: list[Flavor] | None = None` parameter (keyword-only). When provided, these flavors SHALL be passed to `BaseAgent(flavors=...)`. When None, the current default behavior (building a Flavor from config) SHALL be preserved.
@@ -44,31 +42,3 @@ class Flavor:
 #### Scenario: Empty flavors list
 - **WHEN** `build_agent(config, model="openai-chat:Claude-Fable", flavors=[])` is called
 - **THEN** an empty list SHALL be passed to BaseAgent (no flavors applied)
-
-### Requirement: build_toolkit SHALL support include_builtins
-`build_toolkit()` SHALL accept an optional `include_builtins: bool = True` parameter. This SHALL be passed through to `ToolRegistry(include_builtins=include_builtins)`.
-
-**Verified current signature (sdk/tools.py:11-15):**
-```python
-def build_toolkit(
-    tools: list[BaseTool[Any]],
-    hooks: list[dict[str, Any]] | None = None,
-) -> ToolRegistry:
-```
-
-**Current behavior:** Creates `ToolRegistry(include_builtins=False)` — builtins are always excluded.
-
-#### Scenario: Builtins included (default)
-- **WHEN** `build_toolkit(tools)` is called without include_builtins
-- **THEN** the ToolRegistry SHALL include all 7 built-in tools alongside the provided tools
-
-#### Scenario: Builtins explicitly excluded
-- **WHEN** `build_toolkit(tools, include_builtins=False)` is called
-- **THEN** the ToolRegistry SHALL contain only the provided tools (current behavior)
-
-### Requirement: hooks vs capabilities SHALL be documented
-AGENTS.md SHALL include a decision matrix explaining when to use hooks vs harness capabilities.
-
-#### Scenario: Developer reads decision matrix
-- **WHEN** a developer reads AGENTS.md looking for guidance on hooks vs capabilities
-- **THEN** a clear decision matrix SHALL be present with the rule: hooks = cross-cutting concerns (metrics, audit, approval), capabilities = agent behavior (compaction, planning, tools)

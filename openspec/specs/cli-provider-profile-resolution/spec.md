@@ -202,7 +202,7 @@ The canonical provider/model/default profile is the source of truth. Each native
 
 #### Scenario: Conflicting alias between canonical and native
 
-- **GIVEN** the canonical profile specifies alias `shopapikey-fable-5` with wire model `fable-5`
+- **GIVEN** the canonical profile specifies alias `shopapikey-claude-fable` with wire model `Claude-Fable`
 - **AND** a native CLI config contains a different model for the same provider
 - **WHEN** the adapter projects the canonical profile
 - **THEN** the canonical profile's model SHALL take precedence

@@ -29,7 +29,7 @@ Each model in the `models` section SHALL declare an alias, provider reference, w
 
 #### Scenario: Model profile accepted
 
-- **GIVEN** the YAML contains `models.shopapikey-fable-5` with `provider: shopapikey`, `model: fable-5`
+- **GIVEN** the YAML contains `models.shopapikey-claude-fable` with `provider: shopapikey`, `model: Claude-Fable`
 - **WHEN** the YAML is loaded and validated
 - **THEN** the model profile SHALL be accepted
 - **AND** the provider reference SHALL resolve to a defined provider
@@ -60,9 +60,9 @@ The `defaults.model` field SHALL reference a defined model alias. Fallbacks MAY 
 
 #### Scenario: Default alias resolved
 
-- **GIVEN** `defaults.model: shopapikey-fable-5` and `models.shopapikey-fable-5` is defined
+- **GIVEN** `defaults.model: shopapikey-claude-fable` and `models.shopapikey-claude-fable` is defined
 - **WHEN** no higher-priority source overrides the default
-- **THEN** the effective model SHALL be `shopapikey-fable-5`
+- **THEN** the effective model SHALL be `shopapikey-claude-fable`
 - **AND** the resolved profile SHALL contain both the alias and the wire model ID
 
 #### Scenario: Default alias references undefined model

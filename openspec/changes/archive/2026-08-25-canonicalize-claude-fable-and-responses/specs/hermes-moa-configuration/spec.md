@@ -1,25 +1,6 @@
-# hermes-moa-configuration Specification
+# hermes-moa-configuration Delta
 
-## Purpose
-Define the validated local Hermes Mixture of Agents model topology, provider-level context ownership, independent failover, operational documentation, and evidence required to keep configuration, behavior, and recovery aligned.
-
-## Requirements
-
-### Requirement: MoA default route
-
-The Hermes default profile SHALL select the Mixture of Agents virtual provider with `model.provider: moa` and `model.default: default`, and the `moa.default_preset` SHALL be `default`.
-
-#### Scenario: Fresh default-profile session
-
-- **WHEN** Hermes starts a fresh session without a session-scoped model override
-- **THEN** the runtime SHALL resolve provider `moa` and preset `default`
-- **AND** the MoA facade SHALL own the main agent call path
-
-#### Scenario: Config-level active preset is empty
-
-- **WHEN** `moa.active_preset` is empty or absent while `model.provider` is `moa` and `model.default` is `default`
-- **THEN** the empty active-preset marker SHALL NOT be interpreted as disabling the selected MoA default route
-- **AND** operator documentation SHALL distinguish `moa.active_preset` from primary model selection
+## MODIFIED Requirements
 
 ### Requirement: Default MoA preset
 
@@ -69,42 +50,6 @@ The `fast` preset SHALL minimize MoA latency while retaining one independent rea
 - **AND** `degraded_reference_policy` SHALL be `loud`
 - **AND** the preset SHALL be `enabled: true`
 
-### Requirement: Context-window ownership
-
-The one-million-token context declaration SHALL be owned by provider and model configuration, and MoA reference or aggregator slots SHALL NOT duplicate `context_length`.
-
-#### Scenario: Provider context validation
-
-- **WHEN** configuration validation inspects `cockpit`, `shopapikey`, and `phanmemvip`
-- **THEN** each provider SHALL declare `context_length: 1000000`
-- **AND** each MoA-used model SHALL resolve a one-million-token context declaration from its provider/model configuration
-
-#### Scenario: MoA slot validation
-
-- **WHEN** configuration validation traverses every reference and aggregator slot
-- **THEN** no slot SHALL contain a `context_length` field
-
-### Requirement: Advisor privacy and failure isolation
-
-Hermes SHALL preserve the aggregator path when one reference model fails. The `moa.privacy_filter` value SHALL be the literal empty string. The degraded-reference policy for every preset SHALL be `loud`. A failed advisor SHALL NOT abort aggregation when another advisor and the aggregator remain available.
-
-#### Scenario: Privacy filter literal value
-
-- **WHEN** configuration validation inspects `moa.privacy_filter`
-- **THEN** the value SHALL be the literal empty string
-
-#### Scenario: User-visible reference output
-
-- **WHEN** advisor output is shown or persisted as a user-visible MoA trace
-- **THEN** maintained documentation SHALL NOT claim that `display`-mode privacy filtering is configured
-- **AND** any redaction guarantee SHALL require separate runtime verification
-
-#### Scenario: One advisor fails
-
-- **WHEN** one reference provider fails while at least one remaining reference and the aggregator remain available
-- **THEN** Hermes SHALL report or retain the degraded-reference result
-- **AND** SHALL continue to the aggregator rather than aborting the entire turn solely because of that advisor failure
-
 ### Requirement: Fallback independence
 
 The fallback chain SHALL contain routes that are distinct from the selected primary `moa:default` deployment and SHALL preserve the configured direct-provider order.
@@ -119,27 +64,6 @@ The fallback chain SHALL contain routes that are distinct from the selected prim
 - **WHEN** a fallback entry resolves to the same provider, model, and effective virtual deployment as the failed `moa:default` primary
 - **THEN** the configuration SHALL exclude that redundant entry
 - **AND** validation SHALL confirm the chain begins with an independent direct provider
-
-### Requirement: Operational documentation and evidence
-
-The maintained runbook SHALL document architecture, preset intent, selection, inspection, health checks, cost/latency, privacy, partial failures, context ownership, rollback, and sanitized validation evidence.
-
-#### Scenario: Operator validates MoA
-
-- **WHEN** an operator follows the runbook
-- **THEN** they SHALL be able to verify YAML shape, normalized configuration, all three direct providers, and a fresh MoA tool-call continuation without exposing credentials
-
-#### Scenario: Real tool-call smoke test
-
-- **WHEN** a fresh `moa:default` session is instructed to use a harmless terminal tool
-- **THEN** retained transcript or runtime metadata SHALL show the MoA aggregator requested the tool
-- **AND** the session SHALL continue after the tool result to produce the final answer
-
-#### Scenario: Rollback
-
-- **WHEN** the reconciled configuration must be rolled back
-- **THEN** the operator SHALL restore only a local sanitized backup or the explicitly removed fields/entry
-- **AND** SHALL rerun config and MoA validation before declaring recovery complete
 
 ### Requirement: Specialist MoA topology and independent cockpit routes
 
@@ -171,22 +95,6 @@ The MoA configuration SHALL use `cockpit:gpt-5.6-sol` as the cockpit-backed refe
 - **WHEN** a direct non-streaming inference request is sent to cockpit with model `gpt-5.6-luna`
 - **THEN** the provider SHALL return a successful response
 - **AND** the verification SHALL not expose credentials or authorization headers
-
-### Requirement: MoA root normalization
-
-The `moa` configuration root SHALL contain exactly `default_preset`, `privacy_filter`, and `presets`. No legacy flat-level operational fields (`reference_models`, `aggregator`, `reference_temperature`, `aggregator_temperature`, `degraded_reference_policy`, `max_tokens`, `reference_max_tokens`, `fanout`, `enabled`) SHALL exist directly under `moa`. Preset tuning (temperatures, token limits, fanout cadence, degraded-reference policy, enablement) SHALL be owned exclusively by each preset entry under `moa.presets`.
-
-#### Scenario: Root key validation
-
-- **WHEN** configuration validation inspects the `moa` root
-- **THEN** the only permitted top-level keys SHALL be `default_preset`, `privacy_filter`, and `presets`
-- **AND** no legacy flat-level operational field SHALL be present
-
-#### Scenario: Preset owns all tuning
-
-- **WHEN** a preset is inspected for its operational parameters
-- **THEN** each preset SHALL contain its own `reference_temperature`, `aggregator_temperature`, `degraded_reference_policy`, `max_tokens`, `reference_max_tokens`, `fanout`, and `enabled` fields
-- **AND** these values SHALL NOT be inherited from or shadowed by root-level `moa.*` fields
 
 ### Requirement: Default-2 MoA role-switch preset
 
@@ -230,26 +138,3 @@ The Hermes MoA configuration SHALL provide an enabled `default-2` preset that sw
 - **THEN** the existing `default`, `deep`, and `fast` presets SHALL remain available with their prior values
 - **AND** the primary route SHALL remain `moa:default`
 - **AND** structural and runtime MoA validation SHALL pass after rollback
-
-### Requirement: Hermes provider configuration is a separate runtime surface
-
-Hermes provider configuration (`providers.<name>.model`, `providers.<name>.context_length`, and MoA preset slot references) SHALL be governed by this capability and the Hermes runtime, not by the canonical TDT provider schema. The canonical TDT provider schema (transport, protocol, auth_env, cli_provider, base_url, and model-level context_window) SHALL NOT be treated as the authority for Hermes provider fields. Context-window ownership at the Hermes provider level (`providers.<name>.context_length`) is intentional and distinct from the canonical model-level `context_window` behavior field. The two schemas MAY reference the same underlying providers (shopapikey, phanmemvip, cockpit) without one being a projection of the other.
-
-#### Scenario: Hermes provider fields are not canonical TDT fields
-
-- **WHEN** Hermes configuration declares `providers.cockpit.model` or `providers.cockpit.context_length`
-- **THEN** those fields SHALL be interpreted under the Hermes runtime schema
-- **AND** they SHALL NOT be validated against or rejected by the canonical TDT provider schema
-
-#### Scenario: Shared providers do not imply shared schema
-
-- **GIVEN** both Hermes and the canonical TDT configuration reference the cockpit provider
-- **WHEN** either configuration is validated
-- **THEN** each SHALL be validated under its own runtime schema
-- **AND** agreement on the provider name SHALL NOT require agreement on field structure
-
-#### Scenario: Context-window ownership remains provider-level for Hermes
-
-- **WHEN** Hermes validation inspects a provider used by MoA
-- **THEN** the one-million-token context declaration SHALL be owned by `providers.<name>.context_length`
-- **AND** MoA reference and aggregator slots SHALL NOT duplicate that declaration

@@ -15,7 +15,7 @@ The `~/.claude/settings.json` file SHALL contain the shopapikey model, base URL,
 - **THEN** it MUST contain a top-level `model` key set to `fable[1m]`
 - **AND** its `env` block MUST contain `ANTHROPIC_BASE_URL=https://api.phanmemvip.shop`
 - **AND** its `env` block MUST contain `ANTHROPIC_MODEL=fable[1m]`
-- **AND** its `env` block MUST contain `ANTHROPIC_DEFAULT_FABLE_MODEL=fable-5[1m]`
+- **AND** its `env` block MUST contain `ANTHROPIC_DEFAULT_FABLE_MODEL=Claude-Fable[1m]`
 - **AND** its `env` block MUST contain `CLAUDE_CODE_EFFORT_LEVEL=xhigh`
 
 #### Scenario: settings.json contains no auth tokens
@@ -112,7 +112,7 @@ Each provider profile JSON under `~/.claude/profiles/` SHALL contain a top-level
 
 - **WHEN** `~/.claude/profiles/cockpit.json` is loaded
 - **THEN** `model` MUST be `gpt-5.6-luna[1m]`
-- **AND** `env.ANTHROPIC_BASE_URL` MUST be `http://localhost:8787`
+- **AND** `env.ANTHROPIC_BASE_URL` MUST be `http://localhost:8788`
 - **AND** `env.ANTHROPIC_MODEL` MUST be `gpt-5.6-luna[1m]`
 - **AND** `env.CLAUDE_CODE_EFFORT_LEVEL` MUST be `max`
 
