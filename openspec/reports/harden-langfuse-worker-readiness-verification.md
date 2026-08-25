@@ -6,7 +6,7 @@ Schema: `spec-driven`
 Implementation repository: `/Users/androidteam/Developer/tdt-observability`
 Implementation commit: `3516db0dc2652f0d8d1465bc5b83e7cfecad7585`
 Durable evidence commit: `272a6d5cbe480c0755f444ab90ef25323a55c130`
-Reviewed implementation report: `/tmp/langfuse-runtime-final-review.md` (`PASS / MERGE`)
+Independent exact-commit review: `PASS / MERGE` (the ephemeral review source was summarized into this ledger before post-archive cleanup)
 
 ## Summary
 
@@ -34,7 +34,7 @@ Final assessment: **ready for archive after the selected strict-validation and a
 - **T2 — Compose policy tests:** `tests/test_compose_models.py` covers heavy-service CPU limits, bounded ClickHouse HTTP health, strict worker health, healthy Redis ordering, exact false BullMQ gate, fixed paired socket-timeout literals, and absence of an override lane.
 - **T3 — composite behavior tests:** `tests/deployment/test_coordinator_evidence_contract.py` covers a full finite-budget composite, endpoint HTTP 200 failing to mask Redis-path loss, timeout classification, one value-free in-worker Redis probe, failure propagation, three-pass transitions, external evidence validation, and failure dominance.
 - **T4 — credential/routing tests:** focused preflight tests reject missing, placeholder, mismatched, and ambient/file BullMQ-bypass inputs without exposing values; both selected Collector configurations validate under `otel/opentelemetry-collector-contrib:0.159.0`; route/header tests reject legacy fallback.
-- **T5 — independent review:** the final exact-commit review at `/tmp/langfuse-runtime-final-review.md` returned `PASS / MERGE`. The preceding attack rereview passed 121 targeted tests and 223 coordinator contract tests.
+- **T5 — independent review:** the final exact-commit review returned `PASS / MERGE`; its findings are summarized in this ledger and its temporary source was removed after archive. The preceding attack rereview passed 121 targeted tests and 223 coordinator contract tests.
 - **T6 — typing boundary:** changed-line strict mypy produced no diagnostics. Module-wide mypy still reports only pre-existing diagnostics in `stack.py` and `evidence.py`; this change does not claim unrelated type cleanup.
 
 ### Durable documentation
@@ -112,7 +112,7 @@ Final assessment: **ready for archive after the selected strict-validation and a
 - Archive-readiness validator: **PASS** — 13/13 tasks, 2 delta specs, all required artifacts, zero errors or warnings.
 - Delta/main comparison and sync: **PASS** — all 5 selected requirement blocks match the two main specs; strict specs-wide validation passed 376/376.
 - Supported archive: **PASS** — archived as `openspec/changes/archive/2026-08-25-harden-langfuse-worker-readiness`; OpenSpec confirmed both specs were already in sync.
-- Store commit: pending the exact staged-scope review below.
+- Archive/spec/report store commit: **PASS** — committed as `890912f667045f2b31f583d85eba0aa99760ea92`; this post-archive update only finalizes the report's cleanup ledger.
 
 These are ordered lifecycle operations, not implementation gaps. Tasks 4.1 and 4.2 are complete after final validation and the exact pre-archive ownership review; sync, archive, and the store commit now finalize the lifecycle.
 
