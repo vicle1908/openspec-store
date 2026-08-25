@@ -2,7 +2,7 @@
 
 ## Architecture Decisions
 
-### AD1: Proposed canonical ownership, pending cross-repository acceptance
+### AD1: Canonical ownership approved (2026-08-25)
 - **Track 1 + Track 2** (`mcp-router-watchdog.sh`, `weekly-freshness-report.sh`): Canonical source at `ops-automation-suite/scripts/hermes-cron/`. Expand `ops-automation-suite` scope/documentation to cover workstation cron wrappers. Deploy reviewed copies to `~/.hermes/scripts/`. Runtime copies are NOT canonical.
 - **Track 3** (`wiki-lint.sh`): Canonical source at `wiki/scripts/wiki-lint.py`. Contract and tests belong with the wiki. Deploy reviewed copy to `~/.hermes/scripts/`.
 
@@ -41,13 +41,9 @@ Clean result: zero-byte stdout, exit 0. Findings: report content, exit 0. Valida
 
 ## Ownership
 
-### Accepted (no gate)
-- Wiki content corrections (tasks 3.1–3.5): pure mechanical fixes in the wiki repo. No script ownership needed.
-
-### Open gate — requires user approval
-- **Track 1** (watchdog wrapper): canonical source proposed at `ops-automation-suite/scripts/hermes-cron/`
-- **Track 2** (freshness reporter): canonical wrapper source proposed at `ops-automation-suite/scripts/hermes-cron/`. The existing `~/Developer/scripts/knowledge-refresh/` infrastructure is a runtime dependency, NOT the canonical source for the wrapper.
-- **Track 3 script** (wiki validator): canonical source proposed at `wiki/scripts/wiki-lint.py`
-- **knowledge-refresh ownership**: `~/Developer/scripts/knowledge-refresh/` is untracked. Extending `knowledge-status.sh` with `operation_status` fields remains blocked until its own tracked owner is identified.
-
-Do NOT unblock tasks 1.1, 2.1, or 3.6 without explicit user approval.
+### Approved (2026-08-25, user explicitly accepted)
+- **Wiki content corrections** (tasks 3.1–3.5): pure mechanical fixes in the wiki repo. Done.
+- **Track 1 + Track 2** (`mcp-router-watchdog.sh`, `weekly-freshness-report.sh`): Canonical source at `ops-automation-suite/scripts/hermes-cron/`. Expand `ops-automation-suite` scope/documentation to cover workstation cron wrappers. Deploy reviewed copies to `~/.hermes/scripts/`. Runtime copies are NOT canonical.
+- **Track 3 script** (`wiki-lint.py`): Canonical source at `wiki/scripts/wiki-lint.py`. Contract and tests belong with the wiki. Deploy reviewed copy to `~/.hermes/scripts/`.
+- **knowledge-refresh scripts**: Migrate into tracked location (`ops-automation-suite/scripts/knowledge-refresh/`) before extending `operation_status` fields. Preserve approved inventory digest and LaunchAgent/post-merge behavior.
+- **Deployment rule**: All wrappers deployed to `~/.hermes/scripts/` are projections, never canonical sources.

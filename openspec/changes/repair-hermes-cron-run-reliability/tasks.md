@@ -2,21 +2,21 @@
 
 ## Track 1: Deterministic Watchdog
 
-- [ ] 1.1 BLOCKED on ownership acceptance — Create `ops-automation-suite/scripts/hermes-cron/mcp-router-watchdog.sh` — deterministic wrapper
+- [ ] 1.1 Create `ops-automation-suite/scripts/hermes-cron/mcp-router-watchdog.sh` — deterministic wrapper (approved 2026-08-25)
 - [ ] 1.2 Unit test: healthy state → empty stdout, exit 0
 - [ ] 1.3 Unit test: degraded state (critical_missing non-empty) → alert output, `--escalate` invoked
 - [ ] 1.4 Unit test: state unchanged → empty stdout (no duplicate alerts)
 - [ ] 1.5 Unit test: malformed JSON → error output, exit nonzero, no recovery action
 - [ ] 1.6 Unit test: missing state file → treated as unknown previous, proceed normally
-- [ ] 1.7 Unit test: cooldown active (last_restart <5min) → skip escalation
-- [ ] 1.8 Unit test: crash_count_24h >=3 → alert includes pattern warning
+- [ ] 1.7 Unit test: dedupe state atomic write and read-back
+- [ ] 1.8 Unit test: crash_count_24h >=3 warning deduplicated across ticks
 - [ ] 1.9 Backup current jobs.json, convert mcp-router-watchdog to `--script` + `--no-agent` via `hermes cron edit`
 - [ ] 1.10 Acceptance: manual tick → verify silent healthy output, verify state file updated
 - [ ] 1.11 Rollback: revert each modified field with `hermes cron edit` (never restore jobs.json directly)
 
 ## Track 2: Read-Only Freshness Reporter
 
-- [ ] 2.1 BLOCKED on ownership acceptance — Create `ops-automation-suite/scripts/hermes-cron/weekly-freshness-report.sh` — reads knowledge-status.sh --json
+- [ ] 2.1 Create `ops-automation-suite/scripts/hermes-cron/weekly-freshness-report.sh` — reads knowledge-status.sh --json (approved 2026-08-25)
 - [ ] 2.2 Test: produces clean report from current status output
 - [ ] 2.3 Test: exits nonzero when canonical script missing
 - [ ] 2.4 Test: exits nonzero when inventory rejected
@@ -34,8 +34,19 @@
   - `entities/mcp-router.md`: 4 links — cross-directory concept link needs `../concepts/...`, same-directory entity links stay as bare filenames
 - [x] 3.4 Update `SCHEMA.md` frontmatter template to include `status: active|draft|archived`
 - [x] 3.5 Commit wiki fixes in wiki repo (scoped commit: "fix: wiki frontmatter and link integrity")
-- [ ] 3.6 BLOCKED on ownership acceptance — Create `wiki/scripts/wiki-lint.py` — deterministic validator (no-agent mode, zero-byte stdout when clean)
-- [ ] 3.7 BLOCKED on 3.6 — Acceptance: lint tick produces valid report (exit 0 = report generated; findings are success, not failure)
+- [ ] 3.6 Create `wiki/scripts/wiki-lint.py` — deterministic validator (no-agent mode, zero-byte stdout when clean) (approved 2026-08-25)
+- [ ] 3.7 Acceptance: lint tick produces valid report (exit 0 = report generated; findings are success, not failure)
+
+## Track 2a: Knowledge-Refresh Source Migration
+
+- [ ] 2a.1 Create `ops-automation-suite/scripts/knowledge-refresh/` — copy canonical source set (refresh script, status script, inventory, approval digest, LaunchAgent template/installer, hook installer)
+- [ ] 2a.2 Verify inventory digest matches approved SHA
+- [ ] 2a.3 Unit test: inventory approval rejection (digest mismatch → exit 1)
+- [ ] 2a.4 Unit test: clean/dirty classification
+- [ ] 2a.5 Unit test: SHA-based freshness (indexed SHA == HEAD → fresh)
+- [ ] 2a.6 Verify existing LaunchAgent and post-merge behavior preserved
+- [ ] 2a.7 Extend `knowledge-status.sh --json` with `operation_status` field
+- [ ] 2a.8 Deploy tracked source back to runtime path after tests pass
 
 ## Closure
 

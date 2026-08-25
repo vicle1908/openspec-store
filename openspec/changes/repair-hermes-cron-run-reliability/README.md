@@ -1,6 +1,6 @@
 # repair-hermes-cron-run-reliability
 
-**Status:** Planning (Multi-provider review completed with partial coverage. Codex returned BLOCK and AGY returned PASS_WITH_CHANGES. Planning corrections are incorporated, but implementation remains gated on cross-repository ownership and final semantic reconciliation.)
+**Status:** Implementation approved and in progress.
 **Created:** 2026-08-24
 **Schema:** spec-driven
 
@@ -11,10 +11,17 @@ Three-track cron job reliability repair:
 2. **Read-only freshness reporter** — consumes knowledge-status.sh --json, no mutations
 3. **Wiki lint corrections** — frontmatter, links, schema sync
 
+## Ownership
+
+Approved 2026-08-25:
+- Watchdog and freshness wrappers: `ops-automation-suite/scripts/hermes-cron/`
+- Wiki validator: `wiki/scripts/wiki-lint.py`
+- Knowledge-refresh automation: migrate to `ops-automation-suite/scripts/knowledge-refresh/`
+- Runtime copies under `~/.hermes/scripts/` and `~/Developer/scripts/knowledge-refresh/` are projections, not canonical sources.
+
 ## Decision Gates
 
-- **Script ownership** (BLOCKS tasks 1.1, 2.1, 3.6): Proposed: ops-automation-suite/scripts/hermes-cron/ + wiki/scripts/wiki-lint.py. Requires explicit user approval before implementation. See design.md Ownership section.
-- **knowledge-refresh ownership** (BLOCKS Track 2 `operation_status` extension): `~/Developer/scripts/knowledge-refresh/` is untracked. Requires resolution before Track 2 can extend status fields.
+- ~~**Script ownership**~~ — Approved 2026-08-25.
 - **Graphify version pin**: Out of scope (0.9.42→0.9.46/0.9.48 needs separate compatibility review)
 
 ## Files
@@ -25,3 +32,4 @@ Three-track cron job reliability repair:
 - `review-scope.yaml` — Review edges and provider assignments
 - `evidence.md` — Baseline diagnostic evidence
 - `specs/` — Delta specs (2 ADDED, 1 MODIFIED)
+- `reviews/` — Multi-provider review evidence
