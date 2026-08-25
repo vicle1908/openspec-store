@@ -21,5 +21,5 @@
 
 - [x] 4.1 Review staged diff for scope and contradictions
 - [x] 4.2 Stage only intended paths (canonical spec + archive)
-- [ ] 4.3 Commit with scoped message
-- [ ] 4.4 Verify post-commit status
+- [x] 4.3 Commit with scoped message
+- [x] 4.4 Verify post-commit status
