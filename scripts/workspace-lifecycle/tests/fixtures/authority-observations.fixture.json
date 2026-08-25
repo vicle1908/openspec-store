@@ -1,0 +1,149 @@
+[
+  {
+    "authority": "openspec",
+    "canonical_path": "/fixtures/lifecycle/store/openspec/changes/active-change",
+    "subject": "active-change",
+    "observed_at": "2026-08-25T12:00:00Z",
+    "facts": {
+      "change": "active-change",
+      "incomplete_tasks": 3,
+      "untracked": false,
+      "archive_move": false
+    }
+  },
+  {
+    "authority": "openspec",
+    "canonical_path": "/fixtures/lifecycle/store/openspec/changes/archive/archived-change",
+    "subject": "archived-change",
+    "observed_at": "2026-08-25T12:00:00Z",
+    "facts": {
+      "change": "archived-change",
+      "incomplete_tasks": 0,
+      "untracked": true,
+      "archive_move": true
+    }
+  },
+  {
+    "authority": "git",
+    "canonical_path": "/fixtures/lifecycle/repo-alpha",
+    "subject": "main",
+    "observed_at": "2026-08-25T12:00:01Z",
+    "facts": {
+      "repo_identity": "/fixtures/lifecycle/repo-alpha/.git",
+      "worktree_id": "main",
+      "branch": "main",
+      "detached": false,
+      "revision": "aaaa000000000000000000000000000000000001",
+      "dirty": false,
+      "generated_only": false,
+      "unpushed": false,
+      "merged_into_target": false,
+      "ancestor_of_target": false
+    }
+  },
+  {
+    "authority": "git",
+    "canonical_path": "/fixtures/lifecycle/repo-alpha-worktrees/feature-merged",
+    "subject": "feature-merged",
+    "observed_at": "2026-08-25T12:00:01Z",
+    "facts": {
+      "repo_identity": "/fixtures/lifecycle/repo-alpha/.git",
+      "worktree_id": "wt-feature-merged",
+      "branch": "feature-merged",
+      "detached": false,
+      "revision": "bbbb000000000000000000000000000000000002",
+      "dirty": false,
+      "generated_only": false,
+      "unpushed": false,
+      "merged_into_target": true,
+      "ancestor_of_target": true
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/fixtures/lifecycle/repo-alpha-worktrees/feature-merged",
+    "subject": "ws-feature-merged",
+    "observed_at": "2026-08-25T12:00:02Z",
+    "facts": {
+      "workspace_id": "ws-feature-merged",
+      "isPinned": false,
+      "agent_state": "working",
+      "live_terminal": true,
+      "terminal_state": "connected",
+      "attached_pty": false,
+      "host_activity": true,
+      "child_worktrees": [],
+      "parent_worktree": null
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/fixtures/lifecycle/repo-alpha-worktrees/pinned-wt",
+    "subject": "ws-pinned",
+    "observed_at": "2026-08-25T12:00:02Z",
+    "facts": {
+      "workspace_id": "ws-pinned",
+      "isPinned": true,
+      "agent_state": "idle",
+      "live_terminal": false,
+      "terminal_state": "closed",
+      "attached_pty": false,
+      "host_activity": false,
+      "child_worktrees": [],
+      "parent_worktree": null
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/fixtures/lifecycle/repo-alpha-worktrees/orphaned-wt",
+    "subject": "term-orphaned",
+    "observed_at": "2026-08-25T12:00:02Z",
+    "facts": {
+      "workspace_id": "ws-orphaned",
+      "isPinned": false,
+      "agent_state": "idle",
+      "live_terminal": false,
+      "terminal_state": "orphaned",
+      "attached_pty": false,
+      "host_activity": false,
+      "child_worktrees": [],
+      "parent_worktree": null
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/fixtures/lifecycle/service-data",
+    "subject": "tdt-scheduler",
+    "observed_at": "2026-08-25T12:00:03Z",
+    "facts": {
+      "kind": "process",
+      "owner": "tdt-scheduler",
+      "active": true,
+      "available": true
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/fixtures/lifecycle/mystery-db",
+    "subject": "mystery-db",
+    "observed_at": "2026-08-25T12:00:03Z",
+    "facts": {
+      "kind": "database",
+      "owner": "",
+      "active": false,
+      "available": false
+    }
+  },
+  {
+    "authority": "index",
+    "canonical_path": "/fixtures/lifecycle/repo-alpha",
+    "subject": "graphify",
+    "observed_at": "2026-08-25T12:00:04Z",
+    "facts": {
+      "provider": "graphify",
+      "freshness": "FRESH",
+      "watcher_active": true,
+      "dirty": false
+    }
+  }
+]

@@ -1,0 +1,6 @@
+# Repository Inventory for Knowledge Index Refresh (fixture)
+# Format: canonical_root<TAB>default_branch<TAB>gitnexus_enabled<TAB>graphify_enabled
+# Approved: fixture-only, synthetic paths
+/fixtures/lifecycle/repo-alpha	main	yes	yes
+/fixtures/lifecycle/repo-beta	main	yes	no
+/fixtures/lifecycle/repo-gamma	main	no	yes

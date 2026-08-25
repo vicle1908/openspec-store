@@ -1,0 +1,94 @@
+{
+  "policy": "workspace-artifact-retention-policy",
+  "policy_version": "0.1.0",
+  "policy_identity": "sha256:fixture-identity-0001",
+  "approval": {
+    "approved": true,
+    "digest": "sha256:fixture-approval-digest",
+    "approved_at": "2026-08-25T00:00:00Z",
+    "approved_by": "fixture-reviewer"
+  },
+  "generated_at": "2026-08-25T00:00:00Z",
+  "entries": [
+    {
+      "path": "/fixtures/retention/reports/archive-readiness-2026-08.md",
+      "class": "retained evidence or report",
+      "policy_state": "PROTECTED",
+      "owner": "openspec-store",
+      "provenance": {
+        "type": "evidence_identity",
+        "revision": null,
+        "evidence": "evidence:archive-readiness-2026-08",
+        "observed_at": "2026-08-25T00:00:00Z"
+      },
+      "justification": "Retained verification report referenced by archive readiness review",
+      "last_reference": "2026-08-25T00:00:00Z",
+      "candidate": false,
+      "review": {
+        "reviewed_at": "2026-08-25T00:00:00Z",
+        "reviewed_by": "fixture-reviewer",
+        "note": "fixture"
+      }
+    },
+    {
+      "path": "/fixtures/retention/tmp/ephemeral-pytest-cache",
+      "class": "temporary or ephemeral test fixture",
+      "policy_state": "RECLAIMABLE",
+      "owner": "agent-core",
+      "provenance": {
+        "type": "repo_revision",
+        "revision": "0000000000000000000000000000000000000000",
+        "evidence": null,
+        "observed_at": "2026-08-25T00:00:00Z"
+      },
+      "justification": "Untracked ephemeral pytest cache with no active test owner",
+      "last_reference": "2026-08-25T00:00:00Z",
+      "candidate": true,
+      "review": {
+        "reviewed_at": "2026-08-25T00:00:00Z",
+        "reviewed_by": "fixture-reviewer",
+        "note": "fixture"
+      }
+    },
+    {
+      "path": "/fixtures/retention/indexes/watched-graphify-out",
+      "class": "generated index or cache",
+      "policy_state": "PROTECTED",
+      "owner": "graphify-watcher",
+      "provenance": {
+        "type": "runtime_observation",
+        "revision": null,
+        "evidence": null,
+        "observed_at": "2026-08-25T00:00:00Z"
+      },
+      "justification": "Generated index still owned by an active watcher",
+      "last_reference": "2026-08-25T00:00:00Z",
+      "candidate": false,
+      "review": {
+        "reviewed_at": "2026-08-25T00:00:00Z",
+        "reviewed_by": "fixture-reviewer",
+        "note": "fixture"
+      }
+    },
+    {
+      "path": "/fixtures/retention/tmp/stale-cache-missing-provenance",
+      "class": "generated index or cache",
+      "policy_state": "RECLAIMABLE",
+      "owner": "fixture-owner",
+      "provenance": {
+        "type": null,
+        "revision": null,
+        "evidence": null,
+        "observed_at": null
+      },
+      "justification": "Candidate-class entry with unbound provenance; must downgrade to REVIEW_REQUIRED",
+      "last_reference": "2026-08-25T00:00:00Z",
+      "candidate": true,
+      "review": {
+        "reviewed_at": "2026-08-25T00:00:00Z",
+        "reviewed_by": "fixture-reviewer",
+        "note": "fixture"
+      }
+    }
+  ]
+}

@@ -1,0 +1,180 @@
+[
+  {
+    "authority": "openspec",
+    "canonical_path": "/fixtures/e2e/store/openspec/changes/active-change",
+    "subject": "active-change",
+    "observed_at": "2026-08-25T20:30:00Z",
+    "facts": {
+      "change": "active-change",
+      "incomplete_tasks": 3,
+      "untracked": false,
+      "archive_move": false
+    }
+  },
+  {
+    "authority": "openspec",
+    "canonical_path": "/fixtures/e2e/store/openspec/changes/archive/moved-change",
+    "subject": "moved-change",
+    "observed_at": "2026-08-25T20:30:00Z",
+    "facts": {
+      "change": "moved-change",
+      "incomplete_tasks": 0,
+      "untracked": true,
+      "archive_move": true
+    }
+  },
+  {
+    "authority": "git",
+    "canonical_path": "/fixtures/e2e/worktrees/feature-live",
+    "subject": "feature-live",
+    "observed_at": "2026-08-25T20:30:01Z",
+    "facts": {
+      "repo_identity": "/fixtures/e2e/repo/.git",
+      "worktree_id": "wt-feature-live",
+      "branch": "feature-live",
+      "detached": false,
+      "revision": "feac000000000000000000000000000000000001",
+      "dirty": false,
+      "generated_only": false,
+      "unpushed": false,
+      "merged_into_target": true,
+      "ancestor_of_target": false
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/fixtures/e2e/worktrees/feature-live",
+    "subject": "ws-feature-live",
+    "observed_at": "2026-08-25T20:30:02Z",
+    "facts": {
+      "workspace_id": "ws-feature-live",
+      "isPinned": false,
+      "agent_state": "working",
+      "live_terminal": true,
+      "terminal_state": "connected",
+      "attached_pty": false,
+      "host_activity": true,
+      "child_worktrees": []
+    }
+  },
+  {
+    "authority": "git",
+    "canonical_path": "/fixtures/e2e/worktrees/deploy-source-2026-07",
+    "subject": "deploy-source-2026-07",
+    "observed_at": "2026-08-25T20:30:03Z",
+    "facts": {
+      "repo_identity": "/fixtures/e2e/repo/.git",
+      "worktree_id": "wt-deploy-source-2026-07",
+      "branch": null,
+      "detached": true,
+      "revision": "d3ad000000000000000000000000000000000002",
+      "dirty": false,
+      "generated_only": false,
+      "unpushed": false,
+      "merged_into_target": false,
+      "ancestor_of_target": true
+    }
+  },
+  {
+    "authority": "git",
+    "canonical_path": "/fixtures/e2e/worktrees/unique-detached",
+    "subject": "unique-detached",
+    "observed_at": "2026-08-25T20:30:04Z",
+    "facts": {
+      "repo_identity": "/fixtures/e2e/repo/.git",
+      "worktree_id": "wt-unique-detached",
+      "branch": null,
+      "detached": true,
+      "revision": "0ddba11000000000000000000000000000000003",
+      "dirty": false,
+      "generated_only": false,
+      "unpushed": false,
+      "merged_into_target": false,
+      "ancestor_of_target": false,
+      "remote_reachable": false,
+      "backup_reachable": false
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/fixtures/e2e/worktrees/pinned-wt",
+    "subject": "ws-pinned",
+    "observed_at": "2026-08-25T20:30:05Z",
+    "facts": {
+      "workspace_id": "ws-pinned",
+      "isPinned": true,
+      "agent_state": "idle",
+      "live_terminal": false,
+      "terminal_state": "closed",
+      "attached_pty": false,
+      "host_activity": false,
+      "child_worktrees": []
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/fixtures/e2e/worktrees/parent-wt",
+    "subject": "ws-parent",
+    "observed_at": "2026-08-25T20:30:06Z",
+    "facts": {
+      "workspace_id": "ws-parent",
+      "isPinned": false,
+      "agent_state": "idle",
+      "live_terminal": false,
+      "terminal_state": "closed",
+      "attached_pty": false,
+      "host_activity": false,
+      "child_worktrees": ["/fixtures/e2e/worktrees/child-wt"]
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/fixtures/e2e/worktrees/orphaned-wt",
+    "subject": "term-orphaned",
+    "observed_at": "2026-08-25T20:30:07Z",
+    "facts": {
+      "workspace_id": "ws-orphaned",
+      "isPinned": false,
+      "agent_state": "idle",
+      "live_terminal": false,
+      "terminal_state": "orphaned",
+      "attached_pty": false,
+      "host_activity": false,
+      "child_worktrees": []
+    }
+  },
+  {
+    "authority": "git",
+    "canonical_path": "/fixtures/retention/reports/archive-readiness-2026-08.md",
+    "subject": "archive-readiness-report",
+    "observed_at": "2026-08-25T20:30:08Z",
+    "facts": {
+      "repo_identity": "/fixtures/e2e/store/.git",
+      "worktree_id": "main",
+      "branch": "main",
+      "detached": false,
+      "revision": "a1ea000000000000000000000000000000000004",
+      "dirty": false,
+      "generated_only": false,
+      "unpushed": false,
+      "merged_into_target": true,
+      "ancestor_of_target": true
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/fixtures/e2e/service/secret-runtime",
+    "subject": "mystery-db",
+    "observed_at": "2026-08-25T20:30:09Z",
+    "facts": {
+      "kind": "database",
+      "owner": "mystery-db",
+      "active": true,
+      "available": true,
+      "endpoint": "postgres://localhost:5432/mystery",
+      "api_key": "sk-live-e2e-999",
+      "db_password": "hunter2-e2e",
+      "request_body": "{\"secret\": \"leak-me\"}"
+    }
+  }
+]

@@ -1,0 +1,76 @@
+{
+  "generated": "2026-08-25T14:00:00Z",
+  "inventory": "/fixtures/knowledge-refresh/knowledge-refresh-inventory.tsv",
+  "inventoryDigest": "sha256:fixture-digest-0001",
+  "providerVersions": { "gitnexus": "1.6.9", "graphify": "0.9.42" },
+  "stalenessThresholdDays": 1,
+  "repos": [
+    {
+      "repo": "repo-alpha",
+      "tool": "GitNexus",
+      "status": "FRESH",
+      "indexedSha": "aaaa000",
+      "headSha": "aaaa000",
+      "freshness": "FRESH",
+      "freshnessRule": "commit_equality",
+      "lastRefresh": "2026-08-25",
+      "lockOwner": null
+    },
+    {
+      "repo": "repo-alpha",
+      "tool": "Graphify",
+      "status": "FRESH",
+      "indexedSha": "aaaa000",
+      "headSha": "aaaa000",
+      "freshness": "FRESH",
+      "freshnessRule": "commit_equality",
+      "lastRefresh": "2026-08-25",
+      "lockOwner": null
+    },
+    {
+      "repo": "repo-beta",
+      "tool": "GitNexus",
+      "status": "STALE",
+      "indexedSha": "bbbb000",
+      "headSha": "bbbb111",
+      "freshness": "STALE",
+      "freshnessRule": "commit_equality",
+      "lastRefresh": "2026-08-20",
+      "lockOwner": null
+    },
+    {
+      "repo": "repo-beta",
+      "tool": "Dirty",
+      "status": "DIRTY",
+      "dirtyFiles": 3,
+      "indexedSha": "",
+      "headSha": "-",
+      "freshness": "DIRTY",
+      "freshnessRule": "N/A",
+      "lastRefresh": "-",
+      "lockOwner": null
+    },
+    {
+      "repo": "repo-gamma",
+      "tool": "Graphify",
+      "status": "WATCHER",
+      "indexedSha": "cccc000",
+      "headSha": "cccc000",
+      "freshness": "WATCHER",
+      "freshnessRule": "commit_equality",
+      "lastRefresh": "2026-08-25",
+      "lockOwner": null
+    },
+    {
+      "repo": "repo-alpha",
+      "tool": "Worktree",
+      "status": "ACTIVE",
+      "lastRefresh": "-",
+      "indexedSha": "",
+      "headSha": "dddd000",
+      "worktree": "/fixtures/lifecycle/repo-alpha-worktrees/feature-x",
+      "worktreeBranch": "feature-x",
+      "lockOwner": null
+    }
+  ]
+}
