@@ -9,5 +9,6 @@ gitnexus-pdg-query
 gitnexus-pr-review
 gitnexus-refactoring
 gitnexus-taint-analysis
-graphify
+# Graphify keeps a Claude-specific adapter under ~/.claude/skills; the generic
+# workspace skill remains canonical for standard ~/.agents discovery.
 handoff
