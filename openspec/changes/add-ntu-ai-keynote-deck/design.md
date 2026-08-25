@@ -37,12 +37,17 @@ referenced by relative path from `assets/`.
   transitions, notes) are ~100 lines of vanilla JS. (c) Slidev — rejected: Node
   build step is a stage-failure mode.
 
-### D2: Fixed 16:9 stage with CSS transform scaling
+### D2: Fixed 16:9 stage with CSS transform scaling + safe margins
 Slides are authored at a fixed 1280×720 coordinate space; a JS resize handler
 computes `scale = min(vw/1280, vh/720)` and applies `transform: scale()` to the
-stage container, centered with letterboxing.
-- **Why**: pixel-identical layout on any projector/window size; text sizes are
-  authored once and never reflow.
+stage container, centered with letterboxing. All content sits inside a 5% safe
+margin (projector overscan protection). Claim scope: layout is centered and
+letterboxed within tested bounds (16:9, 16:10, 4:3 viewports) — NOT
+"pixel-identical on any display"; browser chrome, OS scaling, and overscan are
+handled by letterboxing + safe margins, and the operator checklist (task 8.2)
+documents fullscreen entry.
+- **Why**: stable layout on any projector/window size; text sizes are authored
+  once and never reflow; safe margins survive real projector overscan.
 - **Alternative**: responsive `vw`/`vh` typography — rejected: layout shifts
   between rehearsal laptop and venue projector are exactly what must not happen.
 
@@ -54,8 +59,8 @@ is open.
   covers all common hardware with no pairing/driver concerns.
 
 ### D4: Speaker notes as hidden overlay with timing cues, toggled by `S`
-Each slide carries a `data-notes` attribute (or sibling `<aside>`) containing
-timing cues ("~3:00 — pivot to tảng băng") and delivery reminders. `S` toggles a
+Each slide carries a `data-notes` attribute (single representation — no
+`<aside>` alternative, to avoid implementation churn) containing timing cues ("~3:00 — pivot to tảng băng") and delivery reminders. `S` toggles a
 semi-transparent overlay panel; it never appears in print output.
 - **Why**: for a 10–15 minute talk, pacing cues matter more than script notes;
   a keypress toggle keeps the audience view clean.
@@ -92,8 +97,19 @@ fade.
 `@media print`: one slide per page (`page-break-after`), notes overlay hidden,
 animations frozen at final state, background forced dark with
 `print-color-adjust: exact`.
-- **Why**: if the venue machine cannot run the HTML, `Cmd+P → Save as PDF` from
-  any browser produces a usable deck in 30 seconds.
+- **Why**: if the venue machine cannot run the HTML, a PRE-GENERATED
+  `keynote-fallback.pdf` ships with the deck (task 7.2). Venue-time Cmd+P is a
+  last resort only — print settings (backgrounds, orientation) are
+  browser-dependent and must not be the primary fallback.
+
+### D9: State recovery via localStorage
+Current slide number persists to localStorage on every navigation and is
+restored on page load (default slide 1 if absent/corrupt); `R` clears it.
+- **Why**: an accidental reload mid-talk must not reset the deck to slide 1 in
+  front of the audience. localStorage survives reloads without any server.
+- **Alternative**: URL hash routing (`#slide-9`) — acceptable but exposes
+  position in the address bar and invites accidental link-shares; localStorage
+  is simpler and invisible.
 
 ## Risks / Trade-offs
 
@@ -112,6 +128,15 @@ animations frozen at final state, background forced dark with
   so the speaker notices.
 - [Statistic challenged by audience] → Mitigation: every stat slide carries a
   small source line (PwC/MIT/Gartner/WEF/Google); sources list also in notes.
+- [Accidental reload mid-talk resets position] → Mitigation: D9 localStorage
+  restore + reload-recovery step in the venue rehearsal (task 8.3).
+- [Projector overscan clips edge content] → Mitigation: 5% safe margin (D2);
+  nothing meaningful is authored outside it.
+- [Notes overlay accidentally shown to audience on mirrored display] →
+  Mitigation: overlay is off by default, carries a visible "notes ON" badge,
+  and the README cue sheet (task 8.2) is the private alternative.
+- [Laptop sleeps/display blanks during talk] → Mitigation: operator checklist
+  (task 8.2): disable sleep + display blanking, AC power.
 
 ## Migration Plan
 
@@ -121,8 +146,9 @@ the notes overlay to confirm timing cues.
 
 ## Open Questions
 
-- Whether the speaker will add first-party call-center metrics (e.g., handle-time
-  reduction %) to slide 11 — the slide is written to work with or without them
-  (qualitative framing as fallback).
-- Whether organizers supply an event-specific logo to place beside the NTU mark
-  on the title slide — layout reserves the slot either way.
+Both original open questions are resolved by task contract rather than left open:
+- First-party call-center metrics for slide 11: task 4.5 requires either a real
+  metric or the qualitative framing with NO audience-visible placeholder marker —
+  the deck ships clean either way.
+- Event-specific logo beside the NTU mark: task 3.1 reserves the slot; if no
+  logo arrives, the typographic "NTU Alumni" treatment is the shipped state.

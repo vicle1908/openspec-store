@@ -17,16 +17,19 @@ that hand off to the roundtable).
   clickers), plus a hidden speaker-notes overlay (key `S`) carrying per-slide timing
   cues for the 10–15 minute budget.
 - Content: fully Vietnamese copy (English retained only for established terms:
-  ROI, Agentic AI, "Beyond the Hype"), structured as:
-  - Act 1 (~3 min): macro picture — $15.7T global GDP impact (PwC), agentic shift
+  ROI, Agentic AI, "Beyond the Hype"). Primary runtime 12:45 (middle of the
+  10–15 min range), with ~1:30 reserved for opening/hook and ~0:30 for the
+  roundtable handoff; a documented 10-minute short-version rule (task 6.2)
+  covers the lower bound. Structure:
+  - Act 1 (0:00–3:45): macro picture — $15.7T global GDP impact (PwC), agentic shift
     (Gartner 0%→15% of work decisions by 2028), Vietnam position (Nghị quyết 57,
     Google's $79.3B ≈ 12% GDP projection by 2030).
-  - Act 2 (~5–7 min): the hype/value gap — MIT 95% pilot-failure stat, Gartner 40%
+  - Act 2 (3:45–10:40): the hype/value gap — MIT 95% pilot-failure stat, Gartner 40%
     agentic-project cancellation forecast, then the speaker's first-party 3-layer
     journey (ChatGPT web training → in-house LLM on Nvidia for customer support /
     call center → multi-agent agentic systems), unified by the thesis: AI value
     lives in reducing manual human effort and automating repetitive processes.
-  - Act 3 (~3 min): leadership mindset ("How to live with AI in uncertainty") and
+  - Act 3 (10:40–12:45): leadership mindset ("How to live with AI in uncertainty") and
     3 roundtable questions, each anchored to a statistic seeded earlier.
 - Bundle local assets: NTU logo (transparent PNG, verified against official brand
   colors) and Be Vietnam Pro font (woff2, vietnamese subset) — zero network access
@@ -35,8 +38,10 @@ that hand off to the roundtable).
   `#D71440` (accent for headline statistics), per NTU's official Quick Brand Guide.
 - Two deliberate animation moments only: an animated counter for the $15.7T stat
   and a slam-in reveal for the 95% stat.
-- PDF fallback via `@media print` so the deck can be exported if the venue laptop
-  cannot run the HTML file.
+- PDF fallback: a PRE-GENERATED `keynote-fallback.pdf` ships with the deck
+  (via `@media print`), plus an operator checklist README covering fullscreen,
+  sleep/blanking prevention, and reload recovery — the deck must survive an
+  accidental browser reload mid-talk (localStorage position restore).
 
 ## Capabilities
 
@@ -60,13 +65,19 @@ None.
   `~/Developer/ntu-keynote/assets/ntu-logo.png` and is reused, not re-fetched.
 - **No dependencies added** to any repo; no toolchain, CI, or store content affected.
 - **External facts embedded in slides** (each verified via web research on
-  2026-08-25): PwC Sizing the Prize ($15.7T/+14% GDP by 2030); McKinsey GenAI value
-  ($2.6–4.4T/yr); MIT NANDA State of AI in Business 2025 (95% of pilots, $30–40B
-  invested, no P&L impact); Gartner June 2025 (40%+ agentic cancellations by 2027;
-  0%→15% autonomous decisions by 2028; <1%→33% enterprise software with agentic AI);
-  WEF Future of Jobs 2025 (170M created / 92M displaced / net +78M; 39% of skills
-  transformed in 5 years); Google/Temasek Vietnam projection ($79.3B ≈ 12% GDP by
-  2030); Nghị quyết 57-NQ/TW (top-3 ASEAN AI R&D by 2030).
+  2026-08-25; all are forecasts/modeled projections and slide copy must say so):
+  PwC Sizing the Prize, 2017 projection ($15.7T/+14% GDP by 2030); McKinsey GenAI
+  potential ($2.6–4.4T/yr, 2023); MIT NANDA State of AI in Business 2025 (95% of
+  analyzed pilots showed no measurable P&L impact at evaluation; $30–40B invested
+  is a directional estimate); Gartner June 2025 forecasts (40%+ agentic
+  cancellations by end-2027; at least 15% of daily work decisions autonomous by
+  2028, up from effectively 0% in 2024; 33% of enterprise software with agentic
+  AI by 2028, up from <1% in 2024); WEF Future of Jobs 2025 projections (170M
+  created / 92M displaced / net +78M by 2030 across all macro drivers, not AI
+  alone; 39% of skills transformed in 5 years); Google/Access Partnership "AI
+  Opportunity Agenda for Vietnam" (2024): modeled potential benefit of $79.3B ≈
+  12% GDP by 2030; Nghị quyết 57-NQ/TW (top-3 ASEAN in AI R&D by 2030 — exact
+  scope is R&D).
 
 ## Non-Goals
 
