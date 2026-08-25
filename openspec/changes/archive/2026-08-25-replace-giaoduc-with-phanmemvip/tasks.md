@@ -80,5 +80,5 @@
 
 - [x] 11.1 Abandon the superseded change: archive `omp-model-role-fallback-tuning` as superseded without applying (its premise — restore giaoduc task role — is invalidated). Moved to `changes/archive/2026-08-25-omp-model-role-fallback-tuning-superseded/` with a `SUPERSEDED.md` guard note (deltas must NOT be synced). Verified 2026-08-25: `openspec list --store openspec-store` no longer shows it as active.
 - [x] 11.2 Validate this change strictly: `openspec validate --changes replace-giaoduc-with-phanmemvip --strict --store openspec-store`. Verify: exit 0, no errors.
-- [ ] 11.3 After apply + verification, sync delta specs to main specs and archive this change: `openspec archive replace-giaoduc-with-phanmemvip --store openspec-store --yes`. Verify: archive succeeds and `openspec validate --all --strict --store openspec-store` passes.
-- [ ] 11.4 Commit the store: `cd ~/Developer/openspec-store && git add -A && git commit -m "archive: replace-giaoduc-with-phanmemvip"`. Verify: `git status` is clean.
+- [x] 11.3 After apply + verification, sync delta specs to main specs and archive this change: `openspec archive replace-giaoduc-with-phanmemvip --store openspec-store --yes`. Verify: archive succeeds and `openspec validate --all --strict --store openspec-store` passes.
+- [x] 11.4 Commit the store: `cd ~/Developer/openspec-store && git add -A && git commit -m "archive: replace-giaoduc-with-phanmemvip"`. Verify: `git status` is clean.
