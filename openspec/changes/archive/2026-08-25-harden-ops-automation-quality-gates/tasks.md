@@ -17,13 +17,13 @@
 
 - [x] 3.1 Record review evidence.
 - [x] 3.2 Commit scoped README/OpenSpec changes.
-- [ ] 3.3 Archive the completed OpenSpec change.
-- [ ] 3.4 Verify archive integrity and store health.
+- [x] 3.3 Archive the completed OpenSpec change.
+- [x] 3.4 Verify archive integrity and store health.
 
 ## Rollback and Closure
 
 - [x] 4.1 Document Git-revert rollback and confirm cron definitions remain unchanged.
-- [ ] 4.2 Complete final status and evidence summary.
+- [x] 4.2 Complete final status and evidence summary.
 
 Total: 15 tasks
 
@@ -66,26 +66,26 @@ This change is accepted only after the README is updated, all verification gates
 
 ## End
 
-Status: in progress
+Status: complete
 Owner: ops-automation-suite
 Store: openspec-store
 Scope: README and OpenSpec only
 Runtime: unchanged
 Generated artifacts: preserved
-Next gate: implementation
+Next gate: none
 
 ## Evidence placeholders
 
-- README diff: pending
-- Test output: pending
-- Ruff output: pending
-- Format output: pending
-- Mypy output: pending
-- OpenSpec output: pending
-- Review output: pending
-- Commit: pending
-- Archive: pending
-- Doctor: pending
+- README diff: `ed74dc38abb0b3a0cfbfbc9aec7af3ed00b16405`
+- Test output: `150 passed in 20.26s`
+- Ruff output: `All checks passed`
+- Format output: `13 files already formatted`
+- Mypy output: `Success: no issues found in 5 source files`
+- OpenSpec output: strict validation passed before archive
+- Review output: `reviews/quality-gates-review.md` — PASS
+- Commit: README `ed74dc38`; OpenSpec history recorded before archive
+- Archive: `2026-08-25-harden-ops-automation-quality-gates`
+- Doctor: `openspec store doctor` — no issues
 
 ## Acceptance statement
 

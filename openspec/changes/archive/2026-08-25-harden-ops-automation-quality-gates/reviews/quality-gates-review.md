@@ -59,6 +59,6 @@ The prior archived change `2026-08-25-repair-hermes-cron-run-reliability` was no
 
 ## Review conclusion
 
-**PASS — ready to commit and archive.**
+**PASS — documentation committed and OpenSpec change archived.**
 
-The documentation is consistent with the implementation, all quality gates pass, and unrelated generated artifacts remain preserved outside the staged scope.
+The documentation is consistent with the implementation, all quality gates pass, and unrelated generated artifacts remain preserved outside the committed scope. The archived change is `2026-08-25-harden-ops-automation-quality-gates`; `openspec store doctor` reports no issues.
