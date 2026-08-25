@@ -28,6 +28,7 @@ context: |
   - Deployment: Docker Compose `base` profile via Docker Hub image (`diegosouzapw/omniroute:latest`), run from ~/Omniroute
   - Ports: 20128 (dashboard), 20129 (API bridge), 20132 (LiveWS) — bound to 127.0.0.1 ONLY (official hardened pattern per README quick-run + VM guide; not LAN-accessible)
   - Security: OMNIROUTE_WS_BRIDGE_SECRET set in .env (official guide: required in production); redis not host-published
+  - Proxy: ENABLE_SOCKS5_PROXY=false + NEXT_PUBLIC_ENABLE_SOCKS5_PROXY=false in .env (fixed 2026-08-25). Half-enabled proxy (flags true, no ALL_PROXY/HTTPS_PROXY endpoint) wraps every outbound fetch through a dead proxy agent -> PROXY_UNREACHABLE, credential health timeouts, event-loop backlog, container unhealthy. Rule: proxy must be fully disabled OR fully configured (flags + reachable endpoint), never half-enabled
   - Redis: compose `redis:7-alpine` service, internal network only (NOT published to host; `ports: !reset []` in override)
   - Persistence: Docker named volume `omniroute-data` → /app/data (SQLite, UID 1000). NOT a bind mount — Docker Desktop virtiofs bind mounts corrupt SQLite WAL DBs. Access via `docker cp` / in-container sqlite3. `restart: unless-stopped`
   - Reboot survival: Docker Desktop is a login item — recovers after user LOGIN (not bare boot)
