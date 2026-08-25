@@ -2,27 +2,27 @@
 
 ## Track 1: Deterministic Watchdog
 
-- [ ] 1.1 Create `ops-automation-suite/scripts/hermes-cron/mcp-router-watchdog.sh` — deterministic wrapper (approved 2026-08-25)
-- [ ] 1.2 Unit test: healthy state → empty stdout, exit 0
-- [ ] 1.3 Unit test: degraded state (critical_missing non-empty) → alert output, `--escalate` invoked
-- [ ] 1.4 Unit test: state unchanged → empty stdout (no duplicate alerts)
-- [ ] 1.5 Unit test: malformed JSON → error output, exit nonzero, no recovery action
-- [ ] 1.6 Unit test: missing state file → treated as unknown previous, proceed normally
-- [ ] 1.7 Unit test: dedupe state atomic write and read-back
-- [ ] 1.8 Unit test: crash_count_24h >=3 warning deduplicated across ticks
-- [ ] 1.9 Backup current jobs.json, convert mcp-router-watchdog to `--script` + `--no-agent` via `hermes cron edit`
-- [ ] 1.10 Acceptance: manual tick → verify silent healthy output, verify state file updated
-- [ ] 1.11 Rollback: revert each modified field with `hermes cron edit` (never restore jobs.json directly)
+- [x] 1.1 Create `ops-automation-suite/scripts/hermes-cron/mcp-router-watchdog.sh` — deterministic wrapper (approved 2026-08-25)
+- [x] 1.2 Unit test: healthy state → empty stdout, exit 0
+- [x] 1.3 Unit test: degraded state (critical_missing non-empty) → alert output, `--escalate` invoked
+- [x] 1.4 Unit test: state unchanged → empty stdout (no duplicate alerts)
+- [x] 1.5 Unit test: malformed JSON → error output, exit nonzero, no recovery action
+- [x] 1.6 Unit test: missing state file → treated as unknown previous, proceed normally
+- [x] 1.7 Unit test: dedupe state atomic write and read-back
+- [x] 1.8 Unit test: crash_count_24h >=3 warning deduplicated across ticks
+- [x] 1.9 Backup current jobs.json, convert mcp-router-watchdog to `--script` + `--no-agent` via `hermes cron edit`
+- [x] 1.10 Acceptance: manual tick → verify healthy status and state file updated; emit the expected deduplicated warning when live `crash_count_24h >= 3`
+- [x] 1.11 Rollback: rehearse revert/restore with `hermes cron edit` (never restore jobs.json directly)
 
 ## Track 2: Read-Only Freshness Reporter
 
-- [ ] 2.1 Create `ops-automation-suite/scripts/hermes-cron/weekly-freshness-report.sh` — reads knowledge-status.sh --json (approved 2026-08-25)
-- [ ] 2.2 Test: produces clean report from current status output
-- [ ] 2.3 Test: exits nonzero when canonical script missing
-- [ ] 2.4 Test: exits nonzero when inventory rejected
-- [ ] 2.5 Backup jobs.json, convert weekly-graphify-freshness to script + `--no-agent`
-- [ ] 2.6 Acceptance: manual tick → clean report, no mutations
-- [ ] 2.7 Rollback: revert each modified field with `hermes cron edit` (never restore jobs.json directly)
+- [x] 2.1 Create `ops-automation-suite/scripts/hermes-cron/weekly-freshness-report.sh` — reads knowledge-status.sh --json (approved 2026-08-25)
+- [x] 2.2 Test: produces clean report from current status output
+- [x] 2.3 Test: exits nonzero when canonical script missing
+- [x] 2.4 Test: exits nonzero when inventory rejected
+- [x] 2.5 Backup jobs.json, convert weekly-graphify-freshness to script + `--no-agent`
+- [x] 2.6 Acceptance: manual tick → clean report, no mutations
+- [x] 2.7 Rollback: rehearse revert/restore with `hermes cron edit` (never restore jobs.json directly)
 
 ## Track 3: Wiki Lint Corrections
 
@@ -39,17 +39,17 @@
 
 ## Track 2a: Knowledge-Refresh Source Migration
 
-- [ ] 2a.1 Create `ops-automation-suite/scripts/knowledge-refresh/` — copy canonical source set (refresh script, status script, inventory, approval digest, LaunchAgent template/installer, hook installer)
-- [ ] 2a.2 Verify inventory digest matches approved SHA
-- [ ] 2a.3 Unit test: inventory approval rejection (digest mismatch → exit 1)
-- [ ] 2a.4 Unit test: clean/dirty classification
-- [ ] 2a.5 Unit test: SHA-based freshness (indexed SHA == HEAD → fresh)
-- [ ] 2a.6 Verify existing LaunchAgent and post-merge behavior preserved
-- [ ] 2a.7 Extend `knowledge-status.sh --json` with `operation_status` field
-- [ ] 2a.8 Deploy tracked source back to runtime path after tests pass
+- [x] 2a.1 Create `ops-automation-suite/scripts/knowledge-refresh/` — copy canonical source set (refresh script, status script, inventory, approval digest, LaunchAgent template/installer, hook installer)
+- [x] 2a.2 Verify inventory digest matches approved SHA
+- [x] 2a.3 Unit test: inventory approval rejection (digest mismatch → exit 1)
+- [x] 2a.4 Unit test: clean/dirty classification
+- [x] 2a.5 Unit test: SHA-based freshness (indexed SHA == HEAD → fresh)
+- [x] 2a.6 Verify existing LaunchAgent and post-merge behavior preserved
+- [x] 2a.7 Extend `knowledge-status.sh --json` with `operation_status` field
+- [x] 2a.8 Deploy tracked source back to runtime path after tests pass
 
 ## Closure
 
-- [ ] 4.1 `openspec validate repair-hermes-cron-run-reliability --strict --store openspec-store`
-- [ ] 4.2 Verify 3 affected jobs run after changes (watchdog, freshness, wiki-lint) and confirm 2 unchanged jobs (go-microservices-monthly, weekly-skills-update) have identical definitions
-- [ ] 4.3 Evidence log: before/after execution status, state files, acceptance output
+- [x] 4.1 `openspec validate repair-hermes-cron-run-reliability --strict --store openspec-store`
+- [x] 4.2 Verify 3 affected jobs run after changes (watchdog, freshness, wiki-lint) and confirm 2 unchanged jobs (go-microservices-monthly, weekly-skills-update) have identical definitions
+- [x] 4.3 Evidence log: before/after execution status, state files, acceptance output
