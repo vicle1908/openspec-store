@@ -2,40 +2,17 @@
 
 ## Purpose
 Defines the provider blocks, wire transports, credential references, role allocation, and native Cockpit routing for omp (oh-my-pi). All three custom providers use environment-variable credential references and are verified through real CLI smoke tests.
+
 ## Requirements
-### Requirement: Provider declaration
-
-omp's `models.yml` SHALL declare provider blocks as siblings under `providers:`.
-Each provider's `api:` field SHALL match its actual wire transport.
-
-#### Scenario: providers appear in model listing
-
-Given the provider blocks are present in `models.yml`
-When `omp models` is executed
-Then the output SHALL list models under `shopapikey`, `giaoduc`, `cockpit`
-And the existing `omniroute` models SHALL remain listed unchanged.
-
-#### Scenario: cockpit uses native endpoint
-
-Given the Cockpit provider block in `models.yml`
-Then its `baseUrl` SHALL be `http://localhost:51006/v1`
-And its `api` SHALL be `openai-responses`
-And its `apiKey` SHALL reference `HERMES_CUSTOM_COCKPIT_API_KEY`
-And its model list SHALL include `gpt-5.6-luna`.
-
-#### Scenario: shopapikey and giaoduc unchanged
-
-Given the shopapikey and giaoduc provider blocks
-Then their `api` SHALL remain `anthropic-messages`
-And their `baseUrl` and model lists SHALL be unchanged.
 
 ### Requirement: Credential reference by env-var name
 
 Each provider block SHALL reference its credential via the `apiKey:` field
-pointing to an environment variable name. The three newly added providers SHALL
-use environment-variable references (`HERMES_CUSTOM_*_API_KEY`). This change
-SHALL introduce no new plaintext credentials. The pre-existing `omniroute`
-credential is explicitly preserved and outside the credential-migration scope.
+pointing to an environment variable name. The three custom providers
+(shopapikey, phanmemvip, cockpit) SHALL use environment-variable references
+(`HERMES_CUSTOM_*_API_KEY`). This change SHALL introduce no new plaintext
+credentials. The pre-existing `omniroute` credential is explicitly preserved
+and outside the credential-migration scope.
 
 #### Scenario: no secrets in config files
 
@@ -52,13 +29,13 @@ Each provider's transport SHALL match its endpoint's actual protocol.
 Given provider blocks in `models.yml`
 When inspected programmatically
 Then `shopapikey.api` SHALL be `anthropic-messages`
-And `giaoduc.api` SHALL be `anthropic-messages`
+And `phanmemvip.api` SHALL be `openai-responses`
 And `cockpit.api` SHALL be `openai-responses`.
 
 ### Requirement: Canonical model IDs
 
 Model IDs in `models.yml` SHALL use the canonical upstream identifiers
-(`fable-5`, `Advance`, `gpt-5.6-luna`) confirmed by response metadata.
+(`fable-5`, `gpt-5.6-sol`, `gpt-5.6-luna`) confirmed by response metadata.
 The `[1m]` suffixed variants SHALL NOT be used until isolated-profile
 testing proves omp parses bracket notation correctly.
 
@@ -67,6 +44,12 @@ testing proves omp parses bracket notation correctly.
 Given `shopapikey/fable-5` is selected
 When a prompt is sent
 Then the response `model` field SHALL contain `fable-5`.
+
+#### Scenario: phanmemvip model ID in response
+
+Given `phanmemvip/gpt-5.6-sol` is selected
+When a prompt is sent
+Then the response SHALL identify model `gpt-5.6-sol`.
 
 ### Requirement: Base URL convention verified
 
@@ -126,7 +109,7 @@ Then both `models.yml` and `config.yml` SHALL be present.
 
 Given a temporary profile with proposed `models.yml` and `config.yml`
 When `omp --profile <test> --no-session --model <selector> -p "reply only: pong"` is run
-Then each of the six role selectors SHALL return "pong" with exit code 0.
+Then each role selector, including `phanmemvip/gpt-5.6-sol:xhigh`, SHALL return "pong" with exit code 0.
 
 ### Requirement: No live config mutation without approval
 
@@ -144,8 +127,8 @@ Then the files SHALL be byte-for-byte identical.
 
 omp `modelRoles` in `config.yml` SHALL be assigned based on observed
 omp catalog capabilities, not upstream provider marketing claims.
-The thinking-level suffixes `:high` and `:max` SHALL only be used for
-providers where they were validated through omp smoke testing.
+The thinking-level suffixes `:high`, `:xhigh`, and `:max` SHALL only be used
+for providers where they were validated through omp smoke testing.
 
 #### Scenario: thinking-level selectors work
 
@@ -167,7 +150,7 @@ Then the response SHALL contain "pong" and exit 0, subject to provider-side rate
 
 #### Scenario: third-provider task model works
 
-Given `giaoduc/Advance` is assigned to `task`
+Given `phanmemvip/gpt-5.6-sol:xhigh` is assigned to `task`
 When invoked through omp
 Then the response SHALL contain "pong" and exit 0.
 
@@ -261,15 +244,43 @@ When `models.yml` is inspected programmatically
 Then each `apiKey` value SHALL start with `HERMES_CUSTOM_` and SHALL NOT
 match patterns `pmv_`, `agt_`, or `sk-`.
 
-### Requirement: No modification to external systems
+### Requirement: Provider declaration for the active provider set
 
-This change SHALL NOT modify Hermes, Claude Code, Cockpit Tools.app,
-Docker Compose, adapter-status.sh, start-adapter.sh, the launchd plist,
-Claude profiles, agent-core, tdt-core, or any Python agent configuration.
+omp's `models.yml` SHALL declare provider blocks as siblings under `providers:`.
+Each provider's `api:` field SHALL match its actual wire transport.
 
-#### Scenario: external files unchanged
+#### Scenario: providers appear in model listing
 
-Given the change is applied
-When the adapter docker-compose.yml, `~/.claude/profiles/*`, `~/.hermes/config.yaml`,
-and adapter-status.sh are compared to their pre-change state
-Then all SHALL be byte-for-byte identical.
+Given the provider blocks are present in `models.yml`
+When `omp models` is executed
+Then the output SHALL list models under `shopapikey`, `phanmemvip`, `cockpit`
+And the existing `omniroute` models SHALL remain listed unchanged.
+
+#### Scenario: cockpit uses native endpoint
+
+Given the Cockpit provider block in `models.yml`
+Then its `baseUrl` SHALL be `http://localhost:51006/v1`
+And its `api` SHALL be `openai-responses`
+And its `apiKey` SHALL reference `HERMES_CUSTOM_COCKPIT_API_KEY`
+And its model list SHALL include `gpt-5.6-luna`.
+
+#### Scenario: shopapikey unchanged
+
+Given the shopapikey provider block
+Then its `api` SHALL remain `anthropic-messages`
+And its `baseUrl` and model list SHALL be unchanged.
+
+#### Scenario: phanmemvip uses the Responses endpoint
+
+Given the phanmemvip provider block in `models.yml`
+Then its `baseUrl` SHALL be `https://api.phanmemvip.shop/v1`
+And its `api` SHALL be `openai-responses`
+And its `apiKey` SHALL reference `HERMES_CUSTOM_PHANMEMVIP_API_KEY`
+And its model list SHALL include `gpt-5.6-sol`.
+
+#### Scenario: giaoduc block removed
+
+Given the migrated `models.yml`
+When inspected programmatically
+Then no provider block named `giaoduc` SHALL exist
+And no model selector SHALL reference `giaoduc`.

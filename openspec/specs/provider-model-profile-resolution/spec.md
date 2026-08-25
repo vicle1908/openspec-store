@@ -73,7 +73,7 @@ The `defaults.model` field SHALL reference a defined model alias. Fallbacks MAY 
 
 #### Scenario: Fallback aliases reference defined models
 
-- **GIVEN** `defaults.fallback: [giaoduc-advance, cockpit-luna]`
+- **GIVEN** `defaults.fallback: [phanmemvip-sol, cockpit-luna]`
 - **WHEN** the YAML is loaded and validated
 - **THEN** each fallback alias SHALL resolve to a defined model profile
 - **AND** validation SHALL fail with all undefined aliases listed
@@ -131,8 +131,8 @@ Every public boundary that resolves or reveals protected provider credential mat
 
 #### Scenario: Matching provider accesses protected credential
 
-- **GIVEN** exactly one validated credential reference is bound to canonical provider `giaoduc`
-- **WHEN** resolution and reveal are requested with canonical provider identity `giaoduc`
+- **GIVEN** exactly one validated credential reference is bound to canonical provider `phanmemvip`
+- **WHEN** resolution and reveal are requested with canonical provider identity `phanmemvip`
 - **THEN** the process-local credential SHALL be available to that provider boundary
 - **AND** no serializable profile, diagnostic, provenance record, report, exception, or retained evidence SHALL contain the value
 
@@ -145,10 +145,10 @@ Every public boundary that resolves or reveals protected provider credential mat
 
 #### Scenario: Raw key reference is bound before environment lookup
 
-- **GIVEN** a raw environment-key name identifies exactly one credential metadata entry bound to canonical provider `giaoduc`
-- **WHEN** protected resolution is requested with canonical provider identity `giaoduc`
+- **GIVEN** a raw environment-key name identifies exactly one credential metadata entry bound to canonical provider `phanmemvip`
+- **WHEN** protected resolution is requested with canonical provider identity `phanmemvip`
 - **THEN** the resolver SHALL validate the unique provider binding before reading the environment value
-- **AND** any returned protected credential SHALL remain bound to `giaoduc`
+- **AND** any returned protected credential SHALL remain bound to `phanmemvip`
 - **AND** later reveal SHALL still require the matching canonical provider identity
 
 #### Scenario: Credential provider binding is missing or ambiguous

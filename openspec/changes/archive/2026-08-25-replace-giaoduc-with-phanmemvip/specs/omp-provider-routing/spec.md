@@ -13,6 +13,22 @@ intentionally dropped because giaoduc no longer exists.
 ADDED Requirements with a phanmemvip Responses-endpoint scenario replacing the
 giaoduc scenario.
 
+
+### Requirement: No modification to external systems
+
+**Reason**: This requirement was a change-scoped constraint of the original
+OMP provider-onboarding change, which deliberately touched only
+`~/.omp/agent/`. The giaoduc → phanmemvip migration intentionally spans
+Hermes, Claude Code profiles/launchers, goose, grok, pi, prime-agent, and
+tdt-core surfaces, so a blanket "no external modification" rule contradicts
+the migration's purpose.
+
+**Migration**: Cross-surface consistency for this migration is governed by the
+`replace-giaoduc-with-phanmemvip` change's tasks and by the updated
+provider-routing, MoA, credential-registry, and Claude profile/routing
+requirements. Future OMP-only changes MAY reintroduce a similarly scoped
+constraint in their own change artifacts.
+
 ## ADDED Requirements
 
 ### Requirement: Provider declaration for the active provider set
@@ -55,6 +71,8 @@ Given the migrated `models.yml`
 When inspected programmatically
 Then no provider block named `giaoduc` SHALL exist
 And no model selector SHALL reference `giaoduc`.
+
+## MODIFIED Requirements
 
 ### Requirement: Credential reference by env-var name
 
@@ -155,20 +173,3 @@ Then both `models.yml` and `config.yml` SHALL be present.
 Given a temporary profile with proposed `models.yml` and `config.yml`
 When `omp --profile <test> --no-session --model <selector> -p "reply only: pong"` is run
 Then each role selector, including `phanmemvip/gpt-5.6-sol:xhigh`, SHALL return "pong" with exit code 0.
-
-## REMOVED Requirements
-
-### Requirement: No modification to external systems
-
-**Reason**: This requirement was a change-scoped constraint of the original
-OMP provider-onboarding change, which deliberately touched only
-`~/.omp/agent/`. The giaoduc → phanmemvip migration intentionally spans
-Hermes, Claude Code profiles/launchers, goose, grok, pi, prime-agent, and
-tdt-core surfaces, so a blanket "no external modification" rule contradicts
-the migration's purpose.
-
-**Migration**: Cross-surface consistency for this migration is governed by the
-`replace-giaoduc-with-phanmemvip` change's tasks and by the updated
-provider-routing, MoA, credential-registry, and Claude profile/routing
-requirements. Future OMP-only changes MAY reintroduce a similarly scoped
-constraint in their own change artifacts.

@@ -9,27 +9,6 @@ Responses, and evidence-gated provider acceptance.
 
 ## Requirements
 
-### Requirement: Provider launchers SHALL use the documented model alias, `[1m]` suffix, and effort contract
-
-Each provider launcher MUST use lowercase `[1m]` on its model selector to request the 1 million token context window, declare the capability needed for its requested effort, and set `CLAUDE_CODE_EFFORT_LEVEL` in its subshell. The shopapikey launcher MUST use the built-in `fable` alias pinned with `ANTHROPIC_DEFAULT_FABLE_MODEL=fable-5[1m]`; giaoduc and cockpit MUST use custom model options with `[1m]` for `Advance[1m]` and `gpt-5.6-luna[1m]` respectively.
-
-Claude Code MUST strip the `[1m]` suffix before transmitting the model ID to the provider. The wire model ID MUST be the bare base name without the `[1m]` suffix. Selector acceptance by Claude Code MUST NOT be interpreted as proof of provider-side 1M context window capacity.
-
-#### Scenario: Shopapikey resolves the Fable alias with 1M context
-
-- **WHEN** `shopapikey` launches Claude Code with `ANTHROPIC_MODEL=fable[1m]` and `ANTHROPIC_DEFAULT_FABLE_MODEL=fable-5[1m]`
-- **THEN** Claude Code MUST send `model=fable-5` (suffix stripped) and `output_config.effort=xhigh`
-
-#### Scenario: Giaoduc selects its custom model with 1M context
-
-- **WHEN** `giaoduc` launches Claude Code with `ANTHROPIC_MODEL=Advance[1m]` and `ANTHROPIC_CUSTOM_MODEL_OPTION=Advance[1m]`
-- **THEN** Claude Code MUST send `model=Advance` (suffix stripped) and `output_config.effort=xhigh`
-
-#### Scenario: Cockpit selects its custom model with 1M context
-
-- **WHEN** `cockpit` launches Claude Code with `ANTHROPIC_MODEL=gpt-5.6-luna[1m]` and `ANTHROPIC_CUSTOM_MODEL_OPTION=gpt-5.6-luna[1m]`
-- **THEN** Claude Code MUST send `model=gpt-5.6-luna` (suffix stripped) and `output_config.effort=max`
-
 ### Requirement: The cockpit adapter SHALL preserve requested effort
 
 The adapter MUST translate a valid Anthropic `output_config.effort` value to OpenAI Responses `reasoning.effort` for both streaming and non-streaming requests. It MUST omit the Anthropic-only `output_config` and `thinking` fields from the upstream body.
@@ -51,7 +30,7 @@ The adapter MUST translate a valid Anthropic `output_config.effort` value to Ope
 
 ### Requirement: Provider acceptance SHALL be evidence-gated
 
-The change MUST NOT be archived as complete until all three launchers have fresh live smoke evidence, the cockpit outbound body independently proves the requested effort field, and the wire model excludes the `[1m]` suffix.
+The change MUST NOT be archived as complete until all remaining launchers (shopapikey, cockpit) have fresh live smoke evidence, the cockpit outbound body independently proves the requested effort field, the wire model excludes the `[1m]` suffix, and every migrated consumer selector for `phanmemvip/gpt-5.6-sol` returns a successful response in its own CLI.
 
 #### Scenario: A provider is rate limited
 
@@ -84,3 +63,26 @@ This capability SHALL own the per-provider launcher functions: each launcher sel
 
 - **WHEN** Claude Code is invoked without a launcher or `--settings` profile
 - **THEN** the global settings file defaults SHALL apply
+
+### Requirement: Active provider launchers SHALL use the documented model alias, `[1m]` suffix, and effort contract
+
+Each provider launcher MUST use lowercase `[1m]` on its model selector to request the 1 million token context window, declare the capability needed for its requested effort, and set `CLAUDE_CODE_EFFORT_LEVEL` in its subshell. The shopapikey launcher MUST use the built-in `fable` alias pinned with `ANTHROPIC_DEFAULT_FABLE_MODEL=fable-5[1m]`; cockpit MUST use a custom model option with `[1m]` for `gpt-5.6-luna[1m]`. The Claude Code launcher set SHALL be exactly shopapikey and cockpit; no giaoduc launcher SHALL exist.
+
+Claude Code MUST strip the `[1m]` suffix before transmitting the model ID to the provider. The wire model ID MUST be the bare base name without the `[1m]` suffix. Selector acceptance by Claude Code MUST NOT be interpreted as proof of provider-side 1M context window capacity.
+
+#### Scenario: Shopapikey resolves the Fable alias with 1M context
+
+- **WHEN** `shopapikey` launches Claude Code with `ANTHROPIC_MODEL=fable[1m]` and `ANTHROPIC_DEFAULT_FABLE_MODEL=fable-5[1m]`
+- **THEN** Claude Code MUST send `model=fable-5` (suffix stripped) and `output_config.effort=xhigh`
+
+#### Scenario: Cockpit selects its custom model with 1M context
+
+- **WHEN** `cockpit` launches Claude Code with `ANTHROPIC_MODEL=gpt-5.6-luna[1m]` and `ANTHROPIC_CUSTOM_MODEL_OPTION=gpt-5.6-luna[1m]`
+- **THEN** Claude Code MUST send `model=gpt-5.6-luna` (suffix stripped) and `output_config.effort=max`
+
+#### Scenario: Giaoduc launcher removed
+
+- **WHEN** `~/.zshrc` is sourced in a fresh shell
+- **THEN** no `giaoduc` launcher function SHALL be defined
+- **AND** no `cline_giaoduc` launcher function SHALL be defined
+- **AND** the Anthropic-side Claude route SHALL remain shopapikey only until a phanmemvip launcher is introduced by a later change
