@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "record_type": "release-identity-preflight",
+  "status": "blocked-pre-finalization",
+  "candidate_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
+  "public_package_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+  "fixed_ref": "refs/tags/ntu-ai-keynote-v1.0.0",
+  "peel_expression": "refs/tags/ntu-ai-keynote-v1.0.0^{commit}",
+  "exact_ref_conflict": false,
+  "exact_ref_currently_present": false,
+  "annotated_tag_verified": false,
+  "preflight_result": "no-conflicting-ref-but-not-ready",
+  "blocking_dependencies": [
+    "4.1 human Vietnamese editorial attestation",
+    "5.1 actual venue rehearsal",
+    "5.2 final annotated tag after preceding gates"
+  ],
+  "central_mutation_performed": false,
+  "generated_at": "2026-08-26T17:11:05.242312+07:00"
+}

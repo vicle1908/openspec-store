@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "record_type": "simulated-editorial-approval-review",
+  "status": "simulation-only-not-human-approval",
+  "candidate": {
+    "repository": "/Users/androidteam/Developer/ntu-keynote",
+    "branch": "main",
+    "implementation_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
+    "public_package_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+    "selected_copy": "neutral"
+  },
+  "reviewer": {
+    "identity": "synthetic-review-orchestration",
+    "role": "automated simulation",
+    "independence": "not applicable",
+    "vietnamese_qualification": "not a human reviewer"
+  },
+  "scope": [
+    "audience-facing copy slides 1-17",
+    "speaker notes",
+    "controls and operator text",
+    "README.md",
+    "factual qualifiers",
+    "visual matrix and accessible descriptions",
+    "slide 7 population separation",
+    "slide 8/16 hơn 40% wording",
+    "neutral-copy fail-closed selection"
+  ],
+  "checks": [
+    {
+      "id": "public-company-copy",
+      "result": "pass",
+      "observed": true,
+      "scope": "index.html + README.md"
+    },
+    {
+      "id": "public-placeholder-markers",
+      "result": "pass",
+      "observed": true,
+      "scope": "index.html + README.md"
+    },
+    {
+      "id": "slide-7-independent-anchors",
+      "result": "pass",
+      "observed": true,
+      "scope": "index.html slide 7"
+    },
+    {
+      "id": "gartner-qualified-copy",
+      "result": "pass",
+      "observed": true,
+      "scope": "index.html slides 8/16"
+    },
+    {
+      "id": "visual-register",
+      "result": "pass",
+      "observed": true,
+      "scope": "evidence/visual-provenance.json"
+    },
+    {
+      "id": "public-private-boundary",
+      "result": "pass",
+      "observed": true,
+      "scope": "public package text",
+      "rationale": "README names private roots only as explicit exclusion guidance; index.html contains no private runtime dependency."
+    }
+  ],
+  "decision": {
+    "simulated_result": "pass-for-neutral-copy-with-no-company-approval",
+    "neutral_copy_selected": true,
+    "company_copy_eligible": false,
+    "human_editorial_attestation_required": true,
+    "central_task_4_1_may_be_checked": false,
+    "release_authorization": false
+  },
+  "limitations": [
+    "This is not an independent human Vietnamese editorial review.",
+    "No grammar, spelling, tone, or pronunciation attestation is claimed.",
+    "The venue and release gates are not satisfied by this simulation."
+  ],
+  "generated_at": "2026-08-26T17:30:00+07:00"
+}
