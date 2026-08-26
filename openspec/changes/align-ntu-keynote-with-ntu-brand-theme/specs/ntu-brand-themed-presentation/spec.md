@@ -30,7 +30,7 @@ The presentation SHALL use crimson and gold for restrained identity decoration a
 #### Scenario: Slides receive a non-interactive identity rule
 
 - **WHEN** a slide is rendered in full or short mode
-- **THEN** a thin crimson-led identity rule with a limited gold separator MAY appear at the top edge
+- **THEN** a 4px solid crimson identity rule with a thin gold bottom edge SHALL appear at the top edge
 - **AND** the rule SHALL not consume authored safe-area space, alter content flow, or create a focusable element
 
 #### Scenario: Eyebrow and key metrics use the researched accent family
@@ -72,11 +72,16 @@ Because `index.html` is an allowlisted public package file, any implementation o
 - **AND** the revised candidate SHALL have a recomputed seven-file digest and per-file hashes
 - **AND** the central acceptance artifact SHALL bind to the revised commit
 
-#### Scenario: Evidence is refreshed or honestly blocked
+#### Scenario: Evidence is refreshed against the revised candidate
 
-- **WHEN** PDF or browser evidence is required for the changed public bytes
-- **THEN** regenerated evidence SHALL identify the revised candidate and environment
-- **OR** an unavailable renderer/browser SHALL be recorded as an explicit blocker
+- **WHEN** PDF or browser evidence is regenerated for the changed public bytes
+- **THEN** the regenerated evidence SHALL identify the revised candidate commit and environment
+- **AND** stale prior screenshots SHALL NOT be relabeled as fresh evidence
+
+#### Scenario: Evidence generation is honestly blocked
+
+- **WHEN** a required renderer or browser is unavailable
+- **THEN** the exact blocker SHALL be recorded in the acceptance artifact
 - **AND** stale prior screenshots SHALL NOT be relabeled as fresh evidence
 
 ### Requirement: Brand alignment SHALL preserve offline and public-private boundaries

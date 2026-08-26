@@ -10,9 +10,9 @@ The design will preserve the current visual hierarchy and use color as identity,
 
 | Role | Value | Use | Contrast/guardrail |
 |---|---|---|---|
-| `--ntu-blue` | `#001E61` | reference navy for brand-aligned structural accents | not used as normal body text on dark stage |
+| `--ntu-blue` | `#001E61` | structural navy for UI surfaces (presenter buttons); not body text | not used as normal body text on dark stage |
 | `--ntu-blue-stage` | `#0d1038` | dominant slide stage background | preserve current readability |
-| `--ntu-red` | `#B21F2F` | structural crimson: top rule, rails, borders, blocks | decoration only on dark background; not normal text |
+| `--ntu-red` | `#B21F2F` | structural crimson: top rule, rails, borders, blocks | decoration only; not used for text at any size on the dark stage |
 | `--ntu-red-ink` | `#F15B70` | readable crimson for eyebrow text | contrast against `#0d1038` is at least 4.5:1 |
 | `--ntu-gold` | `#FFD166` | restrained metric/attention accent and focus ring | contrast against `#0d1038` is at least 4.5:1 |
 | `--ntu-white` | `#FFFFFF` | primary text and logo-card background | preserve current white text |
@@ -21,12 +21,12 @@ The crimson and navy reference values are treated as visual references, not offi
 
 ## CSS implementation
 
-1. Add `--ntu-blue-reference`, `--ntu-red-ink`, `--ntu-gold`, and `--ntu-white` alongside existing tokens. Retain `--ntu-blue-stage` and stage dimensions.
+1. Add `--ntu-red-ink`, `--ntu-gold`, and `--ntu-white` alongside existing tokens. Redefine `--ntu-red` from `#d71440` to reference crimson `#B21F2F`. Retain `--ntu-blue-stage` and stage dimensions. The existing `--ntu-blue` is redefined from `#181c62` to reference navy `#001E61` and applied to the presenter-hud button background. The existing `--ntu-blue-stage` remains unchanged as the dominant stage color; `--ntu-blue-reference` is not used.
 2. Set the existing visible `.eyebrow` text to `var(--ntu-red-ink)`.
-3. Add `.slide-shell::before` as a non-interactive 4px top identity rule: crimson leading segment, short gold separator, transparent remainder. It must not change content flow, safe-area geometry, DOM order, or accessibility tree.
+3. Add `.slide-shell::before` as a non-interactive 4px solid crimson top identity rule with a thin gold bottom edge. It must not change content flow, safe-area geometry, DOM order, or accessibility tree.
 4. Add `.eyebrow::after` as a 32px × 3px gold marker with `aria-hidden`-equivalent decorative CSS only; it must not introduce text or controls. If pseudo-element rendering changes line wrapping at any supported viewport, remove this marker and retain only the top rule.
 5. Set the existing metric outputs (`slide 3` and `slide 7`) and the two semantically meaningful metric-row endpoints (`slide 14` first and last cells) to `var(--ntu-gold)`; leave ordinary labels white.
-6. Use `var(--ntu-red)` for existing structural red treatments and change the iceberg visible treatment from pink to a low-opacity crimson tint.
+6. Use `var(--ntu-red)` for existing structural red treatments, change the iceberg visible treatment from pink to a low-opacity crimson tint, and replace `.notes-overlay` border pink (`#ff708f`) with `var(--ntu-red-ink)` (readable crimson, decoration-only).
 7. Add a thin crimson bottom edge to the existing white logo card only if it remains within the authored safe area; otherwise leave the card geometry unchanged.
 8. Do not use `filter`, SVG recoloring, image editing, external CSS, external fonts, or JavaScript changes.
 
@@ -47,6 +47,24 @@ Because `index.html` is a public package file, this is a Tier-1 public-content c
 3. Capture or regenerate candidate-bound browser/accessibility/screenshot evidence for representative slides and rerun the full automated suite.
 4. Recompute the seven-file package digest, all per-file checksums, release-manifest private hashes, and central intake/verification records.
 5. Never reuse prior screenshot/PDF evidence solely because the old evidence passed; public bytes changed.
+
+## Predecessor gate coordination
+
+The prior change `add-ntu-ai-keynote-deck` is active at 7/12 with open human gates (4.1 editorial, 5.1 venue, 5.2 tag, 6.1/6.2 closure) contractually bound to the superseded candidate digest. This plan does not check, close, or archive those gates. Instead:
+
+- Task 4.1 creates this change's own `acceptance/` artifacts under `align-ntu-keynote-with-ntu-brand-theme/`, registering the new candidate identity.
+- The predecessor's acceptance artifacts are never mutated. Its frozen ledger is preserved as historical context.
+- The predecessor's open gates become unsatisfiable against the old public bytes once this change's new candidate integrates onto `ntu-keynote` main. This is recorded as a known supersession, not a completion claim.
+- This change's own task 5.1 integration step explicitly states that rollback commits for both changes remain reachable after integration.
+
+## Predecessor gate coordination
+
+The prior change `add-ntu-ai-keynote-deck` is active at 7/12 with open human gates (4.1 editorial, 5.1 venue, 5.2 tag, 6.1/6.2 closure) contractually bound to the superseded candidate digest. This plan does not check, close, or archive those gates. Instead:
+
+- Task 4.1 creates this change's own `acceptance/` artifacts under `align-ntu-keynote-with-ntu-brand-theme/`, registering the new candidate identity.
+- The predecessor's acceptance artifacts are never mutated. Its frozen ledger is preserved as historical context.
+- The predecessor's open gates become unsatisfiable against the old public bytes once this change's new candidate integrates onto `ntu-keynote` main. This is recorded as a known supersession, not a completion claim.
+- This change's own task 5.1 integration step explicitly states that rollback commits for both changes remain reachable after integration.
 
 ## Rollback and failure handling
 
