@@ -104,12 +104,17 @@ The deck SHALL honor reduced-motion preferences by exposing final animation stat
 ### Requirement: Font fallback and qualified scaling SHALL preserve comprehension
 **Requirement ID:** `REQ-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension`
 
-Removing the local fonts or rendering at any qualified viewport SHALL NOT clip, overlap, hide, reorder, or change the meaning of required audience content. Vietnamese glyphs SHALL remain readable through the declared system-font fallback.
+Removing the local fonts or rendering at any qualified viewport SHALL NOT clip, overlap, hide, reorder, or change the meaning of required audience content. Vietnamese glyphs SHALL remain readable through the declared system-font fallback. The bundled font files SHALL cover Vietnamese extended glyphs and basic Latin (U+0020–007E) so that approved ASCII technical terms and numerals (AI, ROI, USD, P&L, ChatGPT, LLM, NTU, digits, punctuation) render in the bundled typeface rather than a system fallback; a Vietnamese-only unicode-range subset that omits basic Latin SHALL NOT be accepted as the bundled font.
 
 #### Scenario: Local fonts are unavailable
 **Scenario ID:** `SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-local-fonts-are-unavailable`
 - **WHEN** the venue package is opened without the bundled font files
 - **THEN** all Vietnamese audience copy, labels, prompts, controls, and notes SHALL remain readable without overflow or missing required glyphs
+
+#### Scenario: Bundled fonts cover Vietnamese and basic Latin
+**Scenario ID:** `SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-bundled-fonts-cover-vietnamese-and-basic-latin`
+- **WHEN** the character map of each bundled WOFF2 font file is inspected
+- **THEN** every bundled font SHALL map all basic Latin code points U+0020–007E and the Vietnamese extended glyphs used by the deck, and evidence SHALL record the per-font coverage check result
 
 #### Scenario: Stage is letterboxed
 **Scenario ID:** `SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-stage-is-letterboxed`

@@ -42,7 +42,7 @@ Central tasks consume that descriptor and its referenced evidence read-only. The
 
 ### D2: One self-contained runtime with an exact seven-file public package
 
-The runtime remains one directly opened `index.html` with inline CSS and vanilla JavaScript. The only sibling assets are the transparent 1304×512 NTU logo and Be Vietnam Pro Vietnamese-subset WOFF2 fonts at weights 400, 600, and 800.
+The runtime remains one directly opened `index.html` with inline CSS and vanilla JavaScript. The only sibling assets are the transparent 1304×512 NTU logo and Be Vietnam Pro WOFF2 fonts at weights 400, 600, and 800, each subset to Vietnamese extended glyphs plus basic Latin (U+0020–007E) so that ASCII technical terms and numerals (AI, ROI, USD, P&L, ChatGPT, LLM, NTU, digits, punctuation) render in Be Vietnam Pro rather than a system fallback. The Google Fonts "vietnamese" unicode-range subset alone omits basic Latin and MUST NOT be bundled without Latin coverage.
 
 All new diagrams, data visualizations, editorial illustrations, and iconography are authored inline in `index.html`. The released package contains exactly:
 1. `index.html`
