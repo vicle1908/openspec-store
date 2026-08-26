@@ -30,19 +30,19 @@ Next, previous, Home, End, direct access, full/short selection, notes toggle and
 
 ### Requirement: The 18px floor SHALL apply only to required audience meaning
 
-At the authored 1280×720 stage, audience-visible narrative copy, numeric values, roundtable prompts, and meaningful visual labels that carry required slide meaning SHALL have a browser-computed font size of at least 18 CSS pixels. This 18px floor SHALL NOT apply to source-attribution lines, slide counter or progress metadata, or the speaker-notes overlay; those excluded surfaces SHALL still remain legible, non-overlapping, contrast-compliant for their role, and present at every qualified viewport where they are intended to appear.
+At the unscaled authored 1280×720 stage, required audience narrative copy, numeric values, roundtable prompts, and every meaningful visual label that carries required slide meaning—including SVG text, node labels, legends, source or scope badges, and relationship labels—SHALL have a browser-computed font size of at least 18 CSS pixels in both qualified Safari and Chrome. This 18px floor SHALL NOT apply to source-attribution or provenance lines, slide counter or progress metadata, or the speaker-notes overlay; those excluded surfaces SHALL still remain legible, non-overlapping, contrast-compliant for their role, and present at every qualified viewport where they are intended to appear.
 
 #### Scenario: Required audience text is measured
-- **WHEN** computed styles are captured at the authored stage for narrative copy, numeric values, prompts, and meaningful visual labels
-- **THEN** each included text surface SHALL compute to at least 18px and SHALL fit without clipping or overlap
+- **WHEN** Safari and Chrome computed styles are captured at the authored 1280×720 stage before the stage transform for narrative copy, numeric values, prompts, and meaningful visual labels
+- **THEN** each included text surface SHALL compute to at least 18px in both browsers and SHALL fit without clipping or overlap
 
 #### Scenario: Excluded auxiliary text is measured
 - **WHEN** a source line, slide counter, progress label, or notes-overlay string computes below 18px
 - **THEN** it SHALL NOT fail the scoped 18px floor solely for that reason, but it MUST still pass its applicable legibility, contrast, visibility, and overflow checks
 
-#### Scenario: Decorative text-like shape is removed
-- **WHEN** a decorative vector contains no required audience meaning
-- **THEN** it SHALL NOT be used to bypass the minimum size or accessible-equivalent requirements for meaningful text
+#### Scenario: Required meaning is disguised as decorative
+- **WHEN** visible text or a text-like vector carries required audience meaning but is marked decorative, omitted from the measured set, or moved only into an accessible description
+- **THEN** it SHALL remain subject to the visible 18px floor and accessible-equivalent requirements and MUST NOT bypass either contract
 
 ### Requirement: Contrast and non-color meaning SHALL remain sufficient
 

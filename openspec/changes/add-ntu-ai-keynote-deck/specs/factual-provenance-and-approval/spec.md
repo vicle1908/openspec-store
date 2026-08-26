@@ -18,7 +18,7 @@ Every audience or notes claim SHALL resolve bidirectionally to a stable source i
 
 ### Requirement: Specific factual scopes SHALL remain explicit
 
-PwC, Gartner, Google/Access Partnership, McKinsey, and WEF values SHALL remain projections, modeled potential, or estimates as registered; the MIT NANDA 95% finding SHALL remain scoped to analyzed GenAI pilots and measurable P&L at evaluation; the USD 30–40 billion figure SHALL remain a separate directional estimate; WEF workforce figures SHALL remain projections across all macro drivers; and Nghị quyết 57 SHALL remain scoped to the top-three ASEAN target for AI research and development.
+PwC, Gartner, Google/Access Partnership, McKinsey, and WEF values SHALL remain projections, modeled potential, or estimates as registered; the MIT NANDA 95% finding SHALL remain scoped to organizations in its analyzed population and the 5% finding SHALL remain scoped to integrated AI pilots that generated substantial value; those percentage claims SHALL retain distinct populations and units and MUST NOT be treated as complements; the USD 30–40 billion figure SHALL remain separate directional investment context; Gartner SHALL remain **hơn 40%**, not an exact 40%; WEF workforce figures SHALL remain projections across all macro drivers; and Nghị quyết 57 SHALL remain scoped to the top-three ASEAN target for AI research and development.
 
 #### Scenario: Claim wording is reviewed
 - **WHEN** released wording is compared with its registered source entry
@@ -52,12 +52,12 @@ The selected release copy SHALL default to the complete neutral variant. Viettel
 - **WHEN** no positive exact-copy decision covers the selected wording and slides
 - **THEN** the release candidate MUST select neutral copy and MUST contain no dormant gated claim in the public package
 
-### Requirement: Evidence invalidation SHALL use two tiers
+### Requirement: Evidence invalidation SHALL use Tier 1 and Tier 2
 
-Evidence invalidation SHALL distinguish public-byte changes from private-record-only changes.
+Evidence invalidation SHALL distinguish **Tier 1 — public-candidate change** from **Tier 2 — private-record-only change**.
 
-1. A change to any public venue-package byte, selected audience or notes wording, visual encoding, runtime behavior, or PDF input SHALL invalidate every content-dependent artifact, including browser, accessibility, viewport, screenshot, PDF, public-package checksum, manifest, and copied-folder rehearsal evidence.
-2. A private-record-only change that leaves all public package bytes and the selected copy unchanged SHALL preserve rendering and interaction evidence only when the retained evidence's recorded public hashes still match. The changed private record and every manifest, traceability, approval, freshness, or checksum field that depends on it MUST be regenerated or reconciled before release.
+1. Tier 1 SHALL apply to a change to any public venue-package byte, selected audience or notes wording, visual encoding, runtime behavior, or PDF input and SHALL invalidate every content-dependent artifact, including browser, accessibility, viewport, screenshot, PDF, public-package checksum, manifest, and copied-folder rehearsal evidence.
+2. Tier 2 SHALL apply only to a private-record-only change that leaves all public package bytes and the selected copy unchanged. Rendering and interaction evidence MAY be retained only when its recorded public hashes still match. The changed private record and every manifest, traceability, approval, freshness, or checksum field that depends on it MUST be regenerated or reconciled before release.
 
 #### Scenario: Public candidate bytes change
 - **WHEN** `index.html`, `README.md`, the PDF, logo, or a public font changes
@@ -69,23 +69,23 @@ Evidence invalidation SHALL distinguish public-byte changes from private-record-
 
 #### Scenario: Private change alters selected meaning
 - **WHEN** a private approval, source, or selection change changes the selected public wording or visual meaning
-- **THEN** the change SHALL be treated as a public-candidate change and the full invalidation tier MUST apply
+- **THEN** the change SHALL be classified as Tier 1 and the full public-candidate invalidation requirements MUST apply
 
 ### Requirement: Release identity SHALL avoid self-reference
 
-The private release record SHALL bind one evidence-base commit, non-self checksums, the exact public package digest, selected copy, source and approval records, evidence status, and intended annotated tag `ntu-ai-keynote-v1.0.0`. It MUST NOT embed the SHA of the commit containing that manifest; the authoritative final commit SHALL be resolved externally from the annotated tag.
+The private release record SHALL bind one evidence-base commit, non-self checksums, the exact public package digest, selected copy, source and approval records, evidence status, and the fixed intended annotated ref `refs/tags/ntu-ai-keynote-v1.0.0`. It MUST NOT embed the SHA of the commit containing that manifest. After external release, acceptance SHALL verify that the exact ref resolves to an annotated tag object and SHALL derive the authoritative final commit by peeling `refs/tags/ntu-ai-keynote-v1.0.0^{commit}`.
 
 #### Scenario: Release manifest is finalized
 - **WHEN** all release gates have passed and the manifest is committed
-- **THEN** the manifest SHALL identify its evidence base and public digest without claiming its own containing commit SHA
+- **THEN** the manifest SHALL identify its evidence base, public digest, and fixed intended ref without claiming its own containing commit SHA
 
 #### Scenario: Tag identity is verified
-- **WHEN** the annotated release tag is inspected after the release commit
-- **THEN** the authoritative commit SHALL be derived from the tag object and SHALL match the committed release candidate
+- **WHEN** the fixed annotated ref is inspected after the external release commit
+- **THEN** `refs/tags/ntu-ai-keynote-v1.0.0` SHALL resolve to an annotated tag object whose peeled commit contains the committed release candidate and exact public package digest
 
 ### Requirement: Central acceptance SHALL consume external evidence without mutating its root
 
-External implementation and evidence MAY be submitted to the central change as read-only, hash-bound acceptance evidence. Central planning or task execution SHALL evaluate that evidence against these requirements and MUST NOT write to, reconcile, or regenerate files in the external implementation repository.
+External implementation and evidence MAY be submitted to the central change as read-only, hash-bound acceptance evidence. Central planning or task execution SHALL evaluate that evidence against these requirements and MUST NOT write to, reconcile, or regenerate files in the external implementation repository. External or historical local OpenSpec artifacts MAY be consulted only as read-only migration or evidence inputs; no local OpenSpec `status`, `validate`, `apply`, `archive`, task completion, or same-named lifecycle SHALL contribute independent authority or central acceptance state.
 
 #### Scenario: Central acceptance reviews external evidence
 - **WHEN** an external evidence bundle is presented for a central gate

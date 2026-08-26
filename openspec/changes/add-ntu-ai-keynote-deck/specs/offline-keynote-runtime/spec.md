@@ -6,7 +6,7 @@ Define the observable offline runtime contract that keeps the keynote navigable,
 
 ### Requirement: The keynote SHALL launch directly and remain network-independent
 
-The venue package SHALL open through `file://` in an installed modern Safari or Chrome browser without a server, build step, CDN, live network, package manager, account, or production runtime dependency. Every runtime asset MUST resolve through a relative path inside the allowlisted venue package.
+The venue package SHALL open through `file://` in an installed modern Safari or Chrome browser without a server, build step, CDN, live network, package manager, account, or production runtime dependency. Every runtime asset MUST resolve through a relative path inside the allowlisted venue package. Compliance SHALL be established by immutable, hash-bound external runtime evidence consumed read-only by the central change; local OpenSpec artifact or task status MUST NOT substitute for launch and interaction evidence.
 
 #### Scenario: Offline direct launch succeeds
 - **WHEN** the allowlisted venue package is copied to a new folder and `index.html` is opened while HTTP and HTTPS access are unavailable

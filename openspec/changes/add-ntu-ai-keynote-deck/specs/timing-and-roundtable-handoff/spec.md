@@ -62,11 +62,11 @@ The PwC counter and MIT emphasis SHALL reset before their target slide becomes a
 
 ### Requirement: The roundtable transition SHALL preserve separate audience jobs
 
-Slide 16 SHALL solicit discussion through the three approved concise prompts, and slide 17 SHALL perform the verbal handoff in 30 seconds. The handoff SHALL acknowledge the roundtable and NTU alumni connection without restating the prompts.
+Slide 16 SHALL solicit discussion through three concise prompts anchored respectively to the registered 95% organization context, 39% workforce-skills context, and **hơn 40%** Gartner forecast context; slide 17 SHALL perform the verbal handoff in 30 seconds. The 95% prompt MUST NOT imply that the distinct 5% integrated-pilot finding is its complementary remainder. The handoff SHALL acknowledge the roundtable and NTU alumni connection without restating the prompts.
 
 #### Scenario: Keynote reaches the final two slides
 - **WHEN** slides 16 and 17 are delivered in sequence
-- **THEN** slide 16 SHALL perform the question-setting job and slide 17 SHALL perform only the handoff job within their assigned timing
+- **THEN** slide 16 SHALL perform the question-setting job, preserve **hơn 40%** in its Gartner anchor and the organization-versus-integrated-pilot distinction in any slide-7 reference, and slide 17 SHALL perform only the handoff job within its assigned timing
 
 #### Scenario: Panelist details are unavailable
 - **WHEN** final panelist names or roles have not been supplied

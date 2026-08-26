@@ -40,16 +40,16 @@ Slides 6–14 SHALL present the iceberg as an explicitly illustrative and not-to
 - **WHEN** slide 13 explains what successful organizations do differently
 - **THEN** it SHALL describe conversion of effort into P&L value and MUST NOT equate success solely with layer-3 or advanced-technology adoption
 
-### Requirement: Slide 7 SHALL keep the MIT populations independent
+### Requirement: Slide 7 SHALL keep three factual contexts independent
 
-Slide 7 SHALL present the 95% no-measurable-P&L finding as a result about the analyzed GenAI-pilot population and the USD 30–40 billion figure as a separate directional investment estimate. Text, layout, labels, connectors, proportions, animation, and narration MUST NOT imply that both figures measure the same population, denominator, sample, or causal relationship.
+Slide 7 SHALL present three independent contexts: the registered 95% finding about organizations in the analyzed population, the registered 5% finding about integrated AI pilots that generated substantial value, and the USD 30–40 billion figure only as separate directional investment context. The 95% and 5% figures have distinct populations and units and MUST NOT be encoded as complementary slices, a remainder, or one shared denominator. Text, layout, labels, connectors, proportions, animation, and narration MUST NOT connect the investment context to either percentage as its sample, denominator, or causal explanation.
 
-#### Scenario: Both slide 7 figures are shown
-- **WHEN** the 95% finding and USD 30–40 billion estimate appear together
-- **THEN** their labels and visual grouping SHALL identify them as independent claims with separate scope and SHALL avoid a shared denominator or causal connector
+#### Scenario: All slide 7 contexts are shown
+- **WHEN** the 95% organization finding, 5% integrated-pilot finding, and USD 30–40 billion context appear together
+- **THEN** each SHALL have its own claim identity, population or unit label, qualifier, and visual group, with no bar, pie, donut, track, connector, narration, animation, or proportional geometry implying a common denominator or causal relationship
 
-#### Scenario: A shared population is implied
-- **WHEN** wording or visual encoding suggests that USD 30–40 billion was invested specifically in the analyzed 95% pilot population or that the two values share a sample
+#### Scenario: Populations or context are conflated
+- **WHEN** wording or visual encoding treats 95% and 5% as complementary parts, calls both figures organizations or both figures pilots, or links USD 30–40 billion to the analyzed percentage population
 - **THEN** the candidate MUST fail content and provenance acceptance
 
 ### Requirement: Act 3 SHALL separate leadership, questions, and handoff
@@ -58,7 +58,7 @@ Slides 15–17 SHALL present three complete Vietnamese leadership mindsets, thre
 
 #### Scenario: Roundtable prompts are displayed
 - **WHEN** slide 16 is shown at a qualified viewport
-- **THEN** all three concise prompts SHALL be independently readable, non-overlapping, and anchored to the approved 95%, 39%, and 40% contexts
+- **THEN** all three concise prompts SHALL be independently readable, non-overlapping, and anchored to the approved 95%, 39%, and **hơn 40%** contexts
 
 #### Scenario: Handoff slide is reviewed
 - **WHEN** slide 17 follows slide 16

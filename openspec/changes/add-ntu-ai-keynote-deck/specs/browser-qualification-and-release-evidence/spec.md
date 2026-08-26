@@ -22,7 +22,7 @@ Facts that depend on the browser cascade or rendered state—including computed 
 
 #### Scenario: Scoped 18px floor is verified
 - **WHEN** required audience text and meaningful visual labels are checked for the 18px floor
-- **THEN** browser evidence SHALL capture their computed font sizes at the authored stage and SHALL classify excluded auxiliary text separately
+- **THEN** both Safari and Chrome evidence SHALL enumerate each included element, capture its computed font size at the authored 1280×720 stage before the stage transform, and classify excluded auxiliary text separately
 
 #### Scenario: Contrast is verified
 - **WHEN** a contrast result is accepted
@@ -92,9 +92,21 @@ The private evidence set SHALL record requirement IDs, environments, timestamps,
 - **WHEN** a required record has mismatched hashes, an expired dependency, an unresolved gate, or a result for another candidate
 - **THEN** release acceptance MUST remain incomplete and SHALL identify the failing evidence relationship
 
+### Requirement: Release evidence retention SHALL apply Tier 1 and Tier 2 dependency rules
+
+Tier 1 SHALL apply to any public-package byte, selected audience or notes wording, visual meaning, runtime behavior, or PDF-input change and SHALL require fresh browser, accessibility, viewport, screenshot, PDF, package-checksum, manifest, and copied-folder evidence for the new candidate. Tier 2 SHALL apply only when every public hash and the selected meaning remain identical and MAY retain rendering or interaction evidence only when recorded dependency hashes still match; dependent private traceability, approval, freshness, manifest, and checksum assertions MUST be refreshed.
+
+#### Scenario: Tier 1 evidence is reused
+- **WHEN** a Tier 1 change occurs and content-dependent evidence still identifies the previous candidate
+- **THEN** that evidence MUST remain stale and MUST NOT satisfy release acceptance
+
+#### Scenario: Tier 2 evidence is retained
+- **WHEN** a private-record-only change leaves every public hash and selected meaning identical
+- **THEN** retained rendering or interaction evidence SHALL identify matching public hashes, while every affected private dependency assertion SHALL be refreshed before acceptance
+
 ### Requirement: Central acceptance SHALL be read-only toward external implementation evidence
 
-Central tasks SHALL receive external implementation and evidence as immutable or hash-verifiable inputs, evaluate them against central requirement IDs, and record only central acceptance state inside the central allowed edit root. Central tasks MUST NOT modify, regenerate, stage, commit, tag, or delete any file in the external implementation repository.
+Central tasks SHALL receive external implementation and evidence as immutable or hash-verifiable inputs, evaluate them against central requirement IDs, and record only central acceptance state inside the central allowed edit root. Central tasks MUST NOT modify, regenerate, stage, commit, tag, or delete any file in the external implementation repository and MUST NOT invoke or depend on any local OpenSpec lifecycle. External OpenSpec artifacts, if supplied, are read-only migration or evidence inputs and have no independent acceptance authority.
 
 #### Scenario: External evidence satisfies a central requirement
 - **WHEN** a submitted record proves a requirement with matching candidate hashes and fresh results
@@ -104,10 +116,18 @@ Central tasks SHALL receive external implementation and evidence as immutable or
 - **WHEN** a submitted record is absent, stale, mismatched, or failing
 - **THEN** the central task SHALL remain incomplete and SHALL return the deficiency for separate externally authorized remediation
 
-### Requirement: Annotated tag SHALL identify the final release externally
+### Requirement: The fixed annotated ref SHALL identify the final release externally
 
-After all gates pass, the release commit SHALL be tagged with the annotated tag `ntu-ai-keynote-v1.0.0`. The tag object and its peeled commit SHALL be verified externally; the manifest MUST NOT claim its own containing commit SHA.
+The intended ref SHALL be exactly `refs/tags/ntu-ai-keynote-v1.0.0`. Before external release finalization, immutable evidence SHALL establish that the ref is available for this release. A conflicting existing ref MUST block release and MUST NOT be moved, deleted, reused, or repointed by a central task. After all gates pass and external release occurs, the exact ref SHALL resolve to an annotated tag object; acceptance SHALL derive the authoritative commit by peeling `refs/tags/ntu-ai-keynote-v1.0.0^{commit}`, and the manifest MUST NOT claim its own containing commit SHA.
 
-#### Scenario: Final tag is inspected
-- **WHEN** the intended release tag is resolved
-- **THEN** it SHALL be an annotated tag whose peeled commit contains the released manifest and exact public package digest
+#### Scenario: Fixed tag ref is available
+- **WHEN** pre-finalization tag-availability evidence is reviewed
+- **THEN** it SHALL identify the external repository, exact ref, timestamp, and immutable inspection result showing that no conflicting tag object occupies `refs/tags/ntu-ai-keynote-v1.0.0`
+
+#### Scenario: Final annotated ref is inspected
+- **WHEN** the exact release ref is resolved after external release
+- **THEN** it SHALL be an annotated tag object whose peeled commit contains the accepted manifest and exact public package digest
+
+#### Scenario: Release ref is invalid
+- **WHEN** the ref is lightweight, dynamic, alternate, conflicting, unverifiable, or peels to a commit containing different public bytes
+- **THEN** release acceptance MUST fail
