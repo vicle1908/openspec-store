@@ -5,10 +5,10 @@
   "candidate": {
     "repository": "/Users/androidteam/Developer/ntu-keynote",
     "branch": "main",
-    "implementation_commit": "0028f4e544b4235af42f688d383d688c495139fd",
+    "implementation_commit": "5685afecd03c1adff95973e7844292cd05081c74",
     "public_package_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
     "selected_copy": "neutral",
-    "previous_candidate_commit": "ca70e751d93ecf83445d23adaf48d8bd044739c2"
+    "previous_candidate_commit": "0028f4e544b4235af42f688d383d688c495139fd"
   },
   "reviewer": {
     "identity": "synthetic-review-orchestration",

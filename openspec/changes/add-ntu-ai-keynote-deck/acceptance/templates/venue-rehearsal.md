@@ -4,7 +4,7 @@
 
 ## Candidate identity
 
-- Implementation commit: `0028f4e544b4235af42f688d383d688c495139fd`
+- Implementation commit: `5685afecd03c1adff95973e7844292cd05081c74`
 - Public-package digest: `da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1`
 - Package: exactly seven allowlisted public files
 

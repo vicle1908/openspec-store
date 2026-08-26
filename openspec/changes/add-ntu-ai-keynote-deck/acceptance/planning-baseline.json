@@ -14,7 +14,7 @@
   ],
   "planning_artifact_sha256": {
     ".openspec.yaml": "2722d733de6305f7dbd2c1c069cebb0c319f7cdcbc249e6da8b5422b6bb689d9",
-    "proposal.md": "419daf7e8c02ff2b8cf16a2723d97f8625e2fd71bd71cd17d65b0c6e8d3cdf45",
+    "proposal.md": "2354d899f92ca07ba115a2e60dd448acd90c688d07113c4cb76fac458088e44c",
     "design.md": "e6978478ecb16edfa7b58783283c9e02c9d8684467ef94b8b7870cd7d02aa001",
     "specs/accessible-stage-presentation/spec.md": "a155257de6f879f3e200f319d2fb03d3a2e00ee93d366e7d9797565ffba5c6b1",
     "specs/browser-qualification-and-release-evidence/spec.md": "e9d825a4f46b8937676a8fb4fe165700ec48215e3e4bc93715b0812ee4e1bb2e",
