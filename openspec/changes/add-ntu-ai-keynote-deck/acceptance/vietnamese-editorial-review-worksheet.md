@@ -14,10 +14,10 @@ Complete every field from immutable external evidence. Do not review a moving wo
 | Field | Value |
 |---|---|
 | External repository identity | `/Users/androidteam/Developer/ntu-keynote` (git, branch `main`) |
-| Evidence-base commit, full SHA | `129346bea246cfdeafe687aab8f94b830fecee4d` (candidate: `7cbf0f17c428896b95ae078623d2450996fafe88`) |
+| Evidence-base commit, full SHA | `bb7a4d58a7354f55a61cf862cebac0d6f438b626` (candidate: `bb7a4d58a7354f55a61cf862cebac0d6f438b626`) |
 | `index.html` SHA-256 | `915a270b8c4ddb8032560bc55b14742bb2dcb8f82992ff5f9f0b893bc51f4671` |
 | `README.md` SHA-256 | `43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469` |
-| `keynote-fallback.pdf` SHA-256 | `9c67b1562df5816d72a2217653336150906ac75c404a56dc50f69078cdb0dacf` |
+| `keynote-fallback.pdf` SHA-256 | `256a0cd12e303760c28a5100b09d5e4131dbbc2d19c6fddfd7c3ff94c94515f8` |
 | `assets/ntu-logo.png` SHA-256 | `8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc` |
 | `assets/fonts/be-vietnam-pro-400.woff2` SHA-256 | `077c275da5dee47bc1080bc7d9ae479a837804572635f540e8809f70bc861c7e` |
 | `assets/fonts/be-vietnam-pro-600.woff2` SHA-256 | `dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125` |

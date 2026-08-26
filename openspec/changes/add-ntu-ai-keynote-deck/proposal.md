@@ -36,7 +36,7 @@ Lê Khánh Vinh (Solutions Architect at Viettel, NTU alumnus 2006–2010) will d
 
 ### Visual identity and visual-content contract
 
-- Preserve NTU Blue `#181C62` and NTU Red `#D71440` from the official Quick Brand Guide. Use the projection-adapted dark stage background `#0D1038`, high-contrast light text, and NTU Red as the disciplined accent for headline statistics and narrative alarm moments.
+- Use the NTU brand family adapted for projection: NTU Blue `#001E61`, projection-adapted dark stage background `#0D1038`, NTU Red `#B21F2F` as the disciplined structural accent, NTU Red Ink `#F15B70` for readable red text, and NTU Gold `#FFD166` for focus and small markers. Readable text roles meet WCAG 4.5:1 contrast against the stage.
 - Give every slide one dominant visual that reinforces its existing narrative job without changing content authority, timing, or factual scope.
 - Use project-authored inline SVG/CSS diagrams, source-faithful data visualizations, editorial vector illustrations, and accessible iconography inside `index.html`; add no public file or runtime dependency.
 - Do not encode forecasts, modeled potential, or directional estimates as observed facts. Any meaningful length, area, position, sign, proportion, label, or comparison must match the registered source value and qualifier. Metaphors such as the iceberg remain explicitly illustrative and not to scale.

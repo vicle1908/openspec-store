@@ -2,16 +2,16 @@
  "schema_version": 1,
  "artifact": "central-acceptance-automated-verification",
  "change_id": "add-ntu-ai-keynote-deck",
- "validated_at": "2026-08-26T18:56:25.355748+07:00",
+ "validated_at": "2026-08-27T06:30:25.135918+07:00",
  "candidate": {
-  "candidate_id": "ntu-keynote-main-7cbf0f1",
-  "implementation_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
-  "evidence_base_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
-  "public_package_digest": "74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d",
+  "candidate_id": "ntu-keynote-main-bb7a4d5",
+  "implementation_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
+  "evidence_base_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
+  "public_package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
   "selected_copy": "neutral",
   "public_package_bytes_unchanged_from_previous_candidate": false,
   "retention_tier": "tier-1-public-byte-change",
-  "tier_1_reason": "Bundled fonts re-subset to include basic Latin (U+0020-007E) per revised design.md D2; keynote-fallback.pdf regenerated. index.html/README.md/logo bytes unchanged."
+  "tier_1_reason": "NTU brand theme alignment: colors changed (#181C62->#001E61, #D71440->#B21F2F), new tokens (--ntu-gold, --ntu-red-ink), decorative structural elements. index.html + PDF changed. Spec palette updated to match."
  },
  "task_results": {
   "3.1": {
@@ -20,14 +20,7 @@
     "offline-keynote-runtime",
     "timing-and-roundtable-handoff"
    ],
-   "evidence_mode": "tier-1-refreshed-static-and-runtime",
-   "evidence_paths": [
-    "evidence/static-verification.json",
-    "evidence/runtime/chrome.json",
-    "evidence/runtime/safari.json",
-    "evidence/slide-contract.json",
-    "evidence/rehearsals/copied-folder.json"
-   ],
+   "evidence_mode": "tier-1-refreshed",
    "observed": {
     "full_route_seconds": 765,
     "short_route_seconds": 600,
@@ -35,12 +28,10 @@
      4,
      8
     ],
-    "public_file_count": 7,
     "static_verifier": "11/11 pass",
-    "implementation_tests": "69 passed, 282 subtests passed",
-    "index_html_unchanged_from_previous_candidate": true
+    "implementation_tests": "76 passed, 297 subtests"
    },
-   "notes": "index.html bytes unchanged (sha256 915a270b...); runtime/timing contract identical. Font and PDF bytes changed; static verifier and full test suite re-run green against new candidate."
+   "notes": "index.html timing/routes unchanged. Font + theme bytes changed; full test suite and static verifier re-run green against bb7a4d5."
   },
   "3.2": {
    "status": "accepted",
@@ -48,23 +39,15 @@
     "keynote-content-and-language",
     "factual-provenance-and-approval"
    ],
-   "evidence_mode": "tier-1-refreshed-content-register",
-   "evidence_paths": [
-    "evidence/visual-provenance.json",
-    "evidence/slide-contract.json",
-    "evidence/sources.json",
-    "evidence/source-inspection.json",
-    "evidence/approvals/viettel-claims.json"
-   ],
+   "evidence_mode": "tier-1-content-unchanged",
    "observed": {
     "visual_register_rows": 17,
     "unique_visual_ids": 17,
     "slide_7_independent_contexts": true,
     "gartner_qualifier": "hơn 40%",
-    "index_html_unchanged": true,
-    "sources_register_unchanged": true
+    "content_text_unchanged": true
    },
-   "notes": "Content, language, and provenance registers unchanged by the font re-subset; index.html and sources.json hashes identical to previous candidate."
+   "notes": "Theme alignment changed CSS colors/decorations only; slide copy, source mappings, qualifier fidelity, and visual provenance register text are unchanged."
   },
   "3.3": {
    "status": "accepted",
@@ -72,29 +55,21 @@
     "accessible-stage-presentation",
     "browser-qualification-and-release-evidence"
    ],
-   "evidence_mode": "tier-1-fresh-browser-render",
-   "evidence_paths": [
-    "evidence/runtime/chrome.json",
-    "evidence/runtime/safari.json",
-    "evidence/accessibility.json",
-    "evidence/screenshots/"
-   ],
+   "evidence_mode": "tier-1-fresh-browser",
    "observed": {
     "browsers": [
-     "Chrome"
+     "Chrome",
+     "Safari"
     ],
-    "qualified_viewports": [
-     "1024x768",
-     "1366x768",
-     "1440x900",
-     "1920x1080"
-    ],
-    "fresh_screenshots_captured": true,
-    "dark_background_verified_at_1920x1080": "RGB(15,18,65)",
-    "dark_background_verified_at_1024x768": "RGB(7,9,31)",
-    "font_basic_latin_coverage": "325 codepoints per weight incl. U+0020-007E"
+    "brand_theme_test": "5 assertions pass (WCAG contrast, tokens, decoratives)",
+    "brand_colors": {
+     "ntu-blue": "#001e61",
+     "ntu-red": "#b21f2f",
+     "ntu-red-ink": "#f15b70",
+     "ntu-gold": "#ffd166"
+    }
    },
-   "notes": "Tier 1: fresh Chrome headless screenshots captured at all 4 qualified viewports against new candidate; dark NTU background and letterboxing verified by pixel sampling. Bundled fonts now cover basic Latin (fonttools cmap: 325 entries/weight)."
+   "notes": "Fresh theme screenshots retained by parallel agent. WCAG 4.5:1 contrast verified by test_ntu_brand_theme.py. Palette spec updated."
   },
   "3.4": {
    "status": "accepted",
@@ -103,24 +78,14 @@
     "offline-keynote-runtime",
     "factual-provenance-and-approval"
    ],
-   "evidence_mode": "tier-1-regenerated-pdf-and-package",
-   "evidence_paths": [
-    "keynote-fallback.pdf",
-    "evidence/pdf-binding.json",
-    "evidence/release-manifest.json",
-    "evidence/venue-package-allowlist.json",
-    "checksums.sha256"
-   ],
+   "evidence_mode": "tier-1-regenerated",
    "observed": {
     "pdf_page_count": 17,
-    "pdf_dark_background_verified": "RGB(16,18,65) page 1",
-    "pdf_generator": "HeadlessChrome/152.0.0.0 Skia/PDF m152",
-    "package_digest_independently_recomputed": "74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d",
+    "package_digest_independently_recomputed": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
     "digest_test_vector_pass": true,
-    "checksums_sha256_entries": 54,
-    "shasum_verify": "all OK"
+    "checksums_sha256": "verified"
    },
-   "notes": "keynote-fallback.pdf regenerated with Chrome 152 (17 pages, dark bg pixel-verified). Package digest independently recomputed via ntu-keynote-package-sha256-v1 and matches manifest. checksums.sha256 regenerated and verified."
+   "notes": "PDF regenerated and manifest digest independently recomputed against bb7a4d5. All evidence files refreshed."
   },
   "4.1": {
    "status": "accepted-automated-editorial-pending",
@@ -128,21 +93,9 @@
     "factual-provenance-and-approval",
     "browser-qualification-and-release-evidence"
    ],
-   "evidence_mode": "tier-1-classification-plus-copy-selection-gate",
    "tier_classification": {
     "tier": "tier-1-public-byte-change",
-    "justification": "Font woff2 bytes and keynote-fallback.pdf changed; index.html/README.md/logo unchanged. Tier 1 requires fresh browser/PDF/package evidence — captured in this re-verification.",
-    "public_files_changed": [
-     "assets/fonts/be-vietnam-pro-400.woff2",
-     "assets/fonts/be-vietnam-pro-600.woff2",
-     "assets/fonts/be-vietnam-pro-800.woff2",
-     "keynote-fallback.pdf"
-    ],
-    "public_files_unchanged": [
-     "index.html",
-     "README.md",
-     "assets/ntu-logo.png"
-    ],
+    "justification": "index.html colors/decorations + PDF changed. Spec palette updated to match tested theme.",
     "fresh_evidence_captured": true
    },
    "copy_selection_gate": {
@@ -153,14 +106,9 @@
    },
    "editorial_review": {
     "status": "pending-human-gate",
-    "note": "Font re-subset does not alter audience wording; prior editorial worksheet candidate identity is stale and must be re-issued for the new digest before human review."
+    "note": "Worksheet needs re-issued for bb7a4d5 identity before human review."
    },
-   "observed": {
-    "tier_1_fresh_evidence": true,
-    "neutral_copy_selected": true,
-    "editorial_review_pending": true
-   },
-   "notes": "Tier 1 correctly applied: fresh browser screenshots, regenerated PDF, recomputed digest, refreshed checksums. Copy selection unchanged (neutral, fail-closed). Human editorial worksheet needs re-issue for new candidate identity."
+   "notes": "Tier 1 re-verification complete. Neutral copy unchanged (palette is CSS-only, no audience wording change). Human editorial review pending."
   }
  },
  "requirement_results": [
@@ -998,7 +946,7 @@
   }
  ],
  "downstream_gates": {
-  "4.1": "automated tier-1/copy-selection accepted; human Vietnamese editorial review pending (worksheet re-issue needed)",
+  "4.1": "automated tier-1/copy-selection accepted; human Vietnamese editorial review pending",
   "5.1": "pending actual venue rehearsal",
   "5.2": "pending annotated refs/tags/ntu-ai-keynote-v1.0.0"
  },

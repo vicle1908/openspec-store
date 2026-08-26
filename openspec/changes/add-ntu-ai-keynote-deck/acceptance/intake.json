@@ -4,16 +4,16 @@
   "change_id": "add-ntu-ai-keynote-deck",
   "candidate_count": 1,
   "candidate": {
-    "candidate_id": "ntu-keynote-main-7cbf0f1",
+    "candidate_id": "ntu-keynote-main-bb7a4d5",
     "submitter": {
       "id": "external-ntu-keynote-orchestration",
       "type": "external read-only submission"
     },
     "implementation_repository": "/Users/androidteam/Developer/ntu-keynote",
     "implementation_branch": "main",
-    "implementation_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
+    "implementation_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
     "implementation_worktree_clean": true,
-    "evidence_base_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
+    "evidence_base_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
     "evidence_base_is_ancestor": true,
     "evidence_binding": {
       "mode": "tier-2-metadata-rebind",
@@ -43,12 +43,12 @@
         "assets/fonts/be-vietnam-pro-600.woff2": "dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125",
         "assets/fonts/be-vietnam-pro-800.woff2": "a10e0182ead90b7d43874024d63cc32f09651ae7527a8736552ab7396df7240d",
         "assets/ntu-logo.png": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
-        "index.html": "915a270b8c4ddb8032560bc55b14742bb2dcb8f82992ff5f9f0b893bc51f4671",
-        "keynote-fallback.pdf": "9c67b1562df5816d72a2217653336150906ac75c404a56dc50f69078cdb0dacf"
+        "index.html": "a7d2fdbcddb7146366f633088b9179291a0744e93fc6e4c708db15fdda449710",
+        "keynote-fallback.pdf": "256a0cd12e303760c28a5100b09d5e4131dbbc2d19c6fddfd7c3ff94c94515f8"
       },
       "digest_algorithm": "ntu-keynote-package-sha256-v1",
       "digest_algorithm_definition": "UTF-8 POSIX paths sorted by UTF-8 bytes; SHA-256 prefix NTU_KEYNOTE_PACKAGE_V1\\0; each entry encodes uint64-be path length, path bytes, uint64-be file length, raw file bytes.",
-      "canonical_digest": "74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d",
+      "canonical_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
       "deterministic_test_vector": {
         "a.txt": "41",
         "dir/b.bin": "00ff",
@@ -57,7 +57,7 @@
         "pass": true
       },
       "manifest_claimed_algorithm": "ntu-keynote-package-sha256-v1",
-      "manifest_claimed_digest": "74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d",
+      "manifest_claimed_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
       "manifest_digest_matches_canonical": true
     },
     "evidence_references": [
@@ -340,23 +340,23 @@
       "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-keynote-reaches-the-final-two-slides",
       "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-panelist-details-are-unavailable"
     ],
-    "submission_timestamp": "2026-08-26T18:54:40.624234+07:00",
+    "submission_timestamp": "2026-08-27T06:23:18.161305+07:00",
     "read_only_boundary": {
       "central_may_read": true,
       "central_may_write_external": false,
       "external_writable_paths": []
     },
     "supersedes": {
-      "previous_candidate_id": "ntu-keynote-main-5685afe",
-      "previous_commit": "5685afecd03c1adff95973e7844292cd05081c74",
-      "previous_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
-      "reason": "Tier 1 public-byte change: bundled fonts re-subset to include basic Latin (U+0020-007E) per revised design.md D2 and accessible-stage-presentation spec, closing review finding F-001",
-      "spec_revision_commit": "eba14db"
+      "previous_candidate_id": "ntu-keynote-main-7cbf0f1",
+      "previous_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
+      "previous_digest": "74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d",
+      "reason": "Tier 1 public-byte change: NTU brand theme alignment (colors, structural decorations). Palette updated in central spec to match tested theme.",
+      "spec_revision_commit": "e1ca4aa"
     }
   },
   "intake_findings": [
     {
-      "id": "INTAKE-F-006",
+      "id": "INTAKE-F-007",
       "status": "resolved",
       "tasks": [
         "2.2",
@@ -366,7 +366,7 @@
         "3.4",
         "4.1"
       ],
-      "summary": "Candidate 7cbf0f1 validated: 7/7 per-file hashes match, canonical digest 74ce4f51952c... independently recomputed and matches manifest, test vector passes. Tier 1 re-verification complete."
+      "summary": "Candidate bb7a4d5 validated: 7/7 per-file hashes match, digest independently recomputed, manifest agrees. Palette spec updated."
     },
     {
       "id": "INTAKE-F-002",
@@ -374,7 +374,7 @@
       "tasks": [
         "5.1"
       ],
-      "summary": "evidence/rehearsals/venue.json remains absent; actual presenting-laptop/projector/clicker rehearsal is still required."
+      "summary": "evidence/rehearsals/venue.json remains absent; actual venue rehearsal required."
     },
     {
       "id": "INTAKE-F-003",
