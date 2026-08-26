@@ -83,8 +83,8 @@ None.
 ## Non-Goals
 
 - No transfer of native OpenSpec apply authorization from the central planning root to `ntu-keynote`; OpenSpec 1.10 has no linked implementation-root capability.
-- No metadata, design, task, spec-file, implementation, or evidence change in this proposal-only state amendment.
-- No implementation, evidence regeneration, release-status change, task reconciliation, archive, or approval of unreviewed local amendments as part of this proposal-only update.
+- This authoritative central artifact set changes planning and acceptance contracts only; it performs no external implementation, evidence generation or regeneration, rehearsal, release-status mutation, release commit, or tag mutation.
+- Central acceptance execution remains 0/12 until the central tasks run and record their required immutable evidence, gate results, decision, and closure.
 - No video/audio, live demo, analytics, internet-dependent feature, network service, CDN, framework, bundler, slide CMS, presenter-window protocol, or runtime-generated chart.
 - No stock photography, third-party icon library or icon font, emoji-dependent iconography, external image/SVG reference, extra venue file, or additional animation beyond the two attention moments and restrained base transition.
 - No bilingual or dual-column deck; official source titles and approved technical terms may remain untranslated only under the Vietnamese language policy.
