@@ -1,7 +1,7 @@
 # Vietnamese Editorial Review — Central Human Gate
 
 > **BLANK NON-APPROVING WORKSHEET — NOT COMPLETED EVIDENCE.**
-> This template prepares the independent human Vietnamese editorial review associated with the approved task 4.2 review scope. It does not approve a candidate, satisfy a requirement, complete a task, or authorize release. The current central acceptance ledger controls task completion.
+> This template prepares the independent human Vietnamese editorial review associated with the central task 4.1 review scope. It does not approve a candidate, satisfy a requirement, complete a task, or authorize release. The current central acceptance ledger controls task completion.
 >
 > **Central authority:** `add-ntu-ai-keynote-deck` in store `openspec-store` is the sole OpenSpec lifecycle. This worksheet is tied to the central Vietnamese-language, factual-scope, visual-matrix, neutral-copy, and immutable-evidence requirements, including `REQ-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy`, `REQ-kcl-slide-7-shall-keep-three-factual-contexts-independent`, `REQ-kcl-17-slide-dominant-visual-matrix`, `REQ-fpa-specific-factual-scopes-shall-remain-explicit`, and `REQ-fpa-neutral-company-safe-copy-shall-be-the-default`.
 
