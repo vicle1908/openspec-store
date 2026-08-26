@@ -130,7 +130,7 @@
       ],
       "observed": {
         "ntu_keynote_main": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
-        "central_store_main": "pending-this-commit",
+        "central_store_main": "b2b066e29e01315b446756c7bfa555e4a75ea900",
         "worktrees_clean": "true",
         "unrelated_actor_worktrees_preserved": true,
         "release_tag_created": false
