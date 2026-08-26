@@ -14,16 +14,16 @@ Complete every field from immutable external evidence. Do not review a moving wo
 | Field | Value |
 |---|---|
 | External repository identity | `/Users/androidteam/Developer/ntu-keynote` (git, branch `main`) |
-| Evidence-base commit, full SHA | `16a95eb6caf6a990520855ec3087379ef955e99c` (candidate: `5685afecd03c1adff95973e7844292cd05081c74`) |
+| Evidence-base commit, full SHA | `129346bea246cfdeafe687aab8f94b830fecee4d` (candidate: `7cbf0f17c428896b95ae078623d2450996fafe88`) |
 | `index.html` SHA-256 | `915a270b8c4ddb8032560bc55b14742bb2dcb8f82992ff5f9f0b893bc51f4671` |
 | `README.md` SHA-256 | `43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469` |
-| `keynote-fallback.pdf` SHA-256 | `1a3e5f826bde0b96f12d241a0c14e492df3533c77d4515de40d9fad103184d34` |
+| `keynote-fallback.pdf` SHA-256 | `9c67b1562df5816d72a2217653336150906ac75c404a56dc50f69078cdb0dacf` |
 | `assets/ntu-logo.png` SHA-256 | `8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc` |
-| `assets/fonts/be-vietnam-pro-400.woff2` SHA-256 | `dc085e2fba3414e5c5bf1e6172f921a9f81c5859946a4ed3d63c1e470d96a9e2` |
-| `assets/fonts/be-vietnam-pro-600.woff2` SHA-256 | `97658c6f9a384f29a3005c3d96e2a0d1c810192cf68979071c290f5a377a9f99` |
-| `assets/fonts/be-vietnam-pro-800.woff2` SHA-256 | `26b241d1d5f489c8a65c1a3c4cdcdb48dd114a9ed7e0c0180182191f087cbe96` |
+| `assets/fonts/be-vietnam-pro-400.woff2` SHA-256 | `077c275da5dee47bc1080bc7d9ae479a837804572635f540e8809f70bc861c7e` |
+| `assets/fonts/be-vietnam-pro-600.woff2` SHA-256 | `dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125` |
+| `assets/fonts/be-vietnam-pro-800.woff2` SHA-256 | `a10e0182ead90b7d43874024d63cc32f09651ae7527a8736552ab7396df7240d` |
 | Package digest algorithm | `ntu-keynote-package-sha256-v1` |
-| Canonical public-package digest | `da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1` |
+| Canonical public-package digest | `74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d` |
 | Selected copy identity | `neutral` (approval resolution: `neutral-no-response`, fail-closed) |
 | Review started | `<REQUIRED: ISO-8601>` |
 | Review completed | `<REQUIRED: ISO-8601>` |

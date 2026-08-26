@@ -4,16 +4,16 @@
   "change_id": "add-ntu-ai-keynote-deck",
   "candidate_count": 1,
   "candidate": {
-    "candidate_id": "ntu-keynote-main-5685af",
+    "candidate_id": "ntu-keynote-main-7cbf0f1",
     "submitter": {
       "id": "external-ntu-keynote-orchestration",
       "type": "external read-only submission"
     },
     "implementation_repository": "/Users/androidteam/Developer/ntu-keynote",
     "implementation_branch": "main",
-    "implementation_commit": "5685afecd03c1adff95973e7844292cd05081c74",
+    "implementation_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
     "implementation_worktree_clean": true,
-    "evidence_base_commit": "16a95eb6caf6a990520855ec3087379ef955e99c",
+    "evidence_base_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
     "evidence_base_is_ancestor": true,
     "evidence_binding": {
       "mode": "tier-2-metadata-rebind",
@@ -39,16 +39,16 @@
       "file_count": 7,
       "file_sha256": {
         "README.md": "43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469",
-        "assets/fonts/be-vietnam-pro-400.woff2": "dc085e2fba3414e5c5bf1e6172f921a9f81c5859946a4ed3d63c1e470d96a9e2",
-        "assets/fonts/be-vietnam-pro-600.woff2": "97658c6f9a384f29a3005c3d96e2a0d1c810192cf68979071c290f5a377a9f99",
-        "assets/fonts/be-vietnam-pro-800.woff2": "26b241d1d5f489c8a65c1a3c4cdcdb48dd114a9ed7e0c0180182191f087cbe96",
+        "assets/fonts/be-vietnam-pro-400.woff2": "077c275da5dee47bc1080bc7d9ae479a837804572635f540e8809f70bc861c7e",
+        "assets/fonts/be-vietnam-pro-600.woff2": "dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125",
+        "assets/fonts/be-vietnam-pro-800.woff2": "a10e0182ead90b7d43874024d63cc32f09651ae7527a8736552ab7396df7240d",
         "assets/ntu-logo.png": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
         "index.html": "915a270b8c4ddb8032560bc55b14742bb2dcb8f82992ff5f9f0b893bc51f4671",
-        "keynote-fallback.pdf": "1a3e5f826bde0b96f12d241a0c14e492df3533c77d4515de40d9fad103184d34"
+        "keynote-fallback.pdf": "9c67b1562df5816d72a2217653336150906ac75c404a56dc50f69078cdb0dacf"
       },
       "digest_algorithm": "ntu-keynote-package-sha256-v1",
       "digest_algorithm_definition": "UTF-8 POSIX paths sorted by UTF-8 bytes; SHA-256 prefix NTU_KEYNOTE_PACKAGE_V1\\0; each entry encodes uint64-be path length, path bytes, uint64-be file length, raw file bytes.",
-      "canonical_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+      "canonical_digest": "74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d",
       "deterministic_test_vector": {
         "a.txt": "41",
         "dir/b.bin": "00ff",
@@ -57,7 +57,7 @@
         "pass": true
       },
       "manifest_claimed_algorithm": "ntu-keynote-package-sha256-v1",
-      "manifest_claimed_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+      "manifest_claimed_digest": "74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d",
       "manifest_digest_matches_canonical": true
     },
     "evidence_references": [
@@ -340,24 +340,33 @@
       "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-keynote-reaches-the-final-two-slides",
       "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-panelist-details-are-unavailable"
     ],
-    "submission_timestamp": "2026-08-26T21:00:00+07:00",
+    "submission_timestamp": "2026-08-26T18:54:40.624234+07:00",
     "read_only_boundary": {
       "central_may_read": true,
       "central_may_write_external": false,
       "external_writable_paths": []
+    },
+    "supersedes": {
+      "previous_candidate_id": "ntu-keynote-main-5685afe",
+      "previous_commit": "5685afecd03c1adff95973e7844292cd05081c74",
+      "previous_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+      "reason": "Tier 1 public-byte change: bundled fonts re-subset to include basic Latin (U+0020-007E) per revised design.md D2 and accessible-stage-presentation spec, closing review finding F-001",
+      "spec_revision_commit": "eba14db"
     }
   },
   "intake_findings": [
     {
-      "id": "INTAKE-F-001",
+      "id": "INTAKE-F-006",
       "status": "resolved",
       "tasks": [
         "2.2",
-        "3.4"
+        "3.1",
+        "3.2",
+        "3.3",
+        "3.4",
+        "4.1"
       ],
-      "summary": "The candidate release manifest now records ntu-keynote-package-sha256-v1 and the canonical digest da451f...; the deterministic vector passes.",
-      "resolution_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
-      "remediation_owner": "external-ntu-keynote-orchestration"
+      "summary": "Candidate 7cbf0f1 validated: 7/7 per-file hashes match, canonical digest 74ce4f51952c... independently recomputed and matches manifest, test vector passes. Tier 1 re-verification complete."
     },
     {
       "id": "INTAKE-F-002",
@@ -365,11 +374,7 @@
       "tasks": [
         "5.1"
       ],
-      "requirement_ids": [
-        "REQ-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release"
-      ],
-      "summary": "evidence/rehearsals/venue.json remains absent; actual presenting-laptop/projector/clicker rehearsal is still required.",
-      "remediation_owner": "external-ntu-keynote-orchestration"
+      "summary": "evidence/rehearsals/venue.json remains absent; actual presenting-laptop/projector/clicker rehearsal is still required."
     },
     {
       "id": "INTAKE-F-003",
@@ -377,35 +382,7 @@
       "tasks": [
         "5.2"
       ],
-      "requirement_ids": [
-        "REQ-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally"
-      ],
-      "summary": "The fixed annotated release ref refs/tags/ntu-ai-keynote-v1.0.0 remains absent.",
-      "remediation_owner": "external-ntu-keynote-orchestration"
-    },
-    {
-      "id": "INTAKE-F-004",
-      "status": "resolved",
-      "tasks": [
-        "2.2",
-        "3.4"
-      ],
-      "summary": "The evidence-base commit 16a95eb is an explicit immutable predecessor of candidate 129346b; the candidate commit contains the non-circular metadata/evidence refresh and public bytes are unchanged.",
-      "resolution_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
-      "remediation_owner": "external-ntu-keynote-orchestration"
-    },
-    {
-      "id": "INTAKE-F-005",
-      "status": "submitted-for-central-review",
-      "tasks": [
-        "3.2"
-      ],
-      "requirement_ids": [
-        "REQ-kcl-17-slide-dominant-visual-matrix"
-      ],
-      "summary": "The immutable 17-row register evidence/visual-provenance.json is present with actual DOM order, Vietnamese accessible descriptions, source IDs, qualifiers, safe-area, motion/print, and authorship/license fields; task 3.2 must review it.",
-      "resolution_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
-      "remediation_owner": "external-ntu-keynote-orchestration"
+      "summary": "The fixed annotated release ref refs/tags/ntu-ai-keynote-v1.0.0 remains absent."
     }
   ],
   "status": "accepted-for-review",
