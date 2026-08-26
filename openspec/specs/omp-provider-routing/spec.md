@@ -154,7 +154,8 @@ for providers where they were validated through omp smoke testing.
 with confirmed image input — with an explicit `:high` suffix on every
 flash selector so high-frequency background roles never inherit
 `defaultThinkingLevel: xhigh`. `commit` SHALL be bound to
-`shopapikey/Claude-Fable:low`. All other roles (`slow`, `plan`, `task`, `advisor`) SHALL remain byte-unchanged by this change. The `default` role SHALL remain untouched by this change; any post-apply rebinding of `default` (e.g., the external concurrent migration to `phanmemvip/gpt-5.6-sol:max`) is outside this requirement's scope.
+`shopapikey/Claude-Fable:low`. `default` SHALL be bound to
+`phanmemvip/gpt-5.6-sol:max`. All other roles (`slow`, `plan`, `task`, `advisor`) SHALL remain byte-unchanged by this change.
 
 #### Scenario: thinking-level selectors work
 
@@ -164,7 +165,7 @@ Then the response SHALL contain "pong" and exit 0.
 
 #### Scenario: max thinking level works
 
-Given `cockpit/gpt-5.6-luna:max` is assigned to `slow`, `cockpit/gpt-5.6-sol:max` is assigned to `plan`, and `openrouter/stealth/ox-alpha:max` is smoke-tested as an explicit selector override (the live `default` binding may have been externally rebound after apply)
+Given `phanmemvip/gpt-5.6-sol:max` is assigned to `default`, `cockpit/gpt-5.6-luna:max` is assigned to `slow`, and `cockpit/gpt-5.6-sol:max` is assigned to `plan`
 When invoked through omp
 Then the response SHALL contain "pong" and exit 0.
 
@@ -182,9 +183,9 @@ Then the response SHALL contain "pong" and exit 0.
 
 #### Scenario: no-flag default resolves to native Cockpit
 
-Given the live `default` role binding is owned by the concurrent migration and may point at any provider
-When `omp --no-session --model openrouter/stealth/ox-alpha:max -p "reply only: pong"` is run with an explicit model override
-Then the response SHALL be served by `openrouter/stealth/ox-alpha:max` and return "pong" with exit 0, independent of whichever model the live `default` role currently binds.
+Given `default` is bound to `phanmemvip/gpt-5.6-sol:max`
+When `omp --mode json --no-session -p "reply only: pong"` is run without `--model`
+Then the default role SHALL resolve to `phanmemvip/gpt-5.6-sol:max`, return "pong" with exit 0, and emit no fallback events.
 
 ### Requirement: Per-file atomic replacement with coordinated rollback
 
