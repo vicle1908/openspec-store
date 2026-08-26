@@ -56,11 +56,18 @@ Lê Khánh Vinh (Solutions Architect at Viettel, NTU alumnus 2006–2010) will d
 
 ### New Capabilities
 
-None in the central store. This change intentionally retains `skip_specs: true`; its central proposal, design, and tasks are the approved planning and acceptance record, while executable behavior contracts and evidence remain externally orchestrated in the dedicated `ntu-keynote` repository.
+- `offline-keynote-runtime`: Direct offline `file://` launch, fixed-stage scaling, full/short navigation, fragment recovery, notes, motion behavior, local assets, print behavior, and self-contained inline visual rendering.
+- `keynote-content-and-language`: The exact 17-slide three-act content contract, Vietnamese audience and notes policy, one dominant visual job per slide, factual framing, leadership mindsets, and concise roundtable copy.
+- `timing-and-roundtable-handoff`: Exact 765-second full and 600-second short route arithmetic, route behavior, notes timing, glance-readable visuals within existing durations, and distinct question and handoff responsibilities.
+- `factual-provenance-and-approval`: Source and visual-provenance registration, qualifier and visual-encoding fidelity, neutral-copy default, SHA-bound exact-copy company approval, and unresolved-content release gates.
+- `accessible-stage-presentation`: Semantic active-slide exposure, keyboard operation, accessible visual reading order and text equivalents, contrast, non-color cues, visible focus, reduced motion, system-font fallback, and accessible print behavior.
+- `browser-qualification-and-release-evidence`: Safari and Chrome qualification, inline-SVG and viewport evidence, 17-page PDF fallback, public-package isolation, evidence invalidation and freshness, copied-folder and venue rehearsals, checksums, manifest, and final release gate.
+
+These capabilities are centrally owned requirements and acceptance contracts. Their delta specs will be created in a separately approved planning step after `skip_specs: true` is removed from `.openspec.yaml`; implementation and executable evidence remain externally orchestrated in the dedicated `ntu-keynote` repository.
 
 ### Modified Capabilities
 
-None in the central store.
+None.
 
 ## Impact
 
@@ -74,7 +81,7 @@ None in the central store.
 ## Non-Goals
 
 - No transfer of native OpenSpec apply authorization from the central planning root to `ntu-keynote`; OpenSpec 1.10 has no linked implementation-root capability.
-- No removal of `skip_specs`, creation of central delta specs, or synchronization of keynote behavior into central main specs in this proposal update.
+- No metadata, design, task, spec-file, implementation, or evidence change in this proposal-only correction. Removing `skip_specs: true` and creating the six central delta specs require a later, separate approval gate.
 - No implementation, evidence regeneration, release-status change, task reconciliation, archive, or approval of unreviewed local amendments as part of this proposal-only update.
 - No video/audio, live demo, analytics, internet-dependent feature, network service, CDN, framework, bundler, slide CMS, presenter-window protocol, or runtime-generated chart.
 - No stock photography, third-party icon library or icon font, emoji-dependent iconography, external image/SVG reference, extra venue file, or additional animation beyond the two attention moments and restrained base transition.
