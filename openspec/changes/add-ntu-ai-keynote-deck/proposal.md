@@ -63,7 +63,9 @@ Lê Khánh Vinh (Solutions Architect at Viettel, NTU alumnus 2006–2010) will d
 - `accessible-stage-presentation`: Semantic active-slide exposure, keyboard operation, accessible visual reading order and text equivalents, contrast, non-color cues, visible focus, reduced motion, system-font fallback, and accessible print behavior.
 - `browser-qualification-and-release-evidence`: Safari and Chrome qualification, inline-SVG and viewport evidence, 17-page PDF fallback, public-package isolation, evidence invalidation and freshness, copied-folder and venue rehearsals, checksums, manifest, and final release gate.
 
-These capabilities are centrally owned requirements and acceptance contracts. Their delta specs will be created in a separately approved planning step after `skip_specs: true` is removed from `.openspec.yaml`; implementation and executable evidence remain externally orchestrated in the dedicated `ntu-keynote` repository.
+These six capabilities are centrally owned requirements and acceptance contracts. The former `skip_specs` exemption has been removed, and all six central delta specs are active and strictly valid; implementation and executable evidence remain externally orchestrated in the dedicated `ntu-keynote` repository.
+
+The existing central `design.md` and `tasks.md` remain legacy artifacts until each is separately reconciled and approved against this proposal and the six central specs. OpenSpec statuses such as `done` or `isPlanningComplete: true` report artifact presence/completion under the schema; they do not prove cross-artifact coherence, implementation readiness, evidence freshness, archive readiness, or release readiness.
 
 ### Modified Capabilities
 
@@ -81,7 +83,7 @@ None.
 ## Non-Goals
 
 - No transfer of native OpenSpec apply authorization from the central planning root to `ntu-keynote`; OpenSpec 1.10 has no linked implementation-root capability.
-- No metadata, design, task, spec-file, implementation, or evidence change in this proposal-only correction. Removing `skip_specs: true` and creating the six central delta specs require a later, separate approval gate.
+- No metadata, design, task, spec-file, implementation, or evidence change in this proposal-only state amendment.
 - No implementation, evidence regeneration, release-status change, task reconciliation, archive, or approval of unreviewed local amendments as part of this proposal-only update.
 - No video/audio, live demo, analytics, internet-dependent feature, network service, CDN, framework, bundler, slide CMS, presenter-window protocol, or runtime-generated chart.
 - No stock photography, third-party icon library or icon font, emoji-dependent iconography, external image/SVG reference, extra venue file, or additional animation beyond the two attention moments and restrained base transition.
