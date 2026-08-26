@@ -1,0 +1,89 @@
+## Purpose
+
+Define the authoritative 17-slide narrative, Vietnamese language, factual framing, visual meaning, and roundtable content that the keynote must present without strengthening claims or leaving unresolved audience copy.
+
+## ADDED Requirements
+
+### Requirement: The keynote SHALL contain exactly 17 slides with one narrative job each
+
+The audience deck SHALL contain exactly 17 uniquely ordered slides in three acts. Each slide SHALL have one dominant narrative job and one dominant visual job; no visual redesign may change the approved slide count, order, mandatory anchor, factual scope, or timing responsibility.
+
+#### Scenario: Complete deck is inspected
+- **WHEN** the audience slide sequence is enumerated
+- **THEN** it SHALL contain slides 1 through 17 exactly once and SHALL preserve the approved three-act order
+
+#### Scenario: A visual combines slide responsibilities
+- **WHEN** a proposed visual moves a mandatory claim or narrative job to another slide or requires an additional audience slide
+- **THEN** the candidate MUST fail the content contract
+
+### Requirement: Act 1 SHALL establish the macro picture with qualified claims
+
+Slides 1–5 SHALL identify Lê Khánh Vinh as a Solutions Architect at Viettel and NTU alumnus 2006–2010, present the approved Vietnamese keynote title and two-question hook, and preserve the qualified PwC, Gartner, Nghị quyết 57, and Google/Access Partnership claims defined by the central proposal.
+
+#### Scenario: Act 1 is stage-ready
+- **WHEN** slides 1–5 are reviewed as audience content
+- **THEN** each mandatory anchor SHALL be complete, Vietnamese, source-linked, and framed as projection, modeled potential, or policy target where applicable
+
+#### Scenario: Forecast wording is strengthened
+- **WHEN** an Act 1 projection or modeled potential is presented as an observed outcome, guaranteed result, or causal fact
+- **THEN** the candidate MUST fail factual-language acceptance
+
+### Requirement: Act 2 SHALL distinguish hype, evidence, and transferable experience
+
+Slides 6–14 SHALL present the iceberg as an explicitly illustrative and not-to-scale bridge, retain the scoped MIT NANDA and Gartner findings, separate the three transferable adoption layers, distinguish value conversion from advanced-technology adoption alone, and preserve the WEF workforce scope across all macro drivers.
+
+#### Scenario: Three-layer journey is presented
+- **WHEN** slides 9–12 are reviewed together
+- **THEN** ChatGPT adoption/training, internal-LLM operational lessons, and multi-agent/Agentic AI discipline SHALL remain distinct, transferable narrative layers without requiring Viettel-scale infrastructure
+
+#### Scenario: Value-producing group is described
+- **WHEN** slide 13 explains what successful organizations do differently
+- **THEN** it SHALL describe conversion of effort into P&L value and MUST NOT equate success solely with layer-3 or advanced-technology adoption
+
+### Requirement: Slide 7 SHALL keep the MIT populations independent
+
+Slide 7 SHALL present the 95% no-measurable-P&L finding as a result about the analyzed GenAI-pilot population and the USD 30–40 billion figure as a separate directional investment estimate. Text, layout, labels, connectors, proportions, animation, and narration MUST NOT imply that both figures measure the same population, denominator, sample, or causal relationship.
+
+#### Scenario: Both slide 7 figures are shown
+- **WHEN** the 95% finding and USD 30–40 billion estimate appear together
+- **THEN** their labels and visual grouping SHALL identify them as independent claims with separate scope and SHALL avoid a shared denominator or causal connector
+
+#### Scenario: A shared population is implied
+- **WHEN** wording or visual encoding suggests that USD 30–40 billion was invested specifically in the analyzed 95% pilot population or that the two values share a sample
+- **THEN** the candidate MUST fail content and provenance acceptance
+
+### Requirement: Act 3 SHALL separate leadership, questions, and handoff
+
+Slides 15–17 SHALL present three complete Vietnamese leadership mindsets, three concise statistically anchored audience prompts on slide 16, full moderator expansions only in notes or cue-sheet data, and a distinct complete 30-second NTU alumni handoff on slide 17 that does not repeat the questions.
+
+#### Scenario: Roundtable prompts are displayed
+- **WHEN** slide 16 is shown at a qualified viewport
+- **THEN** all three concise prompts SHALL be independently readable, non-overlapping, and anchored to the approved 95%, 39%, and 40% contexts
+
+#### Scenario: Handoff slide is reviewed
+- **WHEN** slide 17 follows slide 16
+- **THEN** it SHALL acknowledge the roundtable and NTU alumni bond without repeating the three questions or exposing unresolved panelist placeholders
+
+### Requirement: Audience and operator language SHALL follow the Vietnamese policy
+
+Audience copy, speaker notes, controls, warnings, source lines, README instructions, and cue sheets SHALL be Vietnamese except for approved technical terms and official source titles. LLM, Agentic AI, and other retained technical terms MUST receive a Vietnamese first-use explanation where required for audience comprehension.
+
+#### Scenario: Language audit is run
+- **WHEN** all public and speaker-facing strings are reviewed
+- **THEN** no unapproved English planning phrase, unresolved marker, conditional audience wording, `TBD`, `TODO`, or `placeholder` SHALL remain
+
+#### Scenario: Technical term first appears
+- **WHEN** a retained technical term first appears in audience content
+- **THEN** the slide or immediately associated content SHALL provide the approved Vietnamese explanation without changing the claim's meaning
+
+### Requirement: Visuals SHALL preserve factual and linguistic meaning
+
+Every meaningful diagram, data visualization, illustration, or icon SHALL have concise Vietnamese labels or a text equivalent, SHALL preserve the registered factual qualifier, and MUST NOT encode a forecast, directional estimate, or metaphor as measured observed data. Decorative visuals SHALL carry no required meaning.
+
+#### Scenario: Meaningful visual is reviewed
+- **WHEN** a visual carries information needed to understand a slide
+- **THEN** its visible labels and accessible equivalent SHALL communicate the same Vietnamese meaning and factual scope
+
+#### Scenario: Decorative visual is removed
+- **WHEN** a decorative element is hidden or omitted
+- **THEN** no required narrative, factual, or navigational meaning SHALL be lost
