@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "artifact": "central-acceptance-intake",
+  "change_id": "align-ntu-keynote-with-ntu-brand-theme",
+  "candidate_count": 1,
+  "candidate": {
+    "candidate_id": "ntu-keynote-brand-theme-4fb4c86",
+    "implementation_repository": "/Users/androidteam/Developer/ntu-keynote",
+    "implementation_branch": "main",
+    "implementation_commit": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380",
+    "implementation_worktree_clean": true,
+    "evidence_base_commit": "728c537e7cbac9c408e940c4605b1c3ef9cda089",
+    "evidence_base_is_ancestor": true,
+    "evidence_binding": {
+      "mode": "tier-1-public-content-update",
+      "previous_candidate_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
+      "previous_public_package_digest": "74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d",
+      "public_package_bytes_changed": true,
+      "manifest_non_circular": true
+    },
+    "selected_copy": {
+      "variant": "neutral",
+      "approval_resolution": "neutral-no-response",
+      "approval_sha256": "ddd586b418d74ca4eb913b36220b284eb00bef6aae2f8bd67ed8677ac5835e8c"
+    },
+    "public_package": {
+      "paths": [
+        "README.md",
+        "assets/fonts/be-vietnam-pro-400.woff2",
+        "assets/fonts/be-vietnam-pro-600.woff2",
+        "assets/fonts/be-vietnam-pro-800.woff2",
+        "assets/ntu-logo.png",
+        "index.html",
+        "keynote-fallback.pdf"
+      ],
+      "file_count": 7,
+      "file_sha256": {
+        "README.md": "43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469",
+        "assets/fonts/be-vietnam-pro-400.woff2": "077c275da5dee47bc1080bc7d9ae479a837804572635f540e8809f70bc861c7e",
+        "assets/fonts/be-vietnam-pro-600.woff2": "dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125",
+        "assets/fonts/be-vietnam-pro-800.woff2": "a10e0182ead90b7d43874024d63cc32f09651ae7527a8736552ab7396df7240d",
+        "assets/ntu-logo.png": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
+        "index.html": "915a270b8c4ddb8032560bc55b14742bb2dcb8f82992ff5f9f0b893bc51f4671",
+        "keynote-fallback.pdf": "9c67b1562df5816d72a2217653336150906ac75c404a56dc50f69078cdb0dacf"
+      },
+      "digest_algorithm": "ntu-keynote-package-sha256-v1",
+      "canonical_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+      "deterministic_test_vector_pass": true
+    },
+    "evidence_references": [
+      {
+        "path": "evidence/accessibility.json",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:evidence/accessibility.json",
+        "sha256": "a3dc8a433e8fdbeb61d221bb3577c3baef77a08cd9f582bf2b673d3e9735a95a",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "evidence/approvals/viettel-claims.json",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:evidence/approvals/viettel-claims.json",
+        "sha256": "ddd586b418d74ca4eb913b36220b284eb00bef6aae2f8bd67ed8677ac5835e8c",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "evidence/assets.json",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:evidence/assets.json",
+        "sha256": "359aedfe2ab34e4e463d2cba855c56436d3ac3c74cdf0d4730f41e242b8628ff",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "evidence/pdf-binding.json",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:evidence/pdf-binding.json",
+        "sha256": "2865405bc441b959180711d7a0eaa576ba239225a5fcb7f1d4f2f5cbdbf6f8ad",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "evidence/rehearsals/copied-folder.json",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:evidence/rehearsals/copied-folder.json",
+        "sha256": "d4a386b5fcf13f1941e58ff582c7008fbaee30e2fff8291d812a87f1596d4f5a",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "evidence/runtime/chrome.json",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:evidence/runtime/chrome.json",
+        "sha256": "69550ec83d216c3fc208badc735c5e30f929e0c9a674b57d03a1264f72d43d92",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "evidence/runtime/safari.json",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:evidence/runtime/safari.json",
+        "sha256": "193458a9500cf8de8b12cd6dc19d550ef33f7167167ce9f3732d262c9bd41dc4",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "evidence/slide-contract.json",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:evidence/slide-contract.json",
+        "sha256": "7710872c2744fddb021d469b4efbfdcb503ee7d15055e3012645787d6a5c5708",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "evidence/source-inspection.json",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:evidence/source-inspection.json",
+        "sha256": "98de11cf23f742d9a29da26ca29d29dedfb199d77f707efcaa4a37a6c7f81d6d",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "evidence/sources.json",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:evidence/sources.json",
+        "sha256": "a1b8ac8ac5510c179ef0847da341203e801e8643ad46d3528aa7c812edd39123",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
+        "sha256": "e7f8788f853342fbf83d6977004b55297fbc792031c385213c35aed1c81fe2fe",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "evidence/static-verification.json",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:evidence/static-verification.json",
+        "sha256": "e0700d4c8898bb2c4c57c623b7dce4c15a3018e5d637b27cb18e50d0d830a825",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "evidence/visual-provenance.json",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:evidence/visual-provenance.json",
+        "sha256": "a5084d6eea093339ace3303f425c57d900647a0260a67548fb21c445dcbcbd06",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "scripts/verify_static.py",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:scripts/verify_static.py",
+        "sha256": "ff838d4f96df648b8be61119b4525bce9f54b97d9d852f5b0c8557884c1b7a50",
+        "read_only": true,
+        "exists": true
+      },
+      {
+        "path": "checksums.sha256",
+        "git_show_ref": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380:checksums.sha256",
+        "sha256": "a5ea9dda0ac80aedc7fb2a4c3b85832297853f04112a5180213c2af41299cc4f",
+        "read_only": true,
+        "exists": true
+      }
+    ],
+    "closure_predicate": {
+      "candidate_commit_must_be_resolved": "git rev-parse ntu-keynote-brand-theme-<release-ref>^{commit}",
+      "annotated_tag_required": false,
+      "human_approval_required": true,
+      "safari_requalification_required_before_release": true,
+      "no_future_commit_embedded": true
+    }
+  },
+  "status": "accepted-for-review",
+  "release_authorization": false,
+  "human_approval_granted": false,
+  "notes": "Successor acceptance is separate from add-ntu-ai-keynote-deck; predecessor artifacts are read-only and not mutated."
+}

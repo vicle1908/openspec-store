@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "artifact": "theme-alignment-baseline",
+  "change_id": "align-ntu-keynote-with-ntu-brand-theme",
+  "planning_commit": "abb417c26b124577fbc6470f09e526ddce024909",
+  "implementation_repository": "/Users/androidteam/Developer/ntu-keynote",
+  "implementation_branch": "main",
+  "implementation_commit": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380",
+  "implementation_worktree_clean": true,
+  "evidence_base_commit": "728c537e7cbac9c408e940c4605b1c3ef9cda089",
+  "evidence_base_is_ancestor": true,
+  "public_package": {
+    "paths": [
+      "README.md",
+      "assets/fonts/be-vietnam-pro-400.woff2",
+      "assets/fonts/be-vietnam-pro-600.woff2",
+      "assets/fonts/be-vietnam-pro-800.woff2",
+      "assets/ntu-logo.png",
+      "index.html",
+      "keynote-fallback.pdf"
+    ],
+    "file_count": 7,
+    "file_sha256": {
+      "README.md": "43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469",
+      "assets/fonts/be-vietnam-pro-400.woff2": "077c275da5dee47bc1080bc7d9ae479a837804572635f540e8809f70bc861c7e",
+      "assets/fonts/be-vietnam-pro-600.woff2": "dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125",
+      "assets/fonts/be-vietnam-pro-800.woff2": "a10e0182ead90b7d43874024d63cc32f09651ae7527a8736552ab7396df7240d",
+      "assets/ntu-logo.png": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
+      "index.html": "915a270b8c4ddb8032560bc55b14742bb2dcb8f82992ff5f9f0b893bc51f4671",
+      "keynote-fallback.pdf": "9c67b1562df5816d72a2217653336150906ac75c404a56dc50f69078cdb0dacf"
+    },
+    "digest_algorithm": "ntu-keynote-package-sha256-v1",
+    "canonical_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030"
+  },
+  "css_roles": {
+    "--ntu-blue": "#001e61",
+    "--ntu-blue-stage": "#0d1038",
+    "--ntu-red": "#b21f2f",
+    "--ntu-red-ink": "#f15b70",
+    "--ntu-gold": "#ffd166",
+    "--ntu-white": "#fff",
+    "stage": "1280x720",
+    "safe_inset": "64px/36px"
+  },
+  "content_contract": {
+    "slide_count": 17,
+    "slide_ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "content_changed": false,
+    "notes_routes_timing_changed": false
+  },
+  "verification_baseline": {
+    "implementation_tests": "76 passed",
+    "static_verifier": "11/11 pass",
+    "checksums": "54/54 OK",
+    "pdf_pages": 17,
+    "fresh_chrome_screenshots": 20,
+    "safari_requalification": "blocked"
+  },
+  "source_evidence": {
+    "official_ntu_family": "blue/red/golden-yellow from NTU NIE corporate identity page",
+    "exact_hex_status": "reference-only; no official general presentation token table retrieved"
+  }
+}

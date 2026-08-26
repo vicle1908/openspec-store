@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "artifact": "predecessor-supersession-record",
+  "successor_change_id": "align-ntu-keynote-with-ntu-brand-theme",
+  "predecessor_change_id": "add-ntu-ai-keynote-deck",
+  "predecessor_acceptance_artifacts_read_only": true,
+  "predecessor_candidate_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
+  "predecessor_public_package_digest": "74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d",
+  "predecessor_open_gates": [
+    "4.1",
+    "5.1",
+    "5.2",
+    "6.1",
+    "6.2"
+  ],
+  "successor_candidate_commit": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380",
+  "successor_public_package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+  "disposition": "superseded-by-successor",
+  "reason": "index.html public bytes changed for NTU brand-theme alignment; predecessor gates cannot be completed against superseded bytes. No predecessor checkbox, acceptance artifact, tag, or archive was mutated.",
+  "release_authorization": false
+}

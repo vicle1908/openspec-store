@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "artifact": "central-acceptance-verification",
+  "change_id": "align-ntu-keynote-with-ntu-brand-theme",
+  "candidate": {
+    "candidate_id": "ntu-keynote-brand-theme-4fb4c86",
+    "implementation_commit": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380",
+    "evidence_base_commit": "728c537e7cbac9c408e940c4605b1c3ef9cda089",
+    "public_package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+    "selected_copy": "neutral",
+    "public_package_bytes_changed": true
+  },
+  "task_results": {
+    "1.1": {
+      "status": "accepted",
+      "evidence_class": "research-and-planning-review",
+      "evidence_paths": [
+        "knowledge-context.md",
+        "proposal.md",
+        "design.md",
+        "specs/ntu-brand-themed-presentation/spec.md",
+        "tasks.md"
+      ]
+    },
+    "1.2": {
+      "status": "accepted",
+      "evidence_class": "immutable-committed-candidate",
+      "evidence_paths": [
+        "acceptance/baseline.json"
+      ],
+      "observed": {
+        "public_file_count": 7,
+        "slide_count": 17,
+        "stage": "1280x720",
+        "safe_inset": "64px/36px"
+      }
+    },
+    "2.1": {
+      "status": "accepted",
+      "evidence_class": "committed-implementation",
+      "evidence_paths": [
+        "/Users/androidteam/Developer/ntu-keynote/index.html"
+      ],
+      "observed": {
+        "css_only_runtime_change": true,
+        "logo_unchanged": true,
+        "content_unchanged": true,
+        "route_notes_timing_unchanged": true
+      }
+    },
+    "2.2": {
+      "status": "accepted",
+      "evidence_class": "automated-test",
+      "evidence_paths": [
+        "/Users/androidteam/Developer/ntu-keynote/tests/test_ntu_brand_theme.py"
+      ],
+      "observed": {
+        "tests": "76 passed",
+        "theme_tests": "7 passed"
+      }
+    },
+    "3.1": {
+      "status": "accepted-with-safari-blocker",
+      "evidence_class": "fresh-tier-1-render-evidence",
+      "evidence_paths": [
+        "evidence/pdf-binding.json",
+        "evidence/runtime/chrome.json",
+        "evidence/accessibility.json",
+        "evidence/runtime/safari.json"
+      ],
+      "observed": {
+        "pdf_pages": 17,
+        "chrome_matrix": "fresh pass",
+        "accessibility": "fresh pass",
+        "safari": "blocked pending requalification"
+      }
+    },
+    "3.2": {
+      "status": "accepted",
+      "evidence_class": "digest-and-checksum-evidence",
+      "evidence_paths": [
+        "evidence/release-manifest.json",
+        "checksums.sha256",
+        "evidence/static-verification.json"
+      ],
+      "observed": {
+        "package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+        "checksums": "54/54 OK",
+        "static_verifier": "11/11 pass"
+      }
+    },
+    "4.1": {
+      "status": "accepted",
+      "evidence_class": "central-successor-intake",
+      "evidence_paths": [
+        "acceptance/intake.json",
+        "acceptance/verification.json"
+      ]
+    },
+    "4.3": {
+      "status": "accepted-with-supersession-record",
+      "evidence_class": "governance-record",
+      "evidence_paths": [
+        "acceptance/predecessor-supersession.json"
+      ]
+    },
+    "4.2": {
+      "status": "pending-final-central-run",
+      "evidence_class": "not-yet-run",
+      "evidence_paths": []
+    },
+    "5.1": {
+      "status": "pending-integration",
+      "evidence_class": "not-yet-run",
+      "evidence_paths": []
+    }
+  },
+  "human_gates": {
+    "institutional_brand_approval": "pending",
+    "safari_requalification": "blocked",
+    "predecessor_open_gates": "superseded-by-successor-record",
+    "release_tag": "not-created"
+  },
+  "release_authorization": false
+}
