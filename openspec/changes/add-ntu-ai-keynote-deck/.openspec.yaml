@@ -1,6 +1,0 @@
-schema: spec-driven
-created: 2026-08-25
-# skip_specs rationale: standalone content deliverable (presentation deck)
-# outside tracked repos; the HTML runtime mechanics described in the proposal
-# are delivery mechanics, not a repository capability. Exemption is intentional.
-skip_specs: true
