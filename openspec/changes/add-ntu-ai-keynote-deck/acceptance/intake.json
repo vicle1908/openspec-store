@@ -409,7 +409,7 @@
     }
   ],
   "status": "accepted-for-review",
-  "next_central_task": "3.1",
+  "next_central_task": "4.1",
   "validation": {
     "validated_at": "2026-08-26T16:02:32.867953+07:00",
     "status": "accepted-for-review",
