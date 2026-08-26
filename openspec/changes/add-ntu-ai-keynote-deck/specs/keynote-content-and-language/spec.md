@@ -110,3 +110,40 @@ Every meaningful diagram, data visualization, illustration, or icon SHALL have c
 **Scenario ID:** `SCN-kcl-visuals-shall-preserve-factual-and-linguistic-meaning-decorative-visual-is-removed`
 - **WHEN** a decorative element is hidden or omitted
 - **THEN** no required narrative, factual, or navigational meaning SHALL be lost
+
+### Requirement: The 17-slide dominant visual matrix SHALL be authoritative
+**Requirement ID:** `REQ-kcl-17-slide-dominant-visual-matrix`
+
+Each slide SHALL implement exactly the following dominant visual job; these rows are normative contracts, not examples:
+
+| Slide | Required dominant visual job |
+|---:|---|
+| 1 | Hero title with speaker card |
+| 2 | Question cards with a value bridge |
+| 3 | Hero metric with horizon and qualifier |
+| 4 | Agentic-AI definition plus independent forecast cards |
+| 5 | Policy/opportunity split with no causal connector |
+| 6 | Explicitly illustrative, not-to-scale iceberg |
+| 7 | Independent 95% organization and 5% integrated-pilot cards plus a separate investment/P&L context band |
+| 8 | **Hơn 40%** banner plus three risk pillars |
+| 9 | Three-layer overview |
+| 10 | Adoption/problem split |
+| 11 | Four-stage pipeline |
+| 12 | Agent loop plus human-governance gate |
+| 13 | 2×2 synthesis matrix |
+| 14 | Signed workforce grid |
+| 15 | Three leadership pillars |
+| 16 | The exact three prompt cards required by the roundtable contract |
+| 17 | Quiet handoff banner |
+
+For every row, the central planning baseline and external evidence SHALL record the slide number, stable visual ID, dominant visual job and type, factual/metaphor/synthesis/decorative classification, encoded claim/source IDs, values/categories/populations/units where applicable, qualifier/scope, visible and DOM reading order, concise Vietnamese accessible description, safe-area obligation, reduced-motion/print state, and authorship or license basis.
+
+#### Scenario: Complete visual matrix is reviewed
+**Scenario ID:** `SCN-kcl-17-slide-dominant-visual-matrix-complete-matrix-reviewed`
+- **WHEN** the 17 audience slides and their planning-baseline mappings are enumerated
+- **THEN** every slide SHALL map exactly once to its required matrix row and all required visual-contract fields SHALL be present
+
+#### Scenario: A dominant visual job is substituted
+**Scenario ID:** `SCN-kcl-17-slide-dominant-visual-matrix-job-substituted`
+- **WHEN** a slide omits, replaces, merges, or treats its matrix row as optional guidance
+- **THEN** the candidate MUST fail central content acceptance even if its narrative text remains present

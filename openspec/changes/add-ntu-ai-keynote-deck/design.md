@@ -99,6 +99,8 @@ The three acts remain:
 
 Slide 7 deliberately treats three contexts as independent claims: the registered 95% finding about organizations in the analyzed population, the registered 5% finding about integrated AI pilots that generated substantial value, and the USD 30–40 billion figure only as separate directional investment context. The 95% and 5% figures have distinct populations and units; separate claim identities, labels, and visual groups prevent complementary slices, a shared denominator, a common sample, or causal connectors, and no bar, pie, donut, track, or proportional geometry may join them. No animation, layout, narration, or proportional encoding may link the investment context to either percentage population.
 
+The exact 17-row dominant visual matrix in `keynote-content-and-language` requirement `REQ-kcl-17-slide-dominant-visual-matrix` is authoritative. Its slide jobs and required contract fields are normative acceptance inputs, not examples, suggestions, or interchangeable visual treatments. D6 implementation and evidence SHALL preserve every row exactly.
+
 ### D7: Attention animations begin only on target-slide active entry
 
 Motion remains limited to the PwC counter, MIT emphasis, and one restrained base transition. An attention effect resets before entry and starts only after its target slide becomes active and visible. It does not start during unrelated page initialization, on the preceding slide's exit, or merely because the inactive slide exists.
