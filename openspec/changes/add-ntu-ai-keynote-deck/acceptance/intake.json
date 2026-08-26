@@ -4,16 +4,23 @@
   "change_id": "add-ntu-ai-keynote-deck",
   "candidate_count": 1,
   "candidate": {
-    "candidate_id": "ntu-keynote-main-16a95eb",
+    "candidate_id": "ntu-keynote-main-129346b",
     "submitter": {
       "id": "external-ntu-keynote-orchestration",
       "type": "external read-only submission"
     },
     "implementation_repository": "/Users/androidteam/Developer/ntu-keynote",
     "implementation_branch": "main",
-    "implementation_commit": "16a95eb6caf6a990520855ec3087379ef955e99c",
+    "implementation_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
     "implementation_worktree_clean": true,
-    "evidence_base_commit": "eb7e7226d3354e9da5292bed0a332001ed427acc",
+    "evidence_base_commit": "16a95eb6caf6a990520855ec3087379ef955e99c",
+    "evidence_base_is_ancestor": true,
+    "evidence_binding": {
+      "mode": "tier-2-metadata-rebind",
+      "public_package_bytes_unchanged_from_previous_candidate": true,
+      "manifest_non_circular": true,
+      "previous_candidate_commit": "16a95eb6caf6a990520855ec3087379ef955e99c"
+    },
     "selected_copy": {
       "variant": "neutral",
       "approval_resolution": "neutral-no-response",
@@ -49,14 +56,15 @@
         "observed_digest": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
         "pass": true
       },
-      "manifest_claimed_algorithm": "sha256(path\\0sha256\\n, sorted paths)",
-      "manifest_claimed_digest": "2a4b6931c38e77a394758051c2a4aeaeebd074c869615a796df98318374b7e16",
-      "manifest_digest_matches_canonical": false
+      "manifest_claimed_algorithm": "ntu-keynote-package-sha256-v1",
+      "manifest_claimed_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+      "manifest_digest_matches_canonical": true
     },
     "evidence_references": [
       {
         "path": "evidence/sources.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/sources.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/sources.json",
         "read_only": true,
         "exists": true,
         "sha256": "a1b8ac8ac5510c179ef0847da341203e801e8643ad46d3528aa7c812edd39123"
@@ -64,6 +72,7 @@
       {
         "path": "evidence/approvals/viettel-claims.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/approvals/viettel-claims.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/approvals/viettel-claims.json",
         "read_only": true,
         "exists": true,
         "sha256": "ddd586b418d74ca4eb913b36220b284eb00bef6aae2f8bd67ed8677ac5835e8c"
@@ -71,6 +80,7 @@
       {
         "path": "evidence/assets.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/assets.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/assets.json",
         "read_only": true,
         "exists": true,
         "sha256": "648ef5f718759a1e2b32faf24f696c5b767143075bddb6382a54fa45711a353b"
@@ -78,48 +88,55 @@
       {
         "path": "evidence/pdf-binding.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/pdf-binding.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/pdf-binding.json",
         "read_only": true,
         "exists": true,
-        "sha256": "481d78e0090d152e9d607eb1ca220646b964401641b705d1b45574ddd6590bab"
+        "sha256": "3673fb854cd94e49d8fd972a17967320e3b9ac3fc15ac1feaba1972eb16fc249"
       },
       {
         "path": "evidence/release-manifest.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/release-manifest.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/release-manifest.json",
         "read_only": true,
         "exists": true,
-        "sha256": "42c7b6dee223b2f0cfbb8df9e1d79acc35d43f766f405237a3e83c1e63b65bfd"
+        "sha256": "789ecc5e87993754e6442bddcc0d8db23888237614e757ff7c38b0e8b0a09fdb"
       },
       {
         "path": "evidence/runtime/chrome.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/runtime/chrome.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/runtime/chrome.json",
         "read_only": true,
         "exists": true,
-        "sha256": "0afe9da3d311d3a3c7f74caaf5baefe49b2069630432332bd9c2e01a3ae87772"
+        "sha256": "5354c2ee8664a1e71358452252eba6772ac78c8c1f1253ec1841784f0f9f6db0"
       },
       {
         "path": "evidence/runtime/safari.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/runtime/safari.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/runtime/safari.json",
         "read_only": true,
         "exists": true,
-        "sha256": "b3b006ae6aecca6576abc38fb8eb5d0eac28e611dbe88cfb5f33739ffd6fa3d4"
+        "sha256": "9f6ea3785267e24216d898dc09d9f8b579cf93ad65adb16884a61559529cad66"
       },
       {
         "path": "evidence/accessibility.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/accessibility.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/accessibility.json",
         "read_only": true,
         "exists": true,
-        "sha256": "6104ba6958662dbbfe445671d8f5f6e6eca8e0bc8217fe4b062d6eb93850789b"
+        "sha256": "764434625fc3c8df4f79c3a55bba9720f6b8ce0fae2cb5813c3f2cce5ae69166"
       },
       {
         "path": "evidence/rehearsals/copied-folder.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/rehearsals/copied-folder.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/rehearsals/copied-folder.json",
         "read_only": true,
         "exists": true,
-        "sha256": "324591891a9bb74bafa825a5604b85fb3f870f2d76924ed50ef2d0620affa0fb"
+        "sha256": "f4cc4cc5eb7f22f00c36a024283ddb8f7a38e5af9fde6a2fa757aa9299296466"
       },
       {
         "path": "evidence/rehearsals/venue.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/rehearsals/venue.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/rehearsals/venue.json",
         "read_only": true,
         "exists": false,
         "sha256": null
@@ -127,6 +144,7 @@
       {
         "path": "evidence/slide-contract.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/slide-contract.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/slide-contract.json",
         "read_only": true,
         "exists": true,
         "sha256": "7710872c2744fddb021d469b4efbfdcb503ee7d15055e3012645787d6a5c5708"
@@ -134,6 +152,7 @@
       {
         "path": "evidence/source-inspection.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/source-inspection.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/source-inspection.json",
         "read_only": true,
         "exists": true,
         "sha256": "98de11cf23f742d9a29da26ca29d29dedfb199d77f707efcaa4a37a6c7f81d6d"
@@ -141,6 +160,7 @@
       {
         "path": "evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
         "read_only": true,
         "exists": true,
         "sha256": "e7f8788f853342fbf83d6977004b55297fbc792031c385213c35aed1c81fe2fe"
@@ -148,13 +168,15 @@
       {
         "path": "evidence/static-verification.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/static-verification.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/static-verification.json",
         "read_only": true,
         "exists": true,
-        "sha256": "2c6442b88d40ae6d3bc749c0fb135d8b0687d4edf3af5b05ed9c65ac74fe6839"
+        "sha256": "a626e7a13857bf60f8ba5eb6f7dfbd02a95925247f3404ae27aa3219a385790e"
       },
       {
         "path": "evidence/venue-package-allowlist.json",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/venue-package-allowlist.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/venue-package-allowlist.json",
         "read_only": true,
         "exists": true,
         "sha256": "ea70f1b6ef8f5a299894c195161b1796f3ffb4b522b038265c668bcb4b4c10c4"
@@ -162,9 +184,18 @@
       {
         "path": "checksums.sha256",
         "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/checksums.sha256",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:checksums.sha256",
         "read_only": true,
         "exists": true,
-        "sha256": "38b6e6eb30e2c7711d413d7d4e23943996bdf67c526ecbdbd77271034bce09d5"
+        "sha256": "3aff179fc0a65f187e7854e1dab7879a420f7ed361d49602b4332264327d7f4d"
+      },
+      {
+        "path": "evidence/visual-provenance.json",
+        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/visual-provenance.json",
+        "git_show_ref": "129346bea246cfdeafe687aab8f94b830fecee4d:evidence/visual-provenance.json",
+        "read_only": true,
+        "exists": true,
+        "sha256": "6976a477a7bc1190b05591f1159da90ba63a1110ae61ba81988ef9a4f65ed923"
       }
     ],
     "requirement_ids": [
@@ -309,7 +340,7 @@
       "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-keynote-reaches-the-final-two-slides",
       "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-panelist-details-are-unavailable"
     ],
-    "submission_timestamp": "2026-08-26T14:30:00+07:00",
+    "submission_timestamp": "2026-08-26T16:02:32.867440+07:00",
     "read_only_boundary": {
       "central_may_read": true,
       "central_may_write_external": false,
@@ -319,16 +350,13 @@
   "intake_findings": [
     {
       "id": "INTAKE-F-001",
-      "status": "blocked",
+      "status": "resolved",
       "tasks": [
         "2.2",
-        "3.4",
-        "4.1"
+        "3.4"
       ],
-      "requirement_ids": [
-        "REQ-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate"
-      ],
-      "summary": "Candidate release manifest records legacy sha256(path\\0sha256\\n) digest algorithm and digest 2a4b..., while the central contract requires ntu-keynote-package-sha256-v1 and the independently recomputed canonical digest da451f...",
+      "summary": "The candidate release manifest now records ntu-keynote-package-sha256-v1 and the canonical digest da451f...; the deterministic vector passes.",
+      "resolution_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
       "remediation_owner": "external-ntu-keynote-orchestration"
     },
     {
@@ -340,7 +368,7 @@
       "requirement_ids": [
         "REQ-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release"
       ],
-      "summary": "evidence/rehearsals/venue.json is absent; actual presenting-laptop/projector/clicker rehearsal is not submitted.",
+      "summary": "evidence/rehearsals/venue.json remains absent; actual presenting-laptop/projector/clicker rehearsal is still required.",
       "remediation_owner": "external-ntu-keynote-orchestration"
     },
     {
@@ -352,101 +380,102 @@
       "requirement_ids": [
         "REQ-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally"
       ],
-      "summary": "Exact annotated release ref refs/tags/ntu-ai-keynote-v1.0.0 is absent in the candidate repository.",
+      "summary": "The fixed annotated release ref refs/tags/ntu-ai-keynote-v1.0.0 remains absent.",
       "remediation_owner": "external-ntu-keynote-orchestration"
     },
     {
       "id": "INTAKE-F-004",
-      "status": "blocked",
+      "status": "resolved",
       "tasks": [
         "2.2",
-        "3.1",
-        "3.2",
-        "3.3",
         "3.4"
       ],
-      "summary": "The submitted implementation commit is 16a95eb, while evidence records use an older evidence-base identity eb7e722; central acceptance must prove every retained evidence record is explicitly bound to this candidate or mark it stale.",
+      "summary": "The evidence-base commit 16a95eb is an explicit immutable predecessor of candidate 129346b; the candidate commit contains the non-circular metadata/evidence refresh and public bytes are unchanged.",
+      "resolution_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
       "remediation_owner": "external-ntu-keynote-orchestration"
     },
     {
       "id": "INTAKE-F-005",
-      "status": "not-submitted",
+      "status": "submitted-for-central-review",
       "tasks": [
-        "3.2",
-        "3.3"
+        "3.2"
       ],
       "requirement_ids": [
         "REQ-kcl-17-slide-dominant-visual-matrix"
       ],
-      "summary": "No separate immutable visual-provenance register was submitted; the existing slide-contract/evidence files do not yet establish the centralized 17-row visual matrix, visual IDs, accessible descriptions, DOM order, and authorship/license basis.",
+      "summary": "The immutable 17-row register evidence/visual-provenance.json is present with actual DOM order, Vietnamese accessible descriptions, source IDs, qualifiers, safe-area, motion/print, and authorship/license fields; task 3.2 must review it.",
+      "resolution_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
       "remediation_owner": "external-ntu-keynote-orchestration"
     }
   ],
-  "status": "blocked",
+  "status": "accepted-for-review",
   "next_central_task": "3.1",
   "validation": {
-    "validated_at": "2026-08-26T15:03:59.505057+07:00",
-    "status": "blocked",
+    "validated_at": "2026-08-26T16:02:32.867953+07:00",
+    "status": "accepted-for-review",
     "commands": [
       {
-        "command": "git -C /Users/androidteam/Developer/ntu-keynote rev-parse HEAD",
+        "command": "git show 129346bea246cfdeafe687aab8f94b830fecee4d:evidence/release-manifest.json",
         "exit_code": 0,
-        "observed": "16a95eb6caf6a990520855ec3087379ef955e99c"
+        "observed": "manifest canonical digest and v1 algorithm"
       },
       {
-        "command": "git -C /Users/androidteam/Developer/ntu-keynote status --porcelain",
+        "command": "git show 129346bea246cfdeafe687aab8f94b830fecee4d:evidence/visual-provenance.json",
         "exit_code": 0,
-        "observed": ""
+        "observed": "17 rows"
       },
       {
-        "command": "canonical ntu-keynote-package-sha256-v1 recomputation",
+        "command": "canonical ntu-keynote-package-sha256-v1 recomputation from committed candidate",
         "exit_code": 0,
         "observed": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1"
-      },
-      {
-        "command": "deterministic package digest test vector",
-        "exit_code": 0,
-        "observed": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad"
-      },
-      {
-        "command": "git -C /Users/androidteam/Developer/ntu-keynote show-ref --verify --quiet refs/tags/ntu-ai-keynote-v1.0.0",
-        "exit_code": 1,
-        "observed": false
       }
     ],
     "identity": {
       "implementation_commit_matches_submission": true,
+      "evidence_base_commit": "16a95eb6caf6a990520855ec3087379ef955e99c",
+      "evidence_base_is_ancestor_of_candidate": true,
+      "non_circular_manifest_binding": true,
       "external_worktree_clean": true,
       "seven_public_file_count": 7,
       "all_public_file_hashes_match_submission": true,
       "canonical_digest_recomputed": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
       "canonical_digest_matches_submission": true,
+      "manifest_algorithm_matches_canonical": true,
       "deterministic_test_vector": {
         "observed": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
         "expected": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
         "pass": true
       },
-      "evidence_reference_hashes_match": true,
-      "missing_evidence_references": [
+      "visual_provenance_register_present": true,
+      "visual_provenance_rows": 17,
+      "missing_downstream_evidence": [
         "evidence/rehearsals/venue.json"
       ],
-      "manifest_algorithm": "sha256(path\\0sha256\\n, sorted paths)",
-      "manifest_digest": "2a4b6931c38e77a394758051c2a4aeaeebd074c869615a796df98318374b7e16",
-      "manifest_digest_matches_canonical": false,
-      "venue_rehearsal_record_present": false,
       "annotated_release_tag_present": false
     },
     "blocking_findings": [
-      "INTAKE-F-001",
       "INTAKE-F-002",
-      "INTAKE-F-003",
-      "INTAKE-F-004",
-      "INTAKE-F-005"
+      "INTAKE-F-003"
     ],
-    "decision_basis": "blocked because the submitted manifest uses the legacy digest algorithm and digest, the exact venue rehearsal record is absent, the fixed annotated release tag is absent, evidence-base identity differs from the implementation commit, and the centralized visual-provenance matrix is not submitted.",
+    "downstream_gates": [
+      "4.1 editorial/approval review",
+      "5.1 actual venue rehearsal",
+      "5.2 annotated release ref"
+    ],
+    "decision_basis": "accepted-for-review because candidate identity, canonical package digest, evidence references, and non-circular predecessor binding are internally consistent; downstream human and release gates remain open and do not block central review intake.",
     "central_read_only_boundary": {
       "external_mutations_performed": false,
       "external_writable_paths": []
     }
-  }
+  },
+  "submission_history": [
+    {
+      "candidate_id": "ntu-keynote-main-16a95eb",
+      "implementation_commit": "16a95eb6caf6a990520855ec3087379ef955e99c",
+      "status": "blocked",
+      "validation_status": "blocked",
+      "canonical_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+      "captured_from_commit": "0874513ed7dfed2a9f3a8dbaf2084b2eb5f11afd"
+    }
+  ]
 }
