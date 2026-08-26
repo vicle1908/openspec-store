@@ -1,9 +1,4 @@
-# omp-fresh-shell-contract Specification
-
-## Purpose
-Ensures fresh zsh shells receive the five HERMES_CUSTOM_*_API_KEY credentials through an allowlisted loader wired via .zshenv, with 1M context windows declared for omp custom models with shopapikey/Claude-Fable as the default routing role.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Fresh-shell custom credentials
 
@@ -44,17 +39,6 @@ When stdout and stderr are captured
 Then no credential values or `export KEY=value` lines SHALL appear.
 Note: interactive zsh `-i` legitimately emits OSC 1337 terminal
 integration metadata unrelated to credential loading.
-
-### Requirement: One-million-token custom model contexts
-
-The omp model entries for `shopapikey/Claude-Fable`, `phanmemvip/gpt-5.6-sol`, and
-`cockpit/gpt-5.6-luna` SHALL declare `contextWindow: 1000000`.
-
-#### Scenario: custom model context metadata
-
-Given `~/.omp/agent/models.yml`
-When the three custom model entries are inspected programmatically
-Then each SHALL have `contextWindow` equal to `1000000`.
 
 ### Requirement: Existing omp routing preserved
 
