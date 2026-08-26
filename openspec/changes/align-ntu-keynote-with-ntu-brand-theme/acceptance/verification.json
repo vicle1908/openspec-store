@@ -3,12 +3,14 @@
   "artifact": "central-acceptance-verification",
   "change_id": "align-ntu-keynote-with-ntu-brand-theme",
   "candidate": {
-    "candidate_id": "ntu-keynote-brand-theme-4fb4c86",
-    "implementation_commit": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380",
+    "candidate_id": "ntu-keynote-brand-theme-bb7a4d5",
+    "implementation_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
     "evidence_base_commit": "728c537e7cbac9c408e940c4605b1c3ef9cda089",
     "public_package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
     "selected_copy": "neutral",
-    "public_package_bytes_changed": true
+    "public_package_bytes_changed": true,
+    "pre_merge_candidate_commit": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380",
+    "integration_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626"
   },
   "task_results": {
     "1.1": {
@@ -105,14 +107,34 @@
       ]
     },
     "4.2": {
-      "status": "pending-final-central-run",
-      "evidence_class": "not-yet-run",
-      "evidence_paths": []
+      "status": "accepted",
+      "evidence_class": "committed-central-verification",
+      "evidence_paths": [
+        "acceptance/final-verification.json",
+        "tasks.md"
+      ],
+      "observed": {
+        "implementation_tests": "76 passed",
+        "static_verifier": "11/11 pass",
+        "checksums": "54/54 OK",
+        "strict_validation": "PASS",
+        "store_doctor": "PASS",
+        "safari_requalification": "blocked"
+      }
     },
     "5.1": {
-      "status": "pending-integration",
-      "evidence_class": "not-yet-run",
-      "evidence_paths": []
+      "status": "accepted",
+      "evidence_class": "canonical-main-integration",
+      "evidence_paths": [
+        "acceptance/final-verification.json"
+      ],
+      "observed": {
+        "ntu_keynote_main": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
+        "central_store_main": "pending-this-commit",
+        "worktrees_clean": "true",
+        "unrelated_actor_worktrees_preserved": true,
+        "release_tag_created": false
+      }
     }
   },
   "human_gates": {
@@ -121,5 +143,44 @@
     "predecessor_open_gates": "superseded-by-successor-record",
     "release_tag": "not-created"
   },
-  "release_authorization": false
+  "release_authorization": false,
+  "final_run": {
+    "timestamp": "2026-08-27T01:10:00+07:00",
+    "commands": [
+      {
+        "command": "python -m unittest discover -s tests -t tests",
+        "working_directory": "/Users/androidteam/Developer/ntu-keynote",
+        "exit_code": 0,
+        "result": "76 tests OK"
+      },
+      {
+        "command": "python scripts/verify_static.py",
+        "working_directory": "/Users/androidteam/Developer/ntu-keynote",
+        "exit_code": 0,
+        "result": "11/11 pass"
+      },
+      {
+        "command": "shasum -a 256 -c checksums.sha256",
+        "working_directory": "/Users/androidteam/Developer/ntu-keynote",
+        "exit_code": 0,
+        "result": "54/54 OK"
+      },
+      {
+        "command": "openspec validate align-ntu-keynote-with-ntu-brand-theme --strict --json --store openspec-store",
+        "working_directory": "/Users/androidteam/Developer/openspec-store",
+        "exit_code": 0,
+        "result": "valid"
+      },
+      {
+        "command": "openspec store doctor",
+        "working_directory": "/Users/androidteam/Developer/openspec-store",
+        "exit_code": 0,
+        "result": "Issues: none"
+      }
+    ],
+    "limitations": [
+      "Safari requalification blocked after public-byte change; prior Safari screenshots are historical only.",
+      "Institutional NTU brand approval remains a human gate."
+    ]
+  }
 }

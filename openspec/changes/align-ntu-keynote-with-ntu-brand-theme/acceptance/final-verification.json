@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "artifact": "final-verification",
+  "change_id": "align-ntu-keynote-with-ntu-brand-theme",
+  "implementation_repository": "/Users/androidteam/Developer/ntu-keynote",
+  "implementation_branch": "main",
+  "implementation_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
+  "pre_merge_candidate_commit": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380",
+  "evidence_base_commit": "728c537e7cbac9c408e940c4605b1c3ef9cda089",
+  "public_package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+  "public_package_bytes_unchanged_between_pre_merge_and_integrated_main": true,
+  "commands": [
+    {
+      "command": "python -m unittest discover -s tests -t tests",
+      "exit_code": 0,
+      "result": "76 tests OK"
+    },
+    {
+      "command": "python scripts/verify_static.py",
+      "exit_code": 0,
+      "result": "11/11 pass"
+    },
+    {
+      "command": "shasum -a 256 -c checksums.sha256",
+      "exit_code": 0,
+      "result": "54/54 OK"
+    },
+    {
+      "command": "openspec validate align-ntu-keynote-with-ntu-brand-theme --strict --json --store openspec-store",
+      "exit_code": 0,
+      "result": "valid"
+    },
+    {
+      "command": "openspec store doctor",
+      "exit_code": 0,
+      "result": "Issues: none"
+    }
+  ],
+  "human_or_environmental_blockers": {
+    "safari_requalification": "blocked",
+    "institutional_brand_approval": "pending"
+  },
+  "release_tag_created": false,
+  "release_authorized": false
+}

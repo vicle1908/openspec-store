@@ -4,19 +4,20 @@
   "change_id": "align-ntu-keynote-with-ntu-brand-theme",
   "candidate_count": 1,
   "candidate": {
-    "candidate_id": "ntu-keynote-brand-theme-4fb4c86",
+    "candidate_id": "ntu-keynote-brand-theme-bb7a4d5",
     "implementation_repository": "/Users/androidteam/Developer/ntu-keynote",
     "implementation_branch": "main",
-    "implementation_commit": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380",
+    "implementation_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
     "implementation_worktree_clean": true,
     "evidence_base_commit": "728c537e7cbac9c408e940c4605b1c3ef9cda089",
-    "evidence_base_is_ancestor": true,
+    "evidence_base_is_ancestor": false,
     "evidence_binding": {
       "mode": "tier-1-public-content-update",
       "previous_candidate_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
       "previous_public_package_digest": "74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d",
       "public_package_bytes_changed": true,
-      "manifest_non_circular": true
+      "manifest_non_circular": true,
+      "integrated_main_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626"
     },
     "selected_copy": {
       "variant": "neutral",
@@ -159,11 +160,16 @@
       "annotated_tag_required": false,
       "human_approval_required": true,
       "safari_requalification_required_before_release": true,
-      "no_future_commit_embedded": true
-    }
+      "no_future_commit_embedded": true,
+      "integrated_main_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
+      "evidence_base_equivalence_required": true
+    },
+    "pre_merge_candidate_commit": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380",
+    "integration_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
+    "evidence_base_content_equivalent_to": "65c0088d4da9d18e4a93de6542cf58f49f7d9c6d"
   },
   "status": "accepted-for-review",
   "release_authorization": false,
   "human_approval_granted": false,
-  "notes": "Successor acceptance is separate from add-ntu-ai-keynote-deck; predecessor artifacts are read-only and not mutated."
+  "notes": "Successor acceptance is separate from add-ntu-ai-keynote-deck; predecessor artifacts are read-only and not mutated. Evidence was gathered on the equivalent pre-merge candidate and integrated by cherry-pick with identical public bytes."
 }

@@ -13,9 +13,10 @@
     "6.1",
     "6.2"
   ],
-  "successor_candidate_commit": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380",
+  "successor_candidate_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
   "successor_public_package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
   "disposition": "superseded-by-successor",
   "reason": "index.html public bytes changed for NTU brand-theme alignment; predecessor gates cannot be completed against superseded bytes. No predecessor checkbox, acceptance artifact, tag, or archive was mutated.",
-  "release_authorization": false
+  "release_authorization": false,
+  "successor_pre_merge_candidate_commit": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380"
 }
