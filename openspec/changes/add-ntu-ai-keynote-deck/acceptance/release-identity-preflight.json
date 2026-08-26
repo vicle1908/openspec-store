@@ -2,7 +2,7 @@
   "schema_version": 1,
   "record_type": "release-identity-preflight",
   "status": "blocked-pre-finalization",
-  "candidate_commit": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31",
+  "candidate_commit": "ca70e751d93ecf83445d23adaf48d8bd044739c2",
   "public_package_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
   "fixed_ref": "refs/tags/ntu-ai-keynote-v1.0.0",
   "peel_expression": "refs/tags/ntu-ai-keynote-v1.0.0^{commit}",
@@ -17,5 +17,5 @@
   ],
   "central_mutation_performed": false,
   "generated_at": "2026-08-26T17:11:05.242312+07:00",
-  "previous_candidate_commit": "129346bea246cfdeafe687aab8f94b830fecee4d"
+  "previous_candidate_commit": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31"
 }

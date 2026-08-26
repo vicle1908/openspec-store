@@ -2,16 +2,16 @@
   "schema_version": 1,
   "artifact": "central-acceptance-automated-verification",
   "change_id": "add-ntu-ai-keynote-deck",
-  "validated_at": "2026-08-26T18:30:00+07:00",
+  "validated_at": "2026-08-26T19:00:00+07:00",
   "candidate": {
-    "candidate_id": "ntu-keynote-main-1927b",
-    "implementation_commit": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31",
+    "candidate_id": "ntu-keynote-main-ca70e7",
+    "implementation_commit": "ca70e751d93ecf83445d23adaf48d8bd044739c2",
     "evidence_base_commit": "16a95eb6caf6a990520855ec3087379ef955e99c",
     "public_package_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
     "selected_copy": "neutral",
     "public_package_bytes_unchanged_from_previous_candidate": true,
     "retention_tier": "tier-2-metadata-rebind",
-    "previous_candidate_commit": "129346bea246cfdeafe687aab8f94b830fecee4d"
+    "previous_candidate_commit": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31"
   },
   "task_results": {
     "3.1": {
@@ -222,8 +222,8 @@
       "human_attestation_required": true,
       "central_task_completion_eligible": false,
       "simulation_result": "pass-for-neutral-copy-with-no-company-approval",
-      "candidate_commit": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31",
-      "previous_candidate_commit": "129346bea246cfdeafe687aab8f94b830fecee4d"
+      "candidate_commit": "ca70e751d93ecf83445d23adaf48d8bd044739c2",
+      "previous_candidate_commit": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31"
     }
   },
   "requirement_results": [
@@ -958,73 +958,73 @@
   ],
   "evidence_catalog": {
     "evidence/rehearsals/copied-folder.json": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:evidence/rehearsals/copied-folder.json",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:evidence/rehearsals/copied-folder.json",
       "sha256": "f4cc4cc5eb7f22f00c36a024283ddb8f7a38e5af9fde6a2fa757aa9299296466",
       "read_only": true
     },
     "evidence/runtime/chrome.json": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:evidence/runtime/chrome.json",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:evidence/runtime/chrome.json",
       "sha256": "5354c2ee8664a1e71358452252eba6772ac78c8c1f1253ec1841784f0f9f6db0",
       "read_only": true
     },
     "evidence/runtime/safari.json": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:evidence/runtime/safari.json",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:evidence/runtime/safari.json",
       "sha256": "9f6ea3785267e24216d898dc09d9f8b579cf93ad65adb16884a61559529cad66",
       "read_only": true
     },
     "evidence/accessibility.json": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:evidence/accessibility.json",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:evidence/accessibility.json",
       "sha256": "764434625fc3c8df4f79c3a55bba9720f6b8ce0fae2cb5813c3f2cce5ae69166",
       "read_only": true
     },
     "evidence/static-verification.json": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:evidence/static-verification.json",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:evidence/static-verification.json",
       "sha256": "a626e7a13857bf60f8ba5eb6f7dfbd02a95925247f3404ae27aa3219a385790e",
       "read_only": true
     },
     "evidence/slide-contract.json": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:evidence/slide-contract.json",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:evidence/slide-contract.json",
       "sha256": "7710872c2744fddb021d469b4efbfdcb503ee7d15055e3012645787d6a5c5708",
       "read_only": true
     },
     "evidence/visual-provenance.json": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:evidence/visual-provenance.json",
-      "sha256": "8d956613d503f7d17fae74bce654da20de63eccf302ccce63531f4b2a541edaf",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:evidence/visual-provenance.json",
+      "sha256": "16e3ea16de204392b16b1f342d22b67d358f2c04e7b8575b74a51e72a5c8b33d",
       "read_only": true
     },
     "evidence/sources.json": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:evidence/sources.json",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:evidence/sources.json",
       "sha256": "a1b8ac8ac5510c179ef0847da341203e801e8643ad46d3528aa7c812edd39123",
       "read_only": true
     },
     "evidence/source-inspection.json": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:evidence/source-inspection.json",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:evidence/source-inspection.json",
       "sha256": "98de11cf23f742d9a29da26ca29d29dedfb199d77f707efcaa4a37a6c7f81d6d",
       "read_only": true
     },
     "evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
       "sha256": "e7f8788f853342fbf83d6977004b55297fbc792031c385213c35aed1c81fe2fe",
       "read_only": true
     },
     "evidence/approvals/viettel-claims.json": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:evidence/approvals/viettel-claims.json",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:evidence/approvals/viettel-claims.json",
       "sha256": "ddd586b418d74ca4eb913b36220b284eb00bef6aae2f8bd67ed8677ac5835e8c",
       "read_only": true
     },
     "evidence/pdf-binding.json": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:evidence/pdf-binding.json",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:evidence/pdf-binding.json",
       "sha256": "3673fb854cd94e49d8fd972a17967320e3b9ac3fc15ac1feaba1972eb16fc249",
       "read_only": true
     },
     "evidence/venue-package-allowlist.json": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:evidence/venue-package-allowlist.json",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:evidence/venue-package-allowlist.json",
       "sha256": "ea70f1b6ef8f5a299894c195161b1796f3ffb4b522b038265c668bcb4b4c10c4",
       "read_only": true
     },
     "checksums.sha256": {
-      "git_show_ref": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31:checksums.sha256",
-      "sha256": "84340ea9b988be6e0dc1f89f929f546f93eff229ca747347c31354a2be764ae4",
+      "git_show_ref": "ca70e751d93ecf83445d23adaf48d8bd044739c2:checksums.sha256",
+      "sha256": "5492c7862726f23934f7de31ef27a5411cd17aa518a3d8a7a9c3d8dd8d499038",
       "read_only": true
     }
   },
