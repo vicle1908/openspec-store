@@ -166,7 +166,7 @@
     },
     "pre_merge_candidate_commit": "4fb4c86b9029bc219d305a7cc8abbdfafe6b3380",
     "integration_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
-    "evidence_base_content_equivalent_to": "65c0088d4da9d18e4a93de6542cf58f49f7d9c6d"
+    "evidence_base_content_equivalent_to": "65c008815268404e2926c7b97e303136d52be121"
   },
   "status": "accepted-for-review",
   "release_authorization": false,
