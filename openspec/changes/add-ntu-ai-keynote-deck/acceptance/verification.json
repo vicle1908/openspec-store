@@ -103,6 +103,47 @@
         "font_fallback_observed": true
       },
       "notes": "Browser/accessibility observations are retained under Tier 2 because public bytes are unchanged; task 4.1 must validate the Tier-2 dependency decision."
+    },
+    "3.4": {
+      "status": "accepted",
+      "capabilities": [
+        "browser-qualification-and-release-evidence",
+        "offline-keynote-runtime",
+        "factual-provenance-and-approval"
+      ],
+      "evidence_mode": "committed-package-and-pdf-checks",
+      "evidence_paths": [
+        "evidence/release-manifest.json",
+        "evidence/pdf-binding.json",
+        "evidence/venue-package-allowlist.json",
+        "checksums.sha256",
+        "keynote-fallback.pdf",
+        "evidence/static-verification.json"
+      ],
+      "observed": {
+        "pdf_pages": 17,
+        "pdf_ordered": true,
+        "pdf_dark_background_contract": "recorded in evidence/pdf-binding.json",
+        "public_file_count": 7,
+        "public_file_sha256": {
+          "README.md": "43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469",
+          "assets/fonts/be-vietnam-pro-400.woff2": "dc085e2fba3414e5c5bf1e6172f921a9f81c5859946a4ed3d63c1e470d96a9e2",
+          "assets/fonts/be-vietnam-pro-600.woff2": "97658c6f9a384f29a3005c3d96e2a0d1c810192cf68979071c290f5a377a9f99",
+          "assets/fonts/be-vietnam-pro-800.woff2": "26b241d1d5f489c8a65c1a3c4cdcdb48dd114a9ed7e0c0180182191f087cbe96",
+          "assets/ntu-logo.png": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
+          "index.html": "915a270b8c4ddb8032560bc55b14742bb2dcb8f82992ff5f9f0b893bc51f4671",
+          "keynote-fallback.pdf": "1a3e5f826bde0b96f12d241a0c14e492df3533c77d4515de40d9fad103184d34"
+        },
+        "package_digest_algorithm": "ntu-keynote-package-sha256-v1",
+        "package_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+        "deterministic_vector": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
+        "checksum_entries": 54,
+        "checksums_self_excluded": true,
+        "manifest_status": "blocked-automated",
+        "manifest_non_circular": true,
+        "annotated_tag_present": false
+      },
+      "notes": "Automated PDF/package evidence is candidate-bound and current; release remains blocked until editorial, venue, and fixed annotated-tag gates pass."
     }
   },
   "requirement_results": [
@@ -917,6 +958,21 @@
       "command": "python3 scripts/verify_static.py",
       "exit_code": 0,
       "result": "11/11 PASS"
+    },
+    {
+      "command": "shasum -a 256 -c checksums.sha256",
+      "exit_code": 0,
+      "result": "all 54 entries OK"
+    },
+    {
+      "command": "pdfinfo keynote-fallback.pdf",
+      "exit_code": 0,
+      "result": "Pages: 17"
+    },
+    {
+      "command": "git show-ref --verify --quiet refs/tags/ntu-ai-keynote-v1.0.0",
+      "exit_code": 1,
+      "result": "absent (expected before task 5.2)"
     },
     {
       "command": "shasum -a 256 -c checksums.sha256",
