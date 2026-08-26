@@ -1,12 +1,6 @@
-# coding-cli-provider-registry Specification
+# coding-cli-provider-registry Delta
 
-## Purpose
-Define the expected provider registration state for the seven consumer coding
-CLIs (omp, goose, pi, prime-agent, opencode, droid, cline) after the giaoduc
-retirement: giaoduc absent everywhere, phanmemvip present via the OpenAI
-Responses API, and the shopapikey Claude model named `Claude-Fable`.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: No consumer CLI SHALL reference giaoduc
 
