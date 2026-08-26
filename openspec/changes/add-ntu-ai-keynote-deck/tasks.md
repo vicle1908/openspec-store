@@ -20,7 +20,7 @@
 
 - [x] 2.1 Create `acceptance/intake.json` and register exactly one submitted candidate: submitter identity, immutable implementation/evidence-base commit, evidence locations, seven allowlisted public paths and per-file SHA-256 values, `ntu-keynote-package-sha256-v1` algorithm/version and test-vector result, canonical public-package digest, selected-copy identity, submission timestamp, and requirement/evidence references. **Depends on:** 1.1 and the external intake prerequisite. **Verify:** exactly seven public files are listed; repeated identities and hashes use one candidate; no private external content is copied into the central change; and every reference is immutable or hash-verifiable.
 
-- [ ] 2.2 Validate submission identity and internal consistency read-only, recording `accepted-for-review` or `blocked` in `acceptance/intake.json`. **Depends on:** 2.1. **Verify:** every referenced record identifies the same candidate or an explicit dependency on it; all repeated file hashes and package digests agree; every missing, mutable, unreadable, or inconsistent relationship is recorded with requirement IDs and a separately authorized external remediation owner; and no source is modified.
+- [x] 2.2 Validate submission identity and internal consistency read-only, recording `accepted-for-review` or `blocked` in `acceptance/intake.json`. **Depends on:** 2.1. **Verify:** every referenced record identifies the same candidate or an explicit dependency on it; all repeated file hashes and package digests agree; every missing, mutable, unreadable, or inconsistent relationship is recorded with requirement IDs and a separately authorized external remediation owner; and no source is modified.
 
 ## 3. Evaluate Automated Central Requirements Read-Only
 

@@ -382,6 +382,71 @@
       "remediation_owner": "external-ntu-keynote-orchestration"
     }
   ],
-  "status": "submitted-with-blockers",
-  "next_central_task": "2.2"
+  "status": "blocked",
+  "next_central_task": "3.1",
+  "validation": {
+    "validated_at": "2026-08-26T15:03:59.505057+07:00",
+    "status": "blocked",
+    "commands": [
+      {
+        "command": "git -C /Users/androidteam/Developer/ntu-keynote rev-parse HEAD",
+        "exit_code": 0,
+        "observed": "16a95eb6caf6a990520855ec3087379ef955e99c"
+      },
+      {
+        "command": "git -C /Users/androidteam/Developer/ntu-keynote status --porcelain",
+        "exit_code": 0,
+        "observed": ""
+      },
+      {
+        "command": "canonical ntu-keynote-package-sha256-v1 recomputation",
+        "exit_code": 0,
+        "observed": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1"
+      },
+      {
+        "command": "deterministic package digest test vector",
+        "exit_code": 0,
+        "observed": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad"
+      },
+      {
+        "command": "git -C /Users/androidteam/Developer/ntu-keynote show-ref --verify --quiet refs/tags/ntu-ai-keynote-v1.0.0",
+        "exit_code": 1,
+        "observed": false
+      }
+    ],
+    "identity": {
+      "implementation_commit_matches_submission": true,
+      "external_worktree_clean": true,
+      "seven_public_file_count": 7,
+      "all_public_file_hashes_match_submission": true,
+      "canonical_digest_recomputed": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+      "canonical_digest_matches_submission": true,
+      "deterministic_test_vector": {
+        "observed": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
+        "expected": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
+        "pass": true
+      },
+      "evidence_reference_hashes_match": true,
+      "missing_evidence_references": [
+        "evidence/rehearsals/venue.json"
+      ],
+      "manifest_algorithm": "sha256(path\\0sha256\\n, sorted paths)",
+      "manifest_digest": "2a4b6931c38e77a394758051c2a4aeaeebd074c869615a796df98318374b7e16",
+      "manifest_digest_matches_canonical": false,
+      "venue_rehearsal_record_present": false,
+      "annotated_release_tag_present": false
+    },
+    "blocking_findings": [
+      "INTAKE-F-001",
+      "INTAKE-F-002",
+      "INTAKE-F-003",
+      "INTAKE-F-004",
+      "INTAKE-F-005"
+    ],
+    "decision_basis": "blocked because the submitted manifest uses the legacy digest algorithm and digest, the exact venue rehearsal record is absent, the fixed annotated release tag is absent, evidence-base identity differs from the implementation commit, and the centralized visual-provenance matrix is not submitted.",
+    "central_read_only_boundary": {
+      "external_mutations_performed": false,
+      "external_writable_paths": []
+    }
+  }
 }
