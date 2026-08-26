@@ -53,7 +53,7 @@ All new diagrams, data visualizations, editorial illustrations, and iconography 
 6. `assets/fonts/be-vietnam-pro-600.woff2`
 7. `assets/fonts/be-vietnam-pro-800.woff2`
 
-Planning, source, approval, license, tests, scripts, screenshots, evidence, Git, and worktree files remain private and are never runtime dependencies.
+Planning, source, approval, license, tests, scripts, screenshots, evidence, Git, and worktree files remain private and are never runtime dependencies. The package identity uses `ntu-keynote-package-sha256-v1`: sort the exact seven normalized POSIX paths by UTF-8 bytes; hash the domain prefix `NTU_KEYNOTE_PACKAGE_V1\0`; then for each entry hash uint64-be path-byte-length, path UTF-8 bytes, uint64-be file-byte-length, and raw file bytes. Evidence records the algorithm/version, all seven per-file SHA-256 values, and test vector `a.txt`=`41`, `dir/b.bin`=`00ff` => `b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad`.
 
 **Retains:** legacy D1's single HTML and relative local assets.
 **Replaces:** the former instruction to copy an unrestricted external folder.
@@ -64,7 +64,7 @@ Slides are authored at 1280×720, centered and scaled by `min(viewportWidth/1280
 
 The palette remains NTU Blue `#181C62`, projection-adapted background `#0D1038`, NTU Red `#D71440`, and high-contrast light text. Red is a disciplined accent, not the sole carrier of meaning.
 
-At the unscaled authored 1280×720 stage, required audience narrative copy, numeric values, roundtable prompts, meaningful visual labels, and scope or qualifier labels carrying required narrative meaning compute to at least 18 CSS pixels in both qualified Safari and Chrome, measured before the stage transform. Source and citation badges, provenance text, progress metadata, and notes are auxiliary text outside that floor unless a separately classified qualifier within them carries required narrative meaning; all auxiliary text still requires role-appropriate legibility, contrast, visibility, and overflow acceptance. Required meaning may not bypass the floor by being marked decorative or moved only into an accessible description. Local-font failure falls back to a legible Vietnamese-capable system stack without content loss.
+At the unscaled authored 1280×720 stage, every visible element classified as carrying required audience meaning computes to at least 18 CSS pixels in both qualified Safari and Chrome before the stage transform, regardless of element type. Source, citation, and provenance text is auxiliary only when it carries no required audience meaning; a separately classified qualifier within it remains included when narratively required. Evidence records every visible text element, its included-or-auxiliary classification, and the reason. Auxiliary text still requires role-appropriate legibility, contrast, visibility, and overflow acceptance. Required meaning may not bypass the floor by element choice, decorative marking, or an accessible-only description. Local-font failure falls back without content loss.
 
 **Retains:** legacy D2, D5, and D6 with corrected claim scope and fallback acceptance.
 
@@ -130,7 +130,7 @@ Static validation owns source-level structure: slide IDs/order, local-only refer
 
 Safari/Chrome evidence owns facts produced by the cascade or rendered state: computed font sizes, effective foreground/background colors, display, visibility, opacity, transforms, focus outlines, active/inactive exposure, overflow, clipping, reduced-motion state, animation entry, and print final state. A source declaration cannot override a conflicting computed result.
 
-Both browsers qualify the same candidate hashes and retain environment, timestamp, requirement IDs, initial state, action, resulting state, results, and referenced screenshots/reports. For the scoped 18px floor, each browser enumerates every included element and captures its computed font size at the authored 1280×720 stage before the stage transform, classifying excluded auxiliary text separately. Generic pass labels without observable state do not satisfy acceptance.
+Both browsers qualify the same candidate hashes and retain environment, timestamp, requirement IDs, initial state, action, resulting state, results, and referenced screenshots/reports. For the scoped 18px floor, each browser enumerates every visible text element, records its semantic classification and reason, and captures each included element’s computed font size at the authored 1280×720 stage before the stage transform; element type does not determine inclusion. Generic pass labels without observable state do not satisfy acceptance.
 
 ### D11: PDF and rehearsals are fixed external human gates
 
