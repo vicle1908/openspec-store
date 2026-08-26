@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define configuration-driven model and proxy resolution for agent-core, including the active giaoduc Anthropic Messages setup and the OpenAI-compatible alternative.
+Define configuration-driven model and proxy resolution for agent-core, including the active phanmemvip Codex Responses setup and the OpenAI-compatible alternative.
 
 ## Requirements
 

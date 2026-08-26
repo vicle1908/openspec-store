@@ -17,8 +17,8 @@ WHEN the primary provider in the active chain is unreachable or returns a transi
 - **WHEN** the primary provider returns a connection error, timeout, or 5xx status
 - **THEN** the session SHALL transparently retry the same request against the next provider in the fallback chain, and the user SHALL see the successful response (or the next failure) without manual intervention
 
-#### Scenario: giaoduc is down — ordered fallback
-- **WHEN** `giaoduc` is the primary provider and it is unreachable
+#### Scenario: phanmemvip is down — ordered fallback
+- **WHEN** `phanmemvip` is the primary provider and it is unreachable
 - **THEN** the session SHALL attempt `shopapikey` next, then `cockpit`, then `omniroute`, in that order
 
 #### Scenario: All providers in the chain are down

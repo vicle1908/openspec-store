@@ -383,7 +383,7 @@ The system SHALL publish a machine-readable registry for LLM and consumer enviro
 
 #### Scenario: Provider credential registered and bound
 
-- **GIVEN** the registry contains a credential entry with `secret: true` and `provider: "giaoduc"`
+- **GIVEN** the registry contains a credential entry with `secret: true` and `provider: "phanmemvip"`
 - **AND** a canonical provider declares `auth_env: HERMES_CUSTOM_GIAODUC_API_KEY`
 - **WHEN** `resolve_agent_profile()` resolves that provider
 - **THEN** the resolved route SHALL record `CredentialAvailability(key_name="HERMES_CUSTOM_GIAODUC_API_KEY", available=<bool>, provider="giaoduc")`

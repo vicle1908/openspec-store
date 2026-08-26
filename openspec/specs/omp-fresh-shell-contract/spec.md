@@ -1,7 +1,7 @@
 # omp-fresh-shell-contract Specification
 
 ## Purpose
-Ensures fresh zsh shells receive the five HERMES_CUSTOM_*_API_KEY credentials through an allowlisted loader wired via .zshenv, with 1M context windows declared for omp custom models with giaoduc/Advance preserved as the default role.
+Ensures fresh zsh shells receive the five HERMES_CUSTOM_*_API_KEY credentials through an allowlisted loader wired via .zshenv, with 1M context windows declared for omp custom models with shopapikey/Claude-Fable as the default routing role.
 
 ## Requirements
 

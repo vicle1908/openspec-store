@@ -3,7 +3,7 @@
 ## Purpose
 
 Define registration of the three custom provider credential keys
-(shopapikey, giaoduc, cockpit) in the canonical environment-key-registry
+(shopapikey, phanmemvip, cockpit) in the canonical environment-key-registry
 with secret classification, provider binding, cross-provider rejection,
 and preservation of existing credential entries.
 
