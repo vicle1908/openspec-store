@@ -304,6 +304,30 @@ command-line expansion.
 | Health: adapter 8788 / ai-review 8090 / webhook 8080 | 200 / 200 / 200 |
 | Cockpit upstream 51006 | still unreachable (sentinel remains BLOCKED) |
 
+### MCP Router transport follow-up (2026-08-27)
+
+The MCP Router blocker was re-investigated at the transport boundary using the
+MCP integration debugging workflow and official Router documentation:
+
+- Official contract: `npx -y @mcp_router/cli connect` with `MCPR_TOKEN`.
+- Hermes configuration shape verified without printing values: command `npx`,
+  args `[-y, @mcp_router/cli@latest, connect]`, env key `MCPR_TOKEN` present.
+- Desktop/backend health script: `Healthy`.
+- Correct host test: `hermes mcp test mcp-router` → connected in 8021ms,
+  137 tools discovered.
+- Direct official Python SDK probe, with corrected installed-SDK field names
+  (`server_info` and `is_error`), passed: `initialize`, `tools/list`,
+  `list_directory` (`is_error=False`), and `read_file` (`is_error=False`).
+  Probe exit 0; temporary probe removed.
+- Native `mcp__mcp_router__list_directory` in this existing Hermes session
+  still fails because its immutable startup snapshot retains stale watchdog
+  bridges. This is a session lifecycle issue, not Router/backend failure.
+- Required resolution: reload the Hermes gateway from an independent shell and
+  start a fresh session before relying on native `mcp__mcp_router__*` tools.
+  Gateway restart was not attempted from inside this active gateway.
+- The Cua independent-shell fallback was unavailable because embedded Cua
+  startup timed out; no GUI action was taken.
+
 ### Security note
 
 During this session, literal credential values from `~/.zshenv` were
