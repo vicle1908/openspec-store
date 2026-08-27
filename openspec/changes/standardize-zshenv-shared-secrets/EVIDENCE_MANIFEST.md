@@ -190,6 +190,79 @@ Note: the first negative-path attempt used `zsh -c`, which re-sources
 recreated via wrapper after the change: healthy, cockpit key length 42,
 adapter health 200.
 
+### Real CLI verification battery (post-review)
+
+Strict pass criteria: exit=0 AND sentinel present in the FINAL response AND no
+reconnect/auth errors. All sentinels ran with `MCPR_TOKEN` removed from the
+environment; outputs captured to mode-600 temp files, deleted after counting;
+only counts/lengths reported (never values).
+
+| CLI | Command | Result | Classification |
+|---|---|---|---|
+| Claude Code shopapikey | fresh-shell `shopapikey --print` sentinel | exit=0, sentinel returned | FUNCTIONAL — degraded (gateway `unrecognized_model` warning) |
+| OpenCode | `opencode run --model shopapikey/Claude-Fable` | exit=0, sentinel, no errors | PASS |
+| Pi | `pi -p --no-session --no-tools --no-extensions --provider shopapikey --model Claude-Fable` | exit=0, sentinel, no errors | PASS |
+| Codex (giaoduc) | `codex exec --strict-config -c model_provider="giaoduc" -m Advance` | exit=1, 5 reconnects, empty final response | BLOCKED — pre-existing protocol/auth failure |
+| Cockpit | not run | upstream 51006 has no listener | BLOCKED — upstream down |
+
+Environment gates re-verified in the same battery: 17/17 shared keys present
+in all 4 zsh modes; both Claude helpers correct on env-path and fallback
+(lengths 36/42, single line).
+
+### Shopapikey warning diagnosis (degraded pass)
+
+- The `unrecognized_model` warning appears with BOTH the `fable[1m]`
+  selector AND explicit `--model Claude-Fable` (comparison run: both exit=0,
+  both return the sentinel, both warn).
+- Provider catalog (GET /v1/models with the valid key) lists exactly:
+  `codex`, `Claude-Sonnet`, `Claude-Fable`, `default` — the model ID
+  is catalog-valid.
+- Conclusion: gateway-side cosmetic warning on SDK sub-queries
+  (`query_source: sdk`), pre-existing (profile dated 2026-08-25, untouched
+  by this migration). No profile changes made — provider documentation does
+  not confirm expected behavior for the warning.
+
+### codex root cause (pre-existing, NOT migration-caused)
+
+- `env_key` migration itself is verified: `~/.codex` parses,
+  0 literal `experimental_bearer_token` entries remain, `env_key` present
+  for both custom providers, and `--strict-config` accepted the config.
+- Direct endpoint probes with the migrated key:
+  - `POST https://api.giaoduc.online/v1/responses` → **404** (endpoint does
+    not exist), yet the Codex provider block uses `wire_api = "responses"`.
+  - `POST /v1/chat/completions` and `/v1/messages` → **401 "Invalid API
+    key"** with both `Authorization: Bearer` and `x-api-key` styles.
+- Control test: `GET /v1/models` returns 200 even with a **bogus** key —
+  that earlier 200 was NOT authentication evidence.
+- No alternate giaoduc credential exists anywhere (`~/.tdt/.env`,
+  `~/.hermes/.env`, Prime Agent config paths all checked — none).
+- Conclusion: the Codex-era giaoduc key is invalid for inference and/or
+  giaoduc does not expose a Responses endpoint. `wire_api` was NOT blindly
+  switched to `chat` — auth fails on every inference endpoint regardless.
+  Codex+giaoduc is not a working provider without fresh credentials or an
+  adapter; recorded as blocked, pre-existing.
+
+### Cockpit sentinel preconditions (still unmet)
+
+51006 has no listener; the Cockpit Tools app process exists but the API
+service is not serving. Sentinel deferred until `51006 /v1/models` returns
+a real response. Adapter health on 8788 proves adapter liveness only, not
+upstream readiness.
+
+### Credential rotation (user action, blocking further live testing)
+
+Per the security note above, the shared-tier values exposed via the
+patch-tool error must be rotated at the provider side before further live
+CLI testing. Replacement values go only into `~/.zshenv` locally; never
+into chat, command arguments, or tool context. After rotation, re-run
+presence/length/hash checks and the sentinel battery.
+
+Pitfall recorded from this battery: the direct HTTP probes expanded the key
+into curl's argv (`curl -H "Authorization: Bearer $VAR"`), which is visible
+via `ps` while the request runs. Future probes must use a mode-600 curl
+config file (`curl --config`) or client-side env authentication instead of
+command-line expansion.
+
 ### Final battery after wrapper edit (post-review)
 
 | Gate | Result |
