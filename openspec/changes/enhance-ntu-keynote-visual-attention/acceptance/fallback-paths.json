@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "change": "enhance-ntu-keynote-visual-attention",
+  "artifact": "fallback-path-record",
+  "task_reference": "3.1",
+  "created_at": "2026-08-27T21:31:28+07:00",
+  "candidate_commit": "b95b54773eae8efab60d96071cfe348cf0d42412",
+  "per_slide": {
+    "3": {
+      "planned_primary": "single qualified magnitude SVG (visual-s3-magnitude)",
+      "path_taken": "primary",
+      "fallback_triggered": false,
+      "evidence": "SVG id visual-s3-magnitude present in committed index.html; Chrome pwc-animation and viewport checks pass; qualifier \"không phải giá trị đã hiện thực hóa\" present."
+    },
+    "5": {
+      "planned_primary": "three base-labeled stat blocks (stat-three grid)",
+      "planned_fallback": "text fallback if overflow",
+      "path_taken": "primary",
+      "fallback_triggered": false,
+      "evidence": "Three stat-card elements present; Chrome viewport rows at 1920x1080, 1440x900, 1366x768, 1024x768 all report overflow=false, active=true, fonts loaded, min font size 18px."
+    },
+    "6": {
+      "planned_primary": "waterline layout with submerged dominance",
+      "planned_fallback": "decorative-motif fallback if overflow",
+      "path_taken": "primary",
+      "fallback_triggered": false,
+      "evidence": "Waterline CSS treatment present in committed index.html (no SVG required); Chrome viewport checks pass with no overflow."
+    }
+  },
+  "browser_qualification": {
+    "chrome": "pass — 20/20 checks including viewports, reduced-motion, print, fullscreen",
+    "safari": "blocked — safaridriver session creation refused (Allow Remote Automation disabled); recorded as blocked, not pass"
+  }
+}

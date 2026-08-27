@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "change": "enhance-ntu-keynote-visual-attention",
+  "artifact": "geometry-review-record",
+  "task_reference": "1.5",
+  "created_at": "2026-08-27T21:31:28+07:00",
+  "reviewer": "independent-read-only",
+  "reviewed_at": "2026-08-27",
+  "overall_status": "approved-with-conditions",
+  "primary_artifact": {
+    "location": "implementation worktree acceptance/geometry-review.json (feat/visual-attention)",
+    "sha256": "88177138be1eb60592f40260b29923f112ec355678b36824d5d7175c3be9e3b9",
+    "note": "Full 10-check findings, conditions, and recommendations live in the implementation worktree artifact; this store record is the durable reference."
+  },
+  "findings_summary": {
+    "three-separate-containers": "pass",
+    "no-sequential-filtering": "pass",
+    "13.8%-composition-accuracy": "pass",
+    "5.4%-base-visibility": "pass",
+    "no-common-denominator": "pass",
+    "methodology-accuracy": "pass",
+    "846-not-denominator": "pass",
+    "visual-hierarchy": "pass",
+    "audience-copy-feasibility": "warn",
+    "spec-consistency": "warn"
+  },
+  "conditions": [
+    "Verify at implementation time that no card receives a gold/progression accent that implies ordering.",
+    "Verify block-B 13.8% composition label fits the 18px/safe-area constraint at 1366x768; fall back to shorter label + notes detail if dense.",
+    "Reconcile ITVIEC-2025 across HTML data-source-ids, .source-line, slide-contract.json, and the inventory during task 2.1."
+  ],
+  "condition_resolution_at_implementation": {
+    "card-accent": "resolved — all three stat-cards use identical neutral styling; no gold accent on any card (verified in committed index.html and Chrome viewport evidence).",
+    "block-b-label-density": "resolved — concise label \"13,8 điểm phần trăm · 34,9% thử nghiệm + 24,3% hạn chế + 13,8% = 73%\" fits at 18px; Chrome viewport rows confirm no overflow at 1024x768 through 1920x1080.",
+    "itviec-reconciliation": "resolved — HTML data-source-ids, slide-contract.json slide-5 source_ids, and inventory all carry NQ57-2024, GOOGLE-AP-2024, ITVIEC-2025 in identical order; canonical-ID variant sweep clean."
+  },
+  "implementation_verification": "All three conditions were verified against the committed candidate (Chrome qualification viewport rows, committed index.html, cross-surface reconciliation audit). No fails; encoding implemented as reviewed."
+}

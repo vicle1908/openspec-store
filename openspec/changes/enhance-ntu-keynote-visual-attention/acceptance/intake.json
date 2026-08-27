@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "change": "enhance-ntu-keynote-visual-attention",
+  "artifact": "intake",
+  "task_reference": "4.1",
+  "created_at": "2026-08-27T21:31:28+07:00",
+  "candidate_identity": {
+    "implementation_repo": "/Users/androidteam/Developer/ntu-keynote",
+    "implementation_branch": "feat/visual-attention",
+    "frozen_baseline_commit": "58e438250613624029fd79d89ab1d50c6db658b2",
+    "html_register_candidate_commit": "b95b54773eae8efab60d96071cfe348cf0d42412",
+    "full_package_finalized_commit": "4e67315bdf4f796ec3caf0a60e015f39e6b41dc8",
+    "branch_head_at_acceptance": "97a0236259d8a34b5dd25d0b55e2365bd90c7d25",
+    "evidence_base_commit": "b95b54773eae8efab60d96071cfe348cf0d42412",
+    "identity_note": "The evidence chain (pdf-binding, chrome/safari/accessibility evidence, manifest, checksums) is bound to html_register_candidate_commit b95b547, the commit that fixed the public HTML and evidence-register bytes. full_package_finalized_commit 4e67315 added the regenerated PDF and rebound evidence on top of identical public HTML bytes. branch_head_at_acceptance 97a0236 changed only acceptance/visual-inventory.json (a worktree acceptance artifact outside the seven-file package and outside checksums.sha256 scope), so all public-package hashes and the evidence chain remain valid at HEAD.",
+    "files_changed_after_package_finalization": [
+      "acceptance/visual-inventory.json"
+    ]
+  },
+  "public_package": {
+    "digest": "8a96ed4f96147dbc0be384955433c5e257f2d4d01e5d9c4fc03f23563fa6e653",
+    "digest_differs_from_predecessor": true,
+    "predecessor_digest": "795d4f53c3172f382f0ec4a9965cdf88e75dcffaeca29fcb802bb6c11de53254",
+    "file_sha256": {
+      "index.html": "1d98d8b4fe6cf00364e93a4184a380d70a3c1644f516216fc8316e5aa1e01dd1",
+      "assets/ntu-logo.png": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
+      "assets/fonts/be-vietnam-pro-400.woff2": "077c275da5dee47bc1080bc7d9ae479a837804572635f540e8809f70bc861c7e",
+      "assets/fonts/be-vietnam-pro-600.woff2": "dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125",
+      "assets/fonts/be-vietnam-pro-800.woff2": "a10e0182ead90b7d43874024d63cc32f09651ae7527a8736552ab7396df7240d",
+      "README.md": "43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469",
+      "keynote-fallback.pdf": "f96e95137b18ad0eed6ba754a4cdbe33048946c934a216fa7760a1961839f6ea"
+    },
+    "file_count": 7
+  },
+  "evidence_chain_sha256": {
+    "evidence/sources.json": "f0ad79a2038a6a1ce4d947e7c19f64a78aefd03645854c17dc9ccac20e5f364d",
+    "evidence/source-inspection.json": "6abd6ab56a700abc2ba35e13686d1d0f77b55b4711929cc5f7940dc03019fc67",
+    "evidence/slide-contract.json": "6136269f3e9aca164b4b93ba3707c5c167ec104b47bce8a7b7b84d0bf529500f",
+    "evidence/pdf-binding.json": "497c5d76f19975584c7e28e7bcb82ab0b9c07c7a61a41c944259a531c03b16f1",
+    "evidence/release-manifest.json": "508a913018a7f652c6b7fda284a7f8f44939c3449e9273f76c2a7d806c61ca0f",
+    "evidence/runtime/chrome.json": "3b2cb2a40a342fa75b87541d9c80890c7e41f4a76a1c181e58510bef67e854b8",
+    "evidence/runtime/safari.json": "aa4fdd6d69a690c7770e2fcdd0373eff3399330bb10a98f45e901f56f082c6fe",
+    "evidence/accessibility.json": "c0dd33d873e9dc488ea9b9432b93572e5658f6720154f0acbe8d1158a8afcd12",
+    "evidence/rehearsals/copied-folder.json": "b9e1b6a875d961afd5aa97da61a72240e30d7d76e2858783f609b620c2da9fda",
+    "evidence/static-verification.json": "f23163f43174339da479b03355d2ffaada507dd045cf3b1191fe7d88c4bddff0",
+    "checksums.sha256": "882b6b43f3c2e31ca94a07acc099c061ee405b516d5f668fc1948607382ec506"
+  },
+  "worktree_acceptance_artifacts": {
+    "acceptance/geometry-review.json": "88177138be1eb60592f40260b29923f112ec355678b36824d5d7175c3be9e3b9",
+    "acceptance/visual-inventory.json": "8b469a674eaf9f54f01f0f69eb5ecd2cee5e2bb544699efe5f9d15ba9b7225a8"
+  },
+  "release_status": "blocked-automated",
+  "human_gates_open": [
+    "vietnamese_editorial_review",
+    "safari_requalification",
+    "venue_projector_clicker",
+    "release_decision"
+  ]
+}

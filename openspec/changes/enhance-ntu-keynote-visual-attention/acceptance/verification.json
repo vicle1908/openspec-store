@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "change": "enhance-ntu-keynote-visual-attention",
+  "artifact": "verification",
+  "task_reference": "4.1",
+  "created_at": "2026-08-27T21:31:28+07:00",
+  "candidate_commit": "b95b54773eae8efab60d96071cfe348cf0d42412",
+  "public_package_digest": "8a96ed4f96147dbc0be384955433c5e257f2d4d01e5d9c4fc03f23563fa6e653",
+  "requirements": [
+    {
+      "requirement": "Slide 3 SHALL encode the modeled potential as a single qualified magnitude visual",
+      "evidence_class": "automated-test + static-verification + browser-qualification",
+      "evidence": "tests/test_visual_attention.py slide-3 tests; verify_static.py qualifier-fidelity PASS; Chrome pwc-animation pass; evidence/runtime/chrome.json"
+    },
+    {
+      "requirement": "Slide 5 SHALL present ITVIEC-2025 survey findings as three base-labeled stat blocks",
+      "evidence_class": "automated-test + independent-review + browser-qualification",
+      "evidence": "tests/test_visual_attention.py geometry/bidirectionality tests; acceptance/geometry-review.json approved-with-conditions (all conditions resolved); Chrome viewport rows overflow=false"
+    },
+    {
+      "requirement": "The source register SHALL carry ITVIEC-2025 as a primary source with inspected PDF artifact identity",
+      "evidence_class": "automated-test + source-inspection",
+      "evidence": "evidence/sources.json ITVIEC-2025 record (primary_artifact SHA-256 552a2d5e..., methodology p.47); acceptance/itviec-primary-source-inspection.json; wave1/wave2 fixture tests pass"
+    },
+    {
+      "requirement": "Slide 6 SHALL render a visible waterline separating tip from submerged mass",
+      "evidence_class": "automated-test + browser-qualification",
+      "evidence": "tests/test_visual_attention.py slide-6 tests; Chrome viewport checks pass; fallback-paths.json path_taken=primary"
+    },
+    {
+      "requirement": "New visuals SHALL satisfy the inherited accessibility, legibility, and offline contracts",
+      "evidence_class": "browser-qualification + accessibility-evidence",
+      "evidence": "evidence/accessibility.json pass (18px floor, safe-area, reduced-motion); Chrome local-logo-fonts and zero-outbound checks; copied-package rehearsal zero HTTP/HTTPS requests"
+    },
+    {
+      "requirement": "Deck contract invariants SHALL remain unchanged",
+      "evidence_class": "automated-test + static-verification",
+      "evidence": "Full suite 91 passed / 298 subtests (17 slides, routes, timing, fragment routing, slide-7 invariance); verify_static.py 11/11 PASS"
+    },
+    {
+      "requirement": "Tier 1 evidence SHALL be refreshed against the new candidate with human gates remaining open",
+      "evidence_class": "evidence-chain + human-gate-open",
+      "evidence": "evidence/release-manifest.json status=blocked-automated, freshness_graph public_package_changed=true, visual_screenshots_reused=false; checksums.sha256 75/75 OK; Safari blocked; editorial/venue/release gates open"
+    }
+  ],
+  "automated_gates": {
+    "full_test_suite": "91 passed, 298 subtests passed",
+    "static_verifier": "11/11 PASS",
+    "checksums": "75/75 OK",
+    "json_parse_audit": "20 files checked, 0 failures",
+    "openspec_validate_strict": "valid"
+  },
+  "human_gates": {
+    "vietnamese_editorial_review": "OPEN — new slide-5 Vietnamese copy requires independent human editorial review",
+    "safari_requalification": "OPEN — blocked on Allow Remote Automation; not simulated",
+    "venue_projector_clicker": "OPEN — physical rehearsal pending",
+    "release_decision": "OPEN — no tag, no remote, release blocked-automated"
+  }
+}
