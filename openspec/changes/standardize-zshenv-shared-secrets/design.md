@@ -63,7 +63,6 @@ HERMES_CUSTOM_SHOPAPIKEY_API_KEY
 HERMES_CUSTOM_COCKPIT_API_KEY
 HERMES_CUSTOM_ANTIGRAVITY_API_KEY
 HERMES_CUSTOM_LOCALHOST_51006_API_KEY
-HERMES_CUSTOM_GIAODUC_API_KEY
 BRAVE_SEARCH_API_KEY
 EXA_API_KEY
 TAVILY_API_KEY
@@ -95,6 +94,11 @@ Service-private tier unchanged in `~/.hermes/.env`, `~/.tdt/.env`, webui `.env`.
 Canonical hashes recorded pre-migration; post-migration verification asserts
 hash equality for every moved key.
 
+The winner rows above document migration-time source selection. Giaoduc was
+subsequently retired because it is no longer used; the active shared tier now
+contains 16 keys and five provider keys. See the post-migration amendment in
+`tasks.md` and the retirement evidence in `EVIDENCE_MANIFEST.md`.
+
 ### D3: `.zshenv` structure
 
 ```zsh
@@ -104,7 +108,7 @@ export HERMES_CUSTOM_PHANMEMVIP_API_KEY='...'
 # END shared-agent-secrets
 ```
 
-- `chmod 600` applied BEFORE any value is written (file is currently 644).
+- `chmod 600` applied BEFORE any value is written (file is currently 600).
 - Values single-quoted (shell-safe for all observed value charsets).
 - The `~/.config/agent-llm/load-hermes-custom-credentials.zsh` loader and its
   source line are removed (values are now inline; loader retired, file kept
@@ -113,7 +117,7 @@ export HERMES_CUSTOM_PHANMEMVIP_API_KEY='...'
 
 ### D4: Hermes override=True hazard
 
-Because `load_hermes_dotenv()` uses `override=True`, any of the 17 shared-tier
+Because `load_hermes_dotenv()` uses `override=True`, any of the 16 shared-tier
 keys present in `~/.hermes/.env` MUST be removed — otherwise the dotenv file silently
 shadows `.zshenv`. Post-change invariant: `grep HERMES_CUSTOM_ ~/.hermes/.env`
 returns nothing. Verification gate greps after drain.
@@ -202,7 +206,7 @@ compose vars if any — verified: it holds ONLY the key, so it is deleted).
 ## Verification gates
 
 1. `stat -f '%Lp' ~/.zshenv` = 600 (before values written).
-2. All 17 keys present in all 4 zsh modes (presence + length only, never print values).
+2. All 16 keys present in all 4 zsh modes (presence + length only, never print values).
 3. Hash equality: every moved key's sha256 in `.zshenv` == canonical source hash.
 4. `grep -c HERMES_CUSTOM_ ~/.hermes/.env ~/.tdt/.env adapter/.env` = 0 after drain.
 5. Claude helper: output is exactly 1 line; `set -a` absent from script.

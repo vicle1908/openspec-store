@@ -38,3 +38,15 @@
 - [x] 6.2 Write EVIDENCE_MANIFEST.md with all gate results.
 - [x] 6.3 Commit store change.
 - [ ] 6.4 User action (documented, not agent-executed): restart Hermes gateway to activate plist wrapper; run one live sentinel per provider.
+
+
+## Post-migration amendment (2026-08-27)
+
+- [x] R1 Retire the unused Giaoduc provider: remove
+  `HERMES_CUSTOM_GIAODUC_API_KEY` from `~/.zshenv` and remove the
+  `[model_providers.giaoduc]` block from `~/.codex`.
+- [x] R2 Re-verify active configuration: 16 shared keys in all 4 zsh modes;
+  Codex default remains `codex_local_access`; no Giaoduc references remain
+  in active configs, services, or the adapter repository.
+- [x] R3 Update design/evidence documentation and preserve historical
+  17-key migration evidence.

@@ -14,18 +14,40 @@ Scope: macOS user shell, coding-agent CLI configuration, launchd wrappers.
 
 ## Canonical shared tier
 
-`~/.zshenv` now contains 17 exported shared-tier variables, including:
+`~/.zshenv` now contains 16 exported shared-tier variables, including:
 
-- 6 provider keys: Phanmemvip, Shopapikey, Cockpit, Antigravity,
-  Localhost-51006, and Giaoduc.
+- 5 provider keys: Phanmemvip, Shopapikey, Cockpit, Antigravity, and
+  Localhost-51006.
 - Shared tool keys: Brave, Exa, Tavily, OmniRoute, Firecrawl, OpenRouter,
   GitHub, API_KEY_SECRET, Copilot provider, NPMJS, and Postman.
+
+Giaoduc was part of the original migration snapshot but was retired on
+2026-08-27 because it is no longer used. The original 17-key migration
+verification remains below as historical evidence; current-state checks use
+16 keys.
 
 `MCPR_TOKEN` is deliberately excluded from the shared tier. Hash comparison
 showed different values for Hermes, OpenCode, Pi, and Qoder; it is
 client/service-specific and remains owned by each client configuration.
 
-## Verification results
+## Post-migration retirement verification (2026-08-27)
+
+Giaoduc is no longer used and has been removed from active configuration. This
+is a fresh current-state check; historical backups and the historical evidence
+section below are intentionally excluded from the active sweep.
+
+| Gate | Result | Evidence |
+|---|---:|---|
+| Active `~/.zshenv` | PASS | 0 Giaoduc references; 16 exported shared keys; mode 600; `zsh -n` clean |
+| Shell visibility | PASS | `zsh -c`, `zsh -ic`, `zsh -lc`, `zsh -ilc`: 4/4, each 16 set / 0 missing; Giaoduc absent |
+| Active Codex config | PASS | `~/.codex`; 0 Giaoduc references; only `codex_local_access`; default unchanged |
+| Other active consumers | PASS | Pi, OpenCode, Claude profiles/helpers, TDT/Hermes dotenv, LaunchAgents, adapter repo: 0 Giaoduc references |
+| CLI availability | PASS | Claude, OpenCode, Pi, Codex `--help` / version commands exit 0 |
+| Runtime liveness | PASS | Adapter 8788 health 200; ai-review 8090 health 200; webhook 8080 health 200 |
+| Historical references | INTENTIONAL | Migration backup and OpenSpec historical evidence retain Giaoduc for audit; no active consumer uses it |
+| Giaoduc live sentinel | NOT APPLICABLE | Provider retired; no live request made after removal |
+
+## Initial migration verification snapshot (before Giaoduc retirement)
 
 | Gate | Result | Evidence |
 |---|---:|---|
@@ -55,7 +77,7 @@ client/service-specific and remains owned by each client configuration.
 The Hermes gateway plist was edited and validated but was **not reloaded from
 this session**, because this agent runs inside the active Hermes gateway and
 reloading it would terminate the current control process. A fresh wrapper-started
-Hermes Python process was tested after draining `~/.hermes/.env`: all 17 shared
+Hermes Python process was tested after draining `~/.hermes/.env`: all 16 shared
 keys were present, while `MCPR_TOKEN` was loaded from the private Hermes dotenv.
 Reload the gateway LaunchAgent once the current session is no longer needed:
 
@@ -202,10 +224,10 @@ only counts/lengths reported (never values).
 | Claude Code shopapikey | fresh-shell `shopapikey --print` sentinel | exit=0, sentinel returned | FUNCTIONAL — degraded (gateway `unrecognized_model` warning) |
 | OpenCode | `opencode run --model shopapikey/Claude-Fable` | exit=0, sentinel, no errors | PASS |
 | Pi | `pi -p --no-session --no-tools --no-extensions --provider shopapikey --model Claude-Fable` | exit=0, sentinel, no errors | PASS |
-| Codex (giaoduc) | `codex exec --strict-config -c model_provider="giaoduc" -m Advance` | exit=1, 5 reconnects, empty final response | BLOCKED — pre-existing protocol/auth failure |
+| Codex (giaoduc, historical) | `codex exec --strict-config -c model_provider="giaoduc" -m Advance` | exit=1, 5 reconnects, empty final response | HISTORICAL — retired, not an active provider |
 | Cockpit | not run | upstream 51006 has no listener | BLOCKED — upstream down |
 
-Environment gates re-verified in the same battery: 17/17 shared keys present
+Environment gates re-verified in the same battery: 16/16 shared keys present
 in all 4 zsh modes; both Claude helpers correct on env-path and fallback
 (lengths 36/42, single line).
 
@@ -222,9 +244,15 @@ in all 4 zsh modes; both Claude helpers correct on env-path and fallback
   by this migration). No profile changes made — provider documentation does
   not confirm expected behavior for the warning.
 
-### codex root cause (pre-existing, NOT migration-caused)
+### Historical pre-retirement evidence — Giaoduc
 
-- `env_key` migration itself is verified: `~/.codex` parses,
+Giaoduc was removed from the shared tier and Codex configuration on 2026-08-27
+because it is no longer used. The following evidence is retained for audit
+purposes only. Do not re-test or re-enable this provider.
+
+### Codex + Giaoduc root cause (historical)
+
+- `env_key` migration itself is verified: `~/.codex`,
   0 literal `experimental_bearer_token` entries remain, `env_key` present
   for both custom providers, and `--strict-config` accepted the config.
 - Direct endpoint probes with the migrated key:
