@@ -86,6 +86,57 @@ and local source: Codex CLI 0.149.1 exposes `env_key` in its model-provider
 schema; Pi 0.84.3 resolves configured `apiKey` values through
 `resolveConfigValueOrThrow`, including `${ENV_VAR}` templates.
 
+## Follow-up reconciliation (same day, post-commit)
+
+Re-check after the initial migration surfaced residual inconsistencies in the
+adapter repository and one live routing bug:
+
+- **Cockpit launcher port bug**: `cockpit()` in `~/.zshrc` pointed at
+  `localhost:8787`, but 8787 is owned by hermes-webui (`server.py`, PID 671,
+  health body shows `sessions/runs/accept_loop` — not the adapter). The
+  adapter's host-mapped port is **8788** (since adapter commit `3f87da1`).
+  Fixed to `http://localhost:8788`; profile JSON already had 8788.
+- **Phantom `giaoduc()` launcher**: README documented a `giaoduc()` launcher
+  that never existed (no profile JSON, no helper script, no function
+  definition, no backup copy). Removed from README.
+- **Stale `.env` documentation**: README, `install-launchagent.sh`, tracked
+  plist, `.env.example`, and ignore-file exceptions still described the
+  drained repo-local `.env` flow. All cleaned; `.env.example` deleted.
+- **Tracked plist drift**: repo `config/*.plist` lacked the
+  `launchd-env-wrapper.sh` first argument present in the installed
+  LaunchAgent. Aligned; `plutil -lint` OK on both; normalized diff identical.
+- **`start-adapter.sh` fail-fast ordering**: credential check moved before
+  the 120s Docker wait.
+- **README terminology regression** introduced and fixed during cleanup
+  (protocol names restored via scripted replacement; 0 bad occurrences
+  remain, assertions passed).
+
+Adapter repo commit: `5708445 refactor: migrate credential flow to ~/.zshenv
+shared tier` (8 files, +48/−44).
+
+### Post-reconciliation verification
+
+| Gate | Result | Evidence |
+|---|---:|---|
+| Adapter test suite | PASS | 55 passed in 0.35s (`uv run --extra dev pytest`) |
+| Script syntax | PASS | `bash -n` on start-adapter.sh + install-launchagent.sh |
+| Compose config (wrapper env) | PASS | `docker compose config --quiet` via launchd wrapper |
+| Adapter health (8788) | PASS | HTTP 200 |
+| ai-review / webhook health | PASS | HTTP 200 / 200 |
+| Stale-ref sweep (adapter repo) | PASS | `git grep` for `.env.example`, `~/.hermes/.env`, loader, `zshenv.secrets`: no matches |
+| `git diff --check` | PASS | clean |
+| Shopapikey live sentinel | PASS | `SHOPAPIKEY_SENTINEL_OK` returned via fresh-shell `shopapikey --print` (benign `[1m]` selector warning, expected) |
+| Cockpit live sentinel | BLOCKED | upstream `127.0.0.1:51006` has no listener (Cockpit Tools app process exists but is not serving); classification: upstream-down, not auth failure |
+
+### Security note
+
+During this session, literal credential values from `~/.zshenv` were
+displayed once inside a patch-tool fuzzy-match error message. They were not
+written to any file, committed, or delivered, but they passed through tool
+output in this transcript. Treat the affected shared-tier values as exposed
+and rotate them at the provider side when convenient; the local file
+permissions (600) are unaffected.
+
 ## OpenSpec planning evidence
 
 - `openspec validate standardize-zshenv-shared-secrets --strict --store openspec-store`
