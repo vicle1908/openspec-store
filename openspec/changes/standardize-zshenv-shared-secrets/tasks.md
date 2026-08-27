@@ -38,6 +38,10 @@
 - [x] 6.2 Write EVIDENCE_MANIFEST.md with all gate results.
 - [x] 6.3 Commit store change.
 - [ ] 6.4 User action (documented, not agent-executed): restart Hermes gateway to activate plist wrapper; run one live sentinel per provider.
+  - Partial evidence (2026-08-27): shopapikey sentinel PASS (`SHOPAPIKEY_LIVE_OK`);
+    cockpit BLOCKED — upstream 51006 refused; Giaoduc NOT APPLICABLE (retired).
+    Running gateway (pid 4966, started 2026-08-25) predates the wrapper/plist
+    edits and has 0 shared-tier env names — external restart still required.
 
 
 ## Post-migration amendment (2026-08-27)

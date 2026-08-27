@@ -329,6 +329,15 @@ MCP integration debugging workflow and official Router documentation:
 - The Cua independent-shell fallback was unavailable because embedded Cua
   startup timed out; no GUI action was taken.
 
+### Live provider sentinels and gateway wrapper activation (2026-08-27)
+
+| Gate | Result | Evidence |
+|---|---:|---|
+| shopapikey live sentinel | PASS | `zsh -ic 'shopapikey --print …'` returned `SHOPAPIKEY_LIVE_OK`, exit 0 |
+| cockpit live sentinel | BLOCKED — upstream down | CLI timed out at 150s; independent probe: TCP 127.0.0.1:51006 REFUSED, HTTP 000 |
+| Giaoduc live sentinel | NOT APPLICABLE — provider retired | No live request made after retirement |
+| Gateway wrapper activation | PENDING USER ACTION | Running gateway pid 4966 started 2026-08-25 17:49:53, predating the plist edit (2026-08-27 12:57:27) and wrapper edit (2026-08-27 15:58:58); gateway environment contains 0 shared-tier variable names; plist `ProgramArguments[0]` is correctly the wrapper; external `hermes gateway restart` still required |
+
 ### Security note
 
 During this session, literal credential values from `~/.zshenv` were
