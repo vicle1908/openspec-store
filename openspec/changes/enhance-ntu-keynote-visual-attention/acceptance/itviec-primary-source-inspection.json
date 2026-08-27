@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "artifact": "itviec-primary-source-inspection",
+  "change": "enhance-ntu-keynote-visual-attention",
+  "task_reference": "1.2",
+  "inspected_at": "2026-08-27",
+  "outcome": "pdf-retrieved-and-inspected; source classification upgraded to primary (existing register vocabulary); earlier Scribd-mirror paywall gap resolved",
+  "publisher_blog": {
+    "url": "https://itviec.com/blog/key-summary-of-vietnam-ai-adoption-and-it-hiring-report/",
+    "access_date": "2026-08-27",
+    "combined_respondent_claim": "846 online survey respondents (June–July 2025)",
+    "respondent_roles": "C-level, HR Management Leader, Hiring Manager/Executive and IT Professionals in Vietnam",
+    "links_official_drive_folder": true
+  },
+  "official_drive_folder": {
+    "url": "https://drive.google.com/drive/folders/1I-sCbllhyBIKjpii_eiytlaQNpL3ukOX",
+    "files": [
+      {
+        "id": "1JmlOVr4UzA6cKWKlJ1QFC7jxjlUwIdEV",
+        "title": "[EN] ITviec_Vietnam AI Adoption Status And IT Hiring Insight 2025_Mini Report.pdf"
+      },
+      {
+        "id": "1q80yn2Cc2uAP4hOb3cWEvNbPxVVvHm78",
+        "title": "[VI] ITviec_Thực Trạng Ứng Dụng AI Và Tuyển Dụng AI tại Việt Nam 2025_Báo Cáo Nhanh.pdf"
+      }
+    ]
+  },
+  "pdf_artifact": {
+    "download_url": "https://drive.google.com/uc?export=download&id=1JmlOVr4UzA6cKWKlJ1QFC7jxjlUwIdEV",
+    "sha256": "552a2d5e39b6896ed542f59bf12f76499f3458b9b8a352cc7b087131d0f17802",
+    "bytes": 13225156,
+    "pdf_version": "1.3",
+    "pages": 54,
+    "creation_date": "2025-08-21T10:40:20+07:00",
+    "local_inspection_copy_note": "Transient inspection copy existed at /tmp/itviec-inspection/itviec-mini-report-en.pdf at inspection time only; it is NOT durable evidence and is not available to other users. Durable identity is the SHA-256 above plus official Drive file ID 1JmlOVr4UzA6cKWKlJ1QFC7jxjlUwIdEV and the download URL.",
+    "package_boundary_note": "Research evidence only. NOT part of the seven-file public venue package and NOT copied into ntu-keynote assets."
+  },
+  "methodology": {
+    "pdf_page_printed": 46,
+    "statement": "Two independent surveys conducted in second quarter of 2025: one targeting IT professionals and the other engaging HR leaders and business decision-makers across various company sizes and industries.",
+    "combined_846_stated_in_pdf": false,
+    "combined_846_attribution": "publisher blog only; must not be presented as the denominator of any of the three figures"
+  },
+  "claim_locators": {
+    "adoption_breadth_73": {
+      "pdf_page_printed": 8,
+      "exact_text": "73% of companies have adopted AI including 13.8% fully adopted, 24.3% in limited production, and 34.9% at the pilot stage.",
+      "base": "surveyed companies"
+    },
+    "scaled_stage_13_8": {
+      "pdf_page_printed": 8,
+      "relationship": "Component of the 73% breakdown: 34.9% pilot + 24.3% limited production + 13.8% scaled/fully = 73%. Must be labeled as a stage within the adopter group, not as an independent denominator.",
+      "base": "within the 73% adopter group"
+    },
+    "trust_5_4": {
+      "pdf_page_printed": 13,
+      "exact_text": "Only 5.4% of companies use AI Outputs with minimal human oversight and are considered highly reliable",
+      "chart_base_note": "Base: Companies that have adopted AI",
+      "base": "companies that have adopted AI (not all surveyed companies)",
+      "coincidental_match_note": "An unrelated 5.4% appears on printed page ~22 (equity and fairness risks); the normative locator is the trust chart on page 13."
+    }
+  },
+  "denominator_rules": [
+    "73% base = surveyed companies",
+    "13.8% is a stage within the 73% breakdown and must be labeled as such",
+    "5.4% base = companies that have adopted AI, not all surveyed companies",
+    "no geometry may imply a single common denominator across all three figures",
+    "no funnel/stacked/track/arrow geometry may imply a sequential filter",
+    "the real subset relationships are labeled, not denied",
+    "846 respondent count must not be presented as the denominator of any of the three percentages",
+    "all figures are survey-reported, not audited company-level measurements"
+  ]
+}

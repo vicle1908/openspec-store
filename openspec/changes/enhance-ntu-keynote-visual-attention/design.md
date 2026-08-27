@@ -39,16 +39,16 @@ The archived `enhance-ntu-keynote-visual-storytelling` change specified visuals 
 
 - **Current DOM:** `.slide-content.compact` with eyebrow, h2, `.grid-2` (two `.content-card`: NQ57-2024 and GOOGLE-AP-2024), `.qualifier`, `.source-line`.
 - **Insertion point:** new stat-block strip between `.grid-2` and `.qualifier`, reusing the existing `.metric-row`-style pattern (3-column grid, min-height ~76px, 18px font floor).
-- **Encoding:** THREE separate labeled blocks, one per dimension — never a funnel, stacked bar, shared track, nested subset, or arrow-connected progression:
-  - Block A: "73% · doanh nghiệp đã tích hợp AI" (dimension: adoption breadth)
-  - Block B: "13,8% · đạt giai đoạn mở rộng/hoàn toàn" (dimension: adoption stage)
-  - Block C: "5,4% · rất tin tưởng, ít kiểm tra của con người" (dimension: output trust)
-  - Each block carries its dimension label; a single methodology note below states the survey population: "Khảo sát ITviec 2025 · 846 người trả lời (C-level, quản lý nhân sự, tuyển dụng, chuyên gia IT), tháng 6–7/2025".
-- **Wording rule:** audience copy uses survey framing ("Theo khảo sát ITviec 2025…"), never audited-measurement framing. The three figures are NOT presented as subsets of each other even though the concepts are related.
+- **Encoding:** THREE separate labeled blocks — never a funnel, stacked bar, shared track, or arrow-connected progression (the report does not present the figures as a sequential filter); but the real subset relationships are LABELED, not denied:
+  - Block A: "73% · doanh nghiệp đã áp dụng AI" — base label: "doanh nghiệp khảo sát" (adoption breadth)
+  - Block B: "13,8% · mở rộng/áp dụng hoàn toàn" — base label: "trong nhóm 73% đã áp dụng" (a stage within the 73% breakdown: 34,9% pilot + 24,3% limited + 13,8% scaled/fully)
+  - Block C: "5,4% · rất tin tưởng, tối thiểu giám sát của con người" — base label: "trên nhóm doanh nghiệp đã áp dụng AI" (chart base note per PDF p.13)
+  - Each block carries its base label; a single methodology note below states what the PDF itself states: "Hai khảo sát độc lập trong Q2/2025: chuyên gia IT; lãnh đạo nhân sự và người ra quyết định kinh doanh". The combined "846 người trả lời" count appears only on the publisher blog, not in the PDF methodology page; it MAY be included only with explicit blog attribution and MUST NOT be presented as the denominator of any of the three percentages.
+- **Wording rule:** audience copy uses survey framing ("Theo khảo sát ITviec 2025…"), never audited-measurement framing. The real subset relationships (13.8% within the 73% breakdown; 5.4% based on adopters) are stated in the base labels, not denied; no copy or geometry implies one common denominator or a sequential filter.
 - **Existing claims:** NQ57-2024 and GOOGLE-AP-2024 card copy preserved verbatim; mandatory anchors unchanged; `.source-line` gains `[ITVIEC-2025]`.
 - **Notes contract:** slide-5 `delivery_cue` and `source_reminders` updated to cover the new survey claim and its denominator caution.
-- **Overflow fallback:** slide 5 is the densest target (compact layout, 720−72−20px available). If the three-block strip cannot fit at ≥18px within the safe area at 1366×768, fall back to a single `.source-copy` paragraph stating the three figures as three separate sentences with dimension labels (text-only, still registered claims); record which path was taken.
-- **Source register:** `evidence/sources.json` gains source `ITVIEC-2025` (source_type `publisher-page`, URL `https://itviec.com/blog/key-summary-of-vietnam-ai-adoption-and-it-hiring-report/`, methodology and PDF-gap note) and three claims `S05-ITVIEC-ADOPTION-BREADTH`, `S05-ITVIEC-SCALED-STAGE`, `S05-ITVIEC-TRUST-MINIMAL-REVIEW`. `evidence/source-inspection.json` gains the matching inspection record. `evidence/slide-contract.json` slide-5 `source_ids` gains `ITVIEC-2025`; mandatory anchor text extended, not replaced.
+- **Overflow fallback:** slide 5 is the densest target (compact layout, 720−72−20px available). If the three-block strip cannot fit at ≥18px within the safe area at 1366×768, fall back to a single `.source-copy` paragraph stating the three figures as three separate sentences with base labels (text-only, still registered claims); the fallback is a first-class accepted path, not a failure. Record which path was taken.
+- **Source register:** `evidence/sources.json` gains source `ITVIEC-2025` with source_type `primary` (existing register vocabulary — no new enum value is introduced), the publisher blog URL as access URL, the official Drive PDF as primary artifact (SHA-256 `552a2d5e39b6896ed542f59bf12f76499f3458b9b8a352cc7b087131d0f17802`, 54 pages, created 2025-08-21), the two-survey Q2-2025 methodology, and the 846-attribution note. Three claims: `S05-ITVIEC-ADOPTION-BREADTH` (73%, base: surveyed companies), `S05-ITVIEC-SCALED-STAGE` (13.8%, base: within the 73% adopter breakdown), `S05-ITVIEC-TRUST-MINIMAL-REVIEW` (5.4%, base: companies that have adopted AI). `evidence/source-inspection.json` gains the matching inspection record with page locators (p.8, p.13, methodology p.47 printed 46). `evidence/slide-contract.json` slide-5 `source_ids` gains `ITVIEC-2025`; mandatory anchor text extended, not replaced.
 
 ### Slide 6 — Iceberg Waterline (metaphor)
 
@@ -59,7 +59,7 @@ The archived `enhance-ntu-keynote-visual-storytelling` change specified visuals 
 
 ## Claim Geometry Review Gate
 
-Before implementation, an independent read-only review MUST confirm the planned slide-5 encoding against the geometry rules (no shared denominator, no subset implication, dimension labels present). The review result is recorded in this change's acceptance artifacts. This gate exists because the three percentages are visually tempting to connect, and the archived 95/5 incident shows geometry mistakes are easy to make and hard to retract.
+Before implementation, an independent read-only review MUST confirm the planned slide-5 encoding against the corrected denominator rules: three separate containers; visible base labels (surveyed companies / within-73%-stage / adopters-only); no funnel/stacked/track/arrow geometry implying a sequential filter; no geometry implying one common denominator; the real subset relationships labeled rather than denied; methodology note consistent with PDF p.47 (two independent Q2-2025 surveys) and not presenting 846 as any figure's denominator. The review result is recorded in this change's acceptance artifacts. This gate exists because the three percentages are visually tempting to connect, and the archived 95/5 incident shows geometry mistakes are easy to make and hard to retract.
 
 ## Accessibility, Print, Reduced Motion
 
@@ -79,7 +79,7 @@ Before implementation, an independent read-only review MUST confirm the planned 
 
 ## Honest Gaps
 
-- ITviec mini-report PDF not independently extracted (Scribd paywall); inspection rests on the publisher's own blog page. Source record carries `publisher-page` type and documents the gap. Task 1.2 includes a retry gate.
+- ITviec mini-report PDF WAS retrieved and inspected directly (task 1.2 complete): 54 pages, created 2025-08-21, SHA-256 `552a2d5e39b6896ed542f59bf12f76499f3458b9b8a352cc7b087131d0f17802`, from ITviec's official Drive folder; the earlier Scribd-mirror paywall gap is resolved. The combined 846-respondent count appears only on the publisher blog, not in the PDF methodology page; slide-5 copy attributes it to the blog or omits it, and never presents it as the denominator of any figure.
 - Survey figures are respondent-reported, not audited; all copy preserves this.
 - `ntu-keynote` has no GitNexus index or graphify state; file-level review only.
 - Picture-superiority literature (Nelson/Reed/Walling 1976; Paivio 1971) motivates the change but no retention statistics appear in the deck.

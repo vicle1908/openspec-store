@@ -22,23 +22,27 @@ Slide 3 SHALL display the $15.7T modeled estimate as a single magnitude visual w
 - **AND** the exclusion SHALL be recorded in this change's acceptance evidence
 - **AND** the slide SHALL retain its existing text-based encoding and counter animation
 
-### Requirement: Slide 5 SHALL present ITVIEC-2025 survey findings as three dimension-separated stat blocks
+### Requirement: Slide 5 SHALL present ITVIEC-2025 survey findings as three base-labeled stat blocks
 
-Slide 5 SHALL present the three ITVIEC-2025 survey figures — 73% adoption breadth, 13.8% scaled/fully adoption stage, 5.4% very-high-trust-with-minimal-human-review — as three separate labeled stat blocks, each carrying its dimension label. The figures SHALL NOT be encoded as a funnel, stacked bar, shared track, nested subset, or arrow-connected progression, and SHALL NOT be presented as subsets of one another.
+Slide 5 SHALL present the three ITVIEC-2025 survey figures — 73% adoption breadth (base: surveyed companies), 13.8% scaled/fully adoption stage (a stage within the 73% adopter breakdown), and 5.4% very-high-trust-with-minimal-human-oversight (base: companies that have adopted AI) — as three separate, equal-weight stat blocks, each carrying a visible base/denominator label. The figures SHALL NOT be encoded as a funnel, stacked bar, shared track, or arrow-connected progression implying a sequential filter, and no geometry SHALL imply one common denominator across all three figures. The real subset relationships (13.8% within the 73% breakdown; 5.4% based on adopters) SHALL be stated in the base labels, not denied.
 
-#### Scenario: Three stat blocks are inspected for geometry separation
+#### Scenario: Three stat blocks are inspected for geometry and base labels
 
 - **WHEN** the slide-5 survey encoding is examined in the DOM
-- **THEN** the three figures SHALL appear in three separate containers
-- **AND** each container SHALL state its own dimension label (adoption breadth, adoption stage, output trust)
-- **AND** no SVG path, connector, shared axis, stacked geometry, or nested shape SHALL link the three figures
-- **AND** a visible methodology note SHALL state the survey population (846 respondents, named roles, June–July 2025)
+- **THEN** the three figures SHALL appear in three separate equal-weight containers
+- **AND** the 73% block SHALL carry a base label identifying surveyed companies
+- **AND** the 13.8% block SHALL carry a base label identifying it as a stage within the 73% adopter breakdown
+- **AND** the 5.4% block SHALL carry a base label identifying companies that have adopted AI
+- **AND** no SVG path, connector, shared axis, stacked geometry, nested shape, or arrow SHALL link the three figures as a sequential filter
+- **AND** card placement, sizing, and color SHALL NOT imply a single funnel or progression
+- **AND** a visible methodology note SHALL state the two independent Q2-2025 surveys (IT professionals; HR leaders and business decision-makers) per the report methodology page
 
-#### Scenario: Survey wording is preserved
+#### Scenario: Survey wording and respondent-count attribution are preserved
 
 - **WHEN** the slide-5 audience copy and notes are inspected
 - **THEN** the figures SHALL be framed as survey findings ("khảo sát")
 - **AND** no copy SHALL present the figures as audited company-level measurements
+- **AND** the combined 846-respondent count, if present at all, SHALL be attributed to the publisher blog and SHALL NOT be presented as the denominator of any of the three figures
 - **AND** the notes contract for slide 5 SHALL include a source reminder covering the denominator caution
 
 #### Scenario: Existing slide-5 claims are preserved
@@ -51,21 +55,23 @@ Slide 5 SHALL present the three ITVIEC-2025 survey figures — 73% adoption brea
 #### Scenario: Slide-5 encoding overflows and falls back to text
 
 - **WHEN** the three-block strip cannot fit at ≥18px within the safe area at 1366×768
-- **THEN** the implementation SHALL fall back to text-only encoding with three separate sentences and dimension labels
+- **THEN** the implementation SHALL fall back to text-only encoding with three separate sentences and base labels
+- **AND** the fallback SHALL be an accepted implementation path, not a defect
 - **AND** the claims SHALL remain registered in the source register regardless of visual path
 - **AND** the chosen path SHALL be recorded in this change's acceptance evidence
 
-### Requirement: The source register SHALL carry ITVIEC-2025 with publisher-page provenance and documented PDF gap
+### Requirement: The source register SHALL carry ITVIEC-2025 as a primary source with inspected PDF artifact identity
 
-The evidence source register SHALL add source `ITVIEC-2025` with source_type `publisher-page`, the ITviec blog URL, the stated methodology, and an explicit note that the underlying mini-report PDF was not independently extracted. The canonical source ID `ITVIEC-2025` SHALL be used consistently in the source register, claim registry, slide contract, HTML source line, and notes.
+The evidence source register SHALL add source `ITVIEC-2025` using the existing `primary` source_type value (no new enum value is introduced), with the publisher blog URL as access URL and the official mini-report PDF recorded as the inspected primary artifact with its SHA-256, page count, and creation date. The register SHALL record the two-survey Q2-2025 methodology stated in the PDF and SHALL note that the combined 846-respondent count appears only on the publisher blog.
 
 #### Scenario: Source record is inspected
 
 - **WHEN** `evidence/sources.json` is examined
-- **THEN** it SHALL contain source id `ITVIEC-2025` with source_type `publisher-page`
-- **AND** the record SHALL state 846 online survey respondents, June–July 2025, and the named respondent roles
-- **AND** the record SHALL document that the mini-report PDF mirror was paywalled and not independently extracted
-- **AND** three claims SHALL reference this source: adoption breadth 73%, scaled/fully adoption stage 13.8%, very-high-trust-with-minimal-human-review 5.4%
+- **THEN** it SHALL contain source id `ITVIEC-2025` with source_type `primary`
+- **AND** the record SHALL reference the official mini-report PDF with SHA-256 `552a2d5e39b6896ed542f59bf12f76499f3458b9b8a352cc7b087131d0f17802`, 54 pages, created 2025-08-21
+- **AND** the record SHALL state the two independent Q2-2025 surveys methodology from the PDF
+- **AND** the record SHALL note that the combined 846-respondent count is attributed to the publisher blog only
+- **AND** three claims SHALL reference this source with distinct base labels: adoption breadth 73% (surveyed companies), scaled/fully stage 13.8% (within the 73% adopter breakdown), very-high-trust-with-minimal-human-oversight 5.4% (companies that have adopted AI)
 
 #### Scenario: Canonical ID consistency is verified
 
@@ -109,6 +115,7 @@ All new meaningful visuals SHALL comply with the main `visual-storytelling-encod
 - **THEN** the package SHALL contain exactly the existing seven public files
 - **AND** `index.html` SHALL contain no new external URL references
 - **AND** no new binary asset SHALL be added under `assets/`
+- **AND** research artifacts (including the inspected ITviec PDF) SHALL NOT enter the package, `assets/`, or the package digest
 
 ### Requirement: Deck contract invariants SHALL remain unchanged
 

@@ -1,0 +1,39 @@
+{
+  "change": "enhance-ntu-keynote-visual-attention",
+  "artifact": "baseline-freeze",
+  "task_reference": "1.1",
+  "status": "baseline-frozen",
+  "frozen_at": "2026-08-27",
+  "implementation_repo": "/Users/androidteam/Developer/ntu-keynote",
+  "source_branch": "main",
+  "source_commit": "58e438250613624029fd79d89ab1d50c6db658b2",
+  "source_worktree_clean": true,
+  "source_digest": "795d4f53c3172f382f0ec4a9965cdf88e75dcffaeca29fcb802bb6c11de53254",
+  "digest_algorithm": "ntu-keynote-package-sha256-v1",
+  "drive_version_folder": "a7f24085935a-795d4f53c317",
+  "seven_public_files": [
+    "README.md",
+    "assets/fonts/be-vietnam-pro-400.woff2",
+    "assets/fonts/be-vietnam-pro-600.woff2",
+    "assets/fonts/be-vietnam-pro-800.woff2",
+    "assets/ntu-logo.png",
+    "index.html",
+    "keynote-fallback.pdf"
+  ],
+  "public_files_sha256": {
+    "index.html": "5e0cb4979d98ff3e99d0f308627b9a4a7500b60733b8bdeac6051d66d5a8fb88",
+    "README.md": "43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469",
+    "keynote-fallback.pdf": "2b63b38f911942c6e7fed222259e964ccde6c351e2c90843cffe61e80576db75",
+    "assets/ntu-logo.png": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
+    "assets/fonts/be-vietnam-pro-400.woff2": "077c275da5dee47bc1080bc7d9ae479a837804572635f540e8809f70bc861c7e",
+    "assets/fonts/be-vietnam-pro-600.woff2": "dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125",
+    "assets/fonts/be-vietnam-pro-800.woff2": "a10e0182ead90b7d43874024d63cc32f09651ae7527a8736552ab7396df7240d"
+  },
+  "manifest_cross_check": "All seven per-file SHA-256 values recomputed from the working tree at the frozen commit and matched evidence/release-manifest.json (ALL_FILES_MATCH_MANIFEST: true).",
+  "preserved_paths_note": "Parent change dirty editorial worksheet (openspec/changes/add-ntu-ai-keynote-deck/acceptance/vietnamese-editorial-review-worksheet.md) and unrelated untracked store directories were NOT staged, modified, or cleaned up.",
+  "known_limitations": {
+    "gitnexus": "ntu-keynote is not indexed; no graph-based architecture review performed",
+    "graphify": "no graphify-out/ state exists for ntu-keynote",
+    "safari": "qualification remains blocked; gate stays open"
+  }
+}
