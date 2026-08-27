@@ -1,0 +1,118 @@
+{
+  "change": "publish-ntu-keynote-to-google-drive",
+  "recorded_at": "2026-08-27T09:56:38+07:00",
+  "source": {
+    "repository": "/Users/androidteam/Developer/ntu-keynote",
+    "branch": "main",
+    "commit": "72cf4aa2db7e6d1e3f5e99fb8ba157e0038ac742",
+    "worktree_clean": true,
+    "package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+    "package_digest_source": "evidence/release-manifest.json public_venue_package.digest"
+  },
+  "destination": {
+    "remote": "gdrive-tdt",
+    "root_folder": "NTU AI Keynote",
+    "version_folder": "72cf4aa2db7e-3f299c876340",
+    "logical_path": "gdrive-tdt:NTU AI Keynote/72cf4aa2db7e-3f299c876340",
+    "exact_script_output": "SYNC_OK remote=gdrive-tdt: destination=gdrive-tdt:/NTU AI Keynote/72cf4aa2db7e-3f299c876340 commit=72cf4aa2db7e6d1e3f5e99fb8ba157e0038ac742 digest=3f299c8763409b40 files=7",
+    "path_normalization_note": "rclone treats gdrive-tdt:/NTU AI Keynote/... and gdrive-tdt:NTU AI Keynote/... as the same remote path; the logical Drive path is recorded without the leading slash",
+    "version_folder_id": "1lA02kQmbezsTgJPOCU5bGcEwr_KJfSEY",
+    "folder_pre_existed": false,
+    "sharing_permissions_changed": false,
+    "destructive_operations": "none — rclone copy only; no sync, delete, purge, move, or permission commands"
+  },
+  "public_files": [
+    {
+      "path": "README.md",
+      "sha256": "43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469",
+      "local_size": 6246,
+      "remote_size": 6246,
+      "remote_id": "1mzNJR-_bzo4s4BUGB14h-ecPW71FDHL_",
+      "size_match": true
+    },
+    {
+      "path": "assets/fonts/be-vietnam-pro-400.woff2",
+      "sha256": "077c275da5dee47bc1080bc7d9ae479a837804572635f540e8809f70bc861c7e",
+      "local_size": 22524,
+      "remote_size": 22524,
+      "remote_id": "18vSEJpHQUe7wif_TmMHZBR9taG6eYltt",
+      "size_match": true
+    },
+    {
+      "path": "assets/fonts/be-vietnam-pro-600.woff2",
+      "sha256": "dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125",
+      "local_size": 23760,
+      "remote_size": 23760,
+      "remote_id": "135Rc6xwho9o21b3kjAe4BcEiGJ7Ne5KS",
+      "size_match": true
+    },
+    {
+      "path": "assets/fonts/be-vietnam-pro-800.woff2",
+      "sha256": "a10e0182ead90b7d43874024d63cc32f09651ae7527a8736552ab7396df7240d",
+      "local_size": 23948,
+      "remote_size": 23948,
+      "remote_id": "1EKZk1vNrtbRC9Q0Si0tw7M_GTvjmHTif",
+      "size_match": true
+    },
+    {
+      "path": "assets/ntu-logo.png",
+      "sha256": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
+      "local_size": 51150,
+      "remote_size": 51150,
+      "remote_id": "1HT9WaXkOX88o6_CHWo6XhVsxDtejqo-s",
+      "size_match": true
+    },
+    {
+      "path": "index.html",
+      "sha256": "a7d2fdbcddb7146366f633088b9179291a0744e93fc6e4c708db15fdda449710",
+      "local_size": 61168,
+      "remote_size": 61168,
+      "remote_id": "1_EG0tyCUMtpJAm51FElocO55bxZq_ll0",
+      "size_match": true
+    },
+    {
+      "path": "keynote-fallback.pdf",
+      "sha256": "256a0cd12e303760c28a5100b09d5e4131dbbc2d19c6fddfd7c3ff94c94515f8",
+      "local_size": 356590,
+      "remote_size": 356590,
+      "remote_id": "1_ZQtZMfHR6tfiEwUV6mj_Be19IaN2E2O",
+      "size_match": true
+    }
+  ],
+  "readback": {
+    "command": "rclone lsjson 'gdrive-tdt:NTU AI Keynote/72cf4aa2db7e-3f299c876340' --recursive --files-only",
+    "exit_code": 0,
+    "file_count": 7,
+    "expected_paths_match": true,
+    "all_sizes_match": true,
+    "private_paths_present": false,
+    "script_internal_readback": "READBACK_OK files=7"
+  },
+  "dry_run": {
+    "command": "scripts/sync-to-gdrive.sh --dry-run",
+    "exit_code": 0,
+    "output_summary": "DRY_RUN_OK remote=gdrive-tdt: version=72cf4aa2db7e-3f299c876340 commit=72cf4aa2db7e6d1e3f5e99fb8ba157e0038ac742 digest=3f299c8763409b40 files=7",
+    "files_listed": 7,
+    "no_mutation": true
+  },
+  "script_safety": {
+    "syntax_check": "bash -n scripts/sync-to-gdrive.sh — exit 0",
+    "forbidden_commands_absent": ["rclone sync", "rclone delete", "rclone purge", "rclone move", "drive share"],
+    "credential_content_absent": true,
+    "allowlist_enforced": true,
+    "dirty_worktree_rejected": true,
+    "immutable_flag": true
+  },
+  "limitations": {
+    "gws_oauth": "revoked — invalid_grant; separate Hermes-managed OAuth path, not modified by this change",
+    "rclone_shared_client_id": "rclone NOTICE: shared Google Drive client_id being retired during 2026; operational risk, not a current failure",
+    "remote_checksum": "Drive does not expose SHA-256 via lsjson; verification uses exact path set plus byte-size comparison against local SHA-256-bound sources"
+  },
+  "boundaries": {
+    "release_tag_created": false,
+    "archive_performed": false,
+    "sharing_performed": false,
+    "bidirectional_sync": false,
+    "predecessor_changes_mutated": false
+  }
+}
