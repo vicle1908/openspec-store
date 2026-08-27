@@ -329,6 +329,24 @@ MCP integration debugging workflow and official Router documentation:
 - The Cua independent-shell fallback was unavailable because embedded Cua
   startup timed out; no GUI action was taken.
 
+### Skill probe recipe correction (2026-08-27)
+
+The installed MCP Python SDK uses snake_case attributes. The
+`mcp-integration-debugging` skill probe recipe was corrected accordingly:
+`serverInfo` → `server_info`, `isError` → `is_error`, `inputSchema` →
+`input_schema`, `structuredContent` → `structured_content`. Intentional
+camelCase references were preserved: wire-format prose (JSON-RPC/SSE) and
+error-message examples in `stale-session-sdk-fallback.md`.
+
+- Both shipped probe scripts pass `py_compile`.
+- `references/mcp-router-stdio-probe.py` executed live against mcp-router:
+  `Server: MCP Router v0.2.0`, 137 tools, `list_directory` call
+  `is_error=False`, exit 0.
+- `scripts/mcp-router-stdio-probe.py --server mcp-router` executed live in
+  discovery mode: 137 tools listed, exit 0.
+- Provenance: `~/.hermes/skills/` is not git-tracked; these fixes are
+  live-on-disk, not repository-committed.
+
 ### Live provider sentinels and gateway wrapper activation (2026-08-27)
 
 | Gate | Result | Evidence |
