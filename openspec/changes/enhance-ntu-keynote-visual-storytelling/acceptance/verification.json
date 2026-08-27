@@ -1,0 +1,215 @@
+{
+  "change": "enhance-ntu-keynote-visual-storytelling",
+  "candidate_commit": "a7f24085935aadc970c5f76397fd1b0c52682f4f",
+  "evidence_base_commit": "ce4dd1be7bf1d17d5d980e2ee1ab6069237f4e6f",
+  "public_package_digest": "795d4f53c3172f382f0ec4a9965cdf88e75dcffaeca29fcb802bb6c11de53254",
+  "tier": "Tier 1 — public index.html bytes changed",
+  "automated_results": {
+    "focused_visual_tests": {
+      "command": "python -m unittest tests.test_visual_storytelling",
+      "exit_code": 0,
+      "result": "pass",
+      "tests": 7
+    },
+    "full_suite": {
+      "command": "python -m unittest discover -s tests -t tests",
+      "exit_code": 0,
+      "result": "pass",
+      "tests": 83
+    },
+    "static_verifier": {
+      "command": "python scripts/verify_static.py",
+      "exit_code": 0,
+      "result": "pass",
+      "categories": 11
+    },
+    "checksums": {
+      "command": "shasum -a 256 -c checksums.sha256",
+      "exit_code": 0,
+      "result": "pass",
+      "entries": 55
+    },
+    "browser_refresh": {
+      "evidence": "evidence/visual-refresh-observation.json",
+      "result": "pass",
+      "svg_count": 5,
+      "viewports": [
+        "1920x1080",
+        "1440x900",
+        "1366x768",
+        "1024x768"
+      ],
+      "console_errors": 0,
+      "page_errors": 0,
+      "outbound_http_https_requests": 0
+    },
+    "pdf": {
+      "evidence": "evidence/pdf-binding.json",
+      "result": "pass",
+      "pages": 17,
+      "sha256": "2b63b38f911942c6e7fed222259e964ccde6c351e2c90843cffe61e80576db75"
+    },
+    "copied_package": {
+      "evidence": "evidence/rehearsals/copied-folder.json",
+      "result": "pass",
+      "file_count": 7,
+      "digest": "795d4f53c3172f382f0ec4a9965cdf88e75dcffaeca29fcb802bb6c11de53254"
+    },
+    "safari": {
+      "evidence": "evidence/runtime/safari.json",
+      "result": "blocked",
+      "reason": "Safari requalification unavailable; no stale Safari evidence relabeled fresh"
+    }
+  },
+  "requirement_mapping": {
+    "meaningful_svg_accessibility": {
+      "result": "accepted",
+      "evidence": [
+        "tests.test_visual_storytelling",
+        "evidence/visual-refresh-observation.json"
+      ]
+    },
+    "95_5_population_separation": {
+      "result": "accepted",
+      "evidence": [
+        "tests.test_visual_storytelling",
+        "evidence/visual-refresh-observation.json",
+        "evidence/visual-provenance.json"
+      ]
+    },
+    "factual_qualifiers_and_units": {
+      "result": "accepted",
+      "evidence": [
+        "tests.test_visual_storytelling",
+        "evidence/visual-provenance.json"
+      ]
+    },
+    "safe_area_and_legibility": {
+      "result": "accepted",
+      "evidence": [
+        "evidence/visual-refresh-observation.json"
+      ]
+    },
+    "offline_no_external_dependencies": {
+      "result": "accepted",
+      "evidence": [
+        "evidence/visual-refresh-observation.json",
+        "scripts/verify_static.py"
+      ]
+    },
+    "tier1_digest_pdf_manifest_checksums": {
+      "result": "accepted",
+      "evidence": [
+        "evidence/pdf-binding.json",
+        "evidence/release-manifest.json",
+        "checksums.sha256"
+      ]
+    },
+    "visual_budget": {
+      "result": "accepted",
+      "evidence": [
+        "evidence/visual-refresh-observation.json"
+      ],
+      "implemented": 5,
+      "maximum": 8
+    },
+    "safari": {
+      "result": "blocked",
+      "evidence": [
+        "evidence/runtime/safari.json"
+      ]
+    },
+    "human_editorial": {
+      "result": "pending",
+      "evidence": []
+    },
+    "physical_venue": {
+      "result": "pending",
+      "evidence": []
+    },
+    "drive_publication": {
+      "result": "accepted",
+      "evidence": [
+        "acceptance/intake.json",
+        "acceptance/verification.json",
+        "scripts/sync-to-gdrive.sh"
+      ],
+      "new_destination": "gdrive-tdt:NTU AI Keynote/a7f24085935a-795d4f53c317",
+      "prior_destination_preserved": true,
+      "final_integrated_commit": "a7f24085935aadc970c5f76397fd1b0c52682f4f"
+    }
+  },
+  "release_authorization": false,
+  "blockers": [
+    "Safari requalification remains blocked",
+    "Human Vietnamese editorial review remains pending",
+    "Physical venue/projector/clicker rehearsal remains pending"
+  ],
+  "non_circular": true,
+  "predecessor_records_mutated": false,
+  "verified_at": "2026-08-27T14:35:00+07:00",
+  "drive_publication": {
+    "result": "accepted",
+    "remote": "gdrive-tdt",
+    "root_folder": "NTU AI Keynote",
+    "version_folder": "a7f24085935a-795d4f53c317",
+    "version_folder_id": "1Qp6Wgc3SaWDgs60UQRhYTNlmwBkyk3LL",
+    "destination": "gdrive-tdt:NTU AI Keynote/a7f24085935a-795d4f53c317",
+    "prior_version": {
+      "destination": "gdrive-tdt:NTU AI Keynote/72cf4aa2db7e-3f299c876340",
+      "version_folder_id": "1lA02kQmbezsTgJPOCU5bGcEwr_KJfSEY",
+      "preserved": true,
+      "prior_file_count": 7
+    },
+    "new_file_count": 7,
+    "remote_objects": [
+      {
+        "path": "README.md",
+        "size": 6246,
+        "id": "1Ujxxm1bkkQpr-HREdnb0djnQh_cjuOFO"
+      },
+      {
+        "path": "assets/fonts/be-vietnam-pro-400.woff2",
+        "size": 22524,
+        "id": "1XKFtUtocRMrMxqHPKM_mUlZi_iYOSWKh"
+      },
+      {
+        "path": "assets/fonts/be-vietnam-pro-600.woff2",
+        "size": 23760,
+        "id": "1LdJYzK6F9JdaU1eqq4kOs0nyPZSSqps2"
+      },
+      {
+        "path": "assets/fonts/be-vietnam-pro-800.woff2",
+        "size": 23948,
+        "id": "1hQYhk_lP7-HLBaKEm7QfnOOX-YpgeltQ"
+      },
+      {
+        "path": "assets/ntu-logo.png",
+        "size": 51150,
+        "id": "1Q3sC13sq-jhYjhl85Y2TZPkW1Fn36J2v"
+      },
+      {
+        "path": "index.html",
+        "size": 72634,
+        "id": "1TNQ1n6Mnsz5wXquVxiSprVcarXbqbafn"
+      },
+      {
+        "path": "keynote-fallback.pdf",
+        "size": 361529,
+        "id": "1ebUcG7UU4GUjMQUJfRAy3Sd9_DRa3Yav"
+      }
+    ],
+    "readback_command": "rclone lsjson 'gdrive-tdt:NTU AI Keynote/b0b44ffcd53f-795d4f53c317' --recursive --files-only",
+    "readback_exit_code": 0,
+    "upload_command": "scripts/sync-to-gdrive.sh",
+    "upload_exit_code": 0,
+    "public_digest": "795d4f53c3172f382f0ec4a9965cdf88e75dcffaeca29fcb802bb6c11de53254",
+    "private_paths_present": false,
+    "sharing_permissions_changed": false,
+    "destructive_operations": false,
+    "final_integrated_commit": "a7f24085935aadc970c5f76397fd1b0c52682f4f",
+    "readback": "READBACK_OK files=7"
+  },
+  "integrated_main_commit": "a7f24085935aadc970c5f76397fd1b0c52682f4f",
+  "final_verification": "acceptance/final-verification.json"
+}

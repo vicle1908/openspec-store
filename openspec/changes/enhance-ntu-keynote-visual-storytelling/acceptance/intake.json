@@ -1,0 +1,90 @@
+{
+  "change": "enhance-ntu-keynote-visual-storytelling",
+  "candidate": {
+    "implementation_repo": "/Users/androidteam/Developer/ntu-keynote",
+    "implementation_commit": "a7f24085935aadc970c5f76397fd1b0c52682f4f",
+    "implementation_branch": "main",
+    "evidence_base_commit": "ce4dd1be7bf1d17d5d980e2ee1ab6069237f4e6f",
+    "source_worktree_clean": true,
+    "public_package_digest": "795d4f53c3172f382f0ec4a9965cdf88e75dcffaeca29fcb802bb6c11de53254",
+    "digest_algorithm": "ntu-keynote-package-sha256-v1",
+    "public_file_count": 7,
+    "public_files": {
+      "README.md": "43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469",
+      "assets/fonts/be-vietnam-pro-400.woff2": "077c275da5dee47bc1080bc7d9ae479a837804572635f540e8809f70bc861c7e",
+      "assets/fonts/be-vietnam-pro-600.woff2": "dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125",
+      "assets/fonts/be-vietnam-pro-800.woff2": "a10e0182ead90b7d43874024d63cc32f09651ae7527a8736552ab7396df7240d",
+      "assets/ntu-logo.png": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
+      "index.html": "5e0cb4979d98ff3e99d0f308627b9a4a7500b60733b8bdeac6051d66d5a8fb88",
+      "keynote-fallback.pdf": "2b63b38f911942c6e7fed222259e964ccde6c351e2c90843cffe61e80576db75"
+    },
+    "private_evidence_hashes": {
+      "evidence/sources.json": "a1b8ac8ac5510c179ef0847da341203e801e8643ad46d3528aa7c812edd39123",
+      "evidence/approvals/viettel-claims.json": "ddd586b418d74ca4eb913b36220b284eb00bef6aae2f8bd67ed8677ac5835e8c",
+      "evidence/assets.json": "359aedfe2ab34e4e463d2cba855c56436d3ac3c74cdf0d4730f41e242b8628ff",
+      "evidence/pdf-binding.json": "60b0933e97892027bff9622508a8272cb8da1bece318aa824e74b137990531f1",
+      "evidence/venue-package-allowlist.json": "ea70f1b6ef8f5a299894c195161b1796f3ffb4b522b038265c668bcb4b4c10c4",
+      "evidence/runtime/chrome.json": "aeb8ee629a3d616a56863fc94e30a4e069f2f096a497d3228f2d51e49b72ccbe",
+      "evidence/runtime/safari.json": "28d8c4bec68aef02d07714442cd3b27379ac987cd9e431e8c03d5632c1bc2617",
+      "evidence/accessibility.json": "8aa10551f3e776edf8cf902f2adbdc41444161d3ccf6064da1e1bfd64d50b2b1",
+      "evidence/slide-contract.json": "7710872c2744fddb021d469b4efbfdcb503ee7d15055e3012645787d6a5c5708",
+      "evidence/source-inspection.json": "98de11cf23f742d9a29da26ca29d29dedfb199d77f707efcaa4a37a6c7f81d6d",
+      "evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json": "e7f8788f853342fbf83d6977004b55297fbc792031c385213c35aed1c81fe2fe",
+      "evidence/static-verification.json": "f960868c34cb7a6a81adcfc445ea39792df9d4f75cc9a934a75112cef62b07da",
+      "scripts/verify_static.py": "ff838d4f96df648b8be61119b4525bce9f54b97d9d852f5b0c8557884c1b7a50",
+      "evidence/rehearsals/copied-folder.json": "9afb609a5844d5cec0683c57818a50c5fdaf68d9f92244be96ede17fa1c2bde3",
+      "evidence/visual-provenance.json": "413afb550ad79dd08d637f783fec21e00b4988d119f855658787fbc1cf45c8a2",
+      "evidence/visual-refresh-observation.json": "9f8d844a8098ab3f9d2a483a2bac25e2421554fd3f7e1044319a042be4ed7d0f"
+    },
+    "manifest_declared_evidence_base_commit": "ce4dd1be7bf1d17d5d980e2ee1ab6069237f4e6f",
+    "pdf_generation_base_commit": "ce4dd1be7bf1d17d5d980e2ee1ab6069237f4e6f",
+    "visual_refresh_observation": "evidence/visual-refresh-observation.json",
+    "visual_budget": {
+      "implemented_priority_slides": [
+        4,
+        7,
+        11,
+        12,
+        14
+      ],
+      "implemented_visual_count": 5,
+      "optional_deferred_slides": [
+        3,
+        8,
+        9
+      ],
+      "deferred_reason": "priority budget and explicit drop criteria; existing text/CSS encodings retained"
+    },
+    "drive_publication": {
+      "remote": "gdrive-tdt",
+      "root_folder": "NTU AI Keynote",
+      "version_folder": "a7f24085935a-795d4f53c317",
+      "version_folder_id": "1Qp6Wgc3SaWDgs60UQRhYTNlmwBkyk3LL",
+      "logical_path": "gdrive-tdt:NTU AI Keynote/a7f24085935a-795d4f53c317",
+      "prior_version_path": "gdrive-tdt:NTU AI Keynote/72cf4aa2db7e-3f299c876340",
+      "prior_version_preserved": true,
+      "file_count": 7,
+      "readback": "READBACK_OK files=7",
+      "upload_exit_code": 0,
+      "permissions_changed": false,
+      "destructive_operations": false,
+      "final_integrated_commit": "a7f24085935aadc970c5f76397fd1b0c52682f4f"
+    },
+    "integrated_main_commit": "a7f24085935aadc970c5f76397fd1b0c52682f4f"
+  },
+  "predecessors_read_only": true,
+  "predecessor_changes": [
+    "add-ntu-ai-keynote-deck",
+    "align-ntu-keynote-with-ntu-brand-theme"
+  ],
+  "status": "accepted-and-published-final-integrated-candidate",
+  "submission_checks": {
+    "single_candidate_identity": true,
+    "public_file_allowlist_exact": true,
+    "private_content_not_in_public_package": true,
+    "digest_matches_release_manifest": true,
+    "evidence_hashes_immutable_or_hash_verifiable": true,
+    "no_external_source_writable": true
+  },
+  "submitted_at": "2026-08-27T14:20:00+07:00"
+}
