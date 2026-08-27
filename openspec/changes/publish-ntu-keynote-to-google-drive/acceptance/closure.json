@@ -1,0 +1,39 @@
+{
+  "change": "publish-ntu-keynote-to-google-drive",
+  "status": "complete-for-requested-publication-and-sync-mechanism",
+  "implementation_commit": "72cf4aa2db7e6d1e3f5e99fb8ba157e0038ac742",
+  "central_acceptance_commit": "d922a4fced96799124ef3643ce04e583bec0464b",
+  "source_main_clean_owned_paths": true,
+  "central_main_clean_owned_paths": true,
+  "unrelated_paths_preserved": true,
+  "drive": {
+    "remote": "gdrive-tdt",
+    "destination": "gdrive-tdt:NTU AI Keynote/72cf4aa2db7e-3f299c876340",
+    "version_folder_id": "1lA02kQmbezsTgJPOCU5bGcEwr_KJfSEY",
+    "package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+    "file_count": 7,
+    "readback": "READBACK_OK files=7",
+    "dry_run_exit_code": 0,
+    "upload_exit_code": 0,
+    "permissions_changed": false,
+    "destructive_operations": false
+  },
+  "openspec": {
+    "strict_validation_command": "openspec validate publish-ntu-keynote-to-google-drive --strict --json --store openspec-store",
+    "strict_validation_exit_code": 0,
+    "gitnexus_detect_changes": "local CLI; staged scope reported No changes detected because all changed paths are documentation/acceptance and no indexed executable symbols were mapped",
+    "store_doctor": "openspec store doctor — exit 0; Issues: none"
+  },
+  "limitations": {
+    "gws_oauth": "invalid_grant / revoked; not modified",
+    "rclone_shared_client_id_notice": "shared Google Drive client_id is scheduled for retirement during 2026; upload currently succeeded",
+    "remote_sha256": "Drive lsjson does not expose SHA-256; exact path and size read-back is paired with the local canonical SHA-256 digest and per-file hashes"
+  },
+  "release_boundaries": {
+    "release_tag_created": false,
+    "openspec_archive_performed": false,
+    "drive_sharing_performed": false,
+    "human_editorial_approval": "not part of this Drive publication change",
+    "physical_venue_rehearsal": "not part of this Drive publication change"
+  }
+}
