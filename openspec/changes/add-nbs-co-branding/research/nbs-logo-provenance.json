@@ -1,0 +1,57 @@
+{
+  "change": "add-nbs-co-branding",
+  "artifact": "nbs-logo-provenance-research",
+  "researched_at": "2026-08-27",
+  "researcher": "hermes-agent (intake research)",
+  "objective": "Locate an authoritative, downloadable Nanyang Business School (NBS) logo asset for the dual brand lockup",
+  "sources_attempted": [
+    {
+      "url": "https://www.ntu.edu.sg/about-us/nbs-brand",
+      "result": "HTTP 404",
+      "notes": "No NBS brand page at this path"
+    },
+    {
+      "url": "https://www.ntu.edu.sg/brandportal",
+      "result": "HTTP 404",
+      "notes": "Brand portal not publicly reachable (likely staff-only SSO)"
+    },
+    {
+      "url": "https://www.ntu.edu.sg/nbs",
+      "result": "HTTP 404 (NTU error page, 128KB)",
+      "notes": "Only asset on error page is /ResourcePackages/NTU/assets/images/NTU_Logo.png"
+    },
+    {
+      "url": "https://www.ntu.edu.sg/nbs/about-us",
+      "result": "HTTP 404 (NTU error page)",
+      "notes": "Same as above"
+    },
+    {
+      "url": "https://nbs.ntu.edu.sg",
+      "result": "DNS resolution failure (HTTP 000)",
+      "notes": "Subdomain does not resolve"
+    },
+    {
+      "url": "https://commons.wikimedia.org (search: 'Nanyang Business School logo', ns=6)",
+      "result": "3 hits, none relevant",
+      "notes": "No NBS logo file on Wikimedia Commons"
+    },
+    {
+      "url": "maglr.com CDN candidate (62234f...png)",
+      "result": "REJECTED",
+      "notes": "100x100 placeholder thumbnail from third-party CDN; fails provenance classification (not official-page-asset, brand-portal-download, or user-provided)"
+    }
+  ],
+  "existing_ntu_logo_reference": {
+    "path": "assets/ntu-logo.png",
+    "sha256": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
+    "dimensions": "1304x512",
+    "notes": "NTU logo already in repo since commit 3f46568; no download URL recorded in evidence registers — likely user-provided at deck creation"
+  },
+  "conclusion": "No authoritative NBS logo asset is publicly retrievable. Per branding spec requirement 1 (provenance gate), the change SHALL NOT proceed to implementation until the user provides the approved NBS logo file or confirms an official source.",
+  "status": "blocked-on-user-asset",
+  "unblock_options": [
+    "User provides NBS logo file directly (PNG with transparency or SVG) — classified as user-provided",
+    "User confirms an official source URL (e.g., NTU staff brand portal export, NBS marketing kit)",
+    "User extracts the mark from an official NBS document (letterhead, report cover) and accepts responsibility for provenance"
+  ]
+}
