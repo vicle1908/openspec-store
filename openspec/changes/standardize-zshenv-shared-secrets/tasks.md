@@ -36,5 +36,5 @@
 
 - [x] 6.1 Full sweep: 4 zsh modes × 17 keys; hash equality; no shared-tier names in service .env; helper single-line output; plists parse-clean; .zshrc/.zshenv syntax clean.
 - [x] 6.2 Write EVIDENCE_MANIFEST.md with all gate results.
-- [ ] 6.3 Commit store change.
+- [x] 6.3 Commit store change.
 - [ ] 6.4 User action (documented, not agent-executed): restart Hermes gateway to activate plist wrapper; run one live sentinel per provider.
