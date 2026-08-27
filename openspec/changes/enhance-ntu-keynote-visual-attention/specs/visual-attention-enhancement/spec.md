@@ -24,14 +24,14 @@ Slide 3 SHALL display the $15.7T modeled estimate as a single magnitude visual w
 
 ### Requirement: Slide 5 SHALL present ITVIEC-2025 survey findings as three base-labeled stat blocks
 
-Slide 5 SHALL present the three ITVIEC-2025 survey figures — 73% adoption breadth (base: surveyed companies), 13.8% scaled/fully adoption stage (a stage within the 73% adopter breakdown), and 5.4% very-high-trust-with-minimal-human-oversight (base: companies that have adopted AI) — as three separate, equal-weight stat blocks, each carrying a visible base/denominator label. The figures SHALL NOT be encoded as a funnel, stacked bar, shared track, or arrow-connected progression implying a sequential filter, and no geometry SHALL imply one common denominator across all three figures. The real subset relationships (13.8% within the 73% breakdown; 5.4% based on adopters) SHALL be stated in the base labels, not denied.
+Slide 5 SHALL present the three ITVIEC-2025 survey figures — 73% adoption breadth (base: surveyed companies), 13.8% scaled/fully adoption stage (13.8 percentage points of the overall adoption-status distribution, composing the 73% together with 34.9% trial and 24.3% limited production), and 5.4% very-high-trust-with-minimal-human-oversight (base: companies that have adopted AI) — as three separate, equal-weight stat blocks, each carrying a visible base/denominator label. The figures SHALL NOT be encoded as a funnel, stacked bar, shared track, or arrow-connected progression implying a sequential filter, and no geometry SHALL imply one common denominator across all three figures. The real composition relationships (the 73% adopter share comprises 34.9% trial + 24.3% limited production + 13.8% scaled/fully; the 5.4% trust figure is based on adopters only) SHALL be stated in the base labels, not denied.
 
 #### Scenario: Three stat blocks are inspected for geometry and base labels
 
 - **WHEN** the slide-5 survey encoding is examined in the DOM
 - **THEN** the three figures SHALL appear in three separate equal-weight containers
 - **AND** the 73% block SHALL carry a base label identifying surveyed companies
-- **AND** the 13.8% block SHALL carry a base label identifying it as a stage within the 73% adopter breakdown
+- **AND** the 13.8% block SHALL carry a base label identifying it as 13.8 percentage points of the overall adoption-status distribution that, together with 34.9% trial and 24.3% limited production, composes the 73% adopter share
 - **AND** the 5.4% block SHALL carry a base label identifying companies that have adopted AI
 - **AND** no SVG path, connector, shared axis, stacked geometry, nested shape, or arrow SHALL link the three figures as a sequential filter
 - **AND** card placement, sizing, and color SHALL NOT imply a single funnel or progression
@@ -71,7 +71,7 @@ The evidence source register SHALL add source `ITVIEC-2025` using the existing `
 - **AND** the record SHALL reference the official mini-report PDF with SHA-256 `552a2d5e39b6896ed542f59bf12f76499f3458b9b8a352cc7b087131d0f17802`, 54 pages, created 2025-08-21
 - **AND** the record SHALL state the two independent Q2-2025 surveys methodology from the PDF
 - **AND** the record SHALL note that the combined 846-respondent count is attributed to the publisher blog only
-- **AND** three claims SHALL reference this source with distinct base labels: adoption breadth 73% (surveyed companies), scaled/fully stage 13.8% (within the 73% adopter breakdown), very-high-trust-with-minimal-human-oversight 5.4% (companies that have adopted AI)
+- **AND** three claims SHALL reference this source with distinct base labels: adoption breadth 73% (surveyed companies), scaled/fully stage 13.8% (percentage points of the overall adoption-status distribution composing the 73%), very-high-trust-with-minimal-human-oversight 5.4% (companies that have adopted AI)
 
 #### Scenario: Canonical ID consistency is verified
 
@@ -126,7 +126,7 @@ The enhancement SHALL NOT change the slide count, slide order, route definitions
 - **WHEN** the revised `index.html` is compared with the baseline candidate
 - **THEN** exactly 17 slide IDs in the same order SHALL remain
 - **AND** the full and short route arrays and all `data-full-seconds`/`data-short-seconds` values SHALL remain unchanged
-- **AND** the slide-7 visual groups, 95%/5% separation geometry, and investment band SHALL be byte-equivalent in structure
+- **AND** the slide-7 visual groups, 95%/5% separation geometry, and investment band SHALL remain structurally unchanged (same elements, attributes, geometry, and labels; surrounding file bytes may differ due to unrelated edits)
 - **AND** notes-contract entries for slides other than 3, 5, and 6 SHALL remain unchanged
 
 ### Requirement: Tier 1 evidence SHALL be refreshed against the new candidate with human gates remaining open

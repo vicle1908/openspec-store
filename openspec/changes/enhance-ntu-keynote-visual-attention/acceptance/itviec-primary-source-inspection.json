@@ -49,8 +49,8 @@
     },
     "scaled_stage_13_8": {
       "pdf_page_printed": 8,
-      "relationship": "Component of the 73% breakdown: 34.9% pilot + 24.3% limited production + 13.8% scaled/fully = 73%. Must be labeled as a stage within the adopter group, not as an independent denominator.",
-      "base": "within the 73% adopter group"
+      "relationship": "13.8 percentage points of the overall adoption-status distribution; 34.9% trial + 24.3% limited production + 13.8% scaled/fully = 73.0% adopter share. Must be labeled as percentage points of the overall distribution composing the 73%, never as '13.8% of the 73% group'.",
+      "base": "percentage points of the overall adoption-status distribution composing the 73% adopter share"
     },
     "trust_5_4": {
       "pdf_page_printed": 13,
@@ -62,7 +62,7 @@
   },
   "denominator_rules": [
     "73% base = surveyed companies",
-    "13.8% is a stage within the 73% breakdown and must be labeled as such",
+    "13.8% is 13.8 percentage points of the overall adoption-status distribution composing the 73% (34.9 + 24.3 + 13.8 = 73.0); never word it as '13.8% of the 73% group'",
     "5.4% base = companies that have adopted AI, not all surveyed companies",
     "no geometry may imply a single common denominator across all three figures",
     "no funnel/stacked/track/arrow geometry may imply a sequential filter",
