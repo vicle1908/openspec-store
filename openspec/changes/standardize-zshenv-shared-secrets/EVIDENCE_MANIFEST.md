@@ -128,13 +128,93 @@ shared tier` (8 files, +48/−44).
 | Shopapikey live sentinel | PASS | `SHOPAPIKEY_SENTINEL_OK` returned via fresh-shell `shopapikey --print` (benign `[1m]` selector warning, expected) |
 | Cockpit live sentinel | BLOCKED | upstream `127.0.0.1:51006` has no listener (Cockpit Tools app process exists but is not serving); classification: upstream-down, not auth failure |
 
+### Wrapper fail-closed correction (post-review)
+
+The first fail-closed test (`env -u HOME ...`) was **invalid**: zsh
+reconstructs `HOME` from the user account even when unset, so it did not
+exercise the guard. Corrected test with an explicitly invalid home:
+
+```bash
+HOME="/tmp/agent-llm-nonexistent-home-$$" \
+  ~/.config/agent-llm/launchd-env-wrapper.sh /bin/sh -c 'echo SHOULD_NOT_REACH'
+# → "launchd-env-wrapper: missing readable .../.zshenv", exit 1
+```
+
+Result: `FAIL_CLOSED_VERIFIED` (exit 1, command never reached). The wrapper
+was also hardened: a missing `HOME` now exits 1 instead of falling back to a
+hardcoded path. Normal path re-verified after the edit:
+`shop=36 cockpit=42 brave=74 mcpr=0`; modes `.zshenv`=600, wrapper=700.
+
+README protocol terminology was byte-level re-verified after the scripted
+fix: 0 occurrences of the mangled form; `Anthropic Messages (native)` and
+`OpenAI Responses` present; title line intact.
+
+### `hermes verify` limitation (recorded, not a pass)
+
+`hermes verify --json` detects a FastAPI recipe whose bootstrap runs bare
+`uv sync` (which **uninstalls** dev extras) and whose test phase runs bare
+`pytest` (which resolves to Homebrew Python 3.11; the project requires
+≥3.14). This produced a false collection failure (`respx` /
+`claude_code_provider_adapter` missing). The verifier is therefore not a
+valid gate for this repo until its recipe supports `--extra dev` and
+`uv run`. Canonical verification command used instead:
+
+```bash
+cd ~/Developer/claude-code-provider-adapter
+uv sync --extra dev
+uv run --extra dev pytest   # → 55 passed
+```
+
+Dev environment was restored after each verifier run.
+
+### Compose fail-closed hardening (post-review)
+
+`docker-compose.yml` now uses explicit interpolation with a required-variable
+guard instead of bare passthrough, so a manual `docker compose up` without
+the shared credential fails at config time instead of starting with an empty
+key:
+
+```yaml
+HERMES_CUSTOM_COCKPIT_API_KEY: "${HERMES_CUSTOM_COCKPIT_API_KEY:?HERMES_CUSTOM_COCKPIT_API_KEY is required (shared tier in ~/.zshenv)}"
+```
+
+Verified both paths:
+
+| Path | Command | Result |
+|---|---|---|
+| Positive | wrapper env → `docker compose config --quiet` | PASS (`WRAPPER_PATH_OK`) |
+| Negative | `zsh -dfc` (no rc files, `.zshenv` not sourced), var unset → `docker compose config --quiet` | exit 1, `required variable ... is missing a value` (`FAIL_CLOSED_VERIFIED`) |
+
+Note: the first negative-path attempt used `zsh -c`, which re-sources
+`~/.zshenv` and passed vacuously; `zsh -dfc` is the valid test. Container
+recreated via wrapper after the change: healthy, cockpit key length 42,
+adapter health 200.
+
+### Final battery after wrapper edit (post-review)
+
+| Gate | Result |
+|---|---|
+| Adapter tests | 55 passed in 0.28s |
+| `zsh -n` (.zshenv, .zshrc, wrapper) | PASS |
+| `bash -n` (start-adapter.sh, adapter-status.sh) | PASS |
+| `plutil -lint` (repo + installed plist) | OK / OK, normalized diff identical |
+| Compose config via wrapper | PASS |
+| `git diff --check` | PASS |
+| Health: adapter 8788 / ai-review 8090 / webhook 8080 | 200 / 200 / 200 |
+| Cockpit upstream 51006 | still unreachable (sentinel remains BLOCKED) |
+
 ### Security note
 
 During this session, literal credential values from `~/.zshenv` were
 displayed once inside a patch-tool fuzzy-match error message. They were not
 written to any file, committed, or delivered, but they passed through tool
-output in this transcript. Treat the affected shared-tier values as exposed
-and rotate them at the provider side when convenient; the local file
+output in this transcript. **Treat the affected shared-tier values as
+compromised and rotate them at the provider side.** Recommended sequence:
+rotate every exposed provider/tool credential at its provider; update only
+`~/.zshenv` with the replacement values; recompute presence/length/hash
+checks without printing values; confirm no duplicate values remain in
+service `.env` files; re-run the provider sentinels after rotation. Never
+include raw secret values in patch context or diagnostic output. Local file
 permissions (600) are unaffected.
 
 ## OpenSpec planning evidence
