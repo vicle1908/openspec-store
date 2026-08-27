@@ -1,0 +1,47 @@
+{
+  "change": "correct-ntu-drive-object-provenance",
+  "correction_type": "provenance-supersession-by-documentation",
+  "immutability_policy": "The archived acceptance record is NOT mutated. This record supersedes the stale value by documentation only, per the store's corrective-history policy.",
+  "stale_record": {
+    "archived_change": "2026-08-27-enhance-ntu-keynote-visual-storytelling",
+    "file": "openspec/changes/archive/2026-08-27-enhance-ntu-keynote-visual-storytelling/acceptance/verification.json",
+    "json_path": "drive_publication.remote_objects[4].id",
+    "path_field": "assets/ntu-logo.png",
+    "stale_value": "1Q3sC13sq-jhYjhl85Y2TZPkW1Fn36J2v",
+    "origin": "Intermediate worktree upload into gdrive-tdt:NTU AI Keynote/b0b44ffcd53f-795d4f53c317 (worktree commit b0b44ffcd53ff28c9fbb9de1bb19629e828451da), superseded by the final main-integrated publication",
+    "archived_file_mutated": false
+  },
+  "authoritative_value": {
+    "path": "assets/ntu-logo.png",
+    "drive_object_id": "1jdZDPNUlHcLigpCWr4rNJSDXfwCeli5n",
+    "size": 51150,
+    "destination": "gdrive-tdt:NTU AI Keynote/a7f24085935a-795d4f53c317",
+    "version_folder_id": "1Qp6Wgc3SaWDgs60UQRhYTNlmwBkyk3LL",
+    "final_integrated_commit": "a7f24085935aadc970c5f76397fd1b0c52682f4f",
+    "public_package_digest": "795d4f53c3172f382f0ec4a9965cdf88e75dcffaeca29fcb802bb6c11de53254"
+  },
+  "fresh_readback": {
+    "command": "rclone lsjson 'gdrive-tdt:NTU AI Keynote/a7f24085935a-795d4f53c317' --recursive --files-only",
+    "performed_at": "2026-08-27T15:34:28+07:00",
+    "file_count": 7,
+    "objects": [
+      {"path": "README.md", "size": 6246, "id": "1lYtwA2RInmP5MOJnzfGdD2eGpCdHN41o"},
+      {"path": "assets/fonts/be-vietnam-pro-400.woff2", "size": 22524, "id": "1zGLA1Dr0tYn0HEqD2_Ezap8VZEPVJ4f4"},
+      {"path": "assets/fonts/be-vietnam-pro-600.woff2", "size": 23760, "id": "1qm_MBFj7psoWPzELA16QpKHYDSO-h4tY"},
+      {"path": "assets/fonts/be-vietnam-pro-800.woff2", "size": 23948, "id": "1-kFDjZE_FF6GZqMFPhrzf19UZ-jXrCe6"},
+      {"path": "assets/ntu-logo.png", "size": 51150, "id": "1jdZDPNUlHcLigpCWr4rNJSDXfwCeli5n"},
+      {"path": "index.html", "size": 72634, "id": "1b3Uv8c5xMFKrjvloZMfTgebT1mgkU1Df"},
+      {"path": "keynote-fallback.pdf", "size": 361529, "id": "1gvuEWnmqys23TS8DaecwOxh6nvi8m49g"}
+    ]
+  },
+  "public_package_impact": {
+    "public_files_changed": false,
+    "tier1_refresh_required": false,
+    "reason": "Correction touches only private documentation and central provenance records; the seven public package files remain byte-identical at digest 795d4f53c3172f382f0ec4a9965cdf88e75dcffaeca29fcb802bb6c11de53254"
+  },
+  "secondary_finding": {
+    "file": "ntu-keynote/docs/drive-sync.md",
+    "issue": "Referenced the pre-archive active change path publish-ntu-keynote-to-google-drive",
+    "resolution": "Updated to reference the archived change path 2026-08-27-publish-ntu-keynote-to-google-drive and the completed publication state"
+  }
+}
