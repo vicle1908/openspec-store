@@ -166,22 +166,22 @@
       {
         "path": "README.md",
         "size": 6246,
-        "id": "1Ujxxm1bkkQpr-HREdnb0djnQh_cjuOFO"
+        "id": "1lYtwA2RInmP5MOJnzfGdD2eGpCdHN41o"
       },
       {
         "path": "assets/fonts/be-vietnam-pro-400.woff2",
         "size": 22524,
-        "id": "1XKFtUtocRMrMxqHPKM_mUlZi_iYOSWKh"
+        "id": "1zGLA1Dr0tYn0HEqD2_Ezap8VZEPVJ4f4"
       },
       {
         "path": "assets/fonts/be-vietnam-pro-600.woff2",
         "size": 23760,
-        "id": "1LdJYzK6F9JdaU1eqq4kOs0nyPZSSqps2"
+        "id": "1qm_MBFj7psoWPzELA16QpKHYDSO-h4tY"
       },
       {
         "path": "assets/fonts/be-vietnam-pro-800.woff2",
         "size": 23948,
-        "id": "1hQYhk_lP7-HLBaKEm7QfnOOX-YpgeltQ"
+        "id": "1-kFDjZE_FF6GZqMFPhrzf19UZ-jXrCe6"
       },
       {
         "path": "assets/ntu-logo.png",
@@ -191,15 +191,15 @@
       {
         "path": "index.html",
         "size": 72634,
-        "id": "1TNQ1n6Mnsz5wXquVxiSprVcarXbqbafn"
+        "id": "1b3Uv8c5xMFKrjvloZMfTgebT1mgkU1Df"
       },
       {
         "path": "keynote-fallback.pdf",
         "size": 361529,
-        "id": "1ebUcG7UU4GUjMQUJfRAy3Sd9_DRa3Yav"
+        "id": "1gvuEWnmqys23TS8DaecwOxh6nvi8m49g"
       }
     ],
-    "readback_command": "rclone lsjson 'gdrive-tdt:NTU AI Keynote/b0b44ffcd53f-795d4f53c317' --recursive --files-only",
+    "readback_command": "rclone lsjson 'gdrive-tdt:NTU AI Keynote/a7f24085935a-795d4f53c317' --recursive --files-only",
     "readback_exit_code": 0,
     "upload_command": "scripts/sync-to-gdrive.sh",
     "upload_exit_code": 0,
