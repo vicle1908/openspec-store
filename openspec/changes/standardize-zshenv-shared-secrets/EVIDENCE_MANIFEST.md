@@ -39,6 +39,7 @@ section below are intentionally excluded from the active sweep.
 | Gate | Result | Evidence |
 |---|---:|---|
 | Active `~/.zshenv` | PASS | 0 Giaoduc references; 16 exported shared keys; mode 600; `zsh -n` clean |
+| Active `~/.zshrc` | PASS | 0 Giaoduc references; launcher functions are only `shopapikey`, `cockpit`, `claude_reset`; `zsh -n` clean |
 | Shell visibility | PASS | `zsh -c`, `zsh -ic`, `zsh -lc`, `zsh -ilc`: 4/4, each 16 set / 0 missing; Giaoduc absent |
 | Active Codex config | PASS | `~/.codex`; 0 Giaoduc references; only `codex_local_access`; default unchanged |
 | Other active consumers | PASS | Pi, OpenCode, Claude profiles/helpers, TDT/Hermes dotenv, LaunchAgents, adapter repo: 0 Giaoduc references |
