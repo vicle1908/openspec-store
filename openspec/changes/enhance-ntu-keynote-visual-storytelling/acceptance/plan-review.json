@@ -1,0 +1,66 @@
+{
+  "change": "enhance-ntu-keynote-visual-storytelling",
+  "review_status": "recommendation: proceed to implementation",
+  "review_date": "2026-08-27",
+  "findings": [
+    {
+      "id": "F1", "severity": "informational",
+      "finding": "Slides 3, 4, 8, 9, 11, 12 have no quantitative encoding; visuals are conceptual/synthesis diagrams. No factual-contract risk.",
+      "resolution": "none needed"
+    },
+    {
+      "id": "F2", "severity": "critical",
+      "finding": "Slide 7 95/5 separation must never use stacked bar, shared axis, proportional layout, connector, or alignment that visually recombines claims. Each has a distinct population.",
+      "resolution": "enforced in visual-inventory.json; task 2.1 will verify DOM-structural independence"
+    },
+    {
+      "id": "F3", "severity": "high",
+      "finding": "Slide 14 39% must not be encoded as 'caused by AI'; must retain qualifier. Avoid green unless palette/accessibility contract allows it.",
+      "resolution": "enforced in visual-inventory.json; use shape, sign, labels, position as meaning carriers"
+    },
+    {
+      "id": "F4", "severity": "medium",
+      "finding": "Slide 3 described as 'bar' implies unstated denominator. Safer: large numeric anchor + horizon label only.",
+      "resolution": "inventory corrected: 'NOT a bar. No axis, no baseline, no comparison'"
+    },
+    {
+      "id": "F5", "severity": "medium",
+      "finding": "SVG text must be >= 18px at authored 1280x720 stage AND legible at projected 1366x768 viewport.",
+      "resolution": "task 3.1 checks computed font size at both sizes"
+    },
+    {
+      "id": "F6", "severity": "medium",
+      "finding": "Icons/symbols in slide 8 risk color-only meaning or cross-platform rendering variance.",
+      "resolution": "all icons must have Vietnamese text labels; CSS/SVG geometry over Unicode glyphs"
+    },
+    {
+      "id": "F7", "severity": "medium",
+      "finding": "No photographic images unless provenance/license is recorded. SVG/CSS symbolic illustrations preferred.",
+      "resolution": "proposal states no stock photos"
+    },
+    {
+      "id": "F8", "severity": "low",
+      "finding": "Research retention statistics (65% vs 10%, 60000x faster) are marketing claims and should not enter deck or proposal as evidence.",
+      "resolution": "proposal uses qualitative framing only"
+    },
+    {
+      "id": "F9", "severity": "low",
+      "finding": "ntu-keynote is not indexed by GitNexus or Graphify. No graph-based architecture review performed.",
+      "resolution": "recorded in baseline.json known_limitations"
+    }
+  ],
+  "implementation_priority": "Start with slides 4, 7, 11, 12, 14. Treat 3, 8, 9 as optional with explicit drop criteria.",
+  "predecessor_gate_status": {
+    "human_editorial_review": "OPEN — not a gate for this visual-only change",
+    "venue_rehearsal": "OPEN — not a gate for this visual-only change",
+    "release_tag": "OPEN — not a gate for this change",
+    "archive": "OPEN — not a gate for this change"
+  },
+  "design_risks_acknowledged": [
+    "Stock imagery excluded",
+    "All external dependencies excluded",
+    "Safari remains blocked for release",
+    "Any index.html change triggers full Tier 1 evidence cascade",
+    "Drive version folder will be new and immutable; prior version preserved"
+  ]
+}

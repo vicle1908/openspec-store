@@ -1,0 +1,103 @@
+{
+  "change": "enhance-ntu-keynote-visual-storytelling",
+  "visual_budget_note": "Maximum eight. Start with slides 4, 7, 11, 12, 14. Treat 3, 8, 9 as optional — drop if crowding or weak visual meaning at projected distance. Record dropped visuals honestly.",
+  "priority_tier_1": [
+    {
+      "slide": 4,
+      "stable_id": "visual-s4-agent-ladder",
+      "job_from_matrix": "Agentic-AI definition plus independent forecast cards",
+      "classification": "conceptual",
+      "current_encoding": "text definition + two forecast cards",
+      "proposed": "ascending ladder: chatbot > copilot > agent > multi-agent",
+      "constraints": "Conceptual only. Forecast cards remain text-only.",
+      "drop_if": "ladder creates crowding or overlaps text content"
+    },
+    {
+      "slide": 7,
+      "stable_id": "visual-s7-adoption-gap",
+      "job_from_matrix": "Independent 95% organization and 5% integrated-pilot cards plus separate investment/P&L context band",
+      "classification": "factual",
+      "current_encoding": "text metric cards",
+      "proposed": "TWO SEPARATE horizontal bars (95% crimson, 5% gold) in distinct visual groups + separate range indicator for USD 30-40B below",
+      "constraints": "CRITICAL: No stacked bar. No shared axis. No pie/donut. No connector. No common denominator. No proportional layout. Each bar has own visual group with distinct population label. USD 30-40B band visually disconnected. Source/qualifier text visible inside or immediately adjacent to each bar.",
+      "predecessor_spec": "REQ-kcl-slide-7-shall-keep-three-factual-contexts-independent",
+      "dom_structural_requirement": "Each group independently identifiable in DOM, not merely separated by color"
+    },
+    {
+      "slide": 11,
+      "stable_id": "visual-s11-pipeline",
+      "job_from_matrix": "Four-stage pipeline",
+      "classification": "synthesis",
+      "proposed": "horizontal SVG flow: Dữ liệu đúng → Quy trình rõ → Tích hợp an toàn → Kết quả đo lường",
+      "constraints": "Process diagram, not a chart. No numerical encoding."
+    },
+    {
+      "slide": 12,
+      "stable_id": "visual-s12-agent-loop",
+      "job_from_matrix": "Agent loop plus human-governance gate",
+      "classification": "synthesis",
+      "proposed": "circular SVG loop with crimson approval gate and gold human-approval node",
+      "constraints": "Human approval visually distinct (different shape + color + label). Decision points in crimson."
+    },
+    {
+      "slide": 14,
+      "stable_id": "visual-s14-workforce",
+      "job_from_matrix": "Signed workforce grid",
+      "classification": "factual",
+      "proposed": "signed flow with shape/position/sign labels; 39% skills in separate visual group with qualifier",
+      "constraints": "Qualifier visible. NOT all attributed to AI. 39% must not imply AI-caused displacement. Use shape, sign, labels, position as meaning — not green color alone.",
+      "predecessor_spec": "REQ-kcl-17-slide-dominant-visual-matrix row 14"
+    }
+  ],
+  "priority_tier_2_optional": [
+    {
+      "slide": 3,
+      "stable_id": "visual-s3-scale-horizon",
+      "job_from_matrix": "Hero metric with horizon and qualifier",
+      "classification": "factual",
+      "proposed": "large numeric anchor + horizon/2030 marker. NOT a bar. No axis, no baseline, no comparison.",
+      "drop_if": "any layout implies unstated denominator, comparison, or axis"
+    },
+    {
+      "slide": 8,
+      "stable_id": "visual-s8-cancellation-risk",
+      "job_from_matrix": "Hơn 40% banner plus three risk pillars",
+      "classification": "factual-forecast",
+      "proposed": "dominant banner number >40% + three labeled risk pillars with SVG icons and Vietnamese text labels",
+      "constraints": "Qualifier visible. Icons have Vietnamese text labels; no color-only meaning.",
+      "drop_if": "icons create crowding or weak visual meaning at projected distance"
+    },
+    {
+      "slide": 9,
+      "stable_id": "visual-s9-depth-stack",
+      "job_from_matrix": "Three-layer overview",
+      "classification": "metaphor",
+      "proposed": "descending depth stack with opacity gradient, gold layer markers",
+      "constraints": "Illustrative, not to scale. No quantitative encoding.",
+      "drop_if": "depth stack does not add meaning beyond current CSS card layout"
+    }
+  ],
+  "slides_not_in_scope": {
+    "slide_1": "hero/speaker card — unchanged, NTU logo already present",
+    "slide_2": "question cards — unchanged",
+    "slide_5": "policy/opportunity split — unchanged",
+    "slide_6": "iceberg — already visually encoded as metaphor in CSS",
+    "slide_10": "adoption/problem split — unchanged",
+    "slide_13": "2x2 matrix — already structurally encoded in CSS grid",
+    "slide_15": "leadership pillars — unchanged",
+    "slide_16": "prompt cards — unchanged",
+    "slide_17": "handoff banner — unchanged, decorative"
+  },
+  "svg_contract": {
+    "role": "img",
+    "required_children": ["<title> with unique ID", "<desc> with unique ID"],
+    "aria_attribute": "aria-labelledby referencing title and desc IDs",
+    "language": "Vietnamese with proper diacritics in all visible and accessible text",
+    "stable_id_pattern": "visual-s{N}-{short-name}",
+    "qualifier_visibility": "source and qualifier text visible inside or immediately adjacent to every factual SVG",
+    "min_text_px": "18px at 1280x720 authored stage before stage transform",
+    "no_external": "no CDN, no JS libs, no Canvas, no external fonts, no stock photos",
+    "reduced_motion": "all SVG animations disabled, final state shown",
+    "print": "static, full opacity, no animation artifacts"
+  }
+}

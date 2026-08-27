@@ -1,0 +1,34 @@
+{
+  "change": "enhance-ntu-keynote-visual-storytelling",
+  "status": "planning-complete",
+  "implementation_repo": "/Users/androidteam/Developer/ntu-keynote",
+  "source_branch": "main",
+  "source_commit": "72cf4aa2db7e6d1e3f5e99fb8ba157e0038ac742",
+  "source_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+  "drive_version_folder": "72cf4aa2db7e-3f299c876340",
+  "seven_public_files": [
+    "README.md",
+    "assets/fonts/be-vietnam-pro-400.woff2",
+    "assets/fonts/be-vietnam-pro-600.woff2",
+    "assets/fonts/be-vietnam-pro-800.woff2",
+    "assets/ntu-logo.png",
+    "index.html",
+    "keynote-fallback.pdf"
+  ],
+  "predecessor_spec_ids_verified": [
+    "REQ-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each",
+    "REQ-kcl-17-slide-dominant-visual-matrix",
+    "REQ-kcl-slide-7-shall-keep-three-factual-contexts-independent",
+    "REQ-kcl-visuals-shall-preserve-factual-and-linguistic-meaning",
+    "REQ-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent",
+    "REQ-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning",
+    "REQ-asp-printed-fallback-shall-remain-accessible-and-complete",
+    "REQ-bqre-browser-evidence-shall-own-computed-style-acceptance",
+    "REQ-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files"
+  ],
+  "known_limitations": {
+    "gitnexus": "ntu-keynote is not indexed; no graph-based architecture review performed",
+    "graphify": "no graphify-out/ state exists for ntu-keynote",
+    "safari": "qualification remains blocked; not a blocker for implementation"
+  }
+}
