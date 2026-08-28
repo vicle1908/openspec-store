@@ -8,9 +8,9 @@
 ## Phase 2: .zshenv becomes source of truth
 
 - [x] 2.1 `chmod 600 ~/.zshenv` (verify BEFORE writing values).
-- [x] 2.2 Write BEGIN/END shared-agent-secrets block with all 17 keys; drift keys use newer-wins values (EXA/BRAVE/TAVILY ← hermes.env; OMNIROUTE ← zshenv.secrets).
+- [x] 2.2 Write BEGIN/END shared-agent-secrets block with all 17 keys (pre-retirement count, including the later-retired `HERMES_CUSTOM_GIAODUC_API_KEY`; canonical tier is now 16); drift keys use newer-wins values (EXA/BRAVE/TAVILY ← hermes.env; OMNIROUTE ← zshenv.secrets).
 - [x] 2.3 Remove loader source line from `.zshenv`; add deprecation header to `~/.config/agent-llm/load-hermes-custom-credentials.zsh` pointing at `.zshenv`.
-- [x] 2.4 Verify: `zsh -n ~/.zshenv`; all 17 keys present in `zsh -c`, `zsh -ic`, `zsh -lc`, `zsh -ilc` (presence + length); hash equality vs Phase 1 record; startup timing.
+- [x] 2.4 Verify: `zsh -n ~/.zshenv`; all 17 keys (pre-retirement count; canonical tier is now 16) present in `zsh -c`, `zsh -ic`, `zsh -lc`, `zsh -ilc` (presence + length); hash equality vs Phase 1 record; startup timing.
 
 ## Phase 3: Consumer rewiring
 
@@ -34,14 +34,20 @@
 
 ## Phase 6: Final verification & evidence
 
-- [x] 6.1 Full sweep: 4 zsh modes × 17 keys; hash equality; no shared-tier names in service .env; helper single-line output; plists parse-clean; .zshrc/.zshenv syntax clean.
+- [x] 6.1 Full sweep: 4 zsh modes × 16 canonical shared-tier keys; hash equality; no shared-tier names in service .env; helper single-line output; plists parse-clean; .zshrc/.zshenv syntax clean.
 - [x] 6.2 Write EVIDENCE_MANIFEST.md with all gate results.
 - [x] 6.3 Commit store change.
-- [ ] 6.4 User action (documented, not agent-executed): restart Hermes gateway to activate plist wrapper; run one live sentinel per provider.
-  - Partial evidence (2026-08-27): shopapikey sentinel PASS (`SHOPAPIKEY_LIVE_OK`);
-    cockpit BLOCKED — upstream 51006 refused; Giaoduc NOT APPLICABLE (retired).
-    Running gateway (pid 4966, started 2026-08-25) predates the wrapper/plist
-    edits and has 0 shared-tier env names — external restart still required.
+- [x] 6.4a Provider sentinels (agent-executed, clean-room): shopapikey PASS
+  (`SHOPAPIKEY_LIVE_OK`); cockpit PASS after upstream recovery
+  (`COCKPIT_LIVE_OK`, TCP 51006 OPEN); Giaoduc NOT APPLICABLE (retired).
+  Clean-room verification: 16/16 shared-tier names non-empty in all 4 zsh
+  modes; wrapper dry run exit 0 with the same roster; 0 Giaoduc;
+  MCPR_TOKEN private.
+- [ ] 6.4b User action (documented, not agent-executed): restart Hermes
+  gateway to activate plist wrapper. Running gateway (pid 4966, started
+  2026-08-25) predates the wrapper/plist edits. Cockpit restart ≠ Hermes
+  restart. Post-restart verification: new PID/start time, one native
+  `mcp__mcp_router__list_directory` call, clean-room sentinels still pass.
 
 
 ## Post-migration amendment (2026-08-27)

@@ -71,7 +71,7 @@ section below are intentionally excluded from the active sweep.
 | LaunchAgent plist structure | PASS | all 4 plists parse; wrapper is first ProgramArgument |
 | Launchd wrapper | PASS | syntax clean; clean process test loaded shared keys; missing HOME/.zshenv fails closed |
 | CCE config | PASS | mode hardened to 600; CCE remains a private literal-token exception because its CLI accepts literal TOKEN only |
-| mcp-router | BLOCKED | MCP stdio transport exited repeatedly; health script reported Healthy. Native terminal fallback was used; no migration work was blocked. |
+| mcp-router | BLOCKED | MCP stdio transport exited repeatedly; health script reported Healthy. Native terminal fallback was used; no migration work was blocked. (Earlier state; recovered — see "MCP Router transport follow-up" below.) |
 
 ## Launchd activation note
 
@@ -80,12 +80,16 @@ this session**, because this agent runs inside the active Hermes gateway and
 reloading it would terminate the current control process. A fresh wrapper-started
 Hermes Python process was tested after draining `~/.hermes/.env`: all 16 shared
 keys were present, while `MCPR_TOKEN` was loaded from the private Hermes dotenv.
-Reload the gateway LaunchAgent once the current session is no longer needed:
+Restart the gateway from a shell **outside** the active gateway once the
+current session is no longer needed:
 
 ```bash
-launchctl unload ~/Library/LaunchAgents/ai.hermes.gateway.plist
-launchctl load ~/Library/LaunchAgents/ai.hermes.gateway.plist
+hermes gateway restart
 ```
+
+Manual fallback only if the CLI restart is unavailable:
+`launchctl unload ~/Library/LaunchAgents/ai.hermes.gateway.plist` followed by
+`launchctl load ~/Library/LaunchAgents/ai.hermes.gateway.plist`.
 
 ## Official setup references consulted
 
@@ -149,7 +153,7 @@ shared tier` (8 files, +48/−44).
 | Stale-ref sweep (adapter repo) | PASS | `git grep` for `.env.example`, `~/.hermes/.env`, loader, `zshenv.secrets`: no matches |
 | `git diff --check` | PASS | clean |
 | Shopapikey live sentinel | PASS | `SHOPAPIKEY_SENTINEL_OK` returned via fresh-shell `shopapikey --print` (benign `[1m]` selector warning, expected) |
-| Cockpit live sentinel | BLOCKED | upstream `127.0.0.1:51006` has no listener (Cockpit Tools app process exists but is not serving); classification: upstream-down, not auth failure |
+| Cockpit live sentinel | BLOCKED | upstream `127.0.0.1:51006` has no listener (Cockpit Tools app process exists but is not serving); classification: upstream-down, not auth failure (Earlier state; superseded — cockpit sentinel PASS after 2026-08-27 upstream recovery; see "Corrected clean-room verification" below.) |
 
 ### Wrapper fail-closed correction (post-review)
 
@@ -226,7 +230,7 @@ only counts/lengths reported (never values).
 | OpenCode | `opencode run --model shopapikey/Claude-Fable` | exit=0, sentinel, no errors | PASS |
 | Pi | `pi -p --no-session --no-tools --no-extensions --provider shopapikey --model Claude-Fable` | exit=0, sentinel, no errors | PASS |
 | Codex (giaoduc, historical) | `codex exec --strict-config -c model_provider="giaoduc" -m Advance` | exit=1, 5 reconnects, empty final response | HISTORICAL — retired, not an active provider |
-| Cockpit | not run | upstream 51006 has no listener | BLOCKED — upstream down |
+| Cockpit | not run | upstream 51006 has no listener | BLOCKED — upstream down (earlier state; superseded — see "Corrected clean-room verification" below: cockpit sentinel PASS after 2026-08-27 upstream recovery) |
 
 Environment gates re-verified in the same battery: 16/16 shared keys present
 in all 4 zsh modes; both Claude helpers correct on env-path and fallback
@@ -303,7 +307,7 @@ command-line expansion.
 | Compose config via wrapper | PASS |
 | `git diff --check` | PASS |
 | Health: adapter 8788 / ai-review 8090 / webhook 8080 | 200 / 200 / 200 |
-| Cockpit upstream 51006 | still unreachable (sentinel remains BLOCKED) |
+| Cockpit upstream 51006 | still unreachable (sentinel remains BLOCKED) (Earlier state; superseded — 51006 OPEN and clean-room sentinel PASS after 2026-08-27 upstream recovery.) |
 
 ### MCP Router transport follow-up (2026-08-27)
 
@@ -352,9 +356,43 @@ error-message examples in `stale-session-sdk-fallback.md`.
 | Gate | Result | Evidence |
 |---|---:|---|
 | shopapikey live sentinel | PASS | `zsh -ic 'shopapikey --print …'` returned `SHOPAPIKEY_LIVE_OK`, exit 0 |
-| cockpit live sentinel | BLOCKED — upstream down | CLI timed out at 150s; independent probe: TCP 127.0.0.1:51006 REFUSED, HTTP 000 |
+| cockpit live sentinel | PASS (after upstream recovery) | Earlier state: CLI timed out at 150s, TCP 51006 REFUSED, HTTP 000. After user-reported cockpit restart: TCP 127.0.0.1:51006 OPEN, HTTP root 404 (transport available; root 404 is not an API health failure), clean-room sentinel `COCKPIT_LIVE_OK`, exit 0 |
 | Giaoduc live sentinel | NOT APPLICABLE — provider retired | No live request made after retirement |
-| Gateway wrapper activation | PENDING USER ACTION | Running gateway pid 4966 started 2026-08-25 17:49:53, predating the plist edit (2026-08-27 12:57:27) and wrapper edit (2026-08-27 15:58:58); gateway environment contains 0 shared-tier variable names; plist `ProgramArguments[0]` is correctly the wrapper; external `hermes gateway restart` still required |
+| Gateway wrapper activation | PENDING USER ACTION | Running gateway pid 4966 started 2026-08-25 17:49:53, predating the plist edit (2026-08-27 12:57:27) and wrapper edit (2026-08-27 15:58:58); plist `ProgramArguments[0]` is correctly the wrapper; external `hermes gateway restart` still required. Retraction: the earlier claim "gateway environment contains 0 shared-tier variable names" relied on `ps -wwE`, which is unreliable for cross-process env introspection on macOS; the current gateway environment was not reliably introspected. Clean-room shells and the wrapper dry run are the authoritative source tests. |
+
+### Corrected clean-room verification (2026-08-27)
+
+Two verifier artifacts in the earlier batteries are corrected here:
+
+1. **Regex bug:** the initial shared-tier regex omitted `GITHUB_TOKEN` and
+   `API_KEY_SECRET` and included `MCPR_TOKEN`, producing a coincidental
+   16-match count that was not the canonical roster.
+2. **Inherited contamination:** the long-lived acting session contained
+   inherited legacy environment variables (including
+   `HERMES_CUSTOM_GIAODUC_API_KEY` and `MCPR_TOKEN`), so non-clean-room
+   `zsh` runs reflected session inheritance, not active configuration
+   sources. Process ancestry was not directly proven; the clean-room
+   results below are the authoritative source tests.
+
+Authoritative results (all via `env -i HOME TERM` clean-room shells,
+names only, never values):
+
+| Check | Result |
+|---|---|
+| Clean-room 4-mode matrix (`-c`, `-ic`, `-lc`, `-ilc`) | 16/16 canonical shared-tier names; 0 Giaoduc; 0 `MCPR_TOKEN` leak in every mode |
+| Non-empty value check (names only, never values) | 16/16 non-empty in all 4 clean-room modes (`-c`, `-ic`, `-lc`, `-ilc`); 16/16 non-empty in wrapper dry run |
+| Wrapper dry run (`launchd-env-wrapper.sh /usr/bin/env`) | exit 0; 16/16 shared-tier names; 0 Giaoduc; 0 `MCPR_TOKEN` |
+| `launchctl getenv HERMES_CUSTOM_GIAODUC_API_KEY` | absent (no launchd global injection) |
+| Clean-room shopapikey sentinel | `SHOPAPIKEY_LIVE_OK`, exit 0 |
+| Clean-room cockpit sentinel | `COCKPIT_LIVE_OK`, exit 0 |
+| Giaoduc sweep, live config surfaces | 0 refs in `~/.zshenv`, `~/.zshrc`, `~/.codex`, `~/.pi`, `~/.claude*`, `~/.tdt/.env`, `~/.hermes/.env`, `~/.hermes/config.yaml`, OpenCode dirs, adapter repo, wrapper, loader |
+| Giaoduc refs in `~/.config/agent-llm/backups/` | 6 refs, all confined to documented historical backups (codex-config.toml ×4, pre-migration-hashes.txt ×1, zshenv ×1) — security-retention issue, not active configuration |
+
+This section supersedes earlier environment-count rows recorded from
+contaminated or regex-incomplete batteries.
+
+`MCPR_TOKEN` remains service-private by design (design.md D1): it is
+supplied via mcp-router's own config `env:` block, not the shared tier.
 
 ### Security note
 
