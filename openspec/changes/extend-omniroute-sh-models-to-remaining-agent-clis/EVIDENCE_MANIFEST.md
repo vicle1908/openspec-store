@@ -78,9 +78,10 @@ File: `~/.factory/settings.json`
 
 File: `~/.grok/config.toml`
 
-- Added `[model_providers.omniroute]` with the existing Responses backend shape.
+- Added `[model_providers.omniroute]` using the proven Messages backend.
 - Endpoint: `http://localhost:20128/v1`.
 - Credential form: `env_key = "OMNIROUTE_API_KEY"`.
+- Backend: `api_backend = "messages"`.
 - Added aliases:
   - `omniroute-sol` → `sh/gpt-5.6-sol`
   - `omniroute-claude-fable` → `sh/Claude-Fable`
@@ -104,30 +105,41 @@ File: `~/.codex/config.toml`
 - Active file mode: 600.
 - Post-apply SHA-256 prefix: `2069569af69889eb`.
 
-## 5. Real sentinel evidence
+## 5. Protocol and real sentinel evidence
 
-### Passed
+### Direct OmniRoute protocol matrix (2026-08-28)
+
+The live registry returned 968 models during the matrix run; both approved IDs were present. The matrix used both approved IDs across chat-completions, Responses, and Messages, streaming and non-streaming:
+
+- All six streaming paths passed exact `pong` (chat, Responses, and Messages × two models).
+- Chat non-streaming returned HTTP 502 `upstream_empty_response` for both models.
+- Messages non-streaming returned a 90-second no-byte timeout for `sh/gpt-5.6-sol` and HTTP 502 `upstream_empty_response` for `sh/Claude-Fable`.
+- Responses non-streaming returned a completed response; full-body capture confirmed `output_text` was present. An earlier matrix extractor incorrectly treated `error: null` as an error; that parser issue was corrected before CLI verification.
+- Responses streaming contained a malformed bare heartbeat, `data: {"type":"response.in_progress"}`, before a later valid event carrying the response and sequence number. This is the source of Grok's native `serialization error: missing field sequence_number` under the original Responses backend.
+
+### Final end-to-end CLI sentinels (2026-08-29)
+
+Each target was run in a fresh login shell, in a unique disposable directory, with file-backed stdout/stderr, bounded process-group cleanup, and exact response-line matching. No literal credentials were recorded.
 
 | CLI | Selector | Result |
 |---|---|---|
-| OpenCode | `omniroute/sh/gpt-5.6-sol`, pure mode | exact `pong`, exit 0 |
+| OpenCode | `omniroute/sh/gpt-5.6-sol`, `--auto --pure --format default` | exact `pong`, exit 0, 15.52s |
 | OpenCode | `omniroute/sh/Claude-Fable`, pure mode | exact `pong`, exit 0 |
-| OpenCode | `omniroute/sh/gpt-5.6-sol`, controlled full mode | exact `pong`, exit 0 |
-| OpenCode | `omniroute/sh/Claude-Fable`, full mode | exact `pong`, exit 0 |
 | Droid | `custom:OmniRoute-gpt-5-6-sol` | exact `pong`, exit 0 |
 | Droid | `custom:OmniRoute-Claude-Fable` | exact `pong`, exit 0 |
+| Grok | `omniroute-sol`, `--single`, Messages backend | exact `pong`, exit 0 |
+| Grok | `omniroute-claude-fable`, `--single`, Messages backend | exact `pong`, exit 0 |
+| Codex | `sh/gpt-5.6-sol`, `codex exec`, Responses | exact `pong` in `--output-last-message`, exit 0 |
+| Codex | `sh/Claude-Fable`, `codex exec`, Responses | exact `pong` in `--output-last-message`, exit 0 |
 
-An earlier OpenCode full-mode attempt returned `Tool execution aborted`; the controlled retry passed. The failed attempt did not change configuration.
+OpenCode's first fresh SOL attempt reached its 180-second bound without output; a distinct fresh-shell invocation with `--auto --pure --format default` then passed in 15.52 seconds. The timeout did not mutate configuration. The final per-CLI probes passed 8/8.
 
-### Blocked
+### Evidence-based fixes and drift repair
 
-| CLI | Attempt | Observed result |
-|---|---|---|
-| Grok | both aliases via non-TTY runner | `Device not configured (os error 6)` before provider access |
-| Grok | both aliases via real pseudo-terminal | remained in `Waiting for response` for more than 300 seconds with no sentinel; exact runner/child terminated |
-| Codex | `sh/gpt-5.6-sol` via `codex exec` Responses path | no child output for more than 300 seconds; exact runner/child terminated |
-
-The Grok and Codex registrations passed parse, endpoint, env-key, provider-preservation, default-preservation, and no-`dlg/*` checks. Their tasks remain open because real runtime sentinels did not pass. The documented OmniRoute slow-response/SSE heartbeat defect is a likely server-side cause for Responses-family paths; no success is claimed for either blocked CLI.
+- Grok's OmniRoute provider changed only `api_backend = "responses"` → `api_backend = "messages"`; both aliases passed afterward, all inspected defaults/providers were preserved, and mode remained 600.
+- Droid's CLI had rewritten semantically equivalent JSON (escaped `\\u00b7` to literal UTF-8) and mode 0644 during an earlier test. The exact registered baseline was restored atomically, mode 600 enforced, and both final Droid sentinels passed under `umask 077` with no subsequent drift.
+- Final value-blind active hashes were: OpenCode `864e90297bd1f21a`, Droid `3f72ec8d5b6af9b1`, Grok `a49b78c89b32e084`, Codex `2069569af69889eb`. Final modes were 644, 600, 600, and 600 respectively.
+- The final live registry returned 966 models; both approved IDs remained present.
 
 ## 6. Preservation and security audit
 
@@ -150,7 +162,8 @@ A post-repair value-blind audit returned `AUDIT_SUMMARY failures=0` and exit 0. 
 
 ## 7. OpenSpec status
 
-- OpenSpec package is intentionally **not archived** because Grok and Codex real sentinel tasks remain blocked.
+- The previously blocked Grok and Codex sentinel tasks are resolved: Grok uses the evidence-based Messages backend, and Codex passes the Responses path.
+- All approved runtime and preservation gates pass; the package is ready for final strict validation, scoped commit, and archive.
 - No default model changes were approved or retained.
 - No provider-side credential rotation was performed.
 - Unrelated store work remains untouched.

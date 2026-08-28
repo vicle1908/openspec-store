@@ -2,7 +2,7 @@
 
 ### Requirement: Remaining consumer CLIs SHALL register the live sh models with credential indirection
 
-Each of the consumer CLIs opencode, grok, and droid that is mutated by this change SHALL register the model IDs `sh/gpt-5.6-sol` and `sh/Claude-Fable` against the OmniRoute endpoint `http://localhost:20128/v1`, SHALL reference `OMNIROUTE_API_KEY` through environment indirection, and SHALL NOT change any default model selection.
+Each of the consumer CLIs opencode, Grok, and droid that is mutated by this change SHALL register the model IDs `sh/gpt-5.6-sol` and `sh/Claude-Fable` against the OmniRoute endpoint `http://localhost:20128/v1`, SHALL reference `OMNIROUTE_API_KEY` through environment indirection, and SHALL NOT change any default model selection. Grok's `model_providers.omniroute` entry SHALL use the `messages` backend because the upstream Responses stream emits a malformed `response.in_progress` event that the Grok CLI rejects.
 
 #### Scenario: opencode omniroute provider uses env indirection
 

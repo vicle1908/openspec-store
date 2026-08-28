@@ -30,8 +30,8 @@ sh/Claude-Fable
 
 - OpenCode: model entries use the chat endpoint (matches the existing phanmemvip entry shape), avoiding the Responses heartbeat defect.
 - Droid: provider type `openai` (chat-completions family), matching the archived Kimi resolution.
-- Grok: prefer the Responses backend (matches its existing phanmemvip/cockpit entries); if the sentinel hits the SSE heartbeat defect, record a server-side blocker rather than switching dialects without evidence.
-- Codex: wire_api `responses` (the only wire_api observed in its config); same heartbeat caveat as Grok.
+- Grok: use the `messages` backend for OmniRoute. Its initial Responses sentinel failed with the native CLI error `serialization error: missing field sequence_number`; raw SSE capture showed a bare `response.in_progress` event without the required fields. After the evidence-based backend switch, both aliases passed the official headless sentinel.
+- Codex: wire_api `responses` (the only wire_api observed in its config); the final explicit sentinels passed despite the server heartbeat defect.
 
 ## Verification contract
 

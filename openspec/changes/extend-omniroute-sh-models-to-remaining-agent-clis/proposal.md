@@ -50,7 +50,8 @@ Excluded: prime-agent, cline, Copilot, Cursor Agent, Auggie, AGY, Qoder, Claude 
 
 ## Known risks
 
-- OmniRoute's malformed `response.in_progress` SSE heartbeat (documented in the archived change's evidence manifest) affects strict Responses-dialect decoders during slow first-token phases. Grok and Codex use Responses-family backends; if a sentinel hits this defect, the CLI is recorded as a server-side blocker, not forced green.
+- OmniRoute emits a malformed bare `response.in_progress` SSE heartbeat before the valid Responses event; strict Responses-dialect decoders can fail with `serialization error: missing field sequence_number`. Grok's OmniRoute provider was therefore switched to the proven `messages` backend, while Codex remains on `responses` and passed its final sentinels.
+- Direct protocol testing also found intermittent/non-stream `chat` and `messages` upstream-empty-response failures; the approved CLI paths use streaming and passed the final real sentinels.
 - OpenCode's active file is mode 644; this change backs it up at mode 600 but does not change active-file permissions (separate security follow-up).
 - Goose's `config.yaml` selected model (`gpt-5.6-sol`) does not match its catalog name (`sh/gpt-5.6-sol`); dormant because `active_provider` is not custom_omniroute. Documented follow-up; not mutated here.
 
