@@ -91,3 +91,19 @@
   for re-application after an `hermes update` stash-restore conflict:
   `~/.config/agent-llm/backups/20260827-zshenv-shared-secrets/hermes-launchd-env-wrapper.patch`.
   Full evidence in EVIDENCE_MANIFEST.md → "Wrapper-aware generator patch".
+
+- [x] R6 (2026-08-28) Research-CLI centralization + shared-tier data-bug fix.
+  Live verification found `BRAVE_SEARCH_API_KEY` in `.zshenv` was a **URL**
+  (74 chars, `http…`) — the Phase-2 "newer wins" drift resolution had picked
+  hermes.env's corrupted value — and `TAVILY_API_KEY` was an exhausted key
+  (HTTP 432). Fixed both in `.zshenv` from the valid sources (Brave: the
+  31-char `BSAH…` key hash-verified against the tdt.env/zshenv.secrets
+  backups and bx's keystore; Tavily: the 41-char key from tvly's config,
+  HTTP 200 verified). Then centralized the two research CLIs on the shared
+  tier: removed bx's internal keystore key (bx falls back to
+  `BRAVE_SEARCH_API_KEY` env when its config has no key — empirically
+  proven) and ran `tvly logout` (tvly prefers `TAVILY_API_KEY` env over its
+  config file). Live-verified in fresh shells: `bx web` and `tvly search`
+  both return real results via `.zshenv`. Pre-fix backups in
+  `~/.config/agent-llm/backups/20260827-zshenv-shared-secrets/pre-research-cli-centralization/`.
+  Full evidence in EVIDENCE_MANIFEST.md → "Research-CLI centralization".

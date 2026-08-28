@@ -99,6 +99,17 @@ subsequently retired because it is no longer used; the active shared tier now
 contains 16 keys and five provider keys. See the post-migration amendment in
 `tasks.md` and the retirement evidence in `EVIDENCE_MANIFEST.md`.
 
+**D2 correction (2026-08-28, task R6):** "newer wins" selects by mtime, not by
+validity — it cannot detect a corrupted or exhausted value. Live verification
+proved two of the winners were bad: hermes.env's `BRAVE_SEARCH_API_KEY` was a
+**URL** (74 chars, `http…`), and its `TAVILY_API_KEY` was **exhausted**
+(HTTP 432). Both were replaced in `.zshenv` with the valid keys (Brave from
+the tdt.env/zshenv.secrets lineage, hash-verified; Tavily from tvly's config,
+HTTP 200 verified). Lesson: drift resolution should be followed by a live
+validity probe per key, not hash-preservation alone. The research CLIs (bx,
+tvly) were also centralized onto the shared tier in R6 — see
+`EVIDENCE_MANIFEST.md` → "Research-CLI centralization".
+
 ### D3: `.zshenv` structure
 
 ```zsh

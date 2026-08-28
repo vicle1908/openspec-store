@@ -539,3 +539,54 @@ git apply ~/.config/agent-llm/backups/20260827-zshenv-shared-secrets/hermes-laun
 The config knob in `~/.hermes/config.yaml` is outside the git checkout and
 survives updates unconditionally. Patch backup (153 lines, 2 files,
 +118/−6) stored alongside the migration backups.
+
+## Research-CLI centralization (2026-08-28, task R6)
+
+### Data bugs found by live verification
+
+Live CLI round-trips (bx, tvly, exa, gh + direct API probes) exposed two
+shared-tier values that hash-preservation alone could not catch:
+
+| Key | Defect | Evidence |
+|---|---|---|
+| `BRAVE_SEARCH_API_KEY` | Value was a **URL** (74 chars, contains `://`), not a key | Brave API returned 422 `SUBSCRIPTION_TOKEN_INVALID`; pre-migration manifest shows the 74-char value came from hermes.env (the "newer wins" winner) |
+| `TAVILY_API_KEY` | Key **exhausted** at provider | Tavily API returned HTTP 432 (quota) |
+
+The valid keys survived elsewhere: the 31-char `BSAH…` Brave key in the
+`tdt.env`/`zshenv.secrets` backups and bx's keystore (all three
+hash-identical, sha256[:12] `9d1699cf9385`, HTTP 200 verified); the 41-char
+Tavily key in tvly's config file (sha256[:12] `109118dc4a56`, HTTP 200
+verified).
+
+### Fix
+
+1. Replaced both values in `~/.zshenv` from the valid sources (value-blind
+   Python edit; mode 600 preserved; `zsh -n` clean).
+2. Centralized the research CLIs on the shared tier:
+   - **bx**: removed `api_key` from
+     `~/Library/Application Support/brave-search/config.json`. Empirically
+     proven first: with an empty config, bx falls back to the
+     `BRAVE_SEARCH_API_KEY` env var (a bogus env key reached the API).
+   - **tvly**: `tvly logout` removed `~/.tavily/config.json`. tvly prefers
+     `TAVILY_API_KEY` env over its config file (proven: a bogus env key
+     shadowed the valid config key).
+
+### Verification
+
+| Gate | Result | Evidence |
+|---|---:|---|
+| `.zshenv` values | PASS | BRAVE len 31 sha `9d1699cf9385`; TAVILY len 41 sha `109118dc4a56`; mode 600; syntax clean |
+| bx keystore cleared | PASS | `bx config show-key` → "no API key configured" |
+| tvly config cleared | PASS | `~/.tavily/config.json` removed by `tvly logout` |
+| bx live via env | PASS | fresh-shell `bx web` returned real Brave results |
+| tvly live via env | PASS | fresh-shell `tvly search` returned real Tavily results |
+| exa / gh (already env) | PASS | live results / `gh auth status` logged in |
+| Pre-fix backups | PASS | `~/.config/agent-llm/backups/20260827-zshenv-shared-secrets/pre-research-cli-centralization/` (zshenv, bx-config.json, tvly-config.json) |
+
+### Shared-tier status after R6
+
+All 16 shared-tier keys now hold live-validated values where a probe exists:
+Brave, Tavily, Exa, GitHub validated live; provider keys validated via CLI
+round-trips (codex/opencode/pi/hermes PONG, phanmemvip/cockpit HTTP 200).
+OmniRoute/Firecrawl/OpenRouter/Copilot/NPMJS/Postman/API_KEY_SECRET have no
+cheap live probe and remain hash-preserved.
