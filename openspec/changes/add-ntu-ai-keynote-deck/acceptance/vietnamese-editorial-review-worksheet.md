@@ -14,8 +14,8 @@ Complete every field from immutable external evidence. Do not review a moving wo
 | Field | Value |
 |---|---|
 | External repository identity | `/Users/androidteam/Developer/ntu-keynote` (git, branch `main`) |
-| Evidence-base commit, full SHA | `bb7a4d58a7354f55a61cf862cebac0d6f438b626` (candidate: `bb7a4d58a7354f55a61cf862cebac0d6f438b626`) |
-| `index.html` SHA-256 | `915a270b8c4ddb8032560bc55b14742bb2dcb8f82992ff5f9f0b893bc51f4671` |
+| Evidence-base commit, full SHA | `7cbf0f17c428896b95ae078623d2450996fafe88` (candidate: `bb7a4d58a7354f55a61cf862cebac0d6f438b626`) |
+| `index.html` SHA-256 | `a7d2fdbcddb7146366f633088b9179291a0744e93fc6e4c708db15fdda449710` |
 | `README.md` SHA-256 | `43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469` |
 | `keynote-fallback.pdf` SHA-256 | `256a0cd12e303760c28a5100b09d5e4131dbbc2d19c6fddfd7c3ff94c94515f8` |
 | `assets/ntu-logo.png` SHA-256 | `8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc` |
