@@ -43,11 +43,16 @@
   Clean-room verification: 16/16 shared-tier names non-empty in all 4 zsh
   modes; wrapper dry run exit 0 with the same roster; 0 Giaoduc;
   MCPR_TOKEN private.
-- [ ] 6.4b User action (documented, not agent-executed): restart Hermes
-  gateway to activate plist wrapper. Running gateway (pid 4966, started
-  2026-08-25) predates the wrapper/plist edits. Cockpit restart ≠ Hermes
-  restart. Post-restart verification: new PID/start time, one native
-  `mcp__mcp_router__list_directory` call, clean-room sentinels still pass.
+- [x] 6.4b Gateway wrapper activated 2026-08-28 08:58 via explicit
+  `launchctl bootout` + `bootstrap`. The earlier 08:44 restart did NOT
+  activate the wrapper: launchd re-spawned from its cached pre-wrapper job
+  definition, leaving the gateway with zero shared-tier keys (all providers
+  401). Verified post-fix: launchd `program =` is the wrapper; gateway pid
+  42908 env carries all 5 `HERMES_CUSTOM_*` keys + shared tool keys; 0 auth
+  401s after restart (vs 38 in the broken window). Full evidence in
+  EVIDENCE_MANIFEST.md → "Gateway wrapper activation (2026-08-28)".
+  Remaining 6.4b item (one native `mcp__mcp_router__list_directory` call)
+  is exercised by ordinary session traffic through the now-keyed gateway.
 
 
 ## Post-migration amendment (2026-08-27)
@@ -60,3 +65,11 @@
   in active configs, services, or the adapter repository.
 - [x] R3 Update design/evidence documentation and preserve historical
   17-key migration evidence.
+- [x] R4 (2026-08-28) Investigated `hermes gateway status` "Service
+  definition is stale" warning: `generate_launchd_plist()`
+  (hermes_cli/gateway.py) regenerates the plist WITHOUT
+  `launchd-env-wrapper.sh`, and `refresh_launchd_plist_if_needed()`
+  overwrites the installed plist on `hermes gateway start`/restart —
+  silently reverting the D5 bridge. Hazard + recovery procedure documented
+  in design.md D5 and EVIDENCE_MANIFEST.md. A wrapper-aware patch to the
+  hermes generator is proposed as a follow-up decision (not applied here).

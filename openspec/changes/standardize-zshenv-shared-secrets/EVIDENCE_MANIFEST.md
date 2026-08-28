@@ -414,5 +414,54 @@ permissions (600) are unaffected.
   returned `Change 'standardize-zshenv-shared-secrets' is valid` before execution.
 - Proposal, design, tasks, and this evidence manifest are stored in the shared
   `~/Developer/openspec-store` repository.
-- Gateway reload and final live Claude sentinel remain explicit follow-up
-  actions because they would interrupt the active Hermes control process.
+- Gateway reload was executed 2026-08-28 (see below) after confirming the
+  executing session was NOT a descendant of the gateway process. The final
+  live Claude sentinel is exercised by ordinary session traffic through the
+  now-keyed gateway.
+
+
+## Gateway wrapper activation (2026-08-28)
+
+### Incident
+
+The 2026-08-28 08:44 gateway restart (pid 4966 → 14388) did NOT activate the
+wrapper: launchd re-spawned from its **cached pre-wrapper job definition**
+(`launchctl print` showed `program = …/venv/bin/python`, not the wrapper).
+The gateway process carried zero shared-tier keys, and because task 5.1 had
+drained the provider keys from `~/.hermes/.env`, every provider 401'd:
+38 `401`/`AuthenticationError`/`no resolvable api_key` events between 08:44
+and 08:57 (`shopapikey`, `phanmemvip`, `cockpit`, `moa` all affected).
+
+### Fix
+
+Executed from a session verified NOT to descend from the gateway process:
+
+```bash
+launchctl bootout gui/$(id -u)/ai.hermes.gateway
+# first bootstrap raced async teardown → "Bootstrap failed: 5: Input/output error"
+# retried after the job fully left the domain:
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/ai.hermes.gateway.plist
+```
+
+### Verification
+
+| Gate | Result | Evidence |
+|---|---:|---|
+| launchd definition | PASS | `launchctl print` → `program = /Users/androidteam/.config/agent-llm/launchd-env-wrapper.sh` |
+| New gateway process | PASS | pid 42908, started 2026-08-28 08:58:09 |
+| Shared tier in process env | PASS | all 5 `HERMES_CUSTOM_*` keys + `BRAVE_SEARCH_API_KEY`, `EXA_API_KEY`, `TAVILY_API_KEY`, `OMNIROUTE_API_KEY` present (names verified via `ps Eww`; values never printed) |
+| Auth errors after restart | PASS | 0 `401`/`AuthenticationError` events post-08:58 (vs 38 in the broken window) |
+| Wrapper dry-run | PASS | wrapper + `/usr/bin/env` exports 5 `HERMES_CUSTOM_*` keys |
+| Pre-existing failures unchanged | N/A | Matrix/WhatsApp connect failures occur daily since ≥ 2026-08-21 (~250–290/day) — predate the migration; `MATRIX_ACCESS_TOKEN` untouched in private tier |
+
+### Latent hazard found during verification
+
+`hermes gateway status` reports "Service definition is stale relative to the
+current Hermes install — Run: hermes gateway start". Root cause:
+`generate_launchd_plist()` in `hermes_cli/gateway.py` regenerates the plist
+WITHOUT `launchd-env-wrapper.sh` (verified by generating in memory — no
+wrapper reference), and `refresh_launchd_plist_if_needed()` overwrites the
+installed plist on `hermes gateway start`/restart. Following the CLI's own
+advice would silently revert the D5 bridge and reproduce this incident.
+Mitigation rules and recovery procedure: design.md D5 hazard section.
+Proposed follow-up: wrapper-aware generator patch (decision pending).

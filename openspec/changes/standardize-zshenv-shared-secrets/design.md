@@ -144,6 +144,31 @@ Applied to: `ai.hermes.gateway`, `com.tdt.ai-review`,
 `com.tdt.webhook-receiver`, `com.workspace.claude-code-provider-adapter`.
 Each plist backed up, then `launchctl bootout` + `bootstrap` to reload.
 
+**D5 hazard — Hermes regenerates its own plist (found 2026-08-28):**
+`hermes_cli/gateway.py` owns `ai.hermes.gateway.plist` through
+`generate_launchd_plist()` + `refresh_launchd_plist_if_needed()`. The
+generator does NOT include `launchd-env-wrapper.sh`, so any
+`hermes gateway start`/restart that triggers a refresh **overwrites the
+installed plist and silently reverts the bridge** (and `hermes gateway
+status` reports "Service definition is stale — Run: hermes gateway start",
+which would make it worse). The TDT/adapter plists are not owned by Hermes
+and are unaffected.
+
+Rules until a wrapper-aware generator patch lands:
+- NEVER run `hermes gateway start` to "fix" the stale warning.
+- To restart the gateway: `launchctl kickstart -k gui/$(id -u)/ai.hermes.gateway`
+  (re-spawns from the loaded definition, wrapper preserved).
+- To reload after plist edits: `launchctl bootout` + `bootstrap` (a plain
+  restart re-reads the cached definition — this is exactly how the
+  2026-08-28 08:44 incident happened).
+- After any Hermes update or `hermes gateway` command, re-check the plist:
+  `plutil -p ~/Library/LaunchAgents/ai.hermes.gateway.plist | grep -c launchd-env-wrapper`
+  must be ≥ 1; if 0, restore from
+  `~/.config/agent-llm/backups/20260827-zshenv-shared-secrets/` and
+  bootout/bootstrap.
+- Follow-up decision: patch `generate_launchd_plist()` to prepend the
+  wrapper (or move shared-tier keys into a Hermes-native env mechanism).
+
 ### D6: Claude apiKeyHelper rewrite
 
 ```sh
