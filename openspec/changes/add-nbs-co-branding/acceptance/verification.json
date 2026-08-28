@@ -1,0 +1,79 @@
+{
+  "change": "add-nbs-co-branding",
+  "artifact": "verification",
+  "task_reference": "4.1",
+  "verified_at": "2026-08-28",
+  "candidate_digest": "f97a5f71054fae2a64b3e5bfe2ed17f161a17e73a62f5b733e54d91d5806272a",
+  "evidence_base_commit": "074b11956136b42c582fb9ad851757da44b08ba9",
+  "requirements": [
+    {
+      "requirement": "NBS logo asset has honestly recorded provenance",
+      "status": "pass",
+      "evidence": ["research/nbs-logo-provenance.json", "evidence/asset-provenance.json", "acceptance/nbs-candidate-approval.json"],
+      "detail": "Normalized candidate is recorded as user-approved-third-party-derived; source URL, source hash, crop box, raw hash, output hash, normalization, OCR, and open human brand gate are recorded."
+    },
+    {
+      "requirement": "Brand lockup contains exactly one NTU and one NBS logo",
+      "status": "pass",
+      "evidence": ["index.html", "tests/test_nbs_co_branding.py", "evidence/runtime/chrome.json"],
+      "detail": "Two local data-brand-asset images, one divider, Vietnamese group label/alt text; Chromium DOM qualification passed."
+    },
+    {
+      "requirement": "Both logos are local and offline-safe",
+      "status": "pass",
+      "evidence": ["index.html", "scripts/verify_static.py", "evidence/rehearsals/copied-folder.json"],
+      "detail": "No HTTP/HTTPS runtime dependency; copied-package rehearsal recorded zero outbound requests."
+    },
+    {
+      "requirement": "Lockup fits safe area and avoids title overlap",
+      "status": "pass",
+      "evidence": ["evidence/runtime/chrome.json", "evidence/screenshots/chrome/nbs-lockup-1024x768-slide05.png", "evidence/screenshots/chrome/nbs-lockup-1920x1080-slide05.png"],
+      "detail": "All required viewport measurements pass; NBS heights are 19.2px at 1024x768, 25.6px at 1366x768, 27px at 1440x900, and 36px at 1920x1080; heading overlap check passes."
+    },
+    {
+      "requirement": "Lockup does not alter content, timing, or navigation",
+      "status": "pass",
+      "evidence": ["tests/test_nbs_co_branding.py", "tests/test_visual_attention.py", "evidence/runtime/chrome.json"],
+      "detail": "Full route, short route, reset, keyboard, fragment reload, animation replay, and 17-slide invariants pass."
+    },
+    {
+      "requirement": "NTU retains primary prominence and NBS is legible",
+      "status": "pass",
+      "evidence": ["tests/test_nbs_co_branding.py", "evidence/runtime/chrome.json", "evidence/screenshots/chrome/nbs-ocr-1024x768-slide01.png"],
+      "detail": "NTU remains leftmost; NBS authored height 24px and OCR reads the full phrase at 1024x768."
+    },
+    {
+      "requirement": "PDF fallback contains the lockup",
+      "status": "pass",
+      "evidence": ["keynote-fallback.pdf", "evidence/pdf-binding.json", "evidence/screenshots/pdf/pdf-brand-repetition.json"],
+      "detail": "17-page PDF; print-fixed lockup is OCR-confirmed on all 17 pages for both NTU and NBS."
+    },
+    {
+      "requirement": "Package evidence is rebound to the new asset",
+      "status": "pass",
+      "evidence": ["evidence/release-manifest.json", "checksums.sha256", "evidence/rehearsals/copied-folder.json"],
+      "detail": "Eight-file candidate package digest and all 143 checksums agree; copied-package rehearsal is 15/15."
+    },
+    {
+      "requirement": "Existing claim copy, qualifiers, and notes remain unchanged",
+      "status": "pass",
+      "evidence": ["tests/test_visual_attention.py", "scripts/verify_static.py", "evidence/static-verification.json"],
+      "detail": "Static verifier passes all 11 categories; full test suite passes."
+    }
+  ],
+  "test_results": {
+    "full_pytest": "98 passed, 309 subtests",
+    "checksums": "143/143 passed",
+    "static_verifier": "11/11 passed",
+    "chromium": "21/21 passed",
+    "copied_rehearsal": "15/15 passed",
+    "safari": "blocked — Allow Remote Automation disabled"
+  },
+  "release_decision": {
+    "status": "blocked-automated",
+    "drive_upload": "deferred until human brand approval",
+    "tag": "not created",
+    "archive": "not performed",
+    "remaining_human_gates": ["official NBS brand approval", "Safari qualification", "venue projector/clicker/spoken-delivery rehearsal", "Vietnamese editorial review"]
+  }
+}

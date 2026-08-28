@@ -1,0 +1,68 @@
+{
+  "change": "add-nbs-co-branding",
+  "artifact": "intake",
+  "task_reference": "4.1",
+  "recorded_at": "2026-08-28",
+  "status": "candidate-qualified-locally-drive-deferred",
+  "source_repository": "~/Developer/ntu-keynote",
+  "source_worktree": "~/Developer/ntu-keynote/.worktrees/nbs-co-branding",
+  "source_branch": "feat/nbs-co-branding",
+  "evidence_generation_base_commit": "074b11956136b42c582fb9ad851757da44b08ba9",
+  "candidate_identity": {
+    "package_digest": "f97a5f71054fae2a64b3e5bfe2ed17f161a17e73a62f5b733e54d91d5806272a",
+    "digest_algorithm": "ntu-keynote-package-sha256-v1",
+    "file_count": 8,
+    "files": [
+      "index.html",
+      "assets/nbs-logo.png",
+      "assets/ntu-logo.png",
+      "assets/fonts/be-vietnam-pro-400.woff2",
+      "assets/fonts/be-vietnam-pro-600.woff2",
+      "assets/fonts/be-vietnam-pro-800.woff2",
+      "README.md",
+      "keynote-fallback.pdf"
+    ],
+    "pdf_sha256": "2630f7f0831702ab4038f55684550d0399eec8ce02d4ad18efcdc8c4826e9cd7",
+    "pdf_pages": 17
+  },
+  "nbs_asset": {
+    "path": "assets/nbs-logo.png",
+    "sha256": "e7a6df4f6e4fc3a5d80f43cf1582953258f9e6478ccd5274ee2e4297d96913a0",
+    "dimensions": [392, 43],
+    "format": "PNG",
+    "has_alpha": false,
+    "provenance": "user-approved-third-party-derived",
+    "provenance_record": "evidence/asset-provenance.json",
+    "user_approval_record": "openspec-store/openspec/changes/add-nbs-co-branding/acceptance/nbs-candidate-approval.json",
+    "human_brand_gate": "open"
+  },
+  "automated_results": {
+    "focused_tests": "41 passed, 69 subtests",
+    "full_tests": "98 passed, 309 subtests",
+    "static_verifier": "11/11 categories passed",
+    "chromium_matrix": "21/21 checks passed",
+    "copied_package_rehearsal": "15/15 checks passed",
+    "checksum_verification": "143 entries passed",
+    "pdf_brand_repetition": "17/17 pages OCR-confirmed for NTU + NBS",
+    "nbs_ocr_1024x768": "passed — Nanyang Business School",
+    "title_overlap": "no eyebrow/h1/h2/h3 intersections at 1280x720 or 1024x768"
+  },
+  "blocked_or_deferred": {
+    "safari": "blocked — Safari Allow Remote Automation is disabled on the qualification host",
+    "drive_upload": "deferred until human brand approval; no candidate package uploaded",
+    "release": "blocked-automated; no tag and no archive",
+    "venue_rehearsal": "pending human projector/clicker/spoken-delivery gate",
+    "vietnamese_editorial_review": "pending human gate"
+  },
+  "evidence": {
+    "pdf_binding": "evidence/pdf-binding.json",
+    "chrome": "evidence/runtime/chrome.json",
+    "safari": "evidence/runtime/safari.json",
+    "accessibility": "evidence/accessibility.json",
+    "static_verification": "evidence/static-verification.json",
+    "copied_rehearsal": "evidence/rehearsals/copied-folder.json",
+    "release_manifest": "evidence/release-manifest.json",
+    "checksums": "checksums.sha256"
+  },
+  "decision": "Provisional NBS co-branding implementation approved by Vinh Le; local qualification complete. Human brand approval and Drive/public release remain open/deferred."
+}
