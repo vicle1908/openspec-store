@@ -1,9 +1,4 @@
-# coding-agent-credential-loading Specification
-
-## Purpose
-Defines the managed `.zshenv` shared-agent-secrets block as the authoritative source for active shared-tier coding-agent provider credentials. The retired loader is compatibility-only and unrelated service-private variables are not exported by the shared mechanism.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Canonical secret source
 
@@ -16,7 +11,7 @@ When `~/.zshenv` is inspected
 Then it SHALL exist with mode 600 and contain the managed shared-agent-secrets block
 And `~/.hermes/.env` SHALL contain no active `HERMES_CUSTOM_*_API_KEY` entries.
 
-### Requirement: Retired loader status
+### Requirement: Shared allowlisted loader
 
 The retired `~/.config/agent-llm/load-hermes-custom-credentials.zsh` SHALL NOT be the active credential source. It MAY remain as a compatibility stub, while active shared-tier provider keys SHALL be exported by the managed `~/.zshenv` block. Unrelated variables SHALL NOT be exported by the shared credential mechanism.
 
@@ -56,11 +51,11 @@ When a clean non-interactive environment runs `/bin/zsh -c` or `/bin/zsh -lc`
 Then no stdout or stderr output SHALL be produced by credential loading.
 Interactive shells (`-i` flag) may emit unrelated terminal-integration control sequences but SHALL emit no credentials or `export KEY=value` lines.
 
-### Requirement: Managed zshenv missing source is nonfatal
+### Requirement: Nonfatal missing sources
 
 If `~/.zshenv` or its managed shared-agent-secrets block is absent, the shell SHALL start without error and with exit code 0. The retired loader MAY also be absent or unreadable without breaking shell startup.
 
-#### Scenario: missing managed block is nonfatal
+#### Scenario: missing .env is nonfatal
 
 Given the managed shared-agent-secrets block is absent from `~/.zshenv`
 When a login zsh shell starts
@@ -72,11 +67,11 @@ Given `~/.config/agent-llm/load-hermes-custom-credentials.zsh` does not exist
 When `.zshenv` is loaded
 Then the shell SHALL start without error.
 
-### Requirement: Managed zshenv assignment precedence
+### Requirement: Pre-existing variable precedence
 
 The unconditional managed shared-agent-secrets exports in `~/.zshenv` SHALL take precedence over conflicting inherited values.
 
-#### Scenario: managed value overwrites parent sentinel
+#### Scenario: sentinel is preserved
 
 Given `HERMES_CUSTOM_SHOPAPIKEY_API_KEY` is set to `PRESET_SENTINEL` before zsh startup
 When `.zshenv` is loaded
