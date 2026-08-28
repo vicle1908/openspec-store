@@ -1,0 +1,33 @@
+# Local overrides (deployment infrastructure — untracked):
+#   1. Hub image instead of local build
+#   2. redis NOT published to host
+#   3. Named volume instead of bind mount — Docker Desktop for Mac virtiofs
+#      bind mounts corrupt SQLite WAL databases (OmniRoute hardcodes WAL mode)
+#   4. Relaxed healthcheck timing — upstream's 5s timeout false-positives
+#      during background model/credential sync; app is functional throughout
+#   5. Loopback-only port binding — official hardened pattern (README quick-run
+#      and VM guide both expose the app on 127.0.0.1, not all interfaces)
+services:
+  omniroute-base:
+    image: diegosouzapw/omniroute:latest
+    environment:
+      # Adopt upstream v3.8.50 runtime memory setting (upstream compose common
+      # anchor sets this; image default is 1024). We keep the v3.8.49 checkout,
+      # so it is applied here in the deployment-owned override instead.
+      - NODE_OPTIONS=--max-old-space-size=2048
+    volumes: !override
+      - omniroute-data:/app/data
+    ports: !override
+      - "127.0.0.1:${DASHBOARD_PORT:-20128}:${DASHBOARD_PORT:-20128}"
+      - "127.0.0.1:${API_PORT:-20129}:${API_PORT:-20129}"
+      - "127.0.0.1:${LIVE_WS_PORT:-20132}:${LIVE_WS_PORT:-20132}"
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.mjs"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 120s
+  redis:
+    ports: !reset []
+volumes:
+  omniroute-data: {}

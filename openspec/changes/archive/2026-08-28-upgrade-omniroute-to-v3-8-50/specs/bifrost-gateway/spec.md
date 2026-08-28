@@ -1,51 +1,4 @@
-# OmniRoute Proxy Specification
-
-## Purpose
-
-This specification defines the local OmniRoute proxy deployment and its integration with agent-core's native pydantic-ai model API. OmniRoute provides an OpenAI-compatible endpoint; agent consumers resolve a pydantic-ai `Model` with `create_model()` and pass it through the `model=` parameter.
-
-## Requirements
-
-### Requirement: OmniRoute SHALL run as a Docker Compose service
-
-The system SHALL deploy OmniRoute from `~/Omniroute/docker-compose.yml` with the `base` profile. The local override SHALL use the pre-built `diegosouzapw/omniroute:latest` image, and the service SHALL be named `omniroute` with `restart: unless-stopped`.
-
-#### Scenario: Service starts successfully
-- **WHEN** `docker compose --profile base up -d --no-build` is run from `~/Omniroute/`
-- **THEN** the `omniroute` container starts and its Compose health check becomes healthy
-
-#### Scenario: Service restarts automatically
-- **WHEN** the OmniRoute container crashes or the host restarts Docker
-- **THEN** Docker restarts the container using the `unless-stopped` policy
-
-### Requirement: OmniRoute SHALL persist runtime data
-
-The deployment SHALL persist OmniRoute runtime state on the Docker named
-volume `omniroute-data` mounted at `/app/data`. Host filesystem bind mounts
-SHALL NOT be used for `/app/data` because Docker Desktop for Mac virtiofs
-bind mounts corrupt SQLite WAL databases and OmniRoute hardcodes WAL mode.
-Redis rate-limiter state SHALL use the named `omniroute-redis-data` volume,
-and the Redis service SHALL NOT publish any port to the host.
-
-#### Scenario: Configuration persists across restarts
-
-- **WHEN** OmniRoute runtime configuration is changed and the container is restarted
-- **THEN** the configuration and runtime data remain available after restart
-
-#### Scenario: Named volume survives container recreation
-
-- **WHEN** `docker compose --profile base up -d --no-build` recreates the `omniroute` container
-- **THEN** the `omniroute-data` volume is reattached at `/app/data` and the SQLite database and its runtime state remain intact
-
-#### Scenario: Data directory is created if missing
-
-- **WHEN** the `omniroute-data` named volume does not yet exist and the Compose profile is started
-- **THEN** Docker creates the named volume mounted at `/app/data` and the service can initialize its data store
-
-#### Scenario: Redis is not host-published
-
-- **WHEN** the rendered Compose configuration is inspected
-- **THEN** the `redis` service has no published ports and is reachable only via the Compose network
+## MODIFIED Requirements
 
 ### Requirement: OmniRoute SHALL expose an OpenAI-compatible model API
 
@@ -89,38 +42,34 @@ HTTP 200 with a non-empty catalog in either posture.
 - **THEN** OmniRoute returns HTTP 401 with an `invalid_api_key` error
 - **AND** when catalog authentication is disabled the same request returns HTTP 200 with a non-empty catalog
 
-### Requirement: Native model resolution SHALL be the consumer integration boundary
+### Requirement: OmniRoute SHALL persist runtime data
 
-Agent-core consumers SHALL resolve the configured model through `create_model()` and pass the resulting pydantic-ai `Model` through `model=`. Endpoint, API key, and timeout overrides SHALL be represented by `ModelSettings` or explicit `create_model()` keyword arguments; consumers SHALL NOT construct a separate proxy client abstraction.
+The deployment SHALL persist OmniRoute runtime state on the Docker named
+volume `omniroute-data` mounted at `/app/data`. Host filesystem bind mounts
+SHALL NOT be used for `/app/data` because Docker Desktop for Mac virtiofs
+bind mounts corrupt SQLite WAL databases and OmniRoute hardcodes WAL mode.
+Redis rate-limiter state SHALL use the named `omniroute-redis-data` volume,
+and the Redis service SHALL NOT publish any port to the host.
 
-#### Scenario: Consumer resolves an OmniRoute model
-- **WHEN** a consumer loads `model.primary` and `model.base_url` from its settings
-- **THEN** it calls `create_model(model_id, base_url=base_url, api_key=api_key)` and receives a pydantic-ai `Model`
-- **AND** it passes that instance to agent construction as `model=model`
+#### Scenario: Configuration persists across restarts
 
-#### Scenario: Explicit model settings override environment defaults
-- **WHEN** `create_model()` receives an explicit `ModelSettings` value or explicit endpoint and API-key arguments
-- **THEN** those values take precedence over the process environment and provider defaults
+- **WHEN** OmniRoute runtime configuration is changed and the container is restarted
+- **THEN** the configuration and runtime data remain available after restart
 
-#### Scenario: Upstream model failure is typed
-- **WHEN** OmniRoute returns an API failure or cannot reach the selected provider
-- **THEN** the model call raises `ModelAPIError` with a safe diagnostic category and without exposing credentials
+#### Scenario: Named volume survives container recreation
 
-### Requirement: Native retry and fallback SHALL handle provider failures
+- **WHEN** `docker compose --profile base up -d --no-build` recreates the `omniroute` container
+- **THEN** the `omniroute-data` volume is reattached at `/app/data` and the SQLite database and its runtime state remain intact
 
-Consumers SHALL use pydantic-ai's native retry behavior and `FallbackModel` for optional provider failover. They SHALL NOT add a second resilience wrapper around OmniRoute calls. A fallback SHALL be attempted only for configured retryable model failures; authentication and invalid-request failures SHALL remain terminal.
+#### Scenario: Data directory is created if missing
 
-#### Scenario: Transient model failure is retried
-- **WHEN** a model call fails with a timeout, connection error, or retryable 5xx response
-- **THEN** native model retry applies the configured retry limit and backoff before returning failure
+- **WHEN** the `omniroute-data` named volume does not yet exist and the Compose profile is started
+- **THEN** Docker creates the named volume mounted at `/app/data` and the service can initialize its data store
 
-#### Scenario: Fallback model is attempted
-- **WHEN** the primary OmniRoute-backed model fails with a retryable `ModelAPIError` and a fallback model is configured
-- **THEN** `FallbackModel` attempts the fallback model
+#### Scenario: Redis is not host-published
 
-#### Scenario: Non-retryable model failure is not hidden
-- **WHEN** the provider returns an authentication or invalid-request error
-- **THEN** the error is surfaced immediately and no fallback attempt is made
+- **WHEN** the rendered Compose configuration is inspected
+- **THEN** the `redis` service has no published ports and is reachable only via the Compose network
 
 ### Requirement: OmniRoute SHALL expose a dashboard and health status
 
@@ -148,17 +97,7 @@ remains functional.
 - **WHEN** the proxy process cannot serve its configured endpoint
 - **THEN** the Compose health status becomes `unhealthy` and the container logs retain the diagnostic output
 
-### Requirement: OmniRoute SHALL follow local deployment conventions
-
-The deployment SHALL use Docker Compose v2 commands, keep the `base` profile opt-in, use loopback-only bindings for local model traffic by default, and keep secrets in the untracked `.env` file or an approved secret manager. The compose project and primary container name SHALL be `omniroute`.
-
-#### Scenario: Docker Compose v2 is used
-- **WHEN** the service is managed from the deployment directory
-- **THEN** `docker compose` commands are used rather than the legacy `docker-compose` command
-
-#### Scenario: Secrets are not committed
-- **WHEN** the deployment is prepared for a new workstation
-- **THEN** provider API keys are supplied through `.env` or an approved secret store and no secret value is committed to the repository
+## ADDED Requirements
 
 ### Requirement: OmniRoute image upgrades SHALL be fail-closed and evidence-gated
 
