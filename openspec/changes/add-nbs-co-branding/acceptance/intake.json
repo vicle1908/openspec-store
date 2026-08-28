@@ -3,7 +3,7 @@
   "artifact": "intake",
   "task_reference": "4.1",
   "recorded_at": "2026-08-28",
-  "status": "candidate-qualified-locally-drive-deferred",
+  "status": "candidate-preview-uploaded-release-deferred",
   "source_repository": "~/Developer/ntu-keynote",
   "source_worktree": "~/Developer/ntu-keynote/.worktrees/nbs-co-branding",
   "source_branch": "feat/nbs-co-branding",
@@ -28,7 +28,10 @@
   "nbs_asset": {
     "path": "assets/nbs-logo.png",
     "sha256": "e7a6df4f6e4fc3a5d80f43cf1582953258f9e6478ccd5274ee2e4297d96913a0",
-    "dimensions": [392, 43],
+    "dimensions": [
+      392,
+      43
+    ],
     "format": "PNG",
     "has_alpha": false,
     "provenance": "user-approved-third-party-derived",
@@ -49,8 +52,14 @@
   },
   "blocked_or_deferred": {
     "safari": "blocked — Safari Allow Remote Automation is disabled on the qualification host",
-    "drive_upload": "deferred until human brand approval; no candidate package uploaded",
-    "release": "blocked-automated; no tag and no archive",
+    "drive_upload": {
+      "status": "pass",
+      "scope": "candidate preview only",
+      "remote_path": "gdrive-tdt:NTU AI Keynote/50a6a5669563-f97a5f71054f",
+      "url": "https://drive.google.com/open?id=1JvW4QxBwjClLFhyKFHXli2qWHr0PADs0",
+      "readback": "READBACK_OK files=8"
+    },
+    "release": "blocked-automated; final publication/tag/archive not performed",
     "venue_rehearsal": "pending human projector/clicker/spoken-delivery gate",
     "vietnamese_editorial_review": "pending human gate"
   },
@@ -64,5 +73,13 @@
     "release_manifest": "evidence/release-manifest.json",
     "checksums": "checksums.sha256"
   },
-  "decision": "Provisional NBS co-branding implementation approved by Vinh Le; local qualification complete. Human brand approval and Drive/public release remain open/deferred."
+  "decision": "Provisional NBS co-branding implementation and versioned Drive candidate-preview upload approved by Vinh Le; final human brand approval and public release remain open.",
+  "candidate_preview_drive": {
+    "remote_path": "gdrive-tdt:NTU AI Keynote/50a6a5669563-f97a5f71054f",
+    "url": "https://drive.google.com/open?id=1JvW4QxBwjClLFhyKFHXli2qWHr0PADs0",
+    "source_commit": "50a6a566956398ef056058739e655ddc5d62b511",
+    "package_digest": "f97a5f71054fae2a64b3e5bfe2ed17f161a17e73a62f5b733e54d91d5806272a",
+    "files": 8,
+    "readback": "READBACK_OK files=8"
+  }
 }

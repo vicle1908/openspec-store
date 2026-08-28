@@ -11,11 +11,18 @@
     "dimensions": "392x43",
     "ocr": "Nanyang Business School (exact)"
   },
-  "approval_scope": "Provisional use of the extracted normalized wordmark candidate in the deck implementation and qualification. This approval does NOT constitute official NTU/NBS brand endorsement.",
+  "approval_scope": "Provisional use of the extracted normalized wordmark candidate in deck implementation, qualification, and the versioned Drive candidate-preview upload requested by the user. This approval does NOT constitute official NTU/NBS brand endorsement or authorize final release publication.",
   "remaining_gates": {
     "human_brand_approval": "OPEN — official brand sign-off still required before release eligibility",
     "release_status": "blocked-automated",
-    "drive_upload": "DEFERRED until brand approval (task 4.2)",
+    "drive_upload": {
+      "status": "pass",
+      "scope": "candidate preview only",
+      "remote_path": "gdrive-tdt:NTU AI Keynote/50a6a5669563-f97a5f71054f",
+      "url": "https://drive.google.com/open?id=1JvW4QxBwjClLFhyKFHXli2qWHr0PADs0",
+      "readback": "READBACK_OK files=8",
+      "final_release": "deferred"
+    },
     "tag_and_archive": "NOT authorized"
   },
   "classification_transition": {
