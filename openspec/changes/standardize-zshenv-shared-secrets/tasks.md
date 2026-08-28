@@ -107,3 +107,14 @@
   both return real results via `.zshenv`. Pre-fix backups in
   `~/.config/agent-llm/backups/20260827-zshenv-shared-secrets/pre-research-cli-centralization/`.
   Full evidence in EVIDENCE_MANIFEST.md → "Research-CLI centralization".
+
+- [ ] R7 (user action, tracked) Rotate the three provider keys exposed in
+  agent transcripts (phanmemvip, shopapikey, cockpit) at the provider side.
+  Value-blind check on 2026-08-28 confirmed all three are still
+  byte-identical to their pre-migration values (NOT yet rotated).
+  Provider-side rotation requires the provider dashboard and cannot be done
+  from this environment. After rotating: update only `~/.zshenv`, restart
+  the gateway (`launchctl kickstart -k gui/$(id -u)/ai.hermes.gateway`),
+  re-run provider sentinels. Status table in EVIDENCE_MANIFEST.md →
+  "Security note". (Does not block archive — the migration itself is
+  complete; this is post-migration security hygiene.)

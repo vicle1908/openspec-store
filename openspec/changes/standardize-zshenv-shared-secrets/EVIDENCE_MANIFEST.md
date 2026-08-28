@@ -396,17 +396,33 @@ supplied via mcp-router's own config `env:` block, not the shared tier.
 
 ### Security note
 
-During this session, literal credential values from `~/.zshenv` were
-displayed once inside a patch-tool fuzzy-match error message. They were not
-written to any file, committed, or delivered, but they passed through tool
-output in this transcript. **Treat the affected shared-tier values as
-compromised and rotate them at the provider side.** Recommended sequence:
-rotate every exposed provider/tool credential at its provider; update only
-`~/.zshenv` with the replacement values; recompute presence/length/hash
-checks without printing values; confirm no duplicate values remain in
-service `.env` files; re-run the provider sentinels after rotation. Never
-include raw secret values in patch context or diagnostic output. Local file
-permissions (600) are unaffected.
+Literal credential values from `~/.zshenv` passed through tool output in
+agent transcripts on two occasions: (1) once inside a patch-tool fuzzy-match
+error message during the initial migration, and (2) again on 2026-08-28 when
+a diagnostic `grep -n` printed three provider-key lines while investigating
+the gateway wrapper incident. In neither case were the values written to any
+file, committed, or delivered — but they appeared in transcript output.
+**Treat the affected shared-tier values as compromised and rotate them at the
+provider side.** Local file permissions (600) are unaffected.
+
+**Rotation status (checked 2026-08-28, value-blind hash comparison against the
+pre-migration manifest):**
+
+| Key | Status |
+|---|---|
+| `HERMES_CUSTOM_PHANMEMVIP_API_KEY` | ⚠️ **NOT yet rotated** — byte-identical to pre-migration value; rotate at provider |
+| `HERMES_CUSTOM_SHOPAPIKEY_API_KEY` | ⚠️ **NOT yet rotated** — byte-identical to pre-migration value; rotate at provider |
+| `HERMES_CUSTOM_COCKPIT_API_KEY` | ⚠️ **NOT yet rotated** — byte-identical to pre-migration value; rotate at provider |
+| `BRAVE_SEARCH_API_KEY` | ✅ Moot — replaced in R6 (was a URL, now the valid `BSAH…` key) |
+| `TAVILY_API_KEY` | ✅ Moot — replaced in R6 (was exhausted, now the valid key) |
+
+Provider-side rotation requires the provider's account/dashboard and cannot be
+performed from this environment. Recommended sequence once rotated: update only
+`~/.zshenv` with the replacement values; recompute presence/length/hash checks
+without printing values; restart the gateway (`launchctl kickstart -k
+gui/$(id -u)/ai.hermes.gateway`) so it re-sources the new values; confirm no
+duplicate values remain in service `.env` files; re-run the provider sentinels.
+Never include raw secret values in patch context or diagnostic output.
 
 ## OpenSpec planning evidence
 
