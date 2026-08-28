@@ -1,9 +1,10 @@
 {
   "change": "add-nbs-co-branding",
   "artifact": "nbs-logo-provenance-research",
-  "researched_at": "2026-08-27",
-  "researcher": "hermes-agent (intake research)",
-  "objective": "Locate an authoritative, downloadable Nanyang Business School (NBS) logo asset for the dual brand lockup",
+  "researched_at": "2026-08-28",
+  "researcher": "hermes-agent (intake research + user-directed extraction)",
+  "objective": "Locate an authoritative Nanyang Business School (NBS) logo asset for the dual brand lockup; user directed extraction from mbatube.com after official-site dead ends",
+  "status": "candidate-extracted-awaiting-user-and-brand-approval",
   "sources_attempted": [
     {
       "url": "https://www.ntu.edu.sg/about-us/nbs-brand",
@@ -17,8 +18,8 @@
     },
     {
       "url": "https://www.ntu.edu.sg/nbs",
-      "result": "HTTP 404 (NTU error page, 128KB)",
-      "notes": "Only asset on error page is /ResourcePackages/NTU/assets/images/NTU_Logo.png"
+      "result": "HTTP 404 (NTU error page)",
+      "notes": "Only asset on error page is NTU_Logo.png"
     },
     {
       "url": "https://www.ntu.edu.sg/nbs/about-us",
@@ -27,31 +28,138 @@
     },
     {
       "url": "https://nbs.ntu.edu.sg",
-      "result": "DNS resolution failure (HTTP 000)",
+      "result": "DNS resolution failure",
       "notes": "Subdomain does not resolve"
     },
     {
-      "url": "https://commons.wikimedia.org (search: 'Nanyang Business School logo', ns=6)",
+      "url": "https://commons.wikimedia.org (search: 'Nanyang Business School logo')",
       "result": "3 hits, none relevant",
       "notes": "No NBS logo file on Wikimedia Commons"
     },
     {
       "url": "maglr.com CDN candidate (62234f...png)",
       "result": "REJECTED",
-      "notes": "100x100 placeholder thumbnail from third-party CDN; fails provenance classification (not official-page-asset, brand-portal-download, or user-provided)"
+      "notes": "100x100 placeholder thumbnail from third-party CDN; fails provenance"
+    },
+    {
+      "url": "https://www.ntu.edu.sg/business/news-events/news/story-detail/welcome-to-gaia",
+      "result": "HTTP 200 (user-provided URL)",
+      "notes": "Live NBS news article; static header carries only NTU_Logo.png; article body has two official photos"
+    },
+    {
+      "url": "https://mbatube.com/images/schools/nanyang-business-school/logo.png",
+      "result": "HTTP 404",
+      "notes": "Guessed path does not exist (also 404 with referer)"
+    },
+    {
+      "url": "https://mbatube.com/school/nanyang-business-school",
+      "result": "HTTP 200 (user-directed)",
+      "notes": "School page; no school logo in static HTML except og:image under mbatube's own logos directory"
     }
   ],
-  "existing_ntu_logo_reference": {
-    "path": "assets/ntu-logo.png",
-    "sha256": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
-    "dimensions": "1304x512",
-    "notes": "NTU logo already in repo since commit 3f46568; no download URL recorded in evidence registers — likely user-provided at deck creation"
+  "user_provided_attachment": {
+    "path_received": "~/.hermes/cache/images/img_58f72e2dec49.jpg",
+    "format": "JPEG",
+    "dimensions": "755x582",
+    "has_alpha": false,
+    "sha256": "a073418011300c90d8e2550d15483d6ec8c58c6b9516641d4295bc2e9bda98da",
+    "content": "Photographed NTU/NBS signage lockup on textured tan background (border color stdev 36 — not keyable)",
+    "ocr": "NANYANG / TECHNOLOGICAL / UNIVERSITY / SINGAPORE + Nanyang Business School",
+    "assessment": "Official brand imagery but photographic/textured — not production-ready as a lockup asset"
   },
-  "conclusion": "No authoritative NBS logo asset is publicly retrievable. Per branding spec requirement 1 (provenance gate), the change SHALL NOT proceed to implementation until the user provides the approved NBS logo file or confirms an official source.",
-  "status": "blocked-on-user-asset",
+  "official_corroboration": {
+    "gaia_article": "https://www.ntu.edu.sg/business/news-events/news/story-detail/welcome-to-gaia",
+    "picture2_jpg": {
+      "url": "https://www.ntu.edu.sg/media/images/librariesprovider84/cafe/picture2.jpg?sfvrsn=b6aab697_1",
+      "dimensions": "755x582",
+      "sha256": "6a83ec731144eacbc0e2f0bba3fa46439cf612984d2874c1dd4569547e7eddc2",
+      "match_with_attachment": {
+        "dhash_agreement": "255/256 (99%)",
+        "mean_abs_pixel_diff": 4.05,
+        "verdict": "SAME IMAGE — user attachment is the official NTU-hosted picture2.jpg, Telegram-recompressed"
+      }
+    },
+    "picture1_jpg": {
+      "url": "https://www.ntu.edu.sg/media/images/librariesprovider84/cafe/picture1f3ba7d33-5215-4c31-aa68-402de0e13bd4.jpg?sfvrsn=d0e99310_1",
+      "dimensions": "1119x746",
+      "sha256": "9fc2bdb5f79bf0c1691483e7b300c8e316f294971a4930a84fd397dc1f0fc9b6",
+      "notes": "Gaia building exterior photo; no logo content (OCR empty)"
+    }
+  },
+  "extraction": {
+    "directed_by": "user message: 'Try extract logo from https://mbatube.com/school/nanyang-business-school'",
+    "source_page": "https://mbatube.com/school/nanyang-business-school",
+    "source_asset": {
+      "url": "https://mbatube.com/themes/mbatube/logos/a38e857a9d7e204f2314a13045b177f81588585510-1.jpg",
+      "role": "page og:image",
+      "format": "JPEG",
+      "dimensions": "409x195",
+      "sha256": "04221ae19b1df1085c62176fd6204b1187ef31cea86f9cfa48d3aff3e52060bc",
+      "content": "Composite lockup: NTU crest + NANYANG TECHNOLOGICAL UNIVERSITY SINGAPORE (rows 5-143) stacked above 'Nanyang Business School' wordmark (rows 158-188); clean white background; navy/red NTU brand colors"
+    },
+    "crop_box": {
+      "left": 6,
+      "top": 152,
+      "right": 398,
+      "bottom": 195,
+      "derivation": "bottom dense band rows 158-188 (gap-merged, threshold >15 dark px, gap<=5), col extent 12-391, +6px margin"
+    },
+    "output_white_bg": {
+      "path": "/tmp/nbs_wm_white.png",
+      "dimensions": "392x43",
+      "aspect": "9.1:1",
+      "sha256": "8082ad89d419a5c8f89797b2043fc073cd72e7b69830dc9eae705feaf4bb33b3",
+      "ocr": "Nanyang Business School (exact, full-width)",
+      "status": "RAW CROP — provenance artifact; superseded as production candidate by the normalized version"
+    },
+    "output_transparent": {
+      "path": "/tmp/nbs_wm_transparent.png",
+      "dimensions": "392x43",
+      "sha256": "e717c5399ffb320d48d963c83f8eb2c1d66b1b5ec6d332892a98d90d090d6fa5",
+      "ocr": "Nanyang Businese Schoöl (glyph damage from hard-threshold flood fill)",
+      "status": "REJECTED — glyph damage"
+    },
+    "whole_composite_rejected": "Full 409x195 composite NOT usable: it already contains NTU crest + university name, which would duplicate the deck's existing NTU logo",
+    "output_white_bg_normalized": {
+      "path": "/tmp/nbs_wm_white_norm.png",
+      "dimensions": "392x43",
+      "sha256": "e7a6df4f6e4fc3a5d80f43cf1582953258f9e6478ccd5274ee2e4297d96913a0",
+      "ocr": "Nanyang Business School (exact, full-width)",
+      "normalization": "glyph-safe: only near-white (>=240 all channels) pixels with NO content pixel in 8-neighborhood flattened to #fff; antialiased glyph halos preserved; 10053 px (59.6%) flattened; result 59.7% pure #fff / 9.7% halo / 30.6% content; dimensions and geometry unchanged",
+      "rationale": "raw crop background was 48.3% near-white JPEG noise (637 distinct values) which could reveal a faint rectangle even inside the opaque pill",
+      "status": "PRODUCTION CANDIDATE — pending user approval (task 1.1b)"
+    }
+  },
+  "chosen_candidate": {
+    "asset": "normalized white-background wordmark crop (392x43 PNG)",
+    "provenance_classification": "third-party-derived-pending-user-approval",
+    "rationale": "User explicitly directed extraction from mbatube.com; deterministic crop recorded; official Gaia imagery corroborates the brand lockup composition; NOT an officially issued brand asset — human brand gate remains open",
+    "known_limitations": [
+      "Third-party host (mbatube.com), not NTU-issued",
+      "JPEG-derived raster at 43px source height; rendering above ~43px height will soften",
+      "White background baked in (no alpha); relies on the deck's white pill lockup"
+    ],
+    "classification_stages": {
+      "current": "third-party-derived-pending-user-approval",
+      "transitions_to": "user-approved-third-party-derived",
+      "transition_condition": "explicit user approval of provisional use (task 1.1b); until then implementation SHALL NOT proceed"
+    },
+    "durable_storage": {
+      "candidate_path": "acceptance/candidates/nbs-wordmark-candidate.png",
+      "candidate_sha256": "e7a6df4f6e4fc3a5d80f43cf1582953258f9e6478ccd5274ee2e4297d96913a0",
+      "raw_crop_path": "acceptance/candidates/nbs-wordmark-raw-crop.png",
+      "raw_crop_sha256": "8082ad89d419a5c8f89797b2043fc073cd72e7b69830dc9eae705feaf4bb33b3",
+      "source_composite_path": "acceptance/candidates/mbatube-source-composite.jpg",
+      "source_composite_sha256": "04221ae19b1df1085c62176fd6204b1187ef31cea86f9cfa48d3aff3e52060bc",
+      "note": "Preserved durably under the change (not in /tmp). The normalized candidate is copied into the implementation worktree as assets/nbs-logo.png ONLY after task 1.1b approval. Raw crop and source composite retained for provenance and reproducibility."
+    }
+  },
+  "svg_attachment_note": "User attempted to send 'Nanyang_Technological_University-Logo.wine.svg' — file was never persisted to cache (find sweep empty). Filename indicates an NTU logo from Logo.wine, which is not the missing NBS mark; deck already carries assets/ntu-logo.png",
+  "conclusion": "A clean NBS wordmark candidate has been extracted per user direction and corroborated against official NTU-hosted imagery. The candidate is preserved durably under acceptance/candidates/ and is classified third-party-derived-pending-user-approval. Implementation SHALL NOT proceed until the user explicitly approves provisional use (task 1.1b); the human brand-approval gate remains OPEN and release stays blocked-automated.",
   "unblock_options": [
-    "User provides NBS logo file directly (PNG with transparency or SVG) — classified as user-provided",
-    "User confirms an official source URL (e.g., NTU staff brand portal export, NBS marketing kit)",
-    "User extracts the mark from an official NBS document (letterhead, report cover) and accepts responsibility for provenance"
-  ]
+    "Option 1 (recommended, provisional): use the extracted white-bg NBS wordmark for implementation with the human brand gate remaining open; swappable later for an official asset",
+    "Option 2: wait for an officially issued NBS asset (brand portal access or NTU marketing kit) before any implementation",
+    "Option 3: other user-directed source"
+  ],
+  "approval_note": "Extraction was user-directed ('Try extract logo from ...'); this authorizes research and candidate preparation only, NOT embedding in the deck. Task 1.1b requires an explicit user choice before implementation. A third-party-derived candidate is eligible for implementation preview only; it SHALL NOT close the human brand-approval gate or be represented as officially issued by NTU/NBS."
 }

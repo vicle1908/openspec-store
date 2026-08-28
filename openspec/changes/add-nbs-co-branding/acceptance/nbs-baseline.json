@@ -1,0 +1,30 @@
+{
+  "change": "add-nbs-co-branding",
+  "artifact": "nbs-baseline",
+  "task_reference": "1.2",
+  "frozen_at": "2026-08-28T00:02:23Z",
+  "repo": "~/Developer/ntu-keynote",
+  "main_head": "97a0236259d8a34b5dd25d0b55e2365bd90c7d25",
+  "worktree_clean": true,
+  "worktree_status_raw": "",
+  "public_package_digest": "8a96ed4f96147dbc0be384955433c5e257f2d4d01e5d9c4fc03f23563fa6e653",
+  "public_package_files": [
+    "index.html",
+    "assets/ntu-logo.png",
+    "assets/fonts/be-vietnam-pro-400.woff2",
+    "assets/fonts/be-vietnam-pro-600.woff2",
+    "assets/fonts/be-vietnam-pro-800.woff2",
+    "README.md",
+    "keynote-fallback.pdf"
+  ],
+  "file_sha256": {
+    "index.html": "1d98d8b4fe6cf00364e93a4184a380d70a3c1644f516216fc8316e5aa1e01dd1",
+    "assets/ntu-logo.png": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
+    "assets/fonts/be-vietnam-pro-400.woff2": "077c275da5dee47bc1080bc7d9ae479a837804572635f540e8809f70bc861c7e",
+    "assets/fonts/be-vietnam-pro-600.woff2": "dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125",
+    "assets/fonts/be-vietnam-pro-800.woff2": "a10e0182ead90b7d43874024d63cc32f09651ae7527a8736552ab7396df7240d",
+    "README.md": "43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469",
+    "keynote-fallback.pdf": "f96e95137b18ad0eed6ba754a4cdbe33048946c934a216fa7760a1961839f6ea"
+  },
+  "note": "Frozen before any asset registration or index.html modification. Re-verify at implementation start."
+}
