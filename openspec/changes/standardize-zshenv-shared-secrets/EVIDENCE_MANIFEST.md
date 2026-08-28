@@ -590,3 +590,27 @@ Brave, Tavily, Exa, GitHub validated live; provider keys validated via CLI
 round-trips (codex/opencode/pi/hermes PONG, phanmemvip/cockpit HTTP 200).
 OmniRoute/Firecrawl/OpenRouter/Copilot/NPMJS/Postman/API_KEY_SECRET have no
 cheap live probe and remain hash-preserved.
+
+### R6 follow-up: service env alignment + multi-agent sweep (2026-08-28)
+
+After R6 corrected the `.zshenv` values, the running launchd services still
+held the stale Brave/Tavily (all started before the ~10:05 fix and had
+sourced the old `.zshenv`).
+
+| Service | Consumes Brave/Tavily? | Action |
+|---|---|---|
+| `ai.hermes.gateway` | Yes — web toolset falls back to Tavily/Brave behind firecrawl | Restarted via `launchctl kickstart -k` (wrapper re-sources corrected `.zshenv`); new pid 28617 now holds BRAVE len 31 (not a URL) + TAVILY len 41; all 5 `HERMES_CUSTOM_*` present; 0 auth 401s |
+| `com.tdt.ai-review` / `com.tdt.webhook-receiver` | No (grep of both repos: zero references) | Left running — stale env is inert |
+
+Multi-agent sweep (other coding agents unaffected by R6, all live-verified):
+
+| Agent | Key mechanism | Live result |
+|---|---|---|
+| goose | macOS keychain (`api_key_env` hints; providers `configured: true`) | ✅ PONG via cockpit |
+| codex / opencode / pi / hermes | env (shared tier) | ✅ PONG each (verified pre-R6; keys unchanged by R6) |
+| Claude-Fable CLI | `apiKeyHelper` env-first scripts | ✅ single-line tokens |
+| mcp-router (Brave/Tavily MCP) | own valid keys (`auth_mode: keyed`) | ✅ both return results |
+
+Firecrawl (gateway's primary web backend) validated live: HTTP 200. No coding
+agent reads the cleared bx/tvly keystores; no agent config references
+`BRAVE_SEARCH_API_KEY`/`TAVILY_API_KEY` directly except via the shared tier.
