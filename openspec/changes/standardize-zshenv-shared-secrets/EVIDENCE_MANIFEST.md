@@ -465,3 +465,26 @@ installed plist on `hermes gateway start`/restart. Following the CLI's own
 advice would silently revert the D5 bridge and reproduce this incident.
 Mitigation rules and recovery procedure: design.md D5 hazard section.
 Proposed follow-up: wrapper-aware generator patch (decision pending).
+
+### Independent post-restart verification (2026-08-28, this session)
+
+Re-verified independently after the user-reported restart, without relying on
+the activation session's own claims:
+
+| Gate | Result | Evidence |
+|---|---:|---|
+| Gateway process | PASS | pid 42908, started Fri Aug 28 08:58:09 2026 — after plist edit (08-27 12:57) and wrapper edit (08-27 15:58) |
+| launchd loaded definition | PASS | `launchctl print` → `program = …/launchd-env-wrapper.sh` |
+| Gateway env (BSD `ps Eww`, names only) | PASS | 16/16 canonical shared-tier names present; 0 Giaoduc; `MCPR_TOKEN` absent (private tier) |
+| Native MCP bridge | PASS | `mcp__mcp_router__list_directory` on adapter repo returned real listing through the keyed gateway — the decisive 6.4b runtime proof |
+| Clean-room 4-mode matrix | PASS | 16/16 non-empty, 0 Giaoduc, 0 MCPR leak in `-c`/`-ic`/`-lc`/`-ilc` |
+| Wrapper dry run | PASS | exit 0, 16/16 non-empty, 0 Giaoduc, 0 MCPR |
+| Syntax + plist | PASS | `.zshenv`, `.zshrc`, wrapper `zsh -n` clean; plist lint OK; `ProgramArguments[0]` = wrapper |
+| Giaoduc sweep, live surfaces | PASS | 0 refs across all live config surfaces (documented historical backups excluded) |
+| Post-restart sentinels | PASS | clean-room `SHOPAPIKEY_LIVE_OK` and `COCKPIT_LIVE_OK`, both exit 0; cockpit 51006 TCP OPEN |
+| Auth errors post-08:58 | PASS | 0 genuine events. One grep hit at 09:12:53 was a false positive: a hardline-block warning whose text contains the literal string `401` inside a grep pattern, not an auth failure |
+
+Task ledger: all tasks checked (6.4a, 6.4b, R1–R4 complete). Migration is
+fully activated at runtime; the only open item is the documented D5 follow-up
+decision (wrapper-aware `generate_launchd_plist()` patch), which is a
+hardening decision, not a migration gap.
