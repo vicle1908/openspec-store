@@ -4,7 +4,7 @@
   "researched_at": "2026-08-28",
   "researcher": "hermes-agent (intake research + user-directed extraction)",
   "objective": "Locate an authoritative Nanyang Business School (NBS) logo asset for the dual brand lockup; user directed extraction from mbatube.com after official-site dead ends",
-  "status": "candidate-extracted-awaiting-user-and-brand-approval",
+  "status": "candidate-approved-for-provisional-use",
   "sources_attempted": [
     {
       "url": "https://www.ntu.edu.sg/about-us/nbs-brand",
@@ -132,7 +132,7 @@
   },
   "chosen_candidate": {
     "asset": "normalized white-background wordmark crop (392x43 PNG)",
-    "provenance_classification": "third-party-derived-pending-user-approval",
+    "provenance_classification": "user-approved-third-party-derived",
     "rationale": "User explicitly directed extraction from mbatube.com; deterministic crop recorded; official Gaia imagery corroborates the brand lockup composition; NOT an officially issued brand asset — human brand gate remains open",
     "known_limitations": [
       "Third-party host (mbatube.com), not NTU-issued",
@@ -140,9 +140,10 @@
       "White background baked in (no alpha); relies on the deck's white pill lockup"
     ],
     "classification_stages": {
-      "current": "third-party-derived-pending-user-approval",
+      "current": "user-approved-third-party-derived",
       "transitions_to": "user-approved-third-party-derived",
-      "transition_condition": "explicit user approval of provisional use (task 1.1b); until then implementation SHALL NOT proceed"
+      "transition_condition": "explicit user approval of provisional use (task 1.1b); until then implementation SHALL NOT proceed",
+      "transition_recorded": "2026-08-28T00:36:52Z"
     },
     "durable_storage": {
       "candidate_path": "acceptance/candidates/nbs-wordmark-candidate.png",
@@ -161,5 +162,6 @@
     "Option 2: wait for an officially issued NBS asset (brand portal access or NTU marketing kit) before any implementation",
     "Option 3: other user-directed source"
   ],
-  "approval_note": "Extraction was user-directed ('Try extract logo from ...'); this authorizes research and candidate preparation only, NOT embedding in the deck. Task 1.1b requires an explicit user choice before implementation. A third-party-derived candidate is eligible for implementation preview only; it SHALL NOT close the human brand-approval gate or be represented as officially issued by NTU/NBS."
+  "approval_note": "Extraction was user-directed ('Try extract logo from ...'); this authorizes research and candidate preparation only, NOT embedding in the deck. Task 1.1b requires an explicit user choice before implementation. A third-party-derived candidate is eligible for implementation preview only; it SHALL NOT close the human brand-approval gate or be represented as officially issued by NTU/NBS.",
+  "user_approval_reference": "acceptance/nbs-candidate-approval.json"
 }

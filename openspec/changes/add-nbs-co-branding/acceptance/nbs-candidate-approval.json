@@ -1,0 +1,26 @@
+{
+  "change": "add-nbs-co-branding",
+  "artifact": "nbs-candidate-approval",
+  "task_reference": "1.1b",
+  "approved_at": "2026-08-28T00:36:52Z",
+  "approver": "Vinh Le (user, via Telegram DM)",
+  "approval_message": "Ok let proceed. Finish remaining changes tasks",
+  "approved_asset": {
+    "path": "acceptance/candidates/nbs-wordmark-candidate.png",
+    "sha256": "e7a6df4f6e4fc3a5d80f43cf1582953258f9e6478ccd5274ee2e4297d96913a0",
+    "dimensions": "392x43",
+    "ocr": "Nanyang Business School (exact)"
+  },
+  "approval_scope": "Provisional use of the extracted normalized wordmark candidate in the deck implementation and qualification. This approval does NOT constitute official NTU/NBS brand endorsement.",
+  "remaining_gates": {
+    "human_brand_approval": "OPEN — official brand sign-off still required before release eligibility",
+    "release_status": "blocked-automated",
+    "drive_upload": "DEFERRED until brand approval (task 4.2)",
+    "tag_and_archive": "NOT authorized"
+  },
+  "classification_transition": {
+    "from": "third-party-derived-pending-user-approval",
+    "to": "user-approved-third-party-derived",
+    "condition_met": "explicit user approval recorded in this artifact"
+  }
+}
