@@ -41,7 +41,7 @@
 - [x] 6.2 Write a redacted evidence manifest with provenance and honest blockers.
 - [x] 6.3 Run `detect_changes`, scoped `git diff --check`, and a secret-pattern scan (filenames/counts only).
 - [x] 6.4 Commit only this change directory; preserve unrelated store work.
-- [ ] 6.5 Re-run strict validation; archive only after all approved work passes.
+- [x] 6.5 Re-run strict validation; archive only after all approved work passes. (Post-archive bookkeeping: target strict validation passed 390/390 on 2026-08-28; global `validate --archived` still reports failures from ten unrelated pre-existing incomplete archives; this archived change itself is complete.)
 
 ## Scope and safety locks
 
