@@ -4,6 +4,12 @@
 
 The archived change `configure-omniroute-sh-models-across-agent-clis` (commits 41f8c1d, 6e6da66, eefc69e) registered the two approved OmniRoute models (`sh/gpt-5.6-sol` and `sh/Claude-Fable`) in pi, goose, and kimi, and confirmed omp and Kilo already carried `sh/*` routing. Four installed coding-agent CLIs with documented OmniRoute-compatible mechanisms still lack that registration: OpenCode, Droid, Grok, and Codex. This change extends the same clean-break `sh/*` routing to those four, registration-only, without changing any default model.
 
+## What Changes
+
+- Register the two live OmniRoute `sh/*` models in OpenCode, Droid, Grok, and Codex using each CLI's official provider mechanism.
+- Use environment-backed `OMNIROUTE_API_KEY` indirection and preserve existing providers and defaults.
+- Use Grok's proven Messages backend and Codex's required Responses provider configuration, with isolated real sentinel verification.
+
 ## Scope
 
 This change SHALL:
