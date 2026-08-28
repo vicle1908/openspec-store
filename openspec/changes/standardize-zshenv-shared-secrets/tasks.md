@@ -71,5 +71,23 @@
   `launchd-env-wrapper.sh`, and `refresh_launchd_plist_if_needed()`
   overwrites the installed plist on `hermes gateway start`/restart —
   silently reverting the D5 bridge. Hazard + recovery procedure documented
-  in design.md D5 and EVIDENCE_MANIFEST.md. A wrapper-aware patch to the
-  hermes generator is proposed as a follow-up decision (not applied here).
+  in design.md D5 and EVIDENCE_MANIFEST.md. Follow-up patch applied
+  same-day — see R5.
+
+- [x] R5 (2026-08-28) Wrapper-aware generator patch applied to
+  `~/.hermes/hermes-agent` (upstream checkout; local uncommitted change,
+  the update path's designed mechanism for local modifications). New
+  config knob `gateway.launchd_env_wrapper` in `~/.hermes/config.yaml`
+  makes `generate_launchd_plist()` prepend the wrapper to
+  ProgramArguments, so `hermes gateway start`/restart rewrites now
+  PRESERVE the D5 bridge instead of stripping it. Resolver fails open
+  (unset/non-executable → upstream plist shape). 6 new tests
+  (`TestLaunchdEnvWrapper`); full suite green (109 + 72 passed); ruff
+  clean. End-to-end: `refresh_launchd_plist_if_needed()` rewrote the
+  plist to the current format WITH wrapper; gateway restarted via the
+  detached reload helper (pid 6023); all 5 `HERMES_CUSTOM_*` keys in
+  process env; 0 auth 401s; `hermes gateway status` now reports
+  "Service definition matches the current Hermes install". Patch backup
+  for re-application after an `hermes update` stash-restore conflict:
+  `~/.config/agent-llm/backups/20260827-zshenv-shared-secrets/hermes-launchd-env-wrapper.patch`.
+  Full evidence in EVIDENCE_MANIFEST.md → "Wrapper-aware generator patch".

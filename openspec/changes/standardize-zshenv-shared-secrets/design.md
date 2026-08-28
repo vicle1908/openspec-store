@@ -154,20 +154,36 @@ status` reports "Service definition is stale — Run: hermes gateway start",
 which would make it worse). The TDT/adapter plists are not owned by Hermes
 and are unaffected.
 
-Rules until a wrapper-aware generator patch lands:
-- NEVER run `hermes gateway start` to "fix" the stale warning.
+**Resolution (2026-08-28, task R5):** a wrapper-aware generator patch was
+applied to `~/.hermes/hermes-agent`. A new config knob
+`gateway.launchd_env_wrapper` (set in `~/.hermes/config.yaml` to the
+wrapper path) makes `generate_launchd_plist()` prepend the wrapper to
+ProgramArguments — mirroring the existing `runtime.nofile_soft_limit`
+idiom, whose comment documents this exact failure class ("every plist
+rewrite would silently strip a manually-added limit"). The resolver
+(`_configured_launchd_env_wrapper()`) fails open: unset, non-string, or
+non-executable → `None` → upstream plist shape. With the knob set,
+`hermes gateway start`/restart now re-emits the wrapper on every rewrite,
+and `hermes gateway status` reports the definition current.
+
+Operational rules (still apply):
 - To restart the gateway: `launchctl kickstart -k gui/$(id -u)/ai.hermes.gateway`
   (re-spawns from the loaded definition, wrapper preserved).
 - To reload after plist edits: `launchctl bootout` + `bootstrap` (a plain
   restart re-reads the cached definition — this is exactly how the
-  2026-08-28 08:44 incident happened).
-- After any Hermes update or `hermes gateway` command, re-check the plist:
+  2026-08-28 08:44 incident happened). Hermes' own refresh path uses a
+  detached reload helper for the same reason.
+- **Update survival:** the patch is a local uncommitted change in the
+  upstream checkout. `hermes update` stashes local changes, pulls, and
+  restores them (`updates.non_interactive_local_changes: stash` is the
+  default) — so the patch normally survives. If a stash-restore conflict
+  occurs, re-apply from
+  `~/.config/agent-llm/backups/20260827-zshenv-shared-secrets/hermes-launchd-env-wrapper.patch`
+  (`git apply`), then re-check the plist:
   `plutil -p ~/Library/LaunchAgents/ai.hermes.gateway.plist | grep -c launchd-env-wrapper`
-  must be ≥ 1; if 0, restore from
-  `~/.config/agent-llm/backups/20260827-zshenv-shared-secrets/` and
-  bootout/bootstrap.
-- Follow-up decision: patch `generate_launchd_plist()` to prepend the
-  wrapper (or move shared-tier keys into a Hermes-native env mechanism).
+  must be ≥ 1.
+- The config knob lives in `~/.hermes/config.yaml` (outside the git
+  checkout), so it survives updates unconditionally.
 
 ### D6: Claude apiKeyHelper rewrite
 

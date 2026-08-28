@@ -488,3 +488,54 @@ Task ledger: all tasks checked (6.4a, 6.4b, R1–R4 complete). Migration is
 fully activated at runtime; the only open item is the documented D5 follow-up
 decision (wrapper-aware `generate_launchd_plist()` patch), which is a
 hardening decision, not a migration gap.
+
+## Wrapper-aware generator patch (2026-08-28, task R5)
+
+### Change
+
+`~/.hermes/hermes-agent/hermes_cli/gateway.py` (upstream checkout, local
+uncommitted change):
+
+- New `_configured_launchd_env_wrapper()` resolver: reads
+  `gateway.launchd_env_wrapper` via `load_config_readonly()`, validates it
+  is an executable file, fails open to `None` on any error (unset,
+  non-string, missing, non-executable, config unloadable).
+- `generate_launchd_plist()` prepends the resolved wrapper to
+  ProgramArguments before the `stderr_timestamp` command. Mirrors the
+  `runtime.nofile_soft_limit` / SoftResourceLimits idiom.
+- Config knob added to `~/.hermes/config.yaml` (outside the git checkout):
+  `gateway.launchd_env_wrapper: /Users/androidteam/.config/agent-llm/launchd-env-wrapper.sh`.
+- 6 new tests in `tests/hermes_cli/test_gateway_service.py`
+  (`TestLaunchdEnvWrapper`): prepend when configured, omit when unset,
+  resolver absent-key / non-executable / executable / config-unloadable.
+
+### Verification
+
+| Gate | Result | Evidence |
+|---|---:|---|
+| New test class | PASS | 6/6 passed |
+| Full gateway service suite | PASS | 109 passed, 1 skipped |
+| Gateway status suite | PASS | 72 passed, 2 skipped |
+| Lint | PASS | ruff 0.15.10 (repo-pinned) clean on both changed files |
+| Generated plist | PASS | ProgramArguments[0] = wrapper; 13 args; `plistlib` parses |
+| Config merge | PASS | `gateway.launchd_env_wrapper` present; existing gateway keys preserved (deep merge) |
+| End-to-end refresh | PASS | `refresh_launchd_plist_if_needed()` rewrote plist to current format WITH wrapper; detached reload helper restarted gateway (pid 42908 → 6023) |
+| New process env | PASS | all 5 `HERMES_CUSTOM_*` keys + shared tool keys present (names via `ps Eww`; values never printed) |
+| Auth errors post-refresh | PASS | 0 `401`/`AuthenticationError` events |
+| `hermes gateway status` | PASS | "✓ Service definition matches the current Hermes install" (stale warning gone) |
+
+### Update-survival strategy
+
+The patch is a local uncommitted change in the upstream checkout.
+`hermes update` uses `updates.non_interactive_local_changes: stash`
+(default): it stashes local changes, pulls, and restores them — the patch
+normally survives. On a stash-restore conflict, re-apply:
+
+```bash
+cd ~/.hermes/hermes-agent
+git apply ~/.config/agent-llm/backups/20260827-zshenv-shared-secrets/hermes-launchd-env-wrapper.patch
+```
+
+The config knob in `~/.hermes/config.yaml` is outside the git checkout and
+survives updates unconditionally. Patch backup (153 lines, 2 files,
++118/−6) stored alongside the migration backups.
