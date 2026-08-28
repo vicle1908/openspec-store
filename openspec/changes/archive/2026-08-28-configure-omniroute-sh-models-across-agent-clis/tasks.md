@@ -40,7 +40,7 @@
 - [x] 6.1 Verify rollback capability for every changed file (backups present, mode 600, hashes recorded).
 - [x] 6.2 Write a redacted evidence manifest with provenance and honest blockers.
 - [x] 6.3 Run `detect_changes`, scoped `git diff --check`, and a secret-pattern scan (filenames/counts only).
-- [ ] 6.4 Commit only this change directory; preserve unrelated store work.
+- [x] 6.4 Commit only this change directory; preserve unrelated store work.
 - [ ] 6.5 Re-run strict validation; archive only after all approved work passes.
 
 ## Scope and safety locks
