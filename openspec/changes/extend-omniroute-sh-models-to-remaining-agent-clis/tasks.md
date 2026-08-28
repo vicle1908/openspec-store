@@ -31,8 +31,8 @@
 - [x] 5.1 Verify rollback capability for every changed file. (All four backups exist with mode 600 and parse successfully when copied to a disposable directory; `ROLLBACK_CHECK=PASS`.)
 - [x] 5.2 Write a value-blind evidence manifest with provenance and honest blockers. (`EVIDENCE_MANIFEST.md` records live registry, backups/hashes, mutations, sentinels, preservation audit, and Grok/Codex blockers without credential values.)
 - [x] 5.3 Run `detect_changes`, scoped `git diff --check`, and a secret-pattern scan (filenames/counts only). (`detect_changes` staged result: 7 changed files, 0 indexed symbols/processes, risk low; `diff_check=PASS`; `secret_pattern_hits=0`.)
-- [ ] 5.4 Commit only this change directory; preserve unrelated store work.
-- [ ] 5.5 Re-run target strict validation; archive only after all approved work passes. (Do not gate on global `validate --archived`, which fails due to unrelated pre-existing incomplete archives.)
+- [x] 5.4 Commit only this change directory; preserve unrelated store work. (Commit `7d6b7b0` contains only the seven files in this change; unrelated store work remains untracked/untouched.)
+- [ ] 5.5 Re-run target strict validation; archive only after all approved work passes. (Target strict validation re-run after commit passed exit 0 on 2026-08-28; archive remains blocked by the open Grok and Codex runtime-sentinel tasks.)
 
 ## Scope and safety locks
 
