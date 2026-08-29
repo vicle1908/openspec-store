@@ -27,7 +27,7 @@ Task 2.2 — provider credential value scan (values withheld; presence checks on
 - All six provider credential values (HERMES_CUSTOM_SHOPAPIKEY/PHANMEMVIP/COCKPIT/ANTIGRAVITY/LOCALHOST_51006_API_KEY, OMNIROUTE_API_KEY): **ABSENT** from `~/.grok/config.toml` and from every artifact in this change directory
 - Pattern scan of change directory (pmv_/agt_/mcpr_/sk-/xai- value prefixes): **no hits**
 
-**Pre-existing observation (out of change scope):** `~/.grok/config.toml` embeds a literal MCP server token (`MCPR_TOKEN` for the mcp-router server) in `[mcp_servers.mcp-router.env]`. It predates this change, is not a provider credential, and is unchanged by this change. Flagged for a separate hardening change (indirect it through env like provider keys); reason the config backup is stored outside the git-tracked store.
+**Pre-existing observation (out of change scope):** `~/.grok/config.toml` embeds a literal MCP server token (`MCPR_TOKEN` for the mcp-router server) in `[mcp_servers.mcp-router.env]`. It predates this change, is not a provider credential, and is unchanged by this change. Flagged for a separate hardening change (`harden-grok-cli-mcp-credentials`: env indirection via a wrapper, since grok's MCP env table accepts literal values only); reason the config backup is stored outside the git-tracked store.
 
 ## 4. Live catalog check
 
