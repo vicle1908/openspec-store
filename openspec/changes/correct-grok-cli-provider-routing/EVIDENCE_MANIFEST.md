@@ -83,3 +83,38 @@ Task 4.2 — combinations that must not be re-enabled for these gateways; these 
 | messages | cockpit (Claude-Fable model) | 404 `model_not_available` — model not in key scope; cockpit works via chat_completions |
 
 Identical failures on grok 1.0.3 and 1.0.5 → gateway response-shape mismatch, not a CLI regression.
+
+## 9. Post-verification probes (2026-08-29 follow-up)
+
+Resolving the verification warning (credential-absence divergence) and exercising the remaining conditional scenarios. All sanitized.
+
+### 9.1 Keyless root-cause attribution
+
+- Deployment setting: `REQUIRE_API_KEY=false` in `~/Omniroute/.env` (source comments confirm anonymous-access semantics on API routes)
+- Route characterization: `/v1/models` without auth → 401 `Authentication required`; chat route without auth → request processed and routed to the same upstream as auth'd requests (non-streaming no-auth → 502 `upstream_empty_response`, the documented streaming-only constraint, not an auth rejection)
+- CLI: omniroute-sol with `OMNIROUTE_API_KEY` unset (subshell only) → exit 0, sentinel answered on the configured endpoint/model — no reroute, no model rewrite
+- Contrast: cockpit-sol with its key unset → exit 1, `Unauthorized (401) ... missing or invalid API key`, no answer → fail-clearly holds for credential-requiring gateways
+- Credential chain observation: cockpit 401 detail showed `Auth: Oidc` — grok falls back to the xAI session credential when env_key is unset (documented CLI resolution order); no literal values written anywhere
+
+### 9.2 Service-stopped probe (controlled stop/start)
+
+- Pre-check: `docker logs omniroute --since 15m` empty (idle) before both cycles
+- Cycle 1 (45s window): exit 124 (probe timeout), no output, no answer — CLI still retrying at expiry
+- Cycle 2 (150s window): exit 124, no output, no answer — CLI retried the full window without surfacing an error
+- Invariants held in both windows: no answer, no fallback to another provider, no model rewrite
+- Restoration: `/v1/models` 200 after ~10–15s of `docker start`; restoration sentinel OK (exit 0); container healthy; redis untouched
+- Classification: connect-refused triggers the CLI's retry budget (exceeds 150s) — observed CLI retry behavior, not a routing defect
+
+### 9.3 Unavailable-model probe
+
+- Streaming chat with a nonexistent `sh/*` model (auth'd): keepalive chunks, then a clean SSE `error` event (`authentication_error`/`invalid_api_key`) carrying the upstream package's model allowlist message — no answer, no substitution
+- `/v1/responses` with the same model: `authentication_error` — `All 2 connection(s) authentication expired — please reconnect in the dashboard` (the responses-mode upstream connections show expired in the OmniRoute dashboard as of this probe; the chat-mode path is unaffected)
+- Classification: model-out-of-scope failures surface as provider errors with a misleading `invalid_api_key` code from the upstream package gate — a routing constraint, not a failure of the configured credential
+
+### 9.4 No-mutation re-check
+
+- `~/.grok/config.toml` sha256 unchanged after all probes: `d60fdaf97e7117ad0be9bcb84a608fe642a9a9f72a0401447b54b56e0de9397c`
+
+### 9.5 Scenario alignment performed
+
+- Delta-spec scenarios amended per §9.1–§9.3 (fail-clearly scoped to credential-requiring gateways; keyless, service-stopped, and model-unavailable conditions split into accurate scenarios); design context/decisions/risks updated; workspace OmniRoute notes updated with the keyless property

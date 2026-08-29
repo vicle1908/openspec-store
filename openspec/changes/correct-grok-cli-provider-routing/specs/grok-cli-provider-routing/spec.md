@@ -27,10 +27,22 @@ The OmniRoute provider SHALL use `http://localhost:20128/v1`, reference `OMNIROU
 - **WHEN** Grok CLI loads the OmniRoute provider
 - **THEN** it SHALL resolve the environment-backed credential, query `/v1/models` at port 20128, and forward an approved exact `sh/*` model identifier
 
-#### Scenario: OmniRoute is unavailable
+#### Scenario: OmniRoute service is stopped
 
-- **WHEN** the local service is stopped, the credential is absent, or the selected model is unavailable
-- **THEN** the CLI SHALL report a provider-specific failure and SHALL NOT silently send the request to another provider or rewrite the model identifier
+- **WHEN** the local OmniRoute service is not listening
+- **THEN** the request SHALL NOT complete against another provider or a rewritten model identifier
+- **AND** the CLI SHALL surface a provider-specific connection failure after exhausting its retry budget
+
+#### Scenario: OmniRoute model is unavailable
+
+- **WHEN** the selected `sh/*` model identifier is not servable by the upstream package
+- **THEN** the CLI SHALL surface the gateway's provider-specific error without substituting a different provider or model identifier
+
+#### Scenario: OmniRoute credential is absent on the keyless route
+
+- **WHEN** `OMNIROUTE_API_KEY` is unset and the deployment serves inference without a key
+- **THEN** the request MAY complete on the configured endpoint and model identifier
+- **AND** the CLI SHALL NOT route the request to another provider or rewrite the model identifier
 
 ### Requirement: Credentials SHALL remain external to configuration artifacts
 
@@ -41,10 +53,16 @@ Provider API keys SHALL be supplied through documented environment-variable refe
 - **WHEN** a configured provider is invoked from a shell that exports its declared environment variable
 - **THEN** the CLI SHALL resolve the credential and authenticate the request without exposing its value in output or evidence
 
-#### Scenario: Credential is missing
+#### Scenario: Credential is missing on a credential-requiring gateway
 
-- **WHEN** the declared environment variable is unset
-- **THEN** the provider request SHALL fail clearly without leaking another provider credential or mutating the configuration
+- **WHEN** the declared environment variable is unset and the gateway rejects unauthenticated requests
+- **THEN** the provider request SHALL fail clearly with a provider-specific authentication error, without leaking another provider credential or mutating the configuration
+
+#### Scenario: Credential is missing on the keyless local inference route
+
+- **WHEN** the declared environment variable is unset and the deployment serves inference without a key (OmniRoute with `REQUIRE_API_KEY=false`)
+- **THEN** the request SHALL still target the configured endpoint and model identifier without routing to another provider or rewriting the model
+- **AND** no literal credential value SHALL be written to the configuration or evidence
 
 ### Requirement: Routing changes SHALL have real-call and tool-call evidence
 

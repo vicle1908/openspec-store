@@ -29,3 +29,11 @@ All verification calls are real but bounded: one sentinel turn and one disposabl
 - [x] 5.1 Run `openspec validate correct-grok-cli-provider-routing --strict --store openspec-store` and confirm it passes
 - [x] 5.2 Run `git diff --check` in the store and stage only this change's artifacts; confirm the scoped diff contains no credential values and no unrelated files
 - [x] 5.3 Commit the OpenSpec store change with a message referencing `correct-grok-cli-provider-routing`
+
+## 6. Verification follow-up (2026-08-29)
+
+- [x] 6.1 Amend the credential-absence and unavailability scenarios to match verified deployment behavior (fail-clearly scoped to credential-requiring gateways; OmniRoute keyless route documented) and verify strict validation
+- [x] 6.2 Probe the OmniRoute service-stopped condition via controlled docker stop/start (idle-verified) and record CLI failure semantics: no answer, no fallback, no model rewrite; CLI retried beyond both probe windows (45s, 150s)
+- [x] 6.3 Probe the unavailable-model condition with a bogus `sh/*` model and record gateway error semantics (upstream package allowlist error surfaced as a clean SSE error; no substitution)
+- [x] 6.4 Record post-verification evidence in the manifest: keyless root cause (`REQUIRE_API_KEY=false`), route-level characterization, credential-absent matrices, no-mutation re-check
+- [x] 6.5 Document the deployment property in workspace notes, re-run strict validation over the amended change, and commit the follow-up

@@ -10,6 +10,8 @@ Grok CLI 1.0.5 (`~/.grok`) routes four custom providers: `shopapikey` and `phanm
 
 The configuration corrections were applied during diagnosis: all four providers now declare `api_backend = "chat_completions"`, OmniRoute uses `http://localhost:20128/v1`, and `sh/*` models carry per-model `context_window` values. All seven registered models passed text and tool-call probes. This change formalizes that state with a verifiable contract, backup, and sanitized evidence rather than introducing new mutations.
 
+Post-apply verification established two deployment facts that shape the scenarios: the local OmniRoute deployment runs with `REQUIRE_API_KEY=false` (`~/Omniroute/.env`), so inference routes serve requests without a key while `/v1/models` still returns 401 unauthenticated; and when a provider's `env_key` variable is unset, grok's documented credential chain falls back to the xAI session credential (observed as `Auth: Oidc` in a cockpit 401), which credential-requiring gateways reject and the keyless local route ignores.
+
 ## Goals / Non-Goals
 
 **Goals:**
@@ -34,6 +36,7 @@ The configuration corrections were applied during diagnosis: all four providers 
 5. **Streaming-only constraint on OmniRoute `sh/*` accepted and documented.** Grok CLI always streams, so the non-streaming `upstream_empty_response` failure is out of the CLI's request path; it is recorded as a constraint, not a blocker.
 6. **Verification protocol: one sentinel text call plus one disposable tool-call probe per model, spaced to respect the observed phanmemvip.shop rate limit.** A provider counts as verified only when both succeed with exact expected output and no serialization, auth, or reconnect error.
 7. **Backup semantics.** The corrected state receives a fresh mode-600 backup and recorded hash. The pre-diagnosis lineage exists only as `config.toml.bak-pre-*` files that predate the `env_key` migration and contain legacy literal keys — restorable only as a last resort and treated as sensitive material.
+8. **Treat the keyless OmniRoute inference route as a deployment property.** With `REQUIRE_API_KEY=false`, credential absence does not gate chat requests on this gateway; the protective invariants are endpoint/model fidelity (no reroute, no rewrite) and zero literal credentials in config or evidence. The fail-clearly expectation is scoped to credential-requiring gateways (api.phanmemvip.shop, cockpit), where it was verified directly.
 
 ## Risks / Trade-offs
 
@@ -44,6 +47,8 @@ The configuration corrections were applied during diagnosis: all four providers 
 - [Catalog drift on `sh/*` IDs and context windows] → apply-time verification re-fetches `/v1/models` and compares registered IDs against it.
 - [Upstream `sh/*` quirk: injected system-prompt memory observed in reasoning output] → no routing impact; sentinel expectations match the final answer only, never reasoning content.
 - [Credential exposure in evidence] → evidence records statuses, model IDs, timings, and exit codes only; no headers, bodies, or key material.
+- [Session-credential fallback to custom endpoints when env_key is unset] → grok's documented resolution order falls through to the xAI session credential; credential-requiring gateways reject it (observed cockpit 401) and the keyless local route ignores it. Mitigation: documented here and in evidence; per-provider fail-closed auth hardening would be a separate change.
+- [Connect-refused retries exceed bounded probe windows] → grok retried a stopped endpoint for >150s without surfacing an error (45s and 150s windows both expired while retrying, with no answer and no fallback). Mitigation: recorded as observed CLI retry behavior; scenarios assert the no-reroute/no-rewrite invariants directly and defer error surfacing to the CLI's retry budget.
 
 ## Migration Plan
 
