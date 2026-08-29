@@ -12,9 +12,9 @@ The `~/.claude/settings.json` file SHALL contain the shopapikey model, base URL,
 #### Scenario: settings.json provides shopapikey defaults
 
 - **WHEN** `~/.claude/settings.json` is loaded
-- **THEN** it MUST contain a top-level `model` key set to `fable[1m]`
+- **THEN** it MUST contain a top-level `model` key set to `Claude-Fable[1m]`
 - **AND** its `env` block MUST contain `ANTHROPIC_BASE_URL=https://api.phanmemvip.shop`
-- **AND** its `env` block MUST contain `ANTHROPIC_MODEL=fable[1m]`
+- **AND** its `env` block MUST contain `ANTHROPIC_MODEL=Claude-Fable[1m]`
 - **AND** its `env` block MUST contain `ANTHROPIC_DEFAULT_FABLE_MODEL=Claude-Fable[1m]`
 - **AND** its `env` block MUST contain `CLAUDE_CODE_EFFORT_LEVEL=xhigh`
 
@@ -103,9 +103,9 @@ Each provider profile JSON under `~/.claude/profiles/` SHALL contain a top-level
 #### Scenario: shopapikey profile defines fable[1m] with xhigh
 
 - **WHEN** `~/.claude/profiles/shopapikey.json` is loaded
-- **THEN** `model` MUST be `fable[1m]`
+- **THEN** `model` MUST be `Claude-Fable[1m]`
 - **AND** `env.ANTHROPIC_BASE_URL` MUST be `https://api.phanmemvip.shop`
-- **AND** `env.ANTHROPIC_MODEL` MUST be `fable[1m]`
+- **AND** `env.ANTHROPIC_MODEL` MUST be `Claude-Fable[1m]`
 - **AND** `env.CLAUDE_CODE_EFFORT_LEVEL` MUST be `xhigh`
 
 #### Scenario: cockpit profile defines gpt-5.6-luna[1m] with max

@@ -154,5 +154,5 @@ A tool can be configured without being verified (e.g., agentmemory in Claude).
 | Goose v1.45.0 | Skill symlink exists | Not configured | Not an adapter target | stdio extension |
 | OpenCode v1.18.16 | Not configured | Not configured | Optional adapter | stdio |
 | Codex v0.147.0 | Installed + skill generated | Not configured | Not wired | Not configured |
-| Prime Agent v0.7.1 | Not configured | Not configured | Not wired | Not configured |
+| Prime Agent v0.8.1-beta.564.1.d60fab8 | Not configured | Not configured | Not wired | Configured (stdio) |
 | agy v1.1.11 | Not configured | Not configured | Not wired | Not configured |
