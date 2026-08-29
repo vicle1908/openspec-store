@@ -28,8 +28,12 @@
 - [x] 4.1 Write refined two-part diagnosis in proposal.md.
 - [x] 4.2 Write MODIFIED delta for `omniroute-agent-cli-routing` blocker requirement.
 - [x] 4.3 Write value-blind evidence manifest.
-- [ ] 4.4 Strict validation + secret scan.
-- [ ] 4.5 Commit, archive, sync canonical spec.
+- [x] 4.4 Strict validation + secret scan.
+- [x] 4.5 Commit, archive, sync canonical spec.
+
+> Closed retroactively 2026-08-29: the change was archived and the canonical
+> `omniroute-agent-cli-routing` spec synced (the archive itself fulfills 4.5).
+> Strict validation passed for this change prior to archival.
 
 ## Scope locks
 
