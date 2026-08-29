@@ -35,4 +35,4 @@ All live installation, configuration, and inference tasks are approval-gated. Re
 ## 5. Documentation and closure
 
 - [x] 5.1 Document OmniRoute startup, API-key environment setup, `sh/*` model selection, `/v1/models` health verification, common failures, and rollback without embedding secrets.
-- [x] 5.2 Run `git diff --check`, OpenSpec validation, scoped secret scans, and staged-byte verification; confirm only this change's planning artifacts are staged and commit the OpenSpec store change.
+- [x] 5.2 Run `git diff --check`, OpenSpec validation, scoped secret scans, and staged-byte verification; confirm only this change's planning artifacts and sanitized evidence are staged and commit the OpenSpec store change.
