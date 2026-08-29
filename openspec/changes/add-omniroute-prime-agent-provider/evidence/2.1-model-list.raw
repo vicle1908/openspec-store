@@ -1,0 +1,9 @@
+# Isolated OmniRoute configuration
+
+- Provider names: `phanmemvip`, `shopapikey`, `cockpit`, `omniroute`
+- `omniroute` API: `openai-responses`
+- `omniroute` base URL: `http://localhost:20128/v1`
+- `omniroute` credential reference: `OMNIROUTE_API_KEY` (value omitted)
+- Models: `sh/codex`, `sh/gpt-5.6-sol`
+- JSON parse and Prime Agent model-registry validation: passed
+- Credential values and raw model responses: omitted
