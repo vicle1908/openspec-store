@@ -27,4 +27,4 @@
 
 - [x] 4.1 Delta spec `claude-code-omniroute-pm-routing/spec.md` written
 - [x] 4.2 `openspec validate --strict` passes
-- [ ] 4.3 Commit change to openspec-store
+- [x] 4.3 Commit change to openspec-store (commit 82879dd, 2026-08-30)
