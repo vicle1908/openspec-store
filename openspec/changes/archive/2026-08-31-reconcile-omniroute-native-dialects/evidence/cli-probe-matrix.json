@@ -82,7 +82,7 @@
       "argv": [
         "/Users/androidteam/.local/bin/claude",
         "--settings",
-        "/Users/androidteam/.claude/profiles/omniroute.json",
+        "/Users/androidteam/.claude/profiles/omniroute-pm.json",
         "--model",
         "pm/Claude-Fable",
         "--print",

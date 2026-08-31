@@ -1,0 +1,174 @@
+{
+  "value_blind": true,
+  "results": [
+    {
+      "id": "prime-agent.baseline.sh.responses",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 4.6,
+      "endpoint": "/v1/responses"
+    },
+    {
+      "id": "claude-code.pm.messages",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 9.5,
+      "endpoint": "/v1/messages"
+    },
+    {
+      "id": "codex.sh.responses",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 8.5,
+      "endpoint": "/v1/responses"
+    },
+    {
+      "id": "grok.pm.messages",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 17.3,
+      "endpoint": "/v1/messages"
+    },
+    {
+      "id": "grok.sh.chat-fallback",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 29.0,
+      "endpoint": "/chat/completions"
+    },
+    {
+      "id": "goose.pm.messages",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 25.1,
+      "endpoint": "/v1/messages"
+    },
+    {
+      "id": "goose.sh.chat-fallback",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 11.2,
+      "endpoint": "/chat/completions"
+    },
+    {
+      "id": "kimi-code.pm.messages",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 22.7,
+      "endpoint": "/v1/messages"
+    },
+    {
+      "id": "kilo.pm.messages",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 17.3,
+      "endpoint": "/v1/messages"
+    },
+    {
+      "id": "kilo.sh.responses",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 98.2,
+      "endpoint": "/v1/responses"
+    },
+    {
+      "id": "opencode.pm.messages",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 32.9,
+      "endpoint": "/v1/messages"
+    },
+    {
+      "id": "opencode.sh.responses",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 26.5,
+      "endpoint": "/v1/responses"
+    },
+    {
+      "id": "pi.pm.messages",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 2.1,
+      "endpoint": "/v1/messages"
+    },
+    {
+      "id": "pi.sh.responses",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 1.1,
+      "endpoint": "/v1/responses"
+    },
+    {
+      "id": "prime-agent.pm.messages",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 10.1,
+      "endpoint": "/v1/messages"
+    },
+    {
+      "id": "prime-agent.sh.responses",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 85.1,
+      "endpoint": "/v1/responses"
+    },
+    {
+      "id": "droid.pm.messages",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 76.4,
+      "endpoint": "/v1/messages"
+    },
+    {
+      "id": "droid.sh.responses",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 61.4,
+      "endpoint": "/v1/responses"
+    },
+    {
+      "id": "omp.pm.messages",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 17.1,
+      "endpoint": "/v1/messages"
+    },
+    {
+      "id": "kimi-code.sh.chat-fallback",
+      "status": "DEFERRED",
+      "rc": 1,
+      "sentinel": false,
+      "elapsed": 1.1,
+      "endpoint": "/chat/completions",
+      "note": "codex is in the deferred set (credential rotation gate, evidence/apply-blockers.json)"
+    },
+    {
+      "id": "omp.sh.chat-fallback",
+      "status": "PASS",
+      "rc": 0,
+      "sentinel": true,
+      "elapsed": 12.1,
+      "endpoint": "/chat/completions"
+    }
+  ]
+}
