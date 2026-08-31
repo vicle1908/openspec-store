@@ -1,1085 +1,1094 @@
 {
-  "schema_version": 1,
-  "artifact": "central-acceptance-planning-baseline",
-  "change_id": "add-ntu-ai-keynote-deck",
-  "central_planning_commit": "3c0ee32143c5f57832d81da99ac4afd7ac063015",
-  "central_change_root": "openspec/changes/add-ntu-ai-keynote-deck",
-  "capabilities": [
-    "accessible-stage-presentation",
-    "browser-qualification-and-release-evidence",
-    "factual-provenance-and-approval",
-    "keynote-content-and-language",
-    "offline-keynote-runtime",
-    "timing-and-roundtable-handoff"
+ "artifact": "central-acceptance-planning-baseline",
+ "baseline_refresh": {
+  "reason": "Three planning artifacts were legitimately edited by central commits eba14db (font-coverage spec gap) and bd1de07 (palette alignment) after the baseline was last written at 71882e8; the baseline hashes were not refreshed then. This refresh re-records current hashes; the requirement/scenario index was independently verified stable (44/44 headings match, no IDs lost).",
+  "refreshed_at": "2026-08-31T05:46:59Z",
+  "tasks_contract_unchanged": true,
+  "verified_stable": {
+   "heading_mismatches": 0,
+   "requirements": 44
+  }
+ },
+ "capabilities": [
+  "accessible-stage-presentation",
+  "browser-qualification-and-release-evidence",
+  "factual-provenance-and-approval",
+  "keynote-content-and-language",
+  "offline-keynote-runtime",
+  "timing-and-roundtable-handoff"
+ ],
+ "central_change_root": "openspec/changes/add-ntu-ai-keynote-deck",
+ "central_planning_commit": "3c0ee32143c5f57832d81da99ac4afd7ac063015",
+ "change_id": "add-ntu-ai-keynote-deck",
+ "counts": {
+  "capabilities": 6,
+  "requirements": 44,
+  "scenarios": 94
+ },
+ "evidence_contract": {
+  "fixed_ref": "refs/tags/ntu-ai-keynote-v1.0.0",
+  "non_circular_decision_rule": "Acceptance is derived only from immutable predecessor evidence; task 6.1, task 6.2, total task completion, and archive state are excluded from the acceptance predicate.",
+  "peel_expression": "refs/tags/ntu-ai-keynote-v1.0.0^{commit}",
+  "required_fields": [
+   "candidate_id",
+   "implementation_commit",
+   "evidence_base_commit",
+   "public_package_paths",
+   "public_file_sha256",
+   "public_package_digest",
+   "selected_copy_identity",
+   "requirement_ids",
+   "scenario_ids",
+   "environment",
+   "timestamp",
+   "result",
+   "referenced_artifacts",
+   "dependency_reason"
   ],
-  "planning_artifact_sha256": {
-    ".openspec.yaml": "2722d733de6305f7dbd2c1c069cebb0c319f7cdcbc249e6da8b5422b6bb689d9",
-    "proposal.md": "2354d899f92ca07ba115a2e60dd448acd90c688d07113c4cb76fac458088e44c",
-    "design.md": "e6978478ecb16edfa7b58783283c9e02c9d8684467ef94b8b7870cd7d02aa001",
-    "specs/accessible-stage-presentation/spec.md": "a155257de6f879f3e200f319d2fb03d3a2e00ee93d366e7d9797565ffba5c6b1",
-    "specs/browser-qualification-and-release-evidence/spec.md": "e9d825a4f46b8937676a8fb4fe165700ec48215e3e4bc93715b0812ee4e1bb2e",
-    "specs/factual-provenance-and-approval/spec.md": "d914a7e493c2d4ee2435bacbe61f29fef89ad1e009414a4eb1b492bfc9b7725b",
-    "specs/keynote-content-and-language/spec.md": "7122e1cdafc6dca295cb2e5ff818a417152e7955b3ac4737e90e3aedc8da5956",
-    "specs/offline-keynote-runtime/spec.md": "03e3d49d89cb6c40f2022a1ea3c545b1e23aa58bb1b98b738b0893945651d852",
-    "specs/timing-and-roundtable-handoff/spec.md": "2189d1749b156208fe6ba75043e7ee871015d9949d86a1f9c5db0c0a4eaf1acb"
-  },
-  "requirements": [
-    {
-      "capability": "accessible-stage-presentation",
-      "display_heading": "Only the active slide SHALL be exposed as active content",
-      "scenarios": [
-        {
-          "display_heading": "Accessibility tree is inspected",
-          "id": "SCN-asp-only-the-active-slide-shall-be-exposed-as-active-content-accessibility-tree-is-inspected"
-        },
-        {
-          "display_heading": "Slide changes",
-          "id": "SCN-asp-only-the-active-slide-shall-be-exposed-as-active-content-slide-changes"
-        }
-      ],
-      "id": "REQ-asp-only-the-active-slide-shall-be-exposed-as-active-content",
-      "design_decisions": [
-        "D5"
-      ],
-      "design_decision_headings": [
-        "Notes, semantics, and accessibility share one active-slide model"
-      ]
-    },
-    {
-      "capability": "accessible-stage-presentation",
-      "display_heading": "Every runtime action SHALL be keyboard-operable with visible focus",
-      "scenarios": [
-        {
-          "display_heading": "Keyboard-only walkthrough is performed",
-          "id": "SCN-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus-keyboard-only-walkthrough-is-performed"
-        },
-        {
-          "display_heading": "Focused control receives activation",
-          "id": "SCN-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus-focused-control-receives-activation"
-        }
-      ],
-      "id": "REQ-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus",
-      "design_decisions": [
-        "D5",
-        "D10"
-      ],
-      "design_decision_headings": [
-        "Notes, semantics, and accessibility share one active-slide model",
-        "Browser evidence owns computed-style and rendered-state facts"
-      ]
-    },
-    {
-      "capability": "accessible-stage-presentation",
-      "display_heading": "The 18px floor SHALL apply only to required audience meaning",
-      "scenarios": [
-        {
-          "display_heading": "Required audience text is measured",
-          "id": "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-required-audience-text-is-measured"
-        },
-        {
-          "display_heading": "Excluded auxiliary text is measured",
-          "id": "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-excluded-auxiliary-text-is-measured"
-        },
-        {
-          "display_heading": "Required meaning is disguised as decorative",
-          "id": "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-required-meaning-is-disguised-as-decorative"
-        }
-      ],
-      "id": "REQ-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning",
-      "design_decisions": [
-        "D3",
-        "D6",
-        "D10"
-      ],
-      "design_decision_headings": [
-        "Fixed stage, safe area, palette, and scoped typography",
-        "Inline visuals preserve one narrative job and source meaning per slide",
-        "Browser evidence owns computed-style and rendered-state facts"
-      ]
-    },
-    {
-      "capability": "accessible-stage-presentation",
-      "display_heading": "Contrast and non-color meaning SHALL remain sufficient",
-      "scenarios": [
-        {
-          "display_heading": "Computed contrast is evaluated",
-          "id": "SCN-asp-contrast-and-non-color-meaning-shall-remain-sufficient-computed-contrast-is-evaluated"
-        },
-        {
-          "display_heading": "Color is unavailable",
-          "id": "SCN-asp-contrast-and-non-color-meaning-shall-remain-sufficient-color-is-unavailable"
-        }
-      ],
-      "id": "REQ-asp-contrast-and-non-color-meaning-shall-remain-sufficient",
-      "design_decisions": [
-        "D5",
-        "D7",
-        "D10"
-      ],
-      "design_decision_headings": [
-        "Notes, semantics, and accessibility share one active-slide model",
-        "Attention animations begin only on target-slide active entry",
-        "Browser evidence owns computed-style and rendered-state facts"
-      ]
-    },
-    {
-      "capability": "accessible-stage-presentation",
-      "display_heading": "Meaningful visuals SHALL have an accessible reading order and equivalent",
-      "scenarios": [
-        {
-          "display_heading": "Meaningful diagram is encountered",
-          "id": "SCN-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent-meaningful-diagram-is-encountered"
-        },
-        {
-          "display_heading": "Decorative vectors are exposed",
-          "id": "SCN-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent-decorative-vectors-are-exposed"
-        }
-      ],
-      "id": "REQ-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent",
-      "design_decisions": [
-        "D3",
-        "D5"
-      ],
-      "design_decision_headings": [
-        "Fixed stage, safe area, palette, and scoped typography",
-        "Notes, semantics, and accessibility share one active-slide model"
-      ]
-    },
-    {
-      "capability": "accessible-stage-presentation",
-      "display_heading": "Motion preferences and revisit behavior SHALL preserve complete meaning",
-      "scenarios": [
-        {
-          "display_heading": "Reduced motion is enabled",
-          "id": "SCN-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning-reduced-motion-is-enabled"
-        },
-        {
-          "display_heading": "Attention slide is revisited",
-          "id": "SCN-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning-attention-slide-is-revisited"
-        }
-      ],
-      "id": "REQ-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning",
-      "design_decisions": [
-        "D5",
-        "D10"
-      ],
-      "design_decision_headings": [
-        "Notes, semantics, and accessibility share one active-slide model",
-        "Browser evidence owns computed-style and rendered-state facts"
-      ]
-    },
-    {
-      "capability": "accessible-stage-presentation",
-      "display_heading": "Font fallback and qualified scaling SHALL preserve comprehension",
-      "scenarios": [
-        {
-          "display_heading": "Local fonts are unavailable",
-          "id": "SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-local-fonts-are-unavailable"
-        },
-        {
-          "display_heading": "Stage is letterboxed",
-          "id": "SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-stage-is-letterboxed"
-        }
-      ],
-      "id": "REQ-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension",
-      "design_decisions": [
-        "D3",
-        "D5"
-      ],
-      "design_decision_headings": [
-        "Fixed stage, safe area, palette, and scoped typography",
-        "Notes, semantics, and accessibility share one active-slide model"
-      ]
-    },
-    {
-      "capability": "accessible-stage-presentation",
-      "display_heading": "Printed fallback SHALL remain accessible and complete",
-      "scenarios": [
-        {
-          "display_heading": "PDF accessibility checks are performed",
-          "id": "SCN-asp-printed-fallback-shall-remain-accessible-and-complete-pdf-accessibility-checks-are-performed"
-        }
-      ],
-      "id": "REQ-asp-printed-fallback-shall-remain-accessible-and-complete",
-      "design_decisions": [
-        "D5",
-        "D7"
-      ],
-      "design_decision_headings": [
-        "Notes, semantics, and accessibility share one active-slide model",
-        "Attention animations begin only on target-slide active entry"
-      ]
-    },
-    {
-      "capability": "browser-qualification-and-release-evidence",
-      "display_heading": "Safari and Chrome SHALL qualify the same exact candidate",
-      "scenarios": [
-        {
-          "display_heading": "Browser matrices pass",
-          "id": "SCN-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate-browser-matrices-pass"
-        },
-        {
-          "display_heading": "Browser evidence targets different bytes",
-          "id": "SCN-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate-browser-evidence-targets-different-bytes"
-        }
-      ],
-      "id": "REQ-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate",
-      "design_decisions": [
-        "D10"
-      ],
-      "design_decision_headings": [
-        "Browser evidence owns computed-style and rendered-state facts"
-      ]
-    },
-    {
-      "capability": "browser-qualification-and-release-evidence",
-      "display_heading": "Browser evidence SHALL own computed-style acceptance",
-      "scenarios": [
-        {
-          "display_heading": "Scoped 18px floor is verified",
-          "id": "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-scoped-18px-floor-is-verified"
-        },
-        {
-          "display_heading": "Contrast is verified",
-          "id": "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-contrast-is-verified"
-        },
-        {
-          "display_heading": "Static CSS appears compliant but computed style differs",
-          "id": "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-static-css-appears-compliant-but-computed-style-differs"
-        }
-      ],
-      "id": "REQ-bqre-browser-evidence-shall-own-computed-style-acceptance",
-      "design_decisions": [
-        "D11"
-      ],
-      "design_decision_headings": [
-        "PDF and rehearsals are fixed external human gates"
-      ]
-    },
-    {
-      "capability": "browser-qualification-and-release-evidence",
-      "display_heading": "Viewport and interaction evidence SHALL expose observable behavior",
-      "scenarios": [
-        {
-          "display_heading": "Qualified viewport evidence is inspected",
-          "id": "SCN-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior-qualified-viewport-evidence-is-inspected"
-        },
-        {
-          "display_heading": "Interaction result lacks state evidence",
-          "id": "SCN-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior-interaction-result-lacks-state-evidence"
-        }
-      ],
-      "id": "REQ-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior",
-      "design_decisions": [
-        "D1",
-        "D8",
-        "D9"
-      ],
-      "design_decision_headings": [
-        "Central contracts are authoritative; external implementation is a separate transaction",
-        "Provenance and copy selection are machine-readable acceptance inputs",
-        "Evidence invalidation uses two tiers"
-      ]
-    },
-    {
-      "capability": "browser-qualification-and-release-evidence",
-      "display_heading": "PDF fallback SHALL be generated and verified from the accepted candidate",
-      "scenarios": [
-        {
-          "display_heading": "PDF evidence matches the candidate",
-          "id": "SCN-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate-pdf-evidence-matches-the-candidate"
-        },
-        {
-          "display_heading": "A bound PDF input changes",
-          "id": "SCN-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate-a-bound-pdf-input-changes"
-        }
-      ],
-      "id": "REQ-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate",
-      "design_decisions": [
-        "D11",
-        "D12"
-      ],
-      "design_decision_headings": [
-        "PDF and rehearsals are fixed external human gates",
-        "Release identity uses a fixed annotated tag without circular commit claims"
-      ]
-    },
-    {
-      "capability": "browser-qualification-and-release-evidence",
-      "display_heading": "The public venue package SHALL contain exactly the allowlisted files",
-      "scenarios": [
-        {
-          "display_heading": "Venue package is assembled",
-          "id": "SCN-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files-venue-package-is-assembled"
-        },
-        {
-          "display_heading": "Private file is included",
-          "id": "SCN-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files-private-file-is-included"
-        }
-      ],
-      "id": "REQ-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files",
-      "design_decisions": [
-        "D10",
-        "D11"
-      ],
-      "design_decision_headings": [
-        "Browser evidence owns computed-style and rendered-state facts",
-        "PDF and rehearsals are fixed external human gates"
-      ]
-    },
-    {
-      "capability": "browser-qualification-and-release-evidence",
-      "display_heading": "Copied-folder and actual venue rehearsals SHALL gate release",
-      "scenarios": [
-        {
-          "display_heading": "Copied-folder rehearsal passes",
-          "id": "SCN-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release-copied-folder-rehearsal-passes"
-        },
-        {
-          "display_heading": "Venue rehearsal is missing or targets another digest",
-          "id": "SCN-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release-venue-rehearsal-is-missing-or-targets-another-digest"
-        }
-      ],
-      "id": "REQ-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release",
-      "design_decisions": [
-        "D10"
-      ],
-      "design_decision_headings": [
-        "Browser evidence owns computed-style and rendered-state facts"
-      ]
-    },
-    {
-      "capability": "browser-qualification-and-release-evidence",
-      "display_heading": "Release evidence SHALL be complete, fresh, and traceable",
-      "scenarios": [
-        {
-          "display_heading": "Final release gate is evaluated",
-          "id": "SCN-bqre-release-evidence-shall-be-complete-fresh-and-traceable-final-release-gate-is-evaluated"
-        },
-        {
-          "display_heading": "Evidence is stale, missing, or internally inconsistent",
-          "id": "SCN-bqre-release-evidence-shall-be-complete-fresh-and-traceable-evidence-is-stale-missing-or-internally-inconsistent"
-        }
-      ],
-      "id": "REQ-bqre-release-evidence-shall-be-complete-fresh-and-traceable",
-      "design_decisions": [
-        "D10"
-      ],
-      "design_decision_headings": [
-        "Browser evidence owns computed-style and rendered-state facts"
-      ]
-    },
-    {
-      "capability": "browser-qualification-and-release-evidence",
-      "display_heading": "Release evidence retention SHALL apply Tier 1 and Tier 2 dependency rules",
-      "scenarios": [
-        {
-          "display_heading": "Tier 1 evidence is reused",
-          "id": "SCN-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules-tier-1-evidence-is-reused"
-        },
-        {
-          "display_heading": "Tier 2 evidence is retained",
-          "id": "SCN-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules-tier-2-evidence-is-retained"
-        }
-      ],
-      "id": "REQ-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules",
-      "design_decisions": [
-        "D10",
-        "D11"
-      ],
-      "design_decision_headings": [
-        "Browser evidence owns computed-style and rendered-state facts",
-        "PDF and rehearsals are fixed external human gates"
-      ]
-    },
-    {
-      "capability": "browser-qualification-and-release-evidence",
-      "display_heading": "Central acceptance SHALL be read-only toward external implementation evidence",
-      "scenarios": [
-        {
-          "display_heading": "External evidence satisfies a central requirement",
-          "id": "SCN-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence-external-evidence-satisfies-a-central-requirement"
-        },
-        {
-          "display_heading": "External evidence fails acceptance",
-          "id": "SCN-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence-external-evidence-fails-acceptance"
-        }
-      ],
-      "id": "REQ-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence",
-      "design_decisions": [
-        "D11"
-      ],
-      "design_decision_headings": [
-        "PDF and rehearsals are fixed external human gates"
-      ]
-    },
-    {
-      "capability": "browser-qualification-and-release-evidence",
-      "display_heading": "The fixed annotated ref SHALL identify the final release externally",
-      "scenarios": [
-        {
-          "display_heading": "Fixed tag ref is available",
-          "id": "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-fixed-tag-ref-is-available"
-        },
-        {
-          "display_heading": "Final annotated ref is inspected",
-          "id": "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-final-annotated-ref-is-inspected"
-        },
-        {
-          "display_heading": "Release ref is invalid",
-          "id": "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-release-ref-is-invalid"
-        }
-      ],
-      "id": "REQ-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally",
-      "design_decisions": [
-        "D12"
-      ],
-      "design_decision_headings": [
-        "Release identity uses a fixed annotated tag without circular commit claims"
-      ]
-    },
-    {
-      "capability": "factual-provenance-and-approval",
-      "display_heading": "Every factual claim SHALL resolve to a registered source and qualifier",
-      "scenarios": [
-        {
-          "display_heading": "Released claim is traced",
-          "id": "SCN-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier-released-claim-is-traced"
-        },
-        {
-          "display_heading": "Registered claim is orphaned or unqualified",
-          "id": "SCN-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier-registered-claim-is-orphaned-or-unqualified"
-        }
-      ],
-      "id": "REQ-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier",
-      "design_decisions": [
-        "D8"
-      ],
-      "design_decision_headings": [
-        "Provenance and copy selection are machine-readable acceptance inputs"
-      ]
-    },
-    {
-      "capability": "factual-provenance-and-approval",
-      "display_heading": "Specific factual scopes SHALL remain explicit",
-      "scenarios": [
-        {
-          "display_heading": "Claim wording is reviewed",
-          "id": "SCN-fpa-specific-factual-scopes-shall-remain-explicit-claim-wording-is-reviewed"
-        },
-        {
-          "display_heading": "Scope is broadened",
-          "id": "SCN-fpa-specific-factual-scopes-shall-remain-explicit-scope-is-broadened"
-        }
-      ],
-      "id": "REQ-fpa-specific-factual-scopes-shall-remain-explicit",
-      "design_decisions": [
-        "D8"
-      ],
-      "design_decision_headings": [
-        "Provenance and copy selection are machine-readable acceptance inputs"
-      ]
-    },
-    {
-      "capability": "factual-provenance-and-approval",
-      "display_heading": "Meaningful visuals SHALL have provenance and encoding fidelity",
-      "scenarios": [
-        {
-          "display_heading": "Data visual is inspected",
-          "id": "SCN-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity-data-visual-is-inspected"
-        },
-        {
-          "display_heading": "Visual asset has no lawful basis",
-          "id": "SCN-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity-visual-asset-has-no-lawful-basis"
-        }
-      ],
-      "id": "REQ-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity",
-      "design_decisions": [
-        "D8"
-      ],
-      "design_decision_headings": [
-        "Provenance and copy selection are machine-readable acceptance inputs"
-      ]
-    },
-    {
-      "capability": "factual-provenance-and-approval",
-      "display_heading": "Neutral company-safe copy SHALL be the default",
-      "scenarios": [
-        {
-          "display_heading": "Exact-copy approval matches",
-          "id": "SCN-fpa-neutral-company-safe-copy-shall-be-the-default-exact-copy-approval-matches"
-        },
-        {
-          "display_heading": "Approval is absent, rejected, stale, partial, or mismatched",
-          "id": "SCN-fpa-neutral-company-safe-copy-shall-be-the-default-approval-is-absent-rejected-stale-partial-or-mismatched"
-        }
-      ],
-      "id": "REQ-fpa-neutral-company-safe-copy-shall-be-the-default",
-      "design_decisions": [
-        "D8"
-      ],
-      "design_decision_headings": [
-        "Provenance and copy selection are machine-readable acceptance inputs"
-      ]
-    },
-    {
-      "capability": "factual-provenance-and-approval",
-      "display_heading": "Evidence invalidation SHALL use Tier 1 and Tier 2",
-      "scenarios": [
-        {
-          "display_heading": "Public candidate bytes change",
-          "id": "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-public-candidate-bytes-change"
-        },
-        {
-          "display_heading": "Private metadata changes without public-byte change",
-          "id": "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-private-metadata-changes-without-public-byte-change"
-        },
-        {
-          "display_heading": "Private change alters selected meaning",
-          "id": "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-private-change-alters-selected-meaning"
-        }
-      ],
-      "id": "REQ-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2",
-      "design_decisions": [
-        "D8",
-        "D9"
-      ],
-      "design_decision_headings": [
-        "Provenance and copy selection are machine-readable acceptance inputs",
-        "Evidence invalidation uses two tiers"
-      ]
-    },
-    {
-      "capability": "factual-provenance-and-approval",
-      "display_heading": "Release identity SHALL avoid self-reference",
-      "scenarios": [
-        {
-          "display_heading": "Release manifest is finalized",
-          "id": "SCN-fpa-release-identity-shall-avoid-self-reference-release-manifest-is-finalized"
-        },
-        {
-          "display_heading": "Tag identity is verified",
-          "id": "SCN-fpa-release-identity-shall-avoid-self-reference-tag-identity-is-verified"
-        }
-      ],
-      "id": "REQ-fpa-release-identity-shall-avoid-self-reference",
-      "design_decisions": [
-        "D8",
-        "D9"
-      ],
-      "design_decision_headings": [
-        "Provenance and copy selection are machine-readable acceptance inputs",
-        "Evidence invalidation uses two tiers"
-      ]
-    },
-    {
-      "capability": "factual-provenance-and-approval",
-      "display_heading": "Central acceptance SHALL consume external evidence without mutating its root",
-      "scenarios": [
-        {
-          "display_heading": "Central acceptance reviews external evidence",
-          "id": "SCN-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root-central-acceptance-reviews-external-evidence"
-        },
-        {
-          "display_heading": "Evidence is missing or stale",
-          "id": "SCN-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root-evidence-is-missing-or-stale"
-        }
-      ],
-      "id": "REQ-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root",
-      "design_decisions": [
-        "D8",
-        "D9"
-      ],
-      "design_decision_headings": [
-        "Provenance and copy selection are machine-readable acceptance inputs",
-        "Evidence invalidation uses two tiers"
-      ]
-    },
-    {
-      "capability": "keynote-content-and-language",
-      "display_heading": "The keynote SHALL contain exactly 17 slides with one narrative job each",
-      "scenarios": [
-        {
-          "display_heading": "Complete deck is inspected",
-          "id": "SCN-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each-complete-deck-is-inspected"
-        },
-        {
-          "display_heading": "A visual combines slide responsibilities",
-          "id": "SCN-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each-a-visual-combines-slide-responsibilities"
-        }
-      ],
-      "id": "REQ-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each",
-      "design_decisions": [
-        "D6"
-      ],
-      "design_decision_headings": [
-        "Inline visuals preserve one narrative job and source meaning per slide"
-      ]
-    },
-    {
-      "capability": "keynote-content-and-language",
-      "display_heading": "Act 1 SHALL establish the macro picture with qualified claims",
-      "scenarios": [
-        {
-          "display_heading": "Act 1 is stage-ready",
-          "id": "SCN-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims-act-1-is-stage-ready"
-        },
-        {
-          "display_heading": "Forecast wording is strengthened",
-          "id": "SCN-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims-forecast-wording-is-strengthened"
-        }
-      ],
-      "id": "REQ-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims",
-      "design_decisions": [
-        "D6",
-        "D8"
-      ],
-      "design_decision_headings": [
-        "Inline visuals preserve one narrative job and source meaning per slide",
-        "Provenance and copy selection are machine-readable acceptance inputs"
-      ]
-    },
-    {
-      "capability": "keynote-content-and-language",
-      "display_heading": "Act 2 SHALL distinguish hype, evidence, and transferable experience",
-      "scenarios": [
-        {
-          "display_heading": "Three-layer journey is presented",
-          "id": "SCN-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience-three-layer-journey-is-presented"
-        },
-        {
-          "display_heading": "Value-producing group is described",
-          "id": "SCN-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience-value-producing-group-is-described"
-        }
-      ],
-      "id": "REQ-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience",
-      "design_decisions": [
-        "D6",
-        "D8"
-      ],
-      "design_decision_headings": [
-        "Inline visuals preserve one narrative job and source meaning per slide",
-        "Provenance and copy selection are machine-readable acceptance inputs"
-      ]
-    },
-    {
-      "capability": "keynote-content-and-language",
-      "display_heading": "Slide 7 SHALL keep three factual contexts independent",
-      "scenarios": [
-        {
-          "display_heading": "All slide 7 contexts are shown",
-          "id": "SCN-kcl-slide-7-shall-keep-three-factual-contexts-independent-all-slide-7-contexts-are-shown"
-        },
-        {
-          "display_heading": "Populations or context are conflated",
-          "id": "SCN-kcl-slide-7-shall-keep-three-factual-contexts-independent-populations-or-context-are-conflated"
-        }
-      ],
-      "id": "REQ-kcl-slide-7-shall-keep-three-factual-contexts-independent",
-      "design_decisions": [
-        "D6",
-        "D8"
-      ],
-      "design_decision_headings": [
-        "Inline visuals preserve one narrative job and source meaning per slide",
-        "Provenance and copy selection are machine-readable acceptance inputs"
-      ]
-    },
-    {
-      "capability": "keynote-content-and-language",
-      "display_heading": "Act 3 SHALL separate leadership, questions, and handoff",
-      "scenarios": [
-        {
-          "display_heading": "Roundtable prompts are displayed",
-          "id": "SCN-kcl-act-3-shall-separate-leadership-questions-and-handoff-roundtable-prompts-are-displayed"
-        },
-        {
-          "display_heading": "Handoff slide is reviewed",
-          "id": "SCN-kcl-act-3-shall-separate-leadership-questions-and-handoff-handoff-slide-is-reviewed"
-        }
-      ],
-      "id": "REQ-kcl-act-3-shall-separate-leadership-questions-and-handoff",
-      "design_decisions": [
-        "D6",
-        "D7"
-      ],
-      "design_decision_headings": [
-        "Inline visuals preserve one narrative job and source meaning per slide",
-        "Attention animations begin only on target-slide active entry"
-      ]
-    },
-    {
-      "capability": "keynote-content-and-language",
-      "display_heading": "Audience and operator language SHALL follow the Vietnamese policy",
-      "scenarios": [
-        {
-          "display_heading": "Language audit is run",
-          "id": "SCN-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy-language-audit-is-run"
-        },
-        {
-          "display_heading": "Technical term first appears",
-          "id": "SCN-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy-technical-term-first-appears"
-        }
-      ],
-      "id": "REQ-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy",
-      "design_decisions": [
-        "D6",
-        "D8"
-      ],
-      "design_decision_headings": [
-        "Inline visuals preserve one narrative job and source meaning per slide",
-        "Provenance and copy selection are machine-readable acceptance inputs"
-      ]
-    },
-    {
-      "capability": "keynote-content-and-language",
-      "display_heading": "Visuals SHALL preserve factual and linguistic meaning",
-      "scenarios": [
-        {
-          "display_heading": "Meaningful visual is reviewed",
-          "id": "SCN-kcl-visuals-shall-preserve-factual-and-linguistic-meaning-meaningful-visual-is-reviewed"
-        },
-        {
-          "display_heading": "Decorative visual is removed",
-          "id": "SCN-kcl-visuals-shall-preserve-factual-and-linguistic-meaning-decorative-visual-is-removed"
-        }
-      ],
-      "id": "REQ-kcl-visuals-shall-preserve-factual-and-linguistic-meaning",
-      "design_decisions": [
-        "D6"
-      ],
-      "design_decision_headings": [
-        "Inline visuals preserve one narrative job and source meaning per slide"
-      ]
-    },
-    {
-      "capability": "keynote-content-and-language",
-      "display_heading": "The 17-slide dominant visual matrix SHALL be authoritative",
-      "scenarios": [
-        {
-          "display_heading": "Complete visual matrix is reviewed",
-          "id": "SCN-kcl-17-slide-dominant-visual-matrix-complete-matrix-reviewed"
-        },
-        {
-          "display_heading": "A dominant visual job is substituted",
-          "id": "SCN-kcl-17-slide-dominant-visual-matrix-job-substituted"
-        }
-      ],
-      "id": "REQ-kcl-17-slide-dominant-visual-matrix",
-      "design_decisions": [
-        "D6"
-      ],
-      "design_decision_headings": [
-        "Inline visuals preserve one narrative job and source meaning per slide"
-      ]
-    },
-    {
-      "capability": "offline-keynote-runtime",
-      "display_heading": "The keynote SHALL launch directly and remain network-independent",
-      "scenarios": [
-        {
-          "display_heading": "Offline direct launch succeeds",
-          "id": "SCN-okr-the-keynote-shall-launch-directly-and-remain-network-independent-offline-direct-launch-succeeds"
-        },
-        {
-          "display_heading": "External runtime reference is introduced",
-          "id": "SCN-okr-the-keynote-shall-launch-directly-and-remain-network-independent-external-runtime-reference-is-introduced"
-        }
-      ],
-      "id": "REQ-okr-the-keynote-shall-launch-directly-and-remain-network-independent",
-      "design_decisions": [
-        "D1",
-        "D2"
-      ],
-      "design_decision_headings": [
-        "Central contracts are authoritative; external implementation is a separate transaction",
-        "One self-contained runtime with an exact seven-file public package"
-      ]
-    },
-    {
-      "capability": "offline-keynote-runtime",
-      "display_heading": "The stage SHALL preserve its authored geometry within qualified viewports",
-      "scenarios": [
-        {
-          "display_heading": "Qualified viewport scales the stage",
-          "id": "SCN-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports-qualified-viewport-scales-the-stage"
-        },
-        {
-          "display_heading": "Viewport aspect ratio differs from 16:9",
-          "id": "SCN-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports-viewport-aspect-ratio-differs-from-16-9"
-        }
-      ],
-      "id": "REQ-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports",
-      "design_decisions": [
-        "D3"
-      ],
-      "design_decision_headings": [
-        "Fixed stage, safe area, palette, and scoped typography"
-      ]
-    },
-    {
-      "capability": "offline-keynote-runtime",
-      "display_heading": "Navigation SHALL implement deterministic full and short routes",
-      "scenarios": [
-        {
-          "display_heading": "Sequential navigation follows the active route",
-          "id": "SCN-okr-navigation-shall-implement-deterministic-full-and-short-routes-sequential-navigation-follows-the-active-route"
-        },
-        {
-          "display_heading": "Interactive surface receives a click",
-          "id": "SCN-okr-navigation-shall-implement-deterministic-full-and-short-routes-interactive-surface-receives-a-click"
-        }
-      ],
-      "id": "REQ-okr-navigation-shall-implement-deterministic-full-and-short-routes",
-      "design_decisions": [
-        "D4"
-      ],
-      "design_decision_headings": [
-        "Deterministic routes use canonical fragment state, not persistent storage"
-      ]
-    },
-    {
-      "capability": "offline-keynote-runtime",
-      "display_heading": "Fragment state SHALL recover safely under `file://`",
-      "scenarios": [
-        {
-          "display_heading": "Valid state is reloaded",
-          "id": "SCN-okr-fragment-state-shall-recover-safely-under-file-state-valid-state-is-reloaded"
-        },
-        {
-          "display_heading": "Fragment state is absent or invalid",
-          "id": "SCN-okr-fragment-state-shall-recover-safely-under-file-state-fragment-state-is-absent-or-invalid"
-        },
-        {
-          "display_heading": "Browser storage is denied",
-          "id": "SCN-okr-fragment-state-shall-recover-safely-under-file-state-browser-storage-is-denied"
-        }
-      ],
-      "id": "REQ-okr-fragment-state-shall-recover-safely-under-file-state",
-      "design_decisions": [
-        "D4"
-      ],
-      "design_decision_headings": [
-        "Deterministic routes use canonical fragment state, not persistent storage"
-      ]
-    },
-    {
-      "capability": "offline-keynote-runtime",
-      "display_heading": "Speaker notes SHALL remain synchronized and controlled",
-      "scenarios": [
-        {
-          "display_heading": "Notes follow navigation",
-          "id": "SCN-okr-speaker-notes-shall-remain-synchronized-and-controlled-notes-follow-navigation"
-        },
-        {
-          "display_heading": "Notes are closed or printed",
-          "id": "SCN-okr-speaker-notes-shall-remain-synchronized-and-controlled-notes-are-closed-or-printed"
-        }
-      ],
-      "id": "REQ-okr-speaker-notes-shall-remain-synchronized-and-controlled",
-      "design_decisions": [
-        "D5"
-      ],
-      "design_decision_headings": [
-        "Notes, semantics, and accessibility share one active-slide model"
-      ]
-    },
-    {
-      "capability": "offline-keynote-runtime",
-      "display_heading": "Motion SHALL be limited and state-safe",
-      "scenarios": [
-        {
-          "display_heading": "Reduced motion is requested",
-          "id": "SCN-okr-motion-shall-be-limited-and-state-safe-reduced-motion-is-requested"
-        },
-        {
-          "display_heading": "An attention slide is revisited",
-          "id": "SCN-okr-motion-shall-be-limited-and-state-safe-an-attention-slide-is-revisited"
-        }
-      ],
-      "id": "REQ-okr-motion-shall-be-limited-and-state-safe",
-      "design_decisions": [
-        "D6",
-        "D7"
-      ],
-      "design_decision_headings": [
-        "Inline visuals preserve one narrative job and source meaning per slide",
-        "Attention animations begin only on target-slide active entry"
-      ]
-    },
-    {
-      "capability": "timing-and-roundtable-handoff",
-      "display_heading": "The full route SHALL total exactly 765 seconds",
-      "scenarios": [
-        {
-          "display_heading": "Full timing is calculated",
-          "id": "SCN-trh-the-full-route-shall-total-exactly-765-seconds-full-timing-is-calculated"
-        },
-        {
-          "display_heading": "Full-route duration drifts",
-          "id": "SCN-trh-the-full-route-shall-total-exactly-765-seconds-full-route-duration-drifts"
-        }
-      ],
-      "id": "REQ-trh-the-full-route-shall-total-exactly-765-seconds",
-      "design_decisions": [
-        "D4"
-      ],
-      "design_decision_headings": [
-        "Deterministic routes use canonical fragment state, not persistent storage"
-      ]
-    },
-    {
-      "capability": "timing-and-roundtable-handoff",
-      "display_heading": "The short route SHALL total exactly 600 seconds and skip only slides 4 and 8",
-      "scenarios": [
-        {
-          "display_heading": "Short route is traversed sequentially",
-          "id": "SCN-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8-short-route-is-traversed-sequentially"
-        },
-        {
-          "display_heading": "Direct access is used in short mode",
-          "id": "SCN-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8-direct-access-is-used-in-short-mode"
-        }
-      ],
-      "id": "REQ-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8",
-      "design_decisions": [
-        "D4"
-      ],
-      "design_decision_headings": [
-        "Deterministic routes use canonical fragment state, not persistent storage"
-      ]
-    },
-    {
-      "capability": "timing-and-roundtable-handoff",
-      "display_heading": "Notes SHALL expose route-specific timing without contradiction",
-      "scenarios": [
-        {
-          "display_heading": "Presenter changes route mode",
-          "id": "SCN-trh-notes-shall-expose-route-specific-timing-without-contradiction-presenter-changes-route-mode"
-        },
-        {
-          "display_heading": "Skipped slide is inspected in short mode",
-          "id": "SCN-trh-notes-shall-expose-route-specific-timing-without-contradiction-skipped-slide-is-inspected-in-short-mode"
-        }
-      ],
-      "id": "REQ-trh-notes-shall-expose-route-specific-timing-without-contradiction",
-      "design_decisions": [
-        "D5"
-      ],
-      "design_decision_headings": [
-        "Notes, semantics, and accessibility share one active-slide model"
-      ]
-    },
-    {
-      "capability": "timing-and-roundtable-handoff",
-      "display_heading": "Attention animations SHALL begin on target-slide entry",
-      "scenarios": [
-        {
-          "display_heading": "Presenter advances to an attention slide",
-          "id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-presenter-advances-to-an-attention-slide"
-        },
-        {
-          "display_heading": "Target slide is initial fragment state",
-          "id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-target-slide-is-initial-fragment-state"
-        },
-        {
-          "display_heading": "Presenter revisits an attention slide",
-          "id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-presenter-revisits-an-attention-slide"
-        },
-        {
-          "display_heading": "Reduced motion or print is active",
-          "id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-reduced-motion-or-print-is-active"
-        }
-      ],
-      "id": "REQ-trh-attention-animations-shall-begin-on-target-slide-entry",
-      "design_decisions": [
-        "D4",
-        "D5"
-      ],
-      "design_decision_headings": [
-        "Deterministic routes use canonical fragment state, not persistent storage",
-        "Notes, semantics, and accessibility share one active-slide model"
-      ]
-    },
-    {
-      "capability": "timing-and-roundtable-handoff",
-      "display_heading": "The roundtable transition SHALL preserve separate audience jobs",
-      "scenarios": [
-        {
-          "display_heading": "Keynote reaches the final two slides",
-          "id": "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-keynote-reaches-the-final-two-slides"
-        },
-        {
-          "display_heading": "Panelist details are unavailable",
-          "id": "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-panelist-details-are-unavailable"
-        }
-      ],
-      "id": "REQ-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs",
-      "design_decisions": [
-        "D4",
-        "D5"
-      ],
-      "design_decision_headings": [
-        "Deterministic routes use canonical fragment state, not persistent storage",
-        "Notes, semantics, and accessibility share one active-slide model"
-      ]
-    }
+  "result_states": [
+   "accepted",
+   "blocked",
+   "stale",
+   "not-submitted"
   ],
-  "counts": {
-    "capabilities": 6,
-    "requirements": 44,
-    "scenarios": 94
-  },
-  "evidence_contract": {
-    "required_fields": [
-      "candidate_id",
-      "implementation_commit",
-      "evidence_base_commit",
-      "public_package_paths",
-      "public_file_sha256",
-      "public_package_digest",
-      "selected_copy_identity",
-      "requirement_ids",
-      "scenario_ids",
-      "environment",
-      "timestamp",
-      "result",
-      "referenced_artifacts",
-      "dependency_reason"
-    ],
-    "result_states": [
-      "accepted",
-      "blocked",
-      "stale",
-      "not-submitted"
-    ],
-    "tier_rules": {
-      "tier_1": "Any public-package byte, selected wording, visual meaning, runtime behavior, or PDF-input change requires fresh browser, accessibility, viewport, screenshot, PDF, package-checksum, manifest, and copied-folder evidence.",
-      "tier_2": "Only when every public hash and selected meaning remain identical; retained rendering evidence requires matching dependency hashes while private traceability, approval, freshness, manifest, and checksum assertions are refreshed."
+  "tier_rules": {
+   "tier_1": "Any public-package byte, selected wording, visual meaning, runtime behavior, or PDF-input change requires fresh browser, accessibility, viewport, screenshot, PDF, package-checksum, manifest, and copied-folder evidence.",
+   "tier_2": "Only when every public hash and selected meaning remain identical; retained rendering evidence requires matching dependency hashes while private traceability, approval, freshness, manifest, and checksum assertions are refreshed."
+  }
+ },
+ "path_safety": {
+  "all_generated_paths_beneath_central_change": true,
+  "external_artifacts_read_only": true,
+  "external_writable_paths": [],
+  "generated_paths": [
+   "openspec/changes/add-ntu-ai-keynote-deck/acceptance/planning-baseline.json"
+  ]
+ },
+ "planning_artifact_sha256": {
+  ".openspec.yaml": "2722d733de6305f7dbd2c1c069cebb0c319f7cdcbc249e6da8b5422b6bb689d9",
+  "design.md": "ae2bf3e716ba28285dcefa0399632bd8c46be118a8e83b1eb7ea370818caf227",
+  "proposal.md": "1fdaa5bfc61371809fe2ec4733b7cb9b56cb23b11650001040d0499aa353ad1a",
+  "specs/accessible-stage-presentation/spec.md": "b5b1de6094016f40fad6df0f36665ddbd6a4b48801aa610c478043cb7c076b93",
+  "specs/browser-qualification-and-release-evidence/spec.md": "e9d825a4f46b8937676a8fb4fe165700ec48215e3e4bc93715b0812ee4e1bb2e",
+  "specs/factual-provenance-and-approval/spec.md": "d914a7e493c2d4ee2435bacbe61f29fef89ad1e009414a4eb1b492bfc9b7725b",
+  "specs/keynote-content-and-language/spec.md": "7122e1cdafc6dca295cb2e5ff818a417152e7955b3ac4737e90e3aedc8da5956",
+  "specs/offline-keynote-runtime/spec.md": "03e3d49d89cb6c40f2022a1ea3c545b1e23aa58bb1b98b738b0893945651d852",
+  "specs/timing-and-roundtable-handoff/spec.md": "2189d1749b156208fe6ba75043e7ee871015d9949d86a1f9c5db0c0a4eaf1acb"
+ },
+ "requirements": [
+  {
+   "capability": "accessible-stage-presentation",
+   "design_decision_headings": [
+    "Notes, semantics, and accessibility share one active-slide model"
+   ],
+   "design_decisions": [
+    "D5"
+   ],
+   "display_heading": "Only the active slide SHALL be exposed as active content",
+   "id": "REQ-asp-only-the-active-slide-shall-be-exposed-as-active-content",
+   "scenarios": [
+    {
+     "display_heading": "Accessibility tree is inspected",
+     "id": "SCN-asp-only-the-active-slide-shall-be-exposed-as-active-content-accessibility-tree-is-inspected"
     },
-    "fixed_ref": "refs/tags/ntu-ai-keynote-v1.0.0",
-    "peel_expression": "refs/tags/ntu-ai-keynote-v1.0.0^{commit}",
-    "non_circular_decision_rule": "Acceptance is derived only from immutable predecessor evidence; task 6.1, task 6.2, total task completion, and archive state are excluded from the acceptance predicate."
-  },
-  "tasks_contract": {
-    "sha256": "98fa85724923b7d1a6566b80f82888654bdc8389a347c2ecbd4ed37a58bad3be",
-    "algorithm": "UTF-8 decode; normalize CRLF/CR to LF; replace line-start checkbox marker matching case-insensitive ^- \\[[ xX]\\] with - [ ]; preserve all other text; strip all trailing LF; append exactly one LF; hash UTF-8 bytes.",
-    "raw_tasks_sha256_recorded": false,
-    "canonical_bytes": "LF-only with exactly one trailing LF",
-    "controlled_checks": {
-      "lowercase_checkbox_preserves_hash": true,
-      "uppercase_checkbox_preserves_hash": true,
-      "substantive_task_text_changes_hash": true,
-      "canonical_byte_length": 15636
+    {
+     "display_heading": "Slide changes",
+     "id": "SCN-asp-only-the-active-slide-shall-be-exposed-as-active-content-slide-changes"
     }
+   ]
   },
-  "path_safety": {
-    "generated_paths": [
-      "openspec/changes/add-ntu-ai-keynote-deck/acceptance/planning-baseline.json"
-    ],
-    "all_generated_paths_beneath_central_change": true,
-    "external_writable_paths": [],
-    "external_artifacts_read_only": true
+  {
+   "capability": "accessible-stage-presentation",
+   "design_decision_headings": [
+    "Notes, semantics, and accessibility share one active-slide model",
+    "Browser evidence owns computed-style and rendered-state facts"
+   ],
+   "design_decisions": [
+    "D5",
+    "D10"
+   ],
+   "display_heading": "Every runtime action SHALL be keyboard-operable with visible focus",
+   "id": "REQ-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus",
+   "scenarios": [
+    {
+     "display_heading": "Keyboard-only walkthrough is performed",
+     "id": "SCN-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus-keyboard-only-walkthrough-is-performed"
+    },
+    {
+     "display_heading": "Focused control receives activation",
+     "id": "SCN-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus-focused-control-receives-activation"
+    }
+   ]
   },
-  "status": "baseline-established"
+  {
+   "capability": "accessible-stage-presentation",
+   "design_decision_headings": [
+    "Fixed stage, safe area, palette, and scoped typography",
+    "Inline visuals preserve one narrative job and source meaning per slide",
+    "Browser evidence owns computed-style and rendered-state facts"
+   ],
+   "design_decisions": [
+    "D3",
+    "D6",
+    "D10"
+   ],
+   "display_heading": "The 18px floor SHALL apply only to required audience meaning",
+   "id": "REQ-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning",
+   "scenarios": [
+    {
+     "display_heading": "Required audience text is measured",
+     "id": "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-required-audience-text-is-measured"
+    },
+    {
+     "display_heading": "Excluded auxiliary text is measured",
+     "id": "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-excluded-auxiliary-text-is-measured"
+    },
+    {
+     "display_heading": "Required meaning is disguised as decorative",
+     "id": "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-required-meaning-is-disguised-as-decorative"
+    }
+   ]
+  },
+  {
+   "capability": "accessible-stage-presentation",
+   "design_decision_headings": [
+    "Notes, semantics, and accessibility share one active-slide model",
+    "Attention animations begin only on target-slide active entry",
+    "Browser evidence owns computed-style and rendered-state facts"
+   ],
+   "design_decisions": [
+    "D5",
+    "D7",
+    "D10"
+   ],
+   "display_heading": "Contrast and non-color meaning SHALL remain sufficient",
+   "id": "REQ-asp-contrast-and-non-color-meaning-shall-remain-sufficient",
+   "scenarios": [
+    {
+     "display_heading": "Computed contrast is evaluated",
+     "id": "SCN-asp-contrast-and-non-color-meaning-shall-remain-sufficient-computed-contrast-is-evaluated"
+    },
+    {
+     "display_heading": "Color is unavailable",
+     "id": "SCN-asp-contrast-and-non-color-meaning-shall-remain-sufficient-color-is-unavailable"
+    }
+   ]
+  },
+  {
+   "capability": "accessible-stage-presentation",
+   "design_decision_headings": [
+    "Fixed stage, safe area, palette, and scoped typography",
+    "Notes, semantics, and accessibility share one active-slide model"
+   ],
+   "design_decisions": [
+    "D3",
+    "D5"
+   ],
+   "display_heading": "Meaningful visuals SHALL have an accessible reading order and equivalent",
+   "id": "REQ-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent",
+   "scenarios": [
+    {
+     "display_heading": "Meaningful diagram is encountered",
+     "id": "SCN-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent-meaningful-diagram-is-encountered"
+    },
+    {
+     "display_heading": "Decorative vectors are exposed",
+     "id": "SCN-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent-decorative-vectors-are-exposed"
+    }
+   ]
+  },
+  {
+   "capability": "accessible-stage-presentation",
+   "design_decision_headings": [
+    "Notes, semantics, and accessibility share one active-slide model",
+    "Browser evidence owns computed-style and rendered-state facts"
+   ],
+   "design_decisions": [
+    "D5",
+    "D10"
+   ],
+   "display_heading": "Motion preferences and revisit behavior SHALL preserve complete meaning",
+   "id": "REQ-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning",
+   "scenarios": [
+    {
+     "display_heading": "Reduced motion is enabled",
+     "id": "SCN-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning-reduced-motion-is-enabled"
+    },
+    {
+     "display_heading": "Attention slide is revisited",
+     "id": "SCN-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning-attention-slide-is-revisited"
+    }
+   ]
+  },
+  {
+   "capability": "accessible-stage-presentation",
+   "design_decision_headings": [
+    "Fixed stage, safe area, palette, and scoped typography",
+    "Notes, semantics, and accessibility share one active-slide model"
+   ],
+   "design_decisions": [
+    "D3",
+    "D5"
+   ],
+   "display_heading": "Font fallback and qualified scaling SHALL preserve comprehension",
+   "id": "REQ-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension",
+   "scenarios": [
+    {
+     "display_heading": "Local fonts are unavailable",
+     "id": "SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-local-fonts-are-unavailable"
+    },
+    {
+     "display_heading": "Stage is letterboxed",
+     "id": "SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-stage-is-letterboxed"
+    }
+   ]
+  },
+  {
+   "capability": "accessible-stage-presentation",
+   "design_decision_headings": [
+    "Notes, semantics, and accessibility share one active-slide model",
+    "Attention animations begin only on target-slide active entry"
+   ],
+   "design_decisions": [
+    "D5",
+    "D7"
+   ],
+   "display_heading": "Printed fallback SHALL remain accessible and complete",
+   "id": "REQ-asp-printed-fallback-shall-remain-accessible-and-complete",
+   "scenarios": [
+    {
+     "display_heading": "PDF accessibility checks are performed",
+     "id": "SCN-asp-printed-fallback-shall-remain-accessible-and-complete-pdf-accessibility-checks-are-performed"
+    }
+   ]
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "design_decision_headings": [
+    "Browser evidence owns computed-style and rendered-state facts"
+   ],
+   "design_decisions": [
+    "D10"
+   ],
+   "display_heading": "Safari and Chrome SHALL qualify the same exact candidate",
+   "id": "REQ-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate",
+   "scenarios": [
+    {
+     "display_heading": "Browser matrices pass",
+     "id": "SCN-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate-browser-matrices-pass"
+    },
+    {
+     "display_heading": "Browser evidence targets different bytes",
+     "id": "SCN-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate-browser-evidence-targets-different-bytes"
+    }
+   ]
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "design_decision_headings": [
+    "PDF and rehearsals are fixed external human gates"
+   ],
+   "design_decisions": [
+    "D11"
+   ],
+   "display_heading": "Browser evidence SHALL own computed-style acceptance",
+   "id": "REQ-bqre-browser-evidence-shall-own-computed-style-acceptance",
+   "scenarios": [
+    {
+     "display_heading": "Scoped 18px floor is verified",
+     "id": "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-scoped-18px-floor-is-verified"
+    },
+    {
+     "display_heading": "Contrast is verified",
+     "id": "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-contrast-is-verified"
+    },
+    {
+     "display_heading": "Static CSS appears compliant but computed style differs",
+     "id": "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-static-css-appears-compliant-but-computed-style-differs"
+    }
+   ]
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "design_decision_headings": [
+    "Central contracts are authoritative; external implementation is a separate transaction",
+    "Provenance and copy selection are machine-readable acceptance inputs",
+    "Evidence invalidation uses two tiers"
+   ],
+   "design_decisions": [
+    "D1",
+    "D8",
+    "D9"
+   ],
+   "display_heading": "Viewport and interaction evidence SHALL expose observable behavior",
+   "id": "REQ-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior",
+   "scenarios": [
+    {
+     "display_heading": "Qualified viewport evidence is inspected",
+     "id": "SCN-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior-qualified-viewport-evidence-is-inspected"
+    },
+    {
+     "display_heading": "Interaction result lacks state evidence",
+     "id": "SCN-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior-interaction-result-lacks-state-evidence"
+    }
+   ]
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "design_decision_headings": [
+    "PDF and rehearsals are fixed external human gates",
+    "Release identity uses a fixed annotated tag without circular commit claims"
+   ],
+   "design_decisions": [
+    "D11",
+    "D12"
+   ],
+   "display_heading": "PDF fallback SHALL be generated and verified from the accepted candidate",
+   "id": "REQ-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate",
+   "scenarios": [
+    {
+     "display_heading": "PDF evidence matches the candidate",
+     "id": "SCN-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate-pdf-evidence-matches-the-candidate"
+    },
+    {
+     "display_heading": "A bound PDF input changes",
+     "id": "SCN-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate-a-bound-pdf-input-changes"
+    }
+   ]
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "design_decision_headings": [
+    "Browser evidence owns computed-style and rendered-state facts",
+    "PDF and rehearsals are fixed external human gates"
+   ],
+   "design_decisions": [
+    "D10",
+    "D11"
+   ],
+   "display_heading": "The public venue package SHALL contain exactly the allowlisted files",
+   "id": "REQ-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files",
+   "scenarios": [
+    {
+     "display_heading": "Venue package is assembled",
+     "id": "SCN-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files-venue-package-is-assembled"
+    },
+    {
+     "display_heading": "Private file is included",
+     "id": "SCN-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files-private-file-is-included"
+    }
+   ]
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "design_decision_headings": [
+    "Browser evidence owns computed-style and rendered-state facts"
+   ],
+   "design_decisions": [
+    "D10"
+   ],
+   "display_heading": "Copied-folder and actual venue rehearsals SHALL gate release",
+   "id": "REQ-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release",
+   "scenarios": [
+    {
+     "display_heading": "Copied-folder rehearsal passes",
+     "id": "SCN-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release-copied-folder-rehearsal-passes"
+    },
+    {
+     "display_heading": "Venue rehearsal is missing or targets another digest",
+     "id": "SCN-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release-venue-rehearsal-is-missing-or-targets-another-digest"
+    }
+   ]
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "design_decision_headings": [
+    "Browser evidence owns computed-style and rendered-state facts"
+   ],
+   "design_decisions": [
+    "D10"
+   ],
+   "display_heading": "Release evidence SHALL be complete, fresh, and traceable",
+   "id": "REQ-bqre-release-evidence-shall-be-complete-fresh-and-traceable",
+   "scenarios": [
+    {
+     "display_heading": "Final release gate is evaluated",
+     "id": "SCN-bqre-release-evidence-shall-be-complete-fresh-and-traceable-final-release-gate-is-evaluated"
+    },
+    {
+     "display_heading": "Evidence is stale, missing, or internally inconsistent",
+     "id": "SCN-bqre-release-evidence-shall-be-complete-fresh-and-traceable-evidence-is-stale-missing-or-internally-inconsistent"
+    }
+   ]
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "design_decision_headings": [
+    "Browser evidence owns computed-style and rendered-state facts",
+    "PDF and rehearsals are fixed external human gates"
+   ],
+   "design_decisions": [
+    "D10",
+    "D11"
+   ],
+   "display_heading": "Release evidence retention SHALL apply Tier 1 and Tier 2 dependency rules",
+   "id": "REQ-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules",
+   "scenarios": [
+    {
+     "display_heading": "Tier 1 evidence is reused",
+     "id": "SCN-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules-tier-1-evidence-is-reused"
+    },
+    {
+     "display_heading": "Tier 2 evidence is retained",
+     "id": "SCN-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules-tier-2-evidence-is-retained"
+    }
+   ]
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "design_decision_headings": [
+    "PDF and rehearsals are fixed external human gates"
+   ],
+   "design_decisions": [
+    "D11"
+   ],
+   "display_heading": "Central acceptance SHALL be read-only toward external implementation evidence",
+   "id": "REQ-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence",
+   "scenarios": [
+    {
+     "display_heading": "External evidence satisfies a central requirement",
+     "id": "SCN-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence-external-evidence-satisfies-a-central-requirement"
+    },
+    {
+     "display_heading": "External evidence fails acceptance",
+     "id": "SCN-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence-external-evidence-fails-acceptance"
+    }
+   ]
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "design_decision_headings": [
+    "Release identity uses a fixed annotated tag without circular commit claims"
+   ],
+   "design_decisions": [
+    "D12"
+   ],
+   "display_heading": "The fixed annotated ref SHALL identify the final release externally",
+   "id": "REQ-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally",
+   "scenarios": [
+    {
+     "display_heading": "Fixed tag ref is available",
+     "id": "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-fixed-tag-ref-is-available"
+    },
+    {
+     "display_heading": "Final annotated ref is inspected",
+     "id": "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-final-annotated-ref-is-inspected"
+    },
+    {
+     "display_heading": "Release ref is invalid",
+     "id": "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-release-ref-is-invalid"
+    }
+   ]
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "design_decision_headings": [
+    "Provenance and copy selection are machine-readable acceptance inputs"
+   ],
+   "design_decisions": [
+    "D8"
+   ],
+   "display_heading": "Every factual claim SHALL resolve to a registered source and qualifier",
+   "id": "REQ-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier",
+   "scenarios": [
+    {
+     "display_heading": "Released claim is traced",
+     "id": "SCN-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier-released-claim-is-traced"
+    },
+    {
+     "display_heading": "Registered claim is orphaned or unqualified",
+     "id": "SCN-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier-registered-claim-is-orphaned-or-unqualified"
+    }
+   ]
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "design_decision_headings": [
+    "Provenance and copy selection are machine-readable acceptance inputs"
+   ],
+   "design_decisions": [
+    "D8"
+   ],
+   "display_heading": "Specific factual scopes SHALL remain explicit",
+   "id": "REQ-fpa-specific-factual-scopes-shall-remain-explicit",
+   "scenarios": [
+    {
+     "display_heading": "Claim wording is reviewed",
+     "id": "SCN-fpa-specific-factual-scopes-shall-remain-explicit-claim-wording-is-reviewed"
+    },
+    {
+     "display_heading": "Scope is broadened",
+     "id": "SCN-fpa-specific-factual-scopes-shall-remain-explicit-scope-is-broadened"
+    }
+   ]
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "design_decision_headings": [
+    "Provenance and copy selection are machine-readable acceptance inputs"
+   ],
+   "design_decisions": [
+    "D8"
+   ],
+   "display_heading": "Meaningful visuals SHALL have provenance and encoding fidelity",
+   "id": "REQ-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity",
+   "scenarios": [
+    {
+     "display_heading": "Data visual is inspected",
+     "id": "SCN-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity-data-visual-is-inspected"
+    },
+    {
+     "display_heading": "Visual asset has no lawful basis",
+     "id": "SCN-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity-visual-asset-has-no-lawful-basis"
+    }
+   ]
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "design_decision_headings": [
+    "Provenance and copy selection are machine-readable acceptance inputs"
+   ],
+   "design_decisions": [
+    "D8"
+   ],
+   "display_heading": "Neutral company-safe copy SHALL be the default",
+   "id": "REQ-fpa-neutral-company-safe-copy-shall-be-the-default",
+   "scenarios": [
+    {
+     "display_heading": "Exact-copy approval matches",
+     "id": "SCN-fpa-neutral-company-safe-copy-shall-be-the-default-exact-copy-approval-matches"
+    },
+    {
+     "display_heading": "Approval is absent, rejected, stale, partial, or mismatched",
+     "id": "SCN-fpa-neutral-company-safe-copy-shall-be-the-default-approval-is-absent-rejected-stale-partial-or-mismatched"
+    }
+   ]
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "design_decision_headings": [
+    "Provenance and copy selection are machine-readable acceptance inputs",
+    "Evidence invalidation uses two tiers"
+   ],
+   "design_decisions": [
+    "D8",
+    "D9"
+   ],
+   "display_heading": "Evidence invalidation SHALL use Tier 1 and Tier 2",
+   "id": "REQ-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2",
+   "scenarios": [
+    {
+     "display_heading": "Public candidate bytes change",
+     "id": "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-public-candidate-bytes-change"
+    },
+    {
+     "display_heading": "Private metadata changes without public-byte change",
+     "id": "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-private-metadata-changes-without-public-byte-change"
+    },
+    {
+     "display_heading": "Private change alters selected meaning",
+     "id": "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-private-change-alters-selected-meaning"
+    }
+   ]
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "design_decision_headings": [
+    "Provenance and copy selection are machine-readable acceptance inputs",
+    "Evidence invalidation uses two tiers"
+   ],
+   "design_decisions": [
+    "D8",
+    "D9"
+   ],
+   "display_heading": "Release identity SHALL avoid self-reference",
+   "id": "REQ-fpa-release-identity-shall-avoid-self-reference",
+   "scenarios": [
+    {
+     "display_heading": "Release manifest is finalized",
+     "id": "SCN-fpa-release-identity-shall-avoid-self-reference-release-manifest-is-finalized"
+    },
+    {
+     "display_heading": "Tag identity is verified",
+     "id": "SCN-fpa-release-identity-shall-avoid-self-reference-tag-identity-is-verified"
+    }
+   ]
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "design_decision_headings": [
+    "Provenance and copy selection are machine-readable acceptance inputs",
+    "Evidence invalidation uses two tiers"
+   ],
+   "design_decisions": [
+    "D8",
+    "D9"
+   ],
+   "display_heading": "Central acceptance SHALL consume external evidence without mutating its root",
+   "id": "REQ-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root",
+   "scenarios": [
+    {
+     "display_heading": "Central acceptance reviews external evidence",
+     "id": "SCN-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root-central-acceptance-reviews-external-evidence"
+    },
+    {
+     "display_heading": "Evidence is missing or stale",
+     "id": "SCN-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root-evidence-is-missing-or-stale"
+    }
+   ]
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "design_decision_headings": [
+    "Inline visuals preserve one narrative job and source meaning per slide"
+   ],
+   "design_decisions": [
+    "D6"
+   ],
+   "display_heading": "The keynote SHALL contain exactly 17 slides with one narrative job each",
+   "id": "REQ-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each",
+   "scenarios": [
+    {
+     "display_heading": "Complete deck is inspected",
+     "id": "SCN-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each-complete-deck-is-inspected"
+    },
+    {
+     "display_heading": "A visual combines slide responsibilities",
+     "id": "SCN-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each-a-visual-combines-slide-responsibilities"
+    }
+   ]
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "design_decision_headings": [
+    "Inline visuals preserve one narrative job and source meaning per slide",
+    "Provenance and copy selection are machine-readable acceptance inputs"
+   ],
+   "design_decisions": [
+    "D6",
+    "D8"
+   ],
+   "display_heading": "Act 1 SHALL establish the macro picture with qualified claims",
+   "id": "REQ-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims",
+   "scenarios": [
+    {
+     "display_heading": "Act 1 is stage-ready",
+     "id": "SCN-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims-act-1-is-stage-ready"
+    },
+    {
+     "display_heading": "Forecast wording is strengthened",
+     "id": "SCN-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims-forecast-wording-is-strengthened"
+    }
+   ]
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "design_decision_headings": [
+    "Inline visuals preserve one narrative job and source meaning per slide",
+    "Provenance and copy selection are machine-readable acceptance inputs"
+   ],
+   "design_decisions": [
+    "D6",
+    "D8"
+   ],
+   "display_heading": "Act 2 SHALL distinguish hype, evidence, and transferable experience",
+   "id": "REQ-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience",
+   "scenarios": [
+    {
+     "display_heading": "Three-layer journey is presented",
+     "id": "SCN-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience-three-layer-journey-is-presented"
+    },
+    {
+     "display_heading": "Value-producing group is described",
+     "id": "SCN-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience-value-producing-group-is-described"
+    }
+   ]
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "design_decision_headings": [
+    "Inline visuals preserve one narrative job and source meaning per slide",
+    "Provenance and copy selection are machine-readable acceptance inputs"
+   ],
+   "design_decisions": [
+    "D6",
+    "D8"
+   ],
+   "display_heading": "Slide 7 SHALL keep three factual contexts independent",
+   "id": "REQ-kcl-slide-7-shall-keep-three-factual-contexts-independent",
+   "scenarios": [
+    {
+     "display_heading": "All slide 7 contexts are shown",
+     "id": "SCN-kcl-slide-7-shall-keep-three-factual-contexts-independent-all-slide-7-contexts-are-shown"
+    },
+    {
+     "display_heading": "Populations or context are conflated",
+     "id": "SCN-kcl-slide-7-shall-keep-three-factual-contexts-independent-populations-or-context-are-conflated"
+    }
+   ]
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "design_decision_headings": [
+    "Inline visuals preserve one narrative job and source meaning per slide",
+    "Attention animations begin only on target-slide active entry"
+   ],
+   "design_decisions": [
+    "D6",
+    "D7"
+   ],
+   "display_heading": "Act 3 SHALL separate leadership, questions, and handoff",
+   "id": "REQ-kcl-act-3-shall-separate-leadership-questions-and-handoff",
+   "scenarios": [
+    {
+     "display_heading": "Roundtable prompts are displayed",
+     "id": "SCN-kcl-act-3-shall-separate-leadership-questions-and-handoff-roundtable-prompts-are-displayed"
+    },
+    {
+     "display_heading": "Handoff slide is reviewed",
+     "id": "SCN-kcl-act-3-shall-separate-leadership-questions-and-handoff-handoff-slide-is-reviewed"
+    }
+   ]
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "design_decision_headings": [
+    "Inline visuals preserve one narrative job and source meaning per slide",
+    "Provenance and copy selection are machine-readable acceptance inputs"
+   ],
+   "design_decisions": [
+    "D6",
+    "D8"
+   ],
+   "display_heading": "Audience and operator language SHALL follow the Vietnamese policy",
+   "id": "REQ-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy",
+   "scenarios": [
+    {
+     "display_heading": "Language audit is run",
+     "id": "SCN-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy-language-audit-is-run"
+    },
+    {
+     "display_heading": "Technical term first appears",
+     "id": "SCN-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy-technical-term-first-appears"
+    }
+   ]
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "design_decision_headings": [
+    "Inline visuals preserve one narrative job and source meaning per slide"
+   ],
+   "design_decisions": [
+    "D6"
+   ],
+   "display_heading": "Visuals SHALL preserve factual and linguistic meaning",
+   "id": "REQ-kcl-visuals-shall-preserve-factual-and-linguistic-meaning",
+   "scenarios": [
+    {
+     "display_heading": "Meaningful visual is reviewed",
+     "id": "SCN-kcl-visuals-shall-preserve-factual-and-linguistic-meaning-meaningful-visual-is-reviewed"
+    },
+    {
+     "display_heading": "Decorative visual is removed",
+     "id": "SCN-kcl-visuals-shall-preserve-factual-and-linguistic-meaning-decorative-visual-is-removed"
+    }
+   ]
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "design_decision_headings": [
+    "Inline visuals preserve one narrative job and source meaning per slide"
+   ],
+   "design_decisions": [
+    "D6"
+   ],
+   "display_heading": "The 17-slide dominant visual matrix SHALL be authoritative",
+   "id": "REQ-kcl-17-slide-dominant-visual-matrix",
+   "scenarios": [
+    {
+     "display_heading": "Complete visual matrix is reviewed",
+     "id": "SCN-kcl-17-slide-dominant-visual-matrix-complete-matrix-reviewed"
+    },
+    {
+     "display_heading": "A dominant visual job is substituted",
+     "id": "SCN-kcl-17-slide-dominant-visual-matrix-job-substituted"
+    }
+   ]
+  },
+  {
+   "capability": "offline-keynote-runtime",
+   "design_decision_headings": [
+    "Central contracts are authoritative; external implementation is a separate transaction",
+    "One self-contained runtime with an exact seven-file public package"
+   ],
+   "design_decisions": [
+    "D1",
+    "D2"
+   ],
+   "display_heading": "The keynote SHALL launch directly and remain network-independent",
+   "id": "REQ-okr-the-keynote-shall-launch-directly-and-remain-network-independent",
+   "scenarios": [
+    {
+     "display_heading": "Offline direct launch succeeds",
+     "id": "SCN-okr-the-keynote-shall-launch-directly-and-remain-network-independent-offline-direct-launch-succeeds"
+    },
+    {
+     "display_heading": "External runtime reference is introduced",
+     "id": "SCN-okr-the-keynote-shall-launch-directly-and-remain-network-independent-external-runtime-reference-is-introduced"
+    }
+   ]
+  },
+  {
+   "capability": "offline-keynote-runtime",
+   "design_decision_headings": [
+    "Fixed stage, safe area, palette, and scoped typography"
+   ],
+   "design_decisions": [
+    "D3"
+   ],
+   "display_heading": "The stage SHALL preserve its authored geometry within qualified viewports",
+   "id": "REQ-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports",
+   "scenarios": [
+    {
+     "display_heading": "Qualified viewport scales the stage",
+     "id": "SCN-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports-qualified-viewport-scales-the-stage"
+    },
+    {
+     "display_heading": "Viewport aspect ratio differs from 16:9",
+     "id": "SCN-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports-viewport-aspect-ratio-differs-from-16-9"
+    }
+   ]
+  },
+  {
+   "capability": "offline-keynote-runtime",
+   "design_decision_headings": [
+    "Deterministic routes use canonical fragment state, not persistent storage"
+   ],
+   "design_decisions": [
+    "D4"
+   ],
+   "display_heading": "Navigation SHALL implement deterministic full and short routes",
+   "id": "REQ-okr-navigation-shall-implement-deterministic-full-and-short-routes",
+   "scenarios": [
+    {
+     "display_heading": "Sequential navigation follows the active route",
+     "id": "SCN-okr-navigation-shall-implement-deterministic-full-and-short-routes-sequential-navigation-follows-the-active-route"
+    },
+    {
+     "display_heading": "Interactive surface receives a click",
+     "id": "SCN-okr-navigation-shall-implement-deterministic-full-and-short-routes-interactive-surface-receives-a-click"
+    }
+   ]
+  },
+  {
+   "capability": "offline-keynote-runtime",
+   "design_decision_headings": [
+    "Deterministic routes use canonical fragment state, not persistent storage"
+   ],
+   "design_decisions": [
+    "D4"
+   ],
+   "display_heading": "Fragment state SHALL recover safely under `file://`",
+   "id": "REQ-okr-fragment-state-shall-recover-safely-under-file-state",
+   "scenarios": [
+    {
+     "display_heading": "Valid state is reloaded",
+     "id": "SCN-okr-fragment-state-shall-recover-safely-under-file-state-valid-state-is-reloaded"
+    },
+    {
+     "display_heading": "Fragment state is absent or invalid",
+     "id": "SCN-okr-fragment-state-shall-recover-safely-under-file-state-fragment-state-is-absent-or-invalid"
+    },
+    {
+     "display_heading": "Browser storage is denied",
+     "id": "SCN-okr-fragment-state-shall-recover-safely-under-file-state-browser-storage-is-denied"
+    }
+   ]
+  },
+  {
+   "capability": "offline-keynote-runtime",
+   "design_decision_headings": [
+    "Notes, semantics, and accessibility share one active-slide model"
+   ],
+   "design_decisions": [
+    "D5"
+   ],
+   "display_heading": "Speaker notes SHALL remain synchronized and controlled",
+   "id": "REQ-okr-speaker-notes-shall-remain-synchronized-and-controlled",
+   "scenarios": [
+    {
+     "display_heading": "Notes follow navigation",
+     "id": "SCN-okr-speaker-notes-shall-remain-synchronized-and-controlled-notes-follow-navigation"
+    },
+    {
+     "display_heading": "Notes are closed or printed",
+     "id": "SCN-okr-speaker-notes-shall-remain-synchronized-and-controlled-notes-are-closed-or-printed"
+    }
+   ]
+  },
+  {
+   "capability": "offline-keynote-runtime",
+   "design_decision_headings": [
+    "Inline visuals preserve one narrative job and source meaning per slide",
+    "Attention animations begin only on target-slide active entry"
+   ],
+   "design_decisions": [
+    "D6",
+    "D7"
+   ],
+   "display_heading": "Motion SHALL be limited and state-safe",
+   "id": "REQ-okr-motion-shall-be-limited-and-state-safe",
+   "scenarios": [
+    {
+     "display_heading": "Reduced motion is requested",
+     "id": "SCN-okr-motion-shall-be-limited-and-state-safe-reduced-motion-is-requested"
+    },
+    {
+     "display_heading": "An attention slide is revisited",
+     "id": "SCN-okr-motion-shall-be-limited-and-state-safe-an-attention-slide-is-revisited"
+    }
+   ]
+  },
+  {
+   "capability": "timing-and-roundtable-handoff",
+   "design_decision_headings": [
+    "Deterministic routes use canonical fragment state, not persistent storage"
+   ],
+   "design_decisions": [
+    "D4"
+   ],
+   "display_heading": "The full route SHALL total exactly 765 seconds",
+   "id": "REQ-trh-the-full-route-shall-total-exactly-765-seconds",
+   "scenarios": [
+    {
+     "display_heading": "Full timing is calculated",
+     "id": "SCN-trh-the-full-route-shall-total-exactly-765-seconds-full-timing-is-calculated"
+    },
+    {
+     "display_heading": "Full-route duration drifts",
+     "id": "SCN-trh-the-full-route-shall-total-exactly-765-seconds-full-route-duration-drifts"
+    }
+   ]
+  },
+  {
+   "capability": "timing-and-roundtable-handoff",
+   "design_decision_headings": [
+    "Deterministic routes use canonical fragment state, not persistent storage"
+   ],
+   "design_decisions": [
+    "D4"
+   ],
+   "display_heading": "The short route SHALL total exactly 600 seconds and skip only slides 4 and 8",
+   "id": "REQ-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8",
+   "scenarios": [
+    {
+     "display_heading": "Short route is traversed sequentially",
+     "id": "SCN-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8-short-route-is-traversed-sequentially"
+    },
+    {
+     "display_heading": "Direct access is used in short mode",
+     "id": "SCN-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8-direct-access-is-used-in-short-mode"
+    }
+   ]
+  },
+  {
+   "capability": "timing-and-roundtable-handoff",
+   "design_decision_headings": [
+    "Notes, semantics, and accessibility share one active-slide model"
+   ],
+   "design_decisions": [
+    "D5"
+   ],
+   "display_heading": "Notes SHALL expose route-specific timing without contradiction",
+   "id": "REQ-trh-notes-shall-expose-route-specific-timing-without-contradiction",
+   "scenarios": [
+    {
+     "display_heading": "Presenter changes route mode",
+     "id": "SCN-trh-notes-shall-expose-route-specific-timing-without-contradiction-presenter-changes-route-mode"
+    },
+    {
+     "display_heading": "Skipped slide is inspected in short mode",
+     "id": "SCN-trh-notes-shall-expose-route-specific-timing-without-contradiction-skipped-slide-is-inspected-in-short-mode"
+    }
+   ]
+  },
+  {
+   "capability": "timing-and-roundtable-handoff",
+   "design_decision_headings": [
+    "Deterministic routes use canonical fragment state, not persistent storage",
+    "Notes, semantics, and accessibility share one active-slide model"
+   ],
+   "design_decisions": [
+    "D4",
+    "D5"
+   ],
+   "display_heading": "Attention animations SHALL begin on target-slide entry",
+   "id": "REQ-trh-attention-animations-shall-begin-on-target-slide-entry",
+   "scenarios": [
+    {
+     "display_heading": "Presenter advances to an attention slide",
+     "id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-presenter-advances-to-an-attention-slide"
+    },
+    {
+     "display_heading": "Target slide is initial fragment state",
+     "id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-target-slide-is-initial-fragment-state"
+    },
+    {
+     "display_heading": "Presenter revisits an attention slide",
+     "id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-presenter-revisits-an-attention-slide"
+    },
+    {
+     "display_heading": "Reduced motion or print is active",
+     "id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-reduced-motion-or-print-is-active"
+    }
+   ]
+  },
+  {
+   "capability": "timing-and-roundtable-handoff",
+   "design_decision_headings": [
+    "Deterministic routes use canonical fragment state, not persistent storage",
+    "Notes, semantics, and accessibility share one active-slide model"
+   ],
+   "design_decisions": [
+    "D4",
+    "D5"
+   ],
+   "display_heading": "The roundtable transition SHALL preserve separate audience jobs",
+   "id": "REQ-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs",
+   "scenarios": [
+    {
+     "display_heading": "Keynote reaches the final two slides",
+     "id": "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-keynote-reaches-the-final-two-slides"
+    },
+    {
+     "display_heading": "Panelist details are unavailable",
+     "id": "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-panelist-details-are-unavailable"
+    }
+   ]
+  }
+ ],
+ "schema_version": 1,
+ "status": "baseline-established",
+ "tasks_contract": {
+  "algorithm": "UTF-8 decode; normalize CRLF/CR to LF; replace line-start checkbox marker matching case-insensitive ^- \\[[ xX]\\] with - [ ]; preserve all other text; strip all trailing LF; append exactly one LF; hash UTF-8 bytes.",
+  "canonical_bytes": "LF-only with exactly one trailing LF",
+  "controlled_checks": {
+   "canonical_byte_length": 15636,
+   "lowercase_checkbox_preserves_hash": true,
+   "substantive_task_text_changes_hash": true,
+   "uppercase_checkbox_preserves_hash": true
+  },
+  "raw_tasks_sha256_recorded": false,
+  "sha256": "98fa85724923b7d1a6566b80f82888654bdc8389a347c2ecbd4ed37a58bad3be"
+ }
 }

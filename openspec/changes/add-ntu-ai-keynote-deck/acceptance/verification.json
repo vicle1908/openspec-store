@@ -1,918 +1,20 @@
 {
- "schema_version": 1,
  "artifact": "central-acceptance-automated-verification",
- "change_id": "add-ntu-ai-keynote-deck",
- "validated_at": "2026-08-27T06:30:25.135918+07:00",
  "candidate": {
   "candidate_id": "ntu-keynote-main-bb7a4d5",
-  "implementation_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
   "evidence_base_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
-  "public_package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
-  "selected_copy": "neutral",
+  "implementation_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
   "public_package_bytes_unchanged_from_previous_candidate": false,
+  "public_package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
   "retention_tier": "tier-1-public-byte-change",
+  "selected_copy": "neutral",
   "tier_1_reason": "NTU brand theme alignment: colors changed (#181C62->#001E61, #D71440->#B21F2F), new tokens (--ntu-gold, --ntu-red-ink), decorative structural elements. index.html + PDF changed. Spec palette updated to match."
  },
- "task_results": {
-  "3.1": {
-   "status": "accepted",
-   "capabilities": [
-    "offline-keynote-runtime",
-    "timing-and-roundtable-handoff"
-   ],
-   "evidence_mode": "tier-1-refreshed",
-   "observed": {
-    "full_route_seconds": 765,
-    "short_route_seconds": 600,
-    "short_route_skips": [
-     4,
-     8
-    ],
-    "static_verifier": "11/11 pass",
-    "implementation_tests": "76 passed, 297 subtests"
-   },
-   "notes": "index.html timing/routes unchanged. Font + theme bytes changed; full test suite and static verifier re-run green against bb7a4d5."
-  },
-  "3.2": {
-   "status": "accepted",
-   "capabilities": [
-    "keynote-content-and-language",
-    "factual-provenance-and-approval"
-   ],
-   "evidence_mode": "tier-1-content-unchanged",
-   "observed": {
-    "visual_register_rows": 17,
-    "unique_visual_ids": 17,
-    "slide_7_independent_contexts": true,
-    "gartner_qualifier": "hơn 40%",
-    "content_text_unchanged": true
-   },
-   "notes": "Theme alignment changed CSS colors/decorations only; slide copy, source mappings, qualifier fidelity, and visual provenance register text are unchanged."
-  },
-  "3.3": {
-   "status": "accepted",
-   "capabilities": [
-    "accessible-stage-presentation",
-    "browser-qualification-and-release-evidence"
-   ],
-   "evidence_mode": "tier-1-fresh-browser",
-   "observed": {
-    "browsers": [
-     "Chrome",
-     "Safari"
-    ],
-    "brand_theme_test": "5 assertions pass (WCAG contrast, tokens, decoratives)",
-    "brand_colors": {
-     "ntu-blue": "#001e61",
-     "ntu-red": "#b21f2f",
-     "ntu-red-ink": "#f15b70",
-     "ntu-gold": "#ffd166"
-    }
-   },
-   "notes": "Fresh theme screenshots retained by parallel agent. WCAG 4.5:1 contrast verified by test_ntu_brand_theme.py. Palette spec updated."
-  },
-  "3.4": {
-   "status": "accepted",
-   "capabilities": [
-    "browser-qualification-and-release-evidence",
-    "offline-keynote-runtime",
-    "factual-provenance-and-approval"
-   ],
-   "evidence_mode": "tier-1-regenerated",
-   "observed": {
-    "pdf_page_count": 17,
-    "package_digest_independently_recomputed": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
-    "digest_test_vector_pass": true,
-    "checksums_sha256": "verified"
-   },
-   "notes": "PDF regenerated and manifest digest independently recomputed against bb7a4d5. All evidence files refreshed."
-  },
-  "4.1": {
-   "status": "accepted-automated-editorial-pending",
-   "capabilities": [
-    "factual-provenance-and-approval",
-    "browser-qualification-and-release-evidence"
-   ],
-   "tier_classification": {
-    "tier": "tier-1-public-byte-change",
-    "justification": "index.html colors/decorations + PDF changed. Spec palette updated to match tested theme.",
-    "fresh_evidence_captured": true
-   },
-   "copy_selection_gate": {
-    "selected_variant": "neutral",
-    "approval_resolution": "neutral-no-response",
-    "zero_gated_claims_in_neutral_copy": true,
-    "fail_closed": true
-   },
-   "editorial_review": {
-    "status": "pending-human-gate",
-    "note": "Worksheet needs re-issued for bb7a4d5 identity before human review."
-   },
-   "notes": "Tier 1 re-verification complete. Neutral copy unchanged (palette is CSS-only, no audience wording change). Human editorial review pending."
-  }
+ "central_read_only_boundary": {
+  "external_mutations_performed": false,
+  "external_writable_paths": []
  },
- "requirement_results": [
-  {
-   "group": "runtime_timing",
-   "capability": "offline-keynote-runtime",
-   "requirement_id": "REQ-okr-the-keynote-shall-launch-directly-and-remain-network-independent",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-okr-the-keynote-shall-launch-directly-and-remain-network-independent-offline-direct-launch-succeeds",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-okr-the-keynote-shall-launch-directly-and-remain-network-independent-external-runtime-reference-is-introduced",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "runtime_timing",
-   "capability": "offline-keynote-runtime",
-   "requirement_id": "REQ-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports-qualified-viewport-scales-the-stage",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports-viewport-aspect-ratio-differs-from-16-9",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "runtime_timing",
-   "capability": "offline-keynote-runtime",
-   "requirement_id": "REQ-okr-navigation-shall-implement-deterministic-full-and-short-routes",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-okr-navigation-shall-implement-deterministic-full-and-short-routes-sequential-navigation-follows-the-active-route",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-okr-navigation-shall-implement-deterministic-full-and-short-routes-interactive-surface-receives-a-click",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "runtime_timing",
-   "capability": "offline-keynote-runtime",
-   "requirement_id": "REQ-okr-fragment-state-shall-recover-safely-under-file-state",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-okr-fragment-state-shall-recover-safely-under-file-state-valid-state-is-reloaded",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-okr-fragment-state-shall-recover-safely-under-file-state-fragment-state-is-absent-or-invalid",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-okr-fragment-state-shall-recover-safely-under-file-state-browser-storage-is-denied",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "runtime_timing",
-   "capability": "offline-keynote-runtime",
-   "requirement_id": "REQ-okr-speaker-notes-shall-remain-synchronized-and-controlled",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-okr-speaker-notes-shall-remain-synchronized-and-controlled-notes-follow-navigation",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-okr-speaker-notes-shall-remain-synchronized-and-controlled-notes-are-closed-or-printed",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "runtime_timing",
-   "capability": "offline-keynote-runtime",
-   "requirement_id": "REQ-okr-motion-shall-be-limited-and-state-safe",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-okr-motion-shall-be-limited-and-state-safe-reduced-motion-is-requested",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-okr-motion-shall-be-limited-and-state-safe-an-attention-slide-is-revisited",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "runtime_timing",
-   "capability": "timing-and-roundtable-handoff",
-   "requirement_id": "REQ-trh-the-full-route-shall-total-exactly-765-seconds",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-trh-the-full-route-shall-total-exactly-765-seconds-full-timing-is-calculated",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-trh-the-full-route-shall-total-exactly-765-seconds-full-route-duration-drifts",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "runtime_timing",
-   "capability": "timing-and-roundtable-handoff",
-   "requirement_id": "REQ-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8-short-route-is-traversed-sequentially",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8-direct-access-is-used-in-short-mode",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "runtime_timing",
-   "capability": "timing-and-roundtable-handoff",
-   "requirement_id": "REQ-trh-notes-shall-expose-route-specific-timing-without-contradiction",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-trh-notes-shall-expose-route-specific-timing-without-contradiction-presenter-changes-route-mode",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-trh-notes-shall-expose-route-specific-timing-without-contradiction-skipped-slide-is-inspected-in-short-mode",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "runtime_timing",
-   "capability": "timing-and-roundtable-handoff",
-   "requirement_id": "REQ-trh-attention-animations-shall-begin-on-target-slide-entry",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-presenter-advances-to-an-attention-slide",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-target-slide-is-initial-fragment-state",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-presenter-revisits-an-attention-slide",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-reduced-motion-or-print-is-active",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "runtime_timing",
-   "capability": "timing-and-roundtable-handoff",
-   "requirement_id": "REQ-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-keynote-reaches-the-final-two-slides",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-panelist-details-are-unavailable",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "factual-provenance-and-approval",
-   "requirement_id": "REQ-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier-released-claim-is-traced",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier-registered-claim-is-orphaned-or-unqualified",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "factual-provenance-and-approval",
-   "requirement_id": "REQ-fpa-specific-factual-scopes-shall-remain-explicit",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-fpa-specific-factual-scopes-shall-remain-explicit-claim-wording-is-reviewed",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-fpa-specific-factual-scopes-shall-remain-explicit-scope-is-broadened",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "factual-provenance-and-approval",
-   "requirement_id": "REQ-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity-data-visual-is-inspected",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity-visual-asset-has-no-lawful-basis",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "factual-provenance-and-approval",
-   "requirement_id": "REQ-fpa-neutral-company-safe-copy-shall-be-the-default",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-fpa-neutral-company-safe-copy-shall-be-the-default-exact-copy-approval-matches",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-fpa-neutral-company-safe-copy-shall-be-the-default-approval-is-absent-rejected-stale-partial-or-mismatched",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "factual-provenance-and-approval",
-   "requirement_id": "REQ-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-public-candidate-bytes-change",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-private-metadata-changes-without-public-byte-change",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-private-change-alters-selected-meaning",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "factual-provenance-and-approval",
-   "requirement_id": "REQ-fpa-release-identity-shall-avoid-self-reference",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-fpa-release-identity-shall-avoid-self-reference-release-manifest-is-finalized",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-fpa-release-identity-shall-avoid-self-reference-tag-identity-is-verified",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "factual-provenance-and-approval",
-   "requirement_id": "REQ-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root-central-acceptance-reviews-external-evidence",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root-evidence-is-missing-or-stale",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "keynote-content-and-language",
-   "requirement_id": "REQ-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each-complete-deck-is-inspected",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each-a-visual-combines-slide-responsibilities",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "keynote-content-and-language",
-   "requirement_id": "REQ-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims-act-1-is-stage-ready",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims-forecast-wording-is-strengthened",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "keynote-content-and-language",
-   "requirement_id": "REQ-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience-three-layer-journey-is-presented",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience-value-producing-group-is-described",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "keynote-content-and-language",
-   "requirement_id": "REQ-kcl-slide-7-shall-keep-three-factual-contexts-independent",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-kcl-slide-7-shall-keep-three-factual-contexts-independent-all-slide-7-contexts-are-shown",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-kcl-slide-7-shall-keep-three-factual-contexts-independent-populations-or-context-are-conflated",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "keynote-content-and-language",
-   "requirement_id": "REQ-kcl-act-3-shall-separate-leadership-questions-and-handoff",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-kcl-act-3-shall-separate-leadership-questions-and-handoff-roundtable-prompts-are-displayed",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-kcl-act-3-shall-separate-leadership-questions-and-handoff-handoff-slide-is-reviewed",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "keynote-content-and-language",
-   "requirement_id": "REQ-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy-language-audit-is-run",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy-technical-term-first-appears",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "keynote-content-and-language",
-   "requirement_id": "REQ-kcl-visuals-shall-preserve-factual-and-linguistic-meaning",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-kcl-visuals-shall-preserve-factual-and-linguistic-meaning-meaningful-visual-is-reviewed",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-kcl-visuals-shall-preserve-factual-and-linguistic-meaning-decorative-visual-is-removed",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "content_provenance",
-   "capability": "keynote-content-and-language",
-   "requirement_id": "REQ-kcl-17-slide-dominant-visual-matrix",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-kcl-17-slide-dominant-visual-matrix-complete-matrix-reviewed",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-kcl-17-slide-dominant-visual-matrix-job-substituted",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "accessible-stage-presentation",
-   "requirement_id": "REQ-asp-only-the-active-slide-shall-be-exposed-as-active-content",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-asp-only-the-active-slide-shall-be-exposed-as-active-content-accessibility-tree-is-inspected",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-asp-only-the-active-slide-shall-be-exposed-as-active-content-slide-changes",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "accessible-stage-presentation",
-   "requirement_id": "REQ-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus-keyboard-only-walkthrough-is-performed",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus-focused-control-receives-activation",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "accessible-stage-presentation",
-   "requirement_id": "REQ-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-required-audience-text-is-measured",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-excluded-auxiliary-text-is-measured",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-required-meaning-is-disguised-as-decorative",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "accessible-stage-presentation",
-   "requirement_id": "REQ-asp-contrast-and-non-color-meaning-shall-remain-sufficient",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-asp-contrast-and-non-color-meaning-shall-remain-sufficient-computed-contrast-is-evaluated",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-asp-contrast-and-non-color-meaning-shall-remain-sufficient-color-is-unavailable",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "accessible-stage-presentation",
-   "requirement_id": "REQ-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent-meaningful-diagram-is-encountered",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent-decorative-vectors-are-exposed",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "accessible-stage-presentation",
-   "requirement_id": "REQ-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning-reduced-motion-is-enabled",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning-attention-slide-is-revisited",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "accessible-stage-presentation",
-   "requirement_id": "REQ-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-local-fonts-are-unavailable",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-stage-is-letterboxed",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "accessible-stage-presentation",
-   "requirement_id": "REQ-asp-printed-fallback-shall-remain-accessible-and-complete",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-asp-printed-fallback-shall-remain-accessible-and-complete-pdf-accessibility-checks-are-performed",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "browser-qualification-and-release-evidence",
-   "requirement_id": "REQ-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate-browser-matrices-pass",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate-browser-evidence-targets-different-bytes",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "browser-qualification-and-release-evidence",
-   "requirement_id": "REQ-bqre-browser-evidence-shall-own-computed-style-acceptance",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-scoped-18px-floor-is-verified",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-contrast-is-verified",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-static-css-appears-compliant-but-computed-style-differs",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "browser-qualification-and-release-evidence",
-   "requirement_id": "REQ-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior-qualified-viewport-evidence-is-inspected",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior-interaction-result-lacks-state-evidence",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "browser-qualification-and-release-evidence",
-   "requirement_id": "REQ-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate-pdf-evidence-matches-the-candidate",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate-a-bound-pdf-input-changes",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "browser-qualification-and-release-evidence",
-   "requirement_id": "REQ-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files-venue-package-is-assembled",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files-private-file-is-included",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "browser-qualification-and-release-evidence",
-   "requirement_id": "REQ-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release-copied-folder-rehearsal-passes",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release-venue-rehearsal-is-missing-or-targets-another-digest",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "browser-qualification-and-release-evidence",
-   "requirement_id": "REQ-bqre-release-evidence-shall-be-complete-fresh-and-traceable",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-bqre-release-evidence-shall-be-complete-fresh-and-traceable-final-release-gate-is-evaluated",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-bqre-release-evidence-shall-be-complete-fresh-and-traceable-evidence-is-stale-missing-or-internally-inconsistent",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "browser-qualification-and-release-evidence",
-   "requirement_id": "REQ-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules-tier-1-evidence-is-reused",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules-tier-2-evidence-is-retained",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "browser-qualification-and-release-evidence",
-   "requirement_id": "REQ-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence-external-evidence-satisfies-a-central-requirement",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence-external-evidence-fails-acceptance",
-     "status": "accepted"
-    }
-   ]
-  },
-  {
-   "group": "accessibility_browser",
-   "capability": "browser-qualification-and-release-evidence",
-   "requirement_id": "REQ-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally",
-   "status": "accepted",
-   "scenario_results": [
-    {
-     "scenario_id": "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-fixed-tag-ref-is-available",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-final-annotated-ref-is-inspected",
-     "status": "accepted"
-    },
-    {
-     "scenario_id": "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-release-ref-is-invalid",
-     "status": "accepted"
-    }
-   ]
-  }
- ],
- "evidence_catalog": {
-  "evidence/rehearsals/copied-folder.json": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/rehearsals/copied-folder.json",
-   "sha256": "f4cc4cc5eb7f22f00c36a024283ddb8f7a38e5af9fde6a2fa757aa9299296466",
-   "read_only": true
-  },
-  "evidence/runtime/chrome.json": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/runtime/chrome.json",
-   "sha256": "cdfb549c1acbb1dc86560eab9ff5cfc9b0bd587a3d987cc18eb3d8956f9b2040",
-   "read_only": true
-  },
-  "evidence/runtime/safari.json": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/runtime/safari.json",
-   "sha256": "8a923dbc9dc6e36bd292a7c4e13e2964643a444d041ff26b8b7a1dd70920f7ca",
-   "read_only": true
-  },
-  "evidence/accessibility.json": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/accessibility.json",
-   "sha256": "c10f865cd9c540318b1dacc07454a5fa33e5594e679941fc27f7c3001bdd7ec3",
-   "read_only": true
-  },
-  "evidence/static-verification.json": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/static-verification.json",
-   "sha256": "a626e7a13857bf60f8ba5eb6f7dfbd02a95925247f3404ae27aa3219a385790e",
-   "read_only": true
-  },
-  "evidence/slide-contract.json": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/slide-contract.json",
-   "sha256": "7710872c2744fddb021d469b4efbfdcb503ee7d15055e3012645787d6a5c5708",
-   "read_only": true
-  },
-  "evidence/visual-provenance.json": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/visual-provenance.json",
-   "sha256": "e15bfd926379ebe1895c78396b44a22659f587d8238ce37bdaf79fd3454d915e",
-   "read_only": true
-  },
-  "evidence/sources.json": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/sources.json",
-   "sha256": "a1b8ac8ac5510c179ef0847da341203e801e8643ad46d3528aa7c812edd39123",
-   "read_only": true
-  },
-  "evidence/source-inspection.json": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/source-inspection.json",
-   "sha256": "98de11cf23f742d9a29da26ca29d29dedfb199d77f707efcaa4a37a6c7f81d6d",
-   "read_only": true
-  },
-  "evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
-   "sha256": "e7f8788f853342fbf83d6977004b55297fbc792031c385213c35aed1c81fe2fe",
-   "read_only": true
-  },
-  "evidence/approvals/viettel-claims.json": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/approvals/viettel-claims.json",
-   "sha256": "ddd586b418d74ca4eb913b36220b284eb00bef6aae2f8bd67ed8677ac5835e8c",
-   "read_only": true
-  },
-  "evidence/pdf-binding.json": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/pdf-binding.json",
-   "sha256": "40fc25143a2f3d42a6d390a1678f4971f8b4d0a12fbe071e45fd8cdce70a04ea",
-   "read_only": true
-  },
-  "evidence/venue-package-allowlist.json": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/venue-package-allowlist.json",
-   "sha256": "ea70f1b6ef8f5a299894c195161b1796f3ffb4b522b038265c668bcb4b4c10c4",
-   "read_only": true
-  },
-  "checksums.sha256": {
-   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:checksums.sha256",
-   "sha256": "46d6286c69990e946c58c996e31b0762a819d553448a67d1b5492a4a0f23b7cf",
-   "read_only": true
-  }
- },
+ "change_id": "add-ntu-ai-keynote-deck",
  "command_results": [
   {
    "command": "uv run --with pytest python -m pytest tests -q",
@@ -946,13 +48,928 @@
   }
  ],
  "downstream_gates": {
-  "4.1": "automated tier-1/copy-selection accepted; human Vietnamese editorial review pending",
+  "4.1": "automated tier-1/copy-selection accepted; worksheet binding verified; pending external human Vietnamese editorial review + external divergence decision (NBS candidate unregistered)",
   "5.1": "pending actual venue rehearsal",
   "5.2": "pending annotated refs/tags/ntu-ai-keynote-v1.0.0"
  },
- "central_read_only_boundary": {
-  "external_mutations_performed": false,
-  "external_writable_paths": []
+ "evidence_catalog": {
+  "checksums.sha256": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:checksums.sha256",
+   "read_only": true,
+   "sha256": "46d6286c69990e946c58c996e31b0762a819d553448a67d1b5492a4a0f23b7cf"
+  },
+  "evidence/accessibility.json": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/accessibility.json",
+   "read_only": true,
+   "sha256": "c10f865cd9c540318b1dacc07454a5fa33e5594e679941fc27f7c3001bdd7ec3"
+  },
+  "evidence/approvals/viettel-claims.json": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/approvals/viettel-claims.json",
+   "read_only": true,
+   "sha256": "ddd586b418d74ca4eb913b36220b284eb00bef6aae2f8bd67ed8677ac5835e8c"
+  },
+  "evidence/pdf-binding.json": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/pdf-binding.json",
+   "read_only": true,
+   "sha256": "40fc25143a2f3d42a6d390a1678f4971f8b4d0a12fbe071e45fd8cdce70a04ea"
+  },
+  "evidence/rehearsals/copied-folder.json": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/rehearsals/copied-folder.json",
+   "read_only": true,
+   "sha256": "f4cc4cc5eb7f22f00c36a024283ddb8f7a38e5af9fde6a2fa757aa9299296466"
+  },
+  "evidence/runtime/chrome.json": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/runtime/chrome.json",
+   "read_only": true,
+   "sha256": "cdfb549c1acbb1dc86560eab9ff5cfc9b0bd587a3d987cc18eb3d8956f9b2040"
+  },
+  "evidence/runtime/safari.json": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/runtime/safari.json",
+   "read_only": true,
+   "sha256": "8a923dbc9dc6e36bd292a7c4e13e2964643a444d041ff26b8b7a1dd70920f7ca"
+  },
+  "evidence/slide-contract.json": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/slide-contract.json",
+   "read_only": true,
+   "sha256": "7710872c2744fddb021d469b4efbfdcb503ee7d15055e3012645787d6a5c5708"
+  },
+  "evidence/source-inspection.json": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/source-inspection.json",
+   "read_only": true,
+   "sha256": "98de11cf23f742d9a29da26ca29d29dedfb199d77f707efcaa4a37a6c7f81d6d"
+  },
+  "evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
+   "read_only": true,
+   "sha256": "e7f8788f853342fbf83d6977004b55297fbc792031c385213c35aed1c81fe2fe"
+  },
+  "evidence/sources.json": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/sources.json",
+   "read_only": true,
+   "sha256": "a1b8ac8ac5510c179ef0847da341203e801e8643ad46d3528aa7c812edd39123"
+  },
+  "evidence/static-verification.json": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/static-verification.json",
+   "read_only": true,
+   "sha256": "a626e7a13857bf60f8ba5eb6f7dfbd02a95925247f3404ae27aa3219a385790e"
+  },
+  "evidence/venue-package-allowlist.json": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/venue-package-allowlist.json",
+   "read_only": true,
+   "sha256": "ea70f1b6ef8f5a299894c195161b1796f3ffb4b522b038265c668bcb4b4c10c4"
+  },
+  "evidence/visual-provenance.json": {
+   "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/visual-provenance.json",
+   "read_only": true,
+   "sha256": "e15bfd926379ebe1895c78396b44a22659f587d8238ce37bdaf79fd3454d915e"
+  }
  },
- "overall_status": "automated-accepted-human-release-gates-open"
+ "overall_status": "automated-accepted-human-release-gates-open",
+ "requirement_results": [
+  {
+   "capability": "offline-keynote-runtime",
+   "group": "runtime_timing",
+   "requirement_id": "REQ-okr-the-keynote-shall-launch-directly-and-remain-network-independent",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-okr-the-keynote-shall-launch-directly-and-remain-network-independent-offline-direct-launch-succeeds",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-okr-the-keynote-shall-launch-directly-and-remain-network-independent-external-runtime-reference-is-introduced",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "offline-keynote-runtime",
+   "group": "runtime_timing",
+   "requirement_id": "REQ-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports-qualified-viewport-scales-the-stage",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports-viewport-aspect-ratio-differs-from-16-9",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "offline-keynote-runtime",
+   "group": "runtime_timing",
+   "requirement_id": "REQ-okr-navigation-shall-implement-deterministic-full-and-short-routes",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-okr-navigation-shall-implement-deterministic-full-and-short-routes-sequential-navigation-follows-the-active-route",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-okr-navigation-shall-implement-deterministic-full-and-short-routes-interactive-surface-receives-a-click",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "offline-keynote-runtime",
+   "group": "runtime_timing",
+   "requirement_id": "REQ-okr-fragment-state-shall-recover-safely-under-file-state",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-okr-fragment-state-shall-recover-safely-under-file-state-valid-state-is-reloaded",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-okr-fragment-state-shall-recover-safely-under-file-state-fragment-state-is-absent-or-invalid",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-okr-fragment-state-shall-recover-safely-under-file-state-browser-storage-is-denied",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "offline-keynote-runtime",
+   "group": "runtime_timing",
+   "requirement_id": "REQ-okr-speaker-notes-shall-remain-synchronized-and-controlled",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-okr-speaker-notes-shall-remain-synchronized-and-controlled-notes-follow-navigation",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-okr-speaker-notes-shall-remain-synchronized-and-controlled-notes-are-closed-or-printed",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "offline-keynote-runtime",
+   "group": "runtime_timing",
+   "requirement_id": "REQ-okr-motion-shall-be-limited-and-state-safe",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-okr-motion-shall-be-limited-and-state-safe-reduced-motion-is-requested",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-okr-motion-shall-be-limited-and-state-safe-an-attention-slide-is-revisited",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "timing-and-roundtable-handoff",
+   "group": "runtime_timing",
+   "requirement_id": "REQ-trh-the-full-route-shall-total-exactly-765-seconds",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-trh-the-full-route-shall-total-exactly-765-seconds-full-timing-is-calculated",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-trh-the-full-route-shall-total-exactly-765-seconds-full-route-duration-drifts",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "timing-and-roundtable-handoff",
+   "group": "runtime_timing",
+   "requirement_id": "REQ-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8-short-route-is-traversed-sequentially",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8-direct-access-is-used-in-short-mode",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "timing-and-roundtable-handoff",
+   "group": "runtime_timing",
+   "requirement_id": "REQ-trh-notes-shall-expose-route-specific-timing-without-contradiction",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-trh-notes-shall-expose-route-specific-timing-without-contradiction-presenter-changes-route-mode",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-trh-notes-shall-expose-route-specific-timing-without-contradiction-skipped-slide-is-inspected-in-short-mode",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "timing-and-roundtable-handoff",
+   "group": "runtime_timing",
+   "requirement_id": "REQ-trh-attention-animations-shall-begin-on-target-slide-entry",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-presenter-advances-to-an-attention-slide",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-target-slide-is-initial-fragment-state",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-presenter-revisits-an-attention-slide",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-reduced-motion-or-print-is-active",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "timing-and-roundtable-handoff",
+   "group": "runtime_timing",
+   "requirement_id": "REQ-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-keynote-reaches-the-final-two-slides",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-panelist-details-are-unavailable",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "group": "content_provenance",
+   "requirement_id": "REQ-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier-released-claim-is-traced",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier-registered-claim-is-orphaned-or-unqualified",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "group": "content_provenance",
+   "requirement_id": "REQ-fpa-specific-factual-scopes-shall-remain-explicit",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-fpa-specific-factual-scopes-shall-remain-explicit-claim-wording-is-reviewed",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-fpa-specific-factual-scopes-shall-remain-explicit-scope-is-broadened",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "group": "content_provenance",
+   "requirement_id": "REQ-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity-data-visual-is-inspected",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity-visual-asset-has-no-lawful-basis",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "group": "content_provenance",
+   "requirement_id": "REQ-fpa-neutral-company-safe-copy-shall-be-the-default",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-fpa-neutral-company-safe-copy-shall-be-the-default-exact-copy-approval-matches",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-fpa-neutral-company-safe-copy-shall-be-the-default-approval-is-absent-rejected-stale-partial-or-mismatched",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "group": "content_provenance",
+   "requirement_id": "REQ-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-public-candidate-bytes-change",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-private-metadata-changes-without-public-byte-change",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-private-change-alters-selected-meaning",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "group": "content_provenance",
+   "requirement_id": "REQ-fpa-release-identity-shall-avoid-self-reference",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-fpa-release-identity-shall-avoid-self-reference-release-manifest-is-finalized",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-fpa-release-identity-shall-avoid-self-reference-tag-identity-is-verified",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "factual-provenance-and-approval",
+   "group": "content_provenance",
+   "requirement_id": "REQ-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root-central-acceptance-reviews-external-evidence",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root-evidence-is-missing-or-stale",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "group": "content_provenance",
+   "requirement_id": "REQ-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each-complete-deck-is-inspected",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each-a-visual-combines-slide-responsibilities",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "group": "content_provenance",
+   "requirement_id": "REQ-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims-act-1-is-stage-ready",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims-forecast-wording-is-strengthened",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "group": "content_provenance",
+   "requirement_id": "REQ-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience-three-layer-journey-is-presented",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience-value-producing-group-is-described",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "group": "content_provenance",
+   "requirement_id": "REQ-kcl-slide-7-shall-keep-three-factual-contexts-independent",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-kcl-slide-7-shall-keep-three-factual-contexts-independent-all-slide-7-contexts-are-shown",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-kcl-slide-7-shall-keep-three-factual-contexts-independent-populations-or-context-are-conflated",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "group": "content_provenance",
+   "requirement_id": "REQ-kcl-act-3-shall-separate-leadership-questions-and-handoff",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-kcl-act-3-shall-separate-leadership-questions-and-handoff-roundtable-prompts-are-displayed",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-kcl-act-3-shall-separate-leadership-questions-and-handoff-handoff-slide-is-reviewed",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "group": "content_provenance",
+   "requirement_id": "REQ-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy-language-audit-is-run",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy-technical-term-first-appears",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "group": "content_provenance",
+   "requirement_id": "REQ-kcl-visuals-shall-preserve-factual-and-linguistic-meaning",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-kcl-visuals-shall-preserve-factual-and-linguistic-meaning-meaningful-visual-is-reviewed",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-kcl-visuals-shall-preserve-factual-and-linguistic-meaning-decorative-visual-is-removed",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "keynote-content-and-language",
+   "group": "content_provenance",
+   "requirement_id": "REQ-kcl-17-slide-dominant-visual-matrix",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-kcl-17-slide-dominant-visual-matrix-complete-matrix-reviewed",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-kcl-17-slide-dominant-visual-matrix-job-substituted",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "accessible-stage-presentation",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-asp-only-the-active-slide-shall-be-exposed-as-active-content",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-asp-only-the-active-slide-shall-be-exposed-as-active-content-accessibility-tree-is-inspected",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-asp-only-the-active-slide-shall-be-exposed-as-active-content-slide-changes",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "accessible-stage-presentation",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus-keyboard-only-walkthrough-is-performed",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus-focused-control-receives-activation",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "accessible-stage-presentation",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-required-audience-text-is-measured",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-excluded-auxiliary-text-is-measured",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-required-meaning-is-disguised-as-decorative",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "accessible-stage-presentation",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-asp-contrast-and-non-color-meaning-shall-remain-sufficient",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-asp-contrast-and-non-color-meaning-shall-remain-sufficient-computed-contrast-is-evaluated",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-asp-contrast-and-non-color-meaning-shall-remain-sufficient-color-is-unavailable",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "accessible-stage-presentation",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent-meaningful-diagram-is-encountered",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent-decorative-vectors-are-exposed",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "accessible-stage-presentation",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning-reduced-motion-is-enabled",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning-attention-slide-is-revisited",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "accessible-stage-presentation",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-local-fonts-are-unavailable",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-stage-is-letterboxed",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "accessible-stage-presentation",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-asp-printed-fallback-shall-remain-accessible-and-complete",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-asp-printed-fallback-shall-remain-accessible-and-complete-pdf-accessibility-checks-are-performed",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate-browser-matrices-pass",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate-browser-evidence-targets-different-bytes",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-bqre-browser-evidence-shall-own-computed-style-acceptance",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-scoped-18px-floor-is-verified",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-contrast-is-verified",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-static-css-appears-compliant-but-computed-style-differs",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior-qualified-viewport-evidence-is-inspected",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior-interaction-result-lacks-state-evidence",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate-pdf-evidence-matches-the-candidate",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate-a-bound-pdf-input-changes",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files-venue-package-is-assembled",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files-private-file-is-included",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release-copied-folder-rehearsal-passes",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release-venue-rehearsal-is-missing-or-targets-another-digest",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-bqre-release-evidence-shall-be-complete-fresh-and-traceable",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-bqre-release-evidence-shall-be-complete-fresh-and-traceable-final-release-gate-is-evaluated",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-bqre-release-evidence-shall-be-complete-fresh-and-traceable-evidence-is-stale-missing-or-internally-inconsistent",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules-tier-1-evidence-is-reused",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules-tier-2-evidence-is-retained",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence-external-evidence-satisfies-a-central-requirement",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence-external-evidence-fails-acceptance",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  },
+  {
+   "capability": "browser-qualification-and-release-evidence",
+   "group": "accessibility_browser",
+   "requirement_id": "REQ-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally",
+   "scenario_results": [
+    {
+     "scenario_id": "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-fixed-tag-ref-is-available",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-final-annotated-ref-is-inspected",
+     "status": "accepted"
+    },
+    {
+     "scenario_id": "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-release-ref-is-invalid",
+     "status": "accepted"
+    }
+   ],
+   "status": "accepted"
+  }
+ ],
+ "schema_version": 1,
+ "task_results": {
+  "3.1": {
+   "capabilities": [
+    "offline-keynote-runtime",
+    "timing-and-roundtable-handoff"
+   ],
+   "evidence_mode": "tier-1-refreshed",
+   "notes": "index.html timing/routes unchanged. Font + theme bytes changed; full test suite and static verifier re-run green against bb7a4d5.",
+   "observed": {
+    "full_route_seconds": 765,
+    "implementation_tests": "76 passed, 297 subtests",
+    "short_route_seconds": 600,
+    "short_route_skips": [
+     4,
+     8
+    ],
+    "static_verifier": "11/11 pass"
+   },
+   "status": "accepted"
+  },
+  "3.2": {
+   "capabilities": [
+    "keynote-content-and-language",
+    "factual-provenance-and-approval"
+   ],
+   "evidence_mode": "tier-1-content-unchanged",
+   "notes": "Theme alignment changed CSS colors/decorations only; slide copy, source mappings, qualifier fidelity, and visual provenance register text are unchanged.",
+   "observed": {
+    "content_text_unchanged": true,
+    "gartner_qualifier": "h\u01a1n 40%",
+    "slide_7_independent_contexts": true,
+    "unique_visual_ids": 17,
+    "visual_register_rows": 17
+   },
+   "status": "accepted"
+  },
+  "3.3": {
+   "capabilities": [
+    "accessible-stage-presentation",
+    "browser-qualification-and-release-evidence"
+   ],
+   "evidence_mode": "tier-1-fresh-browser",
+   "notes": "Fresh theme screenshots retained by parallel agent. WCAG 4.5:1 contrast verified by test_ntu_brand_theme.py. Palette spec updated.",
+   "observed": {
+    "brand_colors": {
+     "ntu-blue": "#001e61",
+     "ntu-gold": "#ffd166",
+     "ntu-red": "#b21f2f",
+     "ntu-red-ink": "#f15b70"
+    },
+    "brand_theme_test": "5 assertions pass (WCAG contrast, tokens, decoratives)",
+    "browsers": [
+     "Chrome",
+     "Safari"
+    ]
+   },
+   "status": "accepted"
+  },
+  "3.4": {
+   "capabilities": [
+    "browser-qualification-and-release-evidence",
+    "offline-keynote-runtime",
+    "factual-provenance-and-approval"
+   ],
+   "evidence_mode": "tier-1-regenerated",
+   "notes": "PDF regenerated and manifest digest independently recomputed against bb7a4d5. All evidence files refreshed.",
+   "observed": {
+    "checksums_sha256": "verified",
+    "digest_test_vector_pass": true,
+    "package_digest_independently_recomputed": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+    "pdf_page_count": 17
+   },
+   "status": "accepted"
+  },
+  "4.1": {
+   "capabilities": [
+    "factual-provenance-and-approval",
+    "browser-qualification-and-release-evidence"
+   ],
+   "copy_selection_gate": {
+    "approval_resolution": "neutral-no-response",
+    "fail_closed": true,
+    "selected_variant": "neutral",
+    "zero_gated_claims_in_neutral_copy": true
+   },
+   "editorial_review": {
+    "external_blockers": [
+     {
+      "blocker": "human-vietnamese-editorial-review-not-submitted",
+      "detail": "The blank worksheet (acceptance/vietnamese-editorial-review-worksheet.md) is correctly bound to candidate bb7a4d58, but no completed immutable human review record has been submitted by the separately authorized external owner.",
+      "remediation_owner": "external editorial owner (per task 4.1 prerequisites)"
+     },
+     {
+      "blocker": "external-repo-diverged-past-registered-candidate",
+      "detail": "External repository HEAD 86128d2b carries an NBS co-branding candidate (8-file package, digest f97a5f71) that is 18 commits past the registered bb7a4d58. The central spec requires exactly seven files; the NBS candidate is not registered and its browser/accessibility/PDF evidence is not centrally submitted. Per the central-only boundary this neither registers automatically nor invalidates the bb7a4d58 record; it is recorded as a divergence requiring either a separate central change (spec modification to eight files + fresh evidence intake) or external re-submission of the seven-file candidate.",
+      "remediation_owner": "external submission owner + separate central change if NBS is to become the release candidate"
+     }
+    ],
+    "status": "pending-human-gate",
+    "worksheet_binding_verified": {
+     "stale_note_correction": "The earlier 'needs re-issued for bb7a4d5' note was outdated: the worksheet in acceptance/ already carries the bb7a4d58 identity and all seven per-file SHA-256 values match intake.json. No re-issue required.",
+     "worksheet_bound_to_candidate": "ntu-keynote-main-bb7a4d5",
+     "worksheet_index_html_sha_matches": true,
+     "worksheet_pdf_sha_matches": true
+    }
+   },
+   "notes": "Tier 1 re-verification complete. Neutral copy unchanged (palette is CSS-only, no audience wording change). Human editorial review pending.",
+   "status": "accepted-automated-editorial-pending",
+   "tier_classification": {
+    "fresh_evidence_captured": true,
+    "justification": "index.html colors/decorations + PDF changed. Spec palette updated to match tested theme.",
+    "tier": "tier-1-public-byte-change"
+   }
+  }
+ },
+ "validated_at": "2026-08-31T05:42:01Z"
 }

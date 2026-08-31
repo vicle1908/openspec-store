@@ -1,491 +1,497 @@
 {
-  "schema_version": 1,
-  "artifact": "central-acceptance-intake",
-  "change_id": "add-ntu-ai-keynote-deck",
-  "candidate_count": 1,
-  "candidate": {
-    "candidate_id": "ntu-keynote-main-bb7a4d5",
-    "submitter": {
-      "id": "external-ntu-keynote-orchestration",
-      "type": "external read-only submission"
-    },
-    "implementation_repository": "/Users/androidteam/Developer/ntu-keynote",
-    "implementation_branch": "main",
-    "implementation_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
-    "implementation_worktree_clean": true,
-    "evidence_base_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
-    "evidence_base_is_ancestor": true,
-    "evidence_binding": {
-      "mode": "tier-2-metadata-rebind",
-      "public_package_bytes_unchanged_from_previous_candidate": true,
-      "manifest_non_circular": true,
-      "previous_candidate_commit": "0028f4e544b4235af42f688d383d688c495139fd"
-    },
-    "selected_copy": {
-      "variant": "neutral",
-      "approval_resolution": "neutral-no-response",
-      "approval_sha256": "ddd586b418d74ca4eb913b36220b284eb00bef6aae2f8bd67ed8677ac5835e8c"
-    },
-    "public_package": {
-      "paths": [
-        "README.md",
-        "assets/fonts/be-vietnam-pro-400.woff2",
-        "assets/fonts/be-vietnam-pro-600.woff2",
-        "assets/fonts/be-vietnam-pro-800.woff2",
-        "assets/ntu-logo.png",
-        "index.html",
-        "keynote-fallback.pdf"
-      ],
-      "file_count": 7,
-      "file_sha256": {
-        "README.md": "43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469",
-        "assets/fonts/be-vietnam-pro-400.woff2": "077c275da5dee47bc1080bc7d9ae479a837804572635f540e8809f70bc861c7e",
-        "assets/fonts/be-vietnam-pro-600.woff2": "dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125",
-        "assets/fonts/be-vietnam-pro-800.woff2": "a10e0182ead90b7d43874024d63cc32f09651ae7527a8736552ab7396df7240d",
-        "assets/ntu-logo.png": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
-        "index.html": "a7d2fdbcddb7146366f633088b9179291a0744e93fc6e4c708db15fdda449710",
-        "keynote-fallback.pdf": "256a0cd12e303760c28a5100b09d5e4131dbbc2d19c6fddfd7c3ff94c94515f8"
-      },
-      "digest_algorithm": "ntu-keynote-package-sha256-v1",
-      "digest_algorithm_definition": "UTF-8 POSIX paths sorted by UTF-8 bytes; SHA-256 prefix NTU_KEYNOTE_PACKAGE_V1\\0; each entry encodes uint64-be path length, path bytes, uint64-be file length, raw file bytes.",
-      "canonical_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
-      "deterministic_test_vector": {
-        "a.txt": "41",
-        "dir/b.bin": "00ff",
-        "expected_digest": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
-        "observed_digest": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
-        "pass": true
-      },
-      "manifest_claimed_algorithm": "ntu-keynote-package-sha256-v1",
-      "manifest_claimed_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
-      "manifest_digest_matches_canonical": true
-    },
-    "evidence_references": [
-      {
-        "path": "evidence/sources.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/sources.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/sources.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "a1b8ac8ac5510c179ef0847da341203e801e8643ad46d3528aa7c812edd39123"
-      },
-      {
-        "path": "evidence/approvals/viettel-claims.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/approvals/viettel-claims.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/approvals/viettel-claims.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "ddd586b418d74ca4eb913b36220b284eb00bef6aae2f8bd67ed8677ac5835e8c"
-      },
-      {
-        "path": "evidence/assets.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/assets.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/assets.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "648ef5f718759a1e2b32faf24f696c5b767143075bddb6382a54fa45711a353b"
-      },
-      {
-        "path": "evidence/pdf-binding.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/pdf-binding.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/pdf-binding.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "40fc25143a2f3d42a6d390a1678f4971f8b4d0a12fbe071e45fd8cdce70a04ea"
-      },
-      {
-        "path": "evidence/release-manifest.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/release-manifest.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/release-manifest.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "b949f9cdbe8f7277cd4574738c186a59fbdd896891395953520e0530296aac6c"
-      },
-      {
-        "path": "evidence/runtime/chrome.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/runtime/chrome.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/runtime/chrome.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "cdfb549c1acbb1dc86560eab9ff5cfc9b0bd587a3d987cc18eb3d8956f9b2040"
-      },
-      {
-        "path": "evidence/runtime/safari.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/runtime/safari.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/runtime/safari.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "8a923dbc9dc6e36bd292a7c4e13e2964643a444d041ff26b8b7a1dd70920f7ca"
-      },
-      {
-        "path": "evidence/accessibility.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/accessibility.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/accessibility.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "c10f865cd9c540318b1dacc07454a5fa33e5594e679941fc27f7c3001bdd7ec3"
-      },
-      {
-        "path": "evidence/rehearsals/copied-folder.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/rehearsals/copied-folder.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/rehearsals/copied-folder.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "f4cc4cc5eb7f22f00c36a024283ddb8f7a38e5af9fde6a2fa757aa9299296466"
-      },
-      {
-        "path": "evidence/rehearsals/venue.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/rehearsals/venue.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/rehearsals/venue.json",
-        "read_only": true,
-        "exists": false,
-        "sha256": null
-      },
-      {
-        "path": "evidence/slide-contract.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/slide-contract.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/slide-contract.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "7710872c2744fddb021d469b4efbfdcb503ee7d15055e3012645787d6a5c5708"
-      },
-      {
-        "path": "evidence/source-inspection.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/source-inspection.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/source-inspection.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "98de11cf23f742d9a29da26ca29d29dedfb199d77f707efcaa4a37a6c7f81d6d"
-      },
-      {
-        "path": "evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "e7f8788f853342fbf83d6977004b55297fbc792031c385213c35aed1c81fe2fe"
-      },
-      {
-        "path": "evidence/static-verification.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/static-verification.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/static-verification.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "a626e7a13857bf60f8ba5eb6f7dfbd02a95925247f3404ae27aa3219a385790e"
-      },
-      {
-        "path": "evidence/venue-package-allowlist.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/venue-package-allowlist.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/venue-package-allowlist.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "ea70f1b6ef8f5a299894c195161b1796f3ffb4b522b038265c668bcb4b4c10c4"
-      },
-      {
-        "path": "checksums.sha256",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/checksums.sha256",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:checksums.sha256",
-        "read_only": true,
-        "exists": true,
-        "sha256": "46d6286c69990e946c58c996e31b0762a819d553448a67d1b5492a4a0f23b7cf"
-      },
-      {
-        "path": "evidence/visual-provenance.json",
-        "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/visual-provenance.json",
-        "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/visual-provenance.json",
-        "read_only": true,
-        "exists": true,
-        "sha256": "e15bfd926379ebe1895c78396b44a22659f587d8238ce37bdaf79fd3454d915e"
-      }
-    ],
-    "requirement_ids": [
-      "REQ-asp-only-the-active-slide-shall-be-exposed-as-active-content",
-      "REQ-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus",
-      "REQ-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning",
-      "REQ-asp-contrast-and-non-color-meaning-shall-remain-sufficient",
-      "REQ-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent",
-      "REQ-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning",
-      "REQ-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension",
-      "REQ-asp-printed-fallback-shall-remain-accessible-and-complete",
-      "REQ-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate",
-      "REQ-bqre-browser-evidence-shall-own-computed-style-acceptance",
-      "REQ-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior",
-      "REQ-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate",
-      "REQ-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files",
-      "REQ-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release",
-      "REQ-bqre-release-evidence-shall-be-complete-fresh-and-traceable",
-      "REQ-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules",
-      "REQ-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence",
-      "REQ-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally",
-      "REQ-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier",
-      "REQ-fpa-specific-factual-scopes-shall-remain-explicit",
-      "REQ-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity",
-      "REQ-fpa-neutral-company-safe-copy-shall-be-the-default",
-      "REQ-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2",
-      "REQ-fpa-release-identity-shall-avoid-self-reference",
-      "REQ-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root",
-      "REQ-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each",
-      "REQ-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims",
-      "REQ-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience",
-      "REQ-kcl-slide-7-shall-keep-three-factual-contexts-independent",
-      "REQ-kcl-act-3-shall-separate-leadership-questions-and-handoff",
-      "REQ-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy",
-      "REQ-kcl-visuals-shall-preserve-factual-and-linguistic-meaning",
-      "REQ-kcl-17-slide-dominant-visual-matrix",
-      "REQ-okr-the-keynote-shall-launch-directly-and-remain-network-independent",
-      "REQ-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports",
-      "REQ-okr-navigation-shall-implement-deterministic-full-and-short-routes",
-      "REQ-okr-fragment-state-shall-recover-safely-under-file-state",
-      "REQ-okr-speaker-notes-shall-remain-synchronized-and-controlled",
-      "REQ-okr-motion-shall-be-limited-and-state-safe",
-      "REQ-trh-the-full-route-shall-total-exactly-765-seconds",
-      "REQ-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8",
-      "REQ-trh-notes-shall-expose-route-specific-timing-without-contradiction",
-      "REQ-trh-attention-animations-shall-begin-on-target-slide-entry",
-      "REQ-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs"
-    ],
-    "scenario_ids": [
-      "SCN-asp-only-the-active-slide-shall-be-exposed-as-active-content-accessibility-tree-is-inspected",
-      "SCN-asp-only-the-active-slide-shall-be-exposed-as-active-content-slide-changes",
-      "SCN-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus-keyboard-only-walkthrough-is-performed",
-      "SCN-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus-focused-control-receives-activation",
-      "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-required-audience-text-is-measured",
-      "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-excluded-auxiliary-text-is-measured",
-      "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-required-meaning-is-disguised-as-decorative",
-      "SCN-asp-contrast-and-non-color-meaning-shall-remain-sufficient-computed-contrast-is-evaluated",
-      "SCN-asp-contrast-and-non-color-meaning-shall-remain-sufficient-color-is-unavailable",
-      "SCN-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent-meaningful-diagram-is-encountered",
-      "SCN-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent-decorative-vectors-are-exposed",
-      "SCN-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning-reduced-motion-is-enabled",
-      "SCN-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning-attention-slide-is-revisited",
-      "SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-local-fonts-are-unavailable",
-      "SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-stage-is-letterboxed",
-      "SCN-asp-printed-fallback-shall-remain-accessible-and-complete-pdf-accessibility-checks-are-performed",
-      "SCN-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate-browser-matrices-pass",
-      "SCN-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate-browser-evidence-targets-different-bytes",
-      "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-scoped-18px-floor-is-verified",
-      "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-contrast-is-verified",
-      "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-static-css-appears-compliant-but-computed-style-differs",
-      "SCN-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior-qualified-viewport-evidence-is-inspected",
-      "SCN-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior-interaction-result-lacks-state-evidence",
-      "SCN-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate-pdf-evidence-matches-the-candidate",
-      "SCN-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate-a-bound-pdf-input-changes",
-      "SCN-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files-venue-package-is-assembled",
-      "SCN-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files-private-file-is-included",
-      "SCN-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release-copied-folder-rehearsal-passes",
-      "SCN-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release-venue-rehearsal-is-missing-or-targets-another-digest",
-      "SCN-bqre-release-evidence-shall-be-complete-fresh-and-traceable-final-release-gate-is-evaluated",
-      "SCN-bqre-release-evidence-shall-be-complete-fresh-and-traceable-evidence-is-stale-missing-or-internally-inconsistent",
-      "SCN-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules-tier-1-evidence-is-reused",
-      "SCN-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules-tier-2-evidence-is-retained",
-      "SCN-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence-external-evidence-satisfies-a-central-requirement",
-      "SCN-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence-external-evidence-fails-acceptance",
-      "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-fixed-tag-ref-is-available",
-      "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-final-annotated-ref-is-inspected",
-      "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-release-ref-is-invalid",
-      "SCN-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier-released-claim-is-traced",
-      "SCN-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier-registered-claim-is-orphaned-or-unqualified",
-      "SCN-fpa-specific-factual-scopes-shall-remain-explicit-claim-wording-is-reviewed",
-      "SCN-fpa-specific-factual-scopes-shall-remain-explicit-scope-is-broadened",
-      "SCN-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity-data-visual-is-inspected",
-      "SCN-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity-visual-asset-has-no-lawful-basis",
-      "SCN-fpa-neutral-company-safe-copy-shall-be-the-default-exact-copy-approval-matches",
-      "SCN-fpa-neutral-company-safe-copy-shall-be-the-default-approval-is-absent-rejected-stale-partial-or-mismatched",
-      "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-public-candidate-bytes-change",
-      "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-private-metadata-changes-without-public-byte-change",
-      "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-private-change-alters-selected-meaning",
-      "SCN-fpa-release-identity-shall-avoid-self-reference-release-manifest-is-finalized",
-      "SCN-fpa-release-identity-shall-avoid-self-reference-tag-identity-is-verified",
-      "SCN-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root-central-acceptance-reviews-external-evidence",
-      "SCN-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root-evidence-is-missing-or-stale",
-      "SCN-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each-complete-deck-is-inspected",
-      "SCN-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each-a-visual-combines-slide-responsibilities",
-      "SCN-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims-act-1-is-stage-ready",
-      "SCN-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims-forecast-wording-is-strengthened",
-      "SCN-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience-three-layer-journey-is-presented",
-      "SCN-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience-value-producing-group-is-described",
-      "SCN-kcl-slide-7-shall-keep-three-factual-contexts-independent-all-slide-7-contexts-are-shown",
-      "SCN-kcl-slide-7-shall-keep-three-factual-contexts-independent-populations-or-context-are-conflated",
-      "SCN-kcl-act-3-shall-separate-leadership-questions-and-handoff-roundtable-prompts-are-displayed",
-      "SCN-kcl-act-3-shall-separate-leadership-questions-and-handoff-handoff-slide-is-reviewed",
-      "SCN-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy-language-audit-is-run",
-      "SCN-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy-technical-term-first-appears",
-      "SCN-kcl-visuals-shall-preserve-factual-and-linguistic-meaning-meaningful-visual-is-reviewed",
-      "SCN-kcl-visuals-shall-preserve-factual-and-linguistic-meaning-decorative-visual-is-removed",
-      "SCN-kcl-17-slide-dominant-visual-matrix-complete-matrix-reviewed",
-      "SCN-kcl-17-slide-dominant-visual-matrix-job-substituted",
-      "SCN-okr-the-keynote-shall-launch-directly-and-remain-network-independent-offline-direct-launch-succeeds",
-      "SCN-okr-the-keynote-shall-launch-directly-and-remain-network-independent-external-runtime-reference-is-introduced",
-      "SCN-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports-qualified-viewport-scales-the-stage",
-      "SCN-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports-viewport-aspect-ratio-differs-from-16-9",
-      "SCN-okr-navigation-shall-implement-deterministic-full-and-short-routes-sequential-navigation-follows-the-active-route",
-      "SCN-okr-navigation-shall-implement-deterministic-full-and-short-routes-interactive-surface-receives-a-click",
-      "SCN-okr-fragment-state-shall-recover-safely-under-file-state-valid-state-is-reloaded",
-      "SCN-okr-fragment-state-shall-recover-safely-under-file-state-fragment-state-is-absent-or-invalid",
-      "SCN-okr-fragment-state-shall-recover-safely-under-file-state-browser-storage-is-denied",
-      "SCN-okr-speaker-notes-shall-remain-synchronized-and-controlled-notes-follow-navigation",
-      "SCN-okr-speaker-notes-shall-remain-synchronized-and-controlled-notes-are-closed-or-printed",
-      "SCN-okr-motion-shall-be-limited-and-state-safe-reduced-motion-is-requested",
-      "SCN-okr-motion-shall-be-limited-and-state-safe-an-attention-slide-is-revisited",
-      "SCN-trh-the-full-route-shall-total-exactly-765-seconds-full-timing-is-calculated",
-      "SCN-trh-the-full-route-shall-total-exactly-765-seconds-full-route-duration-drifts",
-      "SCN-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8-short-route-is-traversed-sequentially",
-      "SCN-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8-direct-access-is-used-in-short-mode",
-      "SCN-trh-notes-shall-expose-route-specific-timing-without-contradiction-presenter-changes-route-mode",
-      "SCN-trh-notes-shall-expose-route-specific-timing-without-contradiction-skipped-slide-is-inspected-in-short-mode",
-      "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-presenter-advances-to-an-attention-slide",
-      "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-target-slide-is-initial-fragment-state",
-      "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-presenter-revisits-an-attention-slide",
-      "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-reduced-motion-or-print-is-active",
-      "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-keynote-reaches-the-final-two-slides",
-      "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-panelist-details-are-unavailable"
-    ],
-    "submission_timestamp": "2026-08-27T06:23:18.161305+07:00",
-    "read_only_boundary": {
-      "central_may_read": true,
-      "central_may_write_external": false,
-      "external_writable_paths": []
-    },
-    "supersedes": {
-      "previous_candidate_id": "ntu-keynote-main-7cbf0f1",
-      "previous_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
-      "previous_digest": "74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d",
-      "reason": "Tier 1 public-byte change: NTU brand theme alignment (colors, structural decorations). Palette updated in central spec to match tested theme.",
-      "spec_revision_commit": "e1ca4aa"
-    }
+ "artifact": "central-acceptance-intake",
+ "candidate": {
+  "candidate_id": "ntu-keynote-main-bb7a4d5",
+  "evidence_base_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
+  "evidence_base_is_ancestor": true,
+  "evidence_binding": {
+   "manifest_non_circular": true,
+   "mode": "tier-1-public-byte-change",
+   "previous_candidate_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
+   "public_package_bytes_unchanged_from_previous_candidate": false
   },
-  "intake_findings": [
-    {
-      "id": "INTAKE-F-007",
-      "status": "resolved",
-      "tasks": [
-        "2.2",
-        "3.1",
-        "3.2",
-        "3.3",
-        "3.4",
-        "4.1"
-      ],
-      "summary": "Candidate bb7a4d5 validated: 7/7 per-file hashes match, digest independently recomputed, manifest agrees. Palette spec updated."
-    },
-    {
-      "id": "INTAKE-F-002",
-      "status": "not-submitted",
-      "tasks": [
-        "5.1"
-      ],
-      "summary": "evidence/rehearsals/venue.json remains absent; actual venue rehearsal required."
-    },
-    {
-      "id": "INTAKE-F-003",
-      "status": "not-submitted",
-      "tasks": [
-        "5.2"
-      ],
-      "summary": "The fixed annotated release ref refs/tags/ntu-ai-keynote-v1.0.0 remains absent."
-    }
+  "evidence_references": [
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/sources.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/sources.json",
+    "path": "evidence/sources.json",
+    "read_only": true,
+    "sha256": "a1b8ac8ac5510c179ef0847da341203e801e8643ad46d3528aa7c812edd39123"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/approvals/viettel-claims.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/approvals/viettel-claims.json",
+    "path": "evidence/approvals/viettel-claims.json",
+    "read_only": true,
+    "sha256": "ddd586b418d74ca4eb913b36220b284eb00bef6aae2f8bd67ed8677ac5835e8c"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/assets.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/assets.json",
+    "path": "evidence/assets.json",
+    "read_only": true,
+    "sha256": "648ef5f718759a1e2b32faf24f696c5b767143075bddb6382a54fa45711a353b"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/pdf-binding.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/pdf-binding.json",
+    "path": "evidence/pdf-binding.json",
+    "read_only": true,
+    "sha256": "40fc25143a2f3d42a6d390a1678f4971f8b4d0a12fbe071e45fd8cdce70a04ea"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/release-manifest.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/release-manifest.json",
+    "path": "evidence/release-manifest.json",
+    "read_only": true,
+    "sha256": "b949f9cdbe8f7277cd4574738c186a59fbdd896891395953520e0530296aac6c"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/runtime/chrome.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/runtime/chrome.json",
+    "path": "evidence/runtime/chrome.json",
+    "read_only": true,
+    "sha256": "cdfb549c1acbb1dc86560eab9ff5cfc9b0bd587a3d987cc18eb3d8956f9b2040"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/runtime/safari.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/runtime/safari.json",
+    "path": "evidence/runtime/safari.json",
+    "read_only": true,
+    "sha256": "8a923dbc9dc6e36bd292a7c4e13e2964643a444d041ff26b8b7a1dd70920f7ca"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/accessibility.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/accessibility.json",
+    "path": "evidence/accessibility.json",
+    "read_only": true,
+    "sha256": "c10f865cd9c540318b1dacc07454a5fa33e5594e679941fc27f7c3001bdd7ec3"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/rehearsals/copied-folder.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/rehearsals/copied-folder.json",
+    "path": "evidence/rehearsals/copied-folder.json",
+    "read_only": true,
+    "sha256": "f4cc4cc5eb7f22f00c36a024283ddb8f7a38e5af9fde6a2fa757aa9299296466"
+   },
+   {
+    "exists": false,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/rehearsals/venue.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/rehearsals/venue.json",
+    "path": "evidence/rehearsals/venue.json",
+    "read_only": true,
+    "sha256": null
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/slide-contract.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/slide-contract.json",
+    "path": "evidence/slide-contract.json",
+    "read_only": true,
+    "sha256": "7710872c2744fddb021d469b4efbfdcb503ee7d15055e3012645787d6a5c5708"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/source-inspection.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/source-inspection.json",
+    "path": "evidence/source-inspection.json",
+    "read_only": true,
+    "sha256": "98de11cf23f742d9a29da26ca29d29dedfb199d77f707efcaa4a37a6c7f81d6d"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
+    "path": "evidence/source-snapshots/mit-nanda-report-mirror-v0.1.json",
+    "read_only": true,
+    "sha256": "e7f8788f853342fbf83d6977004b55297fbc792031c385213c35aed1c81fe2fe"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/static-verification.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/static-verification.json",
+    "path": "evidence/static-verification.json",
+    "read_only": true,
+    "sha256": "a626e7a13857bf60f8ba5eb6f7dfbd02a95925247f3404ae27aa3219a385790e"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/venue-package-allowlist.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/venue-package-allowlist.json",
+    "path": "evidence/venue-package-allowlist.json",
+    "read_only": true,
+    "sha256": "ea70f1b6ef8f5a299894c195161b1796f3ffb4b522b038265c668bcb4b4c10c4"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/checksums.sha256",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:checksums.sha256",
+    "path": "checksums.sha256",
+    "read_only": true,
+    "sha256": "46d6286c69990e946c58c996e31b0762a819d553448a67d1b5492a4a0f23b7cf"
+   },
+   {
+    "exists": true,
+    "external_absolute_path": "/Users/androidteam/Developer/ntu-keynote/evidence/visual-provenance.json",
+    "git_show_ref": "5685afecd03c1adff95973e7844292cd05081c74:evidence/visual-provenance.json",
+    "path": "evidence/visual-provenance.json",
+    "read_only": true,
+    "sha256": "e15bfd926379ebe1895c78396b44a22659f587d8238ce37bdaf79fd3454d915e"
+   }
   ],
-  "status": "accepted-for-review",
-  "next_central_task": "4.1",
-  "validation": {
-    "validated_at": "2026-08-26T21:00:00+07:00",
-    "status": "accepted-for-review",
-    "commands": [
-      {
-        "command": "git show 5685afecd03c1adff95973e7844292cd05081c74:evidence/release-manifest.json",
-        "exit_code": 0,
-        "observed": "canonical v1 digest, central task IDs 4.1/5.1/5.2"
-      },
-      {
-        "command": "git show 5685afecd03c1adff95973e7844292cd05081c74:evidence/visual-provenance.json",
-        "exit_code": 0,
-        "observed": "17 rows, stable public-package base identity"
-      },
-      {
-        "command": "canonical package digest recomputation",
-        "exit_code": 0,
-        "observed": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1"
-      }
-    ],
-    "identity": {
-      "implementation_commit_matches_submission": true,
-      "evidence_base_commit": "16a95eb6caf6a990520855ec3087379ef955e99c",
-      "evidence_base_is_ancestor_of_candidate": true,
-      "non_circular_manifest_binding": true,
-      "external_worktree_clean": true,
-      "seven_public_file_count": 7,
-      "all_public_file_hashes_match_submission": true,
-      "canonical_digest_recomputed": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
-      "canonical_digest_matches_submission": true,
-      "manifest_algorithm_matches_canonical": true,
-      "deterministic_test_vector": {
-        "observed": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
-        "expected": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
-        "pass": true
-      },
-      "visual_provenance_register_present": true,
-      "visual_provenance_rows": 17,
-      "missing_downstream_evidence": [
-        "evidence/rehearsals/venue.json"
-      ],
-      "annotated_release_tag_present": false,
-      "previous_candidate_commit": "0028f4e544b4235af42f688d383d688c495139fd"
-    },
-    "blocking_findings": [
-      "INTAKE-F-002",
-      "INTAKE-F-003"
-    ],
-    "downstream_gates": [
-      "4.1 editorial/approval review",
-      "5.1 actual venue rehearsal",
-      "5.2 annotated release ref"
-    ],
-    "decision_basis": "accepted-for-review because candidate identity, canonical package digest, evidence references, and non-circular predecessor binding are internally consistent; downstream human and release gates remain open and do not block central review intake.",
-    "central_read_only_boundary": {
-      "external_mutations_performed": false,
-      "external_writable_paths": []
-    }
+  "implementation_branch": "main",
+  "implementation_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
+  "implementation_repository": "/Users/androidteam/Developer/ntu-keynote",
+  "implementation_worktree_clean": true,
+  "public_package": {
+   "canonical_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+   "deterministic_test_vector": {
+    "a.txt": "41",
+    "dir/b.bin": "00ff",
+    "expected_digest": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
+    "observed_digest": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
+    "pass": true
+   },
+   "digest_algorithm": "ntu-keynote-package-sha256-v1",
+   "digest_algorithm_definition": "UTF-8 POSIX paths sorted by UTF-8 bytes; SHA-256 prefix NTU_KEYNOTE_PACKAGE_V1\\0; each entry encodes uint64-be path length, path bytes, uint64-be file length, raw file bytes.",
+   "file_count": 7,
+   "file_sha256": {
+    "README.md": "43f63b5e9e3e3d6f05e3ad68281c3c8092c79e4294be3fafc00f4f09e55f0469",
+    "assets/fonts/be-vietnam-pro-400.woff2": "077c275da5dee47bc1080bc7d9ae479a837804572635f540e8809f70bc861c7e",
+    "assets/fonts/be-vietnam-pro-600.woff2": "dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125",
+    "assets/fonts/be-vietnam-pro-800.woff2": "a10e0182ead90b7d43874024d63cc32f09651ae7527a8736552ab7396df7240d",
+    "assets/ntu-logo.png": "8aabb7eec43917cbda6abe265df09f4159b14b81f250209b8b2e7be788edbafc",
+    "index.html": "a7d2fdbcddb7146366f633088b9179291a0744e93fc6e4c708db15fdda449710",
+    "keynote-fallback.pdf": "256a0cd12e303760c28a5100b09d5e4131dbbc2d19c6fddfd7c3ff94c94515f8"
+   },
+   "manifest_claimed_algorithm": "ntu-keynote-package-sha256-v1",
+   "manifest_claimed_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+   "manifest_digest_matches_canonical": true,
+   "paths": [
+    "README.md",
+    "assets/fonts/be-vietnam-pro-400.woff2",
+    "assets/fonts/be-vietnam-pro-600.woff2",
+    "assets/fonts/be-vietnam-pro-800.woff2",
+    "assets/ntu-logo.png",
+    "index.html",
+    "keynote-fallback.pdf"
+   ]
   },
-  "submission_history": [
-    {
-      "candidate_id": "ntu-keynote-main-16a95eb",
-      "implementation_commit": "16a95eb6caf6a990520855ec3087379ef955e99c",
-      "status": "blocked",
-      "validation_status": "blocked",
-      "canonical_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
-      "captured_from_commit": "0874513ed7dfed2a9f3a8dbaf2084b2eb5f11afd"
-    },
-    {
-      "candidate_id": "ntu-keynote-main-129346b",
-      "implementation_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
-      "status": "accepted-for-review",
-      "validation_status": "accepted-for-review",
-      "canonical_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
-      "captured_from_commit": "68e2f4489cf3cb587c9a6ae40d2668a9ca5a3ee3"
-    },
-    {
-      "candidate_id": "ntu-keynote-main-1927b",
-      "implementation_commit": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31",
-      "status": "accepted-for-review",
-      "validation_status": "accepted-for-review",
-      "canonical_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
-      "captured_from_commit": "30624346879c51d3fdbdc86d0a41952874283dc8"
-    },
-    {
-      "candidate_id": "ntu-keynote-main-ca70e7",
-      "implementation_commit": "ca70e751d93ecf83445d23adaf48d8bd044739c2",
-      "status": "accepted-for-review",
-      "validation_status": "accepted-for-review",
-      "canonical_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
-      "captured_from_commit": "f53be528f0ea97dbae1cfde072128d33d8025d43"
-    },
-    {
-      "candidate_id": "ntu-keynote-main-0028f4",
-      "implementation_commit": "0028f4e544b4235af42f688d383d688c495139fd",
-      "status": "accepted-for-review",
-      "validation_status": "accepted-for-review",
-      "canonical_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
-      "captured_from_commit": "8d841d7a06db744dae356bf7bcadaf189e9e4219"
-    }
-  ]
+  "read_only_boundary": {
+   "central_may_read": true,
+   "central_may_write_external": false,
+   "external_writable_paths": []
+  },
+  "requirement_ids": [
+   "REQ-asp-only-the-active-slide-shall-be-exposed-as-active-content",
+   "REQ-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus",
+   "REQ-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning",
+   "REQ-asp-contrast-and-non-color-meaning-shall-remain-sufficient",
+   "REQ-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent",
+   "REQ-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning",
+   "REQ-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension",
+   "REQ-asp-printed-fallback-shall-remain-accessible-and-complete",
+   "REQ-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate",
+   "REQ-bqre-browser-evidence-shall-own-computed-style-acceptance",
+   "REQ-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior",
+   "REQ-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate",
+   "REQ-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files",
+   "REQ-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release",
+   "REQ-bqre-release-evidence-shall-be-complete-fresh-and-traceable",
+   "REQ-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules",
+   "REQ-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence",
+   "REQ-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally",
+   "REQ-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier",
+   "REQ-fpa-specific-factual-scopes-shall-remain-explicit",
+   "REQ-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity",
+   "REQ-fpa-neutral-company-safe-copy-shall-be-the-default",
+   "REQ-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2",
+   "REQ-fpa-release-identity-shall-avoid-self-reference",
+   "REQ-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root",
+   "REQ-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each",
+   "REQ-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims",
+   "REQ-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience",
+   "REQ-kcl-slide-7-shall-keep-three-factual-contexts-independent",
+   "REQ-kcl-act-3-shall-separate-leadership-questions-and-handoff",
+   "REQ-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy",
+   "REQ-kcl-visuals-shall-preserve-factual-and-linguistic-meaning",
+   "REQ-kcl-17-slide-dominant-visual-matrix",
+   "REQ-okr-the-keynote-shall-launch-directly-and-remain-network-independent",
+   "REQ-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports",
+   "REQ-okr-navigation-shall-implement-deterministic-full-and-short-routes",
+   "REQ-okr-fragment-state-shall-recover-safely-under-file-state",
+   "REQ-okr-speaker-notes-shall-remain-synchronized-and-controlled",
+   "REQ-okr-motion-shall-be-limited-and-state-safe",
+   "REQ-trh-the-full-route-shall-total-exactly-765-seconds",
+   "REQ-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8",
+   "REQ-trh-notes-shall-expose-route-specific-timing-without-contradiction",
+   "REQ-trh-attention-animations-shall-begin-on-target-slide-entry",
+   "REQ-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs"
+  ],
+  "scenario_ids": [
+   "SCN-asp-only-the-active-slide-shall-be-exposed-as-active-content-accessibility-tree-is-inspected",
+   "SCN-asp-only-the-active-slide-shall-be-exposed-as-active-content-slide-changes",
+   "SCN-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus-keyboard-only-walkthrough-is-performed",
+   "SCN-asp-every-runtime-action-shall-be-keyboard-operable-with-visible-focus-focused-control-receives-activation",
+   "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-required-audience-text-is-measured",
+   "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-excluded-auxiliary-text-is-measured",
+   "SCN-asp-the-18px-floor-shall-apply-only-to-required-audience-meaning-required-meaning-is-disguised-as-decorative",
+   "SCN-asp-contrast-and-non-color-meaning-shall-remain-sufficient-computed-contrast-is-evaluated",
+   "SCN-asp-contrast-and-non-color-meaning-shall-remain-sufficient-color-is-unavailable",
+   "SCN-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent-meaningful-diagram-is-encountered",
+   "SCN-asp-meaningful-visuals-shall-have-an-accessible-reading-order-and-equivalent-decorative-vectors-are-exposed",
+   "SCN-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning-reduced-motion-is-enabled",
+   "SCN-asp-motion-preferences-and-revisit-behavior-shall-preserve-complete-meaning-attention-slide-is-revisited",
+   "SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-local-fonts-are-unavailable",
+   "SCN-asp-font-fallback-and-qualified-scaling-shall-preserve-comprehension-stage-is-letterboxed",
+   "SCN-asp-printed-fallback-shall-remain-accessible-and-complete-pdf-accessibility-checks-are-performed",
+   "SCN-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate-browser-matrices-pass",
+   "SCN-bqre-safari-and-chrome-shall-qualify-the-same-exact-candidate-browser-evidence-targets-different-bytes",
+   "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-scoped-18px-floor-is-verified",
+   "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-contrast-is-verified",
+   "SCN-bqre-browser-evidence-shall-own-computed-style-acceptance-static-css-appears-compliant-but-computed-style-differs",
+   "SCN-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior-qualified-viewport-evidence-is-inspected",
+   "SCN-bqre-viewport-and-interaction-evidence-shall-expose-observable-behavior-interaction-result-lacks-state-evidence",
+   "SCN-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate-pdf-evidence-matches-the-candidate",
+   "SCN-bqre-pdf-fallback-shall-be-generated-and-verified-from-the-accepted-candidate-a-bound-pdf-input-changes",
+   "SCN-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files-venue-package-is-assembled",
+   "SCN-bqre-the-public-venue-package-shall-contain-exactly-the-allowlisted-files-private-file-is-included",
+   "SCN-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release-copied-folder-rehearsal-passes",
+   "SCN-bqre-copied-folder-and-actual-venue-rehearsals-shall-gate-release-venue-rehearsal-is-missing-or-targets-another-digest",
+   "SCN-bqre-release-evidence-shall-be-complete-fresh-and-traceable-final-release-gate-is-evaluated",
+   "SCN-bqre-release-evidence-shall-be-complete-fresh-and-traceable-evidence-is-stale-missing-or-internally-inconsistent",
+   "SCN-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules-tier-1-evidence-is-reused",
+   "SCN-bqre-release-evidence-retention-shall-apply-tier-1-and-tier-2-dependency-rules-tier-2-evidence-is-retained",
+   "SCN-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence-external-evidence-satisfies-a-central-requirement",
+   "SCN-bqre-central-acceptance-shall-be-read-only-toward-external-implementation-evidence-external-evidence-fails-acceptance",
+   "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-fixed-tag-ref-is-available",
+   "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-final-annotated-ref-is-inspected",
+   "SCN-bqre-the-fixed-annotated-ref-shall-identify-the-final-release-externally-release-ref-is-invalid",
+   "SCN-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier-released-claim-is-traced",
+   "SCN-fpa-every-factual-claim-shall-resolve-to-a-registered-source-and-qualifier-registered-claim-is-orphaned-or-unqualified",
+   "SCN-fpa-specific-factual-scopes-shall-remain-explicit-claim-wording-is-reviewed",
+   "SCN-fpa-specific-factual-scopes-shall-remain-explicit-scope-is-broadened",
+   "SCN-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity-data-visual-is-inspected",
+   "SCN-fpa-meaningful-visuals-shall-have-provenance-and-encoding-fidelity-visual-asset-has-no-lawful-basis",
+   "SCN-fpa-neutral-company-safe-copy-shall-be-the-default-exact-copy-approval-matches",
+   "SCN-fpa-neutral-company-safe-copy-shall-be-the-default-approval-is-absent-rejected-stale-partial-or-mismatched",
+   "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-public-candidate-bytes-change",
+   "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-private-metadata-changes-without-public-byte-change",
+   "SCN-fpa-evidence-invalidation-shall-use-tier-1-and-tier-2-private-change-alters-selected-meaning",
+   "SCN-fpa-release-identity-shall-avoid-self-reference-release-manifest-is-finalized",
+   "SCN-fpa-release-identity-shall-avoid-self-reference-tag-identity-is-verified",
+   "SCN-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root-central-acceptance-reviews-external-evidence",
+   "SCN-fpa-central-acceptance-shall-consume-external-evidence-without-mutating-its-root-evidence-is-missing-or-stale",
+   "SCN-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each-complete-deck-is-inspected",
+   "SCN-kcl-the-keynote-shall-contain-exactly-17-slides-with-one-narrative-job-each-a-visual-combines-slide-responsibilities",
+   "SCN-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims-act-1-is-stage-ready",
+   "SCN-kcl-act-1-shall-establish-the-macro-picture-with-qualified-claims-forecast-wording-is-strengthened",
+   "SCN-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience-three-layer-journey-is-presented",
+   "SCN-kcl-act-2-shall-distinguish-hype-evidence-and-transferable-experience-value-producing-group-is-described",
+   "SCN-kcl-slide-7-shall-keep-three-factual-contexts-independent-all-slide-7-contexts-are-shown",
+   "SCN-kcl-slide-7-shall-keep-three-factual-contexts-independent-populations-or-context-are-conflated",
+   "SCN-kcl-act-3-shall-separate-leadership-questions-and-handoff-roundtable-prompts-are-displayed",
+   "SCN-kcl-act-3-shall-separate-leadership-questions-and-handoff-handoff-slide-is-reviewed",
+   "SCN-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy-language-audit-is-run",
+   "SCN-kcl-audience-and-operator-language-shall-follow-the-vietnamese-policy-technical-term-first-appears",
+   "SCN-kcl-visuals-shall-preserve-factual-and-linguistic-meaning-meaningful-visual-is-reviewed",
+   "SCN-kcl-visuals-shall-preserve-factual-and-linguistic-meaning-decorative-visual-is-removed",
+   "SCN-kcl-17-slide-dominant-visual-matrix-complete-matrix-reviewed",
+   "SCN-kcl-17-slide-dominant-visual-matrix-job-substituted",
+   "SCN-okr-the-keynote-shall-launch-directly-and-remain-network-independent-offline-direct-launch-succeeds",
+   "SCN-okr-the-keynote-shall-launch-directly-and-remain-network-independent-external-runtime-reference-is-introduced",
+   "SCN-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports-qualified-viewport-scales-the-stage",
+   "SCN-okr-the-stage-shall-preserve-its-authored-geometry-within-qualified-viewports-viewport-aspect-ratio-differs-from-16-9",
+   "SCN-okr-navigation-shall-implement-deterministic-full-and-short-routes-sequential-navigation-follows-the-active-route",
+   "SCN-okr-navigation-shall-implement-deterministic-full-and-short-routes-interactive-surface-receives-a-click",
+   "SCN-okr-fragment-state-shall-recover-safely-under-file-state-valid-state-is-reloaded",
+   "SCN-okr-fragment-state-shall-recover-safely-under-file-state-fragment-state-is-absent-or-invalid",
+   "SCN-okr-fragment-state-shall-recover-safely-under-file-state-browser-storage-is-denied",
+   "SCN-okr-speaker-notes-shall-remain-synchronized-and-controlled-notes-follow-navigation",
+   "SCN-okr-speaker-notes-shall-remain-synchronized-and-controlled-notes-are-closed-or-printed",
+   "SCN-okr-motion-shall-be-limited-and-state-safe-reduced-motion-is-requested",
+   "SCN-okr-motion-shall-be-limited-and-state-safe-an-attention-slide-is-revisited",
+   "SCN-trh-the-full-route-shall-total-exactly-765-seconds-full-timing-is-calculated",
+   "SCN-trh-the-full-route-shall-total-exactly-765-seconds-full-route-duration-drifts",
+   "SCN-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8-short-route-is-traversed-sequentially",
+   "SCN-trh-the-short-route-shall-total-exactly-600-seconds-and-skip-only-slides-4-and-8-direct-access-is-used-in-short-mode",
+   "SCN-trh-notes-shall-expose-route-specific-timing-without-contradiction-presenter-changes-route-mode",
+   "SCN-trh-notes-shall-expose-route-specific-timing-without-contradiction-skipped-slide-is-inspected-in-short-mode",
+   "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-presenter-advances-to-an-attention-slide",
+   "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-target-slide-is-initial-fragment-state",
+   "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-presenter-revisits-an-attention-slide",
+   "SCN-trh-attention-animations-shall-begin-on-target-slide-entry-reduced-motion-or-print-is-active",
+   "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-keynote-reaches-the-final-two-slides",
+   "SCN-trh-the-roundtable-transition-shall-preserve-separate-audience-jobs-panelist-details-are-unavailable"
+  ],
+  "selected_copy": {
+   "approval_resolution": "neutral-no-response",
+   "approval_sha256": "ddd586b418d74ca4eb913b36220b284eb00bef6aae2f8bd67ed8677ac5835e8c",
+   "variant": "neutral"
+  },
+  "submission_timestamp": "2026-08-27T06:23:18.161305+07:00",
+  "submitter": {
+   "id": "external-ntu-keynote-orchestration",
+   "type": "external read-only submission"
+  },
+  "supersedes": {
+   "previous_candidate_id": "ntu-keynote-main-7cbf0f1",
+   "previous_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
+   "previous_digest": "74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d",
+   "reason": "Tier 1 public-byte change: NTU brand theme alignment (colors, structural decorations). Palette updated in central spec to match tested theme.",
+   "spec_revision_commit": "e1ca4aa"
+  }
+ },
+ "candidate_count": 1,
+ "change_id": "add-ntu-ai-keynote-deck",
+ "intake_findings": [
+  {
+   "id": "INTAKE-F-007",
+   "status": "resolved",
+   "summary": "Candidate bb7a4d5 validated: 7/7 per-file hashes match, digest independently recomputed, manifest agrees. Palette spec updated.",
+   "tasks": [
+    "2.2",
+    "3.1",
+    "3.2",
+    "3.3",
+    "3.4",
+    "4.1"
+   ]
+  },
+  {
+   "id": "INTAKE-F-002",
+   "status": "not-submitted",
+   "summary": "evidence/rehearsals/venue.json remains absent; actual venue rehearsal required.",
+   "tasks": [
+    "5.1"
+   ]
+  },
+  {
+   "id": "INTAKE-F-003",
+   "status": "not-submitted",
+   "summary": "The fixed annotated release ref refs/tags/ntu-ai-keynote-v1.0.0 remains absent.",
+   "tasks": [
+    "5.2"
+   ]
+  }
+ ],
+ "next_central_task": "4.1 (external human editorial review pending; see external-divergence-record.json)",
+ "schema_version": 1,
+ "status": "accepted-for-review",
+ "submission_history": [
+  {
+   "candidate_id": "ntu-keynote-main-16a95eb",
+   "canonical_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+   "captured_from_commit": "0874513ed7dfed2a9f3a8dbaf2084b2eb5f11afd",
+   "implementation_commit": "16a95eb6caf6a990520855ec3087379ef955e99c",
+   "status": "blocked",
+   "validation_status": "blocked"
+  },
+  {
+   "candidate_id": "ntu-keynote-main-129346b",
+   "canonical_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+   "captured_from_commit": "68e2f4489cf3cb587c9a6ae40d2668a9ca5a3ee3",
+   "implementation_commit": "129346bea246cfdeafe687aab8f94b830fecee4d",
+   "status": "accepted-for-review",
+   "validation_status": "accepted-for-review"
+  },
+  {
+   "candidate_id": "ntu-keynote-main-1927b",
+   "canonical_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+   "captured_from_commit": "30624346879c51d3fdbdc86d0a41952874283dc8",
+   "implementation_commit": "1927b3bc3bd8488e9dea9c214a25c42f9001bd31",
+   "status": "accepted-for-review",
+   "validation_status": "accepted-for-review"
+  },
+  {
+   "candidate_id": "ntu-keynote-main-ca70e7",
+   "canonical_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+   "captured_from_commit": "f53be528f0ea97dbae1cfde072128d33d8025d43",
+   "implementation_commit": "ca70e751d93ecf83445d23adaf48d8bd044739c2",
+   "status": "accepted-for-review",
+   "validation_status": "accepted-for-review"
+  },
+  {
+   "candidate_id": "ntu-keynote-main-0028f4",
+   "canonical_digest": "da451f11443c7a6593a7f044637b4fae0239f234e07a707c774beb021e7314c1",
+   "captured_from_commit": "8d841d7a06db744dae356bf7bcadaf189e9e4219",
+   "implementation_commit": "0028f4e544b4235af42f688d383d688c495139fd",
+   "status": "accepted-for-review",
+   "validation_status": "accepted-for-review"
+  }
+ ],
+ "validation": {
+  "blocking_findings": [
+   "INTAKE-F-002",
+   "INTAKE-F-003"
+  ],
+  "central_read_only_boundary": {
+   "external_mutations_performed": false,
+   "external_writable_paths": []
+  },
+  "commands": [
+   {
+    "command": "git show 5685afecd03c1adff95973e7844292cd05081c74:evidence/release-manifest.json",
+    "exit_code": 0,
+    "observed": "canonical v1 digest, central task IDs 4.1/5.1/5.2"
+   },
+   {
+    "command": "git show 5685afecd03c1adff95973e7844292cd05081c74:evidence/visual-provenance.json",
+    "exit_code": 0,
+    "observed": "17 rows, stable public-package base identity"
+   },
+   {
+    "command": "canonical package digest recomputation",
+    "exit_code": 0,
+    "observed": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030"
+   }
+  ],
+  "decision_basis": "accepted-for-review because candidate identity, canonical package digest, evidence references, and non-circular predecessor binding are internally consistent; downstream human and release gates remain open and do not block central review intake.",
+  "downstream_gates": [
+   "4.1 editorial/approval review",
+   "5.1 actual venue rehearsal",
+   "5.2 annotated release ref"
+  ],
+  "identity": {
+   "all_public_file_hashes_match_submission": true,
+   "annotated_release_tag_present": false,
+   "canonical_digest_matches_submission": true,
+   "canonical_digest_recomputed": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+   "deterministic_test_vector": {
+    "expected": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
+    "observed": "b13c66f843d56fdd261d6d57faade59c68f1a349d8f5a467657420cc396ab1ad",
+    "pass": true
+   },
+   "evidence_base_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
+   "evidence_base_is_ancestor_of_candidate": true,
+   "external_worktree_clean": true,
+   "implementation_commit_matches_submission": true,
+   "manifest_algorithm_matches_canonical": true,
+   "missing_downstream_evidence": [
+    "evidence/rehearsals/venue.json"
+   ],
+   "non_circular_manifest_binding": true,
+   "previous_candidate_commit": "0028f4e544b4235af42f688d383d688c495139fd",
+   "seven_public_file_count": 7,
+   "visual_provenance_register_present": true,
+   "visual_provenance_rows": 17
+  },
+  "registered_candidate_git_object_recheck": {
+   "checked_at": "2026-08-31T05:47:21Z",
+   "method": "git show bb7a4d58:<path> per-file SHA-256, read-only",
+   "result": "all seven registered file hashes match the immutable commit objects",
+   "worktree_divergence": "external worktree/HEAD evolved to 86128d2 (NBS 8-file candidate, digest f97a5f71); recorded in acceptance/external-divergence-record.json; does not affect the immutability of the registered candidate."
+  },
+  "status": "accepted-for-review",
+  "validated_at": "2026-08-31T12:34:27+07:00"
+ }
 }

@@ -23,7 +23,7 @@ Complete every field from immutable external evidence. Do not review a moving wo
 | `assets/fonts/be-vietnam-pro-600.woff2` SHA-256 | `dd6129cdd3110f73836675e84150533048781467ecae76cf57719c7a22731125` |
 | `assets/fonts/be-vietnam-pro-800.woff2` SHA-256 | `a10e0182ead90b7d43874024d63cc32f09651ae7527a8736552ab7396df7240d` |
 | Package digest algorithm | `ntu-keynote-package-sha256-v1` |
-| Canonical public-package digest | `74ce4f51952ccdf2a628cdc7095f599cbf86ad9863b903de7aaccca342ead00d` |
+| Canonical public-package digest | `3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030` |
 | Selected copy identity | `neutral` (approval resolution: `neutral-no-response`, fail-closed) |
 | Review started | `<REQUIRED: ISO-8601>` |
 | Review completed | `<REQUIRED: ISO-8601>` |

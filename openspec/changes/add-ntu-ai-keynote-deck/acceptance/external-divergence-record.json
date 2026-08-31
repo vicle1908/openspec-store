@@ -1,0 +1,48 @@
+{
+ "central_actions_taken": [
+  "Corrected the stale task-4.1 worksheet-reissue note (worksheet already bound to bb7a4d58; all seven SHA-256 values match intake).",
+  "Recorded the human-editorial and divergence blockers without checking any gate task.",
+  "No external file or repository was read-modified; only this central change's acceptance records were updated."
+ ],
+ "central_impact": {
+  "task_4_1": "Remains blocked on the external human Vietnamese editorial review for bb7a4d58. The divergence adds a second blocker: a decision on whether the NBS candidate should become the release candidate.",
+  "tasks_5_1_5_2": "Rehearsal and release gates remain pending external submissions for the seven-file candidate; if the NBS candidate is chosen, a separate central change must first modify the seven-file requirement and re-run intake + verification 3.1-3.4 against f97a5f71 with fresh external browser/accessibility/PDF evidence.",
+  "tasks_6_1_6_2": "Cannot record decision: accepted while blockers remain (non-circular closure rule)."
+ },
+ "central_registered_candidate": {
+  "candidate_id": "ntu-keynote-main-bb7a4d5",
+  "evidence_base_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
+  "implementation_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
+  "public_files": 7,
+  "public_package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030"
+ },
+ "central_spec_constraints": {
+  "offline-keynote-runtime": "The released venue package SHALL contain only index.html, README.md, keynote-fallback.pdf, assets/ntu-logo.png, the three be-vietnam-pro-*.woff2 fonts \u2014 exactly seven files (spec.md scenario).",
+  "planning_decisions": "D2 heading: One self-contained runtime with an exact seven-file public package."
+ },
+ "change_id": "add-ntu-ai-keynote-deck",
+ "decision_required_from_owner": "Choose the release candidate path: (A) external re-submission + human gates for the registered seven-file bb7a4d58, or (B) a separate central change authorizing the eight-file NBS candidate (spec modification + full fresh evidence intake).",
+ "external_repository_head": {
+  "branch": "main",
+  "bytes_changed_vs_registered": [
+   "index.html",
+   "keynote-fallback.pdf"
+  ],
+  "commits_past_registered_candidate": 18,
+  "external_self_reported_state": {
+   "browser_evidence_binding": "evidence_base 074b119 (predates NBS candidate \u2014 not fresh for f97a5f71)",
+   "external_release_manifest_status": "blocked-automated",
+   "independent_code_review": "passed=true (integrated NBS co-branding change 074b119..e6d36e2)",
+   "static_verification": "scripts/verify_static.py 11/11 categories (independent review record)",
+   "tests": "98/98 passing under Python 3.13 (docs/verification.md)"
+  },
+  "head_commit": "86128d2b656e40e4b4f48bf663f1fa8c3f857437",
+  "head_package_digest": "f97a5f71054fae2a64b3e5bfe2ed17f161a17e73a62f5b733e54d91d5806272a",
+  "head_public_files": 8,
+  "new_public_asset": "assets/nbs-logo.png",
+  "repository": "/Users/androidteam/Developer/ntu-keynote"
+ },
+ "record_type": "central-external-divergence-record",
+ "recorded_at": "2026-08-31T05:44:13Z",
+ "schema_version": 1
+}
