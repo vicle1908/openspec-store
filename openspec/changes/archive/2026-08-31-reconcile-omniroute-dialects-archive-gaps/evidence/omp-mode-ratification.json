@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "change_id": "reconcile-omniroute-dialects-archive-gaps",
+  "record_type": "omp-mode-ratification",
+  "value_blind": true,
+  "target_file": "/Users/androidteam/.omp/agent/models.yml",
+  "pre_apply_mode": "0o644",
+  "current_on_disk_mode": "0o600",
+  "decision": "ratify",
+  "ratified_by": "user (controlling session owner)",
+  "user_instruction_verbatim": "ok confirm",
+  "recorded_at": "2026-08-31T15:02:14+07:00",
+  "rationale": "User explicitly ratified the 0644->0600 mode tightening; conforms to the uniform 0600 permission policy across all coding-agent configuration files."
+}

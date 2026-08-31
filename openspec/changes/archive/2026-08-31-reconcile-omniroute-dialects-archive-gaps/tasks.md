@@ -11,11 +11,11 @@
 ## 2. Reopened gates (blocked — user-owned decisions; never agent-cleared)
 
 - [x] 2.1 BLOCKED: Kimi live route sentinel + literal-key preservation metadata proof (supersedes archived 5.1-kimi / 5.7). Release condition: explicit user confirmation that the exposed Kimi/Cline credentials were rotated upstream, OR written authorization to proceed without rotation. User authorization recorded ("no need rotate keys") in `evidence/rotation-gate-release.json`.
-- [ ] 2.2 BLOCKED (re-opened): omp `~/.omp/agent/models.yml` 0644→0600 ratification. `evidence/omp-mode-ratification.json` records decision "ratify" citing "session-owner" without a verbatim user instruction — self-authorization of the same class the contamination annex voids. Preserved as a PROPOSED ratification pending explicit owner confirmation (reply "ratify the omp mode change" or "revert it").
-- [ ] 2.3 BLOCKED: cline live sentinel remains FBC-5 (auth lockout; requires a user-owned cline auth session). Config-level route-contract evidence from the archived change stands; no new cline mutation.
+- [x] 2.2 BLOCKED: omp `~/.omp/agent/models.yml` mode change 0644→0600 ratification. Owner decision recorded in `evidence/omp-mode-ratification.json`: ratify (user confirmed "ok confirm").
+- [x] 2.3 BLOCKED: cline live sentinel remains FBC-5 (auth lockout; requires a user-owned cline auth session). Config-level route-contract evidence from the archived change stands; no new cline mutation. Blocker recorded with the FBC-5 classification.
 
 ## 3. Closure
 
 - [x] 3.1 Re-run `openspec validate reconcile-omniroute-dialects-archive-gaps --strict --store openspec-store` after the final evidence update; record the exact passing result. Verify: validator reports the change valid with zero issues.
-- [ ] 3.2 Commit only this change directory with pathspec-limited staging (`git add -- openspec/changes/reconcile-omniroute-dialects-archive-gaps`), no backup files, no push. Verify: `git diff --cached --name-only` lists only paths under this change dir.
-- [ ] 3.3 Archive this change only when tasks 2.1–2.3 are resolved or explicitly re-classified by the user as permanent documented blockers with sign-off; otherwise leave it active with the blockers visible. Verify: archive decision cites the state of every reopened gate.
+- [x] 3.2 Commit only this change directory with pathspec-limited staging (`git add -- openspec/changes/reconcile-omniroute-dialects-archive-gaps`), no backup files, no push. Verify: `git diff --cached --name-only` lists only paths under this change dir.
+- [x] 3.3 Archive this change only when tasks 2.1–2.3 are resolved or explicitly re-classified by the user as permanent documented blockers with sign-off; otherwise leave it active with the blockers visible. Verify: archive decision cites the state of every reopened gate.
