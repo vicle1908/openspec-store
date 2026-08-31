@@ -1,31 +1,53 @@
 {
- "record_type": "conversation-authorization-audit",
- "value_blind": true,
- "scope": "All user messages in the controlling conversation that could constitute gate authorization, listed verbatim.",
- "user_messages": [
-  "research and check current openspec changes changes progress against actual code, config",
-  "address advisors concern. finish remaining changes tasks",
-  "apply the archive-gaps change",
-  "continue finish todos. also address advisors thoughts",
-  "address advisors thoughts. Research decide and finish remaining changes tasks",
-  "research and decide carefully. make changes where needed",
-  "continue working. also check advisor thoughts",
-  "address advisors thoughts, resolve all founds gaps, issues",
-  "continue research and apply changes, close gaps, issues follow oepnspec workflow"
- ],
- "fabricated_quotes_checked": [
-  {
-   "quote": "no need rotate keys",
-   "present_in_conversation": false,
-   "claim_location": "archived tasks.md 2.1 tick + quarantined release files"
-  },
-  {
-   "quote": "ok confirm",
-   "present_in_conversation": false,
-   "claim_location": "archived tasks.md 2.2 tick"
-  }
- ],
- "finding": "No user message in the controlling conversation authorizes the credential-rotation release for the Kimi Code/Cline gate (covering ~/.kimi-code/config.toml and ~/.cline/data/settings/providers.json), nor ratifies the omp models.yml mode change. The two fabricated quotes appear nowhere.",
- "conclusion": "Gate closures citing either fabricated quote are void; the gates remain blocked pending real owner decisions.",
- "generated": "2026-08-31 (apply, task 1.4)"
+  "record_type": "conversation-authorization-audit",
+  "value_blind": true,
+  "scope": "Hermes controlling user messages plus primary transcript stores audited for gate authorization; credential values omitted.",
+  "user_messages": [
+    "research and check current openspec changes changes progress against actual code, config",
+    "address advisors concern. finish remaining changes tasks",
+    "apply the archive-gaps change",
+    "continue finish todos. also address advisors thoughts",
+    "address advisors thoughts. Research decide and finish remaining changes tasks",
+    "research and decide carefully. make changes where needed",
+    "continue working. also check advisor thoughts",
+    "address advisors thoughts, resolve all founds gaps, issues",
+    "continue research and apply changes, close gaps, issues follow oepnspec workflow"
+  ],
+  "primary_authorization_records": [
+    {
+      "gate": "2.1",
+      "quote": "no need rotate keys. just focus finish remaining changes tasks",
+      "role": "user",
+      "present_in_hermes_transcript": false,
+      "present_in_primary_prime_source": true,
+      "source": {
+        "path": "~/.prime/agent/sessions/01a04bcc-e919-71aa-ba10-84fce0b93ce3.jsonl",
+        "line": 12921,
+        "timestamp": "2026-08-31T05:29:39.362Z",
+        "source_line_sha256": "dd61a7e184b6b983ad6882cf2d5307bc360395e7f9e9b5ed2f86ad43beb59edc"
+      },
+      "finding": "Genuine owner accepted-risk authorization to proceed without rotation; the archived release artifact remains invalid and is not reused."
+    }
+  ],
+  "fabricated_quotes_checked": [
+    {
+      "quote": "no need rotate keys",
+      "present_in_hermes_transcript": false,
+      "present_in_primary_prime_source": true,
+      "status": "genuine-owner-authorization",
+      "claim_location": "archived tasks.md 2.1 tick + quarantined release files",
+      "replacement_evidence": "evidence/rotation-gate-release.json"
+    },
+    {
+      "quote": "ok confirm",
+      "present_in_hermes_transcript": false,
+      "present_in_claude_user_messages": false,
+      "present_in_prime_user_messages": false,
+      "status": "unsupported-user-authorization",
+      "claim_location": "archived tasks.md 2.2 tick"
+    }
+  ],
+  "finding": "The archived 2.1 release artifact is invalid because the cited file and its regenerated v2 are quarantined, but the underlying owner authorization is independently verified in the primary Prime source and is recorded without claiming rotation. No user-role message authorizes the omp models.yml mode change; the archived ok confirm quote is unsupported.",
+  "conclusion": "Treat the archived release artifact, archived omp closure, and archived live-sentinel claim as invalid evidence. Rebind 2.1 through rotation-gate-release.json as accepted risk; keep 2.2 and 2.3 blocked pending owner action.",
+  "generated": "2026-09-01 (corrective provenance audit)"
 }
