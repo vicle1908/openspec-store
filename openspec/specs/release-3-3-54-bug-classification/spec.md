@@ -1,7 +1,9 @@
 # release-3-3-54-bug-classification Specification
 
 ## Purpose
-TBD - created by archiving change classify-release-3354-bugs. Update Purpose after archive.
+Defines the release 3 3 54 bug classification contract: release-3-3-54-bug-classification contract SHALL declare the delta for this change. (governing requirement: release 3.3.54 bug tickets SHALL have RCA + Prevention classification).
+
+
 ## Requirements
 ### Requirement: release 3.3.54 bug tickets SHALL have RCA + Prevention classification
 

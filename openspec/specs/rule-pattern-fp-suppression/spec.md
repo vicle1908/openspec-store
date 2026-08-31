@@ -1,7 +1,9 @@
 # rule-pattern-fp-suppression Specification
 
 ## Purpose
-TBD - created by archiving change rule-pattern-fp-reduction. Update Purpose after archive.
+Defines the rule pattern fp suppression contract: android `L3` rule (`Static or singleton object retains Context/View/Fragment`) SHALL suppress a finding when the matched `companion object {` line in the source file is not followed by a `lateinit var` declaration of type `Context`, `Activity`, `Fragment`, or `View` within 30 lines of the match. (governing requirement: L3 Android const-only companion object findings are suppressed).
+
+
 ## Requirements
 ### Requirement: L3 Android const-only companion object findings are suppressed
 

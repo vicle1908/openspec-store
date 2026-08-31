@@ -1,7 +1,9 @@
 # python-syntax-modernization Specification
 
 ## Purpose
-TBD - created by archiving change tdt-workspace-cleanup-2026-06-29. Update Purpose after archive.
+Defines the python syntax modernization contract: every `except` clause in TDT Python source code SHALL use `except (<Type1>, <Type2>, ...) as <name>:`. (governing requirement: `except` clauses SHALL use the parenthesized tuple form).
+
+
 ## Requirements
 ### Requirement: `except` clauses SHALL use the parenthesized tuple form
 

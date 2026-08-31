@@ -1,7 +1,9 @@
 # skills-disposition Specification
 
 ## Purpose
-TBD - created by archiving change ecc-harness-alignment. Update Purpose after archive.
+Defines the skills disposition contract: system SHALL classify every entry in `~/.claude/plugins/cache/everything-claude-code/ecc/<version>/skills/` against the canonical classification enum defined in the design spec. (governing requirement: Every ECC v2.0.0 skill SHALL have exactly one classification).
+
+
 ## Requirements
 ### Requirement: Every ECC v2.0.0 skill SHALL have exactly one classification
 

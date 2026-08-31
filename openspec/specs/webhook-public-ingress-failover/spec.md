@@ -1,7 +1,9 @@
 # webhook-public-ingress-failover Specification
 
 ## Purpose
-TBD - created by archiving change coverage-sweep. Update Purpose after archive.
+Defines the webhook public ingress failover contract: primary URL SHALL be `https://les-mac-mini.tailc6b508.ts.net/gitlab-webhook`, served by (governing requirement: The primary public ingress URL MUST be a Tailscale Funnel endpoint).
+
+
 ## Requirements
 ### Requirement: The primary public ingress URL MUST be a Tailscale Funnel endpoint
 

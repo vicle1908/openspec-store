@@ -1,7 +1,9 @@
 # gitlab-impact-note Specification
 
 ## Purpose
-TBD - created by archiving change gitlab-impact-note. Update Purpose after archive.
+Defines the gitlab impact note contract: system SHALL provide `find_mr_notes` and `upsert_mr_note` in `tdt_core.clients.gitlab_mr` using `GitlabClientFactory.from_env()`. (governing requirement: GitLab MR Note Writer (tdt-core)).
+
+
 ## Requirements
 ### Requirement: GitLab MR Note Writer (tdt-core)
 The system SHALL provide `find_mr_notes` and `upsert_mr_note` in `tdt_core.clients.gitlab_mr` using `GitlabClientFactory.from_env()`. The idempotency marker SHALL be `NOTE_PREFIX = "<!-- tdt-impact-analysis -->"` (an HTML-comment marker, codescan-style — NOT a visible prefix). Idempotency detection SHALL use substring match (`prefix in body`) — NOT prefix match (`startswith`). This aligns with the `GitLabReviewPoster` marker convention used by the codescan reviewer in `ai-review`. `post_gitlab_note` is responsible for prepending the marker to the body before calling `upsert_mr_note`.

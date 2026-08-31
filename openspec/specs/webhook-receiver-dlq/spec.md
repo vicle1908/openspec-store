@@ -1,7 +1,9 @@
 # webhook-receiver-dlq Specification
 
 ## Purpose
-TBD - created by archiving change coverage-sweep. Update Purpose after archive.
+Defines the webhook receiver dlq contract: dLQ writer MUST be invoked when `webhook-receiver` calls `ai-review` and the response (governing requirement: Two consecutive downstream failures MUST write the payload to the DLQ).
+
+
 ## Requirements
 ### Requirement: Two consecutive downstream failures MUST write the payload to the DLQ
 

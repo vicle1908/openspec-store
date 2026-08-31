@@ -1,7 +1,9 @@
 # code-scan-android-rules Specification
 
 ## Purpose
-TBD - created by archiving change code-scan-android-rule-refinements. Update Purpose after archive.
+Defines the code scan android rules contract: code-scan-android-rules contract SHALL declare the delta for this change. (governing requirement: Android code-daily-scan SHALL distinguish real cleartext HTTP from XML namespace false positives).
+
+
 ## Requirements
 ### Requirement: Android code-daily-scan SHALL distinguish real cleartext HTTP from XML namespace false positives
 

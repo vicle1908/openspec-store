@@ -1,7 +1,9 @@
 # person-capacity-role-overrides Specification
 
 ## Purpose
-TBD - created by archiving change person-capacity-role-overrides. Update Purpose after archive.
+Defines the person capacity role overrides contract: `load_role_config()` SHALL parse an optional `overrides` top-level key from the YAML config file. (governing requirement: Override-based role pinning).
+
+
 ## Requirements
 ### Requirement: Override-based role pinning
 

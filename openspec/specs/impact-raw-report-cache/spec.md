@@ -1,7 +1,9 @@
 # impact-raw-report-cache Specification
 
 ## Purpose
-TBD - created by archiving change impact-sheet-integration. Update Purpose after archive.
+Defines the impact raw report cache contract: system SHALL expose a `RawReportCache` class in `jira_skill.impact.impact_report` that owns the on-disk JSON cache lifecycle. (governing requirement: RawReportCache class).
+
+
 ## Requirements
 ### Requirement: RawReportCache class
 The system SHALL expose a `RawReportCache` class in `jira_skill.impact.impact_report` that owns the on-disk JSON cache lifecycle. The class MUST expose `get()`, `put()`, and `invalidate()` methods, all keyed on the tuple `(project_path, mr_iid, commit_sha)`. The default cache directory SHALL be `$TDT_HOME/state/webhook-receiver/webhook-impacts/`, and the default TTL SHALL be 24 hours.

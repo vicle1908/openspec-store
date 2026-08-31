@@ -1,7 +1,9 @@
 # spec-driven-mobile-estimation Specification
 
 ## Purpose
-TBD - created by archiving change ai-driven-mobile-estimation. Update Purpose after archive.
+Defines the spec driven mobile estimation contract: `Ready_Project_Est_Spec_driven` tab SHALL present estimation rows using a 7-column layout, replacing the previous manual-development layout. (governing requirement: Column layout — 7-column spec-driven format).
+
+
 ## Requirements
 ### Requirement: Column layout — 7-column spec-driven format
 

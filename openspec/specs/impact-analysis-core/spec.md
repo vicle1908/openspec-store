@@ -1,7 +1,9 @@
 # impact-analysis-core Specification
 
 ## Purpose
-TBD - created by archiving change jira-impact-analysis. Update Purpose after archive.
+Defines the impact analysis core contract: system SHALL resolve a changed file path to one or more `feature.<tag>` tags using a YAML feature map at `~/Developer/feature-map.yaml`. (governing requirement: Feature Map Configuration).
+
+
 ## Requirements
 ### Requirement: Feature Map Configuration
 The system SHALL resolve a changed file path to one or more `feature.<tag>` tags using a YAML feature map at `~/Developer/feature-map.yaml`. The file MUST have a top-level `feature_map:` key mapping path prefixes (directories end with `/`) to lists of `[feature_tag, platform]` tags. Tags MUST be dot-separated identifiers (e.g. `feature.auth`); the second element MUST be one of `ios`, `android`, `python`. The file MUST also contain a `base_modules:` list whose entries trigger full-platform escalation.

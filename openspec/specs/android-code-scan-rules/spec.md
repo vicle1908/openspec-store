@@ -1,7 +1,9 @@
 # android-code-scan-rules Specification
 
 ## Purpose
-TBD - created by archiving change android-rule-pattern-accuracy. Update Purpose after archive.
+Defines the android code scan rules contract: c2 detection pattern SHALL match only Fragment classes that have at least one constructor parameter. (governing requirement: C2 rule SHALL only flag Fragments with constructor parameters).
+
+
 ## Requirements
 ### Requirement: C2 rule SHALL only flag Fragments with constructor parameters
 

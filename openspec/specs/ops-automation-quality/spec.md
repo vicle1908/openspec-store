@@ -1,7 +1,8 @@
 # ops-automation-quality Specification
 
 ## Purpose
-TBD - created by archiving change harden-ops-automation-quality-gates. Update Purpose after archive.
+Defines the ops automation quality contract: operations automation repository README SHALL document reproducible setup, test, lint, formatting, and type-check commands using the repository's `uv` toolchain. (governing requirement: Repository quality commands SHALL be documented).
+
 
 ## Requirements
 

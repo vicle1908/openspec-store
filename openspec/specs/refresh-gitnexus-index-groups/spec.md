@@ -2,7 +2,8 @@
 
 ## Purpose
 
-TBD: Define the purpose of refresh-gitnexus-index-groups.
+Defines the refresh gitnexus index groups contract: an index refresh SHALL run only for an exact repository set with contemporaneous approval, a pinned provider identity, bounded arguments, and recorded preflight revisions. (governing requirement: Authorized bounded index maintenance).
+
 
 ## Requirements
 

@@ -1,7 +1,9 @@
 # temporal-nexus-contracts Specification
 
 ## Purpose
-TBD - created by archiving change introduce-self-hosted-temporal-nexus-contracts. Update Purpose after archive.
+Defines the temporal nexus contracts contract: platform SHALL maintain a canonical context map for every Nexus (governing requirement: Nexus contracts follow an explicit bounded-context map).
+
+
 ## Requirements
 ### Requirement: Nexus contracts follow an explicit bounded-context map
 

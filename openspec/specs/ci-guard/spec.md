@@ -1,7 +1,9 @@
 # ci-guard Specification
 
 ## Purpose
-TBD - created by archiving change code-daily-scan-mirror-retirement-v2. Update Purpose after archive.
+Defines the ci guard contract: `poems-mobile3-android` SHALL include a GitLab CI job that runs `code-daily-scan check-docs-drift --platform=android` on every pipeline. (governing requirement: CI-1 — `check-docs-drift` runs as a GitLab CI job in Android).
+
+
 ## Requirements
 ### Requirement: CI-1 — `check-docs-drift` runs as a GitLab CI job in Android
 

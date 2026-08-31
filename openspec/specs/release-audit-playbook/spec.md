@@ -1,7 +1,9 @@
 # release-audit-playbook Specification
 
 ## Purpose
-TBD - created by archiving change ecc-harness-alignment. Update Purpose after archive.
+Defines the release audit playbook contract: system SHALL execute the 4-phase audit (Discovery, Static-Diff, Usage-Evidence, Output/Verify) without human intervention between phases. (governing requirement: The playbook SHALL be runnable end-to-end by a single agent).
+
+
 ## Requirements
 ### Requirement: The playbook SHALL be runnable end-to-end by a single agent
 

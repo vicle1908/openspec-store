@@ -1,7 +1,9 @@
 # delivery-plan-jira-link-display Specification
 
 ## Purpose
-TBD - created by archiving change delivery-plan-jira-link-display. Update Purpose after archive.
+Defines the delivery plan jira link display contract: jira Link column SHALL display the ticket number (e.g., "RMD-4160") as a clickable hyperlink to the actual ticket URL. (governing requirement: Jira Link column SHALL display ticket number as hyperlink).
+
+
 ## Requirements
 ### Requirement: Jira Link column SHALL display ticket number as hyperlink
 

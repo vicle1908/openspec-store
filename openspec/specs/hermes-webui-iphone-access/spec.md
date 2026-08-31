@@ -1,7 +1,9 @@
 # hermes-webui-iphone-access Specification
 
 ## Purpose
-TBD - created by archiving change verify-hermes-webui-iphone-access. Update Purpose after archive.
+Defines the hermes webui iphone access contract: configured Tailscale Serve HTTPS endpoint SHALL be reachable from an iPhone on the same tailnet via Safari. (governing requirement: HTTPS reachability from iPhone).
+
+
 ## Requirements
 ### Requirement: HTTPS reachability from iPhone
 The configured Tailscale Serve HTTPS endpoint SHALL be reachable from an iPhone on the same tailnet via Safari.

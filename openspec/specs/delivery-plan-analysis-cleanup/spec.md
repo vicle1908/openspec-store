@@ -1,7 +1,9 @@
 # delivery-plan-analysis-cleanup Specification
 
 ## Purpose
-TBD - created by archiving change delivery-plan-analysis-cleanup. Update Purpose after archive.
+Defines the delivery plan analysis cleanup contract: readiness column SHALL display all key metrics in a single, scannable line using `|` separators instead of a multi-line paragraph. (governing requirement: Readiness column SHALL be condensed to single line).
+
+
 ## Requirements
 ### Requirement: Readiness column SHALL be condensed to single line
 

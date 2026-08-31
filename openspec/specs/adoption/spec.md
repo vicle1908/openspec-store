@@ -1,7 +1,9 @@
 # adoption Specification
 
 ## Purpose
-TBD - created by archiving change ecc-harness-alignment. Update Purpose after archive.
+Defines the adoption contract: system SHALL record, for each adopted feature, the integration plan. (governing requirement: Each adopted v2.0 feature SHALL have an integration plan).
+
+
 ## Requirements
 ### Requirement: Each adopted v2.0 feature SHALL have an integration plan
 

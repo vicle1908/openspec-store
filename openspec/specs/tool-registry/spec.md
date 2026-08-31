@@ -1,7 +1,9 @@
 # tool-registry Specification
 
 ## Purpose
-TBD - created by archiving change agent-core-builtin-toolkit. Update Purpose after archive.
+Defines the tool registry contract: system MUST allow `ToolRegistry` to auto-register the built-in tool set via an opt-out flag, with the default being to include them. (governing requirement: ToolRegistry supports auto-registration of built-in tools).
+
+
 ## Requirements
 ### Requirement: ToolRegistry supports auto-registration of built-in tools
 The system MUST allow `ToolRegistry` to auto-register the built-in tool set via an opt-out flag, with the default being to include them.

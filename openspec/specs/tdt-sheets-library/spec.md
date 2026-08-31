@@ -1,7 +1,8 @@
 # tdt-sheets-library Specification
 
 ## Purpose
-TBD - created by archiving change create-tdt-sheets-library. Update Purpose after archive.
+Defines the tdt sheets library contract: tdt-sheets-library contract SHALL declare the delta for this change. (governing requirement: tdt-sheets SHALL be the canonical Python client for Google Sheets operations).
+
 
 ## Requirements
 

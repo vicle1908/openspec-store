@@ -1,7 +1,8 @@
 # agent-core-capabilities Specification
 
 ## Purpose
-TBD - created by archiving change upgrade-harness-23. Update Purpose after archive.
+Defines the agent core capabilities contract: agentRuntime SHALL compose a default `TieredCompaction` capability with a (governing requirement: TieredCompaction in AgentRuntime).
+
 
 ## Requirements
 

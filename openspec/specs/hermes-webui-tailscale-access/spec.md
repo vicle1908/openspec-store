@@ -1,7 +1,9 @@
 # hermes-webui-tailscale-access Specification
 
 ## Purpose
-TBD - created by archiving change setup-hermes-webui-tailscale-access. Update Purpose after archive.
+Defines the hermes webui tailscale access contract: system SHALL expose Hermes WebUI through a tailnet-only HTTPS endpoint and require application password authentication. (governing requirement: Authenticated Tailscale access).
+
+
 ## Requirements
 ### Requirement: Authenticated Tailscale access
 The system SHALL expose Hermes WebUI through a tailnet-only HTTPS endpoint and require application password authentication.

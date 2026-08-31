@@ -1,7 +1,9 @@
 # webhook-incident-report Specification
 
 ## Purpose
-TBD - created by archiving change coverage-sweep. Update Purpose after archive.
+Defines the webhook incident report contract: `incident-report` skill SHALL live at (governing requirement: The skill MUST be invocable from the agent's chat UI).
+
+
 ## Requirements
 ### Requirement: The skill MUST be invocable from the agent's chat UI
 

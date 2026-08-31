@@ -1,7 +1,9 @@
 # unified-code-daily-scan Specification
 
 ## Purpose
-TBD - created by archiving change unified-code-daily-scan. Update Purpose after archive.
+Defines the unified code daily scan contract: tDT ecosystem SHALL provide a unified `code-daily-scan` CLI that dispatches platform-specific scanning (Android, iOS) through shared worktree-aware core modules. (governing requirement: Unified Code Quality Scanning).
+
+
 ## Requirements
 ### Requirement: Unified Code Quality Scanning
 

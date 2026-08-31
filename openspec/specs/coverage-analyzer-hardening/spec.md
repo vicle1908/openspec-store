@@ -1,7 +1,9 @@
 # coverage-analyzer-hardening Specification
 
 ## Purpose
-TBD - created by archiving change impact-analysis-hardening. Update Purpose after archive.
+Defines the coverage analyzer hardening contract: system SHALL derive `coverage_gaps` from `at_risk_modules` such that a (governing requirement: Coverage Gaps Substring Matching).
+
+
 ## Requirements
 ### Requirement: Coverage Gaps Substring Matching
 

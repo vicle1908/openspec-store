@@ -1,7 +1,9 @@
 # commands-policy Specification
 
 ## Purpose
-TBD - created by archiving change ecc-harness-alignment. Update Purpose after archive.
+Defines the commands policy contract: system SHALL classify every entry in `~/.claude/plugins/cache/everything-claude-code/ecc/<version>/commands/` against the canonical classification enum. (governing requirement: Every ECC command MUST have a disposition).
+
+
 ## Requirements
 ### Requirement: Every ECC command MUST have a disposition
 

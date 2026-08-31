@@ -1,7 +1,9 @@
 # ai-review-structured-findings Specification
 
 ## Purpose
-TBD - created by archiving change ai-review-structured-findings. Update Purpose after archive.
+Defines the ai review structured findings contract: ai-review pipeline SHALL emit findings as structured data with fields for severity, category, location, and remediation text. (governing requirement: Structured Finding Schema).
+
+
 ## Requirements
 ### Requirement: Structured Finding Schema
 

@@ -1,7 +1,9 @@
 # self-hosted-temporal-nexus Specification
 
 ## Purpose
-TBD - created by archiving change introduce-self-hosted-temporal-nexus-contracts. Update Purpose after archive.
+Defines the self hosted temporal nexus contract: local Docker Compose Temporal deployments that advertise Nexus SHALL configure (governing requirement: Self-hosted Temporal exposes routable Nexus callbacks).
+
+
 ## Requirements
 ### Requirement: Self-hosted Temporal exposes routable Nexus callbacks
 

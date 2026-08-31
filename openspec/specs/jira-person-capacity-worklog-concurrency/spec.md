@@ -1,7 +1,9 @@
 # jira-person-capacity-worklog-concurrency Specification
 
 ## Purpose
-TBD - created by archiving change jira-person-capacity-worklog-concurrency. Update Purpose after archive.
+Defines the jira person capacity worklog concurrency contract: `fetch_person_worklogs()` function in `person_worklog_source.py` SHALL fetch worklogs for multiple issues concurrently using `ThreadPoolExecutor` with configurable `WORKLOG_FETCH_CONCURRENCY` (default 8). (governing requirement: Concurrent Worklog Fetching).
+
+
 ## Requirements
 ### Requirement: Concurrent Worklog Fetching
 

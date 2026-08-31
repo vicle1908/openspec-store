@@ -1,7 +1,9 @@
 # agents-policy Specification
 
 ## Purpose
-TBD - created by archiving change ecc-harness-alignment. Update Purpose after archive.
+Defines the agents policy contract: system SHALL keep only domain-reviewer agents whose language/framework matches a repo under `~/Developer/tdt/`. (governing requirement: Domain-reviewer agents MUST match repos we actively edit).
+
+
 ## Requirements
 ### Requirement: Domain-reviewer agents MUST match repos we actively edit
 

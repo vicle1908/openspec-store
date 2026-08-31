@@ -1,7 +1,9 @@
 # person-capacity-daily-total-time Specification
 
 ## Purpose
-TBD - created by archiving change person-capacity-daily-total-time. Update Purpose after archive.
+Defines the person capacity daily total time contract: daily Ticket Details column SHALL display the total hours/minutes at the start of each day line, followed by individual ticket details. (governing requirement: Daily Ticket Details SHALL show total time per day).
+
+
 ## Requirements
 ### Requirement: Daily Ticket Details SHALL show total time per day
 

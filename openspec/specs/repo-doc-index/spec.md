@@ -1,7 +1,9 @@
 # repo-doc-index Specification
 
 ## Purpose
-TBD - created by archiving change docs-cleanup-and-repo-links. Update Purpose after archive.
+Defines the repo doc index contract: `docs/INDEX.md` file SHALL contain a "Repository Documentation" section that links to each non-mobile repository's `docs/` directory. (governing requirement: Central index links to repository documentation).
+
+
 ## Requirements
 ### Requirement: Central index links to repository documentation
 

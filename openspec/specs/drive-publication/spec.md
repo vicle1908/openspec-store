@@ -1,7 +1,8 @@
 # drive-publication Specification
 
 ## Purpose
-TBD - created by archiving change publish-ntu-keynote-to-google-drive. Update Purpose after archive.
+Defines the drive publication contract: publication process SHALL upload exactly the seven files specified by the keynote public-package allowlist and SHALL exclude all evidence, tests, scripts, OpenSpec, Git, and worktree content. (governing requirement: Drive publication SHALL upload only the public keynote package).
+
 
 ## Requirements
 

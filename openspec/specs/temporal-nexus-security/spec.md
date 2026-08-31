@@ -1,7 +1,9 @@
 # temporal-nexus-security Specification
 
 ## Purpose
-TBD - created by archiving change introduce-self-hosted-temporal-nexus-contracts. Update Purpose after archive.
+Defines the temporal nexus security contract: local Docker Compose SHALL explicitly label its no-op transport authorization (governing requirement: Self-hosted Nexus calls are authenticated).
+
+
 ## Requirements
 ### Requirement: Self-hosted Nexus calls are authenticated
 

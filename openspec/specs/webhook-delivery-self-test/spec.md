@@ -1,7 +1,9 @@
 # webhook-delivery-self-test Specification
 
 ## Purpose
-TBD - created by archiving change coverage-sweep. Update Purpose after archive.
+Defines the webhook delivery self test contract: central `tdt-scheduler serve` daemon (in the `agent-core` container) MUST (governing requirement: A self-test loop MUST run every 5 minutes, owned by the central DBOS scheduler).
+
+
 ## Requirements
 ### Requirement: A self-test loop MUST run every 5 minutes, owned by the central DBOS scheduler
 

@@ -1,7 +1,9 @@
 # impact-shared-primitive Specification
 
 ## Purpose
-TBD - created by archiving change impact-sheet-integration. Update Purpose after archive.
+Defines the impact shared primitive contract: system SHALL expose a single async function `analyze_mr_to_report(project_path, mr_iid, mr_url, triggered_by, ticket_key=None, state_dir=None, cache=None, *, payload_metadata=None) -> ImpactReport | None` in `jira_skill.impact.impact_report`. (governing requirement: analyze_mr_to_report shared primitive).
+
+
 ## Requirements
 ### Requirement: analyze_mr_to_report shared primitive
 The system SHALL expose a single async function `analyze_mr_to_report(project_path, mr_iid, mr_url, triggered_by, ticket_key=None, state_dir=None, cache=None, *, payload_metadata=None) -> ImpactReport | None` in `jira_skill.impact.impact_report`. Both webhook-receiver's `_run_pipeline` and `jira-skill`'s `impact mr` CLI command MUST delegate to this function. The function MUST encapsulate the five-step pipeline: cache lookup → fetch MR changes → fetch MR metadata + SHA resolution → `analyze_diff` → `build_impact_report` → cache write.

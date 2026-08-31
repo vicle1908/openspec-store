@@ -1,7 +1,9 @@
 # jira-daily-reports-jql-pagination Specification
 
 ## Purpose
-TBD - created by archiving change jira-daily-reports-jql-pagination. Update Purpose after archive.
+Defines the jira daily reports jql pagination contract: jQL search in jira-daily-reports SHALL fetch the full result set regardless of size by following `nextPageToken` cursor pagination. (governing requirement: JQL Pagination).
+
+
 ## Requirements
 ### Requirement: JQL Pagination
 

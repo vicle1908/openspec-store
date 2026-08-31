@@ -1,7 +1,8 @@
 # code-daily-scan-core Specification
 
 ## Purpose
-TBD - created by archiving change scheduler-stale-workflow-hardening. Update Purpose after archive.
+Defines the code daily scan core contract: system SHALL surface stderr from failed `git worktree` subprocess calls at (governing requirement: WorktreeManager subprocess error surfacing).
+
 
 ## Requirements
 

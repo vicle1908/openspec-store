@@ -1,7 +1,8 @@
 # visual-storytelling-encoding Specification
 
 ## Purpose
-TBD - created by archiving change enhance-ntu-keynote-visual-storytelling. Update Purpose after archive.
+Defines the visual storytelling encoding contract: every chart, diagram, or symbolic visual that carries audience-required meaning SHALL be implemented as inline SVG with `role="img"`, a unique `<title>`, a unique `<desc>`, and `aria-labelledby` referencing both IDs. (governing requirement: Meaningful visuals SHALL be inline SVG with accessible semantics).
+
 
 ## Requirements
 

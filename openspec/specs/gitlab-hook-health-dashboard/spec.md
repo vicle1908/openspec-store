@@ -1,7 +1,9 @@
 # gitlab-hook-health-dashboard Specification
 
 ## Purpose
-TBD - created by archiving change coverage-sweep. Update Purpose after archive.
+Defines the gitlab hook health dashboard contract: `tdt-tools/gitlab-hook-dashboard.py` SHALL query `glab api projects/<id>/hooks/<id>/events` (governing requirement: The dashboard MUST summarize the last 24 hours of deliveries per project).
+
+
 ## Requirements
 ### Requirement: The dashboard MUST summarize the last 24 hours of deliveries per project
 

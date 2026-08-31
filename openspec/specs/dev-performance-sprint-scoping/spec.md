@@ -1,7 +1,9 @@
 # dev-performance-sprint-scoping Specification
 
 ## Purpose
-TBD - created by archiving change dev-performance-sprint-scoping. Update Purpose after archive.
+Defines the dev performance sprint scoping contract: dev-performance report SHALL use the sprint date range from `config.toml` (via workbook title) as the default data collection window. (governing requirement: dev-performance SHALL default to sprint period).
+
+
 ## Requirements
 ### Requirement: dev-performance SHALL default to sprint period
 

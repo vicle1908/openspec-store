@@ -1,7 +1,9 @@
 # drift-allowlist Specification
 
 ## Purpose
-TBD - created by archiving change code-daily-scan-mirror-retirement-v2. Update Purpose after archive.
+Defines the drift allowlist contract: `.drift-allowlist` file MUST be located at `<mirror_root>/.drift-allowlist`, where `<mirror_root>` is `docs/rules/categories/` within the platform repo. (governing requirement: AL-1 — Allowlist file location and naming).
+
+
 ## Requirements
 ### Requirement: AL-1 — Allowlist file location and naming
 

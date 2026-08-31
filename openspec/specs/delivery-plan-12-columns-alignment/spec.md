@@ -1,7 +1,9 @@
 # delivery-plan-12-columns-alignment Specification
 
 ## Purpose
-TBD - created by archiving change delivery-plan-12-columns-alignment. Update Purpose after archive.
+Defines the delivery plan 12 columns alignment contract: delivery Plan Analysis tab SHALL display exactly 12 columns with the specified names. (governing requirement: Delivery Plan Analysis SHALL have exactly 12 columns).
+
+
 ## Requirements
 ### Requirement: Delivery Plan Analysis SHALL have exactly 12 columns
 

@@ -1,7 +1,9 @@
 # dev-performance-merged-at-fallback Specification
 
 ## Purpose
-TBD - created by archiving change dev-perf-merged-at-fallback. Update Purpose after archive.
+Defines the dev performance merged at fallback contract: when `fetch_deployments()` returns an empty list for a merged MR, the system SHALL use the MR's `merged_at` timestamp as a fallback for `first_deploy_at` if all of the following are true: (governing requirement: Fall back to MR.merged_at when the Deployments API returns no results).
+
+
 ## Requirements
 ### Requirement: Fall back to MR.merged_at when the Deployments API returns no results
 

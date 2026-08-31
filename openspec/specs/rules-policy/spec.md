@@ -1,7 +1,9 @@
 # rules-policy Specification
 
 ## Purpose
-TBD - created by archiving change ecc-harness-alignment. Update Purpose after archive.
+Defines the rules policy contract: system SHALL surface only language rule dirs whose language matches at least one repo under `~/Developer/tdt/`. (governing requirement: Only language rule dirs matching TDT repos SHALL be surfaced).
+
+
 ## Requirements
 ### Requirement: Only language rule dirs matching TDT repos SHALL be surfaced
 

@@ -1,7 +1,9 @@
 # ops-scheduler-warning-hygiene Specification
 
 ## Purpose
-TBD - created by archiving change ops-fix-three-scheduler-warnings. Update Purpose after archive.
+Defines the ops scheduler warning hygiene contract: `_parse_report_timezone` function SHALL consult a static (governing requirement: Timezone parser resolves documented IANA aliases without warning).
+
+
 ## Requirements
 ### Requirement: Timezone parser resolves documented IANA aliases without warning
 

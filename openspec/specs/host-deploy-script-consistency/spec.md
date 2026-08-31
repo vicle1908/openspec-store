@@ -1,7 +1,9 @@
 # host-deploy-script-consistency Specification
 
 ## Purpose
-TBD - created by archiving change deployment-and-scheduling-hygiene. Update Purpose after archive.
+Defines the host deploy script consistency contract: `ai-review/scripts/deploy.sh` pre-deploy lock check SHALL exit (governing requirement: Stale uv lock fails the deploy).
+
+
 ## Requirements
 ### Requirement: Stale uv lock fails the deploy
 

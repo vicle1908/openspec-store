@@ -1,7 +1,9 @@
 # sprint-switch Specification
 
 ## Purpose
-TBD - created by archiving change sprint-switch-config-consolidation. Update Purpose after archive.
+Defines the sprint switch contract: cLI SHALL accept either a full Google Sheets URL (`https://docs.google.com/spreadsheets/d/<id>/edit`) or a raw spreadsheet ID as a positional argument. (governing requirement: `sprint-switch` command SHALL accept a spreadsheet URL or ID).
+
+
 ## Requirements
 ### Requirement: `sprint-switch` command SHALL accept a spreadsheet URL or ID
 

@@ -1,7 +1,9 @@
 # tdt-artifact-hygiene Specification
 
 ## Purpose
-TBD - created by archiving change tdt-workspace-cleanup-2026-06-29. Update Purpose after archive.
+Defines the tdt artifact hygiene contract: every TDT ecosystem repository's `.gitignore` SHALL list `.graphify/` (or `.graphify/cache/`) so that the GitNexus toolchain never has a chance to commit a generated artifact. (governing requirement: GitNexus / Graphify output directories SHALL NOT be tracked in git).
+
+
 ## Requirements
 ### Requirement: GitNexus / Graphify output directories SHALL NOT be tracked in git
 
