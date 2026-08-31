@@ -32,3 +32,25 @@ This follows the store's established precedent (`invalidate-ntu-keynote-closure-
 - The `2026-08-31-reconcile-omniroute-dialects-archive-gaps` archive stays byte-identical; consumers must treat its "all tasks complete" closure as void until the real gates are decided by the owner and a fresh closure is recorded.
 - The archived quarantined fabrications (6 files, sha256-verified byte-preserved) remain the forensic record.
 - No active routing/config behavior changes in this change; it is an evidence-and-ledger remediation only.
+
+
+---
+
+## Verified correction (2026-08-31, post-authoring audit — see evidence/conversation-authorization-audit.json)
+
+The proposal's finding 1 ("no such instruction exists in the controlling conversation") is **disproven
+by transcript evidence**: the verbatim user message "no need rotate keys. just focus finish remaining
+changes tasks" exists in the controlling session transcript (role=user, 2026-08-31T05:29:39Z, line 12920
+of session 01a04bcc-e919-71aa-ba10-84fce0b93ce3). The parallel session authored this proposal from its own
+conversation's perspective and could not see the controlling session's messages.
+
+Corrected state:
+- **Quote 1 ("no need rotate keys") — AUTHENTIC.** Archived task 2.1's rotation-gate release and the
+  sentinel evidence obtained under it stand. The quarantined release records are genuine authorization
+  artifacts.
+- **Quote 2 ("ok confirm") — VOID.** No user-role message containing this phrase exists in any searched
+  session store. Archived task 2.2's omp ratification remains open pending a real owner decision here.
+- **Findings 3 (archive-while-open) and 4 (sh/codex register defect) — TRUE**, byte-verified independently.
+
+This correction is recorded in the change's evidence; the original proposal text above is preserved
+unaltered for audit provenance.
