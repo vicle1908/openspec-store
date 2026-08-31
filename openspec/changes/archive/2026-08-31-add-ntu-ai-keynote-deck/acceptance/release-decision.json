@@ -1,0 +1,37 @@
+{
+  "artifact": "central-acceptance-release-decision",
+  "schema_version": 1,
+  "change_id": "add-ntu-ai-keynote-deck",
+  "decision": "accepted",
+  "timestamp": "2026-08-31T13:25:00+07:00",
+  "candidate": {
+    "candidate_id": "ntu-keynote-main-bb7a4d5",
+    "implementation_commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
+    "evidence_base_commit": "7cbf0f17c428896b95ae078623d2450996fafe88",
+    "public_package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+    "selected_copy": "neutral",
+    "retention_tier": "tier-1-public-byte-change"
+  },
+  "gate_evaluations": {
+    "section_1_baseline": "accepted",
+    "section_2_intake": "accepted",
+    "section_3_automated_verification": "accepted",
+    "section_4_editorial_and_copy": "accepted",
+    "section_5_rehearsal_and_release_identity": "accepted"
+  },
+  "release_ref": {
+    "ref": "refs/tags/ntu-ai-keynote-v1.0.0",
+    "target_package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+    "status": "verified"
+  },
+  "rehearsal_and_presentation": {
+    "session_status": "completed",
+    "notes": "Presentation session and venue delivery successfully concluded; neutral copy presented without company claim dependencies."
+  },
+  "non_circular_predicate": {
+    "task_6_1_checkbox_excluded": true,
+    "task_6_2_state_excluded": true,
+    "archive_state_excluded": true,
+    "derived_solely_from_immutable_predecessor_gates": true
+  }
+}

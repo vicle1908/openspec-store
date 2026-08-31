@@ -1,0 +1,22 @@
+{
+  "artifact": "central-acceptance-closure",
+  "schema_version": 1,
+  "change_id": "add-ntu-ai-keynote-deck",
+  "timestamp": "2026-08-31T13:25:30+07:00",
+  "status": "closed-accepted",
+  "predecessor_decision": {
+    "artifact": "central-acceptance-release-decision",
+    "decision": "accepted",
+    "timestamp": "2026-08-31T13:25:00+07:00"
+  },
+  "candidate": {
+    "candidate_id": "ntu-keynote-main-bb7a4d5",
+    "public_package_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+    "selected_copy": "neutral"
+  },
+  "validation_result": {
+    "strict_validation": "pass",
+    "all_specs_valid": true
+  },
+  "closure_summary": "All 12 central tasks evaluated, gates resolved, session delivery confirmed, specs synced to main specs, and ready for archival."
+}
