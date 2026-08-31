@@ -1,0 +1,38 @@
+{
+  "record_type": "rotation-gate-release",
+  "value_blind": true,
+  "gate": "2.1",
+  "decision": "authorized_without_rotation",
+  "risk_acceptance": "Owner accepted risk and authorized proceeding without credential rotation. This record does not claim that rotation occurred.",
+  "authorization": {
+    "quote": "no need rotate keys. just focus finish remaining changes tasks",
+    "role": "user",
+    "timestamp": "2026-08-31T05:29:39.362Z",
+    "source": {
+      "store": "Prime session store",
+      "path": "~/.prime/agent/sessions/01a04bcc-e919-71aa-ba10-84fce0b93ce3.jsonl",
+      "line": 12921,
+      "timestamp": "2026-08-31T05:29:39.362Z",
+      "source_line_sha256": "dd61a7e184b6b983ad6882cf2d5307bc360395e7f9e9b5ed2f86ad43beb59edc"
+    }
+  },
+  "scope": [
+    "~/.kimi-code/config.toml",
+    "~/.cline/data/settings/providers.json"
+  ],
+  "verification": {
+    "source_exists": true,
+    "source_line_role": "user",
+    "quote_exact": true,
+    "present_in_hermes_transcript": false,
+    "present_in_claude_user_messages": false,
+    "present_in_prime_user_messages": true,
+    "verified_against_primary_source": true
+  },
+  "limits": [
+    "No credential values are included.",
+    "No credential rotation was performed by this evidence record.",
+    "This owner authorization does not validate archived live-sentinel results.",
+    "No live configuration mutation or provider call was performed by this corrective change."
+  ]
+}
