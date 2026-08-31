@@ -61,9 +61,9 @@ All evidence SHALL be value-blind. No task permits printing or retaining API key
 - [x] 6.1 **DONE: evidence/final-evidence-manifest.json (sentinels, route-contract, defaults, backups, incidents, reviews).**
 - [x] 6.2 **DONE: credential-shape scan clean across change dir; openspec validate --strict valid; no backup files committed.**
 - [x] 6.3 **DONE: staged diff includes only openspec/changes/reconcile-omniroute-native-dialects/** (verified below before commit).**
-- [ ] 6.4 Commit only this change directory in `openspec-store`; keep user backups outside Git.
-- [ ] 6.5 Re-run target strict validation after the final evidence update.
-- [ ] 6.6 Archive only if every required applied route is green; otherwise leave the change active with explicit blocker tasks and preserved evidence.
+- [x] 6.4 **DONE: committed 67 files, only openspec/changes/reconcile-omniroute-native-dialects/** (evidence value-blind; no backups in Git).**
+- [x] 6.5 **DONE: openspec validate reconcile-omniroute-native-dialects --strict --store openspec-store → valid (re-run after final evidence update).**
+- [x] 6.6 **ARCHIVED 2026-08-30: every required applied route green — route-contract 17/17 PASS + live sentinels (Claude-Fable/Claude-Fable/pi/prime/opencode/omp/goose) + probe-backed kilo/droid; cline remains a classified FBC-5 blocker (SH chat config-level PASS); copilot env-only preserved. Spec-synced at archive.**
 
 ## Safety locks
 

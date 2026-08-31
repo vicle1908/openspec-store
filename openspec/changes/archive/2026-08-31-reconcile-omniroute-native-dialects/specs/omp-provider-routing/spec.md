@@ -20,22 +20,6 @@ Then `shopapikey.api` SHALL be `anthropic-messages`
 And `phanmemvip.api` SHALL be `openai-responses`
 And `cockpit.api` SHALL be `openai-responses`.
 
-### Requirement: Existing omniroute provider SHALL remain available while its stale Claude binding is reconciled
-
-The existing OmniRoute provider SHALL remain selectable and its unrelated model entries, role assignments, fallback chains, and defaults SHALL be preserved. Its stale `sh/Claude-Fable` entry SHALL NOT remain as the authoritative Claude route under an OpenAI Responses provider; the corrected PM model SHALL be exposed through a sibling `anthropic-messages` provider. OmniRoute SHALL remain absent from omp `modelRoles` and `retry.fallbackChains` unless a separate role-allocation approval is recorded.
-
-#### Scenario: corrected OmniRoute catalog remains available
-
-- **WHEN** `omp models` is executed after the reconciliation
-- **THEN** the Responses provider SHALL list `sh/gpt-5.6-sol`
-- **AND** the Messages provider SHALL list `pm/Claude-Fable`
-- **AND** unrelated pre-existing OmniRoute models SHALL remain available unless their live catalog entries are retired
-
-#### Scenario: no implicit role or fallback assignment
-
-- **WHEN** `~/.omp/agent/config.yml` is compared before and after the change
-- **THEN** `modelRoles` and fallback chains SHALL be byte-identical
-- **AND** no new selector SHALL route through OmniRoute without explicit role approval
 
 ### Requirement: Credential reference by env-var name
 
@@ -52,3 +36,22 @@ Every OmniRoute provider added or corrected by this change SHALL reference the `
 Given the provider blocks are written to `models.yml`
 When the file is inspected
 Then no string matching `pmv_`, `agt_`, or `sk-` SHALL appear in the file.
+
+## ADDED Requirements
+
+### Requirement: Existing omniroute provider SHALL remain available while its stale Claude binding is reconciled
+
+The existing OmniRoute provider SHALL remain selectable and its unrelated model entries, role assignments, fallback chains, and defaults SHALL be preserved. Its stale `sh/Claude-Fable` entry SHALL NOT remain as the authoritative Claude route under an OpenAI Responses provider; the corrected PM model SHALL be exposed through a sibling `anthropic-messages` provider. OmniRoute SHALL remain absent from omp `modelRoles` and `retry.fallbackChains` unless a separate role-allocation approval is recorded.
+
+#### Scenario: corrected OmniRoute catalog remains available
+
+- **WHEN** `omp models` is executed after the reconciliation
+- **THEN** the Responses provider SHALL list `sh/gpt-5.6-sol`
+- **AND** the Messages provider SHALL list `pm/Claude-Fable`
+- **AND** unrelated pre-existing OmniRoute models SHALL remain available unless their live catalog entries are retired
+
+#### Scenario: no implicit role or fallback assignment
+
+- **WHEN** `~/.omp/agent/config.yml` is compared before and after the change
+- **THEN** `modelRoles` and fallback chains SHALL be byte-identical
+- **AND** no new selector SHALL route through OmniRoute without explicit role approval

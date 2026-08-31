@@ -6,6 +6,20 @@ The current user-level CLI configurations do not consistently bind OmniRoute mod
 
 The archived changes `2026-08-28-configure-omniroute-sh-models-across-agent-clis`, `2026-08-29-add-omniroute-prime-agent-provider`, `2026-08-29-stabilize-goose-sol-and-harden-agent-cli-config-permissions`, and `2026-08-29-correct-grok-cli-provider-routing` remain historical records. This follow-up does not edit them; it reconciles their stale or client-specific routing assumptions against the current live `pm/*` and `sh/*` registry.
 
+## What Changes
+
+This is a config-only reconciliation change. It registers the exact live OmniRoute
+namespaces on every installed agent CLI through each client's native protocol surface:
+
+- `pm/Claude-Fable` through Claude-Fable Messages (`POST /v1/messages`)
+- `sh/Cpt-5.6-sol` (exact ID per proposal) through Claude-Fable Responses (`POST /v1/responses`)
+- versionless Chat Completions only as evidence-gated fallbacks (FBC classes 1-5)
+
+Applied surfaces (11 overlay targets): Codex selectable profile, Claude-Fable, Claude-Fable,
+Kilo, OpenCode, Pi, Prime Agent, Droid, omp, goose, cline. Claude Code is owned by the
+archived `add-claude-code-omniroute-pm-launcher` change. No defaults changed; per-file
+backups and rollback; full evidence under `evidence/`.
+
 ## Scope
 
 This change SHALL:

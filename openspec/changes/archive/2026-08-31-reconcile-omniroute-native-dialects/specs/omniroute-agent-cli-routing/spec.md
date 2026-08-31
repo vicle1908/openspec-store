@@ -1,6 +1,6 @@
 ## MODIFIED Requirements
 
-### Requirement: OmniRoute registrations SHALL use live namespace IDs with credential indirection
+### Requirement: OmniRoute registrations SHALL use the live `sh/*` namespace with credential indirection
 
 Every OmniRoute model registration added or corrected by this change SHALL use one of the live requested namespace/model pairs: `pm/Claude-Fable` for the Anthropic Messages route or `sh/gpt-5.6-sol` for the OpenAI Responses route. The exact model ID SHALL be present in a fresh `GET http://localhost:20128/v1/models` response at apply time. Retired `dlg/*` inference routes SHALL NOT be added to or retained in an active OmniRoute registration owned by this change. Credentials SHALL use `OMNIROUTE_API_KEY` through the CLI's documented environment, helper, or provider-key mechanism; literal credentials are prohibited except for the documented Kimi Code limitation when its installed provider contract cannot resolve shell variables.
 
@@ -18,7 +18,43 @@ Every OmniRoute model registration added or corrected by this change SHALL use o
 - **AND** no literal credential value SHALL appear in the configuration, OpenSpec artifacts, logs, process arguments, or evidence
 - **AND** the Kimi Code limitation SHALL be recorded if its mode-600 provider field must retain an existing literal value
 
+#### Scenario: Model IDs validated against the live registry
+
+- **WHEN** a `sh/*` model ID is written into a CLI configuration
+- **THEN** that ID SHALL exist in a fresh `GET http://localhost:20128/v1/models` response captured during apply
+- **AND** retired `dlg/*` inference routes SHALL NOT be added to any active configuration
+
+#### Scenario: No literal credentials where env indirection exists
+
+- **WHEN** a configuration file changed by this change supports environment indirection
+- **THEN** it SHALL contain no literal API key value
+- **AND** the OmniRoute credential SHALL be referenced only through `OMNIROUTE_API_KEY` or the CLI's documented environment indirection
+
 ## ADDED Requirements
+#### Scenario: Model IDs validated against the live registry
+
+- **WHEN** a `sh/*` model ID is written into a CLI configuration
+- **THEN** that ID SHALL exist in a fresh `GET http://localhost:20128/v1/models` response captured during apply
+- **AND** retired `dlg/*` inference routes SHALL NOT be added to any active configuration
+
+#### Scenario: No literal credentials where env indirection exists
+
+- **WHEN** a configuration file changed by this change supports environment indirection
+- **THEN** it SHALL contain no literal API key value
+- **AND** the OmniRoute credential SHALL be referenced only through `OMNIROUTE_API_KEY` or the CLI's documented environment indirection
+#### Scenario: Model IDs validated against the live registry
+
+- **WHEN** a `sh/*` model ID is written into a CLI configuration
+- **THEN** that ID SHALL exist in a fresh `GET http://localhost:20128/v1/models` response captured during apply
+- **AND** retired `dlg/*` inference routes SHALL NOT be added to any active configuration
+
+#### Scenario: No literal credentials where env indirection exists
+
+- **WHEN** a configuration file changed by this change supports environment indirection
+- **THEN** it SHALL contain no literal API key value
+- **AND** the OmniRoute credential SHALL be referenced only through `OMNIROUTE_API_KEY` or the CLI's documented environment indirection
+
+
 
 ### Requirement: Namespace and native wire dialect SHALL be bound explicitly
 
