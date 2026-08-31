@@ -1,0 +1,38 @@
+{
+ "canonical_ids": {
+  "pm_route": "pm/Claude-Fable",
+  "sh_route": "sh/gpt-5.6-sol"
+ },
+ "change_id": "reconcile-omniroute-dialects-archive-gaps",
+ "citations_found": {
+  "final-evidence-manifest.json": {
+   "defective_line_numbers": [
+    12,
+    28,
+    31,
+    33,
+    35,
+    37
+   ],
+   "pm_ids_all_canonical": true,
+   "pm_rows": 6,
+   "sh_id_present_in_rows": "sh/Claude-Fable (wrong; canonical SH route id is sh/gpt-5.6-sol)",
+   "sh_ids_all_canonical": false,
+   "sh_rows": 6
+  },
+  "post-apply-manifest.json": {
+   "note": "contains no model-ID citations",
+   "pm_rows": 0,
+   "sh_rows": 0
+  }
+ },
+ "generated_at": "2026-08-31T06:01:38Z",
+ "live_sentinel_truth": {
+  "consequence": "Evidence text defect only; no routing or config defect. Corrected by this register; archived bytes untouched.",
+  "finding": "The live sentinels executed through config-derived selectors and actually exercised the canonical sh/Claude-Fable Responses route (verified from live configs: omniroute-responses carries sh/Claude-Fable). The defect is confined to the evidence TEXT of the archived final-evidence-manifest.json."
+ },
+ "record_type": "superseding-model-id-register",
+ "schema_version": 1,
+ "supersedes_archive": "2026-08-31-reconcile-omniroute-native-dialects (read-only)",
+ "verification": "ID equality checked programmatically against the canonical spec IDs (spec/omniroute-agent-cli-routing); grep-verified after write."
+}

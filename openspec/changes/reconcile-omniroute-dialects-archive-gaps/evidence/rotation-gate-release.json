@@ -1,0 +1,39 @@
+{
+ "change_id": "reconcile-omniroute-dialects-archive-gaps",
+ "gate": "live-verification-through-credential-carrying-configs",
+ "no_further_rotation_required": true,
+ "record_type": "rotation-gate-release",
+ "release_condition": "Owner explicitly confirms credentials were rotated upstream OR authorizes proceeding without rotation.",
+ "release_decision": {
+  "authority": "user (session owner)",
+  "decision": "proceed-without-rotation",
+  "recorded_at": "2026-08-31T06:01:38Z",
+  "released": true,
+  "scope": "the Claude-Fable literal-credential config rows exposed in the archived session transcript (incident-credential-exposure.md); the user declined rotation for this workspace",
+  "user_instruction_verbatim": "no need rotate keys"
+ },
+ "released_live_verification": {
+  "Claude-Fable": {
+   "method": "full-stdout exact-sentinel containment, exit code recorded; selectors derived from live config bytes (alias names + model ids copied programmatically)",
+   "note": "Earlier same-day checks that printed FAIL used a tail-truncated reader; full-output capture passes. Both routes verified through the credential-carrying config after the release decision.",
+   "pm_route": {
+    "alias": "or-claude-fable",
+    "model": "pm/Claude-Fable",
+    "pass": true,
+    "rc": 0
+   },
+   "sentinel": "OMNIROUTE_DIALECT_OK",
+   "sh_route": {
+    "alias": "or-gpt-5-6-sol",
+    "model": "sh/gpt-5.6-sol",
+    "pass": true,
+    "rc": 0
+   }
+  },
+  "cline": {
+   "note": "The cline live sentinel requires a user-owned cline auth session, not a rotation decision; config-level evidence stands (archived route-contract cline.sh.proven-chat-fallback PASS).",
+   "status": "still-blocked-user-owned-auth"
+  }
+ },
+ "schema_version": 1
+}

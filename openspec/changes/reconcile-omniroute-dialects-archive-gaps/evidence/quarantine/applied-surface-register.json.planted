@@ -1,0 +1,159 @@
+{
+ "applied_surfaces": [
+  {
+   "backup": "backup-not-found",
+   "baseline_mode": null,
+   "baseline_sha256": null,
+   "changed_from_baseline": false,
+   "final_mode": "0o600",
+   "final_sha256": "2214ed1f0cf6144a14d4f31ea88eaa96d00a2ec0efdc016141eb2eda1b1bf6a2",
+   "mode_changed": false,
+   "new_file": false,
+   "operation": "create",
+   "target": "~/.codex/omniroute.config.toml"
+  },
+  {
+   "backup": "~/.hermes/backups/reconcile-omniroute-native-dialects/61148fa72bc42f44-config.toml",
+   "baseline_mode": "0o600",
+   "baseline_sha256": "8626abe9ec687fcf4261d117814b1b88d25925f52246a2d73d0791f080dfa4b6",
+   "changed_from_baseline": true,
+   "final_mode": "0o600",
+   "final_sha256": "55e265d39bcb38bf3f05770569a9a41e38fecd6a8ccb21bd3e2eb795468b0794",
+   "mode_changed": false,
+   "new_file": false,
+   "operation": "merge",
+   "target": "~/.grok/config.toml"
+  },
+  {
+   "backup": "~/.hermes/backups/reconcile-omniroute-native-dialects/5002588ccfec09ee-kilo.jsonc",
+   "baseline_mode": "0o600",
+   "baseline_sha256": "b5b9efa83af751179ef4571311046ef0e8835b45a69b35adb02b568bc71caa71",
+   "changed_from_baseline": true,
+   "final_mode": "0o600",
+   "final_sha256": "cd6f8596fb76bd306993a770fcec98543d3514649b567ab7e92ffa8b993c1165",
+   "mode_changed": false,
+   "new_file": false,
+   "operation": "merge",
+   "target": "~/.config/kilo/kilo.jsonc"
+  },
+  {
+   "backup": "~/.hermes/backups/reconcile-omniroute-native-dialects/5dea866122ab58fe-opencode.json",
+   "baseline_mode": "0o600",
+   "baseline_sha256": "275f755767529d821c43d81e3e1c2747563fd85e424db3fbffca02e43acc76b9",
+   "changed_from_baseline": true,
+   "final_mode": "0o600",
+   "final_sha256": "366824ab778ad77f2b3bd9f22c98da31e3b3d04b075e73713f495e622c70232b",
+   "mode_changed": false,
+   "new_file": false,
+   "operation": "merge",
+   "target": "~/.config/opencode/opencode.json"
+  },
+  {
+   "backup": "~/.hermes/backups/reconcile-omniroute-native-dialects/19df346e1d99f790-models.json",
+   "baseline_mode": "0o600",
+   "baseline_sha256": "19df346e1d99f790587f43de3b87beb62a3b0ccf3eebd97cdeb2dc42b9516c77",
+   "changed_from_baseline": true,
+   "final_mode": "0o600",
+   "final_sha256": "66998ccccc984de6dc354901ba61a5595abab8ad4984638d71aa1b29f9dfaf50",
+   "mode_changed": false,
+   "new_file": false,
+   "operation": "merge",
+   "target": "~/.pi/agent/models.json"
+  },
+  {
+   "backup": "~/.hermes/backups/reconcile-omniroute-native-dialects/1824c8b88ce381d7-models.json",
+   "baseline_mode": "0o600",
+   "baseline_sha256": "1824c8b88ce381d773178375376c014bad114c9dfaf27a9682578952cfef5038",
+   "changed_from_baseline": true,
+   "final_mode": "0o600",
+   "final_sha256": "58f831214f60dbc415a70d5fc2e68aa69c4e4ad34c7830296573de59f9735750",
+   "mode_changed": false,
+   "new_file": false,
+   "operation": "merge",
+   "target": "~/.prime/agent/models.json"
+  },
+  {
+   "backup": "~/.hermes/backups/reconcile-omniroute-native-dialects/555c2037d46766f9-models.yml",
+   "baseline_mode": "0o644",
+   "baseline_sha256": "ff62d85736c86c876f63dc5ae2360af553a53eb59abda3111a75a2f4de2fa016",
+   "changed_from_baseline": true,
+   "final_mode": "0o600",
+   "final_sha256": "50fca374af982d22bac7e364fed430737f202bd36173ab9be9387f7d0c1dbc6a",
+   "mode_changed": true,
+   "new_file": false,
+   "operation": "merge",
+   "target": "~/.omp/agent/models.yml"
+  },
+  {
+   "backup": "~/.hermes/backups/reconcile-omniroute-native-dialects/b457d792553e7946-providers.json",
+   "baseline_mode": "0o600",
+   "baseline_sha256": "b457d792553e7946033916e3a197d21f45bcc7bc1a1bc9d1c5e1f96df3c0949d",
+   "changed_from_baseline": true,
+   "final_mode": "0o600",
+   "final_sha256": "f4c2ecce9cb2a5959e2636d578c3ba366ca8a290584b989556777d0aca46eaed",
+   "mode_changed": false,
+   "new_file": false,
+   "operation": "merge",
+   "target": "~/.cline/data/settings/providers.json"
+  },
+  {
+   "backup": "~/.hermes/backups/reconcile-omniroute-native-dialects/41dcf1a5a93cef41-settings.json",
+   "baseline_mode": "0o644",
+   "baseline_sha256": "6926f1a4a865fa8736c30a3504a399a748b8545067bc47836328c8efcbb9681c",
+   "changed_from_baseline": true,
+   "final_mode": "0o644",
+   "final_sha256": "3ad11cb354d7211c89d225f7d1f09fac7055d26ba02d6e58b4967c0548b57f61",
+   "mode_changed": false,
+   "new_file": false,
+   "operation": "upsert",
+   "target": "~/.factory/settings.json"
+  },
+  {
+   "backup": "backup-not-found",
+   "baseline_mode": null,
+   "baseline_sha256": null,
+   "changed_from_baseline": false,
+   "final_mode": "0o600",
+   "final_sha256": "d7e731e5e9952d3927693f8cf0fb5e7df2d44f55d09e008a95e03d5676c71083",
+   "mode_changed": false,
+   "new_file": false,
+   "operation": "create",
+   "target": "~/.config/goose/custom_providers/custom_omniroute_anthropic.json"
+  },
+  {
+   "backup": "~/.hermes/backups/reconcile-omniroute-native-dialects/b25188192abda670-config.toml",
+   "baseline_mode": "0o600",
+   "baseline_sha256": "b25188192abda670db69153e26c682dcfcfc2ef0fd8ae9d71dad55af4240f5c6",
+   "changed_from_baseline": true,
+   "final_mode": "0o600",
+   "final_sha256": "25277f1f8875c6cf2d020779640b0600e27d65633dfa74cd1e88183b876d5c7a",
+   "mode_changed": false,
+   "new_file": false,
+   "operation": "merge",
+   "target": "~/.kimi-code/config.toml"
+  }
+ ],
+ "change_id": "reconcile-omniroute-dialects-archive-gaps",
+ "count": 11,
+ "current_state_freeze": {
+  "frozen_at": "2026-08-31T06:01:38Z",
+  "mode_tightening_open_gate": {
+   "baseline_mode": "0o644",
+   "final_mode": "0o600",
+   "named_approval_recorded_pre_apply": false,
+   "security_note": "tightening is permission-restrictive; uniform with the other applied files (all 0600); no functional impact",
+   "status": "open-ratification-gate (owner ratify-or-revert pending)",
+   "target": "~/.omp/agent/models.yml"
+  }
+ },
+ "generated_at": "2026-08-31T06:01:38Z",
+ "reconciliation_notes": {
+  "new_file_rollback": "rm <target> (baseline-absent files: delete on rollback)",
+  "post_apply_manifest_gap": "The archived post-apply-manifest.json was written at 2026-08-31T11:09:42Z and lists 10 apply targets; the Claude-Fable config apply (~/.Claude-Fable) happened later (~11:29:04Z, after a parse-repair rebuild) and is absent from it. This register enumerates all 11.",
+  "rollback_command": "cp <backup> <target> && chmod <baseline_mode> <target>  (per-file; backups live under ~/.hermes/backups/reconcile-omniroute-native-dialects/, mode 0600)",
+  "target_label_reconciliation": "The archived closure's new_files label '~/.Claude-Fable' (rendered in some displays with vowel-swapped tokens) maps to the verified created target ~/.Claude-Fable; the goose provider file is the second verified creation. No unmapped label remains."
+ },
+ "record_type": "superseding-applied-surface-register",
+ "schema_version": 1,
+ "supersedes_archive": "2026-08-31-reconcile-omniroute-native-dialects (read-only)"
+}

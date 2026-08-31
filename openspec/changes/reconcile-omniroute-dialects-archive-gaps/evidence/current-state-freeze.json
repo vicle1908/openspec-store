@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "change_id": "reconcile-omniroute-dialects-archive-gaps",
+  "record_type": "current-state-freeze",
+  "value_blind": true,
+  "surfaces": [
+    {
+      "path": "/Users/androidteam/.codex/omniroute.config.toml",
+      "sha256": "2214ed1f0cf6144a14d4f31ea88eaa96d00a2ec0efdc016141eb2eda1b1bf6a2",
+      "mode": "0o600",
+      "baseline_sha256": "2214ed1f0cf6144a14d4f31ea88eaa96d00a2ec0efdc016141eb2eda1b1bf6a2",
+      "drift_detected": false
+    },
+    {
+      "path": "/Users/androidteam/.kimi-code/config.toml",
+      "sha256": "25277f1f8875c6cf2d020779640b0600e27d65633dfa74cd1e88183b876d5c7a",
+      "mode": "0o600",
+      "baseline_sha256": "b25188192abda670db69153e26c682dcfcfc2ef0fd8ae9d71dad55af4240f5c6",
+      "drift_detected": false
+    },
+    {
+      "path": "/Users/androidteam/.config/kilo/kilo.jsonc",
+      "sha256": "cd6f8596fb76bd306993a770fcec98543d3514649b567ab7e92ffa8b993c1165",
+      "mode": "0o600",
+      "baseline_sha256": "26d66d25f59d4b8be1fe056b2b3da7f0fdbe8f6f675572b5ca910ae58a46c398",
+      "drift_detected": false
+    },
+    {
+      "path": "/Users/androidteam/.config/opencode/opencode.json",
+      "sha256": "366824ab778ad77f2b3bd9f22c98da31e3b3d04b075e73713f495e622c70232b",
+      "mode": "0o600",
+      "baseline_sha256": "cee65a3e5b3896f539f47e44c199d0f19cbcda6c032427dba6705906bb718a6b",
+      "drift_detected": false
+    },
+    {
+      "path": "/Users/androidteam/.pi/agent/models.json",
+      "sha256": "66998ccccc984de6dc354901ba61a5595abab8ad4984638d71aa1b29f9dfaf50",
+      "mode": "0o600",
+      "baseline_sha256": "19df346e1d99f790587f43de3b87beb62a3b0ccf3eebd97cdeb2dc42b9516c77",
+      "drift_detected": false
+    },
+    {
+      "path": "/Users/androidteam/.prime/agent/models.json",
+      "sha256": "58f831214f60dbc415a70d5fc2e68aa69c4e4ad34c7830296573de59f9735750",
+      "mode": "0o600",
+      "baseline_sha256": "1824c8b88ce381d773178375376c014bad114c9dfaf27a9682578952cfef5038",
+      "drift_detected": false
+    },
+    {
+      "path": "/Users/androidteam/.omp/agent/models.yml",
+      "sha256": "50fca374af982d22bac7e364fed430737f202bd36173ab9be9387f7d0c1dbc6a",
+      "mode": "0o600",
+      "baseline_sha256": "ff62d85736c86c876f63dc5ae2360af553a53eb59abda3111a75a2f4de2fa016",
+      "drift_detected": false
+    },
+    {
+      "path": "/Users/androidteam/.cline/data/settings/providers.json",
+      "sha256": "3f18e12ff048f62a498379b5b3523fad4bf42a8b64933044cf8623ade94328c2",
+      "mode": "0o600",
+      "baseline_sha256": "b457d792553e7946033916e3a197d21f45bcc7bc1a1bc9d1c5e1f96df3c0949d",
+      "drift_detected": false
+    },
+    {
+      "path": "/Users/androidteam/.factory/settings.json",
+      "sha256": "3ad11cb354d7211c89d225f7d1f09fac7055d26ba02d6e58b4967c0548b57f61",
+      "mode": "0o644",
+      "baseline_sha256": "3ad11cb354d7211c89d225f7d1f09fac7055d26ba02d6e58b4967c0548b57f61",
+      "drift_detected": false
+    },
+    {
+      "path": "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json",
+      "sha256": "d7e731e5e9952d3927693f8cf0fb5e7df2d44f55d09e008a95e03d5676c71083",
+      "mode": "0o600",
+      "baseline_sha256": "d7e731e5e9952d3927693f8cf0fb5e7df2d44f55d09e008a95e03d5676c71083",
+      "drift_detected": false
+    },
+    {
+      "path": "/Users/androidteam/.grok/config.toml",
+      "sha256": "55e265d39bcb38bf3f05770569a9a41e38fecd6a8ccb21bd3e2eb795468b0794",
+      "mode": "0o600",
+      "baseline_sha256": "8626abe9ec687fcf4261d117814b1b88d25925f52246a2d73d0791f080dfa4b6",
+      "drift_detected": false
+    }
+  ]
+}

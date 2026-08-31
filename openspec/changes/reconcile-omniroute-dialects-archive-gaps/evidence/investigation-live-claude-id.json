@@ -1,0 +1,23 @@
+{
+ "change_id": "reconcile-omniroute-dialects-archive-gaps",
+ "findings": {
+  "archived_defect_boundary": "The defect (D-1) was confined to final-evidence-manifest SH-route ROWS citing the Claude id where the GPT route id belonged. Configs, live sentinels, and the registry spec are all internally consistent.",
+  "catalog": {
+   "live_id_confirmed": true,
+   "note": "sh/Claude-Fable is a real live model in the sh namespace (Claude family), distinct from the Claude-Fable sh/Claude-Fable that the routing family's SH Responses route uses.",
+   "query": "GET http://localhost:20128/v1/models (keyed, loopback)",
+   "sh_namespace_count": 14
+  },
+  "registry_spec": {
+   "cites_live_claude_id": true,
+   "conclusion": "No contamination. The registry spec correctly distinguishes the two; no follow-up change needed.",
+   "context": "coding-cli-provider-registry scenarios register BOTH sh/Claude-Fable (GPT route) and sh/Claude-Fable (live Claude chat model) where the client's provider surface carries it (e.g., goose custom_omniroute_sh, pi live omniroute provider). This is intentional, not contamination.",
+   "gpt_route_id_in_spec": "sh/gpt-5.6-sol"
+  }
+ },
+ "generated_at": "2026-08-31T06:01:38Z",
+ "question": "Is sh/Claude-Fable a live OmniRoute catalog ID serving other routes, and does any registry-spec scenario depend on it?",
+ "record_type": "investigation-live-claude-id",
+ "schema_version": 1,
+ "value_blind": true
+}

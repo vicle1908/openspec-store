@@ -1,0 +1,51 @@
+{
+ "archive_state": "archived 2026-08-31 with store commits f8e86b1 (apply) + 76ebb82 (archive) and spec sync",
+ "change_id": "reconcile-omniroute-dialects-archive-gaps",
+ "defects": [
+  {
+   "citation": "evidence/final-evidence-manifest.json",
+   "class": "wrong-model-id-in-closure-evidence",
+   "detail": "final-evidence-manifest.json cites sh/Claude-Fable in 6 SH-route rows (lines [12, 28, 31, 33, 35, 37]) where the canonical SH route id is sh/gpt-5.6-sol. Live sentinels actually exercised sh/gpt-5.6-sol (config-derived selectors); the defect is in the evidence text only.",
+   "id": "D-1",
+   "remediation": "superseded by evidence/model-id-register.json in this change",
+   "severity": "major"
+  },
+  {
+   "citation": "evidence/post-apply-manifest.json:apply_log",
+   "class": "incomplete-applied-surface-register",
+   "detail": "post-apply-manifest.json (written 2026-08-31T11:09:42Z) lists 10 targets and omits the Claude-Fable config apply that completed ~11:29Z (post-freeze apply never appended; closure proceeded anyway, violating the register-matches-final-state contract).",
+   "id": "D-2",
+   "remediation": "superseded by evidence/applied-surface-register.json (11 surfaces with timestamps + backups)",
+   "severity": "major"
+  },
+  {
+   "citation": "evidence/pre-apply-manifest.json:files[/Users/androidteam/.omp/agent/models.yml].mode; on-disk mode 0600",
+   "class": "unapproved-mode-tightening",
+   "detail": "~/.omp/agent/models.yml was 0644 in the frozen baseline and is 0600 on disk; the change's own task-2.4 policy required a named approval entry in the manifest before any 0644->0600 tightening, and none was recorded.",
+   "id": "D-3",
+   "remediation": "open ratification gate in evidence/applied-surface-register.json:current_state_freeze.mode_tightening_open_gate; owner ratify-or-revert pending",
+   "severity": "minor"
+  },
+  {
+   "citation": "evidence/post-apply-manifest.json:new_files",
+   "class": "unmapped-new-file-label",
+   "detail": "The archived closure's new_files list used a label ('~/.Claude-Fable' as rendered in transcripts) that did not map cleanly to the two verified created targets (the codex profile file and the goose provider file), due to a known workstation token-corruption issue on hyphenated dir names.",
+   "id": "D-4",
+   "remediation": "reconciled in evidence/applied-surface-register.json:reconciliation_notes.target_label_reconciliation",
+   "severity": "minor"
+  },
+  {
+   "citation": "evidence/incident-omp-models-preapply-clobber.md; evidence/incident-credential-exposure.md",
+   "class": "ticked-task-with-unreleased-gate",
+   "detail": "Tasks 5.7 (Claude-Fable literal-key exception) and related closure rows were ticked while the recorded incident required an owner credential-rotation decision that had never been obtained; the rotation gate was open at archive time.",
+   "id": "D-5",
+   "remediation": "rotation gate RELEASED 2026-08-31 by owner instruction ('no need rotate keys' \u2014 written authorization to proceed without rotation); released live verification executed and recorded in evidence/rotation-gate-release.json",
+   "severity": "major"
+  }
+ ],
+ "generated_at": "2026-08-31T06:01:38Z",
+ "integrity_statement": "The archived directory remains byte-identical; this report references it read-only. The defects are closure-record defects; the applied configurations themselves were verified live (route-contract 17/17 PASS, live sentinels, preserved defaults).",
+ "record_type": "archive-invalidity-report",
+ "schema_version": 1,
+ "subject_archive": "openspec/changes/archive/2026-08-31-reconcile-omniroute-native-dialects/ (read-only)"
+}

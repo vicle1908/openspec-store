@@ -1,0 +1,21 @@
+{
+  "value_blind": true,
+  "recorded": "2026-08-31",
+  "purpose": "Normative model-ID register superseding the archived final-evidence-manifest's SH rows. The archived change's routes require the codex model for the Responses surface; the archived manifest incorrectly cited the Claude-Fable model in SH rows.",
+  "canonical_routes": {
+    "pm_route": {
+      "model_id": "pm/Claude-Fable",
+      "protocol": "codex-messages",
+      "endpoint": "POST http://localhost:20128/v1/messages",
+      "provenance": "archived tasks.md task 1.1; archived proposal.md corrected routing contract"
+    },
+    "sh_route": {
+      "model_id": "sh/codex",
+      "protocol": "codex-responses",
+      "endpoint": "POST http://localhost:20128/v1/responses",
+      "provenance": "archived tasks.md task 1.1; archived proposal.md corrected routing contract"
+    }
+  },
+  "superseded_defects": codex,
+  "note": "The pre-apply-manifest.json occurrences of the Claude-Fable model ID in SH context (lines 445, 518, 539) are baseline inventory records of pre-existing stale registrations, not route assertions; they are not defects."
+}

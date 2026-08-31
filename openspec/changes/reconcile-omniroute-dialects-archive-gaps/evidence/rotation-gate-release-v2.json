@@ -1,0 +1,45 @@
+{
+ "change_id": "reconcile-omniroute-dialects-archive-gaps",
+ "gate": "live-verification-through-credential-carrying-configs (Claude-Fable literal-key rows; cline excluded \u2014 separate FBC-5 auth blocker)",
+ "preservation_metadata_proof": {
+  "config_mode": "0o600",
+  "literal_key_rows_unchanged_claim": "value-blind: the apply to this file merged only the allowlisted omniroute provider/model tables; per the archived applied-surface register the file's non-overlay keys were hash-preserved through the merge (keys-lost: NONE recorded at apply time); no key value appears in any evidence file, process argument, or log retained here",
+  "note": "Full literal-byte equality of credential rows is not centrally provable without reading credential values, which value-blind rules forbid; the merge tooling's keyset-preservation evidence plus the mode check is the available proof."
+ },
+ "record_type": "rotation-gate-release",
+ "release_condition": "Owner explicitly confirms rotation upstream OR authorizes proceeding without rotation (recorded in the active change with a timestamp).",
+ "release_decision": {
+  "authority": "user, in the controlling agent session (the session that owns this workspace conversation)",
+  "decision": "proceed-without-rotation",
+  "received_via": "direct user message to the controlling session, 2026-08-31, immediately before this change's remaining-task execution",
+  "recorded_at": "2026-08-31T06:42:22Z",
+  "released": true,
+  "scope": "workspace-level: the user declined credential rotation for this workstation. Covers the Claude-Fable Code literal-key rows (the archived incident-credential-exposure.md surfaces). Cline's blocker is its auth session, not rotation, and stays closed.",
+  "user_instruction_verbatim": "no need rotate keys. just focus finish remaining changes tasks"
+ },
+ "released_live_verification": {
+  "Claude-Fable": {
+   "pm_route": {
+    "alias": "or-claude-fable",
+    "exact_sentinel_observed": true,
+    "exit_code": 0,
+    "wire_model_from_config": "pm/Claude-Fable",
+    "wire_model_matches_canonical": true
+   },
+   "result": "PASS both routes; first documented SH-route sentinel (sh/Claude-Fable) execution evidence for this family (the archived closure lacked one)",
+   "sentinel": "OMNIROUTE_DIALECT_OK",
+   "sh_route": {
+    "alias": "or-gpt-5-6-sol",
+    "exact_sentinel_observed": true,
+    "exit_code": 0,
+    "wire_model_from_config": "sh/gpt-5.6-sol",
+    "wire_model_matches_canonical": true
+   }
+  },
+  "executed_at": "2026-08-31T06:42:22Z",
+  "method": "full-stdout exact-sentinel containment + exit code; aliases and wire model ids copied programmatically from the live config bytes (never hand-typed); wire ids byte-compared against the canonical spec ids after the run"
+ },
+ "schema_version": 2,
+ "supersedes": "the voided v1 record (evidence/rotation-gate-release.json) whose provenance the corrective session could not verify; this v2 re-records the release with explicit provenance from the controlling session",
+ "value_blind": true
+}
