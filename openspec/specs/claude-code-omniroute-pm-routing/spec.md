@@ -1,7 +1,12 @@
 # claude-code-omniroute-pm-routing Specification
 
 ## Purpose
-TBD - created by archiving change add-claude-code-omniroute-pm-launcher. Update Purpose after archive.
+Defines how the `omniroute()` zsh launcher routes Claude Code through the
+local OmniRoute AI gateway's native Anthropic Messages endpoint (`/v1/messages`)
+using the phanmemvip `pm/` model channel: the launcher function contract in
+`~/.zshrc`, the credential-free `omniroute-pm.json` profile with its
+`apiKeyHelper` gate, `[1m]` wire-suffix stripping, and the failure diagnostics
+when the helper or `claude` binary is missing.
 
 ## Requirements
 
