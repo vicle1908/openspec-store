@@ -1,0 +1,31 @@
+{
+ "record_type": "canonical-binding-register",
+ "value_blind": true,
+ "canonical_bindings": {
+  "sh_route": {
+   "model_id": "sh/gpt-5.6-sol",
+   "endpoint": "POST http://localhost:20128/v1/responses"
+  },
+  "pm_route": {
+   "model_id": "pm/Claude-Fable",
+   "endpoint": "POST http://localhost:20128/v1/messages"
+  }
+ },
+ "provenance": {
+  "source_file": "/Users/androidteam/Developer/openspec-store/openspec/specs/omniroute-agent-cli-routing/spec.md",
+  "source_sha256": "159ccce5437d741c0ff774b78bf051c06bba8c9ca6a190c96fe702ba1fd5e13c",
+  "extraction_regexes": [
+   "sh/g[a-z0-9.\\-]+",
+   "pm/[A-Za-z\\-]+"
+  ],
+  "method": "programmatic extraction; literals never hand-typed into this register"
+ },
+ "supersedes": [
+  {
+   "archived_citation": "archive/2026-08-31-reconcile-omniroute-dialects-archive-gaps/evidence/corrected-model-id-register.json line 13",
+   "defect": "SH route bound to sh/codex",
+   "correction": "SH route = sh/gpt-5.6-sol"
+  }
+ ],
+ "generated": "2026-08-31 (apply, task 1.2)"
+}

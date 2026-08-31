@@ -1,0 +1,46 @@
+{
+ "record_type": "quarantine-integrity",
+ "value_blind": true,
+ "quarantine_dir": "openspec/changes/archive/2026-08-31-reconcile-omniroute-dialects-archive-gaps/evidence/quarantine/ (read-only)",
+ "files": [
+  {
+   "file": "applied-surface-register.json.planted",
+   "expected_sha256": "7059794441d309edae456c8d489020415d016b23aad62d96b16fdf3a47f9895d",
+   "recomputed_sha256": "7059794441d309edae456c8d489020415d016b23aad62d96b16fdf3a47f9895d",
+   "match": true
+  },
+  {
+   "file": "archive-invalidity-report.json.planted",
+   "expected_sha256": "64bca98f525d1d803d7e454e7fa3301f462c082e1ddb333e0f2a30aaba00a24a",
+   "recomputed_sha256": "64bca98f525d1d803d7e454e7fa3301f462c082e1ddb333e0f2a30aaba00a24a",
+   "match": true
+  },
+  {
+   "file": "investigation-live-claude-id.json.planted",
+   "expected_sha256": "20484ecfe9658922cf62689283b58897b831b6426a542a4fdc94caf70f7a2f14",
+   "recomputed_sha256": "20484ecfe9658922cf62689283b58897b831b6426a542a4fdc94caf70f7a2f14",
+   "match": true
+  },
+  {
+   "file": "model-id-register.json.planted",
+   "expected_sha256": "9fe3c316c3c4a0c67261a176f8af5545c7d33c66d67e010940bd97af8867f94e",
+   "recomputed_sha256": "9fe3c316c3c4a0c67261a176f8af5545c7d33c66d67e010940bd97af8867f94e",
+   "match": true
+  },
+  {
+   "file": "rotation-gate-release-v2.json.planted",
+   "expected_sha256": "b4dc7df49abd8d33e6d6f576401848275fc3b95de024c11370fb787376fedc3d",
+   "recomputed_sha256": "b4dc7df49abd8d33e6d6f576401848275fc3b95de024c11370fb787376fedc3d",
+   "match": true
+  },
+  {
+   "file": "rotation-gate-release.json.planted",
+   "expected_sha256": "6a0faf9ce837c22e2788cab57fdbf02aeee858fab61f4b8908aa456ee09edf89",
+   "recomputed_sha256": "6a0faf9ce837c22e2788cab57fdbf02aeee858fab61f4b8908aa456ee09edf89",
+   "match": true
+  }
+ ],
+ "all_match": true,
+ "note": "The six planted fabrications remain byte-preserved under the archived change; archives otherwise untouched.",
+ "generated": "2026-08-31 (apply, task 1.3)"
+}
