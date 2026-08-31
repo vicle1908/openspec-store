@@ -1,0 +1,16 @@
+{
+ "algorithm": "ntu-keynote-package-sha256-v1 (documented in external repo docs/verification.md)",
+ "candidate": {
+  "commit": "bb7a4d58a7354f55a61cf862cebac0d6f438b626",
+  "files": 7
+ },
+ "change_id": "invalidate-ntu-keynote-closure-fabrications",
+ "conclusion": "The candidate binding in the archived intake is genuine. The invalidity is confined to the closure gates (editorial/rehearsal/tag), not the package identity.",
+ "generated_at": "2026-08-31T07:08:36Z",
+ "matches_archived_intake": true,
+ "method": "git show <commit>:<path> per file; canonical domain-separated length-prefixed SHA-256",
+ "record_type": "candidate-digest-reproduction",
+ "reproduced_digest": "3f299c8763409b4030a2f48d3c6cec1ad7b1d1b3e92b172552918d045ff7d030",
+ "schema_version": 1,
+ "value_blind": true
+}

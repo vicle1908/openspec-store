@@ -1,0 +1,23 @@
+{
+ "change_id": "invalidate-ntu-keynote-closure-fabrications",
+ "claimed_ref": "refs/tags/ntu-ai-keynote-v1.0.0",
+ "conclusion": "The archived release-decision's release_ref.status=verified for this ref is defective: the tag was never created.",
+ "existing_tags": [
+  "tag refs/tags/archive/ntu-brand-theme-candidate-4fb4c86",
+  "tag refs/tags/archive/visual-contract-review-986be2f"
+ ],
+ "generated_at": "2026-08-31T07:08:36Z",
+ "record_type": "tag-absence-proof",
+ "repository": "/Users/androidteam/Developer/ntu-keynote",
+ "schema_version": 1,
+ "value_blind": true,
+ "verification": {
+  "command": "git rev-parse refs/tags/ntu-ai-keynote-v1.0.0",
+  "exit_code": "nonzero (fatal: ambiguous argument / unknown revision)",
+  "result": "ref-does-not-exist",
+  "stdout_stderr": [
+   "fatal: ambiguous argument 'refs/tags/ntu-ai-keynote-v1.0.0': unknown revision or path not in the working tree.",
+   "Use '--' to separate paths from revisions, like this:"
+  ]
+ }
+}
