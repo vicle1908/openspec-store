@@ -1,37 +1,27 @@
-# Target-Label Reconciliation — archived closure `new_files`
+# Target-Label Reconciliation: `~/.Claude-Fable` in the archived new_files
 
-Subject archive (read-only): `openspec/changes/archive/2026-08-31-reconcile-omniroute-native-dialects/`
+## Problem
 
-## The unmapped label
+The archived `final-evidence-manifest.json` `new_files` map includes the label `~/.Claude-Fable: "0600"`. This label maps to no verified apply target in the archived change's write set (the write set is enumerated in `overlay-contract.json` with 11 entries, none of which is a file named `Claude-Fable` or at a path matching `~/.Claude-Fable`).
 
-The archived closure records referenced a `new_files` list whose rendering in transcripts and session
-displays reads `~/.Claude-Fable`/`~/.codex`-like hyphenated labels inconsistently (documented workstation
-token-corruption on hyphenated identifiers). The final committed `post-apply-manifest.json` contains
-`"new_files": []` (empty), and its `apply_log` lists 10 created/mutated rows — the earlier in-flight
-version of that manifest carried one ambiguous label.
+## Investigation
 
-## Verified created targets (baseline-absent in the frozen pre-apply manifest, present on disk, value-blind)
+The label appears to be a display-layer or transcription artifact. The display environment used during the archived session consistently obfuscated and rewrote path strings containing `.codex` and `.codex`, replacing them with `.Claude-Fable` and `.Claude-Fable` respectively. The `~/.Claude-Fable` label most likely originally referred to one of the two verified created files:
 
-| Target | Current SHA-256 (first 16) | Mode |
-|---|---|---|
-| `~/.claude/helpers/omniroute-key.sh` | 8c19caf7b87fbd67 | 0700 |
-| `~/.Claude-Fable` | 2214ed1f0cf6144a | 0600 |
-| `~/.config/goose/custom_providers/custom_omniroute_anthropic.json` | d7e731e5e9952d39 | 0600 |
+1. `~/.codex` (codex CLI omniroute profile, created, mode 0600, sha `2214ed1f...`)
+2. `~/.config/goose/custom_providers/custom_omniroute_anthropic.json` (goose omniroute codex provider, created, mode 0600, sha `d7e731e5...`)
 
-(The `~/.claude/helpers/omniroute-key.sh` creation belongs to the separately archived
-`add-claude-code-omniroute-pm-launcher` change surface, present in the frozen manifest as
-baseline-absent and now on disk; listed for completeness of the reconciliation.)
+However, we do NOT guess the referent. The label is marked as requiring owner reconciliation.
 
-## Reconciliation result
+## Verified created files (from the applied-surface register)
 
-- The archived `new_files` label resolves to the two verified created routing targets in THIS family:
-  the Codex selectable profile and the goose PM provider file.
-- The committed archive record's empty `new_files: []` is incomplete rather than wrong: it fails to
-  enumerate the verified creations. Recorded here as defect **D-4** in
-  `evidence/archive-invalidity-report.md`.
-- No unmapped label remains after this reconciliation.
+| File | Mode | SHA-256 (prefix) |
+| --- | --- | --- |
+| `~/.codex` | 0600 | `2214ed1f` |
+| `~/.config/goose/custom_providers/custom_omniroute_anthropic.json` | 0600 | `d7e731e5` |
 
-## Method
+Both files exist on disk and are recorded in `evidence/applied-surface-register.json`.
 
-Value-blind: per-file sha256 + mode only, read from disk; frozen-manifest baseline comparison done
-read-only. No credential values appear.
+## Disposition
+
+The `~/.Claude-Fable` label is an unmapped entry. It requires the owner (the session that produced the archived manifest) to reconcile. No path is invented here.

@@ -16,6 +16,12 @@
       "provenance": "archived tasks.md task 1.1; archived proposal.md corrected routing contract"
     }
   },
-  "superseded_defects": codex,
+  "superseded_defects": [
+    {"archived_file": "evidence/final-evidence-manifest.json", "line": 12, "defect": "canonical_sh cites the wrong model ID"},
+    {"archived_file": "evidence/final-evidence-manifest.json", "line": 28, "defect": "goose SH row cites the wrong model ID"},
+    {"archived_file": "evidence/final-evidence-manifest.json", "line": 31, "defect": "omp SH row cites the wrong model ID"},
+    {"archived_file": "evidence/final-evidence-manifest.json", "line": 33, "defect": "opencode SH row cites the wrong model ID"},
+    {"archived_file": "evidence/final-evidence-manifest.json", "line": 35, "defect": "pi SH row cites the wrong model ID"}
+  ],
   "note": "The pre-apply-manifest.json occurrences of the Claude-Fable model ID in SH context (lines 445, 518, 539) are baseline inventory records of pre-existing stale registrations, not route assertions; they are not defects."
 }

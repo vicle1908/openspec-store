@@ -26,7 +26,7 @@
     "wire_model_from_config": "pm/Claude-Fable",
     "wire_model_matches_canonical": true
    },
-   "result": "PASS both routes; first documented SH-route sentinel (sh/Claude-Fable) execution evidence for this family (the archived closure lacked one)",
+   "result": "PASS both routes; first documented SH-route sentinel (sh/gpt-5.6-sol) execution evidence for this family (the archived closure lacked one)",
    "sentinel": "OMNIROUTE_DIALECT_OK",
    "sh_route": {
     "alias": "or-gpt-5-6-sol",
