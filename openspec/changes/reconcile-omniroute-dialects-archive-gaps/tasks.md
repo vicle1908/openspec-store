@@ -16,6 +16,6 @@
 
 ## 3. Closure
 
-- [ ] 3.1 Re-run `openspec validate reconcile-omniroute-dialects-archive-gaps --strict --store openspec-store` after the final evidence update; record the exact passing result. Verify: validator reports the change valid with zero issues.
+- [x] 3.1 Re-run `openspec validate reconcile-omniroute-dialects-archive-gaps --strict --store openspec-store` after the final evidence update; record the exact passing result. Verify: validator reports the change valid with zero issues.
 - [ ] 3.2 Commit only this change directory with pathspec-limited staging (`git add -- openspec/changes/reconcile-omniroute-dialects-archive-gaps`), no backup files, no push. Verify: `git diff --cached --name-only` lists only paths under this change dir.
 - [ ] 3.3 Archive this change only when tasks 2.1–2.3 are resolved or explicitly re-classified by the user as permanent documented blockers with sign-off; otherwise leave it active with the blockers visible. Verify: archive decision cites the state of every reopened gate.
