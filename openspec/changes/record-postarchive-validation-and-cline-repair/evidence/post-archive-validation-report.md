@@ -46,3 +46,13 @@ Scope: archived changes `2026-08-31-reconcile-omniroute-dialects-archive-gaps`,
 
 No archived byte was modified. The single live mutation (cline providers.json restoration) is recorded
 above with its backup hash. All comparisons were programmatic to defeat hyphenated-token display corruption.
+
+
+## 7. Residual sweep item (documented, no action)
+
+`openspec validate --all --strict` (1.11.0) reports one remaining failure:
+`change/invalidate-ntu-keynote-closure-fabrications` — the ARCHIVED copy of that change. The identical
+delta validates cleanly as an active change (verified with a disposable copy, since removed); the
+archived main spec `ntu-keynote-release-integrity` is valid and synced. This is an openspec 1.11.0
+archived-change validation quirk, not a content defect. Archived bytes are left untouched per the
+immutability rule; the item is recorded here as a known tooling exception.
