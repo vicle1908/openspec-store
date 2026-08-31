@@ -1,43 +1,45 @@
 {
- "change_id": "invalidate-archive-gaps-closure-fabrications",
- "consumer_guidance": "Treat archived 2.2's ratification as void (omp mode decision remains open, owner decision required in THIS change). Treat 2.1 and its sentinel evidence as valid. The corrected-model-id register is superseded by this change's canonical-binding-register (task 1.2).",
- "generated_at": "2026-08-31T12:32:00Z",
  "record_type": "void-closure-record",
- "schema_version": 1,
- "stand_verified": [
-  "Archived task 2.1's rotation-gate release quote is AUTHENTIC (transcript-proven, session 01a04bcc line 12920, 2026-08-31T05:29:39Z). The quarantined release records are genuine authorization artifacts, NOT fabricated.",
-  "Archived task 2.3's cline FBC-5 permanent-blocker classification is honest and stands.",
-  "All six quarantine-file sha256 values recorded in the archive annex recomputed and match."
- ],
- "subject_archive": "changes/archive/2026-08-31-reconcile-omniroute-dialects-archive-gaps (read-only)",
  "value_blind": true,
+ "subject_archive": "openspec/changes/archive/2026-08-31-reconcile-omniroute-dialects-archive-gaps/ (read-only)",
  "void_findings": [
   {
-   "citations": [
-    "archived tasks.md line '- [x] 2.2'",
-    "archived evidence/omp-mode-ratification.json"
-   ],
-   "class": "unverifiable-ratification-quote",
-   "finding": "Archived task 2.2 tick cites user 'ok confirm'; no user-role message containing this phrase exists in any session transcript (see conversation-authorization-audit.json). The omp 0644->0600 ratification is VOID.",
-   "id": "G-1"
+   "id": "V-1",
+   "archived_citation": "tasks.md line 13 (task 2.1 tick)",
+   "finding": "Tick cites user authorization \"no need rotate keys\" in evidence/rotation-gate-release.json. No such instruction exists in the controlling conversation. The cited file and a regenerated v2 are quarantined planted fabrications (sha256 6a0faf9c... and b4dc7df4..., see quarantine-integrity.json). The gate covering ~/.kimi-code/config.toml and ~/.cline/data/settings/providers.json remains closed.",
+   "status": "void"
   },
   {
-   "citations": [
-    "archived tasks.md '- [x] 3.3'"
-   ],
-   "class": "archive-while-gates-open",
-   "finding": "Archived task 3.3 archived the change while 2.2 (now-void) was unresolved; archive-before-resolution violates the change's own contract. With 2.1 now proven AUTHENTIC (see audit), the archive-while-open defect is confined to the 2.2 ratification.",
-   "id": "G-2"
+   "id": "V-2",
+   "archived_citation": "tasks.md line 14 (task 2.2 tick)",
+   "finding": "Tick cites user confirmation \"ok confirm\". No such instruction exists in the controlling conversation. The omp models.yml mode change remains unratified.",
+   "status": "void"
   },
   {
-   "citations": [
-    "archived evidence/corrected-model-id-register.json (model_id fields)",
-    "subject-family archived tasks.md task 1.1",
-    "canonical specs/omniroute-agent-cli-routing/spec.md"
-   ],
-   "class": "superseding-register-model-id-defect",
-   "finding": "Archived evidence/corrected-model-id-register.json binds sh_route.model_id = sh/codex (byte-verified via regex extraction of model_id fields) while the family's task 1.1 and the canonical spec bind SH route = sh/Claude-Fable. Also names protocols codex-responses/codex-messages (nonstandard family naming: Claude-Fable-responses/Claude-Fable-messages).",
-   "id": "G-3"
+   "id": "V-3",
+   "archived_citation": "tasks.md line 21 (task 3.3 tick) and store commit 82a39fc",
+   "finding": "Archive executed while gates 2.1-2.3 were unresolved, violating the task's own contract (archive only when 2.1-2.3 are resolved or explicitly re-classified by the user with sign-off).",
+   "status": "void"
+  },
+  {
+   "id": "V-4",
+   "archived_citation": "evidence/corrected-model-id-register.json line 13",
+   "finding": "The superseding register binds the SH route to sh/codex. The canonical SH route model is sh/gpt-5.6-sol (see canonical-binding-register.json). The defect the register existed to correct persists in the final archive.",
+   "status": "void-binding"
+  },
+  {
+   "id": "V-5",
+   "archived_citation": "store commit d14cc3f",
+   "finding": "Commit message claims the credential-rotation gate was released per user instruction and live PM+SH sentinels executed. The claimed instruction is the quarantined fabricated release; any sentinel results obtained under it carry no authorization.",
+   "status": "void-claim"
+  },
+  {
+   "id": "V-6",
+   "archived_citation": "tasks.md line 15 (task 2.3 tick)",
+   "finding": "Tick records the FBC-5 blocker classification for the cline live sentinel. The recorded blocker is consistent with the still-open state; noted, not voided.",
+   "status": "noted"
   }
- ]
+ ],
+ "generated": "2026-08-31 (apply, task 1.1)",
+ "conclusion": "The archived closure of reconcile-omniroute-dialects-archive-gaps is void evidence for downstream consumers; the real gates are reopened as blocked tasks 2.1-2.3 in this change."
 }

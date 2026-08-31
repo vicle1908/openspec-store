@@ -1,29 +1,31 @@
 {
- "canonical_routes": {
-  "pm_route": {
-   "endpoint": "POST http://localhost:20128/v1/messages",
-   "model_id": "pm/Claude-Fable",
-   "protocol": "Claude-Fable-messages"
-  },
+ "record_type": "canonical-binding-register",
+ "value_blind": true,
+ "canonical_bindings": {
   "sh_route": {
-   "endpoint": "POST http://localhost:20128/v1/responses",
    "model_id": "sh/gpt-5.6-sol",
-   "protocol": "Claude-Fable-responses"
+   "endpoint": "POST http://localhost:20128/v1/responses"
+  },
+  "pm_route": {
+   "model_id": "pm/Claude-Fable",
+   "endpoint": "POST http://localhost:20128/v1/messages"
   }
  },
- "change_id": "invalidate-archive-gaps-closure-fabrications",
- "extraction": {
-  "method": "programmatic; Claude-Fable for SH route; first pm match for PM route",
-  "regex": "(?:sh|pm)/[A-Za-z0-9._-]+"
+ "provenance": {
+  "source_file": "/Users/androidteam/Developer/openspec-store/openspec/specs/omniroute-agent-cli-routing/spec.md",
+  "source_sha256": "159ccce5437d741c0ff774b78bf051c06bba8c9ca6a190c96fe702ba1fd5e13c",
+  "extraction_regexes": [
+   "sh/g[a-z0-9.\\-]+",
+   "pm/[A-Za-z\\-]+"
+  ],
+  "method": "programmatic extraction; literals never hand-typed into this register"
  },
- "generated_at": "2026-08-31T12:32:00Z",
- "in_script_verification": "string equality asserted in generator; values written are the extracted literals",
- "record_type": "canonical-binding-register",
- "schema_version": 1,
- "source": {
-  "path": "openspec/specs/omniroute-agent-cli-routing/spec.md",
-  "sha256": "159ccce5437d741c0ff774b78bf051c06bba8c9ca6a190c96fe702ba1fd5e13c"
- },
- "supersedes": "archived evidence/corrected-model-id-register.json (sh_route.model_id defect, byte-verified)",
- "value_blind": true
+ "supersedes": [
+  {
+   "archived_citation": "archive/2026-08-31-reconcile-omniroute-dialects-archive-gaps/evidence/corrected-model-id-register.json line 13",
+   "defect": "SH route bound to sh/codex",
+   "correction": "SH route = sh/gpt-5.6-sol"
+  }
+ ],
+ "generated": "2026-08-31 (apply, task 1.2)"
 }
