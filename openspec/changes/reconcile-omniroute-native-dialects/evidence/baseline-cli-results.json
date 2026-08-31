@@ -1,0 +1,30 @@
+{
+  "phase": "baseline",
+  "value_blind": true,
+  "selected": 1,
+  "required": 1,
+  "passed": true,
+  "results": [
+    {
+      "id": "prime-agent.baseline.sh.responses",
+      "route": "sh/gpt-5.6-sol",
+      "phase": "baseline",
+      "classification": "baseline-control",
+      "fallback": false,
+      "native_failure_class": null,
+      "fallback_for": null,
+      "endpoint_path": "/v1/responses",
+      "returncode": 0,
+      "timeout": false,
+      "duration_seconds": 43.477,
+      "stdout_bytes": 16,
+      "stderr_bytes": 0,
+      "stdout_sha256_16": "bebdf9801a729b84",
+      "stderr_sha256_16": "e3b0c44298fc1c14",
+      "sentinel": true,
+      "sentinel_substring": true,
+      "error_text": false,
+      "diagnostic_class": "other_output"
+    }
+  ]
+}

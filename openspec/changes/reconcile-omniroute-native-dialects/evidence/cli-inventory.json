@@ -1,0 +1,42 @@
+{
+  "captured": "2026-08-29",
+  "identity_refresh": {
+    "date": "2026-08-30",
+    "reason": "Installed-binary upgrades and zsh -lc PATH resolution changed four canonical paths after the 2026-08-29 capture. Canonicals now follow the same resolution semantics as inventory-check.py (zsh -lc 'command -v' + realpath).",
+    "codex": "cask 0.150.1 -> 0.151.0; the retained profile-mechanism probe originally tested the npm-global 0.149.0 binary and was repeated against the checker-resolved 0.151.0 binary (version-sensitive mechanism).",
+    "pi": "Cellar path 0.84.3 -> 0.84.4 (version field was already 0.84.4).",
+    "omp": "Cellar 18.0.10 -> 18.0.11.",
+    "cursor-agent": "canonical moved from the ~/.local/share 2026.07.09 installation to the zsh -lc resolved cask 2026.08.25; classification remains unchanged (no OmniRoute apply for this CLI).",
+    "probe_drift_decision": "omp and pi version drift is recorded here without a pre-apply probe repeat: their dispositions concern dialect endpoints, not binary-version-sensitive mechanisms, and the live post-apply route gates (tasks.md section 5) run against the current binaries. Only the codex profile-mechanism probe is repeated pre-apply because profile layering semantics are version-sensitive."
+  },
+  "value_blind": true,
+  "products": [
+    {"id": "claude-code", "command": "claude", "canonical": "/Users/androidteam/.local/share/claude/versions/2.1.251", "version": "2.1.251", "classification": "candidate", "config": ["~/.claude/settings.json", "~/.claude/profiles", "~/.claude/helpers", "~/.zshrc"]},
+    {"id": "codex", "command": "codex", "canonical": "/opt/homebrew/Caskroom/codex/0.151.0/bin/codex", "version": "0.151.0", "classification": "candidate", "config": ["~/.codex/config.toml"]},
+    {"id": "grok", "command": "grok", "canonical": "/Users/androidteam/.grok/downloads/grok-1.0.5-macos-aarch64", "version": "1.0.5", "classification": "candidate", "config": ["~/.grok/config.toml"]},
+    {"id": "goose", "command": "goose", "canonical": "/opt/homebrew/bin/goose", "version": "1.45.0", "classification": "candidate", "config": ["~/.config/goose/config.yaml", "~/.config/goose/custom_providers"]},
+    {"id": "kimi-code", "command": "kimi", "canonical": "/opt/homebrew/bin/kimi", "version": "0.39.0", "classification": "candidate", "config": ["~/.kimi-code/config.toml"]},
+    {"id": "kilo", "command": "kilo", "canonical": "/Users/androidteam/.npm-global/lib/node_modules/@kilocode/cli/bin/kilo", "version": "7.4.23", "classification": "candidate", "config": ["~/.config/kilo/kilo.jsonc"]},
+    {"id": "opencode", "command": "opencode", "canonical": "/opt/homebrew/Cellar/opencode/1.18.25/bin/opencode", "version": "1.18.25", "classification": "candidate", "config": ["~/.config/opencode/opencode.json"]},
+    {"id": "pi", "command": "pi", "canonical": "/opt/homebrew/Cellar/pi-coding-agent/0.84.4/bin/pi", "version": "0.84.4", "classification": "candidate", "config": ["~/.pi/agent/models.json"]},
+    {"id": "prime-agent", "command": "prime-agent", "canonical": "/opt/homebrew/lib/node_modules/prime-agent/dist/bundle/cli.js", "version": "0.8.1-beta.564.1.d60fab8", "classification": "candidate", "config": ["~/.prime/agent/models.json"]},
+    {"id": "droid", "command": "droid", "canonical": "/opt/homebrew/Caskroom/droid/0.202.0/droid", "version": "0.202.0", "classification": "candidate", "config": ["~/.factory/settings.json"]},
+    {"id": "omp", "command": "omp", "canonical": "/opt/homebrew/Cellar/omp/18.0.11/bin/omp", "version": "18.0.11", "classification": "candidate", "config": ["~/.omp/agent/models.yml", "~/.omp/agent/config.yml"]},
+    {"id": "cline", "command": "cline", "canonical": "/opt/homebrew/Cellar/nvm/0.40.7/versions/node/v22.23.2/lib/node_modules/cline/bin/cline", "version": "installed", "classification": "candidate", "config": ["~/.cline/data/settings/providers.json"]},
+    {"id": "copilot", "command": "copilot", "canonical": "/opt/homebrew/Caskroom/copilot-cli/1.0.40/copilot", "version": "1.0.40", "classification": "candidate", "config": ["COPILOT_PROVIDER_* environment"]},
+    {"id": "cursor-agent", "command": "cursor-agent", "canonical": "/opt/homebrew/Caskroom/cursor-cli/2026.08.25-3e8eec8/dist-package/cursor-agent", "version": "2026.08.25", "classification": "unchanged", "config": ["~/.cursor/cli-config.json"]},
+    {"id": "auggie", "command": "auggie", "canonical": "/Users/androidteam/.npm-global/lib/node_modules/@augmentcode/auggie/augment.mjs", "version": "installed", "classification": "unchanged", "config": ["~/.augment/.auggie.json", "~/.augment/session.json"]},
+    {"id": "qoder", "command": "qoder", "canonical": "/Users/androidteam/.qoder/entry/qoder", "version": "installed", "classification": "unchanged", "config": ["~/.qoder/settings.json"]},
+    {"id": "agy", "command": "agy", "canonical": "/opt/homebrew/bin/agy", "version": "1.1.22", "classification": "unchanged", "config": ["~/.gemini/antigravity-cli", "~/.gemini/antigravity"]}
+  ],
+  "aliases": {
+    "grok": ["/Users/androidteam/.local/bin/grok", "/Users/androidteam/.grok/bin/grok", "/Users/androidteam/.local/bin/grok"],
+    "claude": ["/Users/androidteam/.local/bin/claude"],
+    "pi": ["/opt/homebrew/bin/pi"]
+  },
+  "alternate_installations": {
+    "codex": ["/Users/androidteam/.npm-global/bin/codex", "/opt/homebrew/opt/nvm/versions/node/v22.23.2/bin/codex"],
+    "opencode": ["/Users/androidteam/.npm-global/bin/opencode"],
+    "cursor-agent": ["/Users/androidteam/.local/share/cursor-agent/versions/2026.07.09-a3815c0/cursor-agent", "/Users/androidteam/.local/bin/cursor-agent"]
+  }
+}

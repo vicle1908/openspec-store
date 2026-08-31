@@ -1,0 +1,24 @@
+[model_providers.omniroute-anthropic]
+base_url = "http://localhost:20128/v1"
+env_key = "OMNIROUTE_API_KEY"
+api_backend = "messages"
+context_window = 200000
+
+[model_providers.omniroute-chat]
+base_url = "http://localhost:20128"
+env_key = "OMNIROUTE_API_KEY"
+api_backend = "chat_completions"
+context_window = 1050000
+
+[model.omniroute-sol]
+model = "sh/gpt-5.6-sol"
+name = "sh/gpt-5.6-sol (OmniRoute Chat fallback)"
+model_provider = "omniroute-chat"
+context_window = 1050000
+
+[model.omniroute-claude-fable]
+model = "pm/Claude-Fable"
+name = "pm/Claude-Fable (OmniRoute Messages)"
+model_provider = "omniroute-anthropic"
+context_window = 200000
+

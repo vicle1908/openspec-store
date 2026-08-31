@@ -1,0 +1,201 @@
+{
+ "version": 2,
+ "description": "Candidate templates are overlays or selectable profiles. Missing fields inherit the frozen baseline; protected fields are never deleted or replaced. Claude Code is satisfied by the archived change 2026-08-30-add-claude-code-omniroute-pm-launcher (applied live) and has no entries here. Failed-native provider registrations (FBC classes) are not applied; only proven routes are registered.",
+ "entries": [
+  {
+   "template": "candidate-templates/.codex/omniroute.config.toml",
+   "target": "~/.codex/omniroute.config.toml",
+   "format": "toml-profile",
+   "operation": "create-or-replace-named-profile",
+   "merge_key": "profile:omniroute",
+   "protected_baseline_paths": [
+    "~/.codex/config.toml:model",
+    "~/.codex/config.toml:model_provider",
+    "~/.codex/config.toml:model_providers"
+   ],
+   "allowed_top_level_keys": [
+    "model",
+    "model_provider",
+    "model_reasoning_effort",
+    "model_reasoning_summary",
+    "model_providers"
+   ]
+  },
+  {
+   "template": "candidate-templates/.grok/config.toml",
+   "target": "~/.grok/config.toml",
+   "format": "toml-overlay",
+   "operation": "merge-provider-and-model-entries",
+   "merge_key": "model_providers.omniroute-anthropic,model_providers.omniroute-chat,model.omniroute-sol,model.omniroute-claude-fable",
+   "forbidden_top_level_keys": [
+    "models.default"
+   ],
+   "protected_baseline_paths": [
+    "models.default",
+    "models.session_summary",
+    "models.web_search"
+   ],
+   "allowed_top_level_keys": [
+    "model_providers",
+    "model"
+   ]
+  },
+  {
+   "template": "candidate-templates/.kimi-code/config.toml",
+   "target": "~/.kimi-code/config.toml",
+   "format": "toml-overlay",
+   "operation": "merge-provider-and-model-entries",
+   "merge_key": "providers.omniroute-anthropic,providers.omniroute-chat,models.or-claude-fable,models.or-gpt-5-6-sol",
+   "forbidden_top_level_keys": [
+    "default_model"
+   ],
+   "protected_baseline_paths": [
+    "default_model",
+    "default_permission_mode"
+   ],
+   "allowed_top_level_keys": [
+    "providers",
+    "models"
+   ]
+  },
+  {
+   "template": "candidate-templates/.config/kilo/kilo.jsonc",
+   "target": "~/.config/kilo/kilo.jsonc",
+   "format": "json-overlay",
+   "operation": "merge-provider-entries",
+   "merge_key": "provider.omniroute-responses,provider.omniroute-anthropic",
+   "forbidden_top_level_keys": [
+    "model",
+    "permission",
+    "agent"
+   ],
+   "protected_baseline_paths": [
+    "model",
+    "small_model",
+    "provider",
+    "permission",
+    "agent"
+   ],
+   "allowed_top_level_keys": [
+    "$schema",
+    "provider"
+   ]
+  },
+  {
+   "template": "candidate-templates/.config/opencode/opencode.json",
+   "target": "~/.config/opencode/opencode.json",
+   "format": "json-overlay",
+   "operation": "merge-provider-entries",
+   "merge_key": "provider.omniroute-responses,provider.omniroute-anthropic",
+   "forbidden_top_level_keys": [
+    "model",
+    "small_model",
+    "agent"
+   ],
+   "protected_baseline_paths": [
+    "model",
+    "small_model",
+    "provider",
+    "agent"
+   ],
+   "allowed_top_level_keys": [
+    "$schema",
+    "provider"
+   ]
+  },
+  {
+   "template": "candidate-templates/.pi/agent/models.json",
+   "target": "~/.pi/agent/models.json",
+   "format": "json-overlay",
+   "operation": "merge-provider-entries",
+   "merge_key": "providers.omniroute-anthropic,providers.omniroute-responses",
+   "protected_baseline_paths": [
+    "providers.*"
+   ],
+   "allowed_top_level_keys": [
+    "providers"
+   ],
+   "merge_depth": "per-provider-object: new keys only; existing providers.* untouched (no replace of live providers.omniroute; live models + compat preserved)"
+  },
+  {
+   "template": "candidate-templates/.prime/agent/models.json",
+   "target": "~/.prime/agent/models.json",
+   "format": "json-overlay",
+   "operation": "merge-provider-entries",
+   "merge_key": "providers.omniroute-responses,providers.omniroute-anthropic",
+   "protected_baseline_paths": [
+    "providers.*"
+   ],
+   "allowed_top_level_keys": [
+    "providers"
+   ]
+  },
+  {
+   "template": "candidate-templates/.factory/settings.json",
+   "target": "~/.factory/settings.json",
+   "product": "droid",
+   "allowed_provider_id_removals": [
+    "openai:custom:OmniRoute-Claude-Fable",
+    "openai:sh/Claude-Fable"
+   ],
+   "format": "json-overlay",
+   "operation": "upsert-custom-models-by-id",
+   "merge_key": "customModels[].id",
+   "forbidden_top_level_keys": [
+    "sessionDefaultSettings"
+   ],
+   "protected_baseline_paths": [
+    "sessionDefaultSettings",
+    "trustedFolders",
+    "enabledPlugins"
+   ],
+   "allowed_top_level_keys": [
+    "customModels"
+   ],
+   "merge_depth": "upsert-custom-models-by-id = whole-object replace of the matching customModels[] entry; unspecified sibling fields (e.g. live index:5) are dropped by design; entry order/other array elements preserved"
+  },
+  {
+   "template": "candidate-templates/.omp/agent/models.yml",
+   "target": "~/.omp/agent/models.yml",
+   "format": "yaml-overlay",
+   "operation": "merge-provider-entries",
+   "merge_key": "providers.omniroute-anthropic,providers.omniroute-chat",
+   "protected_baseline_paths": [
+    "~/.omp/agent/config.yml:modelRoles",
+    "~/.omp/agent/config.yml:retry.fallbackChains",
+    "~/.omp/agent/config.yml:defaultThinkingLevel"
+   ],
+   "allowed_top_level_keys": [
+    "providers"
+   ]
+  },
+  {
+   "template": "candidate-templates/.config/goose/custom_providers/custom_omniroute_anthropic.json",
+   "target": "~/.config/goose/custom_providers/custom_omniroute_anthropic.json",
+   "format": "json-new-provider",
+   "operation": "add-provider-file",
+   "merge_key": "name",
+   "protected_baseline_paths": [
+    "~/.config/goose/custom_providers/custom_omniroute.json",
+    "~/.config/goose/custom_providers/custom_omniroute_sh.json"
+   ]
+  },
+  {
+   "template": "candidate-templates/cline/data/settings/providers.json",
+   "target": "~/.cline/data/settings/providers.json",
+   "format": "json-overlay",
+   "operation": "merge-provider-entries",
+   "merge_key": "providers.openai-omniroute-chat",
+   "forbidden_top_level_keys": [
+    "lastUsedProvider"
+   ],
+   "protected_baseline_paths": [
+    "lastUsedProvider",
+    "providers.*"
+   ],
+   "allowed_top_level_keys": [
+    "providers"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,51 @@
+{
+  "providers": {
+    "omniroute-anthropic": {
+      "baseUrl": "http://localhost:20128",
+      "api": "anthropic-messages",
+      "apiKey": "$OMNIROUTE_API_KEY",
+      "models": [
+        {
+          "id": "pm/Claude-Fable",
+          "name": "pm/Claude-Fable",
+          "reasoning": true,
+          "input": [
+            "text",
+            "image"
+          ],
+          "contextWindow": 200000,
+          "maxTokens": 32000,
+          "compat": {
+            "forceAdaptiveThinking": false
+          }
+        }
+      ]
+    },
+    "omniroute-responses": {
+      "baseUrl": "http://localhost:20128/v1",
+      "api": "openai-responses",
+      "apiKey": "$OMNIROUTE_API_KEY",
+      "models": [
+        {
+          "id": "sh/gpt-5.6-sol",
+          "name": "sh/gpt-5.6-sol",
+          "reasoning": true,
+          "input": [
+            "text",
+            "image"
+          ],
+          "contextWindow": 1050000,
+          "maxTokens": 128000,
+          "thinkingLevelMap": {
+            "off": "none",
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
+            "xhigh": "xhigh",
+            "max": null
+          }
+        }
+      ]
+    }
+  }
+}

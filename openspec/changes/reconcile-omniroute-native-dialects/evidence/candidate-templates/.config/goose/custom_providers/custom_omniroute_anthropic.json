@@ -1,0 +1,22 @@
+{
+  "name": "custom_omniroute_anthropic",
+  "engine": "anthropic",
+  "display_name": "OmniRoute",
+  "description": "isolated OmniRoute candidate",
+  "api_key_env": "OMNIROUTE_API_KEY",
+  "headers": null,
+  "timeout_seconds": 180,
+  "supports_streaming": true,
+  "requires_auth": true,
+  "catalog_provider_id": null,
+  "env_vars": null,
+  "dynamic_models": null,
+  "skip_canonical_filtering": true,
+  "model_doc_link": null,
+  "setup_steps": [],
+  "fast_model": null,
+  "base_url": "http://localhost:20128",
+  "models": [{"name":"pm/Claude-Fable","context_limit":200000}],
+  "base_path": null,
+  "preserves_thinking": true
+}

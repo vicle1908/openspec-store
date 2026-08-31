@@ -1,0 +1,24 @@
+{
+  "customModels": [
+    {
+      "model": "pm/Claude-Fable",
+      "id": "custom:OmniRoute-Claude-Fable",
+      "displayName": "pm/Claude-Fable (OmniRoute Messages)",
+      "baseUrl": "http://localhost:20128",
+      "apiKey": "${OMNIROUTE_API_KEY}",
+      "provider": "anthropic",
+      "maxOutputTokens": 32000,
+      "noImageSupport": false
+    },
+    {
+      "model": "sh/gpt-5.6-sol",
+      "id": "custom:OmniRoute-gpt-5-6-sol",
+      "displayName": "sh/gpt-5.6-sol (OmniRoute Responses)",
+      "baseUrl": "http://localhost:20128/v1",
+      "apiKey": "${OMNIROUTE_API_KEY}",
+      "provider": "openai",
+      "maxOutputTokens": 128000,
+      "noImageSupport": false
+    }
+  ]
+}

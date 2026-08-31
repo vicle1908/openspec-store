@@ -1,0 +1,13 @@
+# Selectable Codex OmniRoute Responses profile.
+# Apply by writing this as $CODEX_HOME/omniroute.config.toml while leaving
+# the existing config.toml defaults and provider inventory unchanged.
+model = "sh/gpt-5.6-sol"
+model_provider = "omniroute"
+model_reasoning_effort = "high"
+model_reasoning_summary = "detailed"
+
+[model_providers.omniroute]
+name = "OmniRoute"
+base_url = "http://localhost:20128/v1"
+wire_api = "responses"
+env_key = "OMNIROUTE_API_KEY"

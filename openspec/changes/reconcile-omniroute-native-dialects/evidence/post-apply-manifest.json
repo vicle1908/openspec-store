@@ -1,0 +1,122 @@
+{
+ "applied_at": "2026-08-31T11:09:42",
+ "applied_by": "session 01a04bcc (apply owner)",
+ "apply_log": [
+  {
+   "backup": {
+    "backup": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/2214ed1f0cf6144a-omniroute.config.toml",
+    "bytes": 456,
+    "sha256": "2214ed1f0cf6144a14d4f31ea88eaa96d00a2ec0efdc016141eb2eda1b1bf6a2"
+   },
+   "created": false,
+   "operation": "create-or-replace-named-profile",
+   "result": "applied",
+   "target": "/Users/androidteam/.codex/omniroute.config.toml"
+  },
+  {
+   "backup": {
+    "backup": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/b25188192abda670-config.toml",
+    "bytes": 8635,
+    "sha256": "b25188192abda670db69153e26c682dcfcfc2ef0fd8ae9d71dad55af4240f5c6"
+   },
+   "operation": "merge-provider-and-model-entries",
+   "result": "applied",
+   "target": "/Users/androidteam/.kimi-code/config.toml"
+  },
+  {
+   "backup": {
+    "backup": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/26d66d25f59d4b8b-kilo.jsonc",
+    "bytes": 2873,
+    "sha256": "26d66d25f59d4b8be1fe056b2b3da7f0fdbe8f6f675572b5ca910ae58a46c398"
+   },
+   "operation": "merge-provider-entries",
+   "result": "applied",
+   "target": "~/.config/kilo/kilo.jsonc"
+  },
+  {
+   "backup": {
+    "backup": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/cee65a3e5b3896f5-opencode.json",
+    "bytes": 6854,
+    "sha256": "cee65a3e5b3896f539f47e44c199d0f19cbcda6c032427dba6705906bb718a6b"
+   },
+   "operation": "merge-provider-entries",
+   "result": "applied",
+   "target": "~/.config/opencode/opencode.json"
+  },
+  {
+   "backup": {
+    "backup": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/19df346e1d99f790-models.json",
+    "bytes": 7315,
+    "sha256": "19df346e1d99f790587f43de3b87beb62a3b0ccf3eebd97cdeb2dc42b9516c77"
+   },
+   "operation": "merge-provider-entries",
+   "result": "applied",
+   "target": "~/.pi/agent/models.json"
+  },
+  {
+   "backup": {
+    "backup": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/1824c8b88ce381d7-models.json",
+    "bytes": 2097,
+    "sha256": "1824c8b88ce381d773178375376c014bad114c9dfaf27a9682578952cfef5038"
+   },
+   "operation": "merge-provider-entries",
+   "result": "applied",
+   "target": "~/.prime/agent/models.json"
+  },
+  {
+   "backup": {
+    "backup": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/ff62d85736c86c87-models.yml",
+    "bytes": 3507,
+    "sha256": "ff62d85736c86c876f63dc5ae2360af553a53eb59abda3111a75a2f4de2fa016"
+   },
+   "operation": "merge-provider-entries",
+   "result": "applied",
+   "target": "~/.omp/agent/models.yml"
+  },
+  {
+   "backup": {
+    "backup": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/b457d792553e7946-providers.json",
+    "bytes": 619,
+    "sha256": "b457d792553e7946033916e3a197d21f45bcc7bc1a1bc9d1c5e1f96df3c0949d"
+   },
+   "operation": "merge-provider-entries",
+   "result": "applied",
+   "target": "/Users/androidteam/.cline/data/settings/providers.json"
+  },
+  {
+   "backup": {
+    "backup": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/3ad11cb354d7211c-settings.json",
+    "bytes": 6804,
+    "sha256": "3ad11cb354d7211c89d225f7d1f09fac7055d26ba02d6e58b4967c0548b57f61"
+   },
+   "operation": "upsert-custom-models-by-id",
+   "result": "applied",
+   "target": "/Users/androidteam/.factory/settings.json"
+  },
+  {
+   "backup": {
+    "backup": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/d7e731e5e9952d39-custom_omniroute_anthropic.json",
+    "bytes": 624,
+    "sha256": "d7e731e5e9952d3927693f8cf0fb5e7df2d44f55d09e008a95e03d5676c71083"
+   },
+   "created": false,
+   "operation": "add-provider-file",
+   "result": "applied",
+   "target": "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json"
+  }
+ ],
+ "backup_root": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects",
+ "mutated_files": [
+  "/Users/androidteam/.codex/omniroute.config.toml",
+  "/Users/androidteam/.kimi-code/config.toml",
+  "~/.config/kilo/kilo.jsonc",
+  "~/.config/opencode/opencode.json",
+  "~/.pi/agent/models.json",
+  "~/.prime/agent/models.json",
+  "~/.omp/agent/models.yml",
+  "/Users/androidteam/.cline/data/settings/providers.json",
+  "/Users/androidteam/.factory/settings.json",
+  "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json"
+ ],
+ "new_files": []
+}

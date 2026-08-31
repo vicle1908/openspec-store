@@ -1,0 +1,52 @@
+{
+ "backups": {
+  "dir_mode": "0700",
+  "file_mode": "0600",
+  "per_file": "see post-apply-manifest.json apply_log",
+  "root": "~/.hermes/backups/reconcile-omniroute-native-dialects"
+ },
+ "change": "reconcile-omniroute-native-dialects",
+ "defaults_preserved": "all frozen defaults verified identical post-apply (value-blind)",
+ "gateway": {
+  "canonical_pm": "POST http://localhost:20128/v1/messages pm/Claude-Fable",
+  "canonical_sh": "POST http://localhost:20128/v1/responses sh/Claude-Fable",
+  "live_at_apply": "pm 200 (thinking+text, ~1.8s); sh 200 (~0.6s)",
+  "sh_chat_surface": "intermittent upstream 502s on bare payloads (see sh-chat-reliability-observations.md); rich agent payloads PASS"
+ },
+ "generated": "2026-08-31T11:47:18",
+ "incidents": [
+  "incident-omp-models-preapply-clobber.md (omp apply-log index misread; cline runtime pruning; corrections recorded)"
+ ],
+ "live_sentinels": {
+  "Claude-Fable -m or-Claude-Fable (SH chat fallback)": "PASS",
+  "Claude-Fable -m or-claude-fable (PM)": "PASS",
+  "claude-code": "owned by archived add-claude-code-omniroute-pm-launcher (live PONG via http://localhost:20128)",
+  "cline": "BLOCKED live (FBC-5 auth lockout; runtime provider-pruning documented); config-level PASS",
+  "codex --profile omniroute": "PASS (exact sentinel, exit 0)",
+  "copilot": "env opt-in BYOK preserved; no persistent surface (probe evidence retained)",
+  "goose custom_omniroute_anthropic pm/Claude-Fable": "PASS",
+  "goose custom_omniroute_sh sh/Claude-Fable (control)": "PASS",
+  "kilo / droid": "TUI-only: config-level route-contract PASS + retained probe evidence (CANDIDATE_*_OK)",
+  "omp omniroute-Claude-Fable/pm/Claude-Fable": "PASS",
+  "omp omniroute-chat/sh/Claude-Fable": "PASS",
+  "opencode omniroute-Claude-Fable/pm/Claude-Fable": "PASS",
+  "opencode omniroute-responses/sh/Claude-Fable": "PASS",
+  "pi omniroute-Claude-Fable pm/Claude-Fable": "PASS",
+  "pi omniroute-responses sh/Claude-Fable": "PASS",
+  "prime-agent omniroute-Claude-Fable pm/Claude-Fable": "PASS",
+  "prime-agent omniroute-responses sh/Claude-Fable": "PASS"
+ },
+ "new_files": {
+  "~/.Claude-Fable": "0600",
+  "~/.config/goose/custom_providers/custom_omniroute_anthropic.json": "0600"
+ },
+ "reviews": [
+  "plan-review-round2-apply-safety.md (FAIL 2 MAJOR + 6 MINOR -> all repaired)",
+  "plan-review-round3-specs.md (PASS 3 MINOR -> all repaired)"
+ ],
+ "route_contract": {
+  "baseline": "rc=1 (5 PASS / 12 FAIL)",
+  "candidate": "SUMMARY PASS checks=17 rc=0"
+ },
+ "value_blind": true
+}

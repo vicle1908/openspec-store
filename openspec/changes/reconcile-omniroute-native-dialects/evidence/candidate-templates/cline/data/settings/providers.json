@@ -1,0 +1,13 @@
+{
+  "providers": {
+    "openai-omniroute-chat": {
+      "settings": {
+        "provider": "openai-compatible",
+        "apiKey": "unused-local-keyless",
+        "model": "sh/gpt-5.6-sol",
+        "baseUrl": "http://localhost:20128"
+      },
+      "tokenSource": "manual"
+    }
+  }
+}

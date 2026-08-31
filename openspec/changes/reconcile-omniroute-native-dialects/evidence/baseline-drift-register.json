@@ -1,0 +1,225 @@
+{
+ "value_blind": true,
+ "record": "baseline-drift-register",
+ "register_semantics": "v3 \u2014 externally-owned surfaces (existing drift, baseline-absent creations, and glob-captured extras outside the baseline files map) are registered with their current state; the post-apply comparator accepts exactly the registered state and fails on any further drift (re-register required after every legitimate external change, e.g. credential rotation)",
+ "captured": "2026-08-31T01:03:14+0700",
+ "purpose": "Reconcile live drift on files OUTSIDE this change's 11-file write set against the frozen pre-apply manifest. The baseline is NOT regenerated and its hashes are NOT updated. The apply preflight (evidence/apply-backups.py) and the post-apply comparator (evidence/manifest-check.py --drift-register) compare these registered paths against current_state captured here.",
+ "baseline": "evidence/pre-apply-manifest.json",
+ "enforcement": "evidence/apply-backups.py preflight + evidence/manifest-check.py --drift-register post-apply comparison",
+ "write_set": {
+  "modify": [
+   "/Users/androidteam/.config/kilo/kilo.jsonc",
+   "/Users/androidteam/.config/opencode/opencode.json",
+   "/Users/androidteam/.factory/settings.json",
+   "/Users/androidteam/.grok/config.toml",
+   "/Users/androidteam/.kimi-code/config.toml",
+   "/Users/androidteam/.omp/agent/models.yml",
+   "/Users/androidteam/.pi/agent/models.json",
+   "/Users/androidteam/.prime/agent/models.json",
+   "/Users/androidteam/.cline/data/settings/providers.json"
+  ],
+  "create": [
+   "/Users/androidteam/.codex/omniroute.config.toml",
+   "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json"
+  ]
+ },
+ "integrity_precheck": {
+  "summary": {
+   "modify_targets_baseline_match": 9,
+   "modify_targets_total": 9,
+   "create_targets_absent": 2,
+   "create_targets_total": 2,
+   "untouched_baseline_match": 17,
+   "untouched_total": 17,
+   "registered_snapshots_captured": 4,
+   "registered_total": 4
+  },
+  "per_path": {
+   "modify_targets": {
+    "/Users/androidteam/.config/kilo/kilo.jsonc": true,
+    "/Users/androidteam/.config/opencode/opencode.json": true,
+    "/Users/androidteam/.factory/settings.json": true,
+    "/Users/androidteam/.grok/config.toml": true,
+    "/Users/androidteam/.kimi-code/config.toml": true,
+    "/Users/androidteam/.omp/agent/models.yml": true,
+    "/Users/androidteam/.pi/agent/models.json": true,
+    "/Users/androidteam/.prime/agent/models.json": true,
+    "/Users/androidteam/.cline/data/settings/providers.json": true
+   },
+   "create_targets": {
+    "/Users/androidteam/.codex/omniroute.config.toml": true,
+    "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json": true
+   },
+   "untouched": {
+    "/Users/androidteam/.claude/helpers/cockpit-key.sh": true,
+    "/Users/androidteam/.claude/helpers/shopapikey-key.sh": true,
+    "/Users/androidteam/.claude/profiles/cockpit.json": true,
+    "/Users/androidteam/.claude/profiles/omniroute.json": true,
+    "/Users/androidteam/.claude/profiles/shopapikey.json": true,
+    "/Users/androidteam/.claude/settings.json": true,
+    "/Users/androidteam/.config/goose/config.yaml": true,
+    "/Users/androidteam/.config/goose/custom_providers/custom_omniroute.json": true,
+    "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_responses.json": true,
+    "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_sh.json": true,
+    "/Users/androidteam/.config/goose/custom_providers/custom_phanmemvip.json": true,
+    "/Users/androidteam/.config/goose/custom_providers/custom_shopapikey.json": true,
+    "/Users/androidteam/.omp/agent/config.yml": true,
+    "/Users/androidteam/.pi/agent/settings.json": true,
+    "/Users/androidteam/.prime/agent/auth.json": true,
+    "/Users/androidteam/.prime/agent/settings.json": true,
+    "/Users/androidteam/.prime/agent/telemetry.json": true
+   },
+   "registered": {
+    "/Users/androidteam/.claude/helpers/omniroute-key.sh": true,
+    "/Users/androidteam/.claude/profiles/omniroute-pm.json": true,
+    "/Users/androidteam/.codex/config.toml": true,
+    "/Users/androidteam/.zshrc": true
+   }
+  }
+ },
+ "entries": [
+  {
+   "path": "/Users/androidteam/.claude/helpers/omniroute-key.sh",
+   "disposition": "externally-owned",
+   "baseline_presence": "absent",
+   "owner": "archived change 2026-08-30-add-claude-code-omniroute-pm-launcher (applied live after this baseline was frozen)",
+   "this_change_action": "verify-only; no write; no backup",
+   "baseline": {
+    "exists": false,
+    "mode": null,
+    "sha256": null,
+    "bytes": 0
+   },
+   "current_state": {
+    "exists": true,
+    "mode": "0o700",
+    "sha256": "8c19caf7b87fbd67c4efc96ce3a5cfb40bfae959a91b0a259f2b1e55dab1a87e",
+    "bytes": 962
+   },
+   "notes": "Claude helper expected mode 0o700; creation post-baseline is legitimate external ownership, not apply drift"
+  },
+  {
+   "path": "/Users/androidteam/.claude/profiles/omniroute-pm.json",
+   "disposition": "externally-owned",
+   "baseline_presence": "not-in-baseline-map",
+   "owner": "archived change 2026-08-30-add-claude-code-omniroute-pm-launcher (provider-config glob surface; profile never tracked by the frozen baseline)",
+   "this_change_action": "verify-only; no write; no backup",
+   "baseline": {
+    "exists": false,
+    "mode": null,
+    "sha256": null,
+    "bytes": 0
+   },
+   "current_state": {
+    "exists": true,
+    "mode": "0o600",
+    "sha256": "be6df55ab6f2e46b0fcc448c0cf0beadd56aaa4bf37bce3a286ce26e43ba6a15",
+    "bytes": 744
+   },
+   "notes": "Captured by the claude-code profiles glob during post-apply captures; must be registered so the comparator accepts it as an externally-owned extra"
+  },
+  {
+   "path": "/Users/androidteam/.codex/config.toml",
+   "disposition": "externally-churned-base-config",
+   "baseline_presence": "existing",
+   "owner": "codex runtime/user surface outside this change",
+   "this_change_action": "untouched; this change writes only the standalone ~/.codex/omniroute.config.toml profile",
+   "baseline": {
+    "exists": true,
+    "mode": "0o600",
+    "sha256": "e7bb7a5846cb68c68e70b419d3edeef2db1299d7bec123e9035247554d82b463",
+    "bytes": 9918
+   },
+   "current_state": {
+    "exists": true,
+    "mode": "0o600",
+    "sha256": "45a06ecc0620ac224376104af5a36e7e5365898ba2253e25878602073b38b813",
+    "bytes": 9918
+   },
+   "notes": "byte length and mode stable; top-level routing fields recorded value-blind below",
+   "parsed_metadata": {
+    "top_level_keys": [
+     "model",
+     "model_catalog_json",
+     "model_context_window",
+     "model_provider",
+     "model_reasoning_effort",
+     "model_reasoning_summary",
+     "model_verbosity",
+     "personality",
+     "sandbox_mode"
+    ],
+    "model": "gpt-5.6-sol",
+    "model_provider": "codex_local_access",
+    "model_reasoning_effort": "xhigh",
+    "model_reasoning_summary": "detailed",
+    "profiles_table": []
+   }
+  },
+  {
+   "path": "/Users/androidteam/.zshrc",
+   "disposition": "deferred-externally-managed-shell-surface",
+   "baseline_presence": "existing",
+   "owner": "deferred Copilot launcher binding + archived claude-code launcher owner + PATH-normalization change",
+   "this_change_action": "no write by this change; COPILOT_* opt-in env surface preserved",
+   "baseline": {
+    "exists": true,
+    "mode": "0o600",
+    "sha256": "78c6f7ab1eb7eb5ffe1875cd98f0ad106f234df2c3cc4b3d5be597aa7f6e7527",
+    "bytes": 10459
+   },
+   "current_state": {
+    "exists": true,
+    "mode": "0o600",
+    "sha256": "9a61f19dc8a788def4054d92cd846ac39394ee2085b4285c282f7c304b7b1324",
+    "bytes": 11411
+   },
+   "notes": "function launchers added post-baseline (omniroute + path helpers); no launcher and no Copilot binding removed",
+   "parsed_metadata": {
+    "inventory_semantics": "v2 \u2014 function launchers and COPILOT_* environment bindings are separate classes",
+    "function_launcher_inventory": [
+     "_claude_has",
+     "_claude_require_helper",
+     "_claude_with_profile",
+     "_path_append",
+     "_path_prepend",
+     "claude_reset",
+     "cockpit",
+     "omniroute",
+     "shopapikey"
+    ],
+    "baseline_function_launcher_inventory": [
+     "_claude_has",
+     "_claude_require_helper",
+     "_claude_with_profile",
+     "claude_reset",
+     "cockpit",
+     "shopapikey"
+    ],
+    "function_launchers_added_since_baseline": [
+     "_path_append",
+     "_path_prepend",
+     "omniroute"
+    ],
+    "function_launchers_removed_since_baseline": [],
+    "copilot_environment_bindings": [
+     "COPILOT_MODEL",
+     "COPILOT_PROVIDER_BASE_URL",
+     "COPILOT_PROVIDER_MAX_OUTPUT_TOKENS",
+     "COPILOT_PROVIDER_MAX_PROMPT_TOKENS",
+     "COPILOT_PROVIDER_TYPE"
+    ],
+    "baseline_copilot_environment_bindings": [
+     "COPILOT_MODEL",
+     "COPILOT_PROVIDER_BASE_URL",
+     "COPILOT_PROVIDER_MAX_OUTPUT_TOKENS",
+     "COPILOT_PROVIDER_MAX_PROMPT_TOKENS",
+     "COPILOT_PROVIDER_TYPE"
+    ],
+    "copilot_bindings_added_since_baseline": [],
+    "copilot_bindings_removed_since_baseline": [],
+    "copilot_env_surface_preserved": true
+   }
+  }
+ ]
+}

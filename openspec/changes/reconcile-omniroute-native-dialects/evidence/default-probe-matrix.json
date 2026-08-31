@@ -1,0 +1,257 @@
+{
+  "version": 1,
+  "value_blind": true,
+  "purpose": "No-override default route observations. These commands are declarations until the post-apply verification phase executes them.",
+  "probes": [
+    {
+      "id": "claude-code.default",
+      "product": "claude-code",
+      "argv": [
+        "/Users/androidteam/.local/bin/claude",
+        "-p",
+        "Reply with exactly: DEFAULT_CLAUDE_OK",
+        "--no-session-persistence"
+      ],
+      "expected": "DEFAULT_CLAUDE_OK",
+      "acceptable_outcomes": [
+        "success",
+        "configured-default-failure",
+        "timeout"
+      ],
+      "working_directory": "/tmp",
+      "timeout": 240
+    },
+    {
+      "id": "codex.default",
+      "product": "codex",
+      "argv": [
+        "/Users/androidteam/.npm-global/bin/codex",
+        "exec",
+        "--ephemeral",
+        "--skip-git-repo-check",
+        "--sandbox",
+        "read-only",
+        "-C",
+        "/tmp",
+        "Reply with exactly: DEFAULT_CODEX_OK"
+      ],
+      "expected": "DEFAULT_CODEX_OK",
+      "acceptable_outcomes": [
+        "success",
+        "configured-default-failure",
+        "timeout"
+      ],
+      "working_directory": "/tmp",
+      "timeout": 240
+    },
+    {
+      "id": "grok.default",
+      "product": "grok",
+      "argv": [
+        "/Users/androidteam/.local/bin/grok",
+        "--single",
+        "Reply with exactly: DEFAULT_GROK_OK"
+      ],
+      "expected": "DEFAULT_GROK_OK",
+      "acceptable_outcomes": [
+        "success",
+        "configured-default-failure",
+        "timeout"
+      ],
+      "working_directory": "/tmp",
+      "timeout": 240
+    },
+    {
+      "id": "goose.default",
+      "product": "goose",
+      "argv": [
+        "/opt/homebrew/bin/goose",
+        "run",
+        "-t",
+        "Reply with exactly: DEFAULT_GOOSE_OK",
+        "--no-session",
+        "-q",
+        "--max-turns",
+        "1",
+        "--output-format",
+        "json"
+      ],
+      "expected": "DEFAULT_GOOSE_OK",
+      "acceptable_outcomes": [
+        "success",
+        "configured-default-failure",
+        "timeout"
+      ],
+      "working_directory": "/tmp",
+      "timeout": 240
+    },
+    {
+      "id": "kimi-code.default",
+      "product": "kimi-code",
+      "argv": [
+        "/opt/homebrew/bin/kimi",
+        "-p",
+        "Reply with exactly: DEFAULT_KIMI_OK",
+        "--output-format",
+        "text"
+      ],
+      "expected": "DEFAULT_KIMI_OK",
+      "acceptable_outcomes": [
+        "success",
+        "configured-default-failure",
+        "timeout"
+      ],
+      "working_directory": "/tmp",
+      "timeout": 240
+    },
+    {
+      "id": "kilo.default",
+      "product": "kilo",
+      "argv": [
+        "/Users/androidteam/.npm-global/bin/kilo",
+        "run",
+        "--prompt",
+        "Reply with exactly: DEFAULT_KILO_OK"
+      ],
+      "expected": "DEFAULT_KILO_OK",
+      "acceptable_outcomes": [
+        "success",
+        "configured-default-failure",
+        "timeout"
+      ],
+      "working_directory": "/tmp",
+      "timeout": 240
+    },
+    {
+      "id": "opencode.default",
+      "product": "opencode",
+      "argv": [
+        "/Users/androidteam/.npm-global/bin/opencode",
+        "run",
+        "--format",
+        "json",
+        "Reply with exactly: DEFAULT_OPENCODE_OK"
+      ],
+      "expected": "DEFAULT_OPENCODE_OK",
+      "acceptable_outcomes": [
+        "success",
+        "configured-default-failure",
+        "timeout"
+      ],
+      "working_directory": "/tmp",
+      "timeout": 240
+    },
+    {
+      "id": "pi.default",
+      "product": "pi",
+      "argv": [
+        "/opt/homebrew/bin/pi",
+        "-p",
+        "--no-session",
+        "--no-tools",
+        "--no-extensions",
+        "Reply with exactly: DEFAULT_PI_OK"
+      ],
+      "expected": "DEFAULT_PI_OK",
+      "acceptable_outcomes": [
+        "success",
+        "configured-default-failure",
+        "timeout"
+      ],
+      "working_directory": "/tmp",
+      "timeout": 240
+    },
+    {
+      "id": "prime-agent.default",
+      "product": "prime-agent",
+      "argv": [
+        "/opt/homebrew/bin/prime-agent",
+        "-p",
+        "Reply with exactly: DEFAULT_PRIME_OK"
+      ],
+      "expected": "DEFAULT_PRIME_OK",
+      "acceptable_outcomes": [
+        "success",
+        "configured-default-failure",
+        "timeout"
+      ],
+      "working_directory": "/tmp",
+      "timeout": 240
+    },
+    {
+      "id": "droid.default",
+      "product": "droid",
+      "argv": [
+        "/opt/homebrew/bin/droid",
+        "exec",
+        "Reply with exactly: DEFAULT_DROID_OK"
+      ],
+      "expected": "DEFAULT_DROID_OK",
+      "acceptable_outcomes": [
+        "success",
+        "vendor-default-auth-failure",
+        "timeout"
+      ],
+      "working_directory": "/tmp",
+      "timeout": 240
+    },
+    {
+      "id": "omp.default",
+      "product": "omp",
+      "argv": [
+        "/opt/homebrew/bin/omp",
+        "-p",
+        "--no-session",
+        "--no-lsp",
+        "--no-pty",
+        "Reply with exactly: DEFAULT_OMP_OK"
+      ],
+      "expected": "DEFAULT_OMP_OK",
+      "acceptable_outcomes": [
+        "success",
+        "configured-default-failure",
+        "timeout"
+      ],
+      "working_directory": "/tmp",
+      "timeout": 240
+    },
+    {
+      "id": "cline.default",
+      "product": "cline",
+      "argv": [
+        "/opt/homebrew/Cellar/nvm/0.40.7/versions/node/v22.23.2/lib/node_modules/cline/bin/cline",
+        "--json",
+        "Reply with exactly: DEFAULT_CLINE_OK"
+      ],
+      "expected": "DEFAULT_CLINE_OK",
+      "acceptable_outcomes": [
+        "success",
+        "configured-default-failure",
+        "timeout"
+      ],
+      "working_directory": "/tmp",
+      "timeout": 240
+    },
+    {
+      "id": "copilot.default",
+      "product": "copilot",
+      "argv": [
+        "/opt/homebrew/bin/copilot",
+        "-p",
+        "Reply with exactly: DEFAULT_COPILOT_OK",
+        "--output-format",
+        "text",
+        "--silent",
+        "--no-remote"
+      ],
+      "expected": "DEFAULT_COPILOT_OK",
+      "acceptable_outcomes": [
+        "success",
+        "configured-default-failure",
+        "timeout"
+      ],
+      "working_directory": "/tmp",
+      "timeout": 240
+    }
+  ]
+}

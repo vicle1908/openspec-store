@@ -1,0 +1,31 @@
+{
+  "value_blind": true,
+  "recorded": "2026-08-30",
+  "policy": "Partial apply per tasks.md safety locks: a blocked CLI never blocks independent surfaces. Kimi Code and Cline live-apply (and their live backups) are held pending credential rotation; the remaining 9 write-set surfaces proceed once the review gate passes.",
+  "blockers": [
+    {
+      "id": "kimi-code-live-apply",
+      "surface": "kimi-code",
+      "tasks": ["4.3", "5.7"],
+      "status": "blocked-pending-credential-rotation",
+      "reason": "Literal provider credentials carried by ~/.kimi-code/config.toml were emitted into an agent session transcript on 2026-08-30 (evidence/incident-credential-exposure.md; providers cockpit, phanmemvip, shopapikey, omniroute, moonshot-ai). A live restructuring that preserves those literal bytes would propagate compromised credentials into the corrected configuration. Rotation is an upstream operator action outside this change's scope. The isolated candidate template and its FBC-2 fallback evidence are unaffected and remain valid.",
+      "release_condition": "User confirms the affected keys have been rotated upstream, or explicitly approves proceeding without rotation. Until then task 4.3 applies the other six surfaces independently and task 5.7 stays unchecked."
+    },
+    {
+      "id": "cline-live-apply",
+      "surface": "cline",
+      "tasks": ["4.5", "5.7"],
+      "status": "blocked-pending-credential-rotation",
+      "reason": "The pre-existing literal credential field providers.openai-native.settings.apiKey in ~/.cline/data/settings/providers.json was emitted into an agent session transcript on 2026-08-30 (incident 2, evidence/incident-credential-exposure.md). The overlay adds only the new openai-omniroute-chat provider entry and never touches that field, but a live merge now would carry compromised credential bytes forward into the corrected file. Rotation is an upstream operator action outside this change's scope.",
+      "release_condition": "User confirms the exposed Cline credential has been rotated upstream, or explicitly approves proceeding without rotation. Until then the Cline half of task 4.5 stays deferred and task 5.7 stays unchecked; every other surface applies independently."
+    },
+    {
+      "id": "sh-chat-upstream-flakiness",
+      "surface": "goose legacy sh/Claude-Fable chat rows",
+      "tasks": [],
+      "status": "observed-external",
+      "reason": "The sh/* chat-completions surface returned intermittent HTTP 502 on 2026-08-30 (evidence/sh-chat-reliability-observations.md). This concerns the preserved legacy sh/Claude-Fable rows on the archived goose provider (deferred stale selectors), not this change's requested sh/gpt-5.6-sol fallback, whose isolated probe evidence (CANDIDATE_GOOSE_CHAT_OK) is separately retained. No configuration change can fix an upstream capacity error.",
+      "release_condition": "n/a — observation only; no gate depends on the legacy rows."
+    }
+  ]
+}

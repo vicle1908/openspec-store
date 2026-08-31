@@ -1,0 +1,981 @@
+{
+  "change": "reconcile-omniroute-native-dialects",
+  "value_blind": true,
+  "sentinel": "OMNIROUTE_DIALECT_OK",
+  "probes": [
+    {
+      "id": "prime-agent.baseline.sh.responses",
+      "phase": "baseline",
+      "enabled": true,
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "baseline-control",
+      "argv": [
+        "/opt/homebrew/bin/prime-agent",
+        "--provider",
+        "omniroute",
+        "--model",
+        "sh/gpt-5.6-sol",
+        "--no-session",
+        "--no-tools",
+        "--no-skills",
+        "--no-extensions",
+        "--mode",
+        "text",
+        "--thinking",
+        "high",
+        "-p",
+        "Reply with exactly: MINENV_PRIME_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "MINENV_PRIME_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/responses",
+      "pty": false
+    },
+    {
+      "id": "codex.baseline.sh.responses",
+      "phase": "baseline",
+      "enabled": false,
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "baseline-control-blocked",
+      "argv": [
+        "/opt/homebrew/bin/codex",
+        "exec",
+        "--ephemeral",
+        "--skip-git-repo-check",
+        "--sandbox",
+        "read-only",
+        "-C",
+        "/tmp",
+        "-c",
+        "model_provider=omniroute",
+        "-c",
+        "model=sh/gpt-5.6-sol",
+        "-c",
+        "model_reasoning_effort=high",
+        "Reply with exactly: BASELINE_CODEX_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "BASELINE_CODEX_OK",
+      "required": false,
+      "fallback": false,
+      "endpoint_path": "/v1/responses",
+      "disabled_reason": "fresh baseline control timed out at 180s via live config; superseded by isolated canonical probe CANDIDATE_CODEX_CANONICAL_SH_OK (rc=0) recorded in evidence/cli-disposition-matrix.md"
+    },
+    {
+      "id": "claude-code.pm.messages",
+      "phase": "candidate",
+      "route": "pm/Claude-Fable",
+      "protocol": "anthropic-messages",
+      "classification": "native_route",
+      "argv": [
+        "/Users/androidteam/.local/bin/claude",
+        "--settings",
+        "/Users/androidteam/.claude/profiles/omniroute.json",
+        "--model",
+        "pm/Claude-Fable",
+        "--print",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/messages",
+      "enabled": true
+    },
+    {
+      "id": "codex.sh.responses",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/codex",
+        "exec",
+        "--ephemeral",
+        "--skip-git-repo-check",
+        "--sandbox",
+        "read-only",
+        "--profile",
+        "omniroute",
+        "-C",
+        "/tmp",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/responses",
+      "enabled": true,
+      "selection": "CODEX_HOME/omniroute.config.toml via --profile omniroute"
+    },
+    {
+      "id": "grok.pm.messages",
+      "phase": "candidate",
+      "route": "pm/Claude-Fable",
+      "protocol": "anthropic-messages",
+      "classification": "native_route",
+      "argv": [
+        "/Users/androidteam/.local/bin/grok",
+        "-p",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK",
+        "--model",
+        "omniroute-claude-fable",
+        "--output-format",
+        "json",
+        "--max-turns",
+        "1"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/messages",
+      "enabled": true
+    },
+    {
+      "id": "grok.sh.responses",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "native_route",
+      "argv": [
+        "/Users/androidteam/.local/bin/grok",
+        "-p",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK",
+        "--model",
+        "omniroute-sol",
+        "--output-format",
+        "json",
+        "--max-turns",
+        "1"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": false,
+      "fallback": false,
+      "endpoint_path": "/v1/responses",
+      "enabled": false,
+      "native_failure_class": "fbc-3-serialization-sequence-number",
+      "disabled_reason": "native route failed isolated candidate probe; live disposition is chat fallback per evidence/cli-disposition-matrix.md"
+    },
+    {
+      "id": "grok.sh.chat-fallback",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-chat-completions-versionless",
+      "classification": "versionless_chat_fallback",
+      "argv": [
+        "/Users/androidteam/.local/bin/grok",
+        "-p",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK",
+        "--model",
+        "omniroute-sol",
+        "--output-format",
+        "json",
+        "--max-turns",
+        "1"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": true,
+      "native_failure_class": "fbc-3-serialization-sequence-number",
+      "endpoint_path": "/chat/completions",
+      "enabled": true,
+      "fallback_for": "grok.sh.responses"
+    },
+    {
+      "id": "goose.pm.messages",
+      "phase": "candidate",
+      "route": "pm/Claude-Fable",
+      "protocol": "anthropic-messages",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/goose",
+        "run",
+        "-t",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK",
+        "--provider",
+        "custom_omniroute_anthropic",
+        "--model",
+        "pm/Claude-Fable",
+        "--no-session",
+        "-q",
+        "--max-turns",
+        "1",
+        "--output-format",
+        "json"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 240,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/messages",
+      "enabled": true
+    },
+    {
+      "id": "goose.sh.responses",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/goose",
+        "run",
+        "-t",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK",
+        "--provider",
+        "custom_omniroute_responses",
+        "--model",
+        "sh/gpt-5.6-sol",
+        "--no-session",
+        "-q",
+        "--max-turns",
+        "1",
+        "--output-format",
+        "json"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 240,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": false,
+      "fallback": false,
+      "endpoint_path": "/v1/responses",
+      "enabled": false,
+      "native_failure_class": "fbc-4-goose-responses-streaming-defect",
+      "disabled_reason": "native route failed isolated candidate probe; live disposition is chat fallback per evidence/cli-disposition-matrix.md"
+    },
+    {
+      "id": "goose.sh.chat-fallback",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-chat-completions-versionless",
+      "classification": "versionless_chat_fallback",
+      "argv": [
+        "/opt/homebrew/bin/goose",
+        "run",
+        "-t",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK",
+        "--provider",
+        "custom_omniroute_sh",
+        "--model",
+        "sh/gpt-5.6-sol",
+        "--no-session",
+        "-q",
+        "--max-turns",
+        "1",
+        "--output-format",
+        "json"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 240,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": true,
+      "native_failure_class": "fbc-4-goose-responses-streaming-defect",
+      "endpoint_path": "/chat/completions",
+      "enabled": true,
+      "fallback_for": "goose.sh.responses"
+    },
+    {
+      "id": "kimi-code.pm.messages",
+      "phase": "candidate",
+      "route": "pm/Claude-Fable",
+      "protocol": "anthropic-messages",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/kimi",
+        "-m",
+        "or-claude-fable",
+        "-p",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK",
+        "--output-format",
+        "text"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/messages",
+      "enabled": true
+    },
+    {
+      "id": "kimi-code.sh.responses",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/kimi",
+        "-m",
+        "or-gpt-5-6-sol",
+        "-p",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK",
+        "--output-format",
+        "text"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/responses",
+      "enabled": false,
+      "native_failure_class": "fbc-2-strict-decode-sequence-number",
+      "disabled_reason": "native route failed isolated candidate probe; live disposition is chat fallback per evidence/cli-disposition-matrix.md"
+    },
+    {
+      "id": "kilo.pm.messages",
+      "phase": "candidate",
+      "route": "pm/Claude-Fable",
+      "protocol": "anthropic-messages",
+      "classification": "native_route",
+      "argv": [
+        "/Users/androidteam/.npm-global/bin/kilo",
+        "run",
+        "-m",
+        "omniroute-anthropic/pm/Claude-Fable",
+        "--format",
+        "json",
+        "--variant",
+        "high",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/messages",
+      "enabled": true
+    },
+    {
+      "id": "kilo.sh.responses",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "native_route",
+      "argv": [
+        "/Users/androidteam/.npm-global/bin/kilo",
+        "run",
+        "-m",
+        "omniroute-responses/sh/gpt-5.6-sol",
+        "--format",
+        "json",
+        "--variant",
+        "high",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/responses",
+      "enabled": true
+    },
+    {
+      "id": "opencode.pm.messages",
+      "phase": "candidate",
+      "route": "pm/Claude-Fable",
+      "protocol": "anthropic-messages",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/opencode",
+        "run",
+        "-m",
+        "omniroute-anthropic/pm/Claude-Fable",
+        "--format",
+        "json",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/messages",
+      "enabled": true
+    },
+    {
+      "id": "opencode.sh.responses",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/opencode",
+        "run",
+        "-m",
+        "omniroute-responses/sh/gpt-5.6-sol",
+        "--format",
+        "json",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/responses",
+      "enabled": true
+    },
+    {
+      "id": "pi.pm.messages",
+      "phase": "candidate",
+      "route": "pm/Claude-Fable",
+      "protocol": "anthropic-messages",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/pi",
+        "-p",
+        "--no-session",
+        "--no-tools",
+        "--no-extensions",
+        "--provider",
+        "omniroute-anthropic",
+        "--model",
+        "pm/Claude-Fable",
+        "--thinking",
+        "high",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/messages",
+      "enabled": true,
+      "pty": true
+    },
+    {
+      "id": "pi.sh.responses",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/pi",
+        "-p",
+        "--no-session",
+        "--no-tools",
+        "--no-extensions",
+        "--provider",
+        "omniroute",
+        "--model",
+        "sh/gpt-5.6-sol",
+        "--thinking",
+        "high",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/responses",
+      "enabled": true,
+      "pty": true
+    },
+    {
+      "id": "prime-agent.pm.messages",
+      "phase": "candidate",
+      "route": "pm/Claude-Fable",
+      "protocol": "anthropic-messages",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/prime-agent",
+        "--provider",
+        "omniroute-anthropic",
+        "--model",
+        "pm/Claude-Fable",
+        "--no-session",
+        "--no-tools",
+        "--no-skills",
+        "--no-extensions",
+        "--mode",
+        "text",
+        "--thinking",
+        "high",
+        "-p",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/messages",
+      "enabled": true,
+      "pty": true
+    },
+    {
+      "id": "prime-agent.sh.responses",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/prime-agent",
+        "--provider",
+        "omniroute-responses",
+        "--model",
+        "sh/gpt-5.6-sol",
+        "--no-session",
+        "--no-tools",
+        "--no-skills",
+        "--no-extensions",
+        "--mode",
+        "text",
+        "--thinking",
+        "high",
+        "-p",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/responses",
+      "enabled": true,
+      "pty": true
+    },
+    {
+      "id": "droid.pm.messages",
+      "phase": "candidate",
+      "route": "pm/Claude-Fable",
+      "protocol": "anthropic-messages",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/droid",
+        "exec",
+        "--model",
+        "custom:OmniRoute-Claude-Fable",
+        "--reasoning-effort",
+        "high",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/messages",
+      "enabled": true
+    },
+    {
+      "id": "droid.sh.responses",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/droid",
+        "exec",
+        "--model",
+        "custom:OmniRoute-gpt-5-6-sol",
+        "--reasoning-effort",
+        "high",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/responses",
+      "enabled": true
+    },
+    {
+      "id": "omp.pm.messages",
+      "phase": "candidate",
+      "route": "pm/Claude-Fable",
+      "protocol": "anthropic-messages",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/omp",
+        "-p",
+        "--no-session",
+        "--no-lsp",
+        "--no-pty",
+        "--model=omniroute-anthropic/pm/Claude-Fable",
+        "--thinking=high",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/messages",
+      "enabled": true,
+      "pty": true
+    },
+    {
+      "id": "omp.sh.responses",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/omp",
+        "-p",
+        "--no-session",
+        "--no-lsp",
+        "--no-pty",
+        "--model=omniroute/sh/gpt-5.6-sol",
+        "--thinking=high",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/responses",
+      "enabled": false,
+      "pty": true,
+      "native_failure_class": "fbc-1-omp-responses-lifecycle-timeout",
+      "disabled_reason": "native Responses candidate exceeded the 240-second bound with no usable output; classification is lifecycle/timeout, not an inferred gateway decoder error"
+    },
+    {
+      "id": "copilot.pm.messages",
+      "phase": "candidate",
+      "route": "pm/Claude-Fable",
+      "protocol": "anthropic-messages",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/copilot",
+        "-p",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK",
+        "--model",
+        "pm/Claude-Fable",
+        "--silent",
+        "--no-remote"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "env_set": {
+        "COPILOT_PROVIDER_BASE_URL": "http://localhost:20128",
+        "COPILOT_PROVIDER_TYPE": "anthropic",
+        "COPILOT_MODEL": "pm/Claude-Fable",
+        "COPILOT_PROVIDER_MAX_PROMPT_TOKENS": "200000",
+        "COPILOT_PROVIDER_MAX_OUTPUT_TOKENS": "32000"
+      },
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/messages",
+      "enabled": true
+    },
+    {
+      "id": "copilot.sh.responses",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "native_route",
+      "argv": [
+        "/opt/homebrew/bin/copilot",
+        "-p",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK",
+        "--model",
+        "sh/gpt-5.6-sol",
+        "--silent",
+        "--no-remote"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "env_set": {
+        "COPILOT_PROVIDER_BASE_URL": "http://localhost:20128/v1",
+        "COPILOT_PROVIDER_TYPE": "openai",
+        "COPILOT_PROVIDER_WIRE_API": "responses",
+        "COPILOT_MODEL": "sh/gpt-5.6-sol",
+        "COPILOT_PROVIDER_MAX_PROMPT_TOKENS": "1050000",
+        "COPILOT_PROVIDER_MAX_OUTPUT_TOKENS": "128000"
+      },
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": false,
+      "endpoint_path": "/v1/responses",
+      "enabled": true
+    },
+    {
+      "id": "kimi-code.sh.chat-fallback",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-chat-completions-versionless",
+      "classification": "chat-fallback",
+      "argv": [
+        "/opt/homebrew/bin/kimi",
+        "-p",
+        "--no-session",
+        "--model",
+        "or-sh-chat-fast",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": true,
+      "native_failure_class": "fbc-2-strict-decode-sequence-number",
+      "endpoint_path": "/chat/completions",
+      "enabled": true,
+      "fallback_for": "kimi-code.sh.responses"
+    },
+    {
+      "id": "omp.sh.chat-fallback",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-chat-completions-versionless",
+      "classification": "chat-fallback",
+      "argv": [
+        "/opt/homebrew/bin/omp",
+        "-p",
+        "--no-session",
+        "--no-lsp",
+        "--no-pty",
+        "--model=omniroute-chat/sh/gpt-5.6-sol",
+        "--thinking=high",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": true,
+      "native_failure_class": "fbc-1-omp-responses-lifecycle-timeout",
+      "endpoint_path": "/chat/completions",
+      "enabled": true,
+      "fallback_for": "omp.sh.responses"
+    },
+    {
+      "id": "cline.chat-fallback",
+      "phase": "candidate",
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-chat-completions-versionless",
+      "classification": "chat-fallback",
+      "argv": [
+        "/opt/homebrew/Cellar/nvm/0.40.7/versions/node/v22.23.2/lib/node_modules/cline/bin/cline",
+        "--provider",
+        "openai-omniroute-chat",
+        "--model",
+        "sh/gpt-5.6-sol",
+        "--thinking",
+        "high",
+        "--timeout",
+        "180",
+        "--json",
+        "Reply with exactly: OMNIROUTE_DIALECT_OK"
+      ],
+      "cwd": "/tmp",
+      "env_allow": [
+        "OMNIROUTE_API_KEY"
+      ],
+      "timeout": 180,
+      "expected": "OMNIROUTE_DIALECT_OK",
+      "required": true,
+      "fallback": true,
+      "native_failure_class": "fbc-5-native-provider-lockout",
+      "endpoint_path": "/chat/completions",
+      "enabled": true,
+      "description": "Cline SH chat fallback only; PM route remains unverified because the isolated probe did not exercise pm/Claude-Fable",
+      "fallback_for": "cline.sh.responses"
+    },
+    {
+      "id": "cline.pm.messages",
+      "phase": "candidate",
+      "enabled": false,
+      "route": "pm/Claude-Fable",
+      "protocol": "anthropic-messages",
+      "classification": "blocked",
+      "argv": [
+        "/opt/homebrew/Cellar/nvm/0.40.7/versions/node/v22.23.2/lib/node_modules/cline/bin/cline",
+        "--provider",
+        "openai-compatible",
+        "--model",
+        "pm/Claude-Fable",
+        "--thinking",
+        "high",
+        "--timeout",
+        "180",
+        "--json",
+        "Reply with exactly: CANDIDATE_CLINE_PM_OK"
+      ],
+      "cwd": "/tmp",
+      "expected": "CANDIDATE_CLINE_PM_OK",
+      "endpoint_path": "/v1/messages",
+      "timeout": 180,
+      "pty": false,
+      "env_allow": [
+        "PATH",
+        "HOME",
+        "TERM",
+        "TMPDIR",
+        "USER",
+        "LOGNAME",
+        "SHELL",
+        "LANG",
+        "LC_ALL",
+        "XDG_CONFIG_HOME",
+        "XDG_DATA_HOME",
+        "XDG_STATE_HOME",
+        "NO_COLOR",
+        "OMNIROUTE_API_KEY"
+      ],
+      "env_set": {},
+      "required": false,
+      "fallback": false,
+      "native_failure_class": "fbc-5-native-provider-lockout",
+      "disabled_reason": "PM Cline route is not proven; existing isolated Cline evidence covers SH chat fallback only. Leave unchanged rather than reuse SH evidence."
+    },
+    {
+      "id": "cline.sh.responses",
+      "phase": "candidate",
+      "enabled": false,
+      "route": "sh/gpt-5.6-sol",
+      "protocol": "openai-responses",
+      "classification": "blocked",
+      "argv": [
+        "/opt/homebrew/Cellar/nvm/0.40.7/versions/node/v22.23.2/lib/node_modules/cline/bin/cline",
+        "--provider",
+        "openai-native",
+        "--model",
+        "sh/gpt-5.6-sol",
+        "--thinking",
+        "high",
+        "--timeout",
+        "180",
+        "--json",
+        "Reply with exactly: CANDIDATE_CLINE_SH_OK"
+      ],
+      "cwd": "/tmp",
+      "expected": "CANDIDATE_CLINE_SH_OK",
+      "endpoint_path": "/v1/responses",
+      "timeout": 180,
+      "pty": false,
+      "env_allow": [
+        "PATH",
+        "HOME",
+        "TERM",
+        "TMPDIR",
+        "USER",
+        "LOGNAME",
+        "SHELL",
+        "LANG",
+        "LC_ALL",
+        "XDG_CONFIG_HOME",
+        "XDG_DATA_HOME",
+        "XDG_STATE_HOME",
+        "NO_COLOR",
+        "OMNIROUTE_API_KEY"
+      ],
+      "env_set": {},
+      "required": false,
+      "fallback": false,
+      "native_failure_class": "fbc-5-native-provider-lockout",
+      "disabled_reason": "Installed Cline provider surface exposes OpenAI-compatible settings but no documented/native Responses wire selector; native SH control remains blocked and is not silently treated as a passing route."
+    }
+  ]
+}

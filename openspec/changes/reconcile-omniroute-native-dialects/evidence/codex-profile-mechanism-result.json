@@ -1,0 +1,32 @@
+{
+  "probe": "codex-profile-mechanism-v6-fast-fail",
+  "binary": "/opt/homebrew/Caskroom/codex/0.151.0/bin/codex",
+  "binary_version": "codex-cli 0.151.0",
+  "binary_resolution": "zsh -lc 'command -v codex' + realpath (matches inventory-check.py)",
+  "detection": "codex exec --json; exact post-strip equality of an event string (not speaker classification)",
+  "negative_control": "base default provider env_key CODEX_PROFILE_NEGATIVE_CONTROL_KEY deliberately absent from the child environment",
+  "traffic_note": "no public-host contact observed in retained output; both failing arms were configured for a local-control provider whose env reference is absent from the child environment; the hostname scan is observational, not a network-level proof",
+  "template": "/Users/androidteam/Developer/openspec-store/openspec/changes/reconcile-omniroute-native-dialects/evidence/candidate-templates/.codex/omniroute.config.toml",
+  "sentinel": "CANDIDATE_CODEX_PROFILE_MECHANISM_OK",
+  "arms": {
+    "positive_profile_present_flag_used": {
+      "rc": 0,
+      "exact_response_sentinel": true,
+      "user_echo_sentinel": false
+    },
+    "negative_profile_absent_flag_used": {
+      "rc": 1,
+      "exact_response_sentinel": false,
+      "user_echo_sentinel": false,
+      "public_host_contact_observed": false
+    },
+    "control_profile_present_no_flag": {
+      "rc": 1,
+      "exact_response_sentinel": false,
+      "user_echo_sentinel": false,
+      "public_host_contact_observed": false
+    }
+  },
+  "verdict": "PASS",
+  "value_blind": true
+}

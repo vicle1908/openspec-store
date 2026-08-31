@@ -1,0 +1,108 @@
+{
+ "value_blind": true,
+ "runs": [
+  {
+   "value_blind": true,
+   "phase": "preflight+copy+verify",
+   "backup_dir": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects",
+   "backup_dir_mode": "0o700",
+   "backup_file_mode": "0o600",
+   "atomic_replacement": "temp file in backup dir + fsync + os.replace + chmod",
+   "single_writer": "root apply session (post-verdict)",
+   "drift_register_crosscheck": "evidence/baseline-drift-register.json",
+   "preflight_passed": true,
+   "selected_targets": [
+    "/Users/androidteam/.config/kilo/kilo.jsonc",
+    "/Users/androidteam/.config/opencode/opencode.json",
+    "/Users/androidteam/.factory/settings.json",
+    "/Users/androidteam/.grok/config.toml",
+    "/Users/androidteam/.omp/agent/models.yml",
+    "/Users/androidteam/.pi/agent/models.json",
+    "/Users/androidteam/.prime/agent/models.json"
+   ],
+   "deferred_targets": [
+    "/Users/androidteam/.kimi-code/config.toml",
+    "/Users/androidteam/.cline/data/settings/providers.json"
+   ],
+   "deferred_reason": "credential-rotation gate (incidents 1-2, evidence/incident-credential-exposure.md)",
+   "backups": [
+    {
+     "path": "/Users/androidteam/.config/kilo/kilo.jsonc",
+     "backup_path": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/5002588ccfec09ee-kilo.jsonc",
+     "backup_mode": "0o600",
+     "live_sha256": "b5b9efa83af751179ef4571311046ef0e8835b45a69b35adb02b568bc71caa71",
+     "baseline_sha256": "b5b9efa83af751179ef4571311046ef0e8835b45a69b35adb02b568bc71caa71",
+     "backup_matches_live": true,
+     "bytes": 1708
+    },
+    {
+     "path": "/Users/androidteam/.config/opencode/opencode.json",
+     "backup_path": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/5dea866122ab58fe-opencode.json",
+     "backup_mode": "0o600",
+     "live_sha256": "275f755767529d821c43d81e3e1c2747563fd85e424db3fbffca02e43acc76b9",
+     "baseline_sha256": "275f755767529d821c43d81e3e1c2747563fd85e424db3fbffca02e43acc76b9",
+     "backup_matches_live": true,
+     "bytes": 5801
+    },
+    {
+     "path": "/Users/androidteam/.factory/settings.json",
+     "backup_path": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/41dcf1a5a93cef41-settings.json",
+     "backup_mode": "0o600",
+     "live_sha256": "6926f1a4a865fa8736c30a3504a399a748b8545067bc47836328c8efcbb9681c",
+     "baseline_sha256": "6926f1a4a865fa8736c30a3504a399a748b8545067bc47836328c8efcbb9681c",
+     "backup_matches_live": true,
+     "bytes": 6815
+    },
+    {
+     "path": "/Users/androidteam/.grok/config.toml",
+     "backup_path": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/61148fa72bc42f44-config.toml",
+     "backup_mode": "0o600",
+     "live_sha256": "8626abe9ec687fcf4261d117814b1b88d25925f52246a2d73d0791f080dfa4b6",
+     "baseline_sha256": "8626abe9ec687fcf4261d117814b1b88d25925f52246a2d73d0791f080dfa4b6",
+     "backup_matches_live": true,
+     "bytes": 2210
+    },
+    {
+     "path": "/Users/androidteam/.omp/agent/models.yml",
+     "backup_path": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/555c2037d46766f9-models.yml",
+     "backup_mode": "0o600",
+     "live_sha256": "ff62d85736c86c876f63dc5ae2360af553a53eb59abda3111a75a2f4de2fa016",
+     "baseline_sha256": "ff62d85736c86c876f63dc5ae2360af553a53eb59abda3111a75a2f4de2fa016",
+     "backup_matches_live": true,
+     "bytes": 3507
+    },
+    {
+     "path": "/Users/androidteam/.pi/agent/models.json",
+     "backup_path": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/12b1ac85e638be56-models.json",
+     "backup_mode": "0o600",
+     "live_sha256": "19df346e1d99f790587f43de3b87beb62a3b0ccf3eebd97cdeb2dc42b9516c77",
+     "baseline_sha256": "19df346e1d99f790587f43de3b87beb62a3b0ccf3eebd97cdeb2dc42b9516c77",
+     "backup_matches_live": true,
+     "bytes": 7315
+    },
+    {
+     "path": "/Users/androidteam/.prime/agent/models.json",
+     "backup_path": "/Users/androidteam/.hermes/backups/reconcile-omniroute-native-dialects/2d4cc93d7237f559-models.json",
+     "backup_mode": "0o600",
+     "live_sha256": "1824c8b88ce381d773178375376c014bad114c9dfaf27a9682578952cfef5038",
+     "baseline_sha256": "1824c8b88ce381d773178375376c014bad114c9dfaf27a9682578952cfef5038",
+     "backup_matches_live": true,
+     "bytes": 2097
+    }
+   ],
+   "created_file_targets": [
+    {
+     "path": "/Users/androidteam/.codex/omniroute.config.toml",
+     "exists_at_backup_time": false,
+     "expected_new_mode": null
+    },
+    {
+     "path": "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json",
+     "exists_at_backup_time": false,
+     "expected_new_mode": "0o600"
+    }
+   ],
+   "run_index": 0
+  }
+ ]
+}

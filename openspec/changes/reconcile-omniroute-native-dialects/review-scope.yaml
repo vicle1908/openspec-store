@@ -1,0 +1,428 @@
+change_name: reconcile-omniroute-native-dialects
+
+repositories: []
+
+specs:
+  - specs/omniroute-agent-cli-routing/spec.md
+  - specs/coding-cli-provider-registry/spec.md
+  - specs/omp-provider-routing/spec.md
+  - specs/grok-cli-provider-routing/spec.md
+
+docs:
+  - review-scope.yaml
+  - proposal.md
+  - design.md
+  - tasks.md
+  - evidence/live-baseline.md
+  - evidence/cli-inventory.json
+  - evidence/cli-probe-matrix.json
+  - evidence/route-contract-check.py
+  - evidence/cli-probe-runner.py
+  - evidence/manifest-check.py
+  - evidence/inventory-check.py
+  - evidence/cli-disposition-matrix.md
+  - evidence/cli-disposition-results.json
+  - evidence/official-docs.md
+  - evidence/fallback-route-observations.md
+  - evidence/overlay-contract.json
+  - evidence/overlay-contract-check.py
+  - evidence/default-probe-matrix.json
+  - evidence/default-probe-contract-check.py
+  - evidence/capture-manifest.py
+  - evidence/codex-profile-mechanism-probe.py
+  - evidence/codex-profile-mechanism-result.json
+  - evidence/sentinel-fixtures.json
+  - evidence/sentinel-fixture-check.py
+  - evidence/drift-provenance.md
+  - evidence/incident-credential-exposure.md
+  - evidence/baseline-cli-results.json
+  - evidence/pre-apply-manifest.json
+  - evidence/baseline-route-contract-result.txt
+  - evidence/apply-backups.py
+  - evidence/apply-blockers.json
+  - evidence/apply-mechanism.md
+  - evidence/apply-overlays.py
+  - evidence/baseline-drift-register.json
+  - evidence/cline-credential-classification.md
+  - evidence/plan-review-round-1.md
+  - evidence/sh-chat-reliability-observations.md
+  - evidence/template-credential-verification.json
+  - evidence/template-credential-verification.py
+  - evidence/write-set-reconciliation.md
+  - evidence/plan-review-round-3.md
+  - evidence/external-remediation-items.md
+  - evidence/plan-review-post-hardening.md
+  - evidence/apply-backups.json
+  - evidence/apply-overlays-results.json
+  - evidence/partial-apply-attempts.json
+  - evidence/candidate-templates/
+  - /Users/androidteam/Developer/AGENTS.md
+  - https://docs.x.ai/build/settings
+  - https://developers.openai.com/codex/config-reference
+  - https://kilo.ai/docs/code-with-ai/agents/custom-models
+  - https://opencode.ai/docs/providers/
+  - https://pi.dev/docs/latest/models
+  - https://moonshotai.github.io/kimi-code/en/configuration/providers.html
+  - https://docs.factory.ai/model-independence/byok
+  - https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/use-byok-models
+
+skills:
+  - openspec-workflow
+  - openspec-plan-review
+  - coding-agent-capability-verification
+  - multi-provider-cli-routing
+  - versioned-official-docs-research
+
+excluded:
+  - .env
+  - .git/
+  - node_modules/
+  - __pycache__/
+  - "*.pyc"
+  - user credential values
+  - archived OpenSpec changes
+  - OmniRoute source and Docker state
+
+coverage_threshold: 80
+
+risk:
+  tier: high-risk
+  fresh_context: true
+
+review_input:
+  mode: working_tree
+  candidate_patch_algorithm: "sha256 over sorted scoped relative paths + NUL + byte length + NUL + raw bytes; review-scope.yaml excluded"
+  review_scope_policy_algorithm: "sha256 over UTF-8 review-scope.yaml after zeroing runtime identity values and every artifact sha256 field"
+  head_commit: "ce217670410385d6d613053fa21d592e439db3b6"
+  candidate_patch_sha256: "c6f480082225ee0e810927bababf4209d65bf606f4b6ccd0589f08992777bf8a"
+  review_scope_policy_hash: "7046acb7ca9400ff8bfa409efc822856324a890261bbc1cb3d1bfa619f4a5584"
+  evidence_manifest_hash: "3880bd1b5cf2cc9dbe3e8882bb3b33dd7e714c26d5ff7c0a0a3807a552c7057c"
+  contract_version: "1"
+  reviewer: "pending"
+  reviewed_at: "pending"
+  dirty_paths:
+    - path: .openspec.yaml
+      status: untracked
+    - path: design.md
+      status: untracked
+    - path: evidence/baseline-cli-results.json
+      status: untracked
+    - path: evidence/baseline-route-contract-result.txt
+      status: untracked
+    - path: evidence/candidate-templates/.codex/omniroute.config.toml
+      status: untracked
+    - path: evidence/candidate-templates/.config/goose/custom_providers/custom_omniroute_anthropic.json
+      status: untracked
+    - path: evidence/candidate-templates/.config/kilo/kilo.jsonc
+      status: untracked
+    - path: evidence/candidate-templates/.config/opencode/opencode.json
+      status: untracked
+    - path: evidence/candidate-templates/.factory/settings.json
+      status: untracked
+    - path: evidence/candidate-templates/.grok/config.toml
+      status: untracked
+    - path: evidence/candidate-templates/.kimi-code/config.toml
+      status: untracked
+    - path: evidence/candidate-templates/.omp/agent/models.yml
+      status: untracked
+    - path: evidence/candidate-templates/.pi/agent/models.json
+      status: untracked
+    - path: evidence/candidate-templates/.prime/agent/models.json
+      status: untracked
+    - path: evidence/candidate-templates/cline/data/settings/providers.json
+      status: untracked
+    - path: evidence/capture-manifest.py
+      status: untracked
+    - path: evidence/cli-disposition-matrix.md
+      status: untracked
+    - path: evidence/cli-disposition-results.json
+      status: untracked
+    - path: evidence/cli-inventory.json
+      status: untracked
+    - path: evidence/cli-probe-matrix.json
+      status: untracked
+    - path: evidence/cli-probe-runner.py
+      status: untracked
+    - path: evidence/codex-profile-mechanism-probe.py
+      status: untracked
+    - path: evidence/codex-profile-mechanism-result.json
+      status: untracked
+    - path: evidence/default-probe-contract-check.py
+      status: untracked
+    - path: evidence/default-probe-matrix.json
+      status: untracked
+    - path: evidence/drift-provenance.md
+      status: untracked
+    - path: evidence/fallback-route-observations.md
+      status: untracked
+    - path: evidence/incident-credential-exposure.md
+      status: untracked
+    - path: evidence/inventory-check.py
+      status: untracked
+    - path: evidence/live-baseline.md
+      status: untracked
+    - path: evidence/manifest-check.py
+      status: untracked
+    - path: evidence/official-docs.md
+      status: untracked
+    - path: evidence/overlay-contract-check.py
+      status: untracked
+    - path: evidence/overlay-contract.json
+      status: untracked
+    - path: evidence/pre-apply-manifest.json
+      status: untracked
+    - path: evidence/route-contract-check.py
+      status: untracked
+    - path: evidence/sentinel-fixture-check.py
+      status: untracked
+    - path: evidence/sentinel-fixtures.json
+      status: untracked
+    - path: proposal.md
+      status: untracked
+    - path: review-scope.yaml
+      status: untracked
+    - path: specs/coding-cli-provider-registry/spec.md
+      status: untracked
+    - path: specs/grok-cli-provider-routing/spec.md
+      status: untracked
+    - path: specs/omniroute-agent-cli-routing/spec.md
+      status: untracked
+    - path: specs/omp-provider-routing/spec.md
+      status: untracked
+    - path: tasks.md
+      status: untracked
+    - path: evidence/apply-backups.py
+      status: untracked
+    - path: evidence/apply-blockers.json
+      status: untracked
+    - path: evidence/apply-mechanism.md
+      status: untracked
+    - path: evidence/apply-overlays.py
+      status: untracked
+    - path: evidence/baseline-drift-register.json
+      status: untracked
+    - path: evidence/cline-credential-classification.md
+      status: untracked
+    - path: evidence/plan-review-round-1.md
+      status: untracked
+    - path: evidence/sh-chat-reliability-observations.md
+      status: untracked
+    - path: evidence/template-credential-verification.json
+      status: untracked
+    - path: evidence/template-credential-verification.py
+      status: untracked
+    - path: evidence/write-set-reconciliation.md
+      status: untracked
+    - path: evidence/plan-review-round-3.md
+      status: untracked
+    - path: evidence/external-remediation-items.md
+      status: untracked
+    - path: evidence/plan-review-post-hardening.md
+      status: untracked
+    - path: evidence/apply-backups.json
+      status: untracked
+    - path: evidence/apply-overlays-results.json
+      status: untracked
+    - path: evidence/partial-apply-attempts.json
+      status: untracked
+  artifacts:
+    - path: .openspec.yaml
+      sha256: "f4a1a5ebcaf832a382f8bba53f7c81d9fa7e1a92b3d01f6b7d8fc34e77619b07"
+    - path: design.md
+      sha256: "e604b622e1c97d0c4ca00fd7b3adbf280c0e2fb2a7521412b0299884f608a2a9"
+    - path: evidence/baseline-cli-results.json
+      sha256: "d2270a8ff3d68a26dd4a12165a2feb51cd584bc4ee527b9b6d855f00cf488caa"
+    - path: evidence/baseline-route-contract-result.txt
+      sha256: "d4267f6d4fe29c5bd3e041523f4615e3acc5c93df71d5e7b4c2f0707a283d712"
+    - path: evidence/candidate-templates/.codex/omniroute.config.toml
+      sha256: "2214ed1f0cf6144a14d4f31ea88eaa96d00a2ec0efdc016141eb2eda1b1bf6a2"
+    - path: evidence/candidate-templates/.config/goose/custom_providers/custom_omniroute_anthropic.json
+      sha256: "d7e731e5e9952d3927693f8cf0fb5e7df2d44f55d09e008a95e03d5676c71083"
+    - path: evidence/candidate-templates/.config/kilo/kilo.jsonc
+      sha256: "dd2d3a011082d7501bedbb82d8666d0725b7b964d067495abb250c0f09ee957d"
+    - path: evidence/candidate-templates/.config/opencode/opencode.json
+      sha256: "0d311655024902d48e02eb896dd8b1e719810894ccbdf9df4ff81642219e775c"
+    - path: evidence/candidate-templates/.factory/settings.json
+      sha256: "7b3f756c2ef24db919a4a5a60baf8dbeb9de2a1b7ca7af6e049f114c9c701df7"
+    - path: evidence/candidate-templates/.grok/config.toml
+      sha256: "49199b161ec3518377a7420bb2fafe48c5ce48c80248479014fb8a291673636d"
+    - path: evidence/candidate-templates/.kimi-code/config.toml
+      sha256: "a4b52b86122366099c42245a3c66ddad40bf4afe6b0843a6daa77cc49a624f14"
+    - path: evidence/candidate-templates/.omp/agent/models.yml
+      sha256: "410812347a5a52e396df885c058921354e19c7011bc58b5b633f20db507ff5fe"
+    - path: evidence/candidate-templates/.pi/agent/models.json
+      sha256: "003a77f2d572bfd10d261b1c475412756b3485482380ec9ecf6e94170656cb0a"
+    - path: evidence/candidate-templates/.prime/agent/models.json
+      sha256: "182e299cd9b76003964a78f7f003397f42e7cc91ae8e97c4332c8797abee0512"
+    - path: evidence/candidate-templates/cline/data/settings/providers.json
+      sha256: "c916b318f5da9fbce23b996078468a3b58f8e26bbcdce5d03f1d0652055a3bd1"
+    - path: evidence/capture-manifest.py
+      sha256: "e8430c6af7eff90439fae419b5b9fec2ecf3c555cb59e47192dedadeb84dedaf"
+    - path: evidence/cli-disposition-matrix.md
+      sha256: "9d2d2b6e107e32596c8947b92cd13e0a054e4af81949ae762d5af4a0c8ce46b0"
+    - path: evidence/cli-disposition-results.json
+      sha256: "7bb40f25cf0a1d11eb97c054bd5620d7fc075d636dfbf68e9d2ddaf90ad88af4"
+    - path: evidence/cli-inventory.json
+      sha256: "35a585947ffd8c004140745178dd5623934fdaf4d6123fd76276d55e5d42a83f"
+    - path: evidence/cli-probe-matrix.json
+      sha256: "a2ff067729f1bf49c445667f33c9ad0cdfd2b0f0e19ee488c50e85407f9fc98d"
+    - path: evidence/cli-probe-runner.py
+      sha256: "387d82cc6f898ce87a678b6ebbde3b5d2313aa96d19ea1acf92577af14cc0e88"
+    - path: evidence/codex-profile-mechanism-probe.py
+      sha256: "35afa9740ce1f244432527a62a1322cc662a7dbd317647a965d58b1b8a986cee"
+    - path: evidence/codex-profile-mechanism-result.json
+      sha256: "af91e805ffd48f12108018589f866f10367eff95076348253e8300f5dc81ae2a"
+    - path: evidence/default-probe-contract-check.py
+      sha256: "92162dcb4f6e8273eb92baf5263a1918e6a6246c108b8d091ac297b361e972ec"
+    - path: evidence/default-probe-matrix.json
+      sha256: "dff54da7918d0e3cef37eca765526eb3137a11747b9764912a2ff5aa0a47b691"
+    - path: evidence/drift-provenance.md
+      sha256: "6138b0259aefd1dc07d21c2963652024fb393a09ee3c5a4799ff4743f1ccc858"
+    - path: evidence/fallback-route-observations.md
+      sha256: "a98597111c11ff23415da0d3748c6012bbd418314013d98c33bddd6ce10541b3"
+    - path: evidence/incident-credential-exposure.md
+      sha256: "0978ee772d1004e38e71239119225551b8d39cdb9e0f5be032a0f046d642b5c9"
+    - path: evidence/inventory-check.py
+      sha256: "0819b39e22b9ba04b5dec611c0b8f0650d0d3bebc2bea58e89c075ce84494d54"
+    - path: evidence/live-baseline.md
+      sha256: "40cbeda751e0a0f5bd9839bff411565eb18735f5bd8ae87eef7acbc781de80d8"
+    - path: evidence/manifest-check.py
+      sha256: "bb00cecccfa285df176fb0f2ad0d66fc4050b2ab4fe2f149a573d7048b9006f9"
+    - path: evidence/official-docs.md
+      sha256: "0ac29c30e1b95270356eafc40b5056531a50403255c88fcccc661b56c8cb482f"
+    - path: evidence/overlay-contract-check.py
+      sha256: "366062ef51a6f2d5b7f56c5b36610e128c19da12031346459c0ef40d654924c5"
+    - path: evidence/overlay-contract.json
+      sha256: "0c3e8fa75e3cb09381fbcd3d27e0c4cb06387447f8aa4d07f773f044334385ea"
+    - path: evidence/pre-apply-manifest.json
+      sha256: "3880bd1b5cf2cc9dbe3e8882bb3b33dd7e714c26d5ff7c0a0a3807a552c7057c"
+    - path: evidence/route-contract-check.py
+      sha256: "2c33ea0c2e048a4eb0751c4e02b0d83895c004ffec54a90d546f94c66dbf474c"
+    - path: evidence/sentinel-fixture-check.py
+      sha256: "5b5feffc89e85d0df8c4868a8c872cd0ff055ae25e4b0024d279d119725b9f61"
+    - path: evidence/sentinel-fixtures.json
+      sha256: "ac418867d485d7e8aa6b5799cdd4c7cc50aa0c9579be96de17d651671de67fdb"
+    - path: proposal.md
+      sha256: "de11ff4f0263c840a33bbb35cc98c2539a1dead5bdcc0e44f4ac3990499ab937"
+    - path: review-scope.yaml
+      sha256: "7046acb7ca9400ff8bfa409efc822856324a890261bbc1cb3d1bfa619f4a5584"
+    - path: specs/coding-cli-provider-registry/spec.md
+      sha256: "30a13427d6438eb303617a18182c958f18158ed75624cdb9e29038af69b1c876"
+    - path: specs/grok-cli-provider-routing/spec.md
+      sha256: "5919b836d5fb0f261ff6cb7a7e5ddc2120be4f055fc2cecb12fdacd360d1b747"
+    - path: specs/omniroute-agent-cli-routing/spec.md
+      sha256: "07ce2c3a832ca8da5c2c3846ef5aa06908dba36ca2f44dede598a92ad844e386"
+    - path: specs/omp-provider-routing/spec.md
+      sha256: "f2f948de4b59af5b99ddb073157a9f79cafedba1a732537f4bbe64f0148f79d0"
+    - path: tasks.md
+      sha256: "a479ce48f4442a457a4af9ac45d5150a8f1dc6ae9d0d0b55277c3ce92aa3c81c"
+    - path: evidence/apply-backups.py
+      sha256: "e945884882debfb9efc47631096d45056811e6471108947075eda74c6ae3f154"
+    - path: evidence/apply-blockers.json
+      sha256: "b37f6aab899ed1f84f3422cc6fd0738060f6caa54b0819ae68d173d54f5281d4"
+    - path: evidence/apply-mechanism.md
+      sha256: "4fcaeb355b764cad6c30665c20564801d64a7226bf41ac204439e4545de78400"
+    - path: evidence/apply-overlays.py
+      sha256: "44b9c4f4e334b84aac331922c4d0e565e5c4d1a347b74603bf7657a3ef0d2e78"
+    - path: evidence/baseline-drift-register.json
+      sha256: "cd32075ca6aacec3afa02b53053d6257c145c3b117e18b50bd0bc9e70f09ab2c"
+    - path: evidence/cline-credential-classification.md
+      sha256: "97063071098f052046dae0b13d6ffe0ba2382b6a48326aeb26e5dd3d65d767c0"
+    - path: evidence/plan-review-round-1.md
+      sha256: "01c5550e3ca5955931638027bc6bb5ce5708db0563104b2829e932f8d7ca98d0"
+    - path: evidence/sh-chat-reliability-observations.md
+      sha256: "c3de96888f853b37fc4eff788709f4f61717293b5aaa94fcc6b78aef7758b60a"
+    - path: evidence/template-credential-verification.json
+      sha256: "92f0bf0e7f8fbe6a72a1181c19251fcb69fc33be162ff31f7a458d191e82d766"
+    - path: evidence/template-credential-verification.py
+      sha256: "08ce123a4132b8608967bb68d360bd8617d6ec60e986acee6a6e1512e020fcc8"
+    - path: evidence/write-set-reconciliation.md
+      sha256: "35b9fc11ab98941a4bdc6c8e35b08632dc2b6df5808100328c6e6515f2bd2c17"
+    - path: evidence/plan-review-round-3.md
+      sha256: "f02817634cf77111c57e1590099816a669f475046e0c7f1aa71280a72140ffd0"
+    - path: evidence/external-remediation-items.md
+      sha256: "859bfcdc6c13e8e7f8d8c4386ad6d9843937d62080b62190caa09e896cd581fb"
+    - path: evidence/plan-review-post-hardening.md
+      sha256: "cb1c9814de448de38c32e5acc46ae96026d79184fe608c38a0b634c82f224b3e"
+    - path: evidence/apply-backups.json
+      sha256: "273b97a23b5b65d99595b05b492389f9b563becfc0b1d77bc77d0f975310e0c8"
+    - path: evidence/apply-overlays-results.json
+      sha256: "1565a435e4a1d703ced07043e6b299d21115bb6520e99e0670b49961672230f0"
+    - path: evidence/partial-apply-attempts.json
+      sha256: "6b95d309b0d8722fd656f1ebd61cccd181e2b6a239a7263d8a5503bbac4ce22a"
+acceptance:
+  fail_to_pass:
+    - id: static-route-contract-partial
+      command: /opt/homebrew/bin/python3
+      args: ["evidence/route-contract-check.py", "--phase", "candidate", "--check", "pi", "--check", "prime", "--check", "opencode", "--check", "kilo", "--check", "droid", "--check", "codex", "--check", "grok", "--check", "goose", "--check", "omp", "--check", "shell-byo", "--check", "modes", "--check", "grok-credentials", "--check", "codex-credentials", "--check", "omp-credentials", "--check", "active-dlg"]
+      working_directory: /Users/androidteam/Developer/openspec-store/openspec/changes/reconcile-omniroute-native-dialects
+      baseline: red
+      candidate: green
+      timeout: 60
+      output_limit: 1000
+    - id: static-route-contract-full
+      command: /opt/homebrew/bin/python3
+      args: ["evidence/route-contract-check.py", "--phase", "candidate"]
+      working_directory: /Users/androidteam/Developer/openspec-store/openspec/changes/reconcile-omniroute-native-dialects
+      baseline: red
+      candidate: green
+      timeout: 60
+      output_limit: 1000
+      note: "sensitive-batch gate: green only after the rotation-gated Kimi/Cline apply (apply-mechanism.md section 4a)"
+    - id: candidate-cli-probes
+      command: /opt/homebrew/bin/python3
+      args: ["evidence/cli-probe-runner.py", "--manifest", "evidence/cli-probe-matrix.json", "--phase", "candidate", "--output", "evidence/cli-probe-results.json"]
+      working_directory: /Users/androidteam/Developer/openspec-store/openspec/changes/reconcile-omniroute-native-dialects
+      baseline: red
+      candidate: green
+      timeout: 7200
+      output_limit: 2000
+  pass_to_pass:
+    - id: openspec-strict
+      command: openspec
+      args: ["validate", "reconcile-omniroute-native-dialects", "--strict", "--store", "openspec-store"]
+      working_directory: /Users/androidteam/Developer/openspec-store
+      baseline: green
+      candidate: green
+      timeout: 120
+      output_limit: 1000
+    - id: planning-artifact-parse
+      command: /usr/bin/ruby
+      args: ["-ryaml", "-e", "YAML.load_file(ARGV[0])", "review-scope.yaml"]
+      working_directory: /Users/androidteam/Developer/openspec-store/openspec/changes/reconcile-omniroute-native-dialects
+      baseline: green
+      candidate: green
+      timeout: 30
+      output_limit: 200
+    - id: cli-identity-inventory
+      command: /opt/homebrew/bin/python3
+      args: ["evidence/inventory-check.py", "evidence/cli-inventory.json"]
+      working_directory: /Users/androidteam/Developer/openspec-store/openspec/changes/reconcile-omniroute-native-dialects
+      baseline: green
+      candidate: green
+      timeout: 60
+      output_limit: 500
+    - id: overlay-contract
+      command: /opt/homebrew/bin/python3
+      args: ["evidence/overlay-contract-check.py"]
+      working_directory: /Users/androidteam/Developer/openspec-store/openspec/changes/reconcile-omniroute-native-dialects
+      baseline: green
+      candidate: green
+      timeout: 60
+      output_limit: 1000
+    - id: default-probe-contract
+      command: /opt/homebrew/bin/python3
+      args: ["evidence/default-probe-contract-check.py"]
+      working_directory: /Users/androidteam/Developer/openspec-store/openspec/changes/reconcile-omniroute-native-dialects
+      baseline: green
+      candidate: green
+      timeout: 60
+      output_limit: 1000
+    - id: manifest-preservation
+      command: /opt/homebrew/bin/python3
+      args: ["evidence/manifest-check.py", "--baseline", "evidence/pre-apply-manifest.json", "--candidate", "evidence/post-apply-manifest.json", "--drift-register", "evidence/baseline-drift-register.json", "--overlay-contract", "evidence/overlay-contract.json"]
+      working_directory: /Users/androidteam/Developer/openspec-store/openspec/changes/reconcile-omniroute-native-dialects
+      baseline: green
+      candidate: green
+      timeout: 60
+      output_limit: 1000

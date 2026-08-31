@@ -1,0 +1,298 @@
+{
+ "value_blind": true,
+ "purpose": "Preserved value-blind record of live partial-apply attempts (the orchestrator's temp results file is overwritten on each execute; this evidence book accumulates attempts instead).",
+ "attempts": [
+  {
+   "attempt": 1,
+   "recorded_at": "2026-08-31T05:39+07:00",
+   "mode": "execute",
+   "home": "/Users/androidteam",
+   "order": [
+    "codex",
+    "goose-pm",
+    "kilo",
+    "opencode",
+    "droid",
+    "grok",
+    "omp",
+    "pi",
+    "prime"
+   ],
+   "outcomes": [
+    {
+     "target": "codex",
+     "path": "/Users/androidteam/.codex/omniroute.config.toml",
+     "kind": "create",
+     "dry_status": "create",
+     "sha_before": null,
+     "apply_rc": 0,
+     "sha_after": "2214ed1f0cf6144a14d4f31ea88eaa96d00a2ec0efdc016141eb2eda1b1bf6a2",
+     "mode_after": "0o600",
+     "probe": "1 row(s) green",
+     "status": "APPLIED"
+    },
+    {
+     "target": "goose-pm",
+     "path": "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json",
+     "kind": "create",
+     "dry_status": "create",
+     "sha_before": null,
+     "apply_rc": 0,
+     "sha_after": "d7e731e5e9952d3927693f8cf0fb5e7df2d44f55d09e008a95e03d5676c71083",
+     "mode_after": "0o600",
+     "probe": "runner rc=1",
+     "status": "ROLLED-BACK post-write probe failure",
+     "rollback": "deleted-created-file"
+    },
+    {
+     "target": "kilo",
+     "path": "/Users/androidteam/.config/kilo/kilo.jsonc",
+     "kind": "insert-providers",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    },
+    {
+     "target": "opencode",
+     "path": "/Users/androidteam/.config/opencode/opencode.json",
+     "kind": "insert-providers",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    },
+    {
+     "target": "droid",
+     "path": "/Users/androidteam/.factory/settings.json",
+     "kind": "droid-upsert",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    },
+    {
+     "target": "grok",
+     "path": "/Users/androidteam/.grok/config.toml",
+     "kind": "toml-splice",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    },
+    {
+     "target": "omp",
+     "path": "/Users/androidteam/.omp/agent/models.yml",
+     "kind": "omp-splice",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    },
+    {
+     "target": "pi",
+     "path": "/Users/androidteam/.pi/agent/models.json",
+     "kind": "pi-merge",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    },
+    {
+     "target": "prime",
+     "path": "/Users/androidteam/.prime/agent/models.json",
+     "kind": "insert-providers",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    }
+   ],
+   "stopped": true,
+   "postmortem": "goose.pm.messages probe false-negative: the pre-repair exact_sentinel parsed only the last non-empty line; goose --output-format json emits pretty-printed session JSON whose last line is '}'. The response was protocol-correct (rc 0, final assistant text == sentinel, /v1/messages). Repair confined to evidence/cli-probe-runner.py (whole-output JSON parse + final-text/final-message strictness), verified by the U1-U16 production-replay fixture matrix and a live disposable-HOME goose probe before the resume."
+  },
+  {
+   "attempt": 2,
+   "recorded_at": "2026-08-31T07:16:47+07:00",
+   "provenance": "reconstructed-after-the-fact from the orchestrator's temp results file (overwritten on each execute) immediately after the attempt; value-blind fields only",
+   "attempt_completed_at": "unknown — the orchestrator's temp results file is shared and later overwritten by verifier sandbox-execute runs (its current mtime belongs to a verifier case-D run, not to any attempt); the outcomes below were snapshotted value-blind in the same shell command immediately after this attempt's execute",
+   "mode": "execute",
+   "home": "/Users/androidteam",
+   "order": [
+    "codex",
+    "goose-pm",
+    "kilo",
+    "opencode",
+    "droid",
+    "grok",
+    "omp",
+    "pi",
+    "prime"
+   ],
+   "outcomes": [
+    {
+     "target": "codex",
+     "path": "/Users/androidteam/.codex/omniroute.config.toml",
+     "kind": "create",
+     "dry_status": "noop-already-present",
+     "mode": "verify-only (already applied)",
+     "probe": "1 row(s) green",
+     "status": "VERIFIED-ALREADY-PRESENT"
+    },
+    {
+     "target": "goose-pm",
+     "path": "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json",
+     "kind": "create",
+     "dry_status": "create",
+     "sha_before": null,
+     "apply_rc": 0,
+     "sha_after": "d7e731e5e9952d3927693f8cf0fb5e7df2d44f55d09e008a95e03d5676c71083",
+     "mode_after": "0o600",
+     "probe": "1 row(s) green",
+     "status": "APPLIED"
+    },
+    {
+     "target": "kilo",
+     "path": "/Users/androidteam/.config/kilo/kilo.jsonc",
+     "kind": "insert-providers",
+     "dry_status": "merge-insert",
+     "sha_before": "b5b9efa83af751179ef4571311046ef0e8835b45a69b35adb02b568bc71caa71",
+     "apply_rc": 0,
+     "sha_after": "26d66d25f59d4b8be1fe056b2b3da7f0fdbe8f6f675572b5ca910ae58a46c398",
+     "mode_after": "0o600",
+     "probe": "runner rc=1",
+     "status": "ROLLED-BACK post-write probe failure",
+     "rollback": "restored-from-backup",
+     "sha_restored": "b5b9efa83af751179ef4571311046ef0e8835b45a69b35adb02b568bc71caa71"
+    },
+    {
+     "target": "opencode",
+     "path": "/Users/androidteam/.config/opencode/opencode.json",
+     "kind": "insert-providers",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    },
+    {
+     "target": "droid",
+     "path": "/Users/androidteam/.factory/settings.json",
+     "kind": "droid-upsert",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    },
+    {
+     "target": "grok",
+     "path": "/Users/androidteam/.grok/config.toml",
+     "kind": "toml-splice",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    },
+    {
+     "target": "omp",
+     "path": "/Users/androidteam/.omp/agent/models.yml",
+     "kind": "omp-splice",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    },
+    {
+     "target": "pi",
+     "path": "/Users/androidteam/.pi/agent/models.json",
+     "kind": "pi-merge",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    },
+    {
+     "target": "prime",
+     "path": "/Users/androidteam/.prime/agent/models.json",
+     "kind": "insert-providers",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    }
+   ],
+   "stopped": true,
+   "postmortem": "goose-pm applied green under the repaired oracle (attempt-1 root cause confirmed fixed live). kilo then failed its post-write probe: direct diagnostics showed both kilo rows rc 0 with the sentinel present in kilo's JSONL output (one JSON record per line: step_start -> text carrier -> step_finish), and a production-runner replay classified BOTH rows as RUNNER-EXTRACTION-GAP (JSONL) — the runner had no JSONL path. Fail-stop held: kilo restored byte-identical from backup, six later targets NOT-ATTEMPTED, deferred Kimi/Cline untouched. Repair confined to evidence/cli-probe-runner.py (dedicated JSONL contract: sentinel credited only from the LAST formal text carrier, only end-of-turn control records may trail it), with J1-J8 production-replay fixtures before any resume."
+  },
+  {
+   "attempt": 3,
+   "recorded_at": "2026-08-31T07:44:38+07:00",
+   "provenance": "preserved same-shell snapshot (T/attempt3-results-snapshot.json) copied immediately after this attempt's execute, before any verifier sandbox run could overwrite the shared temp file; value-blind fields only",
+   "attempt_completed_at": "unknown — not captured at completion; the snapshot preserves outcomes but not the finish timestamp",
+   "mode": "execute",
+   "home": "/Users/androidteam",
+   "order": [
+    "codex",
+    "goose-pm",
+    "kilo",
+    "opencode",
+    "droid",
+    "grok",
+    "omp",
+    "pi",
+    "prime"
+   ],
+   "outcomes": [
+    {
+     "target": "codex",
+     "path": "/Users/androidteam/.codex/omniroute.config.toml",
+     "kind": "create",
+     "dry_status": "noop-already-present",
+     "mode": "verify-only (already applied)",
+     "probe": "1 row(s) green",
+     "status": "VERIFIED-ALREADY-PRESENT"
+    },
+    {
+     "target": "goose-pm",
+     "path": "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json",
+     "kind": "create",
+     "dry_status": "noop-already-present",
+     "mode": "verify-only (already applied)",
+     "probe": "1 row(s) green",
+     "status": "VERIFIED-ALREADY-PRESENT"
+    },
+    {
+     "target": "kilo",
+     "path": "/Users/androidteam/.config/kilo/kilo.jsonc",
+     "kind": "insert-providers",
+     "dry_status": "merge-insert",
+     "sha_before": "b5b9efa83af751179ef4571311046ef0e8835b45a69b35adb02b568bc71caa71",
+     "apply_rc": 0,
+     "sha_after": "26d66d25f59d4b8be1fe056b2b3da7f0fdbe8f6f675572b5ca910ae58a46c398",
+     "mode_after": "0o600",
+     "probe": "2 row(s) green",
+     "status": "APPLIED"
+    },
+    {
+     "target": "opencode",
+     "path": "/Users/androidteam/.config/opencode/opencode.json",
+     "kind": "insert-providers",
+     "dry_status": "merge-insert",
+     "sha_before": "275f755767529d821c43d81e3e1c2747563fd85e424db3fbffca02e43acc76b9",
+     "apply_rc": 0,
+     "sha_after": "cee65a3e5b3896f539f47e44c199d0f19cbcda6c032427dba6705906bb718a6b",
+     "mode_after": "0o600",
+     "probe": "2 row(s) green",
+     "status": "APPLIED"
+    },
+    {
+     "target": "droid",
+     "path": "/Users/androidteam/.factory/settings.json",
+     "kind": "droid-upsert",
+     "dry_status": "merge-droid",
+     "sha_before": "6926f1a4a865fa8736c30a3504a399a748b8545067bc47836328c8efcbb9681c",
+     "apply_rc": 0,
+     "sha_after": "3ad11cb354d7211c89d225f7d1f09fac7055d26ba02d6e58b4967c0548b57f61",
+     "mode_after": "0o644",
+     "mode_note": "0o644 equals the frozen baseline mode — no tightening introduced by this change",
+     "probe": "2 row(s) green",
+     "status": "APPLIED"
+    },
+    {
+     "target": "grok",
+     "path": "/Users/androidteam/.grok/config.toml",
+     "kind": "toml-splice",
+     "dry_status": "merge-toml",
+     "sha_before": "8626abe9ec687fcf4261d117814b1b88d25925f52246a2d73d0791f080dfa4b6",
+     "apply_rc": 0,
+     "sha_after": "8d113f75f50531063dc620a18d0974babd81b97d400824719fa31cfe6e748e03",
+     "mode_after": "0o600",
+     "probe": "runner rc=1",
+     "status": "ROLLED-BACK post-write probe failure",
+     "rollback": "restored-from-backup",
+     "sha_restored": "8626abe9ec687fcf4261d117814b1b88d25925f52246a2d73d0791f080dfa4b6"
+    },
+    {
+     "target": "omp",
+     "path": "/Users/androidteam/.omp/agent/models.yml",
+     "kind": "omp-splice",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    },
+    {
+     "target": "pi",
+     "path": "/Users/androidteam/.pi/agent/models.json",
+     "kind": "pi-merge",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    },
+    {
+     "target": "prime",
+     "path": "/Users/androidteam/.prime/agent/models.json",
+     "kind": "insert-providers",
+     "status": "NOT-ATTEMPTED (stopped after earlier failure)"
+    }
+   ],
+   "stopped": true,
+   "postmortem": "kilo re-applied green under the JSONL carrier oracle (2 rows) — the attempt-2 root cause confirmed fixed live; opencode and droid then applied green (2 rows each; droid mode 0o644 equals baseline, no tightening). grok failed its post-write probe (runner rc=1) and was rolled back byte-identical to baseline; omp/pi/prime NOT-ATTEMPTED; deferred Kimi/Cline untouched. grok classification pending: a production-runner replay classifier (T/hermes-verify-grok-classify.py, disposable sandbox HOME + candidate overlay + exact matrix argv for grok.pm.messages and grok.sh.chat-fallback + retained-disposition comparison) must decide between runner-extraction-gap (oracle regression from the 2026-08-31 tightening), sandbox-green (live env/transient), or a real config/routing failure — BEFORE any repair or rerun."
+  }
+ ]
+}

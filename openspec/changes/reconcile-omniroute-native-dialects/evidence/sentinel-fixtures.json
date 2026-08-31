@@ -1,0 +1,14 @@
+{
+  "expected": "OMNIROUTE_DIALECT_OK",
+  "cases": [
+    {"name":"final_plain_line","output":"progress\nOMNIROUTE_DIALECT_OK\n","expected":true},
+    {"name":"substring_only","output":"prefix OMNIROUTE_DIALECT_OK suffix\n","expected":false},
+    {"name":"prompt_echo_last_line","output":"Reply with exactly: OMNIROUTE_DIALECT_OK\nOMNIROUTE_DIALECT_OK\n","expected":false},
+    {"name":"generic_message_metadata","output":"{\"message\":\"OMNIROUTE_DIALECT_OK\"}\n","expected":false},
+    {"name":"user_content","output":"{\"role\":\"user\",\"content\":\"OMNIROUTE_DIALECT_OK\"}\n","expected":false},
+    {"name":"tool_content","output":"{\"role\":\"tool\",\"content\":\"OMNIROUTE_DIALECT_OK\"}\n","expected":false},
+    {"name":"assistant_content","output":"{\"role\":\"assistant\",\"content\":\"OMNIROUTE_DIALECT_OK\"}\n","expected":true},
+    {"name":"terminal_result_text","output":"{\"type\":\"result\",\"result\":{\"text\":\"OMNIROUTE_DIALECT_OK\"}}\n","expected":true},
+    {"name":"trailing_log","output":"OMNIROUTE_DIALECT_OK\nwarning: trailing log\n","expected":false}
+  ]
+}

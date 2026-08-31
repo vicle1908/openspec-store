@@ -1,0 +1,774 @@
+{
+ "allowed_mode_tightenings": [],
+ "apply_safety": {
+  "atomic_replacement": "write temp file in same directory, fsync, os.replace, then chmod",
+  "backup_dir": "~/.hermes/backups/reconcile-omniroute-native-dialects",
+  "backup_dir_mode": "0o700",
+  "backup_file_mode": "0o600 (all 12 mutate targets)",
+  "claude_code_note": "Claude Code surface owned by archived add-claude-code-omniroute-pm-launcher; no Claude Code files mutated by this change; earlier \"12\" count included the archived change's helper+profile pair, corrected to the 11 overlay targets here.",
+  "mutate_target_count": 11,
+  "mutate_targets": [
+   "~/.cline/data/settings/providers.json",
+   "~/.codex/omniroute.config.toml",
+   "~/.config/goose/custom_providers/custom_omniroute_anthropic.json",
+   "~/.config/kilo/kilo.jsonc",
+   "~/.config/opencode/opencode.json",
+   "~/.factory/settings.json",
+   "~/.grok/config.toml",
+   "~/.kimi-code/config.toml",
+   "~/.omp/agent/models.yml",
+   "~/.pi/agent/models.json",
+   "~/.prime/agent/models.json"
+  ],
+  "one_file_at_a_time": true,
+  "single_writer": "root agent session 01a04bcc (reconcile apply owner)",
+  "verify_after_write": "parse validation + live sentinel per file; rollback on any failure"
+ },
+ "changed_paths": [],
+ "default_preservation_contract": {
+  "default_probe_runner": "task 5.4 executor: evidence/default-probe-runner.py (to be provided at apply time; rows from default-probe-matrix.json are executed with cwd /tmp, no override flags, value-blind capture; schema mapping: working_directory->cwd, expected->exact sentinel, timeout->per-row bound)",
+  "evidence_output": "evidence/post-apply-manifest.json + evidence/default-probe-results.json",
+  "post_check": [
+   "1. every defaults.* key value equals its pre-apply value (no default drift)",
+   "2. every existing file keeps its pre-apply sha256 UNLESS it is one of the 12 apply targets",
+   "3. non-target files: mode + sha256 identical to pre-apply manifest",
+   "4. apply targets: parse-valid JSON/TOML/YAML/JSONC after merge; unrelated top-level keys preserved",
+   "5. new files: created with expected_new_file_modes (0600)",
+   "6. explicit-route sentinels recorded separately from no-override default probes (default-probe-matrix.json)",
+   "7. any failure: atomic restore from backup, target reported blocked/unchanged"
+  ],
+  "pre_snapshot": "files{sha256,mode} + defaults{} + default_selector_hashes{} (this manifest)"
+ },
+ "default_selector_hashes": {
+  "claude-code": "5296ec775c77b1706a9b6c620b41f97bd155126ff4bfd9acad64f2b1e1d747b6",
+  "cline": "b79c34145f53ef88a7d08837d243404f0dd478a92dfd4238cacdd1a7136318de",
+  "codex": "6cda34ec2c7acfd34318c9f87c1708720c8ba46c22a9539c85a3732ac79990eb",
+  "droid": "6c5aca7de520264e134348972122a17e5febf0831fd96776f91a78fc9256831e",
+  "goose": "b7da827f31728f30769cfc21766dff59e9c831abc73c045d0030b82313aad37c",
+  "grok": "2663e2c9bd16a972a206e12874050e4f09082018c28ec20479c38ecea0984659",
+  "kilo": "3fdddf38fcac9a8c2904c61fc9c13ec14371d6752c7405f75e7b04f83fa80301",
+  "kimi-code": "dcc1e6bad8ca726c10f9210b5cb24775be3360a171d815ad9cacd36a2979d1bf",
+  "omp": "837a543daf36db34c4f7c83b6fb2ef45e7616f2eae005046f1288a893e360cbe",
+  "opencode": "db11cd883348201c0b9eeeab69e920a0d03c683613ee6105c6dc8de6e76c3089",
+  "pi": "787cd489d776f74a02ee32c7f161af8e71e565365a9d9d342cd77ae64384a663",
+  "prime-agent": "f0a0f55ab4a1780544ee04bff0ad7c9f0e89e52df2c18f59a3f3c1424b3b6766"
+ },
+ "defaults": {
+  "claude-code.model": "Claude-Fable[1m]",
+  "cline.lastUsedProvider": "openai-native",
+  "codex.model": "gpt-5.6-sol",
+  "codex.model_provider": "codex_local_access",
+  "droid.sessionDefaultSettings.autonomyLevel": "high",
+  "droid.sessionDefaultSettings.autonomyMode": "auto-high",
+  "droid.sessionDefaultSettings.interactionMode": "auto",
+  "droid.sessionDefaultSettings.model": "Claude-Fable",
+  "droid.sessionDefaultSettings.reasoningEffort": "high",
+  "goose.active_provider": "openai",
+  "goose.provider_metadata": {
+   "custom_omniroute": {
+    "configured": true,
+    "enabled": true,
+    "model": "gpt-5.6-sol"
+   },
+   "custom_phanmemvip": {
+    "configured": true,
+    "enabled": true,
+    "model": "gpt-5.6-sol"
+   },
+   "custom_shopapikey": {
+    "configured": true,
+    "enabled": true,
+    "model": "Claude-Fable"
+   },
+   "openai": {
+    "configured": true,
+    "enabled": true,
+    "model": "gpt-5.6-luna"
+   }
+  },
+  "goose.provider_name": "custom_omniroute_sh",
+  "grok.models.default": "cockpit-sol",
+  "grok.models.session_summary": "cockpit-sol",
+  "grok.models.web_search": "grok-4.6",
+  "kilo.model": "omniroute/sh/codex",
+  "kimi-code.default_model": "sh-claude-fable",
+  "kimi-code.provider_metadata": {
+   "cockpit": {
+    "base_url": "http://localhost:51006/v1"
+   },
+   "moonshot-ai": {
+    "base_url": "https://api.moonshot.ai/v1"
+   },
+   "omniroute": {
+    "base_url": "http://localhost:20128/v1"
+   },
+   "phanmemvip": {
+    "base_url": "https://api.phanmemvip.shop/v1"
+   },
+   "shopapikey": {
+    "base_url": "https://api.phanmemvip.shop"
+   }
+  },
+  "omp.defaultThinkingLevel": "auto",
+  "omp.modelRoles": {
+   "advisor": "cockpit/gpt-5.6-sol:xhigh",
+   "commit": "shopapikey/Claude-Fable:low",
+   "default": "shopapikey/Claude-Fable",
+   "plan": "cockpit/gpt-5.6-sol:max",
+   "slow": "cockpit/gpt-5.6-luna:max",
+   "smol": "google-antigravity/gemini-3.7-flash:high",
+   "task": "phanmemvip/gpt-5.6-sol:xhigh",
+   "tiny": "google-antigravity/gemini-3.7-flash:high",
+   "vision": "google-antigravity/gemini-3.7-flash:high"
+  },
+  "omp.provider_metadata": {
+   "cockpit": {
+    "api": "openai-responses",
+    "baseUrl": "http://localhost:51006/v1"
+   },
+   "omniroute": {
+    "api": "openai-responses",
+    "baseUrl": "http://localhost:20128/v1"
+   },
+   "phanmemvip": {
+    "api": "openai-responses",
+    "baseUrl": "https://api.phanmemvip.shop/v1"
+   },
+   "shopapikey": {
+    "api": "anthropic-messages",
+    "baseUrl": "https://api.phanmemvip.shop"
+   }
+  },
+  "omp.retry": {
+   "fallbackChains": {
+    "cockpit/gpt-5.6-luna": [
+     "cockpit/gpt-5.6-sol",
+     "shopapikey/Claude-Fable"
+    ],
+    "cockpit/gpt-5.6-sol": [
+     "cockpit/gpt-5.6-luna",
+     "shopapikey/Claude-Fable"
+    ],
+    "default": [
+     "phanmemvip/gpt-5.6-sol",
+     "shopapikey/Claude-Fable",
+     "cockpit/gpt-5.6-sol",
+     "google-antigravity/gemini-3.7-flash:high"
+    ],
+    "google-antigravity/*": [
+     "google/*",
+     "google-vertex/*",
+     "shopapikey/Claude-Fable"
+    ],
+    "phanmemvip/gpt-5.6-sol": [
+     "cockpit/gpt-5.6-sol",
+     "shopapikey/Claude-Fable"
+    ]
+   }
+  },
+  "opencode.model": "phanmemvip/gpt-5.6-sol",
+  "pi.defaultModel": "Claude-Fable",
+  "pi.defaultProvider": "shopapikey",
+  "pi.defaultThinkingLevel": "xhigh",
+  "pi.provider_metadata": {
+   "cockpit": {
+    "api": "openai-responses",
+    "baseUrl": "http://localhost:51006/v1"
+   },
+   "omniroute": {
+    "api": "openai-responses",
+    "baseUrl": "http://localhost:20128/v1"
+   },
+   "phanmemvip": {
+    "api": "openai-responses",
+    "baseUrl": "https://api.phanmemvip.shop/v1"
+   },
+   "shopapikey": {
+    "api": "anthropic-messages",
+    "baseUrl": "https://api.phanmemvip.shop"
+   }
+  },
+  "prime-agent.defaultModel": "Claude-Fable",
+  "prime-agent.defaultProvider": "shopapikey",
+  "prime-agent.defaultThinkingLevel": "high",
+  "prime-agent.provider_metadata": {
+   "cockpit": {
+    "api": "openai-responses",
+    "baseUrl": "http://localhost:51006/v1"
+   },
+   "omniroute": {
+    "api": "openai-responses",
+    "baseUrl": "http://localhost:20128/v1"
+   },
+   "phanmemvip": {
+    "api": "openai-responses",
+    "baseUrl": "https://api.phanmemvip.shop/v1"
+   },
+   "shopapikey": {
+    "api": "openai-responses",
+    "baseUrl": "https://api.phanmemvip.shop/v1"
+   }
+  }
+ },
+ "expected_new_file_modes": {
+  "/Users/androidteam/.Claude-Fable": "0o600",
+  "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json": "0o600"
+ },
+ "files": {
+  "/Users/androidteam/.claude/helpers/cockpit-key.sh": {
+   "bytes": 881,
+   "exists": true,
+   "mode": "0o700",
+   "sha256": "ce3eba7c0b0d9e59322eaec809350bd58aea53e17edf38dc8043d41a47baf876"
+  },
+  "/Users/androidteam/.claude/helpers/omniroute-key.sh": {
+   "bytes": 0,
+   "exists": false,
+   "mode": null,
+   "sha256": null
+  },
+  "/Users/androidteam/.claude/helpers/shopapikey-key.sh": {
+   "bytes": 887,
+   "exists": true,
+   "mode": "0o700",
+   "sha256": "b8221d88840cc13b7d290a95703c0356701233b8028e216b02501fdc3f082428"
+  },
+  "/Users/androidteam/.claude/profiles/cockpit.json": {
+   "bytes": 660,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "3693dfb9b16220f3ac783770344c040136a9bd466628f5547fd10a2bb35f02ac"
+  },
+  "/Users/androidteam/.claude/profiles/omniroute.json": {
+   "bytes": 0,
+   "exists": false,
+   "mode": null,
+   "sha256": null
+  },
+  "/Users/androidteam/.claude/profiles/shopapikey.json": {
+   "bytes": 615,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "1478a342ec7078bb560a7130eba8fe57bb45f41f465ebd7ef331f05b545a6c82"
+  },
+  "/Users/androidteam/.claude/settings.json": {
+   "bytes": 36050,
+   "exists": true,
+   "mode": "0o644",
+   "sha256": "63ad6e5cddaf23d311ebb361c83c65e4edd5d6396518d619359dd8541589c444"
+  },
+  "/Users/androidteam/.cline/data/settings/providers.json": {
+   "bytes": 619,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "b457d792553e7946033916e3a197d21f45bcc7bc1a1bc9d1c5e1f96df3c0949d"
+  },
+  "/Users/androidteam/.codex/config.toml": {
+   "bytes": 9918,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "e7bb7a5846cb68c68e70b419d3edeef2db1299d7bec123e9035247554d82b463"
+  },
+  "/Users/androidteam/.codex/omniroute.config.toml": {
+   "bytes": 0,
+   "exists": false,
+   "mode": null,
+   "sha256": null
+  },
+  "/Users/androidteam/.config/goose/config.yaml": {
+   "bytes": 4614,
+   "exists": true,
+   "mode": "0o644",
+   "sha256": "e5e6192cacdf2c9b8d82b8eee6027db9fbe8a94f7b1b17d79041b600e7cc75e8"
+  },
+  "/Users/androidteam/.config/goose/custom_providers/custom_omniroute.json": {
+   "bytes": 1371,
+   "exists": true,
+   "mode": "0o644",
+   "sha256": "5aeae04605fe703769ca4d4e614773e2fa3606a5c8e24c5c88ef499b74b5043c"
+  },
+  "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json": {
+   "bytes": 0,
+   "exists": false,
+   "mode": null,
+   "sha256": null
+  },
+  "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_responses.json": {
+   "bytes": 0,
+   "exists": false,
+   "mode": null,
+   "sha256": null
+  },
+  "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_sh.json": {
+   "bytes": 994,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "a55c25cd2de74c2e05c4dd6f68d6f20d464f39210736c761db03037a6e23d0e1"
+  },
+  "/Users/androidteam/.config/goose/custom_providers/custom_phanmemvip.json": {
+   "bytes": 813,
+   "exists": true,
+   "mode": "0o644",
+   "sha256": "9418aece1a583dbbf6548ce2a14df09b2c388ce718f06fc9d223e88a7bfccfb1"
+  },
+  "/Users/androidteam/.config/goose/custom_providers/custom_shopapikey.json": {
+   "bytes": 807,
+   "exists": true,
+   "mode": "0o644",
+   "sha256": "35591790c2416a85e4ad3d916595a6424dcb909bada16dd96629911403dbba90"
+  },
+  "/Users/androidteam/.config/kilo/kilo.jsonc": {
+   "bytes": 1708,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "b5b9efa83af751179ef4571311046ef0e8835b45a69b35adb02b568bc71caa71"
+  },
+  "/Users/androidteam/.config/opencode/opencode.json": {
+   "bytes": 5801,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "275f755767529d821c43d81e3e1c2747563fd85e424db3fbffca02e43acc76b9"
+  },
+  "/Users/androidteam/.factory/settings.json": {
+   "bytes": 6815,
+   "exists": true,
+   "mode": "0o644",
+   "sha256": "6926f1a4a865fa8736c30a3504a399a748b8545067bc47836328c8efcbb9681c"
+  },
+  "/Users/androidteam/.grok/config.toml": {
+   "bytes": 2210,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "8626abe9ec687fcf4261d117814b1b88d25925f52246a2d73d0791f080dfa4b6"
+  },
+  "/Users/androidteam/.kimi-code/config.toml": {
+   "bytes": 8635,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "b25188192abda670db69153e26c682dcfcfc2ef0fd8ae9d71dad55af4240f5c6"
+  },
+  "/Users/androidteam/.omp/agent/config.yml": {
+   "bytes": 2329,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "3bfd622ee2dea2fc49d0a1215ac592a1be161b9da89b9601bf3cdb9cc2ba4068"
+  },
+  "/Users/androidteam/.omp/agent/models.yml": {
+   "bytes": 3507,
+   "exists": true,
+   "mode": "0o644",
+   "sha256": "ff62d85736c86c876f63dc5ae2360af553a53eb59abda3111a75a2f4de2fa016"
+  },
+  "/Users/androidteam/.pi/agent/models.json": {
+   "bytes": 7315,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "19df346e1d99f790587f43de3b87beb62a3b0ccf3eebd97cdeb2dc42b9516c77"
+  },
+  "/Users/androidteam/.pi/agent/settings.json": {
+   "bytes": 1147,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "ab5bffcdf7604467aee5dbec69623d8f23fa9e19134cfe88fefd7f8cee126aa9"
+  },
+  "/Users/androidteam/.prime/agent/auth.json": {
+   "bytes": 2,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+  },
+  "/Users/androidteam/.prime/agent/models.json": {
+   "bytes": 2097,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "1824c8b88ce381d773178375376c014bad114c9dfaf27a9682578952cfef5038"
+  },
+  "/Users/androidteam/.prime/agent/settings.json": {
+   "bytes": 669,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "4bd602e11d615988e461589d8759707096834e2c6d76de8180bd777ce9935dea"
+  },
+  "/Users/androidteam/.prime/agent/telemetry.json": {
+   "bytes": 78,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "0ed131933d2c40d12505a683064f9f8190638d9e55ab82b764f971e76e69c143"
+  },
+  "/Users/androidteam/.zshrc": {
+   "bytes": 10459,
+   "exists": true,
+   "mode": "0o600",
+   "sha256": "78c6f7ab1eb7eb5ffe1875cd98f0ad106f234df2c3cc4b3d5be597aa7f6e7527"
+  }
+ },
+ "launchers": {
+  "/Users/androidteam/.zshrc": [
+   "COPILOT_MODEL",
+   "COPILOT_PROVIDER_BASE_URL",
+   "COPILOT_PROVIDER_MAX_OUTPUT_TOKENS",
+   "COPILOT_PROVIDER_MAX_PROMPT_TOKENS",
+   "COPILOT_PROVIDER_TYPE",
+   "_claude_has",
+   "_claude_require_helper",
+   "_claude_with_profile",
+   "claude_reset",
+   "cockpit",
+   "shopapikey"
+  ]
+ },
+ "provider_ids": {
+  "claude-code": [
+   "profile:cockpit",
+   "profile:cockpit:model:gpt-5.6-luna[1m]",
+   "profile:shopapikey",
+   "profile:shopapikey:model:fable[1m]"
+  ],
+  "cline": [
+   "openai-compatible",
+   "openai-native"
+  ],
+  "codex": [
+   "codex_local_access",
+   "omniroute"
+  ],
+  "droid": [
+   "anthropic",
+   "anthropic:Claude-Fable",
+   "anthropic:custom:ShopAPIKey-\u00b7-Fable-5-0",
+   "openai",
+   "openai:custom:Cockpit-\u00b7-GPT-5.6-Sol-0",
+   "openai:custom:OmniRoute-Claude-Fable",
+   "openai:custom:OmniRoute-gpt-5-6-sol",
+   "openai:custom:phanmemvip-gpt-5.6-sol-0",
+   "openai:gpt-5.6-sol",
+   "openai:sh/Claude-Fable",
+   "openai:sh/gpt-5.6-sol"
+  ],
+  "goose": [
+   "custom_omniroute",
+   "custom_omniroute_sh",
+   "custom_phanmemvip",
+   "custom_shopapikey",
+   "openai"
+  ],
+  "grok": [
+   "cockpit",
+   "omniroute",
+   "phanmemvip",
+   "shopapikey"
+  ],
+  "kilo": [
+   "omniroute"
+  ],
+  "kimi-code": [
+   "cockpit",
+   "moonshot-ai",
+   "omniroute",
+   "phanmemvip",
+   "shopapikey"
+  ],
+  "omp": [
+   "cockpit",
+   "omniroute",
+   "phanmemvip",
+   "shopapikey"
+  ],
+  "opencode": [
+   "cockpit",
+   "omniroute",
+   "phanmemvip",
+   "shopapikey",
+   "zai"
+  ],
+  "pi": [
+   "cockpit",
+   "omniroute",
+   "phanmemvip",
+   "shopapikey"
+  ],
+  "prime-agent": [
+   "cockpit",
+   "omniroute",
+   "phanmemvip",
+   "shopapikey"
+  ]
+ },
+ "provider_model_ids": {
+  "omp": {
+   "cockpit": [
+    "gpt-5.6-luna",
+    "gpt-5.6-sol",
+    "gpt-5.6-terra"
+   ],
+   "omniroute": [
+    "sh/codex",
+    "sh/codex-x",
+    "sh/codex-5.6",
+    "sh/gpt-5.5",
+    "sh/gpt-5.6",
+    "sh/o3",
+    "sh/o4-mini",
+    "sh/gpt-4o",
+    "sh/gpt-5.4",
+    "sh/gpt-5.6-sol",
+    "sh/default",
+    "sh/Claude-Opus",
+    "sh/Claude-Sonnet",
+    "sh/Claude-Fable"
+   ],
+   "phanmemvip": [
+    "gpt-5.6-sol"
+   ],
+   "shopapikey": [
+    "Claude-Fable"
+   ]
+  },
+  "pi": {
+   "cockpit": [
+    "gpt-5.6-sol",
+    "gpt-5.6-terra",
+    "gpt-5.6-luna"
+   ],
+   "omniroute": [
+    "ollamacloud/deepseek-v4-pro:cloud",
+    "ollamacloud/deepseek-v4-flash:cloud",
+    "ollamacloud/kimi-k2.6:cloud",
+    "ollamacloud/glm-5.1:cloud",
+    "sh/gpt-5.6-sol",
+    "sh/Claude-Fable"
+   ],
+   "phanmemvip": [
+    "gpt-5.6-sol"
+   ],
+   "shopapikey": [
+    "Claude-Fable"
+   ]
+  }
+ },
+ "rollback": {
+  "/Users/androidteam/.claude/helpers/cockpit-key.sh": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/e01b54291e5d2268-cockpit-key.sh",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.claude/helpers/omniroute-key.sh": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/17174d2dee52824c-omniroute-key.sh",
+   "backup_mode": "0o600",
+   "backup_required": false,
+   "backup_sha256": null,
+   "backup_status": "not-applicable-baseline-absent",
+   "rollback_action": "delete-created-file"
+  },
+  "/Users/androidteam/.claude/helpers/shopapikey-key.sh": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/1fc73ddd31b5da6b-shopapikey-key.sh",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.claude/profiles/cockpit.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/487cc06785ff0c36-cockpit.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.claude/profiles/omniroute.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/e3e261535803eb4d-omniroute.json",
+   "backup_mode": "0o600",
+   "backup_required": false,
+   "backup_sha256": null,
+   "backup_status": "not-applicable-baseline-absent",
+   "rollback_action": "delete-created-file"
+  },
+  "/Users/androidteam/.claude/profiles/shopapikey.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/944f00b3e8b68801-shopapikey.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.claude/settings.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/ab39cb377f8a38f4-settings.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.cline/data/settings/providers.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/0127e340cd7731ff-providers.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.codex/config.toml": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/26df188b5bd3a365-config.toml",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.codex/omniroute.config.toml": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/118c64e6e4e22f1d-omniroute.config.toml",
+   "backup_mode": "0o600",
+   "backup_required": false,
+   "backup_sha256": null,
+   "backup_status": "not-applicable-baseline-absent",
+   "rollback_action": "delete-created-file"
+  },
+  "/Users/androidteam/.config/goose/config.yaml": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/2aab3021f72e0307-config.yaml",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.config/goose/custom_providers/custom_omniroute.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/cd8450e889628bd8-custom_omniroute.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/935cc364cf17c0a5-custom_omniroute_anthropic.json",
+   "backup_mode": "0o600",
+   "backup_required": false,
+   "backup_sha256": null,
+   "backup_status": "not-applicable-baseline-absent",
+   "rollback_action": "delete-created-file"
+  },
+  "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_responses.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/7e39c3fa38b2e2d8-custom_omniroute_responses.json",
+   "backup_mode": "0o600",
+   "backup_required": false,
+   "backup_sha256": null,
+   "backup_status": "not-applicable-baseline-absent",
+   "rollback_action": "delete-created-file"
+  },
+  "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_sh.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/31d7f456d22d6c6c-custom_omniroute_sh.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.config/goose/custom_providers/custom_phanmemvip.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/f9363f0730754e45-custom_phanmemvip.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.config/goose/custom_providers/custom_shopapikey.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/5d9fc5c62ca97548-custom_shopapikey.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.config/kilo/kilo.jsonc": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/5002588ccfec09ee-kilo.jsonc",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.config/opencode/opencode.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/5dea866122ab58fe-opencode.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.factory/settings.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/41dcf1a5a93cef41-settings.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.grok/config.toml": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/61148fa72bc42f44-config.toml",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.kimi-code/config.toml": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/bc7170e0fc5f10da-config.toml",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.omp/agent/config.yml": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/cf1c4227308d95cb-config.yml",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.omp/agent/models.yml": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/555c2037d46766f9-models.yml",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.pi/agent/models.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/12b1ac85e638be56-models.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.pi/agent/settings.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/01c54d4a87eca819-settings.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.prime/agent/auth.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/91d805f5e74a806f-auth.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.prime/agent/models.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/2d4cc93d7237f559-models.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.prime/agent/settings.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/afc407c7dede560b-settings.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.prime/agent/telemetry.json": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/a2faf5937f9638b3-telemetry.json",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  },
+  "/Users/androidteam/.zshrc": {
+   "backup_location_template": "$HOME/.hermes/backups/reconcile-omniroute-native-dialects/3183599c52987d8a-.zshrc",
+   "backup_mode": "0o600",
+   "backup_required": true,
+   "backup_sha256": null,
+   "backup_status": "not-created-planning-only"
+  }
+ },
+ "value_blind": true
+}

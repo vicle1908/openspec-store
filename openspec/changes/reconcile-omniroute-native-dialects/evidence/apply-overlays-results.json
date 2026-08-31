@@ -1,0 +1,221 @@
+{
+ "value_blind": true,
+ "runs": [
+  {
+   "value_blind": true,
+   "home": "/Users/androidteam",
+   "write": true,
+   "results": [
+    {
+     "target": "codex",
+     "path": "/Users/androidteam/.codex/omniroute.config.toml",
+     "changed": true,
+     "exists_before": false,
+     "sha_before": null,
+     "mode_before": null,
+     "action": "create",
+     "sha_after": "2214ed1f0cf6144a14d4f31ea88eaa96d00a2ec0efdc016141eb2eda1b1bf6a2",
+     "bytes_after": 456,
+     "mode_after": "0o600",
+     "dry_run": false
+    }
+   ],
+   "summary": {
+    "targets": 1,
+    "changed": 1,
+    "noop": 0,
+    "errors": 0
+   },
+   "run_index": 0
+  },
+  {
+   "value_blind": true,
+   "home": "/Users/androidteam",
+   "write": true,
+   "results": [
+    {
+     "target": "goose-pm",
+     "path": "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json",
+     "changed": true,
+     "exists_before": false,
+     "sha_before": null,
+     "mode_before": null,
+     "action": "create",
+     "sha_after": "d7e731e5e9952d3927693f8cf0fb5e7df2d44f55d09e008a95e03d5676c71083",
+     "bytes_after": 624,
+     "mode_after": "0o600",
+     "dry_run": false
+    }
+   ],
+   "summary": {
+    "targets": 1,
+    "changed": 1,
+    "noop": 0,
+    "errors": 0
+   },
+   "run_index": 1
+  },
+  {
+   "value_blind": true,
+   "home": "/Users/androidteam",
+   "write": true,
+   "results": [
+    {
+     "target": "goose-pm",
+     "path": "/Users/androidteam/.config/goose/custom_providers/custom_omniroute_anthropic.json",
+     "changed": true,
+     "exists_before": false,
+     "sha_before": null,
+     "mode_before": null,
+     "action": "create",
+     "sha_after": "d7e731e5e9952d3927693f8cf0fb5e7df2d44f55d09e008a95e03d5676c71083",
+     "bytes_after": 624,
+     "mode_after": "0o600",
+     "dry_run": false
+    }
+   ],
+   "summary": {
+    "targets": 1,
+    "changed": 1,
+    "noop": 0,
+    "errors": 0
+   },
+   "run_index": 2
+  },
+  {
+   "value_blind": true,
+   "home": "/Users/androidteam",
+   "write": true,
+   "results": [
+    {
+     "target": "kilo",
+     "path": "/Users/androidteam/.config/kilo/kilo.jsonc",
+     "changed": true,
+     "exists_before": true,
+     "sha_before": "b5b9efa83af751179ef4571311046ef0e8835b45a69b35adb02b568bc71caa71",
+     "mode_before": "0o600",
+     "action": "merge-insert",
+     "sha_after": "26d66d25f59d4b8be1fe056b2b3da7f0fdbe8f6f675572b5ca910ae58a46c398",
+     "bytes_after": 2873,
+     "mode_after": "0o600",
+     "dry_run": false
+    }
+   ],
+   "summary": {
+    "targets": 1,
+    "changed": 1,
+    "noop": 0,
+    "errors": 0
+   },
+   "run_index": 3
+  },
+  {
+   "value_blind": true,
+   "home": "/Users/androidteam",
+   "write": true,
+   "results": [
+    {
+     "target": "kilo",
+     "path": "/Users/androidteam/.config/kilo/kilo.jsonc",
+     "changed": true,
+     "exists_before": true,
+     "sha_before": "b5b9efa83af751179ef4571311046ef0e8835b45a69b35adb02b568bc71caa71",
+     "mode_before": "0o600",
+     "action": "merge-insert",
+     "sha_after": "26d66d25f59d4b8be1fe056b2b3da7f0fdbe8f6f675572b5ca910ae58a46c398",
+     "bytes_after": 2873,
+     "mode_after": "0o600",
+     "dry_run": false
+    }
+   ],
+   "summary": {
+    "targets": 1,
+    "changed": 1,
+    "noop": 0,
+    "errors": 0
+   },
+   "run_index": 4
+  },
+  {
+   "value_blind": true,
+   "home": "/Users/androidteam",
+   "write": true,
+   "results": [
+    {
+     "target": "opencode",
+     "path": "/Users/androidteam/.config/opencode/opencode.json",
+     "changed": true,
+     "exists_before": true,
+     "sha_before": "275f755767529d821c43d81e3e1c2747563fd85e424db3fbffca02e43acc76b9",
+     "mode_before": "0o600",
+     "action": "merge-insert",
+     "sha_after": "cee65a3e5b3896f539f47e44c199d0f19cbcda6c032427dba6705906bb718a6b",
+     "bytes_after": 6854,
+     "mode_after": "0o600",
+     "dry_run": false
+    }
+   ],
+   "summary": {
+    "targets": 1,
+    "changed": 1,
+    "noop": 0,
+    "errors": 0
+   },
+   "run_index": 5
+  },
+  {
+   "value_blind": true,
+   "home": "/Users/androidteam",
+   "write": true,
+   "results": [
+    {
+     "target": "droid",
+     "path": "/Users/androidteam/.factory/settings.json",
+     "changed": true,
+     "exists_before": true,
+     "sha_before": "6926f1a4a865fa8736c30a3504a399a748b8545067bc47836328c8efcbb9681c",
+     "mode_before": "0o644",
+     "action": "merge-droid",
+     "sha_after": "3ad11cb354d7211c89d225f7d1f09fac7055d26ba02d6e58b4967c0548b57f61",
+     "bytes_after": 6804,
+     "mode_after": "0o644",
+     "dry_run": false
+    }
+   ],
+   "summary": {
+    "targets": 1,
+    "changed": 1,
+    "noop": 0,
+    "errors": 0
+   },
+   "run_index": 6
+  },
+  {
+   "value_blind": true,
+   "home": "/Users/androidteam",
+   "write": true,
+   "results": [
+    {
+     "target": "grok",
+     "path": "/Users/androidteam/.grok/config.toml",
+     "changed": true,
+     "exists_before": true,
+     "sha_before": "8626abe9ec687fcf4261d117814b1b88d25925f52246a2d73d0791f080dfa4b6",
+     "mode_before": "0o600",
+     "action": "merge-toml",
+     "sha_after": "8d113f75f50531063dc620a18d0974babd81b97d400824719fa31cfe6e748e03",
+     "bytes_after": 2563,
+     "mode_after": "0o600",
+     "dry_run": false
+    }
+   ],
+   "summary": {
+    "targets": 1,
+    "changed": 1,
+    "noop": 0,
+    "errors": 0
+   },
+   "run_index": 7
+  }
+ ]
+}

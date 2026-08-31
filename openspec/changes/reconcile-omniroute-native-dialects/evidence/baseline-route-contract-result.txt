@@ -1,0 +1,19 @@
+Baseline route-contract negative control — 2026-08-30 (registry checker)
+
+Checker: evidence/route-contract-check.py --phase baseline
+Scope: all 17 registry entries against the pre-apply live user configuration.
+Value-blind: no credential values printed or retained.
+
+Result (summary metadata only):
+  return_code: 1 (expected nonzero — the pre-apply state does not satisfy the
+  candidate contract)
+  CHECK lines: 5 PASS, 12 FAIL
+  BASELINE_NEGATIVE_CONTROL candidate_contract=FAIL expected=FAIL
+  SUMMARY FAIL phase=baseline checks=17
+
+Interpretation: this is the route-delta acceptance baseline for task 2.5 — the
+retained nonzero result proving the candidate contract is not already green
+before apply. The candidate invocation (post-apply) must pass without printing
+secrets. This static negative control is distinct from
+evidence/baseline-cli-results.json, which is a runtime probe control (passed)
+and measures a different thing.
