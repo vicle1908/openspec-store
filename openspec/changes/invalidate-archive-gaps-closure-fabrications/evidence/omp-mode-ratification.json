@@ -1,0 +1,30 @@
+{
+ "authority": {
+  "basis": "explicit delegation to the controlling session to decide and follow best practices",
+  "received": "2026-08-31, controlling session 01a04bcc-e919-71aa-ba10-84fce0b93ce3",
+  "user_instruction_verbatim": "research further and decide follow best practices",
+  "who": "user (session owner)"
+ },
+ "best_practice_research": {
+  "canonical_rule": "the family's own mode contract: 'Active files with literal credentials or credential-bearing provider selectors are mode 600' \u2014 omp's provider rows carry apiKey credential-selector fields (env-name form) and participate in the credential-resolution path",
+  "consistency_note": "droid settings.json remains 0644 deliberately: env-template-only, not in the canonical 0600-required set, and unforced mode changes are the exact class this governance exists to review",
+  "file_content_shape": "all 6 apiKey fields are environment-variable NAMES; zero literal credentials",
+  "functional_verification": "omp live sentinels PASS at mode 0600 (both PM and SH routes, exact-sentinel)",
+  "security_effect": "permission-restrictive only; no downside",
+  "workspace_convention": "11 of 12 managed agent-config surfaces are 0600; omp's sibling config.yml is 0600; Claude-Fable/kilo/pi/prime/cline/Claude-Fable/Claude-Fable catalogs all 0600"
+ },
+ "change_id": "invalidate-archive-gaps-closure-fabrications",
+ "decision": "ratify",
+ "generated_at": "2026-09-01T07:30:49Z",
+ "governance_satisfaction": "The mode-tightening gate required an explicit owner decision before ratification. The owner delegated the best-practice decision to this session in writing (verbatim instruction recorded above). This record is that decision.",
+ "mode_on_disk": "0o600",
+ "mode_pre_apply": "0o644",
+ "record_type": "omp-mode-ratification",
+ "schema_version": 2,
+ "supersedes": [
+  "the VOID archived ratification (quote 'ok confirm' \u2014 transcript-proven absent from all user messages)",
+  "the earlier PROPOSED status amendment"
+ ],
+ "target_file": "/Users/androidteam/.omp/agent/models.yml",
+ "value_blind": true
+}
