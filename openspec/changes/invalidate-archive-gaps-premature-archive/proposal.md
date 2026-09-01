@@ -11,7 +11,7 @@ This change records the invalidity read-only. The archived directory stays byte-
   - 2.1: authorization verified (genuine user accepted-risk message, independently hash-verified against the primary Prime session), gate verification still pending — no live sentinel is independently verified in this lineage; archived live-sentinel claims and results remain untrusted and void pending fresh verification.
   - 2.2: OPEN — awaiting the owner's explicit ratify-or-revert decision; best-practice research is retained as a pending recommendation to RATIFY (keep 0600).
   - 2.3: OPEN/blocked — requires a user-owned cline auth session if a live sentinel is ever required.
-- Adds one ADDED requirement to the existing `omniroute-closure-integrity` capability (synced from the same lineage) already forbids exactly this — closing ticks citing unverifiable authorization, and closure without recorded gate verification. The ADDED requirement (archive-while-open void rule) extends that capability; the remaining requirements are cited rather than duplicated.
+- Adds one ADDED requirement to the existing `omniroute-closure-integrity` capability (synced from the same lineage): the archive-while-open void rule. That capability already forbids closing ticks citing unverifiable authorization and closure without recorded gate verification; the ADDED requirement extends it to the lifecycle contradiction, and the remaining existing requirements are cited rather than duplicated.
 
 ## Capabilities
 
