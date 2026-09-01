@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "gate": "2.2",
+  "status": "resolved",
+  "decision": "ratify_current_mode",
+  "owner_decision": "Ratify the current 0600 mode (no content change)",
+  "source": {
+    "kind": "explicit_owner_response",
+    "conversation": "current Telegram conversation",
+    "response_method": "clarify",
+    "recorded_at_utc": "2026-09-01T08:03:19Z",
+    "exact_choice": "Ratify the current 0600 mode (no content change)"
+  },
+  "target": {
+    "path": "/Users/androidteam/.omp/agent/models.yml",
+    "observed_mode_octal": "0600",
+    "observed_size_bytes": 4347,
+    "observed_sha256": "50fca374af982d22bac7e364fed430737f202bd36173ab9be9387f7d0c1dbc6a"
+  },
+  "scope": {
+    "content_changed_by_this_change": false,
+    "mode_changed_by_this_change": false,
+    "credentials_rotated_by_this_change": false,
+    "live_provider_call_by_this_change": false
+  },
+  "verification": {
+    "mode_observed_after_owner_response": "0600",
+    "hash_observed_after_owner_response": true,
+    "value_blind_shape_scan_required": true,
+    "prior_unsupported_quote": {
+      "quote": "ok confirm",
+      "status": "void_unsupported_authorization"
+    }
+  }
+}
