@@ -859,7 +859,7 @@
       "argv": [
         "/opt/homebrew/Cellar/nvm/0.40.7/versions/node/v22.23.2/lib/node_modules/cline/bin/cline",
         "--provider",
-        "openai-omniroute-chat",
+        "openai-compatible",
         "--model",
         "sh/gpt-5.6-sol",
         "--thinking",
