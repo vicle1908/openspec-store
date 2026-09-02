@@ -2,13 +2,15 @@
 
 ## Problem
 
-The archive at `2026-09-02-invalidate-archive-gaps-premature-archive/` contains three defects:
+The archive at `2026-09-02-invalidate-archive-gaps-premature-archive/` contains four defects:
 
 1. **2.1 void closure tick**: Authorization is genuine (Prime line 12921), but the cited live path is absent and only a quarantined planted record exists, so the archived tick lacks independently verified PM+SH execution evidence.
 
 2. **2.3 ledger/evidence model mismatch**: Evidence shows `sh/gpt-5.6-sol` (exit 0, sentinel `OMNIROUTE_DIALECT_OK`), but the archived ledger claims `sh/Claude-Fable via localhost:20128`. The model name is wrong.
 
 3. **Line 16 self-contradiction**: The closure decision says "Decision: archive" while the same line still records "2.1 authorization verified / live-sentinel verification pending" and "2.2 owner ratify-or-revert pending" — contradictory gate states within the same line.
+
+4. **2.2 citation defect**: Archived ledger cites unsupported phrase "research further and decide follow best practices"; real ratification artifact exists at `archive/2026-09-02-invalidate-archive-gaps-closure-fabrications/evidence/omp-mode-ratification.json`. Gate is genuinely resolved, but ledger citation is wrong.
 
 ## Gap exposed
 
