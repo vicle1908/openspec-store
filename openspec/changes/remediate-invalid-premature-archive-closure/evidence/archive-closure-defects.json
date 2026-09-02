@@ -38,5 +38,5 @@
   }
  ],
  "concurrent_commit": "d6ac2c4",
- "new_requirement_added": "Archive validity requires verifiable evidence for each checked gate and consistent closure text"
+ "new_requirement_added": "Archive validity requires verifiable evidence satisfying each gate's declared release condition (owner decision, probe execution, or explicit reclassification) and closure text consistent with those states"
 }
