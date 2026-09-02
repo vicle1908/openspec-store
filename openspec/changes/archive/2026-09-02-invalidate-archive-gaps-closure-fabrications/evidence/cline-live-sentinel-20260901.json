@@ -1,0 +1,40 @@
+{
+  "record_type": "cline-live-sentinel",
+  "gate": "2.3 cline live sentinel (FBC-5)",
+  "value_blind": true,
+  "session_id": "1788251735011_07kdk",
+  "session_metadata_path": "~/.cline/data/sessions/1788251735011_07kdk/1788251735011_07kdk.json",
+  "session_messages_path": "~/.cline/data/sessions/1788251735011_07kdk/1788251735011_07kdk.messages.json",
+  "source": "cli",
+  "interactive": false,
+  "provider": "openai-compatible",
+  "model": "sh/gpt-5.6-sol",
+  "cwd": "/Users/androidteam",
+  "started_at": "2026-09-01T08:35:35.016Z",
+  "ended_at": "2026-09-01T08:36:07.722Z",
+  "exit_code": 0,
+  "status": "completed",
+  "prompt": "Reply with exactly: OMNIROUTE_DIALECT_OK",
+  "response_text": "OMNIROUTE_DIALECT_OK",
+  "usage": {
+    "inputTokens": 4861,
+    "outputTokens": 12,
+    "cacheReadTokens": 0,
+    "cacheWriteTokens": 0,
+    "totalCost": 0
+  },
+  "provenance": {
+    "session_history_origin_mode": "user",
+    "cline_version": "3.0.60",
+    "assistant_model_info": {
+      "id": "sh/gpt-5.6-sol",
+      "provider": "openai-compatible"
+    }
+  },
+  "verification": {
+    "exact_sentinel_match": true,
+    "exit_code_zero": true,
+    "raw_session_record_recovered": true,
+    "no_credential_values_recorded": true
+  }
+}
