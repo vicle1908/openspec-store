@@ -1,0 +1,27 @@
+{
+ "record_type": "kimi-pm-sh-sentinel",
+ "gate": "2.1",
+ "kimi_config_sha256": "19103e4c3402454f1c730cce714539766f0675462555e925d5b6df144303aeae",
+ "kimi_config_mode": "0600",
+ "hardening_verified": true,
+ "pm_sentinel": {
+  "command": "kimi -p 'Reply with exactly: OMNIROUTE_DIALECT_OK' --output-format text --model or-claude-fable",
+  "exit_code": 0,
+  "response_contains": "OMNIROUTE_DIALECT_OK",
+  "timeout_seconds": 180,
+  "route": "POST http://localhost:20128/v1/messages (Anthropic Messages)",
+  "model": "pm/Claude-Fable",
+  "session_id": "session_45d80811-584c-4cfc-af31-901db0e98128"
+ },
+ "sh_sentinel": {
+  "command": "kimi -p 'Reply with exactly: OMNIROUTE_DIALECT_OK' --output-format text --model or-gpt-5-6-sol",
+  "exit_code": 0,
+  "response_contains": "OMNIROUTE_DIALECT_OK",
+  "timeout_seconds": 180,
+  "route": "POST http://localhost:20128/v1/responses (OpenAI Responses)",
+  "model": "sh/gpt-5.6-sol",
+  "session_id": "session_61cefc19-bef2-4244-ad3a-f0677483ae8e"
+ },
+ "no_credential_values_recorded": true,
+ "authorization": "ok approve (2026-09-02, owner-approved after 2.0 hardening)"
+}

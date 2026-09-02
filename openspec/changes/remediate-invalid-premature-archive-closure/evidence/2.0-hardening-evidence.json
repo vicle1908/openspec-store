@@ -1,0 +1,17 @@
+{
+ "record_type": "credential-file-hardening",
+ "gate": "2.0",
+ "file": "~/.kimi-code/config.toml",
+ "backup_path": "~/.kimi-code/config.toml.mode600-backup-20260902T231238",
+ "pre_mode": "0600",
+ "post_mode": "0600",
+ "pre_sha256": "19103e4c3402454f1c730cce714539766f0675462555e925d5b6df144303aeae",
+ "post_sha256": "19103e4c3402454f1c730cce714539766f0675462555e925d5b6df144303aeae",
+ "byte_identity_verified": true,
+ "pre_size_bytes": 11528,
+ "post_size_bytes": 11528,
+ "mutation_performed": false,
+ "verification": "already-compliant: file mode was already 0600 at time of inspection; no chmod performed; backup created as precautionary measure; byte-identity verified pre/post",
+ "owner_approval": "ok approve (2026-09-02)",
+ "no_credential_values_recorded": true
+}
