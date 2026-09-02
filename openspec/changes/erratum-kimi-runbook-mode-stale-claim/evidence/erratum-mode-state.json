@@ -1,0 +1,20 @@
+{
+ "record_type": "erratum-mode-state",
+ "gate": "erratum",
+ "file": "~/.kimi-code/config.toml",
+ "authoritative_mode": "0600",
+ "stat_observation": "stat -f '%Lp' returned 600 at inspection (2026-09-02T23:12:38)",
+ "source_chmod_performed": false,
+ "byte_identity_verified": true,
+ "sha256": "19103e4c3402454f1c730cce714539766f0675462555e925d5b6df144303aeae",
+ "size_bytes": 11528,
+ "backup_path": "~/.kimi-code/config.toml.mode600-backup-20260902T231238",
+ "contradiction": {
+  "stale_artifact": "archive/2026-09-02-remediate-invalid-premature-archive-closure/evidence/2.1-kimi-pm-sh-runbook.json",
+  "stale_claim": "config_state.mode: 0o644, mode_drift_detected: true",
+  "correct_artifact": "archive/2026-09-02-remediate-invalid-premature-archive-closure/evidence/2.0-hardening-evidence.json",
+  "correct_claim": "pre_mode: 0600, post_mode: 0600, mutation_performed: false",
+  "root_cause": "Earlier value-blind parser returned inaccurate mode; actual stat showed 0600"
+ },
+ "no_credential_values_recorded": true
+}
