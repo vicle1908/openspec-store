@@ -1,0 +1,30 @@
+{
+ "record_type": "archive-closure-defects",
+ "source_archive": "archive/2026-09-02-invalidate-archive-gaps-premature-archive",
+ "defects": [
+  {
+   "gate": "2.1",
+   "type": "void-tick",
+   "description": "Authorization genuine (Prime line 12921), but closure tick cites quarantined planted sentinel record; no verifiable executed sentinel exists",
+   "archived_tasks_line": 8,
+   "evidence_status": "cited evidence file not found at reconcile-omniroute-dialects-archive-gaps/evidence/rotation-gate-release-v2.json"
+  },
+  {
+   "gate": "2.3",
+   "type": "model-mismatch",
+   "description": "Evidence shows sh/gpt-5.6-sol (exit 0, sentinel OMNIROUTE_DIALECT_OK), ledger claims sh/Claude-Fable via localhost:20128",
+   "archived_tasks_line": 10,
+   "evidence_source": "archive/2026-09-02-invalidate-archive-gaps-closure-fabrications/evidence/cline-live-sentinel-20260901.json",
+   "evidence_model": "sh/gpt-5.6-sol",
+   "ledger_model": "sh/Claude-Fable"
+  },
+  {
+   "gate": "closure-text",
+   "type": "self-contradiction",
+   "description": "Line 16 says 'Decision: archive' while same line records '2.1 authorization verified / live-sentinel verification pending' and '2.2 owner ratify-or-revert pending'",
+   "archived_tasks_line": 16
+  }
+ ],
+ "concurrent_commit": "d6ac2c4",
+ "new_requirement_added": "Archive validity requires verifiable evidence for each checked gate and consistent closure text"
+}
