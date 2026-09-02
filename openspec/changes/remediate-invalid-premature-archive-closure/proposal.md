@@ -16,11 +16,11 @@ The existing archive-while-open void rule prevents archiving while gates are unc
 
 ## What this change does
 
-Adds an ADDED requirement to `omniroute-closure-integrity` that archive validity requires every checked owner gate to have verifiable resolution evidence and closure text consistent with those states; otherwise the archive is void and must be recorded by a subsequent active change.
+- Adds an ADDED requirement to `omniroute-closure-integrity` that archive validity requires verifiable evidence satisfying each gate's declared release condition (owner decision, probe execution, or explicit reclassification) and closure text consistent with those states; otherwise the archive is void and must be recorded by a subsequent active change.
 
 ## Capabilities
 
-- `omniroute-closure-integrity`: one ADDED requirement — archive validity requires verifiable evidence for each checked gate and consistent closure text.
+- `omniroute-closure-integrity`: one ADDED requirement — archive validity requires verifiable evidence satisfying each gate's declared release condition and consistent closure text.
 
 ## Non-Goals
 
