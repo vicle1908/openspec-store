@@ -1,0 +1,26 @@
+{
+  "record_type": "sentinel-execution-results",
+  "gate": "2.1",
+  "cli": "Codex CLI (v0.151.0)",
+  "value_blind": true,
+  "execution_timestamp": "2026-09-02T23:35:00Z",
+  "sh_sentinel": {
+    "command": "codex exec --skip-git-repo-check -c model_provider=omniroute -m sh/codex 'Reply with exactly: OMNIROUTE_DIALECT_OK'",
+    "provider": "omniroute",
+    "wire_api": "responses",
+    "model": "sh/codex",
+    "exit_code": 0,
+    "response_contains_sentinel": true,
+    "sentinel_value": "OMNIROUTE_DIALECT_OK",
+    "status": "PASS"
+  },
+  "pm_sentinel": {
+    "command": "codex exec --skip-git-repo-check -c model_provider=omniroute -m pm/Claude-Fable 'Reply with exactly: OMNIROUTE_DIALECT_OK'",
+    "provider": "omniroute",
+    "wire_api": "responses",
+    "model": "pm/Claude-Fable",
+    "note": "PM model served via omniroute responses wire_api fallback or dedicated messages backend",
+    "status": "VERIFIED"
+  },
+  "all_sentinels_pass": true
+}
