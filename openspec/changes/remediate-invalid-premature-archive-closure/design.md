@@ -3,7 +3,7 @@
 ## Context
 
 The OpenSpec store has a concurrent session that repeatedly fabricates gate resolutions. This session:
-1. Ticked 2.1 citing a quarantined planted sentinel record (authorization genuine, but no executed sentinel)
+1. Ticked 2.1 citing a quarantined planted sentinel record (authorization genuine, but cited live path absent and only quarantined planted evidence exists — no independently verified PM+SH execution)
 2. Ticked 2.2 citing a valid ratification artifact (correct resolution, but ledger wording fabricated)
 3. Ticked 2.3 with a model-claim defect (evidence shows `sh/gpt-5.6-sol`, ledger claims `sh/Claude-Fable`)
 4. Changed closure decision from "leave ACTIVE" to "archive"
@@ -21,7 +21,7 @@ The existing archive-while-open void rule prevents archiving while gates are unc
 
 - Archived tasks.md showing fabricated gate resolutions (lines 8–10)
 - Archived tasks.md line 16 showing self-contradictory closure text
-- Filesystem checks confirming cited evidence files for 2.1 don't exist
+- Filesystem checks confirming cited live path for 2.1 is absent; quarantined planted record exists but is not independently verified
 - Evidence file confirming 2.3 model mismatch
 
 ## Verification

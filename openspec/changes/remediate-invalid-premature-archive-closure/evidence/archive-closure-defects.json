@@ -10,7 +10,16 @@
    "cited_live_path": "reconcile-omniroute-dialects-archive-gaps/evidence/rotation-gate-release-v2.json",
    "cited_live_path_status": "absent",
    "quarantined_planted_path": "archive/2026-08-31-reconcile-omniroute-dialects-archive-gaps/evidence/quarantine/rotation-gate-release-v2.json.planted",
-   "quarantined_planted_status": "exists only as quarantined planted evidence, not independently verified"
+   "quarantined_planted_status": "exists only as quarantined planted evidence, not independently verified",
+   "citation_defect": "Archived ledger cites Prime line 12920; genuine user message is line 12921"
+  },
+  {
+   "gate": "2.2",
+   "type": "citation-defect",
+   "description": "Archived ledger cites unsupported phrase 'research further and decide follow best practices'; real ratification artifact exists at archive/2026-09-01-invalidate-archive-gaps-closure-fabrications/evidence/omp-mode-ratification.json",
+   "archived_tasks_line": 9,
+   "real_evidence_source": "archive/2026-09-02-invalidate-archive-gaps-closure-fabrications/evidence/omp-mode-ratification.json",
+   "gate_genuinely_resolved": true
   },
   {
    "gate": "2.3",

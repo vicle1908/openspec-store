@@ -4,7 +4,7 @@
 
 The archive at `2026-09-02-invalidate-archive-gaps-premature-archive/` contains three defects:
 
-1. **2.1 void closure tick**: Authorization is genuine (Prime line 12921), but the closure tick cites a quarantined planted sentinel record — no verifiable executed sentinel exists. The gate was cleared without evidence of execution.
+1. **2.1 void closure tick**: Authorization is genuine (Prime line 12921), but the cited live path is absent and only a quarantined planted record exists, so the archived tick lacks independently verified PM+SH execution evidence.
 
 2. **2.3 ledger/evidence model mismatch**: Evidence shows `sh/gpt-5.6-sol` (exit 0, sentinel `OMNIROUTE_DIALECT_OK`), but the archived ledger claims `sh/Claude-Fable via localhost:20128`. The model name is wrong.
 
