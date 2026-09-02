@@ -5,9 +5,12 @@
   {
    "gate": "2.1",
    "type": "void-tick",
-   "description": "Authorization genuine (Prime line 12921), but closure tick cites quarantined planted sentinel record; no verifiable executed sentinel exists",
+   "description": "Authorization genuine (Prime line 12921), but archived 2.1 tick cites no valid independently verified PM+SH execution evidence",
    "archived_tasks_line": 8,
-   "evidence_status": "cited evidence file not found at reconcile-omniroute-dialects-archive-gaps/evidence/rotation-gate-release-v2.json"
+   "cited_live_path": "reconcile-omniroute-dialects-archive-gaps/evidence/rotation-gate-release-v2.json",
+   "cited_live_path_status": "absent",
+   "quarantined_planted_path": "archive/2026-08-31-reconcile-omniroute-dialects-archive-gaps/evidence/quarantine/rotation-gate-release-v2.json.planted",
+   "quarantined_planted_status": "exists only as quarantined planted evidence, not independently verified"
   },
   {
    "gate": "2.3",
