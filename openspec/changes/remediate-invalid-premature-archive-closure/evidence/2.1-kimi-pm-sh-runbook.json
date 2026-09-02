@@ -1,0 +1,51 @@
+{
+  "runbook": "2.1 Kimi PM+SH Verification (non-executed)",
+  "gate": "2.1",
+  "scope": "Kimi Code only — credential-carrying config verified through Kimi CLI, not direct HTTP POSTs",
+  "derived_from": [
+    "openspec/specs/omniroute-agent-cli-routing/spec.md (canonical routes, sentinel requirement)",
+    "value-blind parse of ~/.kimi-code/config.toml (allowlisted provider/model structure)"
+  ],
+  "config_state": {
+    "path": "~/.kimi-code/config.toml",
+    "mode": "0o644",
+    "size_bytes": 11528,
+    "sha256": "19103e4c3402454f1c730cce714539766f0675462555e925d5b6df144303aeae",
+    "providers_found": ["cockpit", "shopapikey", "phanmemvip", "omniroute", "moonshot-ai", "omniroute-anthropic", "omniroute-chat"],
+    "omniroute_models_found": ["or-gpt-5-6-sol", "or-claude-fable"],
+    "mode_drift_detected": true,
+    "mode_drift_detail": "File mode is 0o644; canonical spec requires 0o600 for credential-carrying files"
+  },
+  "verification_commands": [
+    {
+      "step": 1,
+      "name": "PM sentinel via Kimi CLI",
+      "command": "kimi -p 'Reply with exactly: OMNIROUTE_DIALECT_OK' --output-format text --model or-claude-fable",
+      "timeout_seconds": 180,
+      "expected_exit": 0,
+      "expected_response_contains": "OMNIROUTE_DIALECT_OK",
+      "expected_no_errors": ["authentication", "reconnect", "401", "403", "invalid_api_key"],
+      "route": "POST http://localhost:20128/v1/messages (Anthropic Messages)",
+      "model": "pm/Claude-Fable"
+    },
+    {
+      "step": 2,
+      "name": "SH sentinel via Kimi CLI",
+      "command": "kimi -p 'Reply with exactly: OMNIROUTE_DIALECT_OK' --output-format text --model or-gpt-5-6-sol",
+      "timeout_seconds": 180,
+      "expected_exit": 0,
+      "expected_response_contains": "OMNIROUTE_DIALECT_OK",
+      "expected_no_errors": ["authentication", "reconnect", "401", "403", "invalid_api_key"],
+      "route": "POST http://localhost:20128/v1/responses (OpenAI Responses)",
+      "model": "sh/gpt-5.6-sol"
+    }
+  ],
+  "exit_criteria": [
+    "Both commands exit 0 with OMNIROUTE_DIALECT_OK in response",
+    "No authentication error (HTTP 401/403, invalid_api_key)",
+    "No reconnect error",
+    "Config file hash unchanged before/after (value-blind check)"
+  ],
+  "evidence_output": "evidence/2.1-kimi-pm-sh-sentinel.json",
+  "non_execution_note": "This runbook describes commands to be executed only on explicit owner order. Do not execute without user authorization."
+}
