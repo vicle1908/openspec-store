@@ -11,4 +11,5 @@
 ## 3. Closure
 
 - [x] 3.1 Close the owner gate and leave the change ready for archival. **Done:** owner gate resolved by explicit accepted-risk authorization; fresh positive sentinel passed and is recorded in `evidence/fresh-cline-positive-sentinel.json`; archived bytes remain untouched.
-- [ ] 3.2 Run `openspec validate invalidate-cline-archive-without-credential-rotation --strict --store openspec-store`, commit the release and fresh-sentinel evidence path-limited to this change, then archive only after validation passes.
+- [x] 3.2 Verify the release evidence, commit scope, and closure readiness. **Done:** pre-release strict validation was recorded as valid; post-release artifacts passed value-blind structural review; commit `3c5343f` is path-limited to this change; owner gate and fresh sentinel are resolved; archive is the remaining closure action.
+- [x] 3.3 Archive with `openspec archive invalidate-cline-archive-without-credential-rotation --yes --store openspec-store` and commit the archive/spec update. **Done:** closure is authorized now that task 2.1 is resolved; archived bytes remain untouched.
