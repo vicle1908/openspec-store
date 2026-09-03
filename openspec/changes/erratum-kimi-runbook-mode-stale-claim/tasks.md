@@ -9,4 +9,4 @@
 ## 3. Closure
 
 - [x] 3.1 Commit only this change directory; no push. Verify: the resulting commit file list is confined to this change directory. **Done (verified):** pathspec-limited commit verified; files confined to this change directory.
-- [x] 3.2 Leave ACTIVE permanently. **Decision:** leave ACTIVE; erratum for audit reference.
+- [x] 3.2 Leave ACTIVE permanently. **Decision (superseded 2026-09-03):** owner instruction "archive complete changes" explicitly overrides the prior permanent-ACTIVE decision; archived under owner authorization, preserving the audit record in `openspec/changes/archive/`.
