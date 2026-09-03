@@ -23,3 +23,17 @@ The archived `2026-09-03-fix-cline-stale-provider-registry` change treats a live
 - The archived Cline cleanup remains byte-identical and read-only.
 - Downstream consumers must treat its positive live-sentinel evidence as void pending owner action.
 - This change remains ACTIVE until the credential gate is resolved and a fresh positive sentinel is recorded.
+
+## Owner Gate Resolution
+
+The owner explicitly authorized proceeding without credential rotation in the
+controlling conversation with the verbatim instruction `address blocker, no
+need rotate` (2026-09-03). The decision is recorded in
+`evidence/owner-credential-gate-release.json`; it does not claim rotation
+occurred. A fresh positive sentinel was then run through the retained Cline
+`openai-compatible` provider using canonical model `sh/gpt-5.6-sol` and is recorded in
+`evidence/fresh-cline-positive-sentinel.json`.
+
+The live sentinel gate is resolved. The archived cleanup's positive claim was
+invalidated only until this fresh, explicitly authorized verification; the
+archived bytes remain untouched.

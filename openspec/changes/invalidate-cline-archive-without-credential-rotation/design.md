@@ -38,3 +38,15 @@ The positive sentinel was executed through a credential-carrying configuration f
 
 - Treating the entire archived cleanup as void would discard valid cleanup, static, and negative-control evidence; this change avoids that overreach.
 - Leaving the change active preserves the owner gate and prevents another premature archive.
+
+## Gate Resolution
+
+The owner released the credential gate with the explicit current-conversation
+decision `address blocker, no need rotate`. Rotation was not performed and no
+credential value is recorded. The release is captured in
+`evidence/owner-credential-gate-release.json`.
+
+After release, a fresh positive Cline sentinel used `openai-compatible` / `sh/gpt-5.6-sol` and
+passed with exit 0 and `OMNIROUTE_DIALECT_OK`; evidence is in
+`evidence/fresh-cline-positive-sentinel.json`. The active correction can now
+be closed after its path-limited commit and archive validation.

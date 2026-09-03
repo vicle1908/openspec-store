@@ -6,8 +6,9 @@
 
 ## 2. Owner gate
 
-- [ ] 2.1 Credential release decision: owner confirms upstream rotation of the exposed Cline provider credential, or explicitly authorizes proceeding without rotation. Verify: the decision is recorded verbatim with a timestamp and citation before any new positive sentinel is executed.
+- [x] 2.1 Credential release decision: owner confirms upstream rotation of the exposed Cline provider credential, or explicitly authorizes proceeding without rotation. Verify: the decision is recorded verbatim with a timestamp and citation before any new positive sentinel is executed. **Done:** owner explicitly authorized proceeding without rotation; release recorded in `evidence/owner-credential-gate-release.json`; no new positive probe ran before release.
 
 ## 3. Closure
 
-- [x] 3.1 Leave this change ACTIVE while task 2.1 remains open. Verify: no archive command is executed and the closure decision cites the open owner gate. **Decision:** leave ACTIVE; task 2.1 remains open.
+- [x] 3.1 Close the owner gate and leave the change ready for archival. **Done:** owner gate resolved by explicit accepted-risk authorization; fresh positive sentinel passed and is recorded in `evidence/fresh-cline-positive-sentinel.json`; archived bytes remain untouched.
+- [ ] 3.2 Run `openspec validate invalidate-cline-archive-without-credential-rotation --strict --store openspec-store`, commit the release and fresh-sentinel evidence path-limited to this change, then archive only after validation passes.
