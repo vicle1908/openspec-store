@@ -45,12 +45,12 @@
    }
   }
 },
- "mode_history_provenance": {
+ "historical_mode_hardening": {
   "artifact": "archive/2026-08-29-stabilize-goose-sol-and-harden-agent-cli-config-permissions/EVIDENCE_MANIFEST.md",
   "line": 84,
   "record": "~/.kimi-code/config.toml hardened 0644→0600 on 2026-08-29; sha b25188192abda670… identical before/after that operation only",
   "scope": "sha-identity applies solely to the 2026-08-29 chmod operation; file bytes changed between 2026-08-29 (sha b25188192abda670…) and the 2026-09-02 snapshot (sha 19103e4c…, hardening lines 8–9) while mode 0600 held",
-  "corroboration": "mode 0600 was established before the 2026-09-02 inspection; hardening lines 6–7 record pre_mode 0600 at 09-02; no byte continuity is implied across the two dates"
+  "relation_to_erratum": "separate 2026-08-29 chmod record for an earlier b25188192abda670… snapshot; the archive provides no causal link to the 2026-09-02 value-blind parse; no byte continuity is implied across the two dates"
 },
  "no_credential_values_recorded": true
 }
