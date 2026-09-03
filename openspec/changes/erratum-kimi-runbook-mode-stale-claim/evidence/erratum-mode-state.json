@@ -3,7 +3,7 @@
  "gate": "erratum",
  "file": "~/.kimi-code/config.toml",
  "authoritative_mode": "0600",
- "stat_observation": "stat -f '%Lp' returned 600 at inspection (2026-09-02T23:12:38)",
+ "archived_mode_observation": "Hardening evidence records pre_mode 0600, post_mode 0600, and already-compliant at inspection",
  "source_chmod_performed": false,
  "byte_identity_verified": true,
  "sha256": "19103e4c3402454f1c730cce714539766f0675462555e925d5b6df144303aeae",
@@ -14,13 +14,16 @@
   "stale_claim": "config_state.mode: 0o644, mode_drift_detected: true",
   "correct_artifact": "archive/2026-09-02-remediate-invalid-premature-archive-closure/evidence/2.0-hardening-evidence.json",
   "correct_claim": "pre_mode: 0600, post_mode: 0600, mutation_performed: false",
-  "root_cause": "Earlier value-blind parser returned inaccurate mode; actual stat showed 0600"
+  "root_cause": "The stale runbook derives its mode claim from a value-blind parse and conflicts with hardening evidence recording mode 0600 with no mutation"
  },
  "line_citations": {
   "stale_runbook": {
    "file": "archive/2026-09-02-remediate-invalid-premature-archive-closure/evidence/2.1-kimi-pm-sh-runbook.json",
    "lines": {
+    "7": "derived_from: value-blind parse of config.toml",
     "11": "mode 0o644 (incorrect)",
+    "12": "size_bytes 11528",
+    "13": "sha256 19103e4c...",
     "16": "mode_drift_detected true",
     "17": "mode_drift_detail explains 0644 vs 0600 drift"
    }
@@ -28,9 +31,17 @@
   "correct_hardening": {
    "file": "archive/2026-09-02-remediate-invalid-premature-archive-closure/evidence/2.0-hardening-evidence.json",
    "lines": {
+    "5": "backup_path created",
     "6": "pre_mode 0600",
     "7": "post_mode 0600",
-    "13": "mutation_performed false"
+    "8": "pre_sha256 matches",
+    "9": "post_sha256 matches",
+    "10": "byte_identity_verified true",
+    "11": "pre_size_bytes 11528",
+    "12": "post_size_bytes 11528",
+    "13": "mutation_performed false (no chmod)",
+    "14": "verification: already-compliant, no chmod",
+    "16": "no_credential_values_recorded true"
    }
   }
  },
