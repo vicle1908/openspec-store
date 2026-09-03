@@ -130,13 +130,13 @@ Then both `models.yml` and `config.yml` SHALL be present.
 
 Given a temporary profile with proposed `models.yml` and `config.yml`
 When `omp --profile <test> --no-session --model <selector> -p "reply only: pong"` is run
-Then each of the seven distinct final role selectors — `openrouter/stealth/ox-alpha:max`, `cockpit/gpt-5.6-luna:max`, `cockpit/gpt-5.6-sol:max`, `cockpit/gpt-5.6-sol:xhigh`, `phanmemvip/gpt-5.6-sol:xhigh`, `google-antigravity/gemini-3.7-flash:high`, `shopapikey/Claude-Fable:low` — SHALL return "pong" with exit code 0
+Then each of the seven distinct final role selectors — `openrouter/stealth/ox-alpha:max`, `cockpit/gpt-5.6-luna:max`, `cockpit/gpt-5.6-sol:max`, `cockpit/gpt-5.6-sol:xhigh`, `phanmemvip/gpt-5.6-sol:xhigh`, `google-antigravity/gemini-3.8-flash:high`, `shopapikey/Claude-Fable:low` — SHALL return "pong" with exit code 0
 And each result SHALL be judged ON the requested selector, so a 401→fallback masquerade (error or model_change lines in the output) SHALL fail the gate.
 
 #### Scenario: native provider credentials resolve in the isolated profile
 
 Given the isolated profile's `agent.db` was seeded READ-ONLY from the live profile's `agent.db` `auth_*` tables
-When a native-provider selector (`openrouter/stealth/ox-alpha:max` or `google-antigravity/gemini-3.7-flash:high`) is smoke-tested in the isolated profile
+When a native-provider selector (`openrouter/stealth/ox-alpha:max` or `google-antigravity/gemini-3.8-flash:high`) is smoke-tested in the isolated profile
 Then the credential SHALL resolve from the seeded `auth_*` tables
 And the live `/Users/androidteam/.omp/agent/agent.db` SHALL remain byte-for-byte unmutated by the seeding.
 
@@ -159,7 +159,7 @@ omp catalog capabilities, not upstream provider marketing claims.
 The thinking-level suffixes `:high`, `:xhigh`, and `:max` SHALL only be used
 for providers where they were validated through omp smoke testing.
 `smol`, `tiny`, and `vision` SHALL be bound to
-`google-antigravity/gemini-3.7-flash:high` — the only fast catalog entry
+`google-antigravity/gemini-3.8-flash:high` — the only fast catalog entry
 with confirmed image input — with an explicit `:high` suffix on every
 flash selector so high-frequency background roles never inherit
 `defaultThinkingLevel: xhigh`. `commit` SHALL be bound to
@@ -168,7 +168,7 @@ flash selector so high-frequency background roles never inherit
 
 #### Scenario: thinking-level selectors work
 
-Given `google-antigravity/gemini-3.7-flash:high` is a validated explicit selector assigned to `smol`, `tiny`, and `vision`
+Given `google-antigravity/gemini-3.8-flash:high` is a validated explicit selector assigned to `smol`, `tiny`, and `vision`
 When invoked through omp
 Then the response SHALL contain "pong" and exit 0.
 
@@ -348,7 +348,7 @@ provider, and `provider/*` entries inside a chain SHALL swap provider
 keeping the model id, with skipped-if-absent semantics for ids missing on
 the target provider. The `default` chain SHALL be exactly
 `[phanmemvip/gpt-5.6-sol, shopapikey/Claude-Fable, cockpit/gpt-5.6-sol,
-google-antigravity/gemini-3.7-flash:high]` in that order, with the flash
+google-antigravity/gemini-3.8-flash:high]` in that order, with the flash
 selector as the terminal hop carrying an explicit `:high` suffix. No chain
 key or entry SHALL reference `omniroute/*` or `giaoduc/*`.
 
@@ -356,7 +356,7 @@ key or entry SHALL reference `omniroute/*` or `giaoduc/*`.
 
 Given `retry.fallbackChains.default` in `config.yml`
 When inspected programmatically
-Then it SHALL equal `[phanmemvip/gpt-5.6-sol, shopapikey/Claude-Fable, cockpit/gpt-5.6-sol, google-antigravity/gemini-3.7-flash:high]` in that order
+Then it SHALL equal `[phanmemvip/gpt-5.6-sol, shopapikey/Claude-Fable, cockpit/gpt-5.6-sol, google-antigravity/gemini-3.8-flash:high]` in that order
 And the terminal hop SHALL carry the explicit `:high` thinking suffix
 And no entry SHALL contain the string `omniroute`.
 
