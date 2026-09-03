@@ -1,0 +1,34 @@
+{
+  "record_type": "cline-provider-cleanup4-preapply",
+  "change": "fix-cline-stale-provider-registry",
+  "value_blind": true,
+  "timestamp_utc": "2026-09-03T08:48:53Z",
+  "target_path": "~/.cline/data/settings/providers.json",
+  "pre_sha256": "df57d55246642d5f9a327b33f9e409c674c656fb0f75196d7f77ce039997f073",
+  "pre_size_bytes": 1128,
+  "pre_mode": "0600",
+  "backup_path": "/Users/androidteam/.cline/data/settings/providers.json.bak-stale-cleanup4-20260903T084853",
+  "backup_sha256": "df57d55246642d5f9a327b33f9e409c674c656fb0f75196d7f77ce039997f073",
+  "backup_mode": "0600",
+  "settings_provider_ids_before": [
+    "codex-compatible",
+    "codex-omniroute-chat",
+    "openai-compatible",
+    "openai-omniroute-chat"
+  ],
+  "models_registry_provider_ids": [
+    "giaoduc",
+    "shopapikey"
+  ],
+  "builtin_provider_ids_source": "installed @cline/llms bundle enum + provider-ids.generated.d.ts",
+  "removed_unregistered_provider_ids": [
+    "codex-compatible",
+    "codex-omniroute-chat",
+    "openai-omniroute-chat"
+  ],
+  "preserved_builtin_provider": "openai-compatible",
+  "working_model_before": "sh/gpt-5.6-sol",
+  "canonical_working_model_after": "sh/gpt-5.6-sol",
+  "last_used_provider_before": "openai-omniroute-chat",
+  "no_credential_values_recorded": true
+}

@@ -2,15 +2,18 @@
   "record_type": "cline-provider-cleanup4-verification",
   "change": "fix-cline-stale-provider-registry",
   "value_blind": true,
+  "timestamp_utc": "2026-09-03T08:49:18Z",
   "target_path": "~/.cline/data/settings/providers.json",
-  "rollback_backup": "~/.cline/data/settings/providers.json.bak-stale-cleanup4-20260903T070607Z",
-  "backup_mode": "0600",
-  "backup_sha256": "ef00b4b8d009678c9be1ed2841d948bef8737694d35c4f2e828936f9085d596c",
-  "backup_byte_identity_verified": true,
-  "pre_sha256": "ef00b4b8d009678c9be1ed2841d948bef8737694d35c4f2e828936f9085d596c",
-  "post_sha256": "3b48ffa092515f070210c6ac5301a6273daffa37559d4a05be034863d5f27c17",
+  "pre_sha256": "df57d55246642d5f9a327b33f9e409c674c656fb0f75196d7f77ce039997f073",
+  "post_sha256": "565d35c94a735952fd9ce72f06a2eb80ada031a8a84dcab54c324628b43320f0",
   "pre_mode": "0600",
   "post_mode": "0600",
+  "builtin_provider_ids_source": "installed @cline/llms bundle enum + provider-ids.generated.d.ts",
+  "builtin_count": 214,
+  "registry_provider_ids": [
+    "giaoduc",
+    "shopapikey"
+  ],
   "removed_unregistered_provider_ids": [
     "codex-compatible",
     "codex-omniroute-chat",
@@ -20,51 +23,65 @@
     "openai-compatible"
   ],
   "working_provider": "openai-compatible",
+  "working_model_before": "sh/gpt-5.6-sol",
+  "working_model": "sh/gpt-5.6-sol",
   "working_base_url": "http://localhost:20128",
-  "pre_working_model": "sh/codex",
-  "post_working_model": "sh/gpt-5.6-sol",
+  "working_endpoint_path": "/chat/completions",
   "last_used_provider_before": "openai-omniroute-chat",
   "last_used_provider_after": "openai-compatible",
-  "provider_count_after": 1,
-  "route_contract_check": {
-    "phase": "candidate",
-    "status": "PASS",
-    "checks": 17
+  "last_used_repair": {
+    "from": "openai-omniroute-chat",
+    "to": "openai-compatible"
   },
-  "live_sentinel": {
-    "status": "PENDING",
-    "reason": "Cleanup4 evidence records only the static 17/17 route-contract result. No cleanup4-specific positive live sentinel exit/boolean result has been recorded."
+  "positive_route": {
+    "provider": "openai-compatible",
+    "model": "sh/gpt-5.6-sol",
+    "exit_code": 0,
+    "sentinel_present": true,
+    "status": "PASS"
   },
-  "negative_controls": {
-    "status": "PASS",
-    "results": [
-      {
-        "provider": "codex-compatible",
-        "model": "sh/codex",
-        "exit_code": 1,
-        "unknown_provider_error": true,
-        "sentinel_present": false
-      },
-      {
-        "provider": "codex-omniroute-chat",
-        "model": "sh/codex",
-        "exit_code": 1,
-        "unknown_provider_error": true,
-        "sentinel_present": false
-      },
-      {
-        "provider": "openai-omniroute-chat",
-        "model": "sh/gpt-5.6-sol",
-        "exit_code": 1,
-        "unknown_provider_error": true,
-        "sentinel_present": false
-      }
-    ]
+  "negative_controls": [
+    {
+      "provider": "codex-compatible",
+      "model": "sh/codex",
+      "isolated": true,
+      "exit_code": 1,
+      "unknown_provider_error": true,
+      "sentinel_present": false
+    },
+    {
+      "provider": "codex-omniroute-chat",
+      "model": "sh/codex",
+      "isolated": true,
+      "exit_code": 1,
+      "unknown_provider_error": true,
+      "sentinel_present": false
+    },
+    {
+      "provider": "openai-omniroute-chat",
+      "model": "sh/gpt-5.6-sol",
+      "isolated": true,
+      "exit_code": 1,
+      "unknown_provider_error": true,
+      "sentinel_present": false
+    }
+  ],
+  "negative_controls_status": "PASS",
+  "default_probe": {
+    "probe": "config-level-only",
+    "provider": "openai-compatible",
+    "model": "sh/gpt-5.6-sol"
   },
-  "security_incident": {
-    "type": "credential-disclosure-in-transcript",
-    "action_required": "Rotate/revoke the exposed Cline provider API-key credential and update the local provider securely.",
-    "credential_value_recorded": false
-  },
-  "no_credential_values_recorded": true
+  "rollback_backup": "/Users/androidteam/.cline/data/settings/providers.json.bak-stale-cleanup4-20260903T084853",
+  "probe_isolation": "negative controls ran in temporary Cline homes; live settings were not used for negative controls",
+  "no_credential_values_recorded": true,
+  "post_apply_sha256_before_positive_probe": "3b48ffa092515f070210c6ac5301a6273daffa37559d4a05be034863d5f27c17",
+  "post_probe_sha256": "565d35c94a735952fd9ce72f06a2eb80ada031a8a84dcab54c324628b43320f0",
+  "post_probe_mode": "0600",
+  "post_probe_semantic_status": "PASS: only the runtime-managed updatedAt field changed after the live positive probe",
+  "post_probe_runtime_rewrites": [
+    "providers.openai-compatible.updatedAt"
+  ],
+  "post_probe_live_settings_unchanged_for_route_fields": true,
+  "evidence_note": "The positive Cline invocation updates its runtime-managed provider timestamp; hashes before and after the probe are both retained and the semantic route/default fields remain unchanged."
 }

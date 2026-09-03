@@ -1,29 +1,61 @@
-# Design: Cline provider registry cleanup and route correction
+# Design: Cline provider registry cleanup
 
 ## Root Cause
 
-Cline resolves a provider ID only when that ID is registered in `~/.cline/data/settings/models.json` or is a built-in provider ID. The pre-cleanup4 settings file contained three custom OmniRoute entries that were absent from the registry and failed explicit resolution with `Unknown or disabled provider`. The retained `openai-compatible` entry still used model `sh/codex`, while the source-derived Cline route contract requires `sh/gpt-5.6-sol`.
+Cline's installed runtime has two provider lanes: built-in provider IDs and
+custom provider IDs loaded from `~/.cline/data/settings/models.json`. The
+settings file had stale custom entries (codex-compatible, codex-omniroute-chat, openai-omniroute-chat) without matching model
+registry entries. The installed runtime therefore reports `Unknown or disabled
+provider` for those IDs. The built-in `openai-compatible` provider is independently
+registered by Cline and reaches the OmniRoute fallback.
 
-## Cleanup4 State
+The canonical Cline fallback is model `sh/gpt-5.6-sol` at
+`http://localhost:20128/chat/completions`. Earlier archived evidence recorded a
+noncanonical model state, but the current pre-apply record shows the canonical
+model already present; the corrective apply asserts and preserves it rather
+than relying on a cross-model sentinel.
 
-The cleanup4 backup is mode `0600` and SHA-256 `ef00b4b8d009678c9be1ed2841d948bef8737694d35c4f2e828936f9085d596c`, byte-identical to the recorded pre-apply state. The apply removed exactly the three stale IDs, updated `openai-compatible` from `sh/codex` to `sh/gpt-5.6-sol`, and repaired `lastUsedProvider` from `openai-omniroute-chat` to `openai-compatible`. The final file remains mode `0600`, has one provider, and hashes to `3b48ffa092515f070210c6ac5301a6273daffa37559d4a05be034863d5f27c17`.
+## Previous Probe Failures
+
+- Attempt 1 removed the working provider due to display-layer identifier
+  confusion; its positive control failed and the file was rolled back from a
+  mode-600 backup.
+- Attempt 2 correctly removed stale IDs but ran negative controls against the
+  live file. Cline's settings manager saved each explicit unknown selection,
+  reintroducing those IDs. The live file then drifted and the route checker
+  failed. This change retains that failure as evidence and never uses live
+  negative controls again.
 
 ## Correct Apply Strategy
 
-1. Read `providers.json` and `models.json`; compute the stale set programmatically as settings provider IDs minus registry provider IDs minus built-in provider IDs. Never hand-type provider IDs.
-2. Confirm the retained set contains `openai-compatible` and that `lastUsedProvider` is repaired only when it points to a removed stale entry.
-3. Create a timestamped mode-600 backup before mutation and record its mode, SHA-256, and byte-identity result.
-4. Remove exactly the computed stale IDs with a same-directory atomic replace and preserve mode `0600`.
-5. Update the retained provider’s model to the source-derived canonical value `sh/gpt-5.6-sol` and preserve `baseUrl http://localhost:20128`.
-6. Verify JSON parsing, final provider IDs, repaired default, the static route contract, a cleanup4-specific positive live sentinel, and per-ID negative controls.
+1. Parse live `providers.json` and `models.json`.
+2. Extract the installed Cline built-in provider IDs from the installed bundle
+   and generated provider-ID declaration. Compute
+   `stale = settings_ids - registry_ids - builtin_ids`.
+3. Assert the computed set excludes the built-in `openai-compatible` provider and that
+   the retained entry has base URL `http://localhost:20128`.
+4. Create a timestamped mode-600 backup before mutation.
+5. Atomically remove exactly `stale`, assert/retain the canonical model
+   `sh/gpt-5.6-sol`, and repair `lastUsedProvider` only if it points to a removed ID.
+6. Run the positive sentinel once through the live retained provider. Run each
+   negative control only in a temporary isolated Cline home.
+7. Confirm the live settings file remains semantically equal to the expected
+   post-apply document after all probes. Roll back atomically on any failure.
 
 ## Verification
 
-- **Static:** `openspec validate fix-cline-stale-provider-registry --strict --store openspec-store` passes with zero issues, and `route-contract-check.py --phase candidate` passes all 17 checks.
-- **Positive live sentinel:** PENDING. A cleanup4-specific positive route through the final `openai-compatible` + `sh/gpt-5.6-sol` pair must be recorded before closure.
-- **Negative controls:** PENDING. Each removed provider ID must be explicitly re-probed after the final state and recorded as failing with `Unknown or disabled provider`.
-- **Evidence:** value-blind only; record provider IDs, model, endpoint, mode, SHA-256 hashes, exit statuses, sentinel booleans, and the backup path. Never record credential values.
+- Positive live route: provider `openai-compatible`, model `sh/gpt-5.6-sol`, base URL
+  `http://localhost:20128`, versionless endpoint `/chat/completions`, exit 0, exact
+  `OMNIROUTE_DIALECT_OK`, and no auth/reconnect/unknown-provider error.
+- Negative isolated controls: each removed ID exits non-zero with
+  `Unknown or disabled provider`; no live settings file is touched.
+- Post-apply JSON parses, mode remains 0600, unrelated settings are preserved,
+  stale IDs are absent, and the default points to the retained provider.
+- OpenSpec strict validation and the archived 17-check route contract are run
+  before closure.
 
 ## Rollback
 
-Restore the recorded mode-600 backup atomically if parsing or the positive sentinel fails. Cleanup4 did not require rollback; its backup identity is recorded in `evidence/cline-provider-cleanup4-sentinel.json`.
+Restore the recorded mode-600 backup atomically if parsing, semantic
+comparison, or the positive sentinel fails. Temporary negative-control homes
+are removed after evidence capture.
