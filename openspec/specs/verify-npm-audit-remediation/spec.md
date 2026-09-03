@@ -1,7 +1,7 @@
 # verify-npm-audit-remediation Specification
 
 ## Purpose
-TBD - created by archiving change verify-npm-audit-remediation. Update Purpose after archive.
+Ensure the 2026-09-03 workspace-wide npm/bun/pnpm audit remediation is independently verified before commit: every audit/build/test claim re-executed in fresh processes against the current working tree, unpatched-upstream residuals identified by package and no-fix marker rather than merely counted, and any surfaced bug fixed within remediation scope with the fix recorded in evidence.
 
 ## Requirements
 

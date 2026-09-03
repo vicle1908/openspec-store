@@ -1,7 +1,7 @@
 # realtime-frontend-build Specification
 
 ## Purpose
-TBD - created by archiving change fix-realtime-frontend-build. Update Purpose after archive.
+Govern the realtime frontend's production build so it reflects the actual Vitest test environment: no undeclared Jest types in the application TypeScript program, test-only sources excluded from production compilation, `npm run build` exiting 0 on a clean dependency tree, and `npm audit` remaining at 0 vulnerabilities.
 
 ## Requirements
 
