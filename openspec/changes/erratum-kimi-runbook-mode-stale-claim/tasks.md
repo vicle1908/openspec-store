@@ -4,7 +4,7 @@
 
 ## 2. Validation
 
-- [x] 2.1 Run strict validation. **Done:** `{"valid": true, "issues": []}`.
+- [x] 2.1 Run strict validation. **Done (2026-09-03, after semantic correction):** `{"valid": true, "issues": [{"level": "INFO", "message": "skip_specs is set in .openspec.yaml: change declares no spec-level behavior changes, zero deltas accepted"}]}` — valid with one INFO issue, zero errors.
 
 ## 3. Closure
 
