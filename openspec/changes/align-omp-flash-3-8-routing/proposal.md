@@ -1,9 +1,9 @@
 # Proposal: Align OMP Flash 3.8 Routing in Canonical Specs
 
-## Intent
+## Why
 Align the canonical `omp-provider-routing` specification with the live OMP configuration, where high-frequency background roles (`smol`, `tiny`, `vision`) and the `default` fallback chain terminal hop were upgraded from `google-antigravity/gemini-3.7-flash:high` to `google-antigravity/gemini-3.8-flash:high`.
 
-## Scope
+## What Changes
 - Spec delta: `specs/omp-provider-routing/spec.md` in this change updating 3 modified requirements (`Isolated profile validation`, `Capability-based role allocation`, and `Fallback chain composition and coverage`).
 - Canonical spec sync: merge the delta into `openspec/specs/omp-provider-routing/spec.md`.
 - Code changes: 0 executable code edits in the workspace (`/Users/androidteam/Developer`), as verified by auditing repository consumers.
