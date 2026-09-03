@@ -1,0 +1,30 @@
+{
+  "record_type": "cline-provider-cleanup-preapply",
+  "change": "fix-cline-stale-provider-registry",
+  "value_blind": true,
+  "target_path": "~/.cline/data/settings/providers.json",
+  "target_mode": "0600",
+  "pre_sha256": "a53cc8d9b7d4d77cfec2e192ac3a22da3d661422b8890d6aacab1d5277a8de18",
+  "pre_size_bytes": 1306,
+  "backup_path": "/Users/androidteam/.cline/data/settings/providers.json.bak-stale-cleanup-20260903T031326",
+  "backup_mode": "0600",
+  "backup_sha256": "a53cc8d9b7d4d77cfec2e192ac3a22da3d661422b8890d6aacab1d5277a8de18",
+  "provider_ids_before": [
+    "codex-compatible",
+    "codex-omniroute-chat",
+    "openai-compatible",
+    "openai-omniroute-chat"
+  ],
+  "registry_provider_ids": [
+    "giaoduc",
+    "shopapikey"
+  ],
+  "stale_unregistered_provider_ids": [
+    "codex-compatible",
+    "codex-omniroute-chat",
+    "openai-omniroute-chat"
+  ],
+  "registry_overlap_for_stale_ids": [],
+  "named_approval": "owner requested verification and bug fixing in current session",
+  "no_credential_values_recorded": true
+}

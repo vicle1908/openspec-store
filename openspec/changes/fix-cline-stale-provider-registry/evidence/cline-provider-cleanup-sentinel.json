@@ -1,0 +1,60 @@
+{
+  "record_type": "cline-provider-cleanup-verification",
+  "change": "fix-cline-stale-provider-registry",
+  "value_blind": true,
+  "timestamp_utc": "2026-09-03T03:15:20Z",
+  "target_path": "~/.cline/data/settings/providers.json",
+  "pre_sha256": "a53cc8d9b7d4d77cfec2e192ac3a22da3d661422b8890d6aacab1d5277a8de18",
+  "post_sha256": "351d7c1c397670738d41215ff2b460c0b966a394ff459109c78f5f10c1d891b1",
+  "pre_mode": "0600",
+  "post_mode": "0600",
+  "removed_unregistered_provider_ids": [
+    "codex-compatible",
+    "codex-omniroute-chat",
+    "openai-omniroute-chat"
+  ],
+  "preserved_working_provider": "codex-compatible",
+  "preserved_working_model": "sh/codex",
+  "preserved_last_used_provider": "codex-compatible",
+  "positive_route": {
+    "provider": "codex-compatible",
+    "model": "sh/codex",
+    "base_url": "http://localhost:20128",
+    "endpoint_path": "/chat/completions",
+    "exit_code": 1,
+    "sentinel_present": false,
+    "error_markers": {
+      "unknown_or_disabled_provider": true,
+      "authentication": false,
+      "invalid_api_key": false,
+      "reconnect": false
+    },
+    "status": "FAIL"
+  },
+  "negative_controls": [
+    {
+      "provider": "codex-compatible",
+      "model": "sh/codex",
+      "exit_code": 1,
+      "unknown_provider_error": true,
+      "sentinel_present": false
+    },
+    {
+      "provider": "codex-omniroute-chat",
+      "model": "sh/codex",
+      "exit_code": 1,
+      "unknown_provider_error": true,
+      "sentinel_present": false
+    },
+    {
+      "provider": "openai-omniroute-chat",
+      "model": "sh/gpt-5.6-sol",
+      "exit_code": 1,
+      "unknown_provider_error": true,
+      "sentinel_present": false
+    }
+  ],
+  "negative_controls_status": "PASS",
+  "rollback_backup": "/Users/androidteam/.cline/data/settings/providers.json.bak-stale-cleanup-20260903T031326",
+  "no_credential_values_recorded": true
+}

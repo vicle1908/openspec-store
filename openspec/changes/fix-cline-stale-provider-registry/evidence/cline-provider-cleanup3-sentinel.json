@@ -1,0 +1,72 @@
+{
+  "record_type": "cline-provider-cleanup3-verification",
+  "change": "fix-cline-stale-provider-registry",
+  "value_blind": true,
+  "timestamp_utc": "2026-09-03T03:35:30Z",
+  "target_path": "~/.cline/data/settings/providers.json",
+  "pre_sha256": "a53cc8d9b7d4d77cfec2e192ac3a22da3d661422b8890d6aacab1d5277a8de18",
+  "post_sha256": "cd9c0ebe9af2bcdc7370da5bb055a8c3208e07bc2fc4f7a956fb8ef2ce933713",
+  "pre_mode": "0600",
+  "post_mode": "0600",
+  "builtin_provider_ids_source": "installed @cline/llms bundle enum + provider-ids.generated.d.ts",
+  "builtin_count": 214,
+  "registry_provider_ids": [
+    "giaoduc",
+    "shopapikey"
+  ],
+  "removed_unregistered_provider_ids": [
+    "codex-compatible",
+    "codex-omniroute-chat",
+    "openai-omniroute-chat"
+  ],
+  "preserved_provider_ids": [
+    "openai-compatible"
+  ],
+  "working_provider": "openai-compatible",
+  "working_model": "sh/codex",
+  "working_base_url": "http://localhost:20128",
+  "working_endpoint_path": "/chat/completions",
+  "last_used_provider_before": "codex-compatible",
+  "last_used_provider_after": "openai-compatible",
+  "last_used_repair": {
+    "from": "codex-compatible",
+    "to": "openai-compatible"
+  },
+  "positive_route": {
+    "provider": "openai-compatible",
+    "model": "sh/codex",
+    "exit_code": 0,
+    "sentinel_present": true,
+    "status": "PASS"
+  },
+  "negative_controls": [
+    {
+      "provider": "codex-compatible",
+      "model": "sh/codex",
+      "exit_code": 1,
+      "unknown_provider_error": true,
+      "sentinel_present": false
+    },
+    {
+      "provider": "codex-omniroute-chat",
+      "model": "sh/codex",
+      "exit_code": 1,
+      "unknown_provider_error": true,
+      "sentinel_present": false
+    },
+    {
+      "provider": "openai-omniroute-chat",
+      "model": "sh/gpt-5.6-sol",
+      "exit_code": 1,
+      "unknown_provider_error": true,
+      "sentinel_present": false
+    }
+  ],
+  "negative_controls_status": "PASS",
+  "default_probe": {
+    "exit_code": 1,
+    "sentinel_present": false
+  },
+  "rollback_backup": "/Users/androidteam/.cline/data/settings/providers.json.bak-stale-cleanup3-20260903T033440",
+  "no_credential_values_recorded": true
+}
