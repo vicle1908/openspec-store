@@ -1,6 +1,6 @@
 ## 1. Evidence collection
 
-- [x] 1.1 Write `evidence/erratum-mode-state.json`: authoritative state record with line citations. **Done:** hash `a367771f…` (1,018 bytes), cites archived `2.1-kimi-pm-sh-runbook.json` lines 11/16/17 (0o644/drift) vs archived `2.0-hardening-evidence.json` lines 6/7/13 (0600/no-mutation).
+- [x] 1.1 Write `evidence/erratum-mode-state.json`: authoritative state record with line citations. **Done:** hash `134be631…` (1,586 bytes), cites archived `2.1-kimi-pm-sh-runbook.json` lines 11/16/17 (0o644/drift) vs archived `2.0-hardening-evidence.json` lines 6/7/13 (0600/no-mutation).
 
 ## 2. Validation
 

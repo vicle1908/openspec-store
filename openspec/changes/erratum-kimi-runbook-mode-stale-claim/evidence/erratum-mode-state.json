@@ -16,5 +16,23 @@
   "correct_claim": "pre_mode: 0600, post_mode: 0600, mutation_performed: false",
   "root_cause": "Earlier value-blind parser returned inaccurate mode; actual stat showed 0600"
  },
+ "line_citations": {
+  "stale_runbook": {
+   "file": "archive/2026-09-02-remediate-invalid-premature-archive-closure/evidence/2.1-kimi-pm-sh-runbook.json",
+   "lines": {
+    "11": "mode 0o644 (incorrect)",
+    "16": "mode_drift_detected true",
+    "17": "mode_drift_detail explains 0644 vs 0600 drift"
+   }
+  },
+  "correct_hardening": {
+   "file": "archive/2026-09-02-remediate-invalid-premature-archive-closure/evidence/2.0-hardening-evidence.json",
+   "lines": {
+    "6": "pre_mode 0600",
+    "7": "post_mode 0600",
+    "13": "mutation_performed false"
+   }
+  }
+ },
  "no_credential_values_recorded": true
 }
