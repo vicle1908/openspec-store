@@ -1,0 +1,32 @@
+{
+  "record_type": "fresh-cline-positive-sentinel",
+  "value_blind": true,
+  "timestamp_utc": "2026-09-03T12:49:46Z",
+  "owner_gate_release": "owner-credential-gate-release.json",
+  "target_path": "~/.cline/data/settings/providers.json",
+  "provider": "openai-compatible",
+  "model": "sh/gpt-5.6-sol",
+  "base_url": "http://localhost:20128",
+  "endpoint_path": "/chat/completions",
+  "pre_sha256": "565d35c94a735952fd9ce72f06a2eb80ada031a8a84dcab54c324628b43320f0",
+  "post_sha256": "4bdfaeb5eec179c6fa3e5e1bc0f97fa60e3a53c1690823bb746ce38e48f03304",
+  "pre_mode": "0600",
+  "post_mode": "0600",
+  "exit_code": 0,
+  "timed_out": false,
+  "sentinel_present": true,
+  "error_markers": {
+    "unknown_or_disabled_provider": false,
+    "authentication": false,
+    "invalid_api_key": false,
+    "reconnect": false
+  },
+  "post_provider_ids": [
+    "openai-compatible"
+  ],
+  "post_route_fields_valid": true,
+  "runtime_timestamp_rewrite_possible": true,
+  "duration_seconds": 19.277,
+  "status": "PASS",
+  "no_credential_values_recorded": true
+}
