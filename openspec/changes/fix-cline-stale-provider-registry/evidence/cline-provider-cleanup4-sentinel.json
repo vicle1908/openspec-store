@@ -36,8 +36,30 @@
     "reason": "Cleanup4 evidence records only the static 17/17 route-contract result. No cleanup4-specific positive live sentinel exit/boolean result has been recorded."
   },
   "negative_controls": {
-    "status": "PENDING",
-    "reason": "The three removed IDs have not yet been re-probed after the cleanup4 final state to record per-ID resolution failures."
+    "status": "PASS",
+    "results": [
+      {
+        "provider": "codex-compatible",
+        "model": "sh/codex",
+        "exit_code": 1,
+        "unknown_provider_error": true,
+        "sentinel_present": false
+      },
+      {
+        "provider": "codex-omniroute-chat",
+        "model": "sh/codex",
+        "exit_code": 1,
+        "unknown_provider_error": true,
+        "sentinel_present": false
+      },
+      {
+        "provider": "openai-omniroute-chat",
+        "model": "sh/gpt-5.6-sol",
+        "exit_code": 1,
+        "unknown_provider_error": true,
+        "sentinel_present": false
+      }
+    ]
   },
   "security_incident": {
     "type": "credential-disclosure-in-transcript",
