@@ -16,13 +16,11 @@
 - [x] 3.1 Run full scan: `for app in /Applications/*.app; do [ ! -f "$app/Contents/Info.plist" ] && echo "STILL CORRUPTED: $app"; done` — confirm no brew-managed apps remain corrupted
 - [x] 3.2 Run `brew doctor` and confirm no new warnings about Caskroom metadata or `.upgrading/` directories for the 5 fixed casks
 
-## 4. Restore Stably AI Orca
+## 4. Install Stably AI Orca (Official Method)
 
-- [ ] 4.1 Verify the Orca bundle in `.upgrading/` is complete: `ls -la /opt/homebrew/Caskroom/orca/1.4.196.upgrading/Orca.app/Contents/MacOS/Orca` and `defaults read /opt/homebrew/Caskroom/orca/1.4.196.upgrading/Orca.app/Contents/Info.plist CFBundleIdentifier` returns `com.stablyai.orca`
-- [ ] 4.2 Remove the corrupted empty shell: `rm -rf /Applications/Orca.app`
-- [ ] 4.3 Copy the complete bundle: `cp -R "/opt/homebrew/Caskroom/orca/1.4.196.upgrading/Orca.app" /Applications/Orca.app`
-- [ ] 4.4 Verify restoration: `defaults read /Applications/Orca.app/Contents/Info.plist CFBundleIdentifier` returns `com.stablyai.orca` and `defaults read /Applications/Orca.app/Contents/Info.plist CFBundleShortVersionString` returns `1.4.197`
-- [ ] 4.5 Clean up the stale Caskroom entry: `rm -rf /opt/homebrew/Caskroom/orca/`
+- [ ] 4.1 Remove the corrupted empty shell and stale Caskroom entry: `rm -rf /Applications/Orca.app /opt/homebrew/Caskroom/orca/`
+- [ ] 4.2 Tap the official Orca repo and install: `brew install --cask stablyai/orca/orca` — verify `/Applications/Orca.app/Contents/Info.plist` exists
+- [ ] 4.3 Verify installation: `defaults read /Applications/Orca.app/Contents/Info.plist CFBundleIdentifier` returns `com.stablyai.orca` and `defaults read /Applications/Orca.app/Contents/Info.plist CFBundleShortVersionString` returns the installed version
 
 ## 5. Sideloaded iOS Apps (Manual Guidance)
 

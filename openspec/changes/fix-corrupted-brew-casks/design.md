@@ -40,17 +40,17 @@ Eight applications in `/Applications/` have corrupted installations across three
 
 **Choice:** After each reinstall, verify `Info.plist` exists and executable is present.
 
-### D4: Restore Orca by copying from `.upgrading/` directory
+### D4: Install Orca via official Homebrew tap
 
-**Choice:** Copy the complete `.app` bundle from `/opt/homebrew/Caskroom/orca/1.4.196.upgrading/Orca.app/` to `/Applications/Orca.app/`.
+**Choice:** `brew install --cask stablyai/orca/orca` — the official method from [github.com/stablyai/orca](https://github.com/stablyai/orca).
 
 **Rationale:**
-- The Homebrew `orca` cask is for Plotly Orca (different app, disabled by Gatekeeper) — `brew reinstall` would install the wrong app
-- The user's Orca is Stably AI Orca (`com.stablyai.orca`), distributed via GitHub releases
-- The `.upgrading/` directory contains a complete, signed bundle (v1.4.197) with all frameworks and executables
-- Direct copy is the only viable restoration path since there's no matching package manager entry
+- The default Homebrew `orca` cask is for Plotly Orca (different app, disabled by Gatekeeper)
+- Stably AI Orca has its own tap: `stablyai/orca/orca`
+- Official install ensures correct version, proper Caskroom metadata, and future `brew upgrade` support
+- Must first remove the corrupted empty shell and stale Caskroom entry to avoid conflicts
 
-**Alternative considered:** Download fresh from GitHub releases → rejected because the existing bundle is complete and verified; download adds unnecessary network dependency.
+**Alternative considered:** Copy from `.upgrading/` directory → rejected because it leaves stale Caskroom metadata and doesn't register with the correct tap.
 
 ### D5: Document manual reinstall for sideloaded iOS apps
 

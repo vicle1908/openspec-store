@@ -8,7 +8,7 @@ Eight applications in `/Applications/` have corrupted installations — their `.
 
 ## What Changes
 
-- Restore Stably AI Orca by copying the complete bundle from the `.upgrading/` directory to `/Applications/`
+- Install Stably AI Orca via the official Homebrew tap: `brew install --cask stablyai/orca/orca`
 - Document manual reinstall steps for AutoForward Messages and Nicegram (sideloaded iOS apps, not managed by any package manager)
 - Clean up stale `.upgrading/` directories from the Caskroom
 - No code changes — this is a tooling/infrastructure fix
