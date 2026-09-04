@@ -1,0 +1,3 @@
+# Design: align-realtime-vitest-docs
+
+Use Vitest as the sole frontend test runner. Inspect all tracked Jest config and global usages, migrate compatible tests to Vitest APIs, remove obsolete Jest config/dependencies only when unused, and update README/testing docs. Establish a baseline from commit `f196754` before attributing failures to the migration. Fix failures attributable to the migration or exposed by the runner/config conversion, including timeout and accessibility failures, while preserving intended behavior. Run the actual Vitest suite and production build. Keep unrelated backend/mobile work untouched.
