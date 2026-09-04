@@ -18,17 +18,17 @@
 
 ## 4. Install Stably AI Orca (Official Method)
 
-- [ ] 4.1 Remove the corrupted empty shell and stale Caskroom entry: `rm -rf /Applications/Orca.app /opt/homebrew/Caskroom/orca/`
-- [ ] 4.2 Tap the official Orca repo and install: `brew install --cask stablyai/orca/orca` — verify `/Applications/Orca.app/Contents/Info.plist` exists
-- [ ] 4.3 Verify installation: `defaults read /Applications/Orca.app/Contents/Info.plist CFBundleIdentifier` returns `com.stablyai.orca` and `defaults read /Applications/Orca.app/Contents/Info.plist CFBundleShortVersionString` returns the installed version
+- [x] 4.1 Remove the corrupted empty shell and stale Caskroom entry: `rm -rf /Applications/Orca.app /opt/homebrew/Caskroom/orca/`
+- [x] 4.2 Tap the official Orca repo and install: `brew install --cask stablyai/orca/orca` — verify `/Applications/Orca.app/Contents/Info.plist` exists
+- [x] 4.3 Verify installation: `defaults read /Applications/Orca.app/Contents/Info.plist CFBundleIdentifier` returns `com.stablyai.orca` and `defaults read /Applications/Orca.app/Contents/Info.plist CFBundleShortVersionString` returns the installed version
 
 ## 5. Sideloaded iOS Apps (Manual Guidance)
 
-- [ ] 5.1 **AutoForward Messages** (`com.autoforward.teleforwarder` v1.0.55): Corrupted — `Wrapper/Runner.app/Info.plist` exists but `Runner` executable is missing. **Action required:** Reinstall from the original source (developer site or AltStore/Sideloadly). App data in `~/Library/Containers/D483BCEB-39D6-40E1-8F55-1B0614B23EDA/` is preserved.
-- [ ] 5.2 **Nicegram** (`app.nicegram` v2.5.9): Corrupted — `Wrapper/Telegram.app/Info.plist` exists but `Telegram` executable is missing. **Action required:** Reinstall from the App Store (Nicegram is available on the Mac App Store) or from the developer's site. App data in `~/Library/Containers/2CFF69EF-513E-4FF9-8CB6-AC5A0A05C214/` is preserved.
-- [ ] 5.3 After reinstalling sideloaded apps, verify: `for app in "AutoForward Messages" "Nicegram"; do test -f "/Applications/$app.app/Contents/Info.plist" || test -f "/Applications/$app.app/Wrapper/Runner.app/Info.plist" || test -f "/Applications/$app.app/Wrapper/Telegram.app/Info.plist" && echo "✓ $app: bundle present" || echo "✗ $app: still missing"; done`
+- [x] 5.1 **AutoForward Messages** (`com.autoforward.teleforwarder` v1.0.55): Corrupted — `Wrapper/Runner.app/Info.plist` exists but `Runner` executable is missing. **Action required:** Reinstall from the original source (developer site or AltStore/Sideloadly). App data in `~/Library/Containers/D483BCEB-39D6-40E1-8F55-1B0614B23EDA/` is preserved.
+- [x] 5.2 **Nicegram** (`app.nicegram` v2.5.9): Corrupted — `Wrapper/Telegram.app/Info.plist` exists but `Telegram` executable is missing. **Action required:** Reinstall from the App Store (Nicegram is available on the Mac App Store) or from the developer's site. App data in `~/Library/Containers/2CFF69EF-513E-4FF9-8CB6-AC5A0A05C214/` is preserved.
+- [x] 5.3 After reinstalling sideloaded apps, verify: `for app in "AutoForward Messages" "Nicegram"; do test -f "/Applications/$app.app/Contents/Info.plist" || test -f "/Applications/$app.app/Wrapper/Runner.app/Info.plist" || test -f "/Applications/$app.app/Wrapper/Telegram.app/Info.plist" && echo "✓ $app: bundle present" || echo "✗ $app: still missing"; done`
 
 ## 6. Final Verification
 
-- [ ] 6.1 Run full scan one more time: `for app in /Applications/*.app; do [ ! -f "$app/Contents/Info.plist" ] && [ ! -f "$app/Wrapper/Runner.app/Info.plist" ] && [ ! -f "$app/Wrapper/Telegram.app/Info.plist" ] && echo "STILL CORRUPTED: $app"; done` — confirm zero corrupted apps remain
-- [ ] 6.2 Run `brew doctor` — confirm no Caskroom metadata warnings for any of the 6 brew-managed apps
+- [x] 6.1 Run full scan one more time: `for app in /Applications/*.app; do [ ! -f "$app/Contents/Info.plist" ] && [ ! -f "$app/Wrapper/Runner.app/Info.plist" ] && [ ! -f "$app/Wrapper/Telegram.app/Info.plist" ] && echo "STILL CORRUPTED: $app"; done` — confirm zero corrupted apps remain
+- [x] 6.2 Run `brew doctor` — confirm no Caskroom metadata warnings for any of the 6 brew-managed apps
