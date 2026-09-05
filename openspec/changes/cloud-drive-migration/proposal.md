@@ -2,47 +2,48 @@
 
 ## Summary
 
-Migrate all code projects from iCloud Drive and Google Drive to `~/Developer`, delete duplicates and build artifacts, and establish a clean separation: `~/Developer` for all code, cloud drives for documentation only.
+Migrate confirmed code projects from iCloud Drive to `~/Developer`, then clean only explicitly approved cloud duplicates and migration artifacts. The change is split into a read-only inventory/approval gate and a separately approved mutation phase; no deletion is performed without path-level approval and rollback evidence.
 
 ## Problem
 
-Development projects are scattered across iCloud Drive and Google Drive, creating several risks:
-
-1. **iCloud corrupts git state** — iCloud's sync daemon can modify `.git/` files, corrupting repositories. Two code projects (`project/vds/` at 6.7G and `project/microservices/` at 604M) are currently in iCloud.
-2. **Google Drive duplicates** — `~/My Drive/TDT (1)/` (2.9G) is a stale duplicate of `~/My Drive/tdt/`. The `tdt/` directory (6.9G) contains rclone bisync mirrors of all workspace repos, which are already in `~/Developer`.
-3. **Build artifacts in iCloud** — Android build caches (`compileDebugKotlin/`, `compileKotlin/`, `ksp/`) totaling 1.4M are in iCloud.
-4. **Desktop/Documents migration stubs** — Empty (0B) stubs from a previous migration clutter Desktop and Documents.
+Development projects and generated artifacts are scattered across iCloud Drive, Google Drive, Desktop, and Documents. iCloud-hosted Git trees risk filesystem corruption; Google Drive contains possible duplicates; personal folders and rollback bundles require explicit ownership decisions.
 
 ## Proposed Solution
 
-### Phase 1: iCloud Migration
+### Phase 0: Read-only inventory and approval gate
 
-- Move `~/Library/Mobile Documents/com~apple~CloudDocs/project/vds/` → `~/Developer/vds`
-- Move `~/Library/Mobile Documents/com~apple~CloudDocs/project/microservices/` → `~/Developer/microservices`
-- Delete iCloud build artifacts: `compileDebugKotlin/`, `compileKotlin/`, `ksp/`, `sparse/`, `inventory/`, `com 2/`, `camunda*`, `airbridge/`, `tmz/`
+- Record exact paths, sizes, Git status, remotes, checksums where practical, and active-process references.
+- Compare iCloud code trees with existing `~/Developer` destinations before any move.
+- Compare Google Drive candidates against canonical workspace repositories.
+- Classify every candidate as `PROTECTED`, `REVIEW_REQUIRED`, or `APPROVED_FOR_ACTION`.
+- Stop unless the user explicitly approves the exact paths for each destructive operation.
 
-### Phase 2: Google Drive Cleanup
+### Phase 1: iCloud code migration (approval required)
 
-- Delete `~/My Drive/TDT (1)/` (2.9G duplicate)
-- Delete `~/My Drive/VinID/` (2.3G — user confirmed delete, no migration)
-- Delete code repos from `~/My Drive/tdt/` (6.3G) — keep documentation repos (600M)
-- Delete `go-microservices-cleanup-20260817.bundle` from `~/Developer/` (1.4G)
+- Move only approved code projects from `~/Library/Mobile Documents/com~apple~CloudDocs/project/` to `~/Developer/`.
+- Verify destination integrity and source absence after each move.
+- Do not delete build artifacts until individually approved.
 
-### Phase 3: Desktop/Documents Cleanup
+### Phase 2: Google Drive cleanup (approval required)
 
-- Delete empty migration stubs from Desktop and Documents
-- Delete `tdt-python-source-package` from Desktop (132K)
+- Delete only explicitly approved duplicate or code-mirror paths.
+- Preserve documentation, rollback bundles, personal data, and unknown ownership by default.
+- Coordinate with rclone before deleting paths that may propagate through bisync.
+
+### Phase 3: Desktop/Documents cleanup (approval required)
+
+- Inventory and classify migration stubs.
+- Delete only exact approved paths; personal-looking paths remain protected unless explicitly approved.
 
 ## Success Criteria
 
-1. All code projects are in `~/Developer/` only
-2. iCloud has zero code projects (documentation only)
-3. Google Drive has zero code repo mirrors (documentation only)
-4. All empty migration stubs are removed from Desktop/Documents
-5. `~/Developer/` gains ~9.6G (vds + microservices) while cloud drives lose ~20G
+1. Every mutation has a recorded path-level approval and pre-action evidence.
+2. Approved code projects are present in `~/Developer/` and verified after migration.
+3. No protected or unknown-ownership data is deleted.
+4. Post-action verification records actual source/destination state and disk usage.
 
 ## Risks
 
-1. **iCloud mv may be slow** — Moving 6.7G from iCloud to local disk. Mitigation: `mv` on same APFS volume is fast (directory entry update, not data copy).
-2. **Google Drive sync may propagate deletions** — Deleting from `~/My Drive/` deletes from cloud. Mitigation: This is intentional — user wants code removed from cloud.
-3. **rclone bisync may see deletions** — Next bisync run will detect removed code repos. Mitigation: User can update rclone config to exclude code repos, or stop bisync entirely.
+- Cloud deletions may propagate to synced services; mitigation: dry-run, exact approvals, and rclone state review.
+- Moves may expose duplicate or conflicting Git histories; mitigation: compare status, remotes, and revisions first.
+- Personal data may be misclassified; mitigation: personal-looking paths are protected by default.
