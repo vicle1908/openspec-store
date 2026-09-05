@@ -1,6 +1,6 @@
 # OpenSpec Framework Documentation
 
-> **Last Updated:** 2026-08-02
+> **Last Updated:** 2026-09-05
 > **Status:** Active workspace index; see individual change folders for source-of-truth status
 
 ---
@@ -22,6 +22,8 @@ OpenSpec is the workspace specification framework for managing project changes, 
 | Historical summaries | Older counts and completion rollups in this file may lag newer changes and should not be treated as canonical |
 
 **Latest validation snapshot:** 2026-06-04 adapter alignment work confirmed live `sprint-sheet` read/write behavior remains valid after loading `~/.tdt/.env`; targeted adapter regression tests passed (`uv run pytest tests/test_tdt_sheet.py`). Historical full-suite and live sheet verification records remain in the owning change folders.
+
+**2026-09-05 validation snapshot:** `openspec validate --specs --strict` passed 401/401 canonical specs (0 failures). The `remediate-cleanup-archive-gaps` delta spec is synced to `openspec/specs/cleanup-archive-verification/spec.md` (archive commit `6f90e86`). `workspace-lifecycle-dryrun-2026-09` archived with `skip_specs: true` (no delta to sync). The remaining active change (`align-realtime-vitest-docs`, 0/7) has delta spec `realtime-vitest-docs` — deliberately **not** synced because implementation has not started.
 
 ---
 
@@ -51,6 +53,14 @@ commands to this store automatically (verified: `source: "declared"`).
 
 The `changes/` directory contains project-specific change proposals:
 
+#### Active Changes — current (2026-09-05)
+
+| Change | Tasks | Last Updated |
+|--------|-------|--------------|
+| **align-realtime-vitest-docs** | 0/7 | 2026-09-03 |
+
+> The historical 15-entry active table below is superseded; entries there were subsequently archived or moved. The table above reflects `openspec list --json` as of 2026-09-05.
+
 #### Active Changes (15)
 
 | Change | Tasks | Last Updated |
@@ -72,6 +82,26 @@ The `changes/` directory contains project-specific change proposals:
 | **microsoft-teams-integration** | 4/58 | 5/30/2026 |
 
 #### Recently Archived Changes
+
+#### Archived — September 2026
+
+| Project | Capabilities | Archived |
+|---------|--------------|----------|
+| **workspace-lifecycle-dryrun-2026-09** | operational evidence (`skip_specs: true`) | 2026-09-05 |
+| **remediate-cleanup-archive-gaps** | `cleanup-archive-verification` | 2026-09-05 |
+| **ecosystem-cleanup** | operational (`skip_specs: true`) | 2026-09-05 |
+| **fix-corrupted-brew-casks** | operational (`skip_specs: true`) | 2026-09-04 |
+| **align-omp-flash-3-8-routing** | `omp-provider-routing` | 2026-09-03 |
+| **invalidate-cline-archive-without-credential-rotation** | `omniroute-closure-integrity` | 2026-09-03 |
+| **fix-realtime-frontend-build** | `realtime-frontend-build` | 2026-09-03 |
+| **verify-npm-audit-remediation** | `verify-npm-audit-remediation` | 2026-09-03 |
+| **fix-cline-stale-provider-registry** | `omniroute-agent-cli-routing` | 2026-09-03 |
+| **erratum-codex** | erratum (`skip_specs: true`) | 2026-09-03 |
+| **remediate-invalid-premature-archive-closure** | `omniroute-closure-integrity` | 2026-09-02 |
+| **invalidate-archive-gaps-premature-archive** | `omniroute-closure-integrity` | 2026-09-02 |
+| **invalidate-archive-gaps-closure-fabrications** | `omniroute-closure-integrity` | 2026-09-02 |
+
+#### Archived — pre-September (legacy snapshot)
 
 | Project | Capabilities | Archived |
 |---------|--------------|----------|
