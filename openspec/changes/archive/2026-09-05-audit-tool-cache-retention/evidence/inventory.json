@@ -1,0 +1,782 @@
+{
+  "/Users/androidteam/.cache/uv": {
+    "path": "/Users/androidteam/.cache/uv",
+    "exists": true,
+    "total_size_bytes": 890004935,
+    "mtime": "2026-09-05T15:27:07+0700",
+    "entries": [
+      {
+        "name": ".gitignore",
+        "path": "/Users/androidteam/.cache/uv/.gitignore",
+        "kind": "file",
+        "size_bytes": 1,
+        "mtime": "2026-09-05T15:26:32+0700"
+      },
+      {
+        "name": ".lock",
+        "path": "/Users/androidteam/.cache/uv/.lock",
+        "kind": "file",
+        "size_bytes": 0,
+        "mtime": "2026-09-05T15:26:32+0700"
+      },
+      {
+        "name": "CACHEDIR.TAG",
+        "path": "/Users/androidteam/.cache/uv/CACHEDIR.TAG",
+        "kind": "file",
+        "size_bytes": 43,
+        "mtime": "2026-09-05T15:26:32+0700"
+      },
+      {
+        "name": "archive-v0",
+        "path": "/Users/androidteam/.cache/uv/archive-v0",
+        "kind": "dir",
+        "size_bytes": 840326268,
+        "mtime": "2026-09-05T15:27:07+0700"
+      },
+      {
+        "name": "builds-v0",
+        "path": "/Users/androidteam/.cache/uv/builds-v0",
+        "kind": "dir",
+        "size_bytes": 0,
+        "mtime": "2026-09-05T15:27:08+0700"
+      },
+      {
+        "name": "interpreter-v4",
+        "path": "/Users/androidteam/.cache/uv/interpreter-v4",
+        "kind": "dir",
+        "size_bytes": 2015,
+        "mtime": "2026-09-05T15:26:32+0700"
+      },
+      {
+        "name": "sdists-v9",
+        "path": "/Users/androidteam/.cache/uv/sdists-v9",
+        "kind": "dir",
+        "size_bytes": 29168,
+        "mtime": "2026-09-05T15:26:37+0700"
+      },
+      {
+        "name": "simple-v24",
+        "path": "/Users/androidteam/.cache/uv/simple-v24",
+        "kind": "dir",
+        "size_bytes": 49291328,
+        "mtime": "2026-09-05T15:26:32+0700"
+      },
+      {
+        "name": "wheels-v6",
+        "path": "/Users/androidteam/.cache/uv/wheels-v6",
+        "kind": "dir",
+        "size_bytes": 356112,
+        "mtime": "2026-09-05T15:26:32+0700"
+      }
+    ]
+  },
+  "/Users/androidteam/Library/Caches/uv": {
+    "path": "/Users/androidteam/Library/Caches/uv",
+    "exists": false
+  },
+  "/Users/androidteam/.claude": {
+    "path": "/Users/androidteam/.claude",
+    "exists": true,
+    "total_size_bytes": 1137309687,
+    "mtime": "2026-09-05T22:17:55+0700",
+    "entries": [
+      {
+        "name": ".last-cleanup",
+        "path": "/Users/androidteam/.claude/.last-cleanup",
+        "kind": "file",
+        "size_bytes": 24,
+        "mtime": "2026-09-05T19:49:12+0700"
+      },
+      {
+        "name": ".last-update-result.json",
+        "path": "/Users/androidteam/.claude/.last-update-result.json",
+        "kind": "file",
+        "size_bytes": 161,
+        "mtime": "2026-09-05T03:15:43+0700"
+      },
+      {
+        "name": "CLAUDE.md",
+        "path": "/Users/androidteam/.claude/CLAUDE.md",
+        "kind": "file",
+        "size_bytes": 228,
+        "mtime": "2026-08-25T20:55:35+0700"
+      },
+      {
+        "name": "backups",
+        "path": "/Users/androidteam/.claude/backups",
+        "kind": "dir",
+        "size_bytes": 287581,
+        "mtime": "2026-09-05T22:31:31+0700"
+      },
+      {
+        "name": "cache",
+        "path": "/Users/androidteam/.claude/cache",
+        "kind": "dir",
+        "size_bytes": 630788,
+        "mtime": "2026-09-05T19:28:35+0700"
+      },
+      {
+        "name": "commands",
+        "path": "/Users/androidteam/.claude/commands",
+        "kind": "dir",
+        "size_bytes": 0,
+        "mtime": "2026-08-09T15:57:47+0700"
+      },
+      {
+        "name": "daemon",
+        "path": "/Users/androidteam/.claude/daemon",
+        "kind": "dir",
+        "size_bytes": 121,
+        "mtime": "2026-08-17T17:38:50+0700"
+      },
+      {
+        "name": "daemon.log",
+        "path": "/Users/androidteam/.claude/daemon.log",
+        "kind": "file",
+        "size_bytes": 2736,
+        "mtime": "2026-08-17T17:38:55+0700"
+      },
+      {
+        "name": "downloads",
+        "path": "/Users/androidteam/.claude/downloads",
+        "kind": "dir",
+        "size_bytes": 0,
+        "mtime": "2026-08-09T16:18:09+0700"
+      },
+      {
+        "name": "file-history",
+        "path": "/Users/androidteam/.claude/file-history",
+        "kind": "dir",
+        "size_bytes": 8362040,
+        "mtime": "2026-09-05T00:22:42+0700"
+      },
+      {
+        "name": "helpers",
+        "path": "/Users/androidteam/.claude/helpers",
+        "kind": "dir",
+        "size_bytes": 2730,
+        "mtime": "2026-08-31T10:38:42+0700"
+      },
+      {
+        "name": "history.jsonl",
+        "path": "/Users/androidteam/.claude/history.jsonl",
+        "kind": "file",
+        "size_bytes": 256996,
+        "mtime": "2026-09-05T22:17:55+0700"
+      },
+      {
+        "name": "ide",
+        "path": "/Users/androidteam/.claude/ide",
+        "kind": "dir",
+        "size_bytes": 0,
+        "mtime": "2026-09-04T17:40:39+0700"
+      },
+      {
+        "name": "jobs",
+        "path": "/Users/androidteam/.claude/jobs",
+        "kind": "dir",
+        "size_bytes": 3752437,
+        "mtime": "2026-09-01T19:18:55+0700"
+      },
+      {
+        "name": "mcp-needs-auth-cache.json",
+        "path": "/Users/androidteam/.claude/mcp-needs-auth-cache.json",
+        "kind": "file",
+        "size_bytes": 2,
+        "mtime": "2026-08-12T12:10:34+0700"
+      },
+      {
+        "name": "paste-cache",
+        "path": "/Users/androidteam/.claude/paste-cache",
+        "kind": "dir",
+        "size_bytes": 26367,
+        "mtime": "2026-08-25T00:57:53+0700"
+      },
+      {
+        "name": "plans",
+        "path": "/Users/androidteam/.claude/plans",
+        "kind": "dir",
+        "size_bytes": 11447,
+        "mtime": "2026-08-20T11:04:51+0700"
+      },
+      {
+        "name": "plugins",
+        "path": "/Users/androidteam/.claude/plugins",
+        "kind": "dir",
+        "size_bytes": 661015367,
+        "mtime": "2026-09-05T19:29:14+0700"
+      },
+      {
+        "name": "profiles",
+        "path": "/Users/androidteam/.claude/profiles",
+        "kind": "dir",
+        "size_bytes": 3756,
+        "mtime": "2026-08-30T12:17:05+0700"
+      },
+      {
+        "name": "projects",
+        "path": "/Users/androidteam/.claude/projects",
+        "kind": "dir",
+        "size_bytes": 455841677,
+        "mtime": "2026-09-05T19:49:12+0700"
+      },
+      {
+        "name": "session-env",
+        "path": "/Users/androidteam/.claude/session-env",
+        "kind": "dir",
+        "size_bytes": 0,
+        "mtime": "2026-09-05T19:49:12+0700"
+      },
+      {
+        "name": "sessions",
+        "path": "/Users/androidteam/.claude/sessions",
+        "kind": "dir",
+        "size_bytes": 2566,
+        "mtime": "2026-09-05T19:27:42+0700"
+      },
+      {
+        "name": "settings.json",
+        "path": "/Users/androidteam/.claude/settings.json",
+        "kind": "file",
+        "size_bytes": 39445,
+        "mtime": "2026-08-31T11:44:20+0700"
+      },
+      {
+        "name": "settings.json.bak",
+        "path": "/Users/androidteam/.claude/settings.json.bak",
+        "kind": "file",
+        "size_bytes": 36050,
+        "mtime": "2026-08-31T11:22:10+0700"
+      },
+      {
+        "name": "settings.json.bak-fix-claude-code-fable-model-id.20260829T170426",
+        "path": "/Users/androidteam/.claude/settings.json.bak-fix-claude-code-fable-model-id.20260829T170426",
+        "kind": "file",
+        "size_bytes": 36036,
+        "mtime": "2026-08-29T17:04:26+0700"
+      },
+      {
+        "name": "settings.json.bak-fix-claude-code-fable-model-id.20260829T170503",
+        "path": "/Users/androidteam/.claude/settings.json.bak-fix-claude-code-fable-model-id.20260829T170503",
+        "kind": "file",
+        "size_bytes": 36036,
+        "mtime": "2026-08-29T17:05:03+0700"
+      },
+      {
+        "name": "settings.json.pre-provider-profiles-20260811",
+        "path": "/Users/androidteam/.claude/settings.json.pre-provider-profiles-20260811",
+        "kind": "file",
+        "size_bytes": 8613,
+        "mtime": "2026-08-11T15:07:10+0700"
+      },
+      {
+        "name": "settings.json.pre-shopapikey-default.20260811_181541",
+        "path": "/Users/androidteam/.claude/settings.json.pre-shopapikey-default.20260811_181541",
+        "kind": "file",
+        "size_bytes": 9085,
+        "mtime": "2026-08-11T18:15:41+0700"
+      },
+      {
+        "name": "shell-snapshots",
+        "path": "/Users/androidteam/.claude/shell-snapshots",
+        "kind": "dir",
+        "size_bytes": 6746881,
+        "mtime": "2026-09-05T19:29:40+0700"
+      },
+      {
+        "name": "skills",
+        "path": "/Users/androidteam/.claude/skills",
+        "kind": "dir",
+        "size_bytes": 99131,
+        "mtime": "2026-09-04T17:44:21+0700"
+      },
+      {
+        "name": "tasks",
+        "path": "/Users/androidteam/.claude/tasks",
+        "kind": "dir",
+        "size_bytes": 34866,
+        "mtime": "2026-09-05T19:49:12+0700"
+      },
+      {
+        "name": "teams",
+        "path": "/Users/androidteam/.claude/teams",
+        "kind": "dir",
+        "size_bytes": 34203,
+        "mtime": "2026-09-05T19:27:42+0700"
+      },
+      {
+        "name": "telemetry",
+        "path": "/Users/androidteam/.claude/telemetry",
+        "kind": "dir",
+        "size_bytes": 32317,
+        "mtime": "2026-09-04T17:18:59+0700"
+      }
+    ]
+  },
+  "/Users/androidteam/Library/Caches/Claude": {
+    "path": "/Users/androidteam/Library/Caches/Claude",
+    "exists": false
+  },
+  "/Users/androidteam/.orca": {
+    "path": "/Users/androidteam/.orca",
+    "exists": true,
+    "total_size_bytes": 28260,
+    "mtime": "2026-08-20T15:06:20+0700",
+    "entries": [
+      {
+        "name": "agent-hooks",
+        "path": "/Users/androidteam/.orca/agent-hooks",
+        "kind": "dir",
+        "size_bytes": 27988,
+        "mtime": "2026-08-31T11:22:08+0700"
+      },
+      {
+        "name": "claude-agent-teams-bin",
+        "path": "/Users/androidteam/.orca/claude-agent-teams-bin",
+        "kind": "dir",
+        "size_bytes": 272,
+        "mtime": "2026-08-20T15:06:20+0700"
+      }
+    ]
+  },
+  "/Users/androidteam/Library/Caches/Orca": {
+    "path": "/Users/androidteam/Library/Caches/Orca",
+    "exists": false
+  },
+  "/Users/androidteam/Library/Application Support/Orca": {
+    "path": "/Users/androidteam/Library/Application Support/Orca",
+    "exists": true,
+    "total_size_bytes": 1235371688,
+    "mtime": "2026-09-05T22:30:03+0700",
+    "entries": [
+      {
+        "name": ".updaterId",
+        "path": "/Users/androidteam/Library/Application Support/Orca/.updaterId",
+        "kind": "file",
+        "size_bytes": 36,
+        "mtime": "2026-08-20T11:09:19+0700"
+      },
+      {
+        "name": "Cache",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Cache",
+        "kind": "dir",
+        "size_bytes": 2113293,
+        "mtime": "2026-08-20T11:09:08+0700"
+      },
+      {
+        "name": "Code Cache",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Code Cache",
+        "kind": "dir",
+        "size_bytes": 228448,
+        "mtime": "2026-08-20T11:09:16+0700"
+      },
+      {
+        "name": "Cookies",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Cookies",
+        "kind": "file",
+        "size_bytes": 20480,
+        "mtime": "2026-09-05T12:13:16+0700"
+      },
+      {
+        "name": "Cookies-journal",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Cookies-journal",
+        "kind": "file",
+        "size_bytes": 0,
+        "mtime": "2026-09-05T12:13:16+0700"
+      },
+      {
+        "name": "Crashpad",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Crashpad",
+        "kind": "dir",
+        "size_bytes": 40,
+        "mtime": "2026-08-22T11:30:11+0700"
+      },
+      {
+        "name": "DIPS",
+        "path": "/Users/androidteam/Library/Application Support/Orca/DIPS",
+        "kind": "file",
+        "size_bytes": 36864,
+        "mtime": "2026-09-04T23:11:36+0700"
+      },
+      {
+        "name": "DIPS-wal",
+        "path": "/Users/androidteam/Library/Application Support/Orca/DIPS-wal",
+        "kind": "file",
+        "size_bytes": 189552,
+        "mtime": "2026-09-05T21:43:24+0700"
+      },
+      {
+        "name": "DawnGraphiteCache",
+        "path": "/Users/androidteam/Library/Application Support/Orca/DawnGraphiteCache",
+        "kind": "dir",
+        "size_bytes": 557424,
+        "mtime": "2026-08-20T11:09:10+0700"
+      },
+      {
+        "name": "DawnWebGPUCache",
+        "path": "/Users/androidteam/Library/Application Support/Orca/DawnWebGPUCache",
+        "kind": "dir",
+        "size_bytes": 557424,
+        "mtime": "2026-08-20T11:09:10+0700"
+      },
+      {
+        "name": "GPUCache",
+        "path": "/Users/androidteam/Library/Application Support/Orca/GPUCache",
+        "kind": "dir",
+        "size_bytes": 5837168,
+        "mtime": "2026-08-20T11:09:10+0700"
+      },
+      {
+        "name": "Local State",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Local State",
+        "kind": "file",
+        "size_bytes": 57,
+        "mtime": "2026-08-20T11:09:17+0700"
+      },
+      {
+        "name": "Local Storage",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Local Storage",
+        "kind": "dir",
+        "size_bytes": 3783,
+        "mtime": "2026-08-20T11:09:08+0700"
+      },
+      {
+        "name": "Network Persistent State",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Network Persistent State",
+        "kind": "file",
+        "size_bytes": 2378,
+        "mtime": "2026-09-05T22:23:52+0700"
+      },
+      {
+        "name": "Partitions",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Partitions",
+        "kind": "dir",
+        "size_bytes": 17328498,
+        "mtime": "2026-08-20T19:24:49+0700"
+      },
+      {
+        "name": "Preferences",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Preferences",
+        "kind": "file",
+        "size_bytes": 178,
+        "mtime": "2026-09-04T23:22:18+0700"
+      },
+      {
+        "name": "Session Storage",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Session Storage",
+        "kind": "dir",
+        "size_bytes": 1281,
+        "mtime": "2026-09-04T23:21:52+0700"
+      },
+      {
+        "name": "Shared Dictionary",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Shared Dictionary",
+        "kind": "dir",
+        "size_bytes": 45128,
+        "mtime": "2026-08-20T11:09:08+0700"
+      },
+      {
+        "name": "SharedStorage",
+        "path": "/Users/androidteam/Library/Application Support/Orca/SharedStorage",
+        "kind": "file",
+        "size_bytes": 4096,
+        "mtime": "2026-08-20T11:11:08+0700"
+      },
+      {
+        "name": "SharedStorage-wal",
+        "path": "/Users/androidteam/Library/Application Support/Orca/SharedStorage-wal",
+        "kind": "file",
+        "size_bytes": 0,
+        "mtime": "2026-09-04T23:24:08+0700"
+      },
+      {
+        "name": "SingletonCookie",
+        "error": "[Errno 2] No such file or directory: '/Users/androidteam/Library/Application Support/Orca/SingletonCookie'"
+      },
+      {
+        "name": "SingletonLock",
+        "error": "[Errno 2] No such file or directory: '/Users/androidteam/Library/Application Support/Orca/SingletonLock'"
+      },
+      {
+        "name": "SingletonSocket",
+        "path": "/Users/androidteam/Library/Application Support/Orca/SingletonSocket",
+        "kind": "file",
+        "size_bytes": 0,
+        "mtime": "2026-09-04T23:22:08+0700"
+      },
+      {
+        "name": "TransportSecurity",
+        "path": "/Users/androidteam/Library/Application Support/Orca/TransportSecurity",
+        "kind": "file",
+        "size_bytes": 859,
+        "mtime": "2026-09-05T22:12:52+0700"
+      },
+      {
+        "name": "Trust Tokens",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Trust Tokens",
+        "kind": "file",
+        "size_bytes": 36864,
+        "mtime": "2026-08-20T11:09:08+0700"
+      },
+      {
+        "name": "Trust Tokens-journal",
+        "path": "/Users/androidteam/Library/Application Support/Orca/Trust Tokens-journal",
+        "kind": "file",
+        "size_bytes": 0,
+        "mtime": "2026-08-20T11:09:08+0700"
+      },
+      {
+        "name": "agent-hooks",
+        "path": "/Users/androidteam/Library/Application Support/Orca/agent-hooks",
+        "kind": "dir",
+        "size_bytes": 4000,
+        "mtime": "2026-09-05T22:30:37+0700"
+      },
+      {
+        "name": "agent-session-authority.key",
+        "path": "/Users/androidteam/Library/Application Support/Orca/agent-session-authority.key",
+        "kind": "file",
+        "size_bytes": 32,
+        "mtime": "2026-08-20T11:09:08+0700"
+      },
+      {
+        "name": "ai-vault",
+        "path": "/Users/androidteam/Library/Application Support/Orca/ai-vault",
+        "kind": "dir",
+        "size_bytes": 1007717,
+        "mtime": "2026-08-24T10:45:36+0700"
+      },
+      {
+        "name": "blob_storage",
+        "path": "/Users/androidteam/Library/Application Support/Orca/blob_storage",
+        "kind": "dir",
+        "size_bytes": 0,
+        "mtime": "2026-09-04T23:22:08+0700"
+      },
+      {
+        "name": "codex-pane-accounts.json",
+        "path": "/Users/androidteam/Library/Application Support/Orca/codex-pane-accounts.json",
+        "kind": "file",
+        "size_bytes": 860,
+        "mtime": "2026-09-05T22:18:01+0700"
+      },
+      {
+        "name": "codex-real-home-hooks",
+        "path": "/Users/androidteam/Library/Application Support/Orca/codex-real-home-hooks",
+        "kind": "dir",
+        "size_bytes": 1661,
+        "mtime": "2026-08-20T11:09:08+0700"
+      },
+      {
+        "name": "codex-runtime-home",
+        "path": "/Users/androidteam/Library/Application Support/Orca/codex-runtime-home",
+        "kind": "dir",
+        "size_bytes": 1007212003,
+        "mtime": "2026-09-05T22:22:12+0700"
+      },
+      {
+        "name": "codex-session-backfill",
+        "path": "/Users/androidteam/Library/Application Support/Orca/codex-session-backfill",
+        "kind": "dir",
+        "size_bytes": 275436,
+        "mtime": "2026-09-05T08:42:42+0700"
+      },
+      {
+        "name": "cookie-import-diag.log",
+        "path": "/Users/androidteam/Library/Application Support/Orca/cookie-import-diag.log",
+        "kind": "file",
+        "size_bytes": 1562,
+        "mtime": "2026-08-20T19:24:57+0700"
+      },
+      {
+        "name": "cookie-import-staging",
+        "path": "/Users/androidteam/Library/Application Support/Orca/cookie-import-staging",
+        "kind": "dir",
+        "size_bytes": 0,
+        "mtime": "2026-08-20T23:26:44+0700"
+      },
+      {
+        "name": "daemon",
+        "path": "/Users/androidteam/Library/Application Support/Orca/daemon",
+        "kind": "dir",
+        "size_bytes": 320,
+        "mtime": "2026-09-04T17:41:25+0700"
+      },
+      {
+        "name": "floating-workspace",
+        "path": "/Users/androidteam/Library/Application Support/Orca/floating-workspace",
+        "kind": "dir",
+        "size_bytes": 0,
+        "mtime": "2026-08-20T15:06:19+0700"
+      },
+      {
+        "name": "logs",
+        "path": "/Users/androidteam/Library/Application Support/Orca/logs",
+        "kind": "dir",
+        "size_bytes": 99410375,
+        "mtime": "2026-09-05T04:03:21+0700"
+      },
+      {
+        "name": "macos-press-and-hold-default.json",
+        "path": "/Users/androidteam/Library/Application Support/Orca/macos-press-and-hold-default.json",
+        "kind": "file",
+        "size_bytes": 120,
+        "mtime": "2026-08-31T11:22:03+0700"
+      },
+      {
+        "name": "macos-tcc-prompt-tally.json",
+        "path": "/Users/androidteam/Library/Application Support/Orca/macos-tcc-prompt-tally.json",
+        "kind": "file",
+        "size_bytes": 121,
+        "mtime": "2026-08-20T15:09:07+0700"
+      },
+      {
+        "name": "o-66682-2057.sock",
+        "path": "/Users/androidteam/Library/Application Support/Orca/o-66682-2057.sock",
+        "kind": "file",
+        "size_bytes": 0,
+        "mtime": "2026-09-04T23:22:08+0700"
+      },
+      {
+        "name": "opencode-hooks",
+        "path": "/Users/androidteam/Library/Application Support/Orca/opencode-hooks",
+        "kind": "dir",
+        "size_bytes": 54825016,
+        "mtime": "2026-08-20T11:12:43+0700"
+      },
+      {
+        "name": "orca-devices.json",
+        "path": "/Users/androidteam/Library/Application Support/Orca/orca-devices.json",
+        "kind": "file",
+        "size_bytes": 584,
+        "mtime": "2026-09-05T21:33:07+0700"
+      },
+      {
+        "name": "orca-e2ee-keypair.json",
+        "path": "/Users/androidteam/Library/Application Support/Orca/orca-e2ee-keypair.json",
+        "kind": "file",
+        "size_bytes": 144,
+        "mtime": "2026-08-20T11:09:10+0700"
+      },
+      {
+        "name": "orca-profile-index.json",
+        "path": "/Users/androidteam/Library/Application Support/Orca/orca-profile-index.json",
+        "kind": "file",
+        "size_bytes": 668,
+        "mtime": "2026-09-04T20:00:41+0700"
+      },
+      {
+        "name": "orca-profile-index.json.bak",
+        "path": "/Users/androidteam/Library/Application Support/Orca/orca-profile-index.json.bak",
+        "kind": "file",
+        "size_bytes": 668,
+        "mtime": "2026-09-04T20:00:41+0700"
+      },
+      {
+        "name": "orca-relay-region-preference.json",
+        "path": "/Users/androidteam/Library/Application Support/Orca/orca-relay-region-preference.json",
+        "kind": "file",
+        "size_bytes": 141,
+        "mtime": "2026-09-04T03:29:33+0700"
+      },
+      {
+        "name": "orca-runtime.json",
+        "path": "/Users/androidteam/Library/Application Support/Orca/orca-runtime.json",
+        "kind": "file",
+        "size_bytes": 395,
+        "mtime": "2026-09-04T23:22:08+0700"
+      },
+      {
+        "name": "orca-stats.json",
+        "path": "/Users/androidteam/Library/Application Support/Orca/orca-stats.json",
+        "kind": "file",
+        "size_bytes": 365650,
+        "mtime": "2026-09-05T22:30:03+0700"
+      },
+      {
+        "name": "orchestration.db",
+        "path": "/Users/androidteam/Library/Application Support/Orca/orchestration.db",
+        "kind": "file",
+        "size_bytes": 10883072,
+        "mtime": "2026-09-04T23:21:54+0700"
+      },
+      {
+        "name": "orchestration.db-shm",
+        "path": "/Users/androidteam/Library/Application Support/Orca/orchestration.db-shm",
+        "kind": "file",
+        "size_bytes": 32768,
+        "mtime": "2026-09-04T23:22:08+0700"
+      },
+      {
+        "name": "orchestration.db-wal",
+        "path": "/Users/androidteam/Library/Application Support/Orca/orchestration.db-wal",
+        "kind": "file",
+        "size_bytes": 8272,
+        "mtime": "2026-09-04T23:22:08+0700"
+      },
+      {
+        "name": "plugins",
+        "path": "/Users/androidteam/Library/Application Support/Orca/plugins",
+        "kind": "dir",
+        "size_bytes": 2145,
+        "mtime": "2026-08-20T19:29:26+0700"
+      },
+      {
+        "name": "plugins-data",
+        "path": "/Users/androidteam/Library/Application Support/Orca/plugins-data",
+        "kind": "dir",
+        "size_bytes": 3731,
+        "mtime": "2026-08-20T19:29:26+0700"
+      },
+      {
+        "name": "profiles",
+        "path": "/Users/androidteam/Library/Application Support/Orca/profiles",
+        "kind": "dir",
+        "size_bytes": 2186730,
+        "mtime": "2026-08-20T11:09:08+0700"
+      },
+      {
+        "name": "rate-limit-pty-cwd",
+        "path": "/Users/androidteam/Library/Application Support/Orca/rate-limit-pty-cwd",
+        "kind": "dir",
+        "size_bytes": 0,
+        "mtime": "2026-08-20T11:09:17+0700"
+      },
+      {
+        "name": "serve-sim-runtime",
+        "path": "/Users/androidteam/Library/Application Support/Orca/serve-sim-runtime",
+        "kind": "dir",
+        "size_bytes": 4394024,
+        "mtime": "2026-08-23T20:49:36+0700"
+      },
+      {
+        "name": "shell-ready",
+        "path": "/Users/androidteam/Library/Application Support/Orca/shell-ready",
+        "kind": "dir",
+        "size_bytes": 39364,
+        "mtime": "2026-08-20T11:12:43+0700"
+      },
+      {
+        "name": "shell-wrappers",
+        "path": "/Users/androidteam/Library/Application Support/Orca/shell-wrappers",
+        "kind": "dir",
+        "size_bytes": 84478,
+        "mtime": "2026-09-04T17:41:27+0700"
+      },
+      {
+        "name": "speech-models",
+        "path": "/Users/androidteam/Library/Application Support/Orca/speech-models",
+        "kind": "dir",
+        "size_bytes": 0,
+        "mtime": "2026-08-20T11:12:54+0700"
+      },
+      {
+        "name": "terminal-history",
+        "path": "/Users/androidteam/Library/Application Support/Orca/terminal-history",
+        "kind": "dir",
+        "size_bytes": 27665780,
+        "mtime": "2026-09-05T22:18:01+0700"
+      }
+    ]
+  }
+}
