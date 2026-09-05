@@ -10,7 +10,7 @@
 ## 2. Approval gate
 
 - [x] 2.1 Present exact candidate paths, sizes, classifications, impact, and rollback options; verify no mutation task is marked complete.
-- [ ] 2.2 Obtain explicit approval naming exact paths for iCloud moves, Google Drive deletions, and Desktop/Documents deletions; record approval in evidence.
+- [x] 2.2 Obtain explicit approval naming exact paths for iCloud moves, Google Drive deletions, and Desktop/Documents deletions; record approval in evidence.
 
 ## 3. Approved iCloud operations
 
@@ -19,12 +19,12 @@
 
 ## 4. Approved Google Drive operations
 
-- [ ] 4.1 Confirm rclone/bisync implications for approved paths; verify excluded or intentionally propagated paths are documented.
-- [ ] 4.2 Delete only approved duplicate/code-mirror paths; verify documentation, rollback, personal, and unknown paths remain.
+- [x] 4.1 Confirm rclone/bisync implications for approved paths; verify excluded or intentionally propagated paths are documented.
+- [x] 4.2 Delete only approved duplicate/code-mirror paths; verify documentation, rollback, personal, and unknown paths remain.
 
 ## 5. Approved Desktop/Documents operations
 
-- [ ] 5.1 Delete only explicitly approved migration stubs; verify exact paths are absent and protected paths remain.
+- [x] 5.1 Delete only explicitly approved migration stubs; verify exact paths are absent and protected paths remain.
 
 ## 6. Final verification
 
