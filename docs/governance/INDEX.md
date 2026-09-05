@@ -94,7 +94,7 @@ The `changes/` directory contains project-specific change proposals:
 | **fix-realtime-frontend-build** | `realtime-frontend-build` | 2026-09-03 |
 | **verify-npm-audit-remediation** | `verify-npm-audit-remediation` | 2026-09-03 |
 | **fix-cline-stale-provider-registry** | `omniroute-agent-cli-routing` | 2026-09-03 |
-| **erratum-codex** | erratum (`skip_specs: true`) | 2026-09-03 |
+| **erratum-kimi-runbook-mode-stale-claim** | erratum (`skip_specs: true`) | 2026-09-03 |
 | **remediate-invalid-premature-archive-closure** | `omniroute-closure-integrity` | 2026-09-02 |
 | **invalidate-archive-gaps-premature-archive** | `omniroute-closure-integrity` | 2026-09-02 |
 | **invalidate-archive-gaps-closure-fabrications** | `omniroute-closure-integrity` | 2026-09-02 |
