@@ -1,0 +1,50 @@
+{
+  "audit_date": "2026-09-05",
+  "tool_caches": {
+    "uv": {
+      "total_bytes": 923000000,
+      "total_human": "923M",
+      "last_modified": "2026-09-05T15:27:07",
+      "subdirs": {
+        "archive-v0": "873M",
+        "simple-v24": "47M",
+        "wheels-v6": "1.8M",
+        "sdists-v9": "76K",
+        "interpreter-v4": "4K",
+        "builds-v0": "0B"
+      }
+    },
+    "claude": {
+      "total_bytes": 1200000000,
+      "total_human": "1.2G",
+      "subdirs": {
+        "plugins": { "size": "808M", "last_modified": "2026-09-05T19:29:14" },
+        "projects": { "size": "439M", "last_modified": "2026-09-05T19:49:12" },
+        "cache": { "size": "624K", "last_modified": "2026-09-05T19:28:35" }
+      }
+    },
+    "orca": {
+      "total_bytes": 1200000000,
+      "total_human": "1.2G",
+      "subdirs": {
+        "codex-runtime-home": { "size": "962M", "last_modified": "2026-09-05T22:57:04" },
+        "logs": { "size": "95M", "last_modified": "2026-09-05T04:03:21" },
+        "opencode-hooks": { "size": "61M", "last_modified": "2026-08-20T11:12:43" }
+      }
+    }
+  },
+  "other_caches": [
+    { "path": "~/.cache/codex-runtimes", "size": "1.9G", "last_modified": "2026-09-05T19:01:47" },
+    { "path": "~/.cache/github-copilot", "size": "1.0G", "last_modified": "2026-07-17T09:23:54" },
+    { "path": "~/.cache/opengrep", "size": "244M", "last_modified": "2026-08-21T00:42:06" },
+    { "path": "~/.cache/chroma", "size": "166M", "last_modified": "2025-11-02T22:55:18" },
+    { "path": "~/.cache/chrome-devtools-mcp", "size": "100M", "last_modified": "2026-08-09T16:03:03" },
+    { "path": "~/.cache/node", "size": "64M", "last_modified": "2026-08-23T23:01:31" },
+    { "path": "~/.cache/oh-my-opencode", "size": "42M", "last_modified": "2026-01-28T00:12:02" },
+    { "path": "~/.cache/gem", "size": "24M", "last_modified": "2026-08-01T17:22:04" },
+    { "path": "~/.cache/gh", "size": "20M", "last_modified": "2026-08-31T13:55:56" },
+    { "path": "~/.cache/pkg", "size": "13M", "last_modified": "2026-07-30T15:44:55" }
+  ],
+  "estimated_total_bytes": 5600000000,
+  "estimated_total_human": "~5.3G"
+}

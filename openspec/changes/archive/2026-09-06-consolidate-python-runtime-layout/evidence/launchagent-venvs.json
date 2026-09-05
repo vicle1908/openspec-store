@@ -1,0 +1,20 @@
+{
+  "scan_date": "2026-09-05",
+  "scan_path": "/Users/androidteam/Library/LaunchAgents",
+  "pattern": "com.tdt.*.plist",
+  "launchagents": [
+    {
+      "plist": "com.tdt.ai-review.plist",
+      "venv_path": "/Users/androidteam/.tdt/deployments/ai-review/app/.venv",
+      "service": "ai-review",
+      "type": "deployment"
+    },
+    {
+      "plist": "com.tdt.webhook-receiver.plist",
+      "venv_path": "/Users/androidteam/.tdt/deployments/webhook-receiver/app/.venv",
+      "service": "webhook-receiver",
+      "type": "deployment"
+    }
+  ],
+  "total_count": 2
+}

@@ -1,0 +1,24 @@
+{
+  "scan_date": "2026-09-05",
+  "scan_path": "/Users/androidteam/.tdt/venvs",
+  "venvs": [
+    {
+      "path": "/Users/androidteam/.tdt/venvs/ai-review",
+      "size_mb": 841
+    },
+    {
+      "path": "/Users/androidteam/.tdt/venvs/jira-daily-reports",
+      "size_mb": 321
+    },
+    {
+      "path": "/Users/androidteam/.tdt/venvs/tdt-observability",
+      "size_mb": 437
+    },
+    {
+      "path": "/Users/androidteam/.tdt/venvs/webhook-receiver",
+      "size_mb": 330
+    }
+  ],
+  "total_count": 4,
+  "total_size_mb": 1929
+}

@@ -1,0 +1,20 @@
+{
+  "scan_date": "2026-09-05",
+  "scan_path": "/Users/androidteam/.tdt/deployments",
+  "venvs": [
+    {
+      "path": "/Users/androidteam/.tdt/deployments/ai-review/app/.venv",
+      "deployment": "ai-review",
+      "size_mb": 876,
+      "launchagent": "com.tdt.ai-review.plist"
+    },
+    {
+      "path": "/Users/androidteam/.tdt/deployments/webhook-receiver/state/.venv",
+      "deployment": "webhook-receiver",
+      "size_mb": 261,
+      "launchagent": "com.tdt.webhook-receiver.plist"
+    }
+  ],
+  "total_count": 2,
+  "total_size_mb": 1137
+}

@@ -2,14 +2,14 @@
 
 ## 1. Read-only inventory
 
-- [ ] 1.1 Inventory iCloud candidates (`~/Library/Mobile Documents/com~apple~CloudDocs/project/vds/`, `microservices/`, and each proposed artifact path) with `du`, `find`, `git status`, and checksums; record exact sizes and timestamps without modifying data.
-- [ ] 1.2 Inventory Google Drive candidates (`~/My Drive/TDT (1)/`, `VinID/`, `tdt/`) with `du`, `find`, and rclone metadata; identify duplicates and code mirrors without deleting anything.
-- [ ] 1.3 Inventory Desktop/Documents candidates and classify personal-looking paths as protected by default; verify no deletion commands run.
-- [ ] 1.4 Capture pre-action evidence in `evidence/inventory.json` and `evidence/inventory.md`; verify all entries have path, owner classification, size, timestamp, and proposed action.
+- [x] 1.1 Inventory iCloud candidates (`~/Library/Mobile Documents/com~apple~CloudDocs/project/vds/`, `microservices/`, and each proposed artifact path) with `du`, `find`, `git status`, and checksums; record exact sizes and timestamps without modifying data.
+- [x] 1.2 Inventory Google Drive candidates (`~/My Drive/TDT (1)/`, `VinID/`, `tdt/`) with `du`, `find`, and rclone metadata; identify duplicates and code mirrors without deleting anything.
+- [x] 1.3 Inventory Desktop/Documents candidates and classify personal-looking paths as protected by default; verify no deletion commands run.
+- [x] 1.4 Capture pre-action evidence in `evidence/inventory.json` and `evidence/inventory.md`; verify all entries have path, owner classification, size, timestamp, and proposed action.
 
 ## 2. Approval gate
 
-- [ ] 2.1 Present exact candidate paths, sizes, classifications, impact, and rollback options; verify no mutation task is marked complete.
+- [x] 2.1 Present exact candidate paths, sizes, classifications, impact, and rollback options; verify no mutation task is marked complete.
 - [ ] 2.2 Obtain explicit approval naming exact paths for iCloud moves, Google Drive deletions, and Desktop/Documents deletions; record approval in evidence.
 
 ## 3. Approved iCloud operations

@@ -1,0 +1,59 @@
+{
+  "scan_date": "2026-09-05",
+  "scan_path": "/Users/androidteam/Developer",
+  "max_depth": 3,
+  "venvs": [
+    {
+      "path": "/Users/androidteam/Developer/agent-harness/.venv",
+      "repo": "agent-harness",
+      "size_mb": 800
+    },
+    {
+      "path": "/Users/androidteam/Developer/hermes-webui/.venv",
+      "repo": "hermes-webui",
+      "size_mb": 127
+    },
+    {
+      "path": "/Users/androidteam/Developer/agent-docs-sync/.venv",
+      "repo": "agent-docs-sync",
+      "size_mb": 791
+    },
+    {
+      "path": "/Users/androidteam/Developer/tdt-core/.venv",
+      "repo": "tdt-core",
+      "size_mb": 192
+    },
+    {
+      "path": "/Users/androidteam/Developer/browser-cli/.venv",
+      "repo": "browser-cli",
+      "size_mb": 321
+    },
+    {
+      "path": "/Users/androidteam/Developer/openspec-store/.venv",
+      "repo": "openspec-store",
+      "size_mb": 33
+    },
+    {
+      "path": "/Users/androidteam/Developer/jira-kanban-from-spreadsheet/.venv",
+      "repo": "jira-kanban-from-spreadsheet",
+      "size_mb": 267
+    },
+    {
+      "path": "/Users/androidteam/Developer/tdt-sheets/.venv",
+      "repo": "tdt-sheets",
+      "size_mb": 256
+    },
+    {
+      "path": "/Users/androidteam/Developer/code-daily-scan/.venv",
+      "repo": "code-daily-scan",
+      "size_mb": 834
+    },
+    {
+      "path": "/Users/androidteam/Developer/ai-harness-skills/.venv",
+      "repo": "ai-harness-skills",
+      "size_mb": 114
+    }
+  ],
+  "total_count": 10,
+  "total_size_mb": 3735
+}

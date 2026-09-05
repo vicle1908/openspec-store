@@ -1,0 +1,42 @@
+{
+  "scan_date": "2026-09-05",
+  "workspace_venvs": {
+    "count": 10,
+    "total_mb": 3735,
+    "details": [
+      {"path": "/Users/androidteam/Developer/agent-harness/.venv", "size_mb": 800},
+      {"path": "/Users/androidteam/Developer/hermes-webui/.venv", "size_mb": 127},
+      {"path": "/Users/androidteam/Developer/agent-docs-sync/.venv", "size_mb": 791},
+      {"path": "/Users/androidteam/Developer/tdt-core/.venv", "size_mb": 192},
+      {"path": "/Users/androidteam/Developer/browser-cli/.venv", "size_mb": 321},
+      {"path": "/Users/androidteam/Developer/openspec-store/.venv", "size_mb": 33},
+      {"path": "/Users/androidteam/Developer/jira-kanban-from-spreadsheet/.venv", "size_mb": 267},
+      {"path": "/Users/androidteam/Developer/tdt-sheets/.venv", "size_mb": 256},
+      {"path": "/Users/androidteam/Developer/code-daily-scan/.venv", "size_mb": 834},
+      {"path": "/Users/androidteam/Developer/ai-harness-skills/.venv", "size_mb": 114}
+    ]
+  },
+  "tdt_venvs": {
+    "count": 4,
+    "total_mb": 1929,
+    "details": [
+      {"path": "/Users/androidteam/.tdt/venvs/ai-review", "size_mb": 841},
+      {"path": "/Users/androidteam/.tdt/venvs/jira-daily-reports", "size_mb": 321},
+      {"path": "/Users/androidteam/.tdt/venvs/tdt-observability", "size_mb": 437},
+      {"path": "/Users/androidteam/.tdt/venvs/webhook-receiver", "size_mb": 330}
+    ]
+  },
+  "deployment_venvs": {
+    "count": 2,
+    "total_mb": 1137,
+    "details": [
+      {"path": "/Users/androidteam/.tdt/deployments/ai-review/app/.venv", "size_mb": 876},
+      {"path": "/Users/androidteam/.tdt/deployments/webhook-receiver/state/.venv", "size_mb": 261}
+    ]
+  },
+  "grand_total": {
+    "venv_count": 16,
+    "total_size_mb": 6801,
+    "total_size_gb": 6.64
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "scan_date": "2026-09-05",
+  "total_venvs": 16,
+  "total_size_gb": 6.64,
+  "classifications": {
+    "live": {
+      "count": 2,
+      "description": "Actively used by running services via LaunchAgents",
+      "venvs": [
+        {
+          "path": "/Users/androidteam/.tdt/deployments/ai-review/app/.venv",
+          "size_mb": 876,
+          "launchagent": "com.tdt.ai-review.plist",
+          "notes": "Active deployment, referenced in LaunchAgent PATH"
+        },
+        {
+          "path": "/Users/androidteam/.tdt/deployments/webhook-receiver/state/.venv",
+          "size_mb": 261,
+          "launchagent": "com.tdt.webhook-receiver.plist",
+          "notes": "Active deployment, referenced in LaunchAgent PATH"
+        }
+      ]
+    },
+    "developer_owned": {
+      "count": 10,
+      "description": "Local development environments created by 'uv sync' in individual repos",
+      "venvs": [
+        {
+          "path": "/Users/androidteam/Developer/agent-harness/.venv",
+          "repo": "agent-harness",
+          "size_mb": 800,
+          "notes": "Created by uv sync, standard dev environment"
+        },
+        {
+          "path": "/Users/androidteam/Developer/hermes-webui/.venv",
+          "repo": "hermes-webui",
+          "size_mb": 127,
+          "notes": "Created by uv sync, standard dev environment"
+        },
+        {
+          "path": "/Users/androidteam/Developer/agent-docs-sync/.venv",
+          "repo": "agent-docs-sync",
+          "size_mb": 791,
+          "notes": "Created by uv sync, standard dev environment"
+        },
+        {
+          "path": "/Users/androidteam/Developer/tdt-core/.venv",
+          "repo": "tdt-core",
+          "size_mb": 192,
+          "notes": "Created by uv sync, standard dev environment"
+        },
+        {
+          "path": "/Users/androidteam/Developer/browser-cli/.venv",
+          "repo": "browser-cli",
+          "size_mb": 321,
+          "notes": "Created by uv sync, standard dev environment"
+        },
+        {
+          "path": "/Users/androidteam/Developer/openspec-store/.venv",
+          "repo": "openspec-store",
+          "size_mb": 33,
+          "notes": "Created by uv sync, standard dev environment"
+        },
+        {
+          "path": "/Users/androidteam/Developer/jira-kanban-from-spreadsheet/.venv",
+          "repo": "jira-kanban-from-spreadsheet",
+          "size_mb": 267,
+          "notes": "Created by uv sync, standard dev environment"
+        },
+        {
+          "path": "/Users/androidteam/Developer/tdt-sheets/.venv",
+          "repo": "tdt-sheets",
+          "size_mb": 256,
+          "notes": "Created by uv sync, standard dev environment"
+        },
+        {
+          "path": "/Users/androidteam/Developer/code-daily-scan/.venv",
+          "repo": "code-daily-scan",
+          "size_mb": 834,
+          "notes": "Created by uv sync, standard dev environment"
+        },
+        {
+          "path": "/Users/androidteam/Developer/ai-harness-skills/.venv",
+          "repo": "ai-harness-skills",
+          "size_mb": 114,
+          "notes": "Created by uv sync, standard dev environment"
+        }
+      ]
+    },
+    "duplicate": {
+      "count": 4,
+      "description": "TDT venvs that may overlap with workspace .venv or deployment venvs",
+      "venvs": [
+        {
+          "path": "/Users/androidteam/.tdt/venvs/ai-review",
+          "size_mb": 841,
+          "overlap": "deployment: /Users/androidteam/.tdt/deployments/ai-review/app/.venv (876MB)",
+          "notes": "Possible duplicate of deployment venv. TDT venv may be older/unused."
+        },
+        {
+          "path": "/Users/androidteam/.tdt/venvs/jira-daily-reports",
+          "size_mb": 321,
+          "overlap": "workspace: no .venv found in jira-daily-reports repo",
+          "notes": "TDT venv exists but no workspace .venv. May be orphaned if repo moved to uv sync."
+        },
+        {
+          "path": "/Users/androidteam/.tdt/venvs/tdt-observability",
+          "size_mb": 437,
+          "overlap": "workspace: no .venv found in tdt-observability repo",
+          "notes": "TDT venv exists but no workspace .venv. May be orphaned if repo moved to uv sync."
+        },
+        {
+          "path": "/Users/androidteam/.tdt/venvs/webhook-receiver",
+          "size_mb": 330,
+          "overlap": "deployment: /Users/androidteam/.tdt/deployments/webhook-receiver/state/.venv (261MB)",
+          "notes": "Possible duplicate of deployment venv. TDT venv may be older/unused."
+        }
+      ]
+    },
+    "unknown": {
+      "count": 0,
+      "description": "No venvs with unknown classification"
+    }
+  }
+}

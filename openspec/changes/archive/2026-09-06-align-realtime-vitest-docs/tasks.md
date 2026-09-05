@@ -5,6 +5,6 @@
 - [x] Migrate or remove stale Jest path consistently
 - [x] Fix migration-caused or newly exposed Vitest behavioral failures
 - [x] Update README/testing documentation
-- [ ] Run full Vitest suite and production build
+- [x] Run full Vitest suite and production build
 - [x] Run production build
 - [x] Record verification evidence and strictly validate this change
