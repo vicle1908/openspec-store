@@ -1,0 +1,531 @@
+[
+  {
+    "authority": "orca",
+    "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/code-daily-scan",
+    "subject": "orphaned-checkout/code-daily-scan",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "orphaned_checkout": true,
+      "registered_in_parent_worktree_list": false,
+      "file_count": 0,
+      "size": "0B"
+    }
+  },
+  {
+    "authority": "git",
+    "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/code-daily-scan",
+    "subject": "code-daily-scan",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "has_dot_git": true,
+      "unregistered_copy": true,
+      "parent_branch": "main"
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/jira-daily-reports",
+    "subject": "orphaned-checkout/jira-daily-reports",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "orphaned_checkout": true,
+      "registered_in_parent_worktree_list": false,
+      "file_count": 0,
+      "size": "0B"
+    }
+  },
+  {
+    "authority": "git",
+    "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/jira-daily-reports",
+    "subject": "jira-daily-reports",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "has_dot_git": true,
+      "unregistered_copy": true,
+      "parent_branch": "main"
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/jira-epic-report",
+    "subject": "orphaned-checkout/jira-epic-report",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "orphaned_checkout": true,
+      "registered_in_parent_worktree_list": false,
+      "file_count": 0,
+      "size": "0B"
+    }
+  },
+  {
+    "authority": "git",
+    "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/jira-epic-report",
+    "subject": "jira-epic-report",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "has_dot_git": true,
+      "unregistered_copy": true,
+      "parent_branch": "main"
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/tdt-core",
+    "subject": "orphaned-checkout/tdt-core",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "orphaned_checkout": true,
+      "registered_in_parent_worktree_list": false,
+      "file_count": 0,
+      "size": "0B"
+    }
+  },
+  {
+    "authority": "git",
+    "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/tdt-core",
+    "subject": "tdt-core",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "has_dot_git": true,
+      "unregistered_copy": true,
+      "parent_branch": "main"
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/tdt-observability",
+    "subject": "orphaned-checkout/tdt-observability",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "orphaned_checkout": true,
+      "registered_in_parent_worktree_list": false,
+      "file_count": 0,
+      "size": "0B"
+    }
+  },
+  {
+    "authority": "git",
+    "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/tdt-observability",
+    "subject": "tdt-observability",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "has_dot_git": true,
+      "unregistered_copy": true,
+      "parent_branch": "main"
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/tdt-scheduler",
+    "subject": "orphaned-checkout/tdt-scheduler",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "orphaned_checkout": true,
+      "registered_in_parent_worktree_list": false,
+      "file_count": 0,
+      "size": "0B"
+    }
+  },
+  {
+    "authority": "git",
+    "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/tdt-scheduler",
+    "subject": "tdt-scheduler",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "has_dot_git": true,
+      "unregistered_copy": true,
+      "parent_branch": "main"
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/Users/androidteam/orca/workspaces/tdt-core",
+    "subject": "orca-empty-dir/tdt-core",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "empty_dir": true,
+      "file_count": 0
+    }
+  },
+  {
+    "authority": "orca",
+    "canonical_path": "/Users/androidteam/orca/workspaces/tdt-scheduler",
+    "subject": "orca-empty-dir/tdt-scheduler",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "empty_dir": true,
+      "file_count": 0
+    }
+  },
+  {
+    "authority": "git",
+    "canonical_path": "/Users/androidteam/orca/workspaces/openspec-store/review-hermes-cron",
+    "subject": "review-hermes-cron",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "registered_in_parent_worktree_list": true,
+      "branch": "review-hermes-cron",
+      "unmerged_commits": 8,
+      "unique_commits_touch_archive": true
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects.md",
+    "subject": "root-file/openspec-review-reconcile-omniroute-native-dialects.md",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "retained-evidence",
+      "size": "168K",
+      "mtime": "Aug 30 04:16:30 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v2.md",
+    "subject": "root-file/openspec-review-reconcile-omniroute-native-dialects-v2.md",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "retained-evidence",
+      "size": "220K",
+      "mtime": "Aug 30 04:51:05 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v3.md",
+    "subject": "root-file/openspec-review-reconcile-omniroute-native-dialects-v3.md",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "retained-evidence",
+      "size": "224K",
+      "mtime": "Aug 30 05:01:17 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v4.md",
+    "subject": "root-file/openspec-review-reconcile-omniroute-native-dialects-v4.md",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "retained-evidence",
+      "size": "224K",
+      "mtime": "Aug 30 05:06:34 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v5.md",
+    "subject": "root-file/openspec-review-reconcile-omniroute-native-dialects-v5.md",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "retained-evidence",
+      "size": "264K",
+      "mtime": "Aug 30 05:22:33 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v6.md",
+    "subject": "root-file/openspec-review-reconcile-omniroute-native-dialects-v6.md",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "retained-evidence",
+      "size": "280K",
+      "mtime": "Aug 30 05:35:36 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/go-microservices-cleanup-20260817.bundle",
+    "subject": "root-file/go-microservices-cleanup-20260817.bundle",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "git-bundle",
+      "size": "3.3M",
+      "mtime": "Aug 17 08:16:58 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/--help",
+    "subject": "root-file/--help",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "shell-artifact",
+      "size": "4.0K",
+      "mtime": "Aug 17 12:30:11 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/yield",
+    "subject": "root-file/yield",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "shell-artifact",
+      "size": "4.0K",
+      "mtime": "Aug 25 17:59:17 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/context.md",
+    "subject": "root-file/context.md",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "unclassified",
+      "size": "4.0K",
+      "mtime": "Aug 20 23:10:52 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/icloud-cleanup-plan.md",
+    "subject": "root-file/icloud-cleanup-plan.md",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "stale-plan",
+      "size": "12K",
+      "mtime": "Aug  9 17:19:35 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/check_spec_alignment.py",
+    "subject": "root-file/check_spec_alignment.py",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "unclassified-script",
+      "size": "4.0K",
+      "mtime": "Aug  5 18:34:54 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/skills-lock.json",
+    "subject": "root-file/skills-lock.json",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "unclassified-config",
+      "size": "8.0K",
+      "mtime": "Aug 20 06:46:03 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/GEMINI.md",
+    "subject": "root-file/GEMINI.md",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "unclassified-config",
+      "size": "4.0K",
+      "mtime": "Aug 19 10:51:41 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/tdt-v2-accept",
+    "subject": "root-file/tdt-v2-accept",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "acceptance-proofs",
+      "size": "32K",
+      "mtime": "Aug 18 12:44:38 2026",
+      "in_retention_inventory": false,
+      "referenced_by_running_service": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/deployments",
+    "subject": "stray-dir/deployments",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "empty-dir",
+      "file_count": 0,
+      "size": "0B",
+      "in_retention_inventory": false,
+      "is_git_repo": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/poems-mobile3-android",
+    "subject": "stray-dir/poems-mobile3-android",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "empty-dir",
+      "file_count": 0,
+      "size": "0B",
+      "in_retention_inventory": false,
+      "is_git_repo": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/poems-mobile3-ios",
+    "subject": "stray-dir/poems-mobile3-ios",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "empty-dir",
+      "file_count": 0,
+      "size": "0B",
+      "in_retention_inventory": false,
+      "is_git_repo": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/wiki-mcp-server",
+    "subject": "stray-dir/wiki-mcp-server",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "stray-repo-no-vcs",
+      "file_count": 1614,
+      "size": "38M",
+      "in_retention_inventory": false,
+      "is_git_repo": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/wiki-cron-validator",
+    "subject": "stray-dir/wiki-cron-validator",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "stray-repo-vcs",
+      "file_count": 28,
+      "size": "144K",
+      "in_retention_inventory": false,
+      "is_git_repo": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/ntu-keynote",
+    "subject": "stray-dir/ntu-keynote",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "stray-repo-vcs",
+      "file_count": 826,
+      "size": "74M",
+      "in_retention_inventory": false,
+      "is_git_repo": true
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/workspace-python-template",
+    "subject": "stray-dir/workspace-python-template",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "template",
+      "file_count": 98,
+      "size": "400K",
+      "in_retention_inventory": false,
+      "is_git_repo": true
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/docs",
+    "subject": "stray-dir/docs",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "kind": "docs-dir",
+      "file_count": 1,
+      "size": "16K",
+      "in_retention_inventory": false,
+      "is_git_repo": false
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/Developer/tdt",
+    "subject": "tdt-stale-copy-with-live-service",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "size": "1.1G",
+      "hosts_live_service": true,
+      "launchagent_label": "com.tdt.ai-review",
+      "launchagent_pid": "671",
+      "service_port": 8090,
+      "process_running": true,
+      "active": true,
+      "host_activity": true
+    }
+  },
+  {
+    "authority": "runtime",
+    "canonical_path": "/Users/androidteam/.tdt/deployments",
+    "subject": "tdt-deployments-home",
+    "observed_at": "2026-09-05T04:41:03Z",
+    "facts": {
+      "exists": true,
+      "services": "ai-review\nwebhook-receiver",
+      "webhook_receiver_live": true,
+      "ai_review_app_missing": true,
+      "active": true
+    }
+  }
+]

@@ -1,0 +1,1526 @@
+{
+  "entries": [
+    {
+      "blockers": [
+        "runtime_owner:unknown:tdt-deployments-home"
+      ],
+      "canonical_path": "/Users/androidteam/.tdt/deployments",
+      "classification": "PROTECTED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "active": true,
+            "ai_review_app_missing": true,
+            "exists": true,
+            "services": "ai-review\nwebhook-receiver",
+            "webhook_receiver_live": true
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "tdt-deployments-home"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "none",
+        "note": "protected; no cleanup action proposed",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/--help",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "shell-artifact",
+            "mtime": "Aug 17 12:30:11 2026",
+            "referenced_by_running_service": false,
+            "size": "4.0K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/--help"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/GEMINI.md",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "unclassified-config",
+            "mtime": "Aug 19 10:51:41 2026",
+            "referenced_by_running_service": false,
+            "size": "4.0K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/GEMINI.md"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/check_spec_alignment.py",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "unclassified-script",
+            "mtime": "Aug  5 18:34:54 2026",
+            "referenced_by_running_service": false,
+            "size": "4.0K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/check_spec_alignment.py"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/context.md",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "unclassified",
+            "mtime": "Aug 20 23:10:52 2026",
+            "referenced_by_running_service": false,
+            "size": "4.0K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/context.md"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/deployments",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "file_count": 0,
+            "in_retention_inventory": false,
+            "is_git_repo": false,
+            "kind": "empty-dir",
+            "size": "0B"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "stray-dir/deployments"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/docs",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "file_count": 1,
+            "in_retention_inventory": false,
+            "is_git_repo": false,
+            "kind": "docs-dir",
+            "size": "16K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "stray-dir/docs"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/go-microservices-cleanup-20260817.bundle",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "git-bundle",
+            "mtime": "Aug 17 08:16:58 2026",
+            "referenced_by_running_service": false,
+            "size": "3.3M"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/go-microservices-cleanup-20260817.bundle"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/icloud-cleanup-plan.md",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "stale-plan",
+            "mtime": "Aug  9 17:19:35 2026",
+            "referenced_by_running_service": false,
+            "size": "12K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/icloud-cleanup-plan.md"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/ntu-keynote",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "file_count": 826,
+            "in_retention_inventory": false,
+            "is_git_repo": true,
+            "kind": "stray-repo-vcs",
+            "size": "74M"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "stray-dir/ntu-keynote"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v2.md",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "retained-evidence",
+            "mtime": "Aug 30 04:51:05 2026",
+            "referenced_by_running_service": false,
+            "size": "220K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/openspec-review-reconcile-omniroute-native-dialects-v2.md"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v3.md",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "retained-evidence",
+            "mtime": "Aug 30 05:01:17 2026",
+            "referenced_by_running_service": false,
+            "size": "224K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/openspec-review-reconcile-omniroute-native-dialects-v3.md"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v4.md",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "retained-evidence",
+            "mtime": "Aug 30 05:06:34 2026",
+            "referenced_by_running_service": false,
+            "size": "224K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/openspec-review-reconcile-omniroute-native-dialects-v4.md"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v5.md",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "retained-evidence",
+            "mtime": "Aug 30 05:22:33 2026",
+            "referenced_by_running_service": false,
+            "size": "264K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/openspec-review-reconcile-omniroute-native-dialects-v5.md"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v6.md",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "retained-evidence",
+            "mtime": "Aug 30 05:35:36 2026",
+            "referenced_by_running_service": false,
+            "size": "280K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/openspec-review-reconcile-omniroute-native-dialects-v6.md"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects.md",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "retained-evidence",
+            "mtime": "Aug 30 04:16:30 2026",
+            "referenced_by_running_service": false,
+            "size": "168K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/openspec-review-reconcile-omniroute-native-dialects.md"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/poems-mobile3-android",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "file_count": 0,
+            "in_retention_inventory": false,
+            "is_git_repo": false,
+            "kind": "empty-dir",
+            "size": "0B"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "stray-dir/poems-mobile3-android"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/poems-mobile3-ios",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "file_count": 0,
+            "in_retention_inventory": false,
+            "is_git_repo": false,
+            "kind": "empty-dir",
+            "size": "0B"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "stray-dir/poems-mobile3-ios"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/skills-lock.json",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "unclassified-config",
+            "mtime": "Aug 20 06:46:03 2026",
+            "referenced_by_running_service": false,
+            "size": "8.0K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/skills-lock.json"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "runtime_owner:unknown:tdt-stale-copy-with-live-service"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/tdt",
+      "classification": "PROTECTED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "active": true,
+            "exists": true,
+            "host_activity": true,
+            "hosts_live_service": true,
+            "launchagent_label": "com.tdt.ai-review",
+            "launchagent_pid": "671",
+            "process_running": true,
+            "service_port": 8090,
+            "size": "1.1G"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "tdt-stale-copy-with-live-service"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "none",
+        "note": "protected; no cleanup action proposed",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/tdt-v2-accept",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "acceptance-proofs",
+            "mtime": "Aug 18 12:44:38 2026",
+            "referenced_by_running_service": false,
+            "size": "32K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/tdt-v2-accept"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/wiki-cron-validator",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "file_count": 28,
+            "in_retention_inventory": false,
+            "is_git_repo": false,
+            "kind": "stray-repo-vcs",
+            "size": "144K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "stray-dir/wiki-cron-validator"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/wiki-mcp-server",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "file_count": 1614,
+            "in_retention_inventory": false,
+            "is_git_repo": false,
+            "kind": "stray-repo-no-vcs",
+            "size": "38M"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "stray-dir/wiki-mcp-server"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/workspace-python-template",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "file_count": 98,
+            "in_retention_inventory": false,
+            "is_git_repo": true,
+            "kind": "template",
+            "size": "400K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "stray-dir/workspace-python-template"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/yield",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "exists": true,
+            "in_retention_inventory": false,
+            "kind": "shell-artifact",
+            "mtime": "Aug 25 17:59:17 2026",
+            "referenced_by_running_service": false,
+            "size": "4.0K"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "root-file/yield"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/code-daily-scan",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "file_count": 0,
+            "orphaned_checkout": true,
+            "registered_in_parent_worktree_list": false,
+            "size": "0B"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "orphaned-checkout/code-daily-scan"
+        },
+        {
+          "authority": "git",
+          "facts": {
+            "exists": true,
+            "has_dot_git": true,
+            "parent_branch": "main",
+            "unregistered_copy": true
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "code-daily-scan"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/jira-daily-reports",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "file_count": 0,
+            "orphaned_checkout": true,
+            "registered_in_parent_worktree_list": false,
+            "size": "0B"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "orphaned-checkout/jira-daily-reports"
+        },
+        {
+          "authority": "git",
+          "facts": {
+            "exists": true,
+            "has_dot_git": true,
+            "parent_branch": "main",
+            "unregistered_copy": true
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "jira-daily-reports"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/jira-epic-report",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "file_count": 0,
+            "orphaned_checkout": true,
+            "registered_in_parent_worktree_list": false,
+            "size": "0B"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "orphaned-checkout/jira-epic-report"
+        },
+        {
+          "authority": "git",
+          "facts": {
+            "exists": true,
+            "has_dot_git": true,
+            "parent_branch": "main",
+            "unregistered_copy": true
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "jira-epic-report"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/tdt-core",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "file_count": 0,
+            "orphaned_checkout": true,
+            "registered_in_parent_worktree_list": false,
+            "size": "0B"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "orphaned-checkout/tdt-core"
+        },
+        {
+          "authority": "git",
+          "facts": {
+            "exists": true,
+            "has_dot_git": true,
+            "parent_branch": "main",
+            "unregistered_copy": true
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "tdt-core"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/tdt-observability",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "file_count": 0,
+            "orphaned_checkout": true,
+            "registered_in_parent_worktree_list": false,
+            "size": "0B"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "orphaned-checkout/tdt-observability"
+        },
+        {
+          "authority": "git",
+          "facts": {
+            "exists": true,
+            "has_dot_git": true,
+            "parent_branch": "main",
+            "unregistered_copy": true
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "tdt-observability"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/tdt-scheduler",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "file_count": 0,
+            "orphaned_checkout": true,
+            "registered_in_parent_worktree_list": false,
+            "size": "0B"
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "orphaned-checkout/tdt-scheduler"
+        },
+        {
+          "authority": "git",
+          "facts": {
+            "exists": true,
+            "has_dot_git": true,
+            "parent_branch": "main",
+            "unregistered_copy": true
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "tdt-scheduler"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/openspec-store/review-hermes-cron",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": "review-hermes-cron",
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "git",
+          "facts": {
+            "branch": "review-hermes-cron",
+            "exists": true,
+            "registered_in_parent_worktree_list": true,
+            "unique_commits_touch_archive": true,
+            "unmerged_commits": 8
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "review-hermes-cron"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/tdt-core",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "empty_dir": true,
+            "file_count": 0
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "orca-empty-dir/tdt-core"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/tdt-scheduler",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T04:48:25Z",
+        "newest_observation": "2026-09-05T04:41:03Z",
+        "oldest_observation": "2026-09-05T04:41:03Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "empty_dir": true,
+            "file_count": 0
+          },
+          "observed_at": "2026-09-05T04:41:03Z",
+          "subject": "orca-empty-dir/tdt-scheduler"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    }
+  ],
+  "generated_at": "2026-09-05T04:48:25Z",
+  "manifest": "workspace-lifecycle-cleanup-manifest",
+  "mode": "dry-run",
+  "plan_id": "plan-workspace-dryrun-2026-09-05-r2",
+  "plan_identity": "dfdc6e33512837dfe0d42d04646815bc66b2dec856fcf0a02585f4a423bfae5e",
+  "retention_policy": {
+    "available": true,
+    "policy": "workspace-artifact-retention-policy",
+    "policy_identity": "workspace-artifact-retention-policy/1.0.0",
+    "source_path": "/Users/androidteam/Developer/.workspace-retention/retention-inventory.json"
+  },
+  "schema_version": "0.1.0",
+  "workspace_root": "~/Developer"
+}

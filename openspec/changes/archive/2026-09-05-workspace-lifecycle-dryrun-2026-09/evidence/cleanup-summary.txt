@@ -1,0 +1,48 @@
+Workspace Lifecycle Cleanup — Dry-Run Summary
+=============================================
+Mode: dry-run (no mutations performed)
+Generated: 2026-09-05T04:48:25Z
+Plan id: plan-workspace-dryrun-2026-09-05-r2
+Plan identity: dfdc6e33512837dfe0d42d04646815bc66b2dec856fcf0a02585f4a423bfae5e
+Retention policy: available (workspace-artifact-retention-policy/1.0.0)
+Paths scanned: 34
+  PROTECTED: 2
+  REVIEW_REQUIRED: 32
+  RECLAIMABLE: 0
+  RECLAIMED: 0
+Reclaimable candidates (review-only proposals): 0
+Skipped paths (protected or review-required): 34
+  - /Users/androidteam/.tdt/deployments [runtime_owner:unknown:tdt-deployments-home]
+  - /Users/androidteam/Developer/--help [reclaimability_not_proven]
+  - /Users/androidteam/Developer/GEMINI.md [reclaimability_not_proven]
+  - /Users/androidteam/Developer/check_spec_alignment.py [reclaimability_not_proven]
+  - /Users/androidteam/Developer/context.md [reclaimability_not_proven]
+  - /Users/androidteam/Developer/deployments [reclaimability_not_proven]
+  - /Users/androidteam/Developer/docs [reclaimability_not_proven]
+  - /Users/androidteam/Developer/go-microservices-cleanup-20260817.bundle [reclaimability_not_proven]
+  - /Users/androidteam/Developer/icloud-cleanup-plan.md [reclaimability_not_proven]
+  - /Users/androidteam/Developer/ntu-keynote [reclaimability_not_proven]
+  - /Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v2.md [reclaimability_not_proven]
+  - /Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v3.md [reclaimability_not_proven]
+  - /Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v4.md [reclaimability_not_proven]
+  - /Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v5.md [reclaimability_not_proven]
+  - /Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects-v6.md [reclaimability_not_proven]
+  - /Users/androidteam/Developer/openspec-review-reconcile-omniroute-native-dialects.md [reclaimability_not_proven]
+  - /Users/androidteam/Developer/poems-mobile3-android [reclaimability_not_proven]
+  - /Users/androidteam/Developer/poems-mobile3-ios [reclaimability_not_proven]
+  - /Users/androidteam/Developer/skills-lock.json [reclaimability_not_proven]
+  - /Users/androidteam/Developer/tdt [runtime_owner:unknown:tdt-stale-copy-with-live-service]
+  - /Users/androidteam/Developer/tdt-v2-accept [reclaimability_not_proven]
+  - /Users/androidteam/Developer/wiki-cron-validator [reclaimability_not_proven]
+  - /Users/androidteam/Developer/wiki-mcp-server [reclaimability_not_proven]
+  - /Users/androidteam/Developer/workspace-python-template [reclaimability_not_proven]
+  - /Users/androidteam/Developer/yield [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/agent-core/code-daily-scan [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/agent-core/jira-daily-reports [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/agent-core/jira-epic-report [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/agent-core/tdt-core [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/agent-core/tdt-observability [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/agent-core/tdt-scheduler [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/openspec-store/review-hermes-cron [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/tdt-core [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/tdt-scheduler [reclaimability_not_proven]
