@@ -86,6 +86,8 @@ The `changes/` directory contains project-specific change proposals:
 | Project | Capabilities | Archived |
 |---------|--------------|----------|
 | **workspace-lifecycle-dryrun-2026-09** | operational evidence (`skip_specs: true`) | 2026-09-05 |
+| **disk-reclaim-2026-09** | operational (`skip_specs: true`) | 2026-09-05 |
+| **retire-review-hermes-cron-worktree** | operational (`skip_specs: true`) | 2026-09-05 |
 | **remediate-cleanup-archive-gaps** | `cleanup-archive-verification` | 2026-09-05 |
 | **ecosystem-cleanup** | operational (`skip_specs: true`) | 2026-09-05 |
 | **fix-corrupted-brew-casks** | operational (`skip_specs: true`) | 2026-09-04 |
