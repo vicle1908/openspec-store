@@ -81,8 +81,6 @@ The `changes/` directory contains project-specific change proposals:
 | **bootstrap-nexus-for-mobile** | 0/74 | 6/12/2026 |
 | **microsoft-teams-integration** | 4/58 | 5/30/2026 |
 
-#### Recently Archived Changes
-
 #### Archived — September 2026
 
 | Project | Capabilities | Archived |
