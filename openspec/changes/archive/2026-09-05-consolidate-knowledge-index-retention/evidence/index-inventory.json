@@ -1,0 +1,162 @@
+[
+  {
+    "path": "/Users/androidteam/Developer/agent-core/.gitnexus",
+    "size_bytes": 129388017
+  },
+  {
+    "path": "/Users/androidteam/Developer/agent-core/graphify-out",
+    "size_bytes": 129307106
+  },
+  {
+    "path": "/Users/androidteam/Developer/agent-docs-sync/.gitnexus",
+    "size_bytes": 63663087
+  },
+  {
+    "path": "/Users/androidteam/Developer/agent-docs-sync/graphify-out",
+    "size_bytes": 37650109
+  },
+  {
+    "path": "/Users/androidteam/Developer/agent-harness/.gitnexus",
+    "size_bytes": 127246984
+  },
+  {
+    "path": "/Users/androidteam/Developer/agent-harness/graphify-out",
+    "size_bytes": 52674466
+  },
+  {
+    "path": "/Users/androidteam/Developer/ai-harness-skills/.gitnexus",
+    "size_bytes": 81983530
+  },
+  {
+    "path": "/Users/androidteam/Developer/ai-harness-skills/graphify-out",
+    "size_bytes": 34435792
+  },
+  {
+    "path": "/Users/androidteam/Developer/ai-review/.gitnexus",
+    "size_bytes": 55046250
+  },
+  {
+    "path": "/Users/androidteam/Developer/ai-review/graphify-out",
+    "size_bytes": 30384859
+  },
+  {
+    "path": "/Users/androidteam/Developer/browser-cli/.gitnexus",
+    "size_bytes": 21206720
+  },
+  {
+    "path": "/Users/androidteam/Developer/browser-cli/graphify-out",
+    "size_bytes": 1379692
+  },
+  {
+    "path": "/Users/androidteam/Developer/code-daily-scan/.gitnexus",
+    "size_bytes": 70492339
+  },
+  {
+    "path": "/Users/androidteam/Developer/code-daily-scan/graphify-out",
+    "size_bytes": 23439621
+  },
+  {
+    "path": "/Users/androidteam/Developer/go-microservices/.gitnexus",
+    "size_bytes": 396536151
+  },
+  {
+    "path": "/Users/androidteam/Developer/go-microservices/graphify-out",
+    "size_bytes": 232137957
+  },
+  {
+    "path": "/Users/androidteam/Developer/jira-daily-reports/.gitnexus",
+    "size_bytes": 108776405
+  },
+  {
+    "path": "/Users/androidteam/Developer/jira-daily-reports/graphify-out",
+    "size_bytes": 38596175
+  },
+  {
+    "path": "/Users/androidteam/Developer/jira-epic-report/.gitnexus",
+    "size_bytes": 75963012
+  },
+  {
+    "path": "/Users/androidteam/Developer/jira-epic-report/graphify-out",
+    "size_bytes": 34056621
+  },
+  {
+    "path": "/Users/androidteam/Developer/jira-kanban-from-spreadsheet/.gitnexus",
+    "size_bytes": 58031627
+  },
+  {
+    "path": "/Users/androidteam/Developer/jira-kanban-from-spreadsheet/graphify-out",
+    "size_bytes": 11451294
+  },
+  {
+    "path": "/Users/androidteam/Developer/jira-skill/.gitnexus",
+    "size_bytes": 210883305
+  },
+  {
+    "path": "/Users/androidteam/Developer/jira-skill/graphify-out",
+    "size_bytes": 104661451
+  },
+  {
+    "path": "/Users/androidteam/Developer/mcp-router/.gitnexus",
+    "size_bytes": 97872796
+  },
+  {
+    "path": "/Users/androidteam/Developer/mcp-router/graphify-out",
+    "size_bytes": 35458941
+  },
+  {
+    "path": "/Users/androidteam/Developer/openspec-store/.gitnexus",
+    "size_bytes": 399980046
+  },
+  {
+    "path": "/Users/androidteam/Developer/openspec-store/graphify-out",
+    "size_bytes": 187205167
+  },
+  {
+    "path": "/Users/androidteam/Developer/ops-automation-suite/.gitnexus",
+    "size_bytes": 39399077
+  },
+  {
+    "path": "/Users/androidteam/Developer/ops-automation-suite/graphify-out",
+    "size_bytes": 3425974
+  },
+  {
+    "path": "/Users/androidteam/Developer/tdt-core/.gitnexus",
+    "size_bytes": 86557447
+  },
+  {
+    "path": "/Users/androidteam/Developer/tdt-core/graphify-out",
+    "size_bytes": 61132264
+  },
+  {
+    "path": "/Users/androidteam/Developer/tdt-observability/.gitnexus",
+    "size_bytes": 69283360
+  },
+  {
+    "path": "/Users/androidteam/Developer/tdt-observability/graphify-out",
+    "size_bytes": 12378220
+  },
+  {
+    "path": "/Users/androidteam/Developer/tdt-scheduler/.gitnexus",
+    "size_bytes": 51185394
+  },
+  {
+    "path": "/Users/androidteam/Developer/tdt-scheduler/graphify-out",
+    "size_bytes": 8934151
+  },
+  {
+    "path": "/Users/androidteam/Developer/tdt-sheets/.gitnexus",
+    "size_bytes": 48288752
+  },
+  {
+    "path": "/Users/androidteam/Developer/tdt-sheets/graphify-out",
+    "size_bytes": 8858396
+  },
+  {
+    "path": "/Users/androidteam/Developer/webhook-receiver/.gitnexus",
+    "size_bytes": 104391930
+  },
+  {
+    "path": "/Users/androidteam/Developer/webhook-receiver/graphify-out",
+    "size_bytes": 28125582
+  }
+]

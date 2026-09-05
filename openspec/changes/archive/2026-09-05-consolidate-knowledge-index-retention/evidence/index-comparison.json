@@ -1,0 +1,302 @@
+[
+  {
+    "repository": "/Users/androidteam/Developer/agent-core",
+    "name": "agent-core",
+    "head": "bcd51c8a1b8600de84f18048f666050326d5e397",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "bfefff3861f9a50b4444e0a2ea6c1d7dec9cde6d"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "bfefff3861f9a50b4444e0a2ea6c1d7dec9cde6d"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/agent-docs-sync",
+    "name": "agent-docs-sync",
+    "head": "626f22773c32fb47db46eaaf3f5a2fa577fdf452",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "27afa3ce25ecfe56bcd90499bdf068375926f1ee"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "27afa3ce25ecfe56bcd90499bdf068375926f1ee"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/agent-harness",
+    "name": "agent-harness",
+    "head": "73902f5c7d245a98f9317f2fb280724a4d9aeb7c",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "0317340356ba76cea6605513261b74a11e227b39"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "8122437e4e369ea9d8174163abe471807843018e"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/ai-harness-skills",
+    "name": "ai-harness-skills",
+    "head": "51724b5ee1f7ed8b82b9eab9d308720cd2786b00",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "9d0dd65f290e4c385fea4ec7a6d8aa3593fb3f30"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "5d629428b5a590b6d87096c3232a24a0dd264f3a"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/ai-review",
+    "name": "ai-review",
+    "head": "03f9f79485e3280491b92899c2d3dbfe3888b548",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "8e28138d8864b97e9f3df3cdc101694493855718"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "8e28138d8864b97e9f3df3cdc101694493855718"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/browser-cli",
+    "name": "browser-cli",
+    "head": "3799ec8115540c3ebe9a7868acb8c1e16e8ca4f0",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "b9e2b02ef40d39a7590f52cabd95271cbd26384f"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "7f57404954e3d75ea530f612bb0ae0dcfb869752"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/code-daily-scan",
+    "name": "code-daily-scan",
+    "head": "8ae4b294b606ce04bdb1f84d51e2b4ea3a9654b2",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "13a31953f168fd521c42adc1d75a884ce4bd1779"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "0afea209dd5b8b0e016b15ef18f475bf6b14d57b"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/jira-daily-reports",
+    "name": "jira-daily-reports",
+    "head": "be7dd9c79febe7e1b91f03d59cb6147bb467fb17",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "92d948f946a7f04f491e5d8a10860846fa0e6cd4"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "1eb1ccaae2562e620971705d6fe28bc96147451c"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/jira-epic-report",
+    "name": "jira-epic-report",
+    "head": "29ef3f53c3e09ffd8a24fed7444a45da24a9e347",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "558aa1aa9103bbb3cc934e29dca85a16e381bc99"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "558aa1aa9103bbb3cc934e29dca85a16e381bc99"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/jira-kanban-from-spreadsheet",
+    "name": "jira-kanban-from-spreadsheet",
+    "head": "fa2adf46d87dc8e0b1a3fb8700849f2c5b11eb41",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "cfa2ab415852f60ba4f72d0db0a799c2112dfbb7"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "82bc6385445709be7223074601afbce0302b9eb7"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/jira-skill",
+    "name": "jira-skill",
+    "head": "dc1bf25c3353b698290abbcee87994a2477a2140",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "67a7359227a2ec3c647e8cf55135ed7f6bcda176"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "921016a191755c3cfae374cd24d952c0b325d81c"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/mcp-router",
+    "name": "mcp-router",
+    "head": "988043e7f2cabbc4ca8fa0fa3d10b33e55c473cc",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "5f594218744436873b187667d15f4b7adb798cc2"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "3fafda1e35060a703e198cc237f490f77f14c93d"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/openspec-store",
+    "name": "openspec-store",
+    "head": "f867a41f7c098af6c08a33f21d0d4c1709f2fbca",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "5d81d62eee87ee89c4608cf69824327017c24b51"
+    },
+    "graphify": {
+      "enabled": false,
+      "status": "disabled",
+      "indexedSha": null
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/ops-automation-suite",
+    "name": "ops-automation-suite",
+    "head": "91bfb50067e8a86127dc8955a180f2c838e01acc",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "b1d7c8556f476dd7a2a406aa5d6a7ffb26c22d46"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "ed74dc38abb0b3a0cfbfbc9aec7af3ed00b16405"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/tdt-core",
+    "name": "tdt-core",
+    "head": "641eb1ecc02970f6b1da8529a4df0c3abe66c1c0",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "a0eb6ef3c076a0f531a5651b73376daf07c9c6bb"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "3d3fe77383ce069b00a20188eeda5cee819320a1"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/tdt-observability",
+    "name": "tdt-observability",
+    "head": "01c5bd84e228256f028ae7ab4e8da710c94d0eb2",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "39f31e957a65a2c6d85fcc8f901f0317fc1ab4b7"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "474b25bd3cb9fee1f4a8786db9d3db0acbe69901"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/tdt-sheets",
+    "name": "tdt-sheets",
+    "head": "24765629f08591e83e73fb069504caa3e827f687",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "25f58ebbd23bbb5d0ce9b6198501c589754ac02c"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "40b2fc0eb218b9095c96a20fc26fb64e02b1787a"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/webhook-receiver",
+    "name": "webhook-receiver",
+    "head": "529812a30f11f5ff2a8faabca7bee8cb7df146a7",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "6e6503aa31702b662a8076d366451964138d9ad4"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "4c77addda8138f672d32aca3dfc3403397cceaf9"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/go-microservices",
+    "name": "go-microservices",
+    "head": "28f1d87ef9f629166443896ca7c6d73403d4f5e8",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "127b802ebb722a028383af4a0c15bdab2ee45b5c"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "5b1cc448428dd6892acb06b2017244009d2aa2e8"
+    }
+  },
+  {
+    "repository": "/Users/androidteam/Developer/tdt-scheduler",
+    "name": "tdt-scheduler",
+    "head": "ae71df8bb03309397664aae08f324ac8cf0a312b",
+    "gitnexus": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "67d4a2a10cbb6f5553323bac01cf6c098d54ab33"
+    },
+    "graphify": {
+      "enabled": true,
+      "status": "stale",
+      "indexedSha": "c6a0fd452d85ef8e7c20730deaad63e387d7ebb2"
+    }
+  }
+]

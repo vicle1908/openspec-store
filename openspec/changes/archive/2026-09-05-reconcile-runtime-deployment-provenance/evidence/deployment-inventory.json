@@ -1,0 +1,100 @@
+{
+  "generated_at_utc": "2026-09-05T15:32:00.000000+00:00",
+  "change": "reconcile-runtime-deployment-provenance",
+  "provenance_files": {
+    "ai_review_manifest": {
+      "path": "/Users/androidteam/.tdt/deployments/ai-review/state/deployment-manifest.json",
+      "owner": "androidteam:staff",
+      "mode": "-rw-r--r--",
+      "size_bytes": 1649,
+      "mtime_utc": "2026-09-05T08:24:46.346891+00:00",
+      "contains_credentials": false
+    },
+    "webhook_receiver_manifest": {
+      "path": "/Users/androidteam/.tdt/deployments/webhook-receiver/state/deployment-manifest.json",
+      "owner": "androidteam:staff",
+      "mode": "-rw-r--r--",
+      "size_bytes": 2825,
+      "mtime_utc": "2026-08-24T05:05:32.566567+00:00",
+      "contains_credentials": false
+    },
+    "ai_review_plist": {
+      "path": "/Users/androidteam/Library/LaunchAgents/com.tdt.ai-review.plist",
+      "owner": "androidteam:staff",
+      "mode": "-rw-r--r--",
+      "size_bytes": 1477,
+      "mtime_utc": "2026-09-05T08:38:30.716535+00:00",
+      "contains_credentials": false
+    },
+    "webhook_receiver_plist": {
+      "path": "/Users/androidteam/Library/LaunchAgents/com.tdt.webhook-receiver.plist",
+      "owner": "androidteam:staff",
+      "mode": "-rw-r--r--",
+      "size_bytes": 1235,
+      "mtime_utc": "2026-08-27T05:57:27.412948+00:00",
+      "contains_credentials": false
+    }
+  },
+  "live_services": {
+    "com.tdt.ai-review": {
+      "launchctl_label": "com.tdt.ai-review",
+      "launchctl_pid": 66918,
+      "launchctl_exit_status": 0,
+      "live_pid": 66918,
+      "live_executable": "/Users/androidteam/.tdt/deployments/ai-review/app/.venv/bin/python",
+      "live_command": "/Users/androidteam/.tdt/deployments/ai-review/app/.venv/bin/python /Users/androidteam/.tdt/deployments/ai-review/app/.venv/bin/uvicorn ai_review.api.app:app --host 127.0.0.1 --port 8090 --log-level info",
+      "listening_ports": [8090],
+      "manifest_pid": 28405,
+      "manifest_port": 8090,
+      "manifest_process_command": "/Users/androidteam/.tdt/deployments/ai-review/app/.venv/bin/python /Users/androidteam/.tdt/deployments/ai-review/app/.venv/bin/uvicorn ai_review.api.app:app --host 127.0.0.1 --port 8090 --log-level info",
+      "manifest_source_root": "/Users/androidteam/Developer/ai-review-deploy-source-c35ee68",
+      "manifest_workspace_root": "/Users/androidteam/.tdt",
+      "manifest_deployment_root": "/Users/androidteam/.tdt/deployments/ai-review"
+    },
+    "com.tdt.webhook-receiver": {
+      "launchctl_label": "com.tdt.webhook-receiver",
+      "launchctl_pid": 667,
+      "launchctl_exit_status": 0,
+      "live_pid": 667,
+      "live_executable": "/Users/androidteam/.tdt/deployments/webhook-receiver/app/.venv/bin/python",
+      "live_command": "/Users/androidteam/.tdt/deployments/webhook-receiver/app/.venv/bin/python /Users/androidteam/.tdt/deployments/webhook-receiver/app/.venv/bin/uvicorn webhook_receiver.api.app:create_app --factory --host 127.0.0.1 --port 8080 --log-level info",
+      "listening_ports": [8080],
+      "manifest_pid": 661,
+      "manifest_port": 8080,
+      "manifest_process_command": "/Users/androidteam/.tdt/deployments/webhook-receiver/app/.venv/bin/python /Users/androidteam/.tdt/deployments/webhook-receiver/app/.venv/bin/uvicorn webhook_receiver.api.app:create_app --factory --host 127.0.0.1 --port 8080 --log-level info",
+      "manifest_source_root": "/Users/androidteam/Developer/webhook-receiver",
+      "manifest_workspace_root": "/Users/androidteam/Developer/tdt",
+      "manifest_deployment_root": "/Users/androidteam/.tdt/deployments/webhook-receiver"
+    }
+  },
+  "discrepancies": [
+    {
+      "service": "com.tdt.ai-review",
+      "field": "pid",
+      "manifest_value": 28405,
+      "live_value": 66918,
+      "status": "stale_pid_recorded_from_pre_migration_process"
+    },
+    {
+      "service": "com.tdt.ai-review",
+      "field": "source_root",
+      "manifest_value": "/Users/androidteam/Developer/ai-review-deploy-source-c35ee68",
+      "live_value": "/Users/androidteam/Developer/ai-review",
+      "status": "stale_temporary_source_root_directory_absent"
+    },
+    {
+      "service": "com.tdt.webhook-receiver",
+      "field": "pid",
+      "manifest_value": 661,
+      "live_value": 667,
+      "status": "stale_pid_from_earlier_launch"
+    },
+    {
+      "service": "com.tdt.webhook-receiver",
+      "field": "workspace_root",
+      "manifest_value": "/Users/androidteam/Developer/tdt",
+      "live_value": "/Users/androidteam/.tdt",
+      "status": "stale_workspace_root_retired_in_root_cleanup_residual"
+    }
+  ]
+}
