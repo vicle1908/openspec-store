@@ -1,7 +1,7 @@
 # realtime-vitest-docs Specification
 
 ## Purpose
-TBD - created by archiving change align-realtime-vitest-docs. Update Purpose after archive.
+This capability keeps the realtime frontend's test configuration, APIs, scripts, and documentation aligned around Vitest while preserving a verifiable production build.
 
 ## Requirements
 
