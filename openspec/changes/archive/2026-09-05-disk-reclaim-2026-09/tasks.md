@@ -14,15 +14,15 @@
 
 ## 4. Stale build cache + Go module cache
 
-- [ ] 4.1 Run `docker builder prune -f` (default, non-`--all`) and record reclaimed bytes; verify remaining cache is the in-use portion only (`docker system df` build-cache reclaimable ≈ 0).
-- [ ] 4.2 Run `go clean -modcache` and verify `du -sh ~/go/pkg/mod` shows ~0 (module cache empty; re-downloads on demand).
+- [x] 4.1 Run `docker builder prune -f` (default, non-`--all`) and record reclaimed bytes; verify remaining cache is the in-use portion only (`docker system df` build-cache reclaimable ≈ 0). — Reclaimed 10.66GB (image removals unlinked extra cache, raising it from the 4.37GB estimate)
+- [x] 4.2 Run `go clean -modcache` and verify `du -sh ~/go/pkg/mod` shows ~0 (module cache empty; re-downloads on demand). — Cache emptied (dir removed, 1.2GiB)
 
 ## 5. Post-cleanup verification gates
 
-- [ ] 5.1 All 3 containers healthy (`docker ps` no restarting/unhealthy states) and OmniRoute healthy per documented contract: `curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:20128/v1/models` returns 401 (keyless loopback inference; 401 on /v1/models is the verified-healthy signature).
-- [ ] 5.2 Free-space delta from task 1.1 baseline is ≥ 15 GiB (`df -h /System/Volumes/Data`), Docker.raw actual size shrank accordingly (`du -sh ~/Library/Containers/com.docker.docker/Data/vms/0/data/Docker.raw`).
-- [ ] 5.3 Preservation audit passes: 10 named volumes present, rollback image present, active images present, `docker volume ls` count = 10.
+- [x] 5.1 All 3 containers healthy (`docker ps` no restarting/unhealthy states) and OmniRoute healthy per documented contract: `curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:20128/v1/models` returns 401 (keyless loopback inference; 401 on /v1/models is the verified-healthy signature). — PASSED: 3/3 healthy, /v1/models → 401
+- [x] 5.2 Free-space delta from task 1.1 baseline is ≥ 15 GiB (`df -h /System/Volumes/Data`), Docker.raw actual size shrank accordingly (`du -sh ~/Library/Containers/com.docker.docker/Data/vms/0/data/Docker.raw`). — PASSED: 49GiB → 70GiB free (+21GiB); Docker.raw 33G → 13G
+- [x] 5.3 Preservation audit passes: 10 named volumes present, rollback image present, active images present, `docker volume ls` count = 10. — PASSED: 10/10 named volumes, rollback present, 5 images (4 preserve-set + redis:8.10.1-alpine target)
 
 ## 6. Closeout
 
-- [ ] 6.1 Record before/after numbers in this change's README (or tasks annotations), archive the change (`openspec archive disk-reclaim-2026-09 --store openspec-store --yes`), and commit the store.
+- [x] 6.1 Record before/after numbers in this change's README (or tasks annotations), archive the change (`openspec archive disk-reclaim-2026-09 --store openspec-store --yes`), and commit the store.
