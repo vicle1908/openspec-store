@@ -8,7 +8,7 @@
 
 | Artifact | SHA-256 |
 |---|---|
-| `evidence/cleanup-verification.json` | `15c19eccd0fbdecb8c828820823731b6b7ec11f6269a3f2814ab71eb1ca683e2` |
+| `evidence/cleanup-verification.json` | `53b4eadfeed35043871bc828ff8439494a8ce1c2602fd7333196fbf27981b7fa` |
 | `evidence/repository-inventory.txt` | `e025d0ef17967da8efe18ab3040f5e62f612bb4c35147bbe0448b7a9816087df` |
 
 JSON syntax: valid (`python3 -m json.tool` passed). Credential-shape scan across `evidence/`: zero matches.
@@ -31,9 +31,9 @@ Authoritative inventory: 19 repositories (18 from `/Users/androidteam/Developer/
 - Clean status (task 7.1): 5 repos dirty, each with exactly one untracked `.claude/` path — the archive's own allowed exception. **Verified under its stated exception.**
 
 
-**Unverified / contradicted:**
+**Contradicted / since resolved:**
 
-- Archive task 6.1 claimed embedded-copy comparison "produced." No comparison output was archived. Live `diff -qr` now shows divergence: `agent-core` 62 entries, `jira-skill` 44, `code-daily-scan` 30, `jira-daily-reports` 28. Claim remains **unverified**; no update/mutation was performed.
+- Archive task 6.1 claimed embedded-copy comparison "produced." Investigation (see `embedded-copies-resolution.md`) found the "embedded copies" were empty untracked stub dirs (0 files), not stale source copies; diff entries were upstream-only files. Current build consumes workspace-root inputs via the allowlist + bind mounts; zero tracked references to the stubs. **Resolved 2026-09-05 by owner decision**: 9 empty stub dirs removed (`rmdir`, fail-safe); tdt-scheduler git status clean; build contract intact.
 
 ## Brew Cask Cleanup Archive (`dce0811`)
 
@@ -60,7 +60,7 @@ The archive's internal contradiction (6.1 "zero corrupted" via plist-only while 
 
 ## Remaining Open Items
 
-1. tdt-scheduler embedded copies: divergent; needs an owner decision (update embedded copies or document accepted divergence) — not resolved here.
+1. ~~tdt-scheduler embedded copies~~ **RESOLVED 2026-09-05**: empty vestigial stubs removed by owner decision (`evidence/embedded-copies-resolution.md`); no copy sync needed — build uses workspace-root inputs.
 2. 5 dirty repos: ownership unknown (likely concurrent sessions); classified, not touched.
 3. `brew doctor` Caskroom warnings for `cockpit-tools`/`antigravity-cli`: outside this archive's scope.
 4. Cline/provider archive invalidation chain: historical context only; no credential/provider surface changed.

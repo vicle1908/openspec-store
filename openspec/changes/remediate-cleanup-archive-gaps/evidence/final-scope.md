@@ -8,10 +8,11 @@
 
 - Corrective planning artifacts (proposal, spec delta, design, tasks) for the two cleanup archives.
 - Value-blind verification evidence recorded:
-  - `evidence/cleanup-verification.json` (sha256 `15c19eccd0fbdecb8c828820823731b6b7ec11f6269a3f2814ab71eb1ca683e2`)
+  - `evidence/cleanup-verification.json` (sha256 `53b4eadfeed35043871bc828ff8439494a8ce1c2602fd7333196fbf27981b7fa`)
   - `evidence/repository-inventory.txt` (sha256 `e025d0ef17967da8efe18ab3040f5e62f612bb4c35147bbe0448b7a9816087df`)
   - `evidence/cleanup-verification.md`
-- 19/19 repository inventory rows; worktree/venv/branch/status evidence; embedded-copy divergence recorded.
+  - `evidence/embedded-copies-resolution.md` (owner-decision follow-up, 2026-09-05)
+- 19/19 repository inventory rows; worktree/venv/branch/status evidence; embedded-copy finding corrected (empty stubs, not stale copies) and resolved by owner decision.
 - Executable-aware verification for all 8 archive-targeted applications (plist-declared CFBundleExecutable vs. actual executable path, bytes, mode).
 - Orca identity/version (`com.stablyai.orca` v1.4.197) and Caskroom `.upgrading` state recorded.
 - `brew doctor` read-only result recorded; target-app warnings false, unrelated findings classified.
@@ -22,7 +23,7 @@
 
 - No archive files modified (git status: only untracked corrective change directory).
 - No applications reinstalled/removed; no worktrees/branches/venvs touched.
-- tdt-scheduler embedded-copy divergence (62/44/30/28 entries) left for owner decision.
+- ~~tdt-scheduler embedded-copy divergence~~ RESOLVED after this record by owner decision ("update copies"): the "copies" were empty untracked stub dirs; 9 removed via fail-safe `rmdir`; tdt-scheduler git status clean; build uses workspace-root inputs (allowlist + bind mounts). See `evidence/embedded-copies-resolution.md`. No tdt-scheduler commit required.
 - 5 dirty repos (`agent-docs-sync`, `agent-harness`, `ai-review`, `jira-epic-report`, `jira-skill`) classified as unrelated, untouched.
 - `brew doctor` `cockpit-tools`/`antigravity-cli` warnings outside archive scope.
 - No credential or provider surface changed.

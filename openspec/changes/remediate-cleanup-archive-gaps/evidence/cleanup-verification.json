@@ -20,7 +20,7 @@
       "all_repositories_on_default_branch": "verified",
       "all_repositories_clean": "verified_with_exceptions",
       "venvs_present": "verified_with_exception",
-      "tdt_scheduler_embedded_copies_current": "unverified"
+      "tdt_scheduler_embedded_copies_current": "vestigial_empty_stubs_removed"
     },
     "repository_rows": [
       {"repository": "agent-core", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": true},
@@ -57,12 +57,13 @@
     "clean_claim_note": "Archive task 7.1 as written allows 'harmless .claude/ dirs'. Every dirty path across all 19 repositories is exactly one untracked .claude/ entry; no other dirty or modified paths exist. The clean-status claim is therefore verified under its own stated exception; no repository requires reclassification as contradicted.",
     "venv_exception": "tdt-scheduler has no local .venv and is Docker-built by design",
     "tdt_scheduler_embedded_copy_comparison": [
-      {"embedded_project": "agent-core", "diff_entries": 62, "status": "divergent_from_upstream"},
-      {"embedded_project": "jira-skill", "diff_entries": 44, "status": "divergent_from_upstream"},
-      {"embedded_project": "code-daily-scan", "diff_entries": 30, "status": "divergent_from_upstream"},
-      {"embedded_project": "jira-daily-reports", "diff_entries": 28, "status": "divergent_from_upstream"}
+      {"embedded_project": "agent-core", "initial_diff_entries": 62},
+      {"embedded_project": "jira-skill", "initial_diff_entries": 44},
+      {"embedded_project": "code-daily-scan", "initial_diff_entries": 30},
+      {"embedded_project": "jira-daily-reports", "initial_diff_entries": 28}
     ],
-    "tdt_scheduler_embedded_copy_claim": "unverified: diff -qr shows 28-62 divergent entries per embedded copy; archive provided no comparison output and no reconciliation decision"
+    "tdt_scheduler_embedded_copy_correction": "Superseded by evidence/embedded-copies-resolution.md: the 'embedded copies' were empty untracked stub directories (0 files each), not stale source copies; the diff entries were upstream-only files plus empty embedded src/. The current build consumes workspace-root inputs via the Dockerfile.dockerignore allowlist and compose bind mounts; zero tracked references pointed at the stubs.",
+    "tdt_scheduler_embedded_copy_resolution": "owner decision 2026-09-05 ('update copies') resolved by removing the 9 empty vestigial stub directories with rmdir (fail-safe, no files existed); tdt-scheduler git status remains clean; build contract and workspace-root inputs verified intact. No tdt-scheduler commit required."
   },
   "brew_cask_cleanup_archive": {
     "archive_path": "openspec/changes/archive/2026-09-04-fix-corrupted-brew-casks",
