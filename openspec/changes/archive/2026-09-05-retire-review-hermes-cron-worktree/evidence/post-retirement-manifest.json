@@ -1,0 +1,346 @@
+{
+  "entries": [
+    {
+      "blockers": [
+        "runtime_owner:unknown:tdt-stale-copy-with-live-service"
+      ],
+      "canonical_path": "/Users/androidteam/Developer/tdt",
+      "classification": "PROTECTED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T06:12:02Z",
+        "newest_observation": "2026-09-05T06:11:15Z",
+        "oldest_observation": "2026-09-05T06:11:15Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "runtime",
+          "facts": {
+            "active": true,
+            "exists": true,
+            "host_activity": true,
+            "launchagent_label": "com.tdt.ai-review",
+            "process_running": true
+          },
+          "observed_at": "2026-09-05T06:11:15Z",
+          "subject": "tdt-stale-copy-with-live-service"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "none",
+        "note": "protected; no cleanup action proposed",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/code-daily-scan",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T06:12:02Z",
+        "newest_observation": "2026-09-05T06:11:15Z",
+        "oldest_observation": "2026-09-05T06:11:15Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "is_symlink": true,
+            "registered_in_orca_db": true,
+            "size_bytes": 0,
+            "symlink_target": "/Users/androidteam/Developer/code-daily-scan"
+          },
+          "observed_at": "2026-09-05T06:11:15Z",
+          "subject": "registered-symlink/code-daily-scan"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/jira-daily-reports",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T06:12:02Z",
+        "newest_observation": "2026-09-05T06:11:15Z",
+        "oldest_observation": "2026-09-05T06:11:15Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "is_symlink": true,
+            "registered_in_orca_db": true,
+            "size_bytes": 0,
+            "symlink_target": "/Users/androidteam/Developer/jira-daily-reports"
+          },
+          "observed_at": "2026-09-05T06:11:15Z",
+          "subject": "registered-symlink/jira-daily-reports"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/jira-epic-report",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T06:12:02Z",
+        "newest_observation": "2026-09-05T06:11:15Z",
+        "oldest_observation": "2026-09-05T06:11:15Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "is_symlink": true,
+            "registered_in_orca_db": true,
+            "size_bytes": 0,
+            "symlink_target": "/Users/androidteam/Developer/jira-epic-report"
+          },
+          "observed_at": "2026-09-05T06:11:15Z",
+          "subject": "registered-symlink/jira-epic-report"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/tdt-core",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T06:12:02Z",
+        "newest_observation": "2026-09-05T06:11:15Z",
+        "oldest_observation": "2026-09-05T06:11:15Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "is_symlink": true,
+            "registered_in_orca_db": true,
+            "size_bytes": 0,
+            "symlink_target": "/Users/androidteam/Developer/tdt-core"
+          },
+          "observed_at": "2026-09-05T06:11:15Z",
+          "subject": "registered-symlink/tdt-core"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/tdt-observability",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T06:12:02Z",
+        "newest_observation": "2026-09-05T06:11:15Z",
+        "oldest_observation": "2026-09-05T06:11:15Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "is_symlink": true,
+            "registered_in_orca_db": true,
+            "size_bytes": 0,
+            "symlink_target": "/Users/androidteam/Developer/tdt-observability"
+          },
+          "observed_at": "2026-09-05T06:11:15Z",
+          "subject": "registered-symlink/tdt-observability"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/agent-core/tdt-scheduler",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T06:12:02Z",
+        "newest_observation": "2026-09-05T06:11:15Z",
+        "oldest_observation": "2026-09-05T06:11:15Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "is_symlink": true,
+            "registered_in_orca_db": true,
+            "size_bytes": 0,
+            "symlink_target": "/Users/androidteam/Developer/tdt-scheduler"
+          },
+          "observed_at": "2026-09-05T06:11:15Z",
+          "subject": "registered-symlink/tdt-scheduler"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    },
+    {
+      "blockers": [
+        "reclaimability_not_proven"
+      ],
+      "canonical_path": "/Users/androidteam/orca/workspaces/tdt-core",
+      "classification": "REVIEW_REQUIRED",
+      "evidence": [
+        "retention:not_governed"
+      ],
+      "evidence_timestamps": {
+        "generated_at": "2026-09-05T06:12:02Z",
+        "newest_observation": "2026-09-05T06:11:15Z",
+        "oldest_observation": "2026-09-05T06:11:15Z"
+      },
+      "identity": {
+        "branch": null,
+        "detached": null,
+        "repo_identity": null,
+        "revision": null,
+        "worktree_id": null
+      },
+      "observations": [
+        {
+          "authority": "orca",
+          "facts": {
+            "empty_dir": true,
+            "exists": true,
+            "referenced_by_orca_db": true,
+            "terminal_records": 9
+          },
+          "observed_at": "2026-09-05T06:11:15Z",
+          "subject": "empty-dir-db-referenced"
+        }
+      ],
+      "previously_skipped": false,
+      "proposed_owner_action": {
+        "action": "review",
+        "note": "operator review required before any lifecycle action",
+        "owner": "operator"
+      }
+    }
+  ],
+  "generated_at": "2026-09-05T06:12:02Z",
+  "manifest": "workspace-lifecycle-cleanup-manifest",
+  "mode": "dry-run",
+  "plan_id": "plan-post-retirement-2026-09-05",
+  "plan_identity": "5c75514972f8667a83b227bc07d798e6ad222250663aff6a2de3525ba20119d8",
+  "retention_policy": {
+    "available": true,
+    "policy": "workspace-artifact-retention-policy",
+    "policy_identity": "workspace-artifact-retention-policy/1.0.0",
+    "source_path": "/Users/androidteam/Developer/.workspace-retention/retention-inventory.json"
+  },
+  "schema_version": "0.1.0",
+  "workspace_root": "~/Developer"
+}

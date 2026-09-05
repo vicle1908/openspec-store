@@ -1,0 +1,22 @@
+Workspace Lifecycle Cleanup — Dry-Run Summary
+=============================================
+Mode: dry-run (no mutations performed)
+Generated: 2026-09-05T06:12:02Z
+Plan id: plan-post-retirement-2026-09-05
+Plan identity: 5c75514972f8667a83b227bc07d798e6ad222250663aff6a2de3525ba20119d8
+Retention policy: available (workspace-artifact-retention-policy/1.0.0)
+Paths scanned: 8
+  PROTECTED: 1
+  REVIEW_REQUIRED: 7
+  RECLAIMABLE: 0
+  RECLAIMED: 0
+Reclaimable candidates (review-only proposals): 0
+Skipped paths (protected or review-required): 8
+  - /Users/androidteam/Developer/tdt [runtime_owner:unknown:tdt-stale-copy-with-live-service]
+  - /Users/androidteam/orca/workspaces/agent-core/code-daily-scan [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/agent-core/jira-daily-reports [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/agent-core/jira-epic-report [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/agent-core/tdt-core [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/agent-core/tdt-observability [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/agent-core/tdt-scheduler [reclaimability_not_proven]
+  - /Users/androidteam/orca/workspaces/tdt-core [reclaimability_not_proven]
