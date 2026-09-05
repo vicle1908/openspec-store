@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "generated_at": "2026-09-05T01:24:53Z",
+    "generated_by": "remediate-cleanup-archive-gaps",
+    "scope": "read-only corrective evidence for archived cleanup claims",
+    "value_blind": true,
+    "repository_inventory": {
+      "source": "/Users/androidteam/Developer/AGENTS.md:365-368 plus tdt-scheduler",
+      "path": "evidence/repository-inventory.txt",
+      "sha256": "e025d0ef17967da8efe18ab3040f5e62f612bb4c35147bbe0448b7a9816087df",
+      "repository_count": 19
+    }
+  },
+  "ecosystem_cleanup_archive": {
+    "archive_path": "openspec/changes/archive/2026-09-05-ecosystem-cleanup",
+    "archive_commit": "5360249",
+    "ledger_task_count": 21,
+    "claim_statuses": {
+      "worktrees_reduced": "contradicted_as_written",
+      "all_repositories_on_default_branch": "verified",
+      "all_repositories_clean": "verified_with_exceptions",
+      "venvs_present": "verified_with_exception",
+      "tdt_scheduler_embedded_copies_current": "unverified"
+    },
+    "repository_rows": [
+      {"repository": "agent-core", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": true},
+      {"repository": "agent-docs-sync", "branch": "main", "dirty_entries": 1, "worktree_count": 1, "venv_present": true},
+      {"repository": "agent-harness", "branch": "main", "dirty_entries": 1, "worktree_count": 1, "venv_present": true},
+      {"repository": "ai-harness-skills", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": true},
+      {"repository": "ai-review", "branch": "main", "dirty_entries": 1, "worktree_count": 1, "venv_present": true},
+      {"repository": "browser-cli", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": true},
+      {"repository": "claude-code-provider-adapter", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": true},
+      {"repository": "code-daily-scan", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": true},
+      {"repository": "hermes-webui", "branch": "master", "dirty_entries": 0, "worktree_count": 1, "venv_present": true},
+      {"repository": "jira-daily-reports", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": true},
+      {"repository": "jira-epic-report", "branch": "main", "dirty_entries": 1, "worktree_count": 1, "venv_present": true},
+      {"repository": "jira-kanban-from-spreadsheet", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": true},
+      {"repository": "jira-skill", "branch": "main", "dirty_entries": 1, "worktree_count": 1, "venv_present": true},
+      {"repository": "ops-automation-suite", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": true},
+      {"repository": "tdt-core", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": true},
+      {"repository": "tdt-observability", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": true},
+      {"repository": "tdt-sheets", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": true},
+      {"repository": "tdt-scheduler", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": false, "venv_expected": false},
+      {"repository": "webhook-receiver", "branch": "main", "dirty_entries": 0, "worktree_count": 1, "venv_present": true}
+    ],
+    "total_worktree_count": 19,
+    "extra_worktree_count_beyond_main_checkouts": 0,
+    "worktree_claim_note": "Archive task 7.2 claims total worktree count <=10 across all repos. With 19 repositories each retaining its main checkout, 19 is the minimum possible total; the literal claim is contradicted. Defensible facts: every repo has exactly 1 worktree (its main checkout), 0 extra/stale worktrees remain, and the 7 originally-affected repos total 7 worktrees (satisfying <=10 only under that narrower reading).",
+    "dirty_repositories": ["agent-docs-sync", "agent-harness", "ai-review", "jira-epic-report", "jira-skill"],
+    "dirty_path_classification": [
+      {"repository": "agent-docs-sync", "path": ".claude/", "porcelain_state": "??", "classification": "archive-allowed .claude/ exception"},
+      {"repository": "agent-harness", "path": ".claude/", "porcelain_state": "??", "classification": "archive-allowed .claude/ exception"},
+      {"repository": "ai-review", "path": ".claude/", "porcelain_state": "??", "classification": "archive-allowed .claude/ exception"},
+      {"repository": "jira-epic-report", "path": ".claude/", "porcelain_state": "??", "classification": "archive-allowed .claude/ exception"},
+      {"repository": "jira-skill", "path": ".claude/", "porcelain_state": "??", "classification": "archive-allowed .claude/ exception"}
+    ],
+    "clean_claim_note": "Archive task 7.1 as written allows 'harmless .claude/ dirs'. Every dirty path across all 19 repositories is exactly one untracked .claude/ entry; no other dirty or modified paths exist. The clean-status claim is therefore verified under its own stated exception; no repository requires reclassification as contradicted.",
+    "venv_exception": "tdt-scheduler has no local .venv and is Docker-built by design",
+    "tdt_scheduler_embedded_copy_comparison": [
+      {"embedded_project": "agent-core", "diff_entries": 62, "status": "divergent_from_upstream"},
+      {"embedded_project": "jira-skill", "diff_entries": 44, "status": "divergent_from_upstream"},
+      {"embedded_project": "code-daily-scan", "diff_entries": 30, "status": "divergent_from_upstream"},
+      {"embedded_project": "jira-daily-reports", "diff_entries": 28, "status": "divergent_from_upstream"}
+    ],
+    "tdt_scheduler_embedded_copy_claim": "unverified: diff -qr shows 28-62 divergent entries per embedded copy; archive provided no comparison output and no reconciliation decision"
+  },
+  "brew_cask_cleanup_archive": {
+    "archive_path": "openspec/changes/archive/2026-09-04-fix-corrupted-brew-casks",
+    "archive_commit": "dce0811",
+    "ledger_task_count": 17,
+    "claim_statuses": {
+      "homebrew_cask_apps_restored": "verified",
+      "orca_identity_and_version": "verified",
+      "caskroom_upgrading_cleanup": "verified_with_unrelated_findings",
+      "brew_doctor_clean": "unverified",
+      "sideloaded_apps_functional": "verified_currently",
+      "executable_aware_final_scan_clean": "verified"
+    },
+    "application_rows": [
+      {"app": "Visual Studio Code.app", "plist_present": true, "declared_executable": "Code", "executable_path": "/Applications/Visual Studio Code.app/Contents/MacOS/Code", "executable_present": true, "bytes": 67840, "mode": "-rwxr-xr-x"},
+      {"app": "Ollama.app", "plist_present": true, "declared_executable": "Ollama", "executable_path": "/Applications/Ollama.app/Contents/MacOS/Ollama", "executable_present": true, "bytes": 52462320, "mode": "-rwxr-xr-x"},
+      {"app": "Google Chrome.app", "plist_present": true, "declared_executable": "Google Chrome", "executable_path": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "executable_present": true, "bytes": 367696, "mode": "-rwxr-xr-x"},
+      {"app": "Postman.app", "plist_present": true, "declared_executable": "Postman", "executable_path": "/Applications/Postman.app/Contents/MacOS/Postman", "executable_present": true, "bytes": 69248, "mode": "-rwxr-xr-x"},
+      {"app": "Warp.app", "plist_present": true, "declared_executable": "stable", "executable_path": "/Applications/Warp.app/Contents/MacOS/stable", "executable_present": true, "bytes": 838416528, "mode": "-rwxr-xr-x"}
+    ],
+    "orca_application_row": {
+      "app": "Orca.app",
+      "plist_present": true,
+      "bundle_identifier": "com.stablyai.orca",
+      "short_version": "1.4.197",
+      "declared_executable": "Orca",
+      "executable_path": "/Applications/Orca.app/Contents/MacOS/Orca",
+      "executable_present": true,
+      "bytes": 53632,
+      "mode": "-rwxr-xr-x"
+    },
+    "sideloaded_application_rows": [
+      {"app": "AutoForward Messages.app", "wrapper_plist": "/Applications/AutoForward Messages.app/Wrapper/Runner.app/Info.plist", "wrapper_plist_present": true, "executable": "/Applications/AutoForward Messages.app/Wrapper/Runner.app/Runner", "executable_present": true, "bytes": 5989504, "mode": "-rwxr-xr-x", "sha256": "8ef539ac873107e3c7a58a901b85620ba26e08e18a4977352a7a2db7d0bd624c"},
+      {"app": "Nicegram.app", "wrapper_plist": "/Applications/Nicegram.app/Wrapper/Telegram.app/Info.plist", "wrapper_plist_present": true, "executable": "/Applications/Nicegram.app/Wrapper/Telegram.app/Telegram", "executable_present": true, "bytes": 158624, "mode": "-rwxr-xr-x", "sha256": "554f9e928f624bae9ca71cc39df244ccebecb124e7d0def590a6d78926bd4680"}
+    ],
+    "sideloaded_reinstall_gate": "resolved_currently_unnecessary: both expected executables exist, are nonzero, and have executable mode; no reinstall provenance claimed",
+    "caskroom": {
+      "orca_path_present": true,
+      "orca_upgrading_directories": 0
+    },
+    "brew_doctor": {
+      "exit_code": 1,
+      "caskroom_metadata_warnings": [
+        "/opt/homebrew/Caskroom/cockpit-tools",
+        "/opt/homebrew/Caskroom/antigravity-cli"
+      ],
+      "targeted_app_warning": false,
+      "unrelated_findings": true
+    },
+    "executable_aware_final_scan": {
+      "command_identity": "for each /Applications/*.app, read plist or wrapper plist CFBundleExecutable and test the declared executable path",
+      "apps_with_missing_declared_executables": 0
+    }
+  }
+}
