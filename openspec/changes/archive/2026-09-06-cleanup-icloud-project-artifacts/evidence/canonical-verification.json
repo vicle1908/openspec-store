@@ -1,0 +1,85 @@
+{
+  "recordType": "canonical-verification",
+  "checkedAt": "2026-09-06T13:09:02",
+  "method": "metadata-only os.path.isdir after deletion; pre-deletion check performed in-session 2026-09-06 (audit script: same parent-dir canonical existence, 15/15 present, 0 missing) before approval presentation",
+  "conflictDirsDeleted": 15,
+  "canonicalPresentNow": 15,
+  "canonicalMissingNow": 0,
+  "checks": [
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/INSURANCE-project/insurance-customer-webview.corrupted.1769743059",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/INSURANCE-project/insurance-customer-webview",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/INSURANCE-project/insurance-proposal-business.corrupted.1769743061",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/INSURANCE-project/insurance-proposal-business",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/INSURANCE-project/insurance-payment-service.corrupted.1769743138",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/INSURANCE-project/insurance-payment-service",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/INSURANCE-project/insurance-promotion-business.corrupted.1769743060",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/INSURANCE-project/insurance-promotion-business",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/INSURANCE-project/insurance-policy-business.corrupted.1769743060",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/INSURANCE-project/insurance-policy-business",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-cms-fe.corrupted.1769743238",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-cms-fe",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-customer-service.corrupted.1769743238",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-customer-service",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-application-service.corrupted.1769743239",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-application-service",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-payment-service.corrupted.1769743242",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-payment-service",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-refund-service.corrupted.1769743243",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-refund-service",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-customer-screening-service.corrupted.1769743239",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-customer-screening-service",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-decision-service.corrupted.1769743239",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-decision-service",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-limit-mgmt.corrupted.1769743241",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-limit-mgmt",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-ekyc-business.corrupted.1769743241",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-ekyc-business",
+      "canonicalPresent": true
+    },
+    {
+      "conflictDirDeleted": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-channel-mgmt.corrupted.1769743238",
+      "canonicalPath": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/LEP-project/lending-channel-mgmt",
+      "canonicalPresent": true
+    }
+  ]
+}

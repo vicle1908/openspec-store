@@ -1,0 +1,113 @@
+{
+  "capturedAt": "2026-09-06T13:12:13",
+  "method": "metadata-only lstat; no content reads",
+  "probes": [
+    {
+      "category": "source",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/microservices/services/inventory-service/build.gradle.kts",
+      "present": true,
+      "dataless": true,
+      "note": "present-but-content-unverified"
+    },
+    {
+      "category": "source",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/microservices/common-events/build.gradle.kts",
+      "present": true,
+      "dataless": false,
+      "note": "materialized"
+    },
+    {
+      "category": "source",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/microservices/services/orders-service/src",
+      "present": true,
+      "dataless": false,
+      "note": "materialized"
+    },
+    {
+      "category": "source",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/microservices/buildSrc",
+      "present": true,
+      "dataless": false,
+      "note": "materialized"
+    },
+    {
+      "category": "source",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/microservices/gradle",
+      "present": true,
+      "dataless": false,
+      "note": "materialized"
+    },
+    {
+      "category": "source",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/microservices/.env",
+      "present": true,
+      "dataless": true,
+      "note": "present-but-content-unverified"
+    },
+    {
+      "category": "source",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/microservices/.github/workflows/pinning-check.yml",
+      "present": true,
+      "dataless": true,
+      "note": "present-but-content-unverified"
+    },
+    {
+      "category": "manifest",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/microservices/build.gradle.kts",
+      "present": true,
+      "dataless": false,
+      "note": "materialized"
+    },
+    {
+      "category": "manifest",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/microservices/settings.gradle.kts",
+      "present": true,
+      "dataless": false,
+      "note": "materialized"
+    },
+    {
+      "category": "lockfile",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/bun.lock",
+      "present": true,
+      "dataless": true,
+      "note": "present-but-content-unverified"
+    },
+    {
+      "category": "lockfile",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/microservices/gradle/wrapper/gradle-wrapper.properties",
+      "present": true,
+      "dataless": false,
+      "note": "materialized"
+    },
+    {
+      "category": "docs",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/design-artifacts",
+      "present": true,
+      "dataless": false,
+      "note": "materialized"
+    },
+    {
+      "category": "docs",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/AGENTS.md",
+      "present": true,
+      "dataless": true,
+      "note": "present-but-content-unverified"
+    },
+    {
+      "category": "docs",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/CLAUDE.md",
+      "present": true,
+      "dataless": false,
+      "note": "materialized"
+    },
+    {
+      "category": "docs",
+      "path": "/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/microservices/CHANGELOG.md",
+      "present": true,
+      "dataless": false,
+      "note": "materialized"
+    }
+  ],
+  "missingCount": 0,
+  "datalessCount": 5
+}

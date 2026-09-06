@@ -1,0 +1,38 @@
+{
+  "recordType": "approval-record",
+  "change": "cleanup-icloud-project-artifacts",
+  "gate": "tasks 2.1 / 2.2 (Dry-Run Manifest and Approval Gate)",
+  "presentation": {
+    "presentedAt": "2026-09-06T12:20:00+07:00 (approx)",
+    "presentedIn": "agent session 2026-09-06T03-56-56-260Z_01a074dc-b444-72a1-8e7e-927720d065ce (this transcript), OpenSpec apply workflow task 2.1",
+    "manifestPresented": "694 directory targets (87,880 files, 19,936 dirs) + 536 file targets (335 .DS_Store, 195 *.log, 6 .coverage), corrected manifest v3 after advisor blocker findings (.log_*.md / .tmp_confluence_audit.py false positives removed, .git_disabled kept, walk-loop pop-time classification fix)",
+    "literalCommandsPresented": [
+      "python3 execute_deletion.py equivalent: shutil.rmtree per manifest directoryTargets, os.remove per manifest fileTargets, per-target fault-tolerant/idempotent semantics per advisory",
+      "Exact presented snippet: python3 -c 'import json, shutil; m = json.load(open(\".../evidence/dry-run-manifest.json\")); for d in m[\"directoryTargets\"]: shutil.rmtree(d[\"path\"], ignore_errors=False); print(\"deleted\", len(m[\"directoryTargets\"]), \"dirs\")' and the analogous file-target loop",
+      "Final execution actually used evidence/execute_deletion.py (fault-tolerant per-target variant, per approval-turn advisory: FileNotFoundError=already-done, failures collected, deleted/failed counts, non-blocking locked dirs)"
+    ],
+    "optionsPresented": "1. Approve all  2. Approve subset  3. Cancel"
+  },
+  "authorization": {
+    "authorizedBy": "user (session owner, androidteam)",
+    "authorizationString": "approve all",
+    "receivedAt": "2026-09-06T12:31:00+07:00 (approx, following turn)",
+    "medium": "agent conversation turn (direct user message to this agent session)",
+    "scope": "all 1,230 targets in the corrected dry-run manifest (694 dirs + 536 files), with fault-tolerant/idempotent deletion semantics"
+  },
+  "authorizedArtifacts": {
+    "manifestSha256": "a415142302cb0d51948a951f75c2b2715ba8d29cdb014ecdf5b3b20d78153d8e",
+    "executorUsedSha256": "6b26e4ea05268ef732f5ac343806a8ecf302658dd2855f61a201102f0b4c0b6d",
+    "executorUsedSha256Note": "Hash of the PRE-GATE executor as it actually ran during the authorized deletion (~12:31 +07). The current evidence/execute_deletion.py is the post-verification fail-closed rewrite (sha256 304100e6de202b03cb6a30872a26efd1849e29f43a09795717c6279c8c5347f8) which requires --approved <manifest sha256> to run at all; it was added during /opsx:verify, and the only authorized run under it was the idempotent verification re-run (0 deletions, all 1,230 already gone; see deletion-report.json rerunHistory).",
+    "currentGatedExecutorSha256": "304100e6de202b03cb6a30872a26efd1849e29f43a09795717c6279c8c5347f8",
+    "files": [
+      "evidence/dry-run-manifest.json",
+      "evidence/execute_deletion.py"
+    ]
+  },
+  "outcome": {
+    "executedAt": "2026-09-06T12:31:00+07:00 (approx, same turn as authorization)",
+    "result": "dirsDeleted=694, filesDeleted=536, failures=0 (see evidence/deletion-report.json)"
+  },
+  "backfillNote": "This record was written after the fact (2026-09-06T12:5x:00+07:00) during /opsx:verify at the independent reviewer's recommendation: the authorization itself preceded execution in the session transcript; this file makes it durable and auditable. Approximate timestamps marked (approx) are reconstructed from session event times; the session transcript is the authoritative record."
+}

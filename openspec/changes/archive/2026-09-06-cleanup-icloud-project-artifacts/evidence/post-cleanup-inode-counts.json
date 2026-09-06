@@ -1,0 +1,17 @@
+{
+  "capturedAt": "2026-09-06T13:12:13",
+  "baseline": {
+    "microservices": 19852,
+    "vds": 2010893,
+    "capturedAt": "2026-09-06T12:31:34"
+  },
+  "post": {
+    "microservices": 7317,
+    "vds": 1914382
+  },
+  "removed": {
+    "microservices": 12535,
+    "vds": 96511,
+    "total": 109046
+  }
+}
