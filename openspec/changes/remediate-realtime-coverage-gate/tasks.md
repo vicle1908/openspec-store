@@ -1,0 +1,20 @@
+## 1. Evidence Inventory
+
+- [ ] 1.1 Record the per-file Analytics coverage table from the final14 canonical run (command: `npm run test:ci -- --reporter=dot --maxWorkers=1`, log `/tmp/realtime-test-ci-final14.log` lines 23295–23416) into `evidence/coverage-baseline.md`, listing each component's measured lines/branches/functions/statements percentages. Verify by reading the written file back and confirming every `src/components/Analytics/*.tsx` file from the run table appears with its numbers.
+- [ ] 1.2 Confirm threshold provenance in `evidence/coverage-baseline.md`: run `git log --oneline -- vitest.config.ts` in `realtime/frontend` and record that the thresholds entered at initial tracking commit `95e031de` and were untouched by migration commit `71b99ca3`. Verify by matching the two commit subjects against the `git show` output recorded in the file.
+
+## 2. Coverage Policy Decision
+
+- [ ] 2.1 Decide and record in `design.md` Decisions the approved policy option: (a) keep aspirational thresholds and accept a red coverage dimension until a dedicated coverage initiative, or (b) set thresholds to the measured baseline (global lines 41%, Analytics lines 22%) with a documented ratchet target. Record the rationale and the ratchet path toward 75/85. Verify by re-reading `design.md` and confirming the chosen option, rationale, and ratchet are stated.
+- [ ] 2.2 If option (b) is approved, update only the `coverage.thresholds` block in `realtime/frontend/vitest.config.ts` to the baseline values, leaving instrumentation, reporters, and excludes untouched. Verify with `git diff --stat` showing a single-file change and `git diff` containing only threshold numbers plus a ratchet comment.
+
+## 3. Focused Component Tests (only if 2.1 selects the coverage-initiative path now)
+
+- [ ] 3.1 Add a behavior-focused test file for one high-value uncovered Analytics component (ScatterPlot, GaugeChart, or Heatmap) asserting loading, error, empty-data, and populated-data rendering. Verify by running `npx vitest run src/components/Analytics/__tests__/<component>.test.tsx --maxWorkers=1` and recording the pass output.
+- [ ] 3.2 Re-measure Analytics coverage and record the delta in `evidence/coverage-baseline.md`. Verify by re-running the canonical command and comparing the `src/components/Analytics` line percentage against the 1.1 baseline.
+
+## 4. Verification and Archive Readiness
+
+- [ ] 4.1 Run the canonical gate from `realtime/frontend` and record exact numbers: test files, tests, coverage summary, threshold errors, exit code. Verify by attaching the command output reference in `evidence/verification.md` with the exit code stated.
+- [ ] 4.2 Run `openspec validate remediate-realtime-coverage-gate --strict` and iterate until it passes. Verify by the validator's `valid: true` JSON output recorded in `evidence/verification.md`.
+- [ ] 4.3 Commit the change artifacts and any approved implementation edits in their respective repositories. Verify with `git status --short` showing only the intended change paths and clean trees afterward.
