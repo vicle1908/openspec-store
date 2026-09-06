@@ -1,0 +1,29 @@
+{
+  "schema": "archive-integrity-reconciliation-v1",
+  "archive_root": "openspec/changes/archive",
+  "records": [
+    {
+      "archive": "2026-09-06-cloud-drive-migration",
+      "tasks_path": "openspec/changes/archive/2026-09-06-cloud-drive-migration/tasks.md",
+      "archived_checked": 9,
+      "archived_unchecked": 4,
+      "active_change": "cloud-drive-migration",
+      "active_checked": 5,
+      "active_unchecked": 8,
+      "unsupported_archived_task_ids": ["3.1", "3.2", "6.1", "6.2"],
+      "status": "false_positive_archive",
+      "release_condition": "Exact path approval and post-action evidence for each mutation; no mutation executed by this corrective change."
+    },
+    {
+      "archive": "2026-09-06-align-realtime-vitest-docs",
+      "tasks_path": "openspec/changes/archive/2026-09-06-align-realtime-vitest-docs/tasks.md",
+      "archived_checked": 8,
+      "archived_unchecked": 0,
+      "unsupported_archived_task_ids": ["Run full Vitest suite and production build"],
+      "status": "false_positive_archive",
+      "release_condition": "Successful full-suite exit 0 or explicit approved exclusion policy; focused checks do not satisfy this gate."
+    }
+  ],
+  "mutations_executed": false,
+  "archive_files_modified": false
+}
