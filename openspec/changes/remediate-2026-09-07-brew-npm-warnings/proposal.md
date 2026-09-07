@@ -4,10 +4,9 @@ Homebrew 6.x deprecated the `verified` parameter in cask `url` stanzas (now a no
 
 ## What Changes
 
-- **Upstream cask PRs**: Remove deprecated `verified:` parameter from four cask files across three third-party taps, and migrate `postflight do` → `postflight_steps do` in cockpit-tools.
-- **Upstream issue tracking**: Reference existing gitnexus issue #2194 (tree-sitter 0.25 upgrade readiness) for the tree-sitter-zig peerOptional conflict.
-- **Workspace documentation**: Add `brew audit --online` hazard note to workspace CLAUDE.md to prevent recurrence of the transient brew breakage.
-- **No local tooling changes**: All fixes are upstream contributions or documentation; no custom scripts, overrides, or forks.
+- **Workspace documentation**: Add `brew audit --online` hazard note and deprecation warning limitations to workspace CLAUDE.md.
+- **No upstream contributions**: All fixes depend on third-party tap maintainers and upstream package authors. We follow official upgrade paths (`brew upgrade`, `npm update -g`) and document limitations where upstream has not yet resolved issues.
+- **No local tooling changes**: No custom scripts, overrides, or forks.
 
 ## Capabilities
 
@@ -21,8 +20,8 @@ None.
 
 ## Impact
 
-- **Third-party taps affected**: `jlcodes99/homebrew-cockpit-tools` (Casks/cockpit-tools.rb), `stablyai/homebrew-orca` (Casks/orca.rb, Casks/orca@rc.rb), `anomalyco/homebrew-trap` (Casks/hex.rb)
+- **Third-party taps affected**: `jlcodes99/homebrew-cockpit-tools` (Casks/cockpit-tools.rb), `stablyai/homebrew-orca` (Casks/orca.rb, Casks/orca@rc.rb), `anomalyco/homebrew-tap` (Casks/hex.rb)
 - **Upstream repos**: jlcodes99/cockpit-tools, stablyai/homebrew-orca, abhigyanpatwari/GitNexus
-- **Workspace files**: `~/Developer/CLAUDE.md` (hazard note)
-- **No code changes in workspace repos**: All fixes are upstream PRs/issues or documentation
-- **Risk**: Low — deprecation removals are safe (`verified:` is a no-op); `postflight_steps` migration is a documented DSL rename; brew hazard note is additive
+- **Workspace files**: `~/Developer/CLAUDE.md` (hazard note + limitations)
+- **No code changes in workspace repos**: Documentation only
+- **Risk**: None — documentation is additive; no behavior changes
