@@ -1,0 +1,25 @@
+{
+  "schema": "archive-closure-audit-v1",
+  "scope": "non-icloud only",
+  "records": [
+    {
+      "archive": "2026-09-06-cloud-drive-migration",
+      "archive_tasks": "openspec/changes/archive/2026-09-06-cloud-drive-migration/tasks.md",
+      "archived_checked": 9,
+      "archived_unchecked": 4,
+      "unsupported_non_icloud_task_ids": ["2.2", "4.1", "4.2", "5.1"],
+      "evidence_files": ["evidence/inventory.md", "evidence/icloud-migration-status.md"],
+      "approval_manifest_present": false,
+      "before_after_verification_present": false,
+      "observed_absent_paths": ["/Users/androidteam/My Drive/TDT (1)", "/Users/androidteam/My Drive/VinID", "/Users/androidteam/Developer/go-microservices-cleanup-20260817.bundle"],
+      "observed_absence_classification": "performed_but_unverifiable",
+      "observed_present_paths": ["/Users/androidteam/My Drive/tdt", "/Users/androidteam/My Drive/tdt/tdt-meta", "/Users/androidteam/My Drive/tdt/poems-mobile3-docs", "/Users/androidteam/My Drive/tdt/tdt-python-source-package", "/Users/androidteam/My Drive/tdt/git-remotes", "/Users/androidteam/My Drive/tdt/git-bundles", "/Users/androidteam/My Drive/tdt/data", "/Users/androidteam/My Drive/tdt/reports", "/Users/androidteam/My Drive/tdt/workflow-dag"],
+      "unobserved_or_unproven": ["exact target manifest", "approval record", "rollback record", "before/after checksums", "rclone/bisync evidence", "protected-path preservation"],
+      "status": "claims_partially_observed_but_unverifiable",
+      "release_condition": "Exact target manifest, exact approval, and post-action evidence for every non-iCloud mutation; do not infer authorization from absence alone."
+    }
+  ],
+  "icloud_operations": "excluded",
+  "mutations_executed_by_this_change": false,
+  "archive_files_modified": false
+}
