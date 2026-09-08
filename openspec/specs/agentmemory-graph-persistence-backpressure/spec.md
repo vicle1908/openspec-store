@@ -7,7 +7,7 @@ Bound graph extraction persistence so iii state writes remain recoverable under 
 
 ### Requirement: Graph extraction SHALL apply bounded backpressure
 
-The installed runtime SHALL NOT create new graph persistence work unless bounded batch, queue, concurrency, and failure-isolation controls are available. Until those controls exist, graph extraction SHALL be disabled by an explicit reversible feature flag while non-graph memory features remain enabled.
+The installed runtime SHALL use graph extraction with awareness of persistence timeouts. Graph extraction SHALL be controlled by the `GRAPH_EXTRACTION_ENABLED` flag. When enabled, heuristic extraction always runs; LLM extraction runs only when the flag is true. Persistence timeouts from `state::set` are non-fatal and shall be monitored. The operator may disable graph extraction by setting `GRAPH_EXTRACTION_ENABLED=false` if persistence timeouts become problematic.
 
 #### Scenario: Large session is graph-extracted
 
