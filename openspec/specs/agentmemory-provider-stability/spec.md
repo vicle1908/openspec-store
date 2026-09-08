@@ -7,13 +7,13 @@ Runtime provider settings and timeout behavior that protect summarization and co
 
 ### Requirement: Provider endpoint and model SHALL be consistent
 
-The runtime agentmemory provider configuration SHALL use `OPENAI_BASE_URL=https://api.phanmemvip.shop/v1` and `OPENAI_MODEL=fable-5`, matching the verified shopapikey endpoint.
+The runtime agentmemory provider configuration SHALL use `OPENAI_BASE_URL=https://api.phanmemvip.shop/v1` and `OPENAI_MODEL=claude-fable`, matching the verified shopapikey endpoint.
 
 #### Scenario: Validated provider endpoint
 
 - WHEN the agentmemory server starts
 - THEN `OPENAI_BASE_URL` SHALL equal `https://api.phanmemvip.shop/v1`
-- AND `OPENAI_MODEL` SHALL equal `fable-5`
+- AND `OPENAI_MODEL` SHALL equal `claude-fable`
 - AND POST requests to `https://api.phanmemvip.shop/v1/chat/completions` SHALL return HTTP 200 with a valid response shape when the configured request timeout is 60000 ms
 
 #### Scenario: Invalid model alias rejected

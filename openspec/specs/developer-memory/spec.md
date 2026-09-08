@@ -43,7 +43,7 @@ The project SHALL adopt rohitg00/agentmemory engine and @agentmemory/mcp version
 #### Scenario: Agentmemory is wired to Hermes
 - WHEN Hermes starts with memory.provider: agentmemory in config and the agentmemory plugin enabled
 - THEN the plugin provides lifecycle hooks and memory tools
-- AND LLM compression uses fable-5 via shopapikey
+- AND LLM compression uses claude-fable via shopapikey
 - AND embeddings use nomic-embed-text locally
 - AND the plugin gracefully degrades when the agentmemory server is unavailable
 
@@ -104,7 +104,7 @@ The workstation SHALL assign distinct ownership to Hermes native memory and Agen
 | DM-001 | developer-memory | Agentmemory server is installed locally | e2e | scripts/agentmemory-doctor.sh | bash scripts/agentmemory-doctor.sh | artifacts/verification/doctor.out |
 | DM-002 | developer-memory | Agentmemory is wired to Cursor | e2e | .cursor/mcp.json | grep agentmemory ~/.cursor/mcp.json | artifacts/verification/cursor-mcp.out |
 | DM-003 | developer-memory | Agentmemory is wired to Claude Code | e2e | .claude/settings.json | grep agentmemory ~/.claude/settings.json | artifacts/verification/claude-code.out |
-| DM-004 | developer-memory | Agentmemory is wired to Codex CLI | e2e | .codex/config.toml | grep agentmemory ~/.fable-5.toml | artifacts/verification/codex.out |
+| DM-004 | developer-memory | Agentmemory is wired to Codex CLI | e2e | .codex/config.toml | grep agentmemory ~/.claude-fable.toml | artifacts/verification/codex.out |
 | DM-005 | developer-memory | Agentmemory is wired to OpenCode | e2e | .config/opencode/opencode.jsonc | grep agentmemory ~/.config/opencode/opencode.jsonc | artifacts/verification/opencode.out |
 | DM-006 | developer-memory | Agentmemory is wired to pi | e2e | .pi/agent/extensions/agentmemory | test -f ~/.pi/agent/extensions/agentmemory/index.js | artifacts/verification/pi.out |
 | DM-007 | developer-memory | Go dependency graph is unchanged | unit | go.mod | go list -m all \| grep -i agentmemory | artifacts/verification/go-deps.out |
