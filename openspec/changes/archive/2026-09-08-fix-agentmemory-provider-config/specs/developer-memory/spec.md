@@ -1,13 +1,4 @@
-# developer-memory Specification
-
-## Purpose
-Persistent cross-session memory for AI coding agents. All 8 supported agents
-remember platform decisions across sessions, eliminating the first-5-minutes
-re-derivation of architectural conventions, past resolutions, and team idioms.
-
-## Requirements
-
-> **Status**: IMPLEMENTED. Agentmemory server installed and wired to Cursor, Claude Code, Codex, OpenCode, pi, Hermes; Go deps unchanged.
+## MODIFIED Requirements
 
 ### Requirement: Agentmemory server as developer-memory layer
 
@@ -68,17 +59,6 @@ The project SHALL adopt rohitg00/agentmemory engine and @agentmemory/mcp version
 - THEN graph extraction SHALL use bounded batches and concurrency
 - AND graph work SHALL not create unbounded memory pressure or delay session completion
 
-### Requirement: No Go service code is modified
-
-> **Status**: IMPLEMENTED. Agentmemory integration is in developer tooling only; Go dependency graph unchanged.
-
-The developer-memory integration SHALL NOT modify any Go service code, package
-structure, or dependency graph. The integration is entirely in developer tooling.
-
-#### Scenario: Go dependency graph is unchanged
-- **WHEN** `go list -m all` runs against the `platform/` module
-- **THEN** no agentmemory package appears in the dependency closure
-
 ### Requirement: Memory systems SHALL have non-overlapping ownership
 
 The workstation SHALL assign distinct ownership to Hermes native memory and AgentMemory shared developer memory. Any additional memory provider MUST remain disabled or unconfigured until a reviewed contract exists.
@@ -97,15 +77,3 @@ The workstation SHALL assign distinct ownership to Hermes native memory and Agen
 - WHEN an operator proposes enabling Mem0 or another overlapping memory server
 - THEN activation is blocked until a reviewed ownership contract exists
 
-## Verification
-
-| ID | Capability | Scenario | Tier | Target | Command | Evidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| DM-001 | developer-memory | Agentmemory server is installed locally | e2e | scripts/agentmemory-doctor.sh | bash scripts/agentmemory-doctor.sh | artifacts/verification/doctor.out |
-| DM-002 | developer-memory | Agentmemory is wired to Cursor | e2e | .cursor/mcp.json | grep agentmemory ~/.cursor/mcp.json | artifacts/verification/cursor-mcp.out |
-| DM-003 | developer-memory | Agentmemory is wired to Claude Code | e2e | .claude/settings.json | grep agentmemory ~/.claude/settings.json | artifacts/verification/claude-code.out |
-| DM-004 | developer-memory | Agentmemory is wired to Codex CLI | e2e | .codex/config.toml | grep agentmemory ~/.fable-5.toml | artifacts/verification/codex.out |
-| DM-005 | developer-memory | Agentmemory is wired to OpenCode | e2e | .config/opencode/opencode.jsonc | grep agentmemory ~/.config/opencode/opencode.jsonc | artifacts/verification/opencode.out |
-| DM-006 | developer-memory | Agentmemory is wired to pi | e2e | .pi/agent/extensions/agentmemory | test -f ~/.pi/agent/extensions/agentmemory/index.js | artifacts/verification/pi.out |
-| DM-007 | developer-memory | Go dependency graph is unchanged | unit | go.mod | go list -m all \| grep -i agentmemory | artifacts/verification/go-deps.out |
-| DM-008 | developer-memory | Agentmemory is wired to Hermes | e2e | ~/.hermes/config.yaml | grep "provider: agentmemory" ~/.hermes/config.yaml | E2E verified 2026-08-06 |
