@@ -4,69 +4,80 @@
 Persistent cross-session memory for AI coding agents. All 8 supported agents
 remember platform decisions across sessions, eliminating the first-5-minutes
 re-derivation of architectural conventions, past resolutions, and team idioms.
+
 ## Requirements
 
 > **Status**: IMPLEMENTED. Agentmemory server installed and wired to Cursor, Claude Code, Codex, OpenCode, pi, Hermes; Go deps unchanged.
 
 ### Requirement: Agentmemory server as developer-memory layer
 
-The project SHALL adopt `rohitg00/agentmemory` engine and `@agentmemory/mcp` version `0.9.28` (Apache-2.0, npm `latest` at plan revision) as the shared developer-memory layer for the go-microservices monorepo. One canonical AgentMemory engine SHALL own the shared persistent store, and supported MCP clients SHALL reach it through one MCP Router-owned fail-closed AgentMemory boundary rather than spawning additional direct shims. The boundary SHALL preserve authenticated client identity through a trusted server-derived mapping: native `agentId` arguments SHALL be injected only for tools whose pinned schema supports them, while `memory_save` SHALL receive a reserved server-derived audit concept because the pinned `0.9.28` save schema does not accept or persist `agentId`. A shim fallback store MUST NOT accept or report shared-memory reads or writes.
+The project SHALL use rohitg00/agentmemory engine and @agentmemory/mcp version 0.9.29 as the shared developer-memory layer. Provider configuration SHALL use the shopapikey-backed LLM endpoint with consistent model naming and bounded timeouts. Graph extraction and persistence SHALL be bounded and failure-isolated so graph backlog or state-store timeout does not block observation capture or session completion.
 
 #### Scenario: Agentmemory server is installed locally
-- **WHEN** a developer runs `make agentmemory-bootstrap && make agentmemory-up`
-- **THEN** the server starts on `localhost:3111` (REST+MCP) and `localhost:3113` (viewer, loopback-only), with B+ feature flags enabled
-- **AND** `make agentmemory-doctor` reports 0 red rows
+
+- WHEN a developer runs agentmemory-bootstrap and agentmemory-up
+- THEN the server starts on localhost:3111 and localhost:3113 with B+ feature flags
+- AND agentmemory-doctor reports 0 red rows
 
 #### Scenario: Agentmemory is wired to Cursor
-- **WHEN** Cursor starts with the shared MCP Router configured
-- **THEN** the Cursor tool palette shows the router-exposed AgentMemory tools
-- **AND** Cursor has no separate direct `agentmemory` MCP server registration
+
+- WHEN Cursor starts with the shared MCP Router configured
+- THEN the Cursor tool palette shows the router-exposed AgentMemory tools
+- AND Cursor has no separate direct agentmemory MCP server registration
 
 #### Scenario: Agentmemory is wired to Claude Code
-- **WHEN** Claude Code starts with the AgentMemory hooks and shared MCP Router configured
-- **THEN** the Claude Code hooks fire on SessionStart, PreToolUse, PostToolUse, PreCompact, and Stop events
-- **AND** `memory_smart_search` through MCP Router returns engine-backed memories tagged with the correct `agentId`
-- **AND** Claude Code has no separate direct AgentMemory MCP shim unless an explicitly documented compatibility exception is active
+
+- WHEN Claude Code starts with the AgentMemory hooks and shared MCP Router configured
+- THEN the Claude Code hooks fire on SessionStart, PreToolUse, PostToolUse, PreCompact, and Stop events
+- AND memory_smart_search through MCP Router returns engine-backed memories
 
 #### Scenario: Agentmemory is wired to Codex CLI
-- **WHEN** Codex CLI starts with the AgentMemory hooks and shared MCP Router configured
-- **THEN** Codex CLI hooks fire on SessionStart, UserPromptSubmit, PreToolUse, PostToolUse, PreCompact, and Stop
-- **AND** Codex Desktop (which ignores plugin-local hooks.json) uses the mirrored hooks in `~/.codex/hooks.json` via the `#16430` workaround
-- **AND** neither Codex client starts a direct AgentMemory MCP shim
+
+- WHEN Codex CLI starts with the AgentMemory hooks and shared MCP Router configured
+- THEN Codex CLI hooks fire on SessionStart, UserPromptSubmit, PreToolUse, PostToolUse, PreCompact, and Stop
 
 #### Scenario: Agentmemory is wired to OpenCode
-- **WHEN** OpenCode starts with the shared MCP Router configured
-- **THEN** the OpenCode tool list includes the router-exposed AgentMemory tools
-- **AND** OpenCode has no separate direct `agentmemory` MCP server registration
+
+- WHEN OpenCode starts with the shared MCP Router configured
+- THEN the OpenCode tool list includes the router-exposed AgentMemory tools
 
 #### Scenario: Agentmemory is wired to pi
-- **WHEN** pi starts with the AgentMemory extension installed
-- **THEN** the extension registers `memory_health`, `memory_search`, and `memory_save` tools
-- **AND** the `before_agent_start` hook injects relevant memories into the system prompt
-- **AND** the extension uses the canonical engine-backed store rather than an isolated fallback store
+
+- WHEN pi starts with the AgentMemory extension installed
+- THEN the extension registers memory_health, memory_search, and memory_save tools
 
 #### Scenario: Agentmemory is wired to Hermes
-- **WHEN** Hermes starts with `memory.provider: agentmemory` in config and the agentmemory plugin enabled
-- **THEN** the plugin provides 6 lifecycle hooks: prefetch, sync_turn, on_session_end, on_pre_compress, on_memory_write, system_prompt_block
-- **AND** the plugin provides 3 tools: memory_recall, memory_save, memory_search
-- **AND** LLM compression uses `fable-5` via shopapikey (same model as Hermes conversations)
-- **AND** embeddings use Ofable-5 `nomic-embed-text` (768-dim, local, GPU-accelerated)
-- **AND** Hermes built-in memory (MEMORY.md/USER.md) remains operational alongside agentmemory
-- **AND** the plugin gracefully degrades when the agentmemory server is unavailable
+
+- WHEN Hermes starts with memory.provider: agentmemory in config and the agentmemory plugin enabled
+- THEN the plugin provides lifecycle hooks and memory tools
+- AND LLM compression uses fable-5 via shopapikey
+- AND embeddings use nomic-embed-text locally
+- AND the plugin gracefully degrades when the agentmemory server is unavailable
 
 #### Scenario: Canonical AgentMemory engine is unavailable
-- **WHEN** the AgentMemory boundary cannot reach the canonical engine health endpoint on loopback port 3111, including after an established connection
-- **THEN** shared-memory reads and writes fail with an engine-unavailable status
-- **AND** no local fallback store accepts the operation
-- **AND** an empty or isolated fallback result MUST NOT satisfy shared-session or shared-recall acceptance
-- **AND** no credential value or memory payload is printed by the diagnostic
+
+- WHEN the AgentMemory boundary cannot reach the canonical engine health endpoint on loopback port 3111
+- THEN shared-memory reads and writes fail with an engine-unavailable status
+- AND no local fallback store accepts the operation
 
 #### Scenario: Cross-client shared recall is verified
-- **WHEN** two distinct authenticated test clients write uniquely tagged non-sensitive observations through MCP Router and each performs cross-client recall
-- **THEN** the engine-backed results preserve distinct server-derived audit attribution (`agentId` where supported, otherwise the reserved save concept) and are visible across the authorized clients within the configured bounded timeout
-- **AND** caller-supplied identity fields cannot override the server-derived attribution
-- **AND** the test observations are deleted or retained according to the approved test-data policy
-- **AND** both calls identify the same canonical AgentMemory engine generation or store identity
+
+- WHEN two distinct authenticated test clients write uniquely tagged observations through MCP Router
+- THEN the engine-backed results preserve distinct server-derived audit attribution
+- AND caller-supplied identity fields cannot override the server-derived attribution
+
+#### Scenario: Provider or graph persistence instability does not block session completion
+
+- WHEN the LLM provider is returning 502 errors or timing out, or graph persistence is queued, deferred, or timing out
+- THEN session end processing SHALL complete successfully
+- AND observation capture SHALL continue uninterrupted
+- AND summarization and graph attempts SHALL be logged as failed or deferred without blocking
+
+#### Scenario: Graph backlog is bounded
+
+- WHEN a session or queued workload contains more observations than the graph batch capacity
+- THEN graph extraction SHALL use bounded batches and concurrency
+- AND graph work SHALL not create unbounded memory pressure or delay session completion
 
 ### Requirement: No Go service code is modified
 
