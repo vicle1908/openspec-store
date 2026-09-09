@@ -13,6 +13,12 @@ Consulted during apply of `remediate-realtime-coverage-gate` at the task-2.1 dec
 5. Ratchet: thresholds are monotonic floors — decreases rejected; raises only via reviewed OpenSpec changes tied to the coverage work that earned them (e.g., Analytics lines 22 → 45 → 65 → 85 as the dedicated initiative tests the seven uncovered components). Optional non-blocking alert when measured exceeds floor by >3% to prompt locking in gains.
 6. Compliance with "SHALL NOT claim coverage completion": floors are enforcement floors, not completion claims — tag the config block as a ratchet baseline citing provenance, keep all instrumentation/excludes untouched, and reports continue to show measured values (ScatterPlot 0.7%, GaugeChart 1.06% remain visible as debt).
 
-## Disposition
+## Second advisor catch (during apply, post-2.2) — dead `global:` wrapper
+
+After the initial 2.2 edit, the advisor flagged that Vitest does not support Jest's `global:` threshold wrapper: any key besides metric names is treated as a glob pattern, so `thresholds.global` matches zero files and leaves global thresholds unenforced. Verified against the installed vitest 4.1.10 source (`coverage.DM_a_rWm.js` `resolveThresholds` — non-metric keys are globs; real global thresholds are the top-level `lines/branches/functions/statements` keys) and corroborated empirically by final14 emitting only the four Analytics errors despite 41.32% global lines against the configured "75". Confirmed root cause of the silent skip: the "global" glob matches zero files, istanbul's `blankSummary` returns `pct: 'Unknown'` (string), and `'Unknown' < threshold` → `NaN < threshold` → false. The advisor also confirmed the ratchet3 `coverage-34.json` ENOENT was a worker thread dying before writing its coverage slice under heavy swap pressure (consistent with the environmental analysis in `verification.md`).
+
+Disposition: config corrected — four global metrics moved to top-level `coverage.thresholds` keys; diff re-verified (+22/−11, single file); `npm run type-check` exit 0. Recorded in `design.md` Decision 2 and `tasks.md` 2.2.
+
+## Disposition (first consultation)
 
 Adopted in full as the approved policy (design.md Decisions 2–3, 5). The spec's controlling requirement independently mandates evidence-based thresholds, so the advisor review corroborates rather than overrides the spec.
