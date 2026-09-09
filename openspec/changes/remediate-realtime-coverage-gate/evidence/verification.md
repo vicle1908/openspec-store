@@ -16,12 +16,13 @@ Result: `{"id": "remediate-realtime-coverage-gate", "valid": true, "issues": []}
 - 1.2: threshold provenance recorded: thresholds entered at `95e031de` (initial tracking, `git show` threshold block present), byte-identical at `71b99ca3` (migration) and at HEAD `21c790e7`.
 - 2.1: policy decision recorded in `design.md` Decisions 2–3 (option (b), integer safety floors, monotonic ratchet toward 75/85); advisor review captured in `evidence/advisor-policy-review.md`.
 - 2.2: `realtime/frontend/vitest.config.ts` `coverage.thresholds` block only — `git diff --stat` one file (final: +22/−11); floors global 39/33/34/40 (top-level metric keys), Analytics 21/25/16/22; instrumentation/reporters/excludes untouched; `npm run type-check` exit 0. **Correction during apply:** the first edit (+16/−9) kept the inherited Jest-style `global: {...}` wrapper. Advisor review flagged, and vitest 4.1.10 source confirmed (`node_modules/vitest/dist/chunks/coverage.DM_a_rWm.js`, `resolveThresholds`: non-metric keys are glob patterns; real global thresholds come from top-level metric keys), that the wrapper is dead config: glob "global" matches zero files and istanbul's `blankSummary` returns `pct: 'Unknown'`, so every comparison is `NaN < threshold` → false — never enforced, never errored. Empirical corroboration: the final14 run emitted only the four Analytics threshold errors and no global error despite 41.32% lines vs the configured "75". The corrected config makes global thresholds enforceable for the first time in this repo.
+- Enforcement smoke proof (post-correction, 23:14–23:15, logs `/tmp/threshold-smoke.log`, `/tmp/threshold-smoke2.log`): `npx vitest run <file> --coverage --reporter=dot --maxWorkers=1` — (a) OfflineBanner (90/100/83.33/89.47): passes floors, exit 0; (b) VideoCall (29.85/17.39/11.11/31.49, below floors): emits `ERROR: Coverage for lines (31.49%) does not meet global threshold (40%)` (+ functions/statements/branches) and exits 1 — the first global-threshold enforcement ever in this repo. Both runs took 1.8–3.5s under load ~59, confirming single-file runs are unaffected by the contention that blocks the full suite.
 
 ## Canonical gate (task 4.1) — NOT YET ACHIEVED (blocked by workstation contention)
 
 **The canonical command has NOT exited 0 under the new floors. No claim is made that the coverage gate is fixed.**
 
-Five attempts on 2026-09-09, all failing environmentally (never by a threshold miss):
+Six attempts on 2026-09-09, all failing environmentally (never by a threshold miss):
 
 | Run | Start | Duration | Result | Failure mode |
 |---|---|---|---|---|
@@ -30,6 +31,7 @@ Five attempts on 2026-09-09, all failing environmentally (never by a threshold m
 | ratchet3 (`/tmp/realtime-test-ci-ratchet3.log`) | 21:44 | 456s | exit 1 | All tests ran (no FAIL lines); unhandled `ENOENT coverage/.tmp/coverage-34.json` during v8 coverage collection — worker died before writing its tmp coverage file |
 | ratchet4 (`/tmp/realtime-test-ci-ratchet4.log`) | 22:01:23 | 144s | exit 1 | 2 tests failed in `integrationProperties.test.tsx`: one 30s timeout + one timing-sensitive property assertion (`expected undefined to be defined`, counterexample [3,18]) under contention |
 | ratchet5 (window poll) | 22:11–22:56 | 45min | no run | No 45-min window with 1-min load < 5 and 5-min load < 20; load oscillated 6–88, swap ~15GB of 16GB throughout |
+| ratchet6 (`/tmp/realtime-test-ci-ratchet6.log`) | 23:25:39 | ~5min | exit 1 | `Error: Worker exited unexpectedly` late in the suite (during Analytics ErrorScenarios stderr); window had load1 6.46 / load5 15.02 — proving the blocker is memory (swap), not CPU load |
 
 Environmental evidence that the suite and config are sound:
 
@@ -43,4 +45,4 @@ Coverage-table validation status: no post-change run has reached the coverage ta
 ## Remaining work
 
 - 4.1: one clean canonical-gate run (exit 0) on an uncontended machine; record exact numbers (test files, tests, coverage summary, threshold errors = none expected, exit code).
-- 4.3: commit frontend `vitest.config.ts` edit + final store artifacts after 4.1 verifies green.
+- 4.3: commit the frontend `vitest.config.ts` edit in `realtime` after 4.1 verifies green, then any residual store artifact updates (store apply-progress is already committed: `cc6d3142`, `f99a98a3`). Verify with clean trees in both repos.
