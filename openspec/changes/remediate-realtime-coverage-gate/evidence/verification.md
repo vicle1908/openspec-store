@@ -58,4 +58,10 @@ Coverage-table validation status: **validated by the final green run** — the f
 ## Strict validation (task 4.2) — PASSED
 
 Command: `openspec validate remediate-realtime-coverage-gate --strict --json --store openspec-store`
-Result: `{"id": "remediate-realtime-coverage-gate", "valid": true, "issues": []}`, summary `1/1 passed`, exit code `0` (re-run after every artifact/evidence update through apply; final confirmation below after commits).
+Result: `{"id": "remediate-realtime-coverage-gate", "valid": true, "issues": []}`, summary `1/1 passed`, exit code `0` — re-run after every artifact/evidence update through apply, and confirmed once more after the final commits (`d9215e79` in realtime, `b201a692` in the store): same result, exit `0`.
+
+## Final state (task 4.3) — COMMITTED
+
+- `realtime` @ `d9215e79` `test(frontend): set evidence-based coverage floors with monotonic ratchet` — one file (`frontend/vitest.config.ts`, +22/−11), stacks directly on `21c790e7`. Working tree clean except the pre-existing untracked `frontend/Makefile` (not part of this change).
+- `openspec-store` — change artifacts fully committed: `24252605` (planning), `cc6d3142` (evidence + decision), `f99a98a3` (enforceable-thresholds correction), `30e3131f` (enforcement proof + attempt record), `b201a692` (gate-green completion + 4.3 tick). Change dir clean.
+- Concurrent sessions' paths in both repos untouched throughout.
