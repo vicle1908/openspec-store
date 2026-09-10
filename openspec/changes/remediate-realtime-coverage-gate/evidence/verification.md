@@ -35,23 +35,23 @@ The gate now satisfies the spec's "Both tests and coverage pass" scenario: canon
 
 ### History: six earlier environmental failures (2026-09-09, preserved for the record)
 
-Six attempts on 2026-09-09, all failing environmentally under chronic memory contention (12 concurrent users, 5-day uptime, 15–17.5GB swap of 16–18GB used) — every failure a timeout/crash artifact, never a code or threshold failure:
+Six attempts on 2026-09-09, all failing under environmental contention (12 concurrent users, 5-day uptime, 15–17.5GB swap of 16–18GB used) — every failure a timeout, worker crash, or environment error, never a code or threshold failure:
 
 | Run | Start | Duration | Result | Failure mode |
 |---|---|---|---|---|
 | ratchet1 (`/tmp/realtime-test-ci-ratchet.log`) | 21:26:58 | 305s | exit 1 | 2 property tests timed out (10s) in `ColorUniqueness.property.test.tsx`; machine load 37–49 |
 | ratchet2 (`/tmp/realtime-test-ci-ratchet2.log`) | 21:37 | 106s | exit 1 | `Error: Worker exited unexpectedly` (Node worker crash; quiet dip, ~15GB swap in use) |
-| ratchet3 (`/tmp/realtime-test-ci-ratchet3.log`) | 21:44 | 456s | exit 1 | All tests ran (no FAIL lines); unhandled `ENOENT coverage/.tmp/coverage-34.json` during v8 coverage collection — worker died before writing its tmp coverage file |
+| ratchet3 (`/tmp/realtime-test-ci-ratchet3.log`) | 21:44 | 456s | exit 1 | All tests ran (no FAIL lines); ENOENT `coverage/.tmp/coverage-34.json` during v8 coverage summary readback — suspected OOM kill of worker, not confirmed (no coverage summary was emitted; test results are unverified) |
 | ratchet4 (`/tmp/realtime-test-ci-ratchet4.log`) | 22:01:23 | 144s | exit 1 | 2 tests failed in `integrationProperties.test.tsx`: one 30s timeout + one timing-sensitive property assertion (`expected undefined to be defined`, counterexample [3,18]) under contention |
 | ratchet5 (window poll) | 22:11–22:56 | 45min | no run | No 45-min window with 1-min load < 5 and 5-min load < 20; load oscillated 6–88, swap ~15GB of 16GB throughout |
-| ratchet6 (`/tmp/realtime-test-ci-ratchet6.log`) | 23:25:39 | ~5min | exit 1 | `Error: Worker exited unexpectedly` late in the suite (during Analytics ErrorScenarios stderr); window had load1 6.46 / load5 15.02 — proving the blocker is memory (swap), not CPU load |
+| ratchet6 (`/tmp/realtime-test-ci-ratchet6.log`) | 23:25:39 | ~5min | exit 1 | `Error: Worker exited unexpectedly` late in the suite (during Analytics ErrorScenarios stderr); window had load1 6.46 / load5 15.02 — consistent with memory (swap) contention but root cause not confirmed |
 
 Environmental evidence that the suite and config are sound:
 
 - Baseline final14 run (log `/tmp/realtime-test-ci-final14.log`, pre-change): 78 files / 580 tests passed, coverage table emitted, exit nonzero solely from the old aspirational thresholds.
 - `ColorUniqueness.property.test.tsx` re-run in isolation at 21:33 under the same memory pressure: **5/5 passed, exit 0** (3.46s test time).
 - `integrationProperties.test.tsx` re-run in isolation at 22:05 under the same memory pressure: **10/10 passed, exit 0** (4.78s test time).
-- The 2.2 config edit changes threshold numbers only; it cannot affect test execution. Every full-suite failure above is a timeout/crash artifact of memory contention (12 concurrent users, 5-day uptime, 15GB swap used), not a code regression.
+- The 2.2 config edit changes threshold numbers only; it cannot affect test execution. Every full-suite failure above occurred under heavy environmental contention (12 concurrent users, 5-day uptime, 15GB swap used), manifesting as timeouts, worker crashes, or environment errors — none are code regressions or threshold failures (the exact root causes were not individually confirmed).
 
 Coverage-table validation status: **validated by the final green run** — the floors (global 39/33/34/40, Analytics 21/25/16/22) derived from final14 measured values (39.95/34.09/34.90/41.32; 21.96/26.19/17.42/22.83) with a ~1% cushion all passed with zero threshold errors and exit 0 on 2026-09-10 (log `/tmp/realtime-test-ci-final-gate.log`).
 
