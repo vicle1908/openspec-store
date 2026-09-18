@@ -1,0 +1,14 @@
+@startuml
+!include <archimate/Archimate>
+' Phase H - Architecture Change Management viewpoint: change drivers, their assessments, and the requirements they motivate for architecture updates.
+
+title Phase H - Architecture Change Management
+
+Motivation_Driver(driver_regulation, "Driver - New Regulation")
+Motivation_Assessment(assessment_impact, "Assessment - Architecture Impact")
+Motivation_Requirement(requirement_compliance, "Requirement - Update Compliance Views")
+
+Rel_Association(assessment_impact, driver_regulation, "assesses")
+Rel_Influence(assessment_impact, requirement_compliance, "necessitates")
+Rel_Influence(driver_regulation, requirement_compliance, "motivates")
+@enduml

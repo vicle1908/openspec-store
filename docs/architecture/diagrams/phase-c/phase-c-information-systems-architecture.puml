@@ -1,0 +1,17 @@
+@startuml
+!include <archimate/Archimate>
+' Phase C - Information Systems Architecture viewpoint: application components and services supporting business processes, and data objects realizing business objects.
+
+title Phase C - Information Systems Architecture
+
+Business_Object(object_order, "Order Business Object")
+Business_Process(process_order, "Order Handling Process")
+Application_DataObject(dataobject_order, "Order Record Data Object")
+Application_Component(component_order, "Order Management Component")
+Application_Service(service_order_api, "Order API Application Service")
+
+Rel_Access(component_order, dataobject_order, "reads and writes")
+Rel_Realization(dataobject_order, object_order, "realizes")
+Rel_Realization(component_order, service_order_api, "realizes")
+Rel_Serving(service_order_api, process_order, "supports")
+@enduml

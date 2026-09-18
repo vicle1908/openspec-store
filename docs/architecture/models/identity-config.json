@@ -1,0 +1,38 @@
+{
+  "baseline": "ArchiMate 3.2 Open Exchange (3.x exchange schemas)",
+  "namespace": "archimate:3.2",
+  "canonical_identity": "{namespace}|{kind}|{type}|{name}",
+  "normalization": {
+    "unicode": "NFC",
+    "whitespace": "trim outer whitespace; preserve internal whitespace",
+    "case": "case-sensitive"
+  },
+  "hash": {
+    "algorithm": "SHA-256",
+    "encoding": "lowercase hexadecimal",
+    "characters": 16
+  },
+  "prefixes": {
+    "model": "model",
+    "element": "ea",
+    "relationship": "rel",
+    "view": "view",
+    "organization_item": "item",
+    "property_definition": "prop",
+    "diagram_node": "node",
+    "diagram_connection": "conn"
+  },
+  "format": "{prefix}-{sha256(canonical_identity)[0:16]}",
+  "name_sources": {
+    "model": "first name element text",
+    "element": "first name element text",
+    "relationship": "first name element text; when a mutation creates a relationship with no name, the name source is '{source identifier}->{target identifier}'",
+    "view": "first name element text",
+    "organization_item": "first label element text; type is folder",
+    "property_definition": "first name element text; type is the propertyDefinition type attribute",
+    "diagram_node": "{view identifier}:{elementRef}",
+    "diagram_connection": "{view identifier}:{relationshipRef}"
+  },
+  "ncname_pattern": "^[A-Za-z][A-Za-z0-9._-]{0,63}$",
+  "collision": "If distinct objects normalize to the same identity, append -2, -3, ... in stable document order; reapplication of the same identity reuses the original identifier. A mutation that would re-allocate the bare identifier to a different object is reported, not silently re-hashed."
+}

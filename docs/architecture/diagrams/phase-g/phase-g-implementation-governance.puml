@@ -1,0 +1,15 @@
+@startuml
+!include <archimate/Archimate>
+' Phase G - Implementation Governance viewpoint: governance actors and roles assigned to work packages, and the deliverables those work packages produce.
+
+title Phase G - Implementation Governance
+
+Business_Actor(actor_lead, "Chief Architect")
+Business_Role(role_board, "Architecture Board Member")
+Implementation_WorkPackage(package_crm, "Work Package - CRM Renewal")
+Implementation_Deliverable(deliverable_solution, "Deliverable - Solution Architecture")
+
+Rel_Assignment(actor_lead, role_board, "acts as")
+Rel_Assignment(role_board, package_crm, "governs")
+Rel_Association(package_crm, deliverable_solution, "produces")
+@enduml

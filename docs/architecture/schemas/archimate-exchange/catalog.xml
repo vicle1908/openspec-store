@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE catalog PUBLIC "-//OASIS//DTD XML Catalogs V1.0//EN" "http://www.oasis-open.org/committees/entity/bootstrap-1.0/catalog.dtd">
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+
+    <!-- Offline resolver for the W3C xml namespace import that archimate3_Model.xsd
+         declares as http://www.w3.org/2001/xml.xsd. Export XML_CATALOG_FILES to this
+         file before running xmllint so schema resolution never depends on w3.org. -->
+
+    <rewriteURI uriStartString="http://www.w3.org/2001/" rewritePrefix="./"/>
+    <system systemId="http://www.w3.org/2001/xml.xsd" uri="xml.xsd"/>
+
+</catalog>

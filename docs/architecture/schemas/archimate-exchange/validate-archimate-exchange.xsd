@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:annotation>
+        <xs:documentation>
+            Validation wrapper for ArchiMate Open Exchange fixtures.
+            xmllint --schema accepts a single schema, while the exchange
+            format chains archimate3_Diagram.xsd -> archimate3_View.xsd ->
+            archimate3_Model.xsd via xs:include/xs:redefine, and fixture
+            vendor extensions require their own namespace schema for
+            processContents="strict" wildcards. This wrapper imports the
+            exchange chain plus the pinned vendor extension schema so one
+            xmllint invocation validates everything.
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:import namespace="http://www.opengroup.org/xsd/archimate/3.0/"
+               schemaLocation="archimate3_Diagram.xsd" />
+
+    <xs:import namespace="https://phanmem.site/architecture/extension/1.0"
+               schemaLocation="vendor-extension-1.0.xsd" />
+
+</xs:schema>

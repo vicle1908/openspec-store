@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.opengroup.org/xsd/archimate/3.0/"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.opengroup.org/xsd/archimate/3.0/ http://www.opengroup.org/xsd/archimate/3.0/archimate3_Diagram.xsd"
+       identifier="model-4d83295d5a4b8e16"
+       version="3.2">
+  <name xml:lang="en">Dangling reference regression fixture</name>
+  <documentation xml:lang="en">Regression fixture: a Serving relationship whose target attribute references an identifier that no element or relationship declares. Must fail structural schema validation with rule STRUCTURAL_IDREF_UNRESOLVED on the offending relationship target attribute.</documentation>
+  <elements>
+    <element identifier="ea-b31c7f23b5ca624e" xsi:type="ApplicationService">
+      <name xml:lang="en">Register Claim</name>
+    </element>
+    <element identifier="ea-a87d473086132d9f" xsi:type="BusinessActor">
+      <name xml:lang="en">Claims Administrator</name>
+    </element>
+  </elements>
+  <relationships>
+    <relationship identifier="rel-43946800a5879cc4" xsi:type="Serving" source="ea-b31c7f23b5ca624e" target="ea-0000000000000000">
+      <name xml:lang="en">serves</name>
+      <documentation xml:lang="en">Target references the undeclared identifier ea-0000000000000000.</documentation>
+    </relationship>
+  </relationships>
+</model>

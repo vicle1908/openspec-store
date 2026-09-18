@@ -1,0 +1,87 @@
+{
+  "version": "1.0",
+  "description": "Fixture manifest for ArchiMate Open Exchange XML models: validation expectations, rule identifiers, and construct identifiers for CI and the scripts/archimate engine.",
+  "identity": "docs/architecture/models/identity-config.json",
+  "identity_documentation": "docs/architecture/models/identity-scheme.md",
+  "schema": {
+    "documentation": "docs/architecture/schemas/archimate-exchange/SCHEMAS.md",
+    "wrapper": "docs/architecture/schemas/archimate-exchange/validate-archimate-exchange.xsd",
+    "catalog": "docs/architecture/schemas/archimate-exchange/catalog.xml"
+  },
+  "tiers": {
+    "structural": "xmllint XML Schema validation (well-formedness, element/attribute structure, xs:ID/IDREF, key/keyref constraints) against the pinned exchange schema chain",
+    "semantic": "ArchiMate 3.2 metamodel validation of relationship endpoint legality and direction, implemented by scripts/archimate"
+  },
+  "fixtures": [
+    {
+      "file": "canonical.xml",
+      "purpose": "Canonical fixture covering all ArchiMate layers (Motivation, Strategy, Business, Application, Technology, Physical, Implementation & Migration), all eleven core relationship types, organization folders, property definitions, documentation, a view with nested nodes and bendpoints, and a pinned vendor extension.",
+      "expected": {
+        "structural": "pass",
+        "semantic": "pass"
+      }
+    },
+    {
+      "file": "regression/serving-reversed.xml",
+      "purpose": "Serving relationship with consumer (BusinessActor) as source and provider (ApplicationService) as target.",
+      "expected": {
+        "structural": "pass",
+        "semantic": "fail"
+      },
+      "failure": {
+        "tier": "semantic",
+        "rule": "SEMANTIC_SERVING_REVERSED",
+        "construct": "relationship[@identifier='rel-43946800a5879cc4']",
+        "endpoints": {
+          "source": "ea-a87d473086132d9f (BusinessActor, consumer)",
+          "target": "ea-b31c7f23b5ca624e (ApplicationService, provider)"
+        }
+      }
+    },
+    {
+      "file": "regression/forbidden-pairing.xml",
+      "purpose": "Composition relationship whose whole is an active structure element (BusinessActor) and whose part is a behavioral element (BusinessService).",
+      "expected": {
+        "structural": "pass",
+        "semantic": "fail"
+      },
+      "failure": {
+        "tier": "semantic",
+        "rule": "SEMANTIC_ILLEGAL_ENDPOINT_PAIR",
+        "construct": "relationship[@identifier='rel-f2dc9319460fc65d']",
+        "endpoints": {
+          "source": "ea-a87d473086132d9f (BusinessActor, active structure)",
+          "target": "ea-f87b7e85b5ded723 (BusinessService, behavior)"
+        }
+      }
+    },
+    {
+      "file": "regression/dangling-idref.xml",
+      "purpose": "Serving relationship whose target attribute references identifier ea-0000000000000000, declared by no element or relationship.",
+      "expected": {
+        "structural": "fail",
+        "semantic": "not-reachable"
+      },
+      "failure": {
+        "tier": "structural",
+        "rule": "STRUCTURAL_IDREF_UNRESOLVED",
+        "construct": "relationship[@identifier='rel-43946800a5879cc4']/@target",
+        "evidence": "xmllint reports no match for key-sequence ['ea-0000000000000000'] of keyref TargetRef"
+      }
+    },
+    {
+      "file": "regression/duplicate-identifier.xml",
+      "purpose": "Two elements share identifier ea-b31c7f23b5ca624e.",
+      "expected": {
+        "structural": "fail",
+        "semantic": "not-reachable"
+      },
+      "failure": {
+        "tier": "structural",
+        "rule": "STRUCTURAL_DUPLICATE_IDENTIFIER",
+        "construct": "elements/element[@identifier='ea-b31c7f23b5ca624e'] (second declaration)",
+        "evidence": "xmllint reports the identifier is not a valid xs:ID and ElementKey/ConceptKey identity constraints do not evaluate"
+      }
+    }
+  ]
+}

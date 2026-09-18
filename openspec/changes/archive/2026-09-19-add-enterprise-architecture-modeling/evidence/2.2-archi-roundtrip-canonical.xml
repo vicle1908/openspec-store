@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.opengroup.org/xsd/archimate/3.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengroup.org/xsd/archimate/3.0/ http://www.opengroup.org/xsd/archimate/3.1/archimate3_Diagram.xsd" identifier="model-537a01e81b1e0c67">
+  <name>Canonical EA exchange fixture</name>
+  <documentation>Repository-owned canonical fixture exercising every ArchiMate 3.2 layer, all eleven core relationship types, organization folders, a property definition, documentation, a diagram view with nested nodes and bendpoints, and a pinned vendor extension. Identifiers are deterministic per docs/architecture/models/identity-config.json.</documentation>
+  <properties>
+    <property propertyDefinitionRef="propid-1">
+      <value>Architecture Practice</value>
+    </property>
+  </properties>
+  <elements>
+    <element identifier="ea-f86d28d9bf0cf00b" xsi:type="Capability">
+      <name>Claims Management</name>
+      <documentation>Strategy layer capability.</documentation>
+    </element>
+    <element identifier="ea-a87d473086132d9f" xsi:type="BusinessActor">
+      <name>Claims Administrator</name>
+      <documentation>Business actor consuming application services.</documentation>
+    </element>
+    <element identifier="ea-b4840c4ea96cb744" xsi:type="BusinessProcess">
+      <name>Handle Claim</name>
+      <documentation>Core business process.</documentation>
+    </element>
+    <element identifier="ea-f87b7e85b5ded723" xsi:type="BusinessService">
+      <name>Claims Handling</name>
+      <documentation>Business service realized by application services.</documentation>
+    </element>
+    <element identifier="ea-673abf27f25922fc" xsi:type="BusinessService">
+      <name>Claims Assessment</name>
+      <documentation>More specific claims assessment service; specializes Claims Handling.</documentation>
+    </element>
+    <element identifier="ea-d01ae79cb61c7f9d" xsi:type="ApplicationComponent">
+      <name>Claims Registry</name>
+      <documentation>Application component maintaining claim records.</documentation>
+    </element>
+    <element identifier="ea-b31c7f23b5ca624e" xsi:type="ApplicationService">
+      <name>Register Claim</name>
+      <documentation>Application service provided to the business actor.</documentation>
+    </element>
+    <element identifier="ea-c8984ffbe72df888" xsi:type="DataObject">
+      <name>Claim Record</name>
+      <documentation>Persisted claim data object.</documentation>
+    </element>
+    <element identifier="ea-f157ed0b1cedc47d" xsi:type="Node">
+      <name>Compute Node</name>
+      <documentation>Technology node hosting the application.</documentation>
+    </element>
+    <element identifier="ea-68bbd23d23dabc06" xsi:type="SystemSoftware">
+      <name>Container Runtime</name>
+      <documentation>System software on the compute node.</documentation>
+    </element>
+    <element identifier="ea-7f8363a573eef481" xsi:type="Device">
+      <name>Edge Gateway</name>
+      <documentation>Physical device at the network edge.</documentation>
+    </element>
+    <element identifier="ea-ee54795dc80c91d9" xsi:type="Goal">
+      <name>Reduce Claim Processing Time</name>
+      <documentation>Motivation layer goal.</documentation>
+    </element>
+    <element identifier="ea-a5bdc1e38350fc88" xsi:type="WorkPackage">
+      <name>Claims Platform Migration</name>
+      <documentation>Implementation work package.</documentation>
+    </element>
+    <element identifier="ea-1ddb1566400dbab5" xsi:type="Plateau">
+      <name>Target Plateau 2027</name>
+      <documentation>Migration plateau.</documentation>
+    </element>
+  </elements>
+  <relationships>
+    <relationship identifier="rel-43946800a5879cc4" source="ea-b31c7f23b5ca624e" target="ea-a87d473086132d9f" xsi:type="Serving">
+      <name>serves</name>
+      <documentation>Legal Serving: the provider (ApplicationService) is the source and the consumer (BusinessActor) is the target.</documentation>
+    </relationship>
+    <relationship identifier="rel-f2dc9319460fc65d" source="ea-a87d473086132d9f" target="ea-d01ae79cb61c7f9d" xsi:type="Composition">
+      <name>contains</name>
+      <documentation>Legal Composition within the Business layer: the business process is the whole and the business service is the part.</documentation>
+    </relationship>
+    <relationship identifier="rel-f888199392033818" source="ea-d01ae79cb61c7f9d" target="ea-c8984ffbe72df888" xsi:type="Aggregation">
+      <name>aggregates</name>
+      <documentation>Legal Aggregation within the Application layer: the component is the whole and the data object is the part.</documentation>
+    </relationship>
+    <relationship identifier="rel-8d4e091540cf783e" source="ea-a87d473086132d9f" target="ea-b4840c4ea96cb744" xsi:type="Assignment">
+      <name>assigned to</name>
+      <documentation>Legal Assignment from active structure (BusinessActor) to behavior (BusinessProcess).</documentation>
+    </relationship>
+    <relationship identifier="rel-be7a0a2fd02c542c" source="ea-d01ae79cb61c7f9d" target="ea-b31c7f23b5ca624e" xsi:type="Realization">
+      <name>realizes</name>
+      <documentation>Legal Realization from application structure to application service.</documentation>
+    </relationship>
+    <relationship identifier="rel-625e5370ecf20143" source="ea-d01ae79cb61c7f9d" target="ea-c8984ffbe72df888" xsi:type="Access" accessType="Write">
+      <name>accesses</name>
+      <documentation>Legal Access between application structure and information structure.</documentation>
+    </relationship>
+    <relationship identifier="rel-43658fc67089dcc0" source="ea-f86d28d9bf0cf00b" target="ea-ee54795dc80c91d9" xsi:type="Influence">
+      <name>influences</name>
+      <documentation>Legal Influence from Strategy (Capability) to Motivation (Goal).</documentation>
+    </relationship>
+    <relationship identifier="rel-908b53e4eb9e0e27" source="ea-b4840c4ea96cb744" target="ea-b31c7f23b5ca624e" xsi:type="Triggering">
+      <name>triggers</name>
+      <documentation>Legal Triggering from business behavior to the application service it invokes.</documentation>
+    </relationship>
+    <relationship identifier="rel-6be9d10a60839553" source="ea-b31c7f23b5ca624e" target="ea-f87b7e85b5ded723" xsi:type="Flow">
+      <name>flows to</name>
+      <documentation>Legal Flow of value from application service to business service.</documentation>
+    </relationship>
+    <relationship identifier="rel-f44e5f406cca9c02" source="ea-673abf27f25922fc" target="ea-f87b7e85b5ded723" xsi:type="Specialization">
+      <name>specializes</name>
+      <documentation>Legal Specialization: the specific Claims Assessment service specializes the general Claims Handling service.</documentation>
+    </relationship>
+    <relationship identifier="rel-6daad277cb829e11" source="ea-7f8363a573eef481" target="ea-f157ed0b1cedc47d" xsi:type="Association">
+      <name>associated with</name>
+      <documentation>Legal Association across the Physical and Technology layers.</documentation>
+    </relationship>
+  </relationships>
+  <organizations>
+    <item>
+      <label>Strategy</label>
+      <item>
+        <label>Architecture</label>
+        <documentation>Root organization folder.</documentation>
+        <item>
+          <label>Strategy</label>
+          <item identifierRef="ea-f86d28d9bf0cf00b" />
+        </item>
+      </item>
+    </item>
+    <item>
+      <label>Business</label>
+      <item>
+        <label>Architecture</label>
+        <documentation>Root organization folder.</documentation>
+        <item>
+          <label>Business</label>
+          <item identifierRef="ea-a87d473086132d9f" />
+          <item identifierRef="ea-b4840c4ea96cb744" />
+          <item identifierRef="ea-f87b7e85b5ded723" />
+          <item identifierRef="ea-673abf27f25922fc" />
+        </item>
+      </item>
+    </item>
+    <item>
+      <label>Application</label>
+      <item>
+        <label>Architecture</label>
+        <documentation>Root organization folder.</documentation>
+        <item>
+          <label>Application</label>
+          <item identifierRef="ea-d01ae79cb61c7f9d" />
+          <item identifierRef="ea-b31c7f23b5ca624e" />
+          <item identifierRef="ea-c8984ffbe72df888" />
+        </item>
+      </item>
+    </item>
+    <item>
+      <label>Technology &amp; Physical</label>
+      <item>
+        <label>Architecture</label>
+        <documentation>Root organization folder.</documentation>
+        <item>
+          <label>Technology</label>
+          <item identifierRef="ea-f157ed0b1cedc47d" />
+          <item identifierRef="ea-68bbd23d23dabc06" />
+        </item>
+        <item>
+          <label>Physical</label>
+          <item identifierRef="ea-7f8363a573eef481" />
+        </item>
+      </item>
+    </item>
+    <item>
+      <label>Motivation</label>
+      <item>
+        <label>Architecture</label>
+        <documentation>Root organization folder.</documentation>
+        <item>
+          <label>Motivation</label>
+          <item identifierRef="ea-ee54795dc80c91d9" />
+        </item>
+      </item>
+    </item>
+    <item>
+      <label>Implementation &amp; Migration</label>
+      <item>
+        <label>Architecture</label>
+        <documentation>Root organization folder.</documentation>
+        <item>
+          <label>Implementation and Migration</label>
+          <item identifierRef="ea-a5bdc1e38350fc88" />
+          <item identifierRef="ea-1ddb1566400dbab5" />
+        </item>
+      </item>
+    </item>
+    <item>
+      <label>Relations</label>
+      <item identifierRef="rel-43946800a5879cc4" />
+      <item identifierRef="rel-f2dc9319460fc65d" />
+      <item identifierRef="rel-f888199392033818" />
+      <item identifierRef="rel-8d4e091540cf783e" />
+      <item identifierRef="rel-be7a0a2fd02c542c" />
+      <item identifierRef="rel-625e5370ecf20143" />
+      <item identifierRef="rel-43658fc67089dcc0" />
+      <item identifierRef="rel-908b53e4eb9e0e27" />
+      <item identifierRef="rel-6be9d10a60839553" />
+      <item identifierRef="rel-f44e5f406cca9c02" />
+      <item identifierRef="rel-6daad277cb829e11" />
+    </item>
+    <item>
+      <label>Views</label>
+      <item identifierRef="view-07de3e07c916f9f7" />
+    </item>
+  </organizations>
+  <propertyDefinitions>
+    <propertyDefinition identifier="propid-1" type="string">
+      <name>Owner</name>
+    </propertyDefinition>
+  </propertyDefinitions>
+  <views>
+    <diagrams>
+      <view identifier="view-07de3e07c916f9f7" xsi:type="Diagram" viewpoint="Layered">
+        <name>Enterprise layered view</name>
+        <documentation>Layered viewpoint fixture with nested nodes and a bendpoint connection.</documentation>
+        <node identifier="node-875d4810367d9a6a" elementRef="ea-a87d473086132d9f" xsi:type="Element" x="20" y="20" w="160" h="60">
+          <style>
+            <fillColor r="255" g="255" b="181" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="node-88bbfc78b8d44213" elementRef="ea-b31c7f23b5ca624e" xsi:type="Element" x="20" y="140" w="160" h="60">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="node-01b44b49fa9255f8" elementRef="ea-d01ae79cb61c7f9d" xsi:type="Element" x="20" y="260" w="160" h="80">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+          <node identifier="node-894fe6c1121321fc" elementRef="ea-c8984ffbe72df888" xsi:type="Element" x="0" y="0" w="120" h="40">
+            <style>
+              <fillColor r="181" g="255" b="255" a="100" />
+              <lineColor r="92" g="92" b="92" a="100" />
+              <font name="Lucida Grande" size="12">
+                <color r="0" g="0" b="0" />
+              </font>
+            </style>
+          </node>
+        </node>
+        <connection identifier="conn-64e8725f7084b0ca" relationshipRef="rel-f2dc9319460fc65d" xsi:type="Relationship" source="node-875d4810367d9a6a" target="node-01b44b49fa9255f8">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="conn-f62b1d47f1f704d2" relationshipRef="rel-43946800a5879cc4" xsi:type="Relationship" source="node-88bbfc78b8d44213" target="node-875d4810367d9a6a">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Lucida Grande" size="12">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+          <bendpoint x="150" y="155" />
+          <bendpoint x="200" y="170" />
+          <bendpoint x="200" y="80" />
+          <bendpoint x="150" y="80" />
+        </connection>
+      </view>
+    </diagrams>
+  </views>
+</model>

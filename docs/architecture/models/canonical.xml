@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.opengroup.org/xsd/archimate/3.0/"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:ext="https://phanmem.site/architecture/extension/1.0"
+       xsi:schemaLocation="http://www.opengroup.org/xsd/archimate/3.0/ http://www.opengroup.org/xsd/archimate/3.0/archimate3_Diagram.xsd"
+       identifier="model-537a01e81b1e0c67"
+       version="3.2">
+  <name xml:lang="en">Canonical EA exchange fixture</name>
+  <documentation xml:lang="en">Repository-owned canonical fixture exercising every ArchiMate 3.2 layer, all eleven core relationship types, organization folders, a property definition, documentation, a diagram view with nested nodes and bendpoints, and a pinned vendor extension. Identifiers are deterministic per docs/architecture/models/identity-config.json.</documentation>
+  <properties>
+    <property propertyDefinitionRef="prop-31ea8fb8745e4125">
+      <value>Architecture Practice</value>
+    </property>
+  </properties>
+  <elements>
+    <element identifier="ea-a87d473086132d9f" xsi:type="BusinessActor">
+      <name xml:lang="en">Claims Administrator</name>
+      <documentation xml:lang="en">Business actor consuming application services.</documentation>
+    </element>
+    <element identifier="ea-b4840c4ea96cb744" xsi:type="BusinessProcess">
+      <name xml:lang="en">Handle Claim</name>
+      <documentation xml:lang="en">Core business process.</documentation>
+    </element>
+    <element identifier="ea-f87b7e85b5ded723" xsi:type="BusinessService">
+      <name xml:lang="en">Claims Handling</name>
+      <documentation xml:lang="en">Business service realized by application services.</documentation>
+    </element>
+    <element identifier="ea-673abf27f25922fc" xsi:type="BusinessService">
+      <name xml:lang="en">Claims Assessment</name>
+      <documentation xml:lang="en">More specific claims assessment service; specializes Claims Handling.</documentation>
+    </element>
+    <element identifier="ea-d01ae79cb61c7f9d" xsi:type="ApplicationComponent">
+      <name xml:lang="en">Claims Registry</name>
+      <documentation xml:lang="en">Application component maintaining claim records.</documentation>
+      <ext:extension id="ext-element-claims-registry">
+        <ext:criticality>tier-1</ext:criticality>
+      </ext:extension>
+    </element>
+    <element identifier="ea-b31c7f23b5ca624e" xsi:type="ApplicationService">
+      <name xml:lang="en">Register Claim</name>
+      <documentation xml:lang="en">Application service provided to the business actor.</documentation>
+    </element>
+    <element identifier="ea-c8984ffbe72df888" xsi:type="DataObject">
+      <name xml:lang="en">Claim Record</name>
+      <documentation xml:lang="en">Persisted claim data object.</documentation>
+    </element>
+    <element identifier="ea-f157ed0b1cedc47d" xsi:type="Node">
+      <name xml:lang="en">Compute Node</name>
+      <documentation xml:lang="en">Technology node hosting the application.</documentation>
+    </element>
+    <element identifier="ea-68bbd23d23dabc06" xsi:type="SystemSoftware">
+      <name xml:lang="en">Container Runtime</name>
+      <documentation xml:lang="en">System software on the compute node.</documentation>
+    </element>
+    <element identifier="ea-7f8363a573eef481" xsi:type="Device">
+      <name xml:lang="en">Edge Gateway</name>
+      <documentation xml:lang="en">Physical device at the network edge.</documentation>
+    </element>
+    <element identifier="ea-a5bdc1e38350fc88" xsi:type="WorkPackage">
+      <name xml:lang="en">Claims Platform Migration</name>
+      <documentation xml:lang="en">Implementation work package.</documentation>
+    </element>
+    <element identifier="ea-1ddb1566400dbab5" xsi:type="Plateau">
+      <name xml:lang="en">Target Plateau 2027</name>
+      <documentation xml:lang="en">Migration plateau.</documentation>
+    </element>
+    <element identifier="ea-ee54795dc80c91d9" xsi:type="Goal">
+      <name xml:lang="en">Reduce Claim Processing Time</name>
+      <documentation xml:lang="en">Motivation layer goal.</documentation>
+    </element>
+    <element identifier="ea-f86d28d9bf0cf00b" xsi:type="Capability">
+      <name xml:lang="en">Claims Management</name>
+      <documentation xml:lang="en">Strategy layer capability.</documentation>
+    </element>
+  </elements>
+  <relationships>
+    <relationship identifier="rel-43946800a5879cc4" xsi:type="Serving" source="ea-b31c7f23b5ca624e" target="ea-a87d473086132d9f">
+      <name xml:lang="en">serves</name>
+      <documentation xml:lang="en">Legal Serving: the provider (ApplicationService) is the source and the consumer (BusinessActor) is the target.</documentation>
+    </relationship>
+    <relationship identifier="rel-f2dc9319460fc65d" xsi:type="Composition" source="ea-b4840c4ea96cb744" target="ea-f87b7e85b5ded723">
+      <name xml:lang="en">contains</name>
+      <documentation xml:lang="en">Legal Composition within the Business layer: the business process is the whole and the business service is the part.</documentation>
+    </relationship>
+    <relationship identifier="rel-f888199392033818" xsi:type="Aggregation" source="ea-d01ae79cb61c7f9d" target="ea-c8984ffbe72df888">
+      <name xml:lang="en">aggregates</name>
+      <documentation xml:lang="en">Legal Aggregation within the Application layer: the component is the whole and the data object is the part.</documentation>
+    </relationship>
+    <relationship identifier="rel-8d4e091540cf783e" xsi:type="Assignment" source="ea-a87d473086132d9f" target="ea-b4840c4ea96cb744">
+      <name xml:lang="en">assigned to</name>
+      <documentation xml:lang="en">Legal Assignment from active structure (BusinessActor) to behavior (BusinessProcess).</documentation>
+    </relationship>
+    <relationship identifier="rel-be7a0a2fd02c542c" xsi:type="Realization" source="ea-d01ae79cb61c7f9d" target="ea-b31c7f23b5ca624e">
+      <name xml:lang="en">realizes</name>
+      <documentation xml:lang="en">Legal Realization from application structure to application service.</documentation>
+    </relationship>
+    <relationship identifier="rel-625e5370ecf20143" xsi:type="Access" source="ea-d01ae79cb61c7f9d" target="ea-c8984ffbe72df888">
+      <name xml:lang="en">accesses</name>
+      <documentation xml:lang="en">Legal Access between application structure and information structure.</documentation>
+    </relationship>
+    <relationship identifier="rel-43658fc67089dcc0" xsi:type="Influence" source="ea-f86d28d9bf0cf00b" target="ea-ee54795dc80c91d9">
+      <name xml:lang="en">influences</name>
+      <documentation xml:lang="en">Legal Influence from Strategy (Capability) to Motivation (Goal).</documentation>
+    </relationship>
+    <relationship identifier="rel-908b53e4eb9e0e27" xsi:type="Triggering" source="ea-b4840c4ea96cb744" target="ea-b31c7f23b5ca624e">
+      <name xml:lang="en">triggers</name>
+      <documentation xml:lang="en">Legal Triggering from business behavior to the application service it invokes.</documentation>
+    </relationship>
+    <relationship identifier="rel-6be9d10a60839553" xsi:type="Flow" source="ea-b31c7f23b5ca624e" target="ea-f87b7e85b5ded723">
+      <name xml:lang="en">flows to</name>
+      <documentation xml:lang="en">Legal Flow of value from application service to business service.</documentation>
+    </relationship>
+    <relationship identifier="rel-f44e5f406cca9c02" xsi:type="Specialization" source="ea-673abf27f25922fc" target="ea-f87b7e85b5ded723">
+      <name xml:lang="en">specializes</name>
+      <documentation xml:lang="en">Legal Specialization: the specific Claims Assessment service specializes the general Claims Handling service.</documentation>
+    </relationship>
+    <relationship identifier="rel-6daad277cb829e11" xsi:type="Association" source="ea-7f8363a573eef481" target="ea-f157ed0b1cedc47d">
+      <name xml:lang="en">associated with</name>
+      <documentation xml:lang="en">Legal Association across the Physical and Technology layers.</documentation>
+    </relationship>
+  </relationships>
+  <organizations>
+    <item identifier="item-dec617fc458a3145">
+      <label xml:lang="en">Architecture</label>
+      <documentation xml:lang="en">Root organization folder.</documentation>
+      <item identifier="item-70b5dda79491a334">
+        <label xml:lang="en">Business</label>
+        <item identifierRef="ea-a87d473086132d9f"/>
+        <item identifierRef="ea-b4840c4ea96cb744"/>
+        <item identifierRef="ea-f87b7e85b5ded723"/>
+        <item identifierRef="ea-673abf27f25922fc"/>
+      </item>
+      <item identifier="item-2b1c46005c13f696">
+        <label xml:lang="en">Application</label>
+        <item identifierRef="ea-d01ae79cb61c7f9d"/>
+        <item identifierRef="ea-b31c7f23b5ca624e"/>
+        <item identifierRef="ea-c8984ffbe72df888"/>
+      </item>
+      <item identifier="item-0ae2a561f6321b11">
+        <label xml:lang="en">Technology</label>
+        <item identifierRef="ea-f157ed0b1cedc47d"/>
+        <item identifierRef="ea-68bbd23d23dabc06"/>
+      </item>
+      <item identifier="item-d0f8ca636352f9d4">
+        <label xml:lang="en">Physical</label>
+        <item identifierRef="ea-7f8363a573eef481"/>
+      </item>
+      <item identifier="item-d831cb65a7539cf6">
+        <label xml:lang="en">Implementation and Migration</label>
+        <item identifierRef="ea-a5bdc1e38350fc88"/>
+        <item identifierRef="ea-1ddb1566400dbab5"/>
+      </item>
+      <item identifier="item-230ec5f10c6271e9">
+        <label xml:lang="en">Motivation</label>
+        <item identifierRef="ea-ee54795dc80c91d9"/>
+      </item>
+      <item identifier="item-59adadac823f91e9">
+        <label xml:lang="en">Strategy</label>
+        <item identifierRef="ea-f86d28d9bf0cf00b"/>
+      </item>
+      <ext:extension id="ext-organization-root">
+        <ext:taxonomy>TOGAF ADM</ext:taxonomy>
+      </ext:extension>
+    </item>
+  </organizations>
+  <propertyDefinitions>
+    <propertyDefinition identifier="prop-31ea8fb8745e4125" type="string">
+      <name xml:lang="en">Owner</name>
+      <documentation xml:lang="en">Owning organizational unit for the concept.</documentation>
+    </propertyDefinition>
+  </propertyDefinitions>
+  <views>
+    <diagrams>
+      <view identifier="view-07de3e07c916f9f7" xsi:type="Diagram" viewpoint="Layered">
+        <name xml:lang="en">Enterprise layered view</name>
+        <documentation xml:lang="en">Layered viewpoint fixture with nested nodes and a bendpoint connection.</documentation>
+        <node identifier="node-875d4810367d9a6a" xsi:type="Element" elementRef="ea-a87d473086132d9f" x="20" y="20" w="160" h="60"/>
+        <node identifier="node-88bbfc78b8d44213" xsi:type="Element" elementRef="ea-b31c7f23b5ca624e" x="20" y="140" w="160" h="60"/>
+        <node identifier="node-01b44b49fa9255f8" xsi:type="Element" elementRef="ea-d01ae79cb61c7f9d" x="20" y="260" w="160" h="80">
+          <node identifier="node-894fe6c1121321fc" xsi:type="Element" elementRef="ea-c8984ffbe72df888" x="0" y="0" w="120" h="40"/>
+        </node>
+        <connection identifier="conn-f62b1d47f1f704d2" xsi:type="Relationship" relationshipRef="rel-43946800a5879cc4" source="node-88bbfc78b8d44213" target="node-875d4810367d9a6a">
+          <sourceAttachment x="100" y="140"/>
+          <bendpoint x="200" y="170"/>
+          <bendpoint x="200" y="80"/>
+          <targetAttachment x="100" y="80"/>
+        </connection>
+        <connection identifier="conn-64e8725f7084b0ca" xsi:type="Relationship" relationshipRef="rel-f2dc9319460fc65d" source="node-875d4810367d9a6a" target="node-01b44b49fa9255f8"/>
+      </view>
+    </diagrams>
+  </views>
+</model>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.opengroup.org/xsd/archimate/3.0/"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.opengroup.org/xsd/archimate/3.0/ http://www.opengroup.org/xsd/archimate/3.0/archimate3_Diagram.xsd"
+       identifier="model-55784b8e07561f69"
+       version="3.2">
+  <name xml:lang="en">Duplicate identifier regression fixture</name>
+  <documentation xml:lang="en">Regression fixture: two elements share the identifier ea-b31c7f23b5ca624e. Must fail structural schema validation with rule STRUCTURAL_DUPLICATE_IDENTIFIER identifying the duplicated identifier value.</documentation>
+  <elements>
+    <element identifier="ea-b31c7f23b5ca624e" xsi:type="ApplicationService">
+      <name xml:lang="en">Register Claim</name>
+    </element>
+    <element identifier="ea-b31c7f23b5ca624e" xsi:type="BusinessActor">
+      <name xml:lang="en">Claims Administrator</name>
+    </element>
+  </elements>
+  <relationships>
+    <relationship identifier="rel-43946800a5879cc4" xsi:type="Serving" source="ea-b31c7f23b5ca624e" target="ea-b31c7f23b5ca624e">
+      <name xml:lang="en">serves</name>
+      <documentation xml:lang="en">Both endpoints use the duplicated identifier.</documentation>
+    </relationship>
+  </relationships>
+</model>

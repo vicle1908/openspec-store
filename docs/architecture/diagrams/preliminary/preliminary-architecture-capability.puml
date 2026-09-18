@@ -1,0 +1,15 @@
+@startuml
+!include <archimate/Archimate>
+' Preliminary phase - Stakeholder and Motivation viewpoint: the principles, stakeholders, drivers, and architecture capability that set up the ADM framework.
+
+title Preliminary Phase - ADM Framework and Architecture Capability
+
+Motivation_Stakeholder(stakeholder_board, "Architecture Board")
+Motivation_Driver(driver_standardization, "Business demand for standardized architecture")
+Motivation_Principle(principle_enterprise, "Maximize benefit to the enterprise")
+Strategy_Capability(capability_architecture, "Architecture Capability")
+
+Rel_Association(stakeholder_board, driver_standardization, "recognizes")
+Rel_Influence(driver_standardization, principle_enterprise, "shapes")
+Rel_Influence(principle_enterprise, capability_architecture, "guides")
+@enduml

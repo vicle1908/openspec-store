@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="https://phanmem.site/architecture/extension/1.0"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="1.0">
+
+    <xs:annotation>
+        <xs:documentation>
+            Vendor extension schema for repository-owned ArchiMate Open Exchange
+            fixtures. The exchange format permits elements from other namespaces
+            wherever the schema declares xs:any namespace="##other"
+            processContents="strict" (see grp.any in archimate3_Model.xsd).
+            Strict processing requires a schema for every extension namespace,
+            so this pinned schema makes the vendor extension elements in the
+            canonical fixture schema-valid and offline-verifiable.
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:element name="extension">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="criticality" type="xs:token" />
+                <xs:element name="taxonomy" type="xs:token" />
+                <xs:element name="renderHint" type="xs:token" />
+            </xs:choice>
+            <xs:attribute name="id" type="xs:ID" />
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

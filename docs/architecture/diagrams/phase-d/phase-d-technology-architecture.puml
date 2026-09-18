@@ -1,0 +1,16 @@
+@startuml
+!include <archimate/Archimate>
+' Phase D - Technology Architecture viewpoint: nodes, the system software they host, the technology services they realize, and the networks connecting them.
+
+title Phase D - Technology Architecture
+
+Technology_CommunicationNetwork(network_enterprise, "Enterprise Network")
+Technology_Node(node_datacenter, "Data Center Node")
+Technology_SystemSoftware(software_os, "Server Operating System")
+Technology_Service(service_hosting, "Hosting Service")
+
+Rel_Association(network_enterprise, node_datacenter, "connects")
+Rel_Aggregation(node_datacenter, software_os, "hosts")
+Rel_Assignment(node_datacenter, service_hosting, "performs")
+Rel_Realization(software_os, service_hosting, "realizes")
+@enduml

@@ -1,0 +1,15 @@
+@startuml
+!include <archimate/Archimate>
+' Phase B - Business Architecture viewpoint: business actors and roles, the processes they perform, and the business services those processes realize.
+
+title Phase B - Business Architecture
+
+Business_Actor(actor_customer, "External Customer")
+Business_Role(role_fulfilment, "Order Fulfilment Role")
+Business_Process(process_order, "Order Fulfilment Process")
+Business_Service(service_order, "Order Service")
+
+Rel_Assignment(role_fulfilment, process_order, "performs")
+Rel_Realization(process_order, service_order, "realizes")
+Rel_Serving(service_order, actor_customer, "serves")
+@enduml

@@ -1,0 +1,16 @@
+@startuml
+!include <archimate/Archimate>
+' Phase F - Migration Planning viewpoint: baseline, transition, and target plateaus sequenced by migration flows, with gaps declared between the compared states.
+
+title Phase F - Migration Planning
+
+Implementation_Plateau(plateau_baseline, "Baseline Architecture")
+Implementation_Plateau(plateau_transition, "Transition Architecture T1")
+Implementation_Plateau(plateau_target, "Target Architecture")
+Implementation_Gap(gap_ordering, "Gap - Legacy Ordering Platform")
+
+Rel_Flow(plateau_baseline, plateau_transition, "migrate")
+Rel_Flow(plateau_transition, plateau_target, "migrate")
+Rel_Association(gap_ordering, plateau_baseline, "observed in")
+Rel_Association(gap_ordering, plateau_target, "closed by")
+@enduml

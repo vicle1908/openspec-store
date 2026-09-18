@@ -1,0 +1,17 @@
+@startuml
+!include <archimate/Archimate>
+' Phase A - Architecture Vision viewpoint: stakeholders, the value they seek, and the key goals that frame the architecture engagement.
+
+title Phase A - Architecture Vision
+
+Business_Actor(actor_customer, "External Customer")
+Motivation_Stakeholder(stakeholder_sponsor, "Executive Sponsor")
+Motivation_Driver(driver_digital, "Digital-first buying journey")
+Motivation_Goal(goal_market_share, "Grow market share")
+Motivation_Value(value_speed, "Faster time-to-service")
+
+Rel_Association(actor_customer, value_speed, "seeks")
+Rel_Association(stakeholder_sponsor, driver_digital, "owns")
+Rel_Influence(driver_digital, goal_market_share, "drives")
+Rel_Association(goal_market_share, value_speed, "yields")
+@enduml

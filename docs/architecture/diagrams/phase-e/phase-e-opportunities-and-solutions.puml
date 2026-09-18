@@ -1,0 +1,16 @@
+@startuml
+!include <archimate/Archimate>
+' Phase E - Opportunities and Solutions viewpoint: work packages grouped into a transition plateau and realizing the target capabilities as consolidated increments.
+
+title Phase E - Opportunities and Solutions
+
+Implementation_Plateau(plateau_transition, "Plateau - Transition Architecture T1")
+Implementation_WorkPackage(package_customer, "Work Package - Customer Platform")
+Implementation_WorkPackage(package_data, "Work Package - Data Foundation")
+Strategy_Capability(capability_insight, "Customer Insight Capability")
+
+Rel_Aggregation(plateau_transition, package_customer, "groups")
+Rel_Aggregation(plateau_transition, package_data, "groups")
+Rel_Realization(package_customer, capability_insight, "delivers")
+Rel_Realization(package_data, capability_insight, "enables")
+@enduml

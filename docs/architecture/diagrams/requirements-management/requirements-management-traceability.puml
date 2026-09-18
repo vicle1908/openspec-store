@@ -1,0 +1,15 @@
+@startuml
+!include <archimate/Archimate>
+' Requirements Management viewpoint: requirements traceability from goals through requirements to the application components that satisfy them, constrained by governance constraints.
+
+title Requirements Management - Requirements Traceability
+
+Motivation_Goal(goal_market_share, "Goal - Grow Market Share")
+Motivation_Requirement(requirement_api, "Requirement - Open Order API")
+Motivation_Constraint(constraint_privacy, "Constraint - Data Privacy Rules")
+Application_Component(component_gateway, "API Gateway Component")
+
+Rel_Realization(requirement_api, goal_market_share, "realizes")
+Rel_Realization(component_gateway, requirement_api, "satisfies")
+Rel_Association(constraint_privacy, requirement_api, "constrains")
+@enduml

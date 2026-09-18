@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.opengroup.org/xsd/archimate/3.0/"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.opengroup.org/xsd/archimate/3.0/ http://www.opengroup.org/xsd/archimate/3.0/archimate3_Diagram.xsd"
+       identifier="model-a26702605ce305c1"
+       version="3.2">
+  <name xml:lang="en">Forbidden endpoint pairing regression fixture</name>
+  <documentation xml:lang="en">Regression fixture: a Composition relationship whose whole is an active structure element (BusinessActor) and whose part is a behavioral element (BusinessService). Passes structural schema validation; must fail semantic validation with rule SEMANTIC_ILLEGAL_ENDPOINT_PAIR.</documentation>
+  <elements>
+    <element identifier="ea-a87d473086132d9f" xsi:type="BusinessActor">
+      <name xml:lang="en">Claims Administrator</name>
+    </element>
+    <element identifier="ea-f87b7e85b5ded723" xsi:type="BusinessService">
+      <name xml:lang="en">Claims Handling</name>
+    </element>
+  </elements>
+  <relationships>
+    <relationship identifier="rel-f2dc9319460fc65d" xsi:type="Composition" source="ea-a87d473086132d9f" target="ea-f87b7e85b5ded723">
+      <name xml:lang="en">contains</name>
+      <documentation xml:lang="en">Illegal pairing: active structure cannot be the whole of a behavioral part.</documentation>
+    </relationship>
+  </relationships>
+</model>

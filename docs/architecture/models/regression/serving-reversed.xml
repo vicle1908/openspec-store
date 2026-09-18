@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.opengroup.org/xsd/archimate/3.0/"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.opengroup.org/xsd/archimate/3.0/ http://www.opengroup.org/xsd/archimate/3.0/archimate3_Diagram.xsd"
+       identifier="model-3397cc705b828e93"
+       version="3.2">
+  <name xml:lang="en">Serving direction regression fixture</name>
+  <documentation xml:lang="en">Regression fixture: a Serving relationship whose source is the consumer (BusinessActor) and whose target is the provider (ApplicationService). Passes structural schema validation; must fail semantic validation with rule SEMANTIC_SERVING_REVERSED.</documentation>
+  <elements>
+    <element identifier="ea-a87d473086132d9f" xsi:type="BusinessActor">
+      <name xml:lang="en">Claims Administrator</name>
+    </element>
+    <element identifier="ea-b31c7f23b5ca624e" xsi:type="ApplicationService">
+      <name xml:lang="en">Register Claim</name>
+    </element>
+  </elements>
+  <relationships>
+    <relationship identifier="rel-43946800a5879cc4" xsi:type="Serving" source="ea-a87d473086132d9f" target="ea-b31c7f23b5ca624e">
+      <name xml:lang="en">serves</name>
+      <documentation xml:lang="en">Reversed endpoint direction: source is the consumer, target is the provider.</documentation>
+    </relationship>
+  </relationships>
+</model>
