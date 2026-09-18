@@ -52,7 +52,7 @@ The program SHALL provide three distinct, role-specialized tracks comprising 18 
 #### Scenario: Quality Assurance track execution
 - **GIVEN** an enrolled quality assurance engineer who has completed Tier 0
 - **WHEN** proceeding through the Quality Assurance track (Modules Q01 through Q06)
-- **THEN** the curriculum SHALL train and evaluate the engineer on AI-augmented combinatorial test matrix design (Q01), automated Playwright/Pytest test generation (Q02), context-aware test gap analysis against AST call graphs (Q03), testing and evaluating LLM applications with DeepEval/RAGAS (Q04), autonomous self-healing test suites, autonomous browser agent engineering, and cross-platform device control inspection (Q05), and adversarial red teaming and prompt injection defense (Q06).
+- **THEN** the curriculum SHALL train and evaluate the engineer on AI-augmented combinatorial test matrix design (Q01), automated Playwright/Pytest test generation and formative mobile accessibility inspection (Q02), context-aware test gap analysis against AST call graphs (Q03), testing and evaluating LLM applications with DeepEval/RAGAS (Q04), autonomous self-healing test suites and one assessed browser exploration with external containment preflight, indirect-injection defense, structured trace, and independent final-state assertion (Q05), and adversarial red teaming and prompt injection defense (Q06).
 
 
 ### Requirement: Autonomous Agent Runtime Engineering Section
@@ -76,15 +76,18 @@ The curriculum SHALL provide a dedicated harness engineering section within adva
 - **GIVEN** a learner wrapping an agent in the `agent-core` sandbox for Module D06
 - **WHEN** the harness loads one on-demand `SKILL.md`, applies a pre-tool deny policy, records a post-tool audit, runs an isolated fixture/worktree, and evaluates a stop gate
 - **THEN** pytest, ruff, and OpenSpec verification SHALL each exit `0`
+- **AND** the canonical positive verifier SHALL be run from the materials repository as `cd ~/Developer/ai-training-materials && python labs/dev/D06/verify_harness.py`
 - **AND** the harness SHALL emit structured evidence and telemetry without committing outside the isolated scope.
 
 #### Scenario: Harness gate failure prevents commit
 - **GIVEN** an intentional fixture failure or unauthorized tool request during Module D06 harness evaluation
 - **WHEN** the stop gate evaluates the run
-- **THEN** the harness SHALL deny the unsafe tool or stop before commit, record the failed gate and reason, and return a non-zero verification result.
+- **THEN** the harness SHALL deny the unsafe tool or stop before commit, record the failed gate and reason, and return a non-zero verification result
+- **AND** the canonical negative verifier SHALL be run from the materials repository as `cd ~/Developer/ai-training-materials && python labs/dev/D06/verify_harness_failure.py`, exit non-zero, and leave no commit.
+
 
 ### Requirement: Autonomous Browser & Device Control
-The curriculum SHALL embed autonomous browser and device control engineering across seven existing modules (C04, D02, D06, B02, B06, Q02, and Q05), teaching three UI perception modalities (DOM/accessibility-driven, screenshot-driven, and hybrid), browser agent frameworks (Browser Use and Playwright MCP), and cross-platform device control (agent-device CLI/MCP/API for mobile, desktop, and web), without creating standalone modules beyond the 24-session baseline. These embedded exercises SHALL preserve the existing assessment model of eight assessed modules per role at five points each, totaling 40 lab points.
+The curriculum SHALL embed autonomous browser and device-control engineering across seven existing modules (C04, D02, D06, B02, B06, Q02, and Q05), teaching DOM/accessibility-driven, screenshot-driven, and hybrid UI perception as lecture/demo comparisons, browser agent frameworks (Browser Use and Playwright MCP), and cross-platform device-control concepts (agent-device CLI/MCP/API) without creating standalone modules beyond the 24-session baseline. Mobile execution SHALL remain formative in Q02; Q05 SHALL assess one browser exploration path with external preflight, injection defense, trace evidence, and an independent final-state assertion. These embedded exercises SHALL preserve the existing assessment model of eight assessed modules per role at five points each, totaling 40 lab points.
 
 #### Scenario: Browser agent completion
 - **GIVEN** a learner with Browser Use or Playwright MCP configured in an approved disposable lab environment
@@ -92,26 +95,41 @@ The curriculum SHALL embed autonomous browser and device control engineering acr
 - **THEN** the agent SHALL complete the task and produce structured evidence of the actions and verified final state
 - **AND** the learner MUST demonstrate that a redirect to a forbidden network destination is blocked at the enforced egress boundary; browser-origin allow-lists SHALL NOT count as a security boundary.
 
-#### Scenario: Cross-platform device inspection
-- **GIVEN** a learner with the agent-device CLI installed and a resettable synthetic app fixture on an iOS simulator or Android emulator
-- **WHEN** the learner opens the app, takes an accessibility snapshot, presses a grounded ref, and captures a screenshot as evidence
-- **THEN** the session SHALL produce a deterministic before/after state-diff trace for the fixture and the screenshot evidence artifact
-- **AND** the learner MUST verify the expected state transition independently of the agent's action choice; deterministic evidence SHALL NOT imply deterministic model decisions.
+#### Scenario: Formative mobile device inspection
+- **GIVEN** a learner in formative Q02 with agent-device and a resettable synthetic app fixture
+- **WHEN** the learner captures an accessibility snapshot, presses a grounded ref, captures a fresh snapshot and screenshot, resets state, and compares the before/after diff
+- **THEN** the learner SHALL produce deterministic fixture-state evidence; mobile execution SHALL carry no Q05 assessment points, and agent action selection SHALL NOT be treated as deterministic.
+#### Scenario: Q05 assessed browser exploration
+- **GIVEN** a learner with Browser Use or Playwright MCP in an approved disposable environment and a passing external containment preflight
+- **WHEN** the learner explores the local fixture, encounters hidden prompt injection, records the denied action and structured trace, and checks the result independently
+- **THEN** the learner SHALL provide an independent final-state assertion with unchanged protected state; mobile execution and modality comparisons SHALL remain formative or optional and unassessed in Q05.
 
 ### Requirement: Device Control Safety & Sandboxing
-The curriculum SHALL teach device-control safety as a cross-cutting concern with three explicitly separate boundaries: execution isolation, data exposure to the model, and authorization to act. Execution isolation SHALL use one disposable environment per learner with synthetic data, resettable application state, and enforced filesystem/egress restrictions at the OS/network boundary; production profiles, production credentials, and existing user browser sessions MUST NOT be attached. Data exposure controls SHALL include screenshot suppression and sensitive-data placeholders, without treating placeholders as screenshot redaction. Consequential action gates SHALL require user confirmation for submit/delete/purchase actions, independently of environment isolation. The curriculum SHALL teach visual indirect prompt injection defense.
+The curriculum SHALL teach device-control safety as a cross-cutting concern with three explicitly separate boundaries: execution isolation, data exposure to the model, and authorization to act. Execution isolation SHALL use one disposable environment per learner with synthetic data, resettable application state, and enforced filesystem/egress restrictions at the OS/network boundary; production profiles, production credentials, and existing user browser sessions MUST NOT be attached. Data exposure controls SHALL include screenshot suppression and sensitive-data placeholders, without treating placeholders as screenshot redaction; local/profile isolation alone MUST NOT be treated as preventing screenshots from reaching a hosted model. Consequential action gates SHALL require user confirmation for submit/delete/purchase actions, independently of environment isolation.
 
 #### Scenario: Sandbox containment proof
 - **GIVEN** a learner configuring a browser/device agent lab in a disposable environment with enforced filesystem/egress restrictions
-- **WHEN** the containment preflight tests a forbidden network destination, forbidden file write, wrong-profile attachment, and denied action approval using synthetic targets
+- **WHEN** an external deterministic containment preflight tests a forbidden network destination, forbidden file write, wrong-profile attachment, and denied action approval using synthetic targets
 - **THEN** all four prohibited operations MUST be blocked and their denials recorded before agent tools are enabled and the exercise starts
-- **AND** a failed or missing containment check SHALL prevent the exercise from starting; denial of action approval MUST prevent the consequential action even when execution isolation and data exposure checks pass.
+- **AND** a failed or missing containment check SHALL prevent tool mounting and the exercise from starting; learners SHALL NOT self-certify containment.
 
 #### Scenario: Visual indirect injection defense
-- **GIVEN** a learner with an active browser agent in the approved disposable environment
-- **WHEN** the agent encounters a webpage containing hidden prompt injection in invisible CSS text or an image payload
-- **THEN** the agent MUST treat the embedded instruction as untrusted data and MUST NOT execute the requested action
-- **AND** the learner SHALL record the blocked action and verified unchanged protected state as evidence.
+-**GIVEN** a learner with an active browser agent in the approved disposable environment
+-**WHEN** the agent encounters a webpage containing hidden prompt injection in invisible CSS text or an image payload
+-**THEN** the agent MUST treat the embedded instruction as untrusted data and MUST NOT execute the requested action
+-**AND** the learner SHALL record the blocked action and verified unchanged protected state as evidence.
+ 
+#### Scenario: Model-data and authorization safety evidence
+ - **GIVEN** a safety fixture containing synthetic sensitive-looking values and a pending consequential transaction
+ - **WHEN** the learner runs the designated safety verifier, changes the transaction recipient or value, and exercises screenshot suppression and placeholder handling
+ - **THEN** the verifier SHALL prove that suppressed screenshots are not exposed, placeholders are not claimed to redact screenshots, no sensitive values appear in model or log evidence, and reapproval is required after the recipient or value changes
+ - **AND** the learner SHALL retain only non-sensitive pass/fail evidence and the changed-transaction approval record.
+
+
+
+
+
+
 
 ---
 
@@ -126,21 +144,20 @@ The curriculum SHALL culminate in Tier 4 collaborative Capstone Triads comprisin
 - **AND** the Developers SHALL implement the feature within isolated worktrees achieving passing compilation and $\ge 80\%$ test coverage
 - **AND** the QA Engineer SHALL generate and execute automated boundary verification suites that pass cleanly in CI.
 
-#### Scenario: Capstone X02 chaos incident and root cause analysis
-- **GIVEN** an active production-like environment with an injected multi-service fault (schema drift, network partition, or prompt injection exploit)
+#### Scenario: Capstone X02 currency-precision incident
+- **GIVEN** an active production-like `go-microservices` environment with an injected currency-ledger precision fault caused by floating-point arithmetic
 - **WHEN** executing Session X02 incident response
 - **THEN** the Triad SHALL collaboratively diagnose the incident using workspace telemetry and knowledge graphs
-- **AND** the Triad SHALL deliver an automated regression test, a permanent code/configuration remedy, and a formal postmortem within the session timebox.
+- **AND** the Triad SHALL deliver a regression test, permanent precision remedy, and formal postmortem, with `make verify-pr && test -f POSTMORTEM.md` as acceptance evidence.
 
 ---
 
 ### Requirement: Deterministic Lab Sandbox Verification
 All practical lab assignments across Tiers 0 through 4 SHALL evaluate learner competency solely through deterministic, automated verification commands that must exit with return code `0`.
 
-#### Scenario: Successful lab verification
 - **GIVEN** a learner completing a practical hands-on sandbox lab
 - **WHEN** executing the designated verification command (`make verify-pr`, `uv run pytest`, `vitest run`, or `openspec validate`)
-- **THEN** the command SHALL exit with code `0`
+- **THEN** the command SHALL exit with code `0` for the designated fixture gate, which SHALL NOT be presented as proof of general LLM/agent quality or safety
 - **AND** the verification harness SHALL record cryptographically verified test telemetry in the session artifact store.
 
 #### Scenario: Unverified or subjective lab claims
@@ -176,23 +193,47 @@ The enterprise rollout SHALL operate on a Weekend-First schedule utilizing a ded
 #### Scenario: Saturday intensive cohort scheduling
 - **GIVEN** enrolled learners assigned to weekend cohorts
 - **WHEN** attending Saturday intensive training
-- **THEN** Cohort A SHALL attend morning sessions from 08:30 to 12:30 comprising two 120-minute modules with a 15-minute break
-- **AND** Cohort B SHALL attend afternoon sessions from 13:30 to 17:30 comprising two 120-minute modules with a 15-minute break.
+- **THEN** Cohort A SHALL attend morning sessions from 08:30 to 12:45 and Cohort B SHALL attend afternoon sessions from 13:45 to 18:00, each comprising two 120-minute modules with a 15-minute break (255 minutes total)
+- **AND** the one-hour interval from 12:45 to 13:45 SHALL be reserved for turnover and lunch.
 
 #### Scenario: Sunday capstone and office hours execution
 - **GIVEN** learners completing Saturday modular training
 - **WHEN** attending Sunday sessions
 - **THEN** the facility SHALL host Open Lab and Facilitator Office Hours from 09:00 to 12:00 for 1-on-1 remediation and technical deep-dives
-- **AND** the facility SHALL host Synchronized Triad Capstone Sprints from 13:30 to 17:30 for Sessions X01 and X02.
+- **AND** the facility SHALL host X01 and X02 sequentially from 13:30 to 17:30, each receiving 120 minutes.
 
-#### Scenario: Dedicated lab hardware and edge infrastructure
 - **GIVEN** the physical training lab room hosting 28 concurrent learners
 - **WHEN** learners execute concurrent multi-agent simulations and model pulls
 - **THEN** the front stage SHALL provide dual 85" 4K displays (Display 1 for Dark-Stage slides; Display 2 for live terminal orchestration telemetry)
 - **AND** student stations SHALL provide dual 27" 4K monitors, mechanical low-noise keyboards, and dedicated Cat 6A Gigabit Ethernet drops
-- **AND** all AI traffic SHALL route through an isolated 10GbE local subnet backed by an on-premise Ollama embedding node (`ofable-5`) and local OmniRoute proxy gateway (`localhost:20128/v1`).
+- **AND** all learner AI traffic SHALL route exclusively through the Local Zero-Egress Facility Profile: an isolated 10GbE local subnet backed by an on-premise Ollama embedding node (`ofable-5`) and local OmniRoute proxy gateway (`localhost:20128/v1`)
+- **AND** the facility profile MUST pass a zero-egress gate (`scripts/verify-zero-egress-resolution.sh`) before any live cohort session begins.
 
 ---
+### Requirement: Infrastructure Profile Governance
+The program SHALL maintain two explicitly separated infrastructure profiles with hard security boundaries: a Local Zero-Egress Facility Profile canonical for all live cohort runtime, and an Approved Cloud-Backed Preparation Profile restricted exclusively to deterministic artifact generation and mirror pre-seeding. These profiles MUST NOT share network paths, credentials, learner workstations, or lab devcontainers during live cohort operations.
+
+#### Scenario: Local facility profile zero-egress gate
+- **GIVEN** a facilitator preparing for a live cohort session
+- **WHEN** running the zero-egress preflight gate before cohort delivery begins
+- **THEN** the gate script (`scripts/verify-zero-egress-resolution.sh`) MUST verify that no non-loopback egress route exists on the learner subnet
+- **AND** the gate MUST verify that all AI traffic routes exclusively to on-premise Ollama (`ofable-5`) and local OmniRoute (`localhost:20128/v1`)
+- **AND** a failed or missing zero-egress gate SHALL prevent the live cohort session from starting.
+
+#### Scenario: Cloud prep profile isolation
+- **GIVEN** a curriculum maintainer using the Approved Cloud-Backed Preparation Profile for deterministic artifact generation or mirror pre-seeding
+- **WHEN** executing cloud-backed operations (slide compilation, seed-manifest resolution, mirror warm-up)
+- **THEN** the cloud profile MUST NOT be accessible from any learner workstation or lab devcontainer during live cohorts
+- **AND** the cloud profile MUST NOT be referenced in any lab exercise, verification gate, or student-facing script
+- **AND** all cloud-backed artifact outputs MUST pass integrity verification (hash and manifest check) before import into the local facility profile
+- **AND** cloud profile usage MUST be logged, time-bounded, and approved per session by the Lead Enterprise Architect.
+
+#### Scenario: Dual-profile security constraint enforcement
+- **GIVEN** a pre-cohort infrastructure readiness check
+- **WHEN** verifying dual-profile isolation before any live cohort session
+- **THEN** an automated isolation verification gate (`scripts/verify-cloud-profile-isolation.sh`) MUST confirm the cloud prep profile is unreachable from learner subnets
+- **AND** a failed isolation check SHALL fail-closed: the live cohort session MUST NOT begin
+- **AND** the isolation gate evidence MUST be recorded in the cohort readiness log.
 
 ### Requirement: 100-Point Competency Evaluation & CEIP Certification
 Learner graduation and enterprise certification SHALL be governed by an objective 100-point competency rubric evaluating lab verification across exactly eight assessed practical modules per learner (Common Core C01 through C04, the learner's assigned track-specific advanced modules—Developer D05 and D06, Business Analyst B05 and B06, or Quality Assurance Q05 and Q06—and shared Capstones X01 and X02, awarding 5 points each for 40 points total), capstone triad delivery (40 points), and security hygiene (20 points); foundational role-track modules (D01 through D04, B01 through B04, and Q01 through Q04) and non-enrolled tracks SHALL serve as required formative exercises without point deductions, and learners SHALL NOT be required to attend or pass modules outside their assigned role track.
