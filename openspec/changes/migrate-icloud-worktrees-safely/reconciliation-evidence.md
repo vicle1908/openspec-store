@@ -1,7 +1,8 @@
 # Hydrated-only reconciliation evidence
 
-- **Source root:** `/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/WHO-project` (historical local symlink/alias target: `/Users/androidteam/Developer/WHO-project-worktrees/`)
-- **Destination root:** `/Users/androidteam/Developer/vds-content-migration/WHO-project/`
+- **Source root:** `/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/WHO-project`
+- **Historical pilot destination note:** `/Users/androidteam/Developer/WHO-project-worktrees/` was the historical bounded-copy pilot destination referenced in Task 2.4 and `design.md` (holding 7 pilot files); it is currently absent from disk in `~/Developer`, so Task 2.4's retained pilot destination audit has no live filesystem path at present.
+- **Current destination root:** `/Users/androidteam/Developer/vds-content-migration/WHO-project/`
 - **Manifest:** `/Users/androidteam/Developer/vds-content-migration/migration-manifest.json`
 - **Observed result:** 16,114 manifest entries; approximately 3.1 GB at the destination; six files in the sensitive quarantine (aggregate only; no names or contents recorded).
 - **Provenance:** This records a deliberate, already-executed hydrated-only reconciliation run for operational evidence. It was outside the explicit seven-file non-sensitive allowlist and outside the restricted-copy contract; it is not a general recovery snapshot and must not be generalized as one.
