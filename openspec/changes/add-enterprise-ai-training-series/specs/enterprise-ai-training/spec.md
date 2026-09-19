@@ -188,20 +188,19 @@ All instructional slide decks, keynote presentations, and stage visual aids SHAL
 ---
 
 ### Requirement: Weekend-First Cohort Schedule & Facility Presentation Reference
-The enterprise rollout SHALL operate on a Weekend-First schedule to eliminate weekday sprint friction and prevent network saturation. The curriculum presentation materials SHALL illustrate a reference facility architecture (front stage displays, student pods, isolated edge compute topology) for lecture and demonstration purposes, but physical hardware installation SHALL NOT be required as a software deployment deliverable of the training materials repository.
+The curriculum specification and presentation materials SHALL define a Weekend-First schedule to eliminate weekday sprint friction and prevent network saturation. The curriculum presentation materials SHALL illustrate a reference facility architecture (front stage displays, student pods, isolated edge compute topology) for lecture and demonstration purposes, but physical hardware installation SHALL NOT be required as a software deployment deliverable of the training materials repository.
 
-#### Scenario: Saturday intensive cohort scheduling
-- **GIVEN** enrolled learners assigned to weekend cohorts
-- **WHEN** attending Saturday intensive training
-- **THEN** Cohort A SHALL attend morning sessions from 08:30 to 12:45 and Cohort B SHALL attend afternoon sessions from 13:45 to 18:00, each comprising two 120-minute modules with a 15-minute break (255 minutes total)
+#### Scenario: Saturday intensive cohort schedule definition
+- **GIVEN** curriculum presentation decks and syllabus materials
+- **WHEN** rendered or distributed to facilitators
+- **THEN** they SHALL define Cohort A morning sessions from 08:30 to 12:45 and Cohort B afternoon sessions from 13:45 to 18:00, each comprising two 120-minute modules with a 15-minute break (255 minutes total)
 - **AND** the one-hour interval from 12:45 to 13:45 SHALL be reserved for turnover and lunch.
 
-#### Scenario: Sunday capstone and office hours execution
-- **GIVEN** learners completing Saturday modular training
-- **WHEN** attending Sunday sessions
-- **THEN** the facility SHALL host Open Lab and Facilitator Office Hours from 09:00 to 12:00 for 1-on-1 remediation and technical deep-dives
-- **AND** the facility SHALL host X01 and X02 sequentially from 13:30 to 17:30, each receiving 120 minutes.
-
+#### Scenario: Sunday capstone and office hours schedule definition
+- **GIVEN** curriculum presentation decks and facilitator runbooks
+- **WHEN** specifying Sunday session operations
+- **THEN** they SHALL define Open Lab and Facilitator Office Hours from 09:00 to 12:00 for 1-on-1 remediation and technical deep-dives
+- **AND** they SHALL specify Sessions X01 and X02 sequentially from 13:30 to 17:30, each receiving 120 minutes.
 #### Scenario: Lab facility presentation reference architecture
 - **GIVEN** lecture and presentation materials covering facility infrastructure
 - **WHEN** slide decks and facilitator guides are rendered
@@ -212,12 +211,11 @@ The enterprise rollout SHALL operate on a Weekend-First schedule to eliminate we
 The program SHALL maintain two explicitly separated infrastructure profiles with hard security boundaries: a Local Zero-Egress Facility Profile canonical for all live cohort runtime, and an Approved Cloud-Backed Preparation Profile restricted exclusively to deterministic artifact generation and mirror pre-seeding. These profiles MUST NOT share network paths, credentials, learner workstations, or lab devcontainers during live cohort operations.
 
 #### Scenario: Local facility profile zero-egress gate
-- **GIVEN** a facilitator preparing for a live cohort session
-- **WHEN** running the zero-egress preflight gate before cohort delivery begins
-- **THEN** the gate script (`scripts/verify-zero-egress-resolution.sh`) MUST verify that no non-loopback egress route exists on the learner subnet
+- **GIVEN** the repository-delivered zero-egress verifier script (`scripts/verify-zero-egress-resolution.sh`)
+- **WHEN** running the zero-egress preflight gate check
+- **THEN** the gate script MUST verify that no non-loopback egress route exists on the runner environment
 - **AND** the gate MUST verify that all AI traffic routes exclusively to on-premise Ollama (`ofable-5`) and local OmniRoute (`localhost:20128/v1`)
-- **AND** a failed or missing zero-egress gate SHALL prevent the live cohort session from starting.
-
+- **AND** a failed or missing zero-egress gate SHALL fail closed.
 #### Scenario: Cloud prep profile isolation
 - **GIVEN** a curriculum maintainer using the Approved Cloud-Backed Preparation Profile for deterministic artifact generation or mirror pre-seeding
 - **WHEN** executing cloud-backed operations (slide compilation, seed-manifest resolution, mirror warm-up)
@@ -234,25 +232,24 @@ The program SHALL maintain two explicitly separated infrastructure profiles with
 - **AND** the isolation gate evidence MUST be recorded in the cohort readiness log.
 
 ### Requirement: 100-Point Competency Evaluation & CEIP Certification
-Learner graduation and enterprise certification SHALL be governed by an objective 100-point competency rubric evaluating lab verification across exactly eight assessed practical modules per learner (Common Core C01 through C04, the learner's assigned track-specific advanced modules—Developer D05 and D06, Business Analyst B05 and B06, or Quality Assurance Q05 and Q06—and shared Capstones X01 and X02, awarding 5 points each for 40 points total), capstone triad delivery (40 points), and security hygiene (20 points); foundational role-track modules (D01 through D04, B01 through B04, and Q01 through Q04) and non-enrolled tracks SHALL serve as required formative exercises without point deductions, and learners SHALL NOT be required to attend or pass modules outside their assigned role track.
+The curriculum specification and facilitator runbooks SHALL define an objective 100-point competency rubric evaluating lab verification across exactly eight assessed practical modules per learner (Common Core C01 through C04, the learner's assigned track-specific advanced modules—Developer D05 and D06, Business Analyst B05 and B06, or Quality Assurance Q05 and Q06—and shared Capstones X01 and X02, awarding 5 points each for 40 points total), capstone triad delivery (40 points), and security hygiene (20 points); foundational role-track modules (D01 through D04, B01 through B04, and Q01 through Q04) and non-enrolled tracks SHALL serve as required formative exercises without point deductions, and learners SHALL NOT be required to attend or pass modules outside their assigned track.
 
-#### Scenario: CEIP certification award
-- **GIVEN** an enrolled learner in any track (Developer, Business Analyst, or Quality Assurance) who has attended 100% of required Tier 0, assigned role-track, and Capstone sessions
-- **WHEN** their cumulative evaluation score reaches or exceeds 80 points out of 100 across their eight role-specific assessed practical modules (C01–C04, their track's 05–06 pair, and X01–X02), capstone triad delivery, and security hygiene
-- **THEN** the program SHALL award the Certified Enterprise AI Practitioner (CEIP) credential
+#### Scenario: CEIP certification award criteria
+- **GIVEN** the assessment documentation and master syllabus in `ai-training-materials`
+- **WHEN** defining credential award criteria
+- **THEN** the rubric SHALL specify that when a learner's cumulative score reaches or exceeds 80 points out of 100 across their eight role-specific assessed practical modules (C01–C04, their track's 05–06 pair, and X01–X02), capstone triad delivery, and security hygiene, the program awards the Certified Enterprise AI Practitioner (CEIP) credential
 - **AND** the learner SHALL be certified to use autonomous coding agent harnesses in production repositories.
-
 #### Scenario: Role-track scoring equity across disciplines
 - **GIVEN** three enrolled learners from the Developer, Business Analyst, and Quality Assurance tracks respectively
 - **WHEN** each learner completes Common Core (C01–C04), their assigned role-track advanced modules (D05–D06 for Dev, B05–B06 for BA, Q05–Q06 for QA), and shared Capstones (X01–X02) with passing deterministic verification gates (exit code 0)
 - **THEN** each learner SHALL receive the full 40 lab verification gate points (8 modules × 5 points) without attending or completing labs from other tracks
 - **AND** all three roles SHALL have an identical opportunity to achieve the maximum 100-point competency score.
 
-#### Scenario: Enterprise AI Champion recognition
-- **GIVEN** a top-performing graduate achieving $\ge 95$ points out of 100
-- **WHEN** demonstrating verified leadership and peer review excellence in Capstone Triads
-- **THEN** the organization SHALL award the Enterprise AI Champion credential
-- **AND** the graduate SHALL be certified to serve as Teaching Assistant (TA) for subsequent cohorts and Department AI Reviewer for production specifications and pull requests.
+#### Scenario: Enterprise AI Champion recognition criteria
+- **GIVEN** the assessment documentation and master syllabus in `ai-training-materials`
+- **WHEN** defining advanced credential criteria
+- **THEN** the rubric SHALL specify that graduates achieving $\ge 95$ points out of 100 receive the Enterprise AI Champion credential
+- **AND** the graduate SHALL be qualified to serve as Teaching Assistant (TA) for subsequent cohorts and Department AI Reviewer for production specifications and pull requests.
 ---
 
 ### Requirement: Dedicated Training Materials Repository
