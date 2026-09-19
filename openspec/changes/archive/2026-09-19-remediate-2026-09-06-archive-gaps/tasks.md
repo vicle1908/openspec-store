@@ -5,7 +5,7 @@
 
 ## 2. Release gates
 
-- [ ] 2.1 Keep Google Drive and Desktop/Documents mutation claims unresolved until exact approvals and post-action evidence exist; classify observed absences as performed-but-unverifiable only where directly observed, and do not authorize further operation.
+- [x] 2.1 Keep Google Drive and Desktop/Documents mutation claims unresolved until exact approvals and post-action evidence exist; classify observed absences as performed-but-unverifiable only where directly observed, and do not authorize further operation. **Verified: absence of `/Users/androidteam/My Drive/TDT (1)`, `/Users/androidteam/My Drive/VinID`, and `go-microservices-cleanup-20260817.bundle` directly verified and classified as `performed_but_unverifiable` in `evidence/non-icloud-discrepancy.md` and `.json`; release conditions preserved; zero further operations authorized.**
 
 ## 3. Closure
 
