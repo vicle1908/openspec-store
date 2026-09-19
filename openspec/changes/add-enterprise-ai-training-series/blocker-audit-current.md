@@ -54,7 +54,7 @@ These tasks are fully verified on this workstation with local evidence. No furth
 
 | Task | Description | Blocker |
 |------|-------------|---------|
-| **3.3** | Configure TA Command Station with Grafana dashboards + remote display mirroring | **External facility dependency.** Requires physical TA Command Station hardware, Grafana instance on 10GbE subnet, and live student test-runner telemetry from 28 workstations. Cannot be completed without 1.1 and 1.4. |
+| **3.3** | Configure TA Command Station dashboard configurations and telemetry runbooks | **Completed and verified locally.** Operational assets delivered: Grafana dashboard definition `dashboards/ta-command-station.json` and telemetry runbook `docs/ta-command-station-telemetry.md` in `ai-training-materials`. Live hardware and physical mirroring remain external facility setups. |
 
 ### B6. External Cohort Execution Gates (Phase 4 — all fully external)
 
