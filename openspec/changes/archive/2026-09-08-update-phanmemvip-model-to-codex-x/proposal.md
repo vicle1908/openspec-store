@@ -1,4 +1,5 @@
 # Proposal: Update phanmemvip Model from gpt-5.6-sol to codex-x + Rotate API Key
+<!-- skip_specs: true -->
 
 ## Summary
 
@@ -8,14 +9,15 @@ Update the default model for the **phanmemvip provider** from `gpt-5.6-sol` to `
 
 The phanmemvip provider (`https://api.phanmemvip.shop/v1`) currently defaults to `gpt-5.6-sol`. The new model `codex-x` has been verified working on the API (returns `model: codex`). This change switches all phanmemvip-specific `gpt-5.6-sol` references to `codex-x`.
 
-**Scope:** phanmemvip provider references only. Cockpit, shopapikey, and OmniRoute references are NOT touched.
+**Scope:** Remove the legacy Giaoduc provider from active CLI configuration, keep exactly four supported provider families (shopapikey, phanmemvip, cockpit, OmniRoute), update phanmemvip references to `codex-x`, rotate the phanmemvip key, and optimize OmniRoute/OMP routing. Cockpit remains separate and is not modified. Shopapikey remains separate using `Claude-Fable`.
 
 ## Scope Rules
 
 - `provider: phanmemvip` + `model: gpt-5.6-sol` → change to `model: codex-x`
 - `provider: cockpit` + `model: gpt-5.6-sol` → **SKIP** (separate provider)
 - `provider: shopapikey` + `model: Claude-Fable` → **SKIP** (separate provider, different key)
-- `omniroute/sh/` references → **SKIP** (separate provider)
+- Existing `omniroute/sh/` references may be updated from stale `sh/gpt-5.6-sol` to `sh/codex-x` when they represent the OmniRoute shopapikey route.
+- `omniroute/sh/Claude-Fable` and `omniroute/sh/codex-x` SHALL remain available as separate OmniRoute routes.
 - `phanmemvip` + `model: Claude-Fable` → **SKIP** (already correct model name)
 
 ## Changes
@@ -133,10 +135,52 @@ The phanmemvip provider (`https://api.phanmemvip.shop/v1`) currently defaults to
 **`~/.Claude-Fable.toml` L27 (kimi-code hardcoded key):**
 `api_key = "pmv_-I8OvaQ2JHeK7X5z-RHpSCCekkjoErEG"` → `api_key = "pmv_OZht_ENR3m3tsTVWODbmaYbYhLSEYD7t"`
 
+## OMP Routing Optimization
+
+The active OMP configuration is `~/.omp/agent/config.yml` (not `~/.omp/config.yml`).
+
+- `omniroute/sh/codex-x:xhigh` SHALL remain the active `task` and `default` model.
+- `omniroute/sh/Claude-Fable:xhigh` SHALL be included in the `default` retry fallback chain.
+- `omniroute/sh/Claude-Fable:xhigh` SHALL be included in the `phanmemvip/codex-x` retry fallback chain.
+- Direct `phanmemvip/codex-x` and `shopapikey/Claude-Fable` fallbacks SHALL remain available.
+- Cockpit fallback entries SHALL remain separate and unchanged.
+
+## Hermes MoA Cockpit Reference
+
+Hermes MoA cockpit references SHALL use `cockpit/gpt-6-astra` rather than `cockpit/gpt-5.6-sol` for the goal judge and all active MoA reference-model collections. The cockpit provider remains separate from phanmemvip and shopapikey.
+
+The cockpit model catalog SHALL expose `gpt-6-astra` before those MoA references are activated. Verification SHALL confirm the cockpit endpoint accepts the model.
+
+## Legacy Provider Removal
+
+The active configuration surface SHALL contain only these supported provider families:
+
+- `shopapikey` → `Claude-Fable`
+- `phanmemvip` → `codex-x`
+- `cockpit` → cockpit-native models
+- `omniroute` → `sh/codex-x`, `sh/Claude-Fable`, and `pm/Claude-Fable` routes as configured
+
+The legacy `giaoduc` provider SHALL be removed from active Cline/provider configuration. Historical backups, logs, sessions, and archived artifacts are not active runtime configuration and are excluded from this cleanup.
+
+Every active coding CLI configuration covered by this change SHALL expose all four supported provider families: `shopapikey`, `phanmemvip`, `cockpit`, and `omniroute`. Cline and Goose require explicit provider additions because their current active configurations do not expose all four families.
+
 ## Verification
+
+1. Active CLI configuration contains no `giaoduc`, `GIAODUC`, or `api.giaoduc.online` references
+2. Active provider families are limited to shopapikey, phanmemvip, cockpit, and OmniRoute
+3. Cline exposes both `shopapikey/Claude-Fable` and `phanmemvip/codex-x`
+4. Direct and OmniRoute model tests pass
+
+## Verification
+
 
 1. No phanmemvip `gpt-5.6-sol` remaining in active config files
 2. Cockpit references still present and unchanged
-3. Shopapikey `Claude-Fable` references untouched
-4. YAML/JSON validation passes for all modified files
-5. API test: `codex-x` with new key returns pong
+3. Shopapikey `Claude-Fable` references remain separate and available
+4. `sh/codex-x` and `sh/Claude-Fable` exist in CLI model registries
+5. OMP defaults to `omniroute/sh/codex-x:xhigh`
+6. OMP fallback chains include `omniroute/sh/Claude-Fable:xhigh`
+7. YAML/JSON validation passes for all modified files
+8. Direct API test: `codex-x` with new key returns pong
+9. OmniRoute tests: `sh/codex-x` and `sh/Claude-Fable` both return responses
+10. Real OMP CLI tests pass for both OmniRoute models

@@ -1,6 +1,6 @@
 # Tasks: Update phanmemvip Model from gpt-5.6-sol to codex-x + Rotate API Key
 
-**Scope:** phanmemvip provider ONLY. Cockpit, shopapikey, OmniRoute untouched.
+**Scope:** phanmemvip provider, OmniRoute routing, and OMP fallback optimization. Cockpit remains separate and unchanged; shopapikey remains separate with Claude-Fable.
 **New key:** `pmv_OZht_ENR3m3tsTVWODbmaYbYhLSEYD7t` (verified: codex-x returns pong)
 **Total:** 55 edits across 23 files, 24 tasks
 
@@ -153,3 +153,73 @@
 - [x] prime-agent: sh/codex-x ✅
 - [x] OMP: sh/codex-x ✅
 - [x] OmniRoute: both sh/codex-x and pm/Claude-Fable verified working
+
+### Task 25: Optimize OMP OmniRoute fallback routing
+- [x] Add `omniroute/sh/Claude-Fable:xhigh` to the default fallback chain in `~/.omp/agent/config.yml`
+- [x] Add `omniroute/sh/Claude-Fable:xhigh` to the `phanmemvip/codex-x` fallback chain
+- [x] Preserve `omniroute/sh/codex-x:xhigh` as task/default
+- [x] Preserve direct `phanmemvip/codex-x` and `shopapikey/Claude-Fable` fallbacks
+- [x] Preserve cockpit as a separate provider
+
+### Task 26: Verify OMP fallback behavior
+- [x] Validate `~/.omp/agent/config.yml`
+- [x] Run OMP with `omniroute/sh/codex-x`
+- [x] Run OMP with `omniroute/sh/Claude-Fable`
+- [x] Confirm both return successful responses
+
+### Task 27: Final verification after OMP optimization
+- [x] All direct phanmemvip CLI tests pass
+- [x] Both OmniRoute routes pass
+- [x] OMP default remains `omniroute/sh/codex-x:xhigh`
+- [x] OMP fallback includes `omniroute/sh/Claude-Fable:xhigh`
+
+### Task 28: Remove legacy Giaoduc from active CLI configuration
+- [x] Remove the active `giaoduc` provider block from `~/.cline/data/settings/models.json`
+- [x] Remove any other active CLI provider entries using `giaoduc`, `GIAODUC`, or `api.giaoduc.online`
+- [x] Preserve historical backups, logs, sessions, and archived artifacts
+- [x] Verify active CLI configs contain only shopapikey, phanmemvip, cockpit, and OmniRoute provider families
+- [x] Verify Cline still exposes `shopapikey/Claude-Fable` and `phanmemvip/codex-x` after removal
+
+### Task 30: Update Hermes cockpit MoA references to gpt-6-astra
+- [x] Add `gpt-6-astra: {}` to the cockpit model catalog in `~/.hermes/config.yaml`
+- [x] Change `goals.goal_judge` cockpit model to `gpt-6-astra`
+- [x] Change cockpit references in `moa.presets.default`, `deep`, `fast`, and `default-2` to `gpt-6-astra`
+- [x] Change the global MoA cockpit reference to `gpt-6-astra`
+- [x] Preserve cockpit as a separate provider
+
+### Task 31: Verify Hermes MoA cockpit configuration
+- [x] Validate `~/.hermes/config.yaml`
+- [x] Verify no intended MoA cockpit reference uses `gpt-5.6-sol`
+- [x] Test cockpit `gpt-6-astra` through its configured endpoint — PASS
+- [x] Confirm phanmemvip, shopapikey, cockpit, and OmniRoute remain configured
+
+### Task 32: Add missing provider families to Goose and Cline
+- [x] Add cockpit provider/model configuration to `~/.config/goose/config.yaml`
+- [x] Preserve Goose shopapikey, phanmemvip, and OmniRoute providers
+- [x] Add cockpit provider to `~/.cline/data/settings/models.json` using `http://localhost:51006/v1`
+- [x] Add OmniRoute provider to `~/.cline/data/settings/models.json` using `http://localhost:20128/v1`
+- [x] Add Cline OmniRoute models `sh/codex-x`, `sh/Claude-Fable`, and `pm/Claude-Fable`
+- [x] Preserve Cline shopapikey/Claude-Fable and phanmemvip/codex-x
+
+### Task 33: Verify complete four-provider topology
+- [x] Validate all active JSON/YAML/TOML configuration files
+- [x] Confirm every active coding CLI exposes shopapikey, phanmemvip, cockpit, and OmniRoute
+- [x] Run direct phanmemvip `codex-x` test
+- [x] Run direct shopapikey `Claude-Fable` test
+- [x] Run OmniRoute `sh/codex-x` test
+- [x] Run OmniRoute `sh/Claude-Fable` test
+- [x] Run OMP with both OmniRoute models
+- [x] Run Cline with direct and OmniRoute models
+- [x] Confirm no active Giaoduc provider remains
+- [x] Confirm Hermes MoA uses cockpit `gpt-6-astra` for all intended references
+- [x] Confirm cockpit remains configured and separate
+
+### Task 34: Resolve external cockpit verification
+- [x] Test cockpit `gpt-6-astra` after upstream cooldown expires — PASS
+- [x] Record successful response
+
+### Task 35: Final provider topology verification
+- [x] Confirm all four providers are configured for every active coding CLI
+- [x] Confirm all direct, OmniRoute, and OMP tests pass
+- [x] Confirm OpenSpec validation passes before archive
+
