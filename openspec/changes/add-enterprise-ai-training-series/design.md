@@ -26,7 +26,9 @@ While these capabilities exist in production, engineering teams have historicall
 - Modifying underlying backend production services or database schemas in `go-microservices`.
 - Replacing existing CI/CD production deploy pipelines.
 - Developing new proprietary LLM foundational models; training relies on established models served via OmniRoute and local Ollama.
-- Physical hardware deployment: procurement, physical rack installation, 10GbE network switch configuration, monitor mounting, and workstation hardware are outside the deployment deliverables of `ai-training-materials`. These are included only as presentation materials and illustrative slide diagrams.
+- Physical hardware and facility network deployment: procurement, physical rack installation, 10GbE network switch configuration, monitor mounting, and workstation hardware are outside the deployment deliverables and completion gates of `ai-training-materials` and this OpenSpec change. These are included only as presentation materials and illustrative slide diagrams.
+- Live cohort operations and staffing: human facilitator recruitment, instructor onboarding rehearsals, live cohort weekend attendance, and live credential certification are post-release operational milestones governed outside this repository change.
+- Pre-existing repository schema drift: M1 documentation validator schema drift in `go-microservices` (`microservices.*` vs `go-microservices.*`) is documented maintainer debt, excluded from curriculum sandbox staging acceptance.
 
 ## Decisions
 
@@ -95,7 +97,7 @@ While these capabilities exist in production, engineering teams have historicall
 ### Decision 4: Weekend-First Cohort Schedule & Facility Presentation Reference Architecture
 - **Decision:** Schedule the 24 modules across weekend intensives (Saturday 255-minute windows for Cohort A 08:30–12:45 and Cohort B 13:45–18:00, preserving one-hour turnover/lunch and existing 120m+15m+120m arithmetic; Sunday Open Lab 09:00–12:00 and Capstone Triads 13:30–17:30).
 - **Facility Presentation Reference Architecture:**
-  Physical hardware specifications (dual 85" 4K displays, 28 student pods with dual 4K monitors and mechanical keyboards, 10GbE subnet, on-premise edge compute rack) are provided as presentation materials and illustrative reference architecture in lecture slide decks and facilitator guides, rather than deployable repository deliverables. The deployment deliverables of `ai-training-materials` are strictly software- and container-based (Docker Compose configs, devcontainers, slide decks, lab starter files, and deterministic verifiers). Physical procurement and facility installation remain external operational concerns.
+  Physical hardware specifications (dual 85" 4K displays, 28 student pods with dual 4K monitors and mechanical keyboards, 10GbE subnet, on-premise edge compute rack) are provided as presentation materials and illustrative reference architecture in lecture slide decks and facilitator guides, rather than deployable repository deliverables. The deployment deliverables of `ai-training-materials` are strictly software- and container-based (Docker Compose configs, devcontainers, slide decks, lab starter files, and deterministic verifiers). Physical procurement, facility installation, human facilitator recruitment, and live cohort execution are decoupled as post-release operational concerns.
 ### Decision 5: 100-Point Objective Competency Matrix & CEIP Certification
 - **Evaluation Breakdown:**
   - **Lab Verification Gates (40 pts):** Exactly 8 assessed practical modules per learner tailored to their enrolled track, awarding 5 pts each (8 modules $\times$ 5 pts = 40 pts). The designated fixture-gate command MUST exit code `0`; this proves only that the designated fixture gate passed, not general LLM/agent quality or safety. Subjective grading is strictly prohibited.
