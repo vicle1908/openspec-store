@@ -344,6 +344,7 @@ sync_entities() {
     "wiki/entities/tdt-observability.md"
     "wiki/entities/tdt-sheets.md"
     "wiki/entities/webhook-receiver.md"
+    "wiki/entities/notion-cli.md"
   )
   for file in "${files[@]}"; do
     sync_document "$file" "entities"
