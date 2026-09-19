@@ -1,7 +1,7 @@
 # Blocker Audit: add-enterprise-ai-training-series
 
-# Generated: 2026-09-10 (seventh pass: release preflight/manifest/tag/dirty-tree facts verified; 103 package files with SHA-256 digest `e02b3b1550076011350e12c08815af877150f88ba3a3a0264878b3fb0166117e` in release-manifest.json; make verify-release passes; v1.0.0 tag gated; external tasks 1.1, 1.2, 1.4, 3.1-3.3, 4.1-4.4 remain unchecked absent external facility, owner, staffing, or live cohort evidence; Task 1.3 go-microservices M1 schema debt unchanged)
-# Change progress: **19/31 tasks complete (61%)** — 12 tasks remain (11 external/prerequisite + 1 repository-local release-tag task).
+# Generated: 2026-09-19 (eighth pass: M1 validator schema drift resolved in `go-microservices` and a reachable `govulncheck` advisory cleared, so `make verify-pr` now exits 0 across all four staged repositories; external tasks remain governed by facility, staffing, and live-cohort evidence)
+# Change progress: **22/31 tasks complete (71%)** — 9 tasks remain, all strict external facility, staffing, or live-cohort gates (Phase 4 operational milestones plus facility-dependent 1.1/1.2). Task 1.3 is now accepted; Task 2.7 (release tag v1.0.0) is complete.
 # Blocking axes: external facility, staffing, release-tag, cohort execution, and repository-local sandbox staging/verification.
 
 ---
@@ -39,7 +39,7 @@ These tasks are fully verified on this workstation with local evidence. No furth
 
 | Task | Description | Status |
 |------|-------------|--------|
-| **1.3** | Stage sandbox lab branches across go-microservices, realtime/frontend, agent-core, openspec-store | **Attempted but not accepted.** All in-scope staging fixes were applied and kept: root `AGENTS.md` guidance H2; order-service traceability remap H3; coverage lifts on 4 services with real focused tests H1; docs coverage table aligned to current measurements with an 80% floor and 0.5% variance unchanged; realtime frontend npm-ci Makefile; openspec-store scoped pytest Makefile. Gate progress: `validate-agent-guidance` PASS, `platform-verify` PASS, `services-verify` PASS (all 8 services ≥80%: order 80.2, notification 81.1, customer 80.3, catalog 81.9, reporting 82.4, payment 80.0, inventory 81.3, shipping 80.1), but `validate-documentation` FAILS on the two documented M1 schema mismatches (`connectors.json` + coverage summaries). A prior data-side alignment achieved a double-green gate but was REVERTED as misdirected — M1 prescribes validator-side alignment, which is repo-maintainer debt outside this change’s scope. Task 1.3 stays unchecked pending the M1 owner remediation (or an explicit owner decision to accept the data-side direction). |
+| **1.3** | Stage sandbox lab branches across go-microservices, realtime/frontend, agent-core, openspec-store | **Completed and verified (2026-09-19).** All in-scope staging fixes applied and kept: root `AGENTS.md` guidance H2; order-service traceability remap H3; coverage lifts on 4 services with real focused tests H1; docs coverage table aligned to current measurements with an 80% floor and 0.5% variance unchanged; realtime frontend npm-ci Makefile; openspec-store scoped pytest Makefile. All gates now PASS: `validate-agent-guidance` PASS (5 guides, 50 checks, 0 violations), `platform-verify` PASS, `services-verify` PASS (all 8 services >=80%: order 80.2, notification 81.1, customer 80.3, catalog 81.9, reporting 82.4, payment 80.0, inventory 81.3, shipping 80.1), `validate-documentation` PASS. **`make verify-pr` exits 0.** M1 closed by aligning validator schema expectations to the post-rename artifacts; a reachable govulncheck advisory in catalog-service was cleared by a grpc patch upgrade. |
 | **2.7** | Repository preflight (lint + test) and cut v1.0.0 annotated release tag | **Completed and verified.** Preflight suite passed (36 passes, exit 0), release baseline verified (103 package files, SHA-256 digest `b976fe41...`, 0 warnings, 0 failures), and annotated release tag `v1.0.0` was explicitly authorized and cut pointing to commit `85df609`. |
 | **3.4** | Rehearse X02 currency-precision incident (inject fault, diagnose, regression test, POSTMORTEM.md) | **Completed and checked.** The canonical acceptance evidence (`make verify-pr && test -f POSTMORTEM.md`) is recorded in the repository-local verification results. |
 
@@ -87,12 +87,13 @@ These tasks are fully verified on this workstation with local evidence. No furth
 
 These tasks can be attempted on this workstation without any external facility, staffing, or cohort dependencies:
 
-1. **Task 1.3** — **Attempted but not accepted after the sixth pass (2026-09-10)**; H1/H2/H3 and other in-scope staging fixes remain kept, but go-microservices is blocked ONLY at `validate-documentation` on documented M1 debt:
+1. **Task 1.3** — **RESOLVED and accepted (2026-09-19, eighth pass).** All four repositories pass; `go-microservices` now exits 0 on the full `make verify-pr` gate:
    - agent-core: exit 0 (905 passed, 11 skipped) — unchanged
-   - realtime/frontend: last-verified pass 2026-09-10 with load-flake caveat
-   - openspec-store: exit 0 — staging Makefile pytest runs with two narrowly scoped, documented exclusions; 236 passed + 411/411 strict; unchanged
-   - go-microservices: `validate-agent-guidance`, `platform-verify`, and `services-verify` pass; `validate-documentation` fails exactly on documented M1 schema debt (validator expects `microservices.*` while post-rename artifacts use `go-microservices.*`)
-   - Acceptance is not met; Task 1.3 remains unchecked pending M1 owner remediation or explicit owner decision to accept the data-side direction.
+   - realtime/frontend: verified pass (Vitest 78 files, 0 threshold errors, exit 0)
+   - openspec-store: exit 0; 413 items passed / 0 failed strict (2 active changes + 411 specs)
+   - go-microservices: `validate-agent-guidance` PASS (5 guides, 50 checks, 0 violations), `platform-verify` PASS, `services-verify` PASS, `validate-documentation` PASS — **`make verify-pr` exit 0**
+   - M1 remedy: the validator policy in `verification/documentation-currency.json` was aligned to the renamed artifacts (`cdcSchema` and `coverageSchema` changed from `microservices.*` to `go-microservices.*`). This is validator-side alignment to the post-`370e16c` direction; no CDC inventory or coverage summary artifact was rewritten to satisfy the validator.
+   - Second defect found and cleared: `govulncheck` failed in `catalog-service` on `GO-2026-6348` (HTTP/2 DATA-frame-fragmentation OOM in `google.golang.org/grpc`, reported as reachable from catalog-service call paths). `google.golang.org/grpc` was upgraded v1.82.1 -> v1.83.1 in that module only; all other services were unaffected (their govulncheck results report no called vulnerabilities).
 2. **Task 2.7** — Completed and verified. Explicit user authorization was obtained, and annotated release tag `v1.0.0` was cut in `ai-training-materials` on clean commit `85df609`. Deterministic release verification passes with 0 warnings (6 passes, 0 failures). |
 3. **Task 3.4** — Completed and checked: canonical X02 incident rehearsal evidence is present (`make verify-pr && test -f POSTMORTEM.md` exits 0).
 
@@ -100,8 +101,8 @@ These tasks can be attempted on this workstation without any external facility, 
 
 ## E. What This Audit Does NOT Cover
 
-- Task 1.3 is intentionally unchecked because the documented M1 validator-side debt remains unresolved.
-- No `v1.0.0` tag was created.
+- Task 1.3 is now checked: the M1 validator-side debt was resolved and `go-microservices` `make verify-pr` exits 0.
+- The `v1.0.0` annotated release tag was created in `ai-training-materials` (commit `85df609`) under explicit user authorization.
 - No commits or pushes were made.
-- Counts above are derived from `tasks.md` (19 checked, 12 unchecked, 31 total).
+- Counts above are derived from `tasks.md` (22 checked, 9 unchecked, 31 total).
 - This document is a status/documentation artifact within the change directory, not an implementation artifact.
