@@ -187,8 +187,8 @@ All instructional slide decks, keynote presentations, and stage visual aids SHAL
 
 ---
 
-### Requirement: Weekend-First Cohort Schedule & Dedicated Lab Hardware Setup
-The enterprise rollout SHALL operate on a Weekend-First schedule utilizing a dedicated, custom-engineered 28-seat physical training laboratory to eliminate weekday sprint friction and prevent network saturation.
+### Requirement: Weekend-First Cohort Schedule & Facility Presentation Reference
+The enterprise rollout SHALL operate on a Weekend-First schedule to eliminate weekday sprint friction and prevent network saturation. The curriculum presentation materials SHALL illustrate a reference facility architecture (front stage displays, student pods, isolated edge compute topology) for lecture and demonstration purposes, but physical hardware installation SHALL NOT be required as a software deployment deliverable of the training materials repository.
 
 #### Scenario: Saturday intensive cohort scheduling
 - **GIVEN** enrolled learners assigned to weekend cohorts
@@ -202,13 +202,11 @@ The enterprise rollout SHALL operate on a Weekend-First schedule utilizing a ded
 - **THEN** the facility SHALL host Open Lab and Facilitator Office Hours from 09:00 to 12:00 for 1-on-1 remediation and technical deep-dives
 - **AND** the facility SHALL host X01 and X02 sequentially from 13:30 to 17:30, each receiving 120 minutes.
 
-- **GIVEN** the physical training lab room hosting 28 concurrent learners
-- **WHEN** learners execute concurrent multi-agent simulations and model pulls
-- **THEN** the front stage SHALL provide dual 85" 4K displays (Display 1 for Dark-Stage slides; Display 2 for live terminal orchestration telemetry)
-- **AND** student stations SHALL provide dual 27" 4K monitors, mechanical low-noise keyboards, and dedicated Cat 6A Gigabit Ethernet drops
-- **AND** all learner AI traffic SHALL route exclusively through the Local Zero-Egress Facility Profile: an isolated 10GbE local subnet backed by an on-premise Ollama embedding node (`ofable-5`) and local OmniRoute proxy gateway (`localhost:20128/v1`)
-- **AND** the facility profile MUST pass a zero-egress gate (`scripts/verify-zero-egress-resolution.sh`) before any live cohort session begins.
-
+#### Scenario: Lab facility presentation reference architecture
+- **GIVEN** lecture and presentation materials covering facility infrastructure
+- **WHEN** slide decks and facilitator guides are rendered
+- **THEN** they SHALL provide illustrative reference diagrams showing the recommended dual 4K front stage, student pod layout, and local zero-egress OmniRoute/Ollama edge compute topology
+- **AND** physical hardware procurement and deployment SHALL NOT be a prerequisite or deliverable of the `ai-training-materials` software baseline.
 ---
 ### Requirement: Infrastructure Profile Governance
 The program SHALL maintain two explicitly separated infrastructure profiles with hard security boundaries: a Local Zero-Egress Facility Profile canonical for all live cohort runtime, and an Approved Cloud-Backed Preparation Profile restricted exclusively to deterministic artifact generation and mirror pre-seeding. These profiles MUST NOT share network paths, credentials, learner workstations, or lab devcontainers during live cohort operations.
