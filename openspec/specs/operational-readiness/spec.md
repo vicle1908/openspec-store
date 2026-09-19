@@ -3,6 +3,7 @@
 ## Purpose
 
 This spec defines operational readiness requirements for the platform, covering infrastructure tooling, deployment safety, documentation, agent configuration, Kubernetes networking, ArgoCD deployment, Dockerfile standards, service verification, Kustomize configuration, and secrets management.
+
 ## Requirements
 
 > **Status**: PARTIAL / UNVERIFIED. Source artifacts exist for several requirements, but current Compose, Kustomize, External Secrets, Argo CD, smoke, and telemetry paths have not passed clean-environment acceptance with retained evidence.
@@ -73,7 +74,7 @@ local CDC MAY be referenced rather than duplicated.
 
 ### Requirement: Agent configs SHALL be wired for all supported agents
 
-The platform SHALL provide properly configured agent configuration files for all supported AI coding agents (Claude via `.claude/settings.json`, Cursor via `.cursor/mcp.json`, Codex, KiloCode, Kiro, Factory, OpenCode, Zed, Kimi, Antigravity, and Hermes where installed). Each supported MCP client SHALL use MCP Router as the single client-facing router for GitNexus, Graphify, and AgentMemory. Client configuration MUST NOT additionally register those same knowledge servers directly unless a documented, time-bounded compatibility exception identifies the owner, reason, expiry, and rollback. Configurations MUST remain synchronized with the platform topology and MUST NOT contain hardcoded secrets or credentials.
+The platform SHALL provide properly configured agent configuration files for all supported AI coding agents (Claude via `.claude/settings.json`, Cursor via `.cursor/mcp.json`, Codex, KiloCode, Kiro, Factory, OpenCode, Zed, Kimi, Antigravity, Hermes, and Oh My Pi via `~/.omp/agent/mcp.json` where installed). Each supported MCP client SHALL use MCP Router as the single client-facing router for GitNexus, Graphify, and AgentMemory. Client configuration MUST NOT additionally register those same knowledge servers directly unless a documented, time-bounded compatibility exception identifies the owner, reason, expiry, and rollback. Configurations MUST remain synchronized with the platform topology and MUST NOT contain hardcoded secrets or credentials.
 
 The running MCP Router desktop app SHALL be the authoritative adapter and live
 configuration owner. The app SHALL remain on latest stable `0.6.3` until a newer
@@ -185,6 +186,13 @@ be encrypted with `safeStorage`; unavailable encryption blocks apply/restore.
 - **WHEN** any required client cannot discover or call its required router-exposed knowledge tools after cutover
 - **THEN** maintenance remains active and the operator restores the exact backed-up client configuration for the affected scope
 - **AND** the run records the failure and rollback outcome without exposing secrets
+
+#### Scenario: Oh My Pi invokes MCP tools via native router config
+
+- **WHEN** Oh My Pi starts in any workspace directory
+- **THEN** it discovers `mcp-router` via `~/.omp/agent/mcp.json`
+- **AND** it connects via the `@mcp_router/cli connect` stdio bridge with its authenticated client token
+- **AND** all approved MCP tools are callable without committing `.mcp.json` to the workspace repository
 
 ### Requirement: K8s NetworkPolicy SHALL allow database and messaging egress
 
@@ -419,3 +427,12 @@ Every failed local, CI, staging, or production acceptance run SHALL collect boun
 - **WHEN** Kubernetes rollout, Argo CD reconciliation, or environment smoke testing fails
 - **THEN** rendered manifests, events, workload descriptions, logs, image IDs, and Argo CD status are collected before cleanup or rollback
 
+### Requirement: Local MCP servers SHALL have verified runtime environments
+
+Local MCP servers executed by MCP Router as child processes (including `wiki-mcp-server`) SHALL maintain complete and valid virtual environment runtimes. Automation and health monitoring scripts SHALL detect missing dependencies and execute environment synchronization before reporting healthy status.
+
+#### Scenario: Missing virtual environment is restored
+
+- **WHEN** a local Python MCP server is missing its `.venv` directory
+- **THEN** executing `uv sync` recreates the virtual environment and installs all declared dependencies
+- **AND** subsequent MCP Router execution launches the child process without exit code 127
