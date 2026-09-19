@@ -33,7 +33,9 @@ active-resource warnings without deleting or modifying data.
 
 ### Requirement: Cleanup candidates have explicit safety classifications
 
-Every cleanup candidate SHALL be classified as rebuildable ephemeral cache (Tier 1), review-first build artifacts or completed installers (Tier 2), or protected stateful assets (Tier 3) before an action is proposed or executed.
+Every cleanup candidate SHALL be classified as read-only evidence,
+rebuildable cache, operator-reviewed irreversible data, or protected stateful
+data before an action is proposed.
 
 #### Scenario: Rebuildable cache is classified
 
@@ -51,12 +53,6 @@ Every cleanup candidate SHALL be classified as rebuildable ephemeral cache (Tier
 - **THEN** the plan marks the item protected until a complete verified-unused
   eligibility record exists
 - **AND** it MUST NOT include the item in a bulk cleanup action
-
-#### Scenario: Multi-tier safety classification
-- **WHEN** the storage audit discovers candidate targets across system, developer, and application caches
-- **THEN** it categorizes package manager caches, temporary staging files, and purgeable memory under Tier 1
-- **AND** it categorizes local build caches and completed installer DMGs under Tier 2 requiring explicit user confirmation
-- **AND** it MUST classify Docker raw virtual disks, persistent database volumes, active browser databases, and active project virtual environments as protected Tier 3 assets excluded from deletion.
 
 ### Requirement: Irreversible actions require exact operator confirmation
 
@@ -394,12 +390,3 @@ deployment, or cloud readiness.
 - **WHEN** repository preflight fails its disk requirement after cleanup
 - **THEN** the readiness run stops with its own failure evidence
 - **AND** the cleanup workflow MUST NOT silently delete additional categories
-
-### Requirement: Verified post-reclamation headroom and state verification
-
-The workflow SHALL measure and record total reclaimed capacity, resulting free disk space, and application integrity following any multi-tier cleanup action.
-
-#### Scenario: Reclaimed space and integrity verification
-- **WHEN** approved Tier 1 and Tier 2 cleanups are completed
-- **THEN** the workflow verifies that total available disk space increases accordingly
-- **AND** it validates that installed application binaries, IDE configurations, and developer repositories remain undamaged and operational.
