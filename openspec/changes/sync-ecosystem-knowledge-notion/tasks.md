@@ -11,17 +11,17 @@
 
 ## 2. Ingestion Adapter & Notion Sub-Page Hierarchy
 
-- [ ] 2.1 Implement section bootstrap routine for Notion Knowledge hierarchy
-  - Query Knowledge Root (`3d7c4b21-deb4-8100-99c0-cfe30ef437ee`) via `ntn pages get` to resolve or create the 4 section sub-pages (`Ecosystem Concepts & Architecture`, `Ecosystem Component Entities`, `OpenSpec Architecture & Specifications`, `Knowledge Health & Freshness Matrix`).
+- [ ] 2.1 Implement section bootstrap routine with regex discovery
+  - Query Knowledge Root (`3d7c4b21-deb4-8100-99c0-cfe30ef437ee`) via `ntn pages get` to resolve existing or create missing section sub-pages using pattern `<page url="https://app.notion.com/p/([0-9a-f]+)">([^<]+)</page>` (`Ecosystem Concepts & Architecture`, `Ecosystem Component Entities`, `OpenSpec Architecture & Specifications`, `Knowledge Health & Freshness Matrix`).
   - Store resolved section page IDs into `notion-sync-manifest.json`.
-  - *Verification*: Run `ntn pages get <section-id>` for all 4 sections and verify each page exists with valid title.
-- [ ] 2.2 Implement idempotent page sync engine (create and edit)
-  - Implement document diffing against manifest SHA-256. If match, output `fresh_noop`. If new, call `ntn pages create --parent page:<section-id>`. If changed, call `ntn pages edit <page-id>`.
+  - *Verification*: Run bootstrap and verify all 4 section page IDs are recorded and accessible via `ntn pages get <section-id>`.
+- [ ] 2.2 Implement idempotent page sync engine with `--allow-deleting-content` and pacing
+  - Implement document diffing against manifest SHA-256 with 500ms pacing delay between API calls. If match, output `fresh_noop`. If new, call `ntn pages create --parent page:<section-id> --json`. If changed, call `ntn pages edit <page-id> --allow-deleting-content --json`.
   - Update `notion-sync-manifest.json` after successful exit code 0.
   - *Verification*: Run sync twice on a test document; observe initial creation followed by `fresh_noop` on second run.
-- [ ] 2.3 Ingest Ecosystem Concepts and Entities into Notion
-  - Process all 6 concept docs from `wiki/concepts/` and 12 entity docs from `wiki/entities/`.
-  - *Verification*: Run `sync-notion-knowledge.sh --section concepts && sync-notion-knowledge.sh --section entities` and verify pages exist in Notion under their respective section parents.
+- [ ] 2.3 Ingest Ecosystem Concepts, Comparisons, Architecture, and Entities into Notion
+  - Process all 6 concept docs from `wiki/concepts/`, 1 comparison from `wiki/comparisons/`, 1 architecture doc from `wiki/architecture/`, and 12 entity docs from `wiki/entities/`.
+  - *Verification*: Run `sync-notion-knowledge.sh --section concepts && sync-notion-knowledge.sh --section entities` and verify all pages exist in Notion under their respective section parents.
 
 ## 3. OpenSpec Catalog & Freshness Matrix Integration
 
@@ -36,9 +36,9 @@
 
 ## 4. Automation & Verification
 
-- [ ] 4.1 Wire post-refresh trigger into `refresh-knowledge-indexes.sh`
+- [ ] 4.1 Wire post-refresh trigger into `refresh-knowledge-indexes.sh` with dual-tree parity
   - Add execution of `sync-notion-knowledge.sh --incremental` to `refresh-knowledge-indexes.sh` after repository indexing completes.
-  - Ensure dual-tree parity between `openspec-store/scripts/knowledge-refresh/` and `Developer/scripts/knowledge-refresh/` and update `knowledge-refresh-approval.sha256`.
+  - Copy updated script from `openspec-store/scripts/knowledge-refresh/` to `Developer/scripts/knowledge-refresh/`.
   - *Verification*: Run `scripts/knowledge-refresh/refresh-knowledge-indexes.sh --check` to verify approval digests match.
 - [ ] 4.2 End-to-end dry-run and live validation
   - Execute `sync-notion-knowledge.sh --dry-run` and confirm 0 side effects.
