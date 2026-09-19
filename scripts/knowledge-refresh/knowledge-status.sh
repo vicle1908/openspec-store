@@ -43,7 +43,7 @@ inventory_digest=$(shasum -a 256 "$INVENTORY" | awk '{print $1}')
 tool_version() {
   local tool="$1"
   if command -v "$tool" >/dev/null 2>&1; then
-    "$tool" --version 2>&1 | head -1 | tr -d '\r' | sed 's/"/\\"/g'
+    "$tool" --version 2>/dev/null | head -1 | tr -d '\r' | sed 's/"/\\"/g'
   else
     echo "missing"
   fi
@@ -68,31 +68,23 @@ short_sha() {
   echo "${1:0:7}"
 }
 
-# Compute staleness: returns FRESH, STALE, or UNKNOWN
-# $1 = index timestamp (epoch), $2 = HEAD timestamp (epoch)
-classify_freshness() {
-  local idx_ts="$1" head_ts="$2"
+# Compute freshness by commit equality: returns FRESH, STALE, or UNKNOWN
+# $1 = recorded indexed revision (full SHA), $2 = current HEAD revision (full SHA)
+classify_freshness_by_commit() {
+  local indexed_rev="$1" head_rev="$2"
 
-  if [[ "$idx_ts" == "0" || -z "$idx_ts" ]]; then
+  if [[ -z "$indexed_rev" || "$indexed_rev" == "" ]]; then
     echo "UNKNOWN"
     return
   fi
-  if [[ "$head_ts" == "0" || -z "$head_ts" ]]; then
+  if [[ -z "$head_rev" || "$head_rev" == "" ]]; then
     echo "UNKNOWN"
     return
   fi
-
-  local diff=$(( head_ts - idx_ts ))
-  if (( diff <= 0 )); then
-    # Index is at or ahead of HEAD — up to date
+  if [[ "$indexed_rev" == "$head_rev" ]]; then
     echo "FRESH"
   else
-    local days=$(( diff / 86400 ))
-    if (( days <= STALENESS_THRESHOLD_DAYS )); then
-      echo "FRESH"
-    else
-      echo "STALE"
-    fi
+    echo "STALE"
   fi
 }
 
@@ -123,6 +115,12 @@ head_sha() {
   git -C "$root" rev-parse --short=7 HEAD 2>/dev/null || echo "unknown"
 }
 
+# Get git HEAD full SHA (40 chars) for commit-equality comparison
+head_sha_full() {
+  local root="$1"
+  git -C "$root" rev-parse --verify HEAD 2>/dev/null || echo ""
+}
+
 # Get the index commit SHA recorded by GitNexus
 gitnexus_indexed_sha() {
   local root="$1"
@@ -131,7 +129,7 @@ gitnexus_indexed_sha() {
     # Extract lastCommit field (e.g. "lastCommit": "abc1234...")
     grep -o '"lastCommit"[[:space:]]*:[[:space:]]*"[^"]*"' "$meta" 2>/dev/null \
       | head -1 \
-      | sed 's/.*"lastCommit"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/'
+      | sed 's/.*"lastCommit"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' || true
   fi
 }
 
@@ -147,7 +145,7 @@ gitnexus_index_timestamp() {
   local ts
   ts=$(grep -o '"lastRefresh"[[:space:]]*:[[:space:]]*"[^"]*"' "$meta" 2>/dev/null \
     | head -1 \
-    | sed 's/.*"lastRefresh"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+    | sed 's/.*"lastRefresh"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' || true)
   if [[ -n "$ts" && "$ts" != "" ]]; then
     # Convert ISO to epoch if possible
     if command -v gdate &>/dev/null; then
@@ -228,6 +226,41 @@ lock_info() {
     fi
   done
   echo ""
+}
+
+# Read the latest bounded refresh outcome for a repo without mutating anything.
+# Missing/unparseable logs intentionally fall back to UNKNOWN.
+operation_status_for() {
+  local repo_name="$1"
+  local refresh_log="${KNOWLEDGE_REFRESH_LOG:-${HOME}/Developer/.knowledge-refresh/refresh.log}"
+  python3 - "$refresh_log" "$repo_name" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+repo = sys.argv[2]
+if not path.is_file():
+    print("UNKNOWN")
+    raise SystemExit(0)
+
+pattern = re.compile(r"^\[[^]]+\]\[" + re.escape(repo) + r"\]\[[^]]+\]\[([^]]+)\]")
+mapping = {
+    "skipped_dirty": "DIRTY_SKIP",
+    "timeout": "TIMEOUT",
+    "success": "SUCCESS",
+    "failed": "FAILED",
+}
+try:
+    for line in reversed(path.read_text(encoding="utf-8", errors="replace").splitlines()):
+        match = pattern.search(line)
+        if match:
+            print(mapping.get(match.group(1), "UNKNOWN"))
+            raise SystemExit(0)
+except OSError:
+    pass
+print("UNKNOWN")
+PY
 }
 
 dirty_file_count() {
@@ -311,17 +344,19 @@ process_repo() {
   local repo_name
   repo_name=$(basename "$root")
 
-  local head_sha_val head_ts lock_owner
+  local head_sha_val head_sha_full_val head_ts lock_owner operation_status
   head_sha_val=$(head_sha "$root")
+  head_sha_full_val=$(head_sha_full "$root")
   head_ts=$(head_timestamp "$root")
   head_date=$(epoch_to_date "$head_ts")
   lock_owner=$(lock_info "$root")
+  operation_status=$(operation_status_for "$repo_name")
 
   local dirty_count
   dirty_count=$(dirty_file_count "$root")
   if [[ "$dirty_count" =~ ^[0-9]+$ ]] && (( dirty_count > 0 )); then
     RESULTS+=("$(printf '%-32s %-10s %-12s %-15s %s' "$repo_name" "Dirty" "${dirty_count} files" "-" "-")")
-    JSON_ITEMS+=("{\"repo\":\"${repo_name}\",\"tool\":\"Dirty\",\"status\":\"DIRTY\",\"dirtyFiles\":${dirty_count},\"lastRefresh\":\"-\",\"indexedSha\":\"\",\"headSha\":\"-\",\"lockOwner\":null}")
+    JSON_ITEMS+=("{\"repo\":\"${repo_name}\",\"tool\":\"Dirty\",\"status\":\"DIRTY\",\"operation_status\":\"${operation_status}\",\"dirtyFiles\":${dirty_count},\"indexedSha\":\"\",\"headSha\":\"-\",\"freshness\":\"DIRTY\",\"freshnessRule\":\"N/A\",\"lastRefresh\":\"-\",\"lockOwner\":null}")
   fi
 
   # --- GitNexus status ---
@@ -333,15 +368,11 @@ process_repo() {
     if [[ "$gn_idx_ts" == "0" ]]; then
       gn_status="UNINITIALIZED"
     elif [[ -z "$gn_idx_sha" ]]; then
-      # No indexed SHA — compare timestamps only
-      gn_status=$(classify_freshness "$gn_idx_ts" "$head_ts")
+      # No indexed SHA available — cannot determine freshness
+      gn_status="UNKNOWN"
     else
       # Compare indexed SHA with HEAD
-      if [[ "$gn_idx_sha" == "$head_sha_val" ]]; then
-        gn_status="FRESH"
-      else
-        gn_status=$(classify_freshness "$gn_idx_ts" "$head_ts")
-      fi
+      gn_status=$(classify_freshness_by_commit "$gn_idx_sha" "$head_sha_full_val")
     fi
 
     local gn_idx_date
@@ -349,14 +380,19 @@ process_repo() {
     local gn_indexed_sha_short
     gn_indexed_sha_short=$(short_sha "$gn_idx_sha")
 
-    RESULTS+=("$(printf '%-32s %-10s %-12s %-15s %s' "$repo_name" "GitNexus" "$gn_status" "$gn_idx_date" "$head_sha_val")")
+    RESULTS+=("$(printf '%-32s %-10s %-12s %-15s %s' "$repo_name" "GitNexus" "$gn_status" "$gn_indexed_sha_short" "$head_sha_val")")
 
     local lock_json="null"
     if [[ -n "$lock_owner" ]]; then
       lock_json="\"${lock_owner}\""
     fi
 
-    JSON_ITEMS+=("{\"repo\":\"${repo_name}\",\"tool\":\"GitNexus\",\"status\":\"${gn_status}\",\"lastRefresh\":\"${gn_idx_date}\",\"indexedSha\":\"${gn_indexed_sha_short}\",\"headSha\":\"${head_sha_val}\",\"lockOwner\":${lock_json}}")
+    local gn_freshness_rule="commit_equality"
+    if [[ -z "$gn_idx_sha" ]]; then
+      gn_freshness_rule="missing_recorded_revision"
+    fi
+
+    JSON_ITEMS+=("{\"repo\":\"${repo_name}\",\"tool\":\"GitNexus\",\"status\":\"${gn_status}\",\"operation_status\":\"${operation_status}\",\"indexedSha\":\"${gn_indexed_sha_short}\",\"headSha\":\"${head_sha_val}\",\"freshness\":\"${gn_status}\",\"freshnessRule\":\"${gn_freshness_rule}\",\"lastRefresh\":\"${gn_idx_date}\",\"lockOwner\":${lock_json}}")
   fi
 
   # --- Graphify status ---
@@ -369,21 +405,33 @@ process_repo() {
       gf_status="WATCHER"
     elif [[ "$gf_idx_ts" == "0" ]]; then
       gf_status="UNINITIALIZED"
+    elif [[ -z "$gf_idx_sha" ]]; then
+      # No indexed SHA available — cannot determine freshness
+      gf_status="UNKNOWN"
     else
-      gf_status=$(classify_freshness "$gf_idx_ts" "$head_ts")
+      # Compare indexed SHA with HEAD
+      gf_status=$(classify_freshness_by_commit "$gf_idx_sha" "$head_sha_full_val")
     fi
 
     local gf_idx_date
     gf_idx_date=$(epoch_to_date "$gf_idx_ts")
 
-    RESULTS+=("$(printf '%-32s %-10s %-12s %-15s %s' "$repo_name" "Graphify" "$gf_status" "$gf_idx_date" "$head_sha_val")")
+    local gf_indexed_sha_short
+    gf_indexed_sha_short=$(short_sha "$gf_idx_sha")
+
+    RESULTS+=("$(printf '%-32s %-10s %-12s %-15s %s' "$repo_name" "Graphify" "$gf_status" "$gf_indexed_sha_short" "$head_sha_val")")
 
     local lock_json="null"
     if [[ -n "$lock_owner" ]]; then
       lock_json="\"${lock_owner}\""
     fi
 
-    JSON_ITEMS+=("{\"repo\":\"${repo_name}\",\"tool\":\"Graphify\",\"status\":\"${gf_status}\",\"lastRefresh\":\"${gf_idx_date}\",\"indexedSha\":\"$(short_sha "$gf_idx_sha")\",\"headSha\":\"${head_sha_val}\",\"lockOwner\":${lock_json}}")
+    local gf_freshness_rule="commit_equality"
+    if [[ -z "$gf_idx_sha" ]]; then
+      gf_freshness_rule="missing_recorded_revision"
+    fi
+
+    JSON_ITEMS+=("{\"repo\":\"${repo_name}\",\"tool\":\"Graphify\",\"status\":\"${gf_status}\",\"operation_status\":\"${operation_status}\",\"indexedSha\":\"${gf_indexed_sha_short}\",\"headSha\":\"${head_sha_val}\",\"freshness\":\"${gf_status}\",\"freshnessRule\":\"${gf_freshness_rule}\",\"lastRefresh\":\"${gf_idx_date}\",\"lockOwner\":${lock_json}}")
   fi
 
   # --- Worktrees ---
@@ -393,7 +441,7 @@ process_repo() {
     wt_sha=$(git -C "$wt_path" rev-parse --short=7 HEAD 2>/dev/null || echo "unknown")
     RESULTS+=("$(printf '%-32s %-10s %-12s %-15s %s' "${repo_name}/*" "Worktree" "ACTIVE" "-" "$wt_sha (${wt_branch})")")
 
-    JSON_ITEMS+=("{\"repo\":\"${repo_name}\",\"tool\":\"Worktree\",\"status\":\"ACTIVE\",\"lastRefresh\":\"-\",\"indexedSha\":\"\",\"headSha\":\"${wt_sha}\",\"worktree\":\"${wt_path}\",\"worktreeBranch\":\"${wt_branch}\",\"lockOwner\":null}")
+    JSON_ITEMS+=("{\"repo\":\"${repo_name}\",\"tool\":\"Worktree\",\"status\":\"ACTIVE\",\"operation_status\":\"N/A\",\"lastRefresh\":\"-\",\"indexedSha\":\"\",\"headSha\":\"${wt_sha}\",\"worktree\":\"${wt_path}\",\"worktreeBranch\":\"${wt_branch}\",\"lockOwner\":null}")
   done < <(discover_worktrees "$root" "$default_branch")
 }
 
@@ -421,7 +469,7 @@ while IFS=$'\t' read -r root branch gn gf; do
   if [[ ! -d "$root" ]]; then
     repo_name=$(basename "$root")
     RESULTS+=("$(printf '%-32s %-10s %-12s %-15s %s' "$repo_name" "-" "NOT_FOUND" "-" "-")")
-    JSON_ITEMS+=("{\"repo\":\"${repo_name}\",\"tool\":\"-\",\"status\":\"NOT_FOUND\",\"lastRefresh\":\"-\",\"indexedSha\":\"\",\"headSha\":\"-\",\"lockOwner\":null}")
+    JSON_ITEMS+=("{\"repo\":\"${repo_name}\",\"tool\":\"-\",\"status\":\"NOT_FOUND\",\"operation_status\":\"N/A\",\"indexedSha\":\"\",\"headSha\":\"-\",\"freshness\":\"NOT_FOUND\",\"freshnessRule\":\"N/A\",\"lastRefresh\":\"-\",\"lockOwner\":null}")
     continue
   fi
 
@@ -454,7 +502,7 @@ else
   echo "Threshold: ${STALENESS_THRESHOLD_DAYS} day(s)"
   echo "Generated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
   echo ""
-  printf '%-32s %-10s %-12s %-15s %s\n' "Repository" "Tool" "Status" "Last Refresh" "HEAD"
+  printf '%-32s %-10s %-12s %-15s %s\n' "Repository" "Tool" "Status" "Indexed Rev" "HEAD"
   printf '%-32s %-10s %-12s %-15s %s\n' "----------------------------" "--------" "----------" "---------------" "-------"
   for result in "${RESULTS[@]}"; do
     echo "$result"
