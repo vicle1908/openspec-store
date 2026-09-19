@@ -1,6 +1,6 @@
 # Hydrated-only reconciliation evidence
 
-- **Source root:** `/Users/androidteam/Developer/WHO-project-worktrees/`
+- **Source root:** `/Users/androidteam/Library/Mobile Documents/com~apple~CloudDocs/project/vds/WHO-project` (historical local symlink/alias target: `/Users/androidteam/Developer/WHO-project-worktrees/`)
 - **Destination root:** `/Users/androidteam/Developer/vds-content-migration/WHO-project/`
 - **Manifest:** `/Users/androidteam/Developer/vds-content-migration/migration-manifest.json`
 - **Observed result:** 16,114 manifest entries; approximately 3.1 GB at the destination; six files in the sensitive quarantine (aggregate only; no names or contents recorded).
