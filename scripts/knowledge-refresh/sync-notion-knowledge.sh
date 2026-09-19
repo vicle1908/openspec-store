@@ -53,10 +53,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Logging helper
+# Logging helper (directs to log file and stderr so stdout captures stay clean)
 log() {
   local level="$1" msg="$2"
-  printf '[%s] [%s] %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$level" "$msg" | tee -a "$LOG_FILE"
+  printf '[%s] [%s] %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$level" "$msg" | tee -a "$LOG_FILE" >&2
 }
 
 # Fail-closed secret sanitization & path normalization
