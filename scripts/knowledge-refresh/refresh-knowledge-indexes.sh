@@ -1175,8 +1175,14 @@ PY
         log_line "SYSTEM" overall "timeout" "$OVERALL_TIMEOUT" "batch timeout"
         return 0
       fi
+
+      # Post-refresh Notion ecosystem knowledge synchronization
+      local notion_sync="${SCRIPT_DIR}/sync-notion-knowledge.sh"
+      if [[ -x "$notion_sync" ]]; then
+        note "Running post-refresh Notion ecosystem knowledge synchronization..."
+        "$notion_sync" --incremental || warn "Notion ecosystem knowledge sync encountered an error"
+      fi
       return "$batch_status"
-      ;;
   esac
 }
 main "$@"
