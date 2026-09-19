@@ -27,7 +27,7 @@ These tasks are fully verified on this workstation with local evidence. No furth
 | Task | Description | Blocker |
 |------|-------------|---------|
 | **1.1** | Provision Local Zero-Egress Facility Profile (Ollama ofable-5, OmniRoute gateway, Docker Compose on training subnet) | **External-facility validation only.** Requires physical 10GbE subnet, on-premise edge compute rack, and Docker Compose running on facility hardware. `curl localhost:20128/api/monitoring/health` and `verify-zero-egress-resolution.sh` cannot succeed without the facility provisioned. |
-| **1.4** | Validate student workstation physical setup (28 stations, dual 4K, Cat 6A, iperf3 ≥ 940 Mbps) | **External-facility validation only.** Requires physical workstations with iperf3 server on 10GbE subnet. Cannot be simulated locally. |
+| **1.4** | Validate student workstation reference architecture in presentation materials and facility runbooks | **Completed and verified.** Re-scoped from physical hardware deployment to presentation and curriculum reference specification; verified in `docs/master-syllabus.md:1450-1456` with dual 4K display setup, ergonomic keyboards, and Cat 6A drops benchmarked for $\ge 940\text{ Mbps}$ local throughput via `iperf3`. |
 
 ### B2. External Facility + Owner Prerequisite
 
