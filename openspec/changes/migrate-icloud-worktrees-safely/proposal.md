@@ -1,16 +1,15 @@
 ## Why
 
-The iCloud project tree contains worktrees whose Git backing state is unresolved, dataless metadata, potentially unique local changes, and sensitive-looking files; migration must preserve source state and fail closed rather than delete or bulk-copy unverified content.
+The iCloud project tree (`~/Library/Mobile Documents/com~apple~CloudDocs/project/vds/WHO-project`) contains 46 worktrees and core repository directories (`vds-scripts`, `vds-skills`) with over 107,000 dataless files and 16,139 already-copied hydrated files. Our objective is to fully copy all source code and documents from iCloud to local disk (`~/Developer/vds-content-migration/WHO-project`), preserving exact directory names and hierarchical structure without triggering FileProvider deadlocks. Git history, `.git` pointers, and backing-store reconstruction are explicitly out of scope for this phase per owner direction.
 
 ## What Changes
 
-- Add a metadata-only inventory and evidence contract for iCloud worktrees, including `.git` pointer type, `st_flags`, `SF_DATALESS` observations, exact metadata errors, and unknown hydration state.
-- Add capacity and readability gates that distinguish logical-size projections from successfully readable bytes.
-- Define a bounded restricted-file pilot procedure that excludes `.git`, performs destination read-back verification, and records per-file bytes, hashes, and errors in access-restricted external evidence; OpenSpec references only aggregate/status metadata.
-- Define an authorized manual copy procedure for targeted non-destructive file or pointer capture under explicit user authorization: requires same-filesystem temporary destination, flush/fsync, atomic no-overwrite install, destination read-back hash verification, source preservation on failure, and value-blind external evidence logging.
-- Quarantine pilot content when local content detection finds sensitive assignments; keep the general recovery destination unavailable for further batches until retained pilot content is independently dispositioned, and keep the secret gate blocked.
-- Require local snapshot or verified clone/replacement validation before any iCloud source deletion.
-- Prohibit bulk deletion of linked worktrees and preserve unresolved local-only, orphaned, detached, staged, unstaged, and untracked state.
+- **Preserve Directory Names and Hierarchy**: Ensure 1:1 structural fidelity so all files retain their exact relative directory paths (e.g. `worktrees/<worktree-name>/...`, `vds-scripts/...`, `vds-skills/...`).
+- **Asynchronous Cocoa Hydration Pipeline**: Implement a 3-stage pipeline using Apple's native Cocoa API (`FileManager.default.startDownloadingUbiquitousItem(at:)` via Swift) to asynchronously trigger background downloads of dataless files without blocking kernel I/O, poll non-blockingly via `os.lstat` until materialized (`st_blocks > 0`), and atomically ingest via `content_migration.py`.
+- **Exclusion of Git Internals and Build Caches**: Exclude `.git`, `.git_disabled`, `.venv`, `__pycache__`, `.pytest_cache`, and build caches from the local destination.
+- **Sensitive File Quarantine**: Automatically divert `.env*` and credential files into a permission-restricted `sensitive-quarantine/` (`0700` dirs, `0600` files).
+- **Atomic Installation and Hash Verification**: Every file is staged to a temporary file on the same local filesystem, flushed/fsynced, atomically installed without overwrite, and read-back verified against its SHA-256 digest in `migration-manifest.json`.
+- **Fail-Closed Source Preservation**: The iCloud source tree is strictly read-only; no files are modified, moved, or deleted in iCloud (`source_mutations: 0`).
 ## Capabilities
 
 ### New Capabilities
@@ -30,11 +29,8 @@ None.
 
 ## Non-Goals
 
-- No iCloud source deletion or move in this planning change.
-- No bulk removal of the 46 worktrees.
-- No assumption that a linked-worktree `.git` pointer proves a surviving backing store.
-- No assumption that `SF_DATALESS` proves the entire tree is unreadable.
-- No copying of `.git`, `.env*`, credential, token, password, secret, key, or certificate paths into the general recovery destination; any targeted manual copy of `.git` pointers or metadata into restricted evidence storage requires explicit, separate user authorization naming the exact source paths.
-- No claim that the bounded restricted-file pilot generalizes to all worktrees: the restricted external pilot manifest records 7 copied and destination-verified allowlisted files across its recorded entries, with no read failures and Git excluded. Per-file details remain access-restricted external evidence; the remaining 11 allowlisted candidates were not copied.
-- Separate restricted reconciliation evidence records four files later quarantined after content scanning; quarantine outcomes are not attributed to the pilot manifest.
+- No iCloud source deletion or move: the iCloud tree is preserved unmutated.
+- No Git backing-store or commit-history reconstruction: Git history is decoupled per owner direction ("no need handle git we just need source code fully copied").
+- No copying of `.git`, `.git_disabled`, `.venv`, or build caches into the destination.
+- No copying of `.env*` or secret keys into the general recovery destination; all sensitive matches are diverted to `sensitive-quarantine/`.
 - No archive modification or archive-gap remediation.

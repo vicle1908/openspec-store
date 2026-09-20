@@ -6,19 +6,21 @@ See `proposal.md` and `specs/icloud-worktree-migration-safety/spec.md`. The curr
 
 **Goals:**
 
-- Make each bounded source-to-destination copy an independently verifiable transaction.
-- Record evidence before advancing any readability, secret, replacement, or deletion gate.
-- Keep sensitive pilot content quarantined and excluded from the general recovery destination.
-- Make deletion authorization exact-path, evidence-backed, and fail closed.
+- Fully copy all source code and documents from the iCloud project tree to local disk while preserving exact directory names and hierarchical structure.
+- Use asynchronous Cocoa hydration (`FileManager.default.startDownloadingUbiquitousItem(at:)` via Swift) to materialize dataless files without blocking kernel I/O or triggering FileProvider deadlocks.
+- Make each source-to-destination copy an independently verifiable atomic transaction with destination read-back SHA-256 verification.
+- Keep sensitive pilot content quarantined (`sensitive-quarantine/`, `0700` dirs, `0600` files) and excluded from the general recovery destination.
+- Preserve the iCloud source tree unmutated (`source_mutations: 0`).
 - Preserve metadata-only and value-blind evidence in OpenSpec while keeping per-file restricted evidence external.
 
 **Non-Goals:**
 
-- No implementation or iCloud mutation is authorized by this design alone.
+- No Git backing-store, pointer, or commit-history reconstruction: Git history is decoupled per owner direction ("no need handle git we just need source code fully copied").
+- No iCloud source deletion or move.
+- No copying of `.git`, `.git_disabled`, `.venv`, or build caches into the destination.
 - No assumption that iCloud deletion is reversible; rollback is not promised.
 - No reuse of the quarantined destination as a non-secret source.
-- No bulk or all-worktree operation.
-- No attempt to authorize an external writable repository through this central OpenSpec change.
+- No bulk or all-worktree operation without atomic per-file verification.
 
 ### External implementation boundary
 
@@ -65,6 +67,23 @@ Gates advance in order: metadata inventory, capacity projection, bounded readabi
 Replacement verification is per exact source path. It must cover the declared readable scope, local changes, and either a preserved local snapshot, recovered Git store, or verified remote clone. Deletion authorization names exactly one source path and references the independently recorded replacement evidence. A missing, stale, or mismatched authorization rejects the operation.
 
 Deletion has no assumed rollback: the original remains untouched until the authorization gate passes, but once deletion executes the design does not promise recovery. Glob, directory, all-worktree, and unbounded requests are rejected before mutation.
+
+### 6. 3-Stage Asynchronous Cocoa Hydration Pipeline
+
+To prevent the process hangs and `fileproviderd` queue churn caused by synchronous POSIX `open()` on dataless files, the migration adopts a 3-stage asynchronous pipeline:
+
+1. **Paced Download Trigger (`hydrate_pilot.swift`)**: Uses Cocoa `FileManager.default.startDownloadingUbiquitousItem(at:)` via Swift to request asynchronous background download of dataless regular files without blocking the calling thread.
+2. **Non-Blocking Metadata Polling**: Polls file metadata via `os.lstat` until `st_blocks > 0` and the `SF_DATALESS` flag is cleared, with bounded timeouts and zero file-body reads.
+3. **Atomic Ingestion & Verification (`content_migration.py`)**: Stages materialized files to a temporary location on the same local filesystem, flushes/fsyncs, atomically installs without overwrite, and verifies destination byte count and SHA-256 digest in `migration-manifest.json`.
+
+### 7. Directory Structure and Naming Fidelity
+
+All files copied from the iCloud source tree (`~/Library/Mobile Documents/com~apple~CloudDocs/project/vds/WHO-project`) SHALL maintain 1:1 relative path and naming fidelity under the local destination (`~/Developer/vds-content-migration/WHO-project`):
+
+- Worktree directories retain their exact names under `worktrees/<worktree-name>/`.
+- Top-level project directories retain their exact names (`vds-scripts/`, `vds-skills/`).
+- Subdirectory hierarchies and file names are preserved verbatim.
+- Excluded directories (`.git`, `.venv`, `__pycache__`, etc.) are pruned; sensitive `.env*` files are diverted to `sensitive-quarantine/` while preserving their relative subdirectory paths.
 
 ## Risks / Trade-offs
 

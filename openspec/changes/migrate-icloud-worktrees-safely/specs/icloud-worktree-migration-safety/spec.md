@@ -106,3 +106,24 @@ The migration SHALL permit targeted manual copying of individual source files or
 
 - **WHEN** manual copy is attempted without explicit exact-path authorization or with broad/unbounded directory wildcards
 - **THEN** the operation SHALL be rejected before any write or mutation occurs.
+
+### Requirement: Directory names and hierarchical structure are preserved identically
+
+The migration SHALL maintain exact 1:1 structural and naming fidelity between the iCloud source tree and the local destination, keeping all relative paths intact across worktrees, tools, and root components.
+
+#### Scenario: Hierarchical structure is preserved
+
+- **WHEN** source code files and directories are copied from the iCloud source tree to the local recovery destination
+- **THEN** every file SHALL be placed at the exact same relative subpath under the destination root (e.g. `worktrees/<worktree-name>/<subpath>` and `vds-scripts/<subpath>`) as it occupied in the source tree
+- **AND** all parent directory names SHALL match the source directory names verbatim.
+
+### Requirement: Asynchronous Cocoa hydration pipeline for dataless source code
+
+The migration SHALL use asynchronous Cocoa APIs to request background materialization of dataless files from iCloud without blocking kernel I/O, and SHALL verify completion via metadata-only polling before reading file bodies.
+
+#### Scenario: Dataless source files are materialized and ingested
+
+- **WHEN** dataless regular files (`SF_DATALESS` / `st_blocks == 0`) are identified in the source tree
+- **THEN** the migration pipeline SHALL invoke `FileManager.default.startDownloadingUbiquitousItem(at:)` asynchronously via the Swift helper tool
+- **AND** the pipeline SHALL poll `os.lstat` until `st_blocks > 0` before any file read or copy is attempted
+- **AND** the materialized file SHALL be atomically installed into the local destination and recorded in `migration-manifest.json` with its size and SHA-256 digest.
