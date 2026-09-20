@@ -1,0 +1,30 @@
+# Spec Delta
+
+## MODIFIED Requirements
+
+### Requirement: Audit Remediation Verification Gates
+The verification pass SHALL re-execute, in fresh processes against the current working tree, every audit/build/test claim made by the 2026-09-20 remediation session across `/Users/androidteam/package.json`, `mcp-router`, `realtime/frontend`, and `prime-agent`, and SHALL record verifiable evidence satisfying each gate's declared release condition (fresh command execution with exit code and observed output, or explicit reclassification as unpatched-upstream residual with no-fix marker cited).
+
+#### Scenario: audit counts match remediation outcomes
+- **WHEN** the package-manager audit command (`npm audit` or `pnpm audit`) for each repository is re-executed
+- **THEN** the reported vulnerability count equals the remediation session's recorded outcome for that repository (0 in `~`, 4 unpatched residuals in `mcp-router`, 0 in `realtime/frontend`, 0 in `prime-agent`), or any delta is explained in evidence as an unpatched upstream residual or a newly published advisory rather than a remediation regression
+
+#### Scenario: unpatched residuals are identified, not just counted
+- **WHEN** an audit reports remaining vulnerabilities in `mcp-router`
+- **THEN** evidence identifies each remaining advisory by package, version, dependency path, and upstream no-fix marker (`image-size <=2.0.2` and `extract-zip <=2.0.1` with `patched: <0.0.0`), confirming that no patched version exists at verification time
+
+#### Scenario: builds and focused tests pass on changed surfaces
+- **WHEN** verification commands for each repository are executed (`pnpm --filter @mcp_router/electron run typecheck`, `turbo run build`, `prime-agent` `npm run check`, `realtime/frontend` `npm run build` or `npm run type-check`)
+- **THEN** each command exits successfully with status 0, or a failure is either fixed within remediation scope or shown to be pre-existing and unrelated to the dependency changes, with the distinction recorded in evidence
+
+#### Scenario: pnpm-managed repo stays pnpm-only
+- **WHEN** `mcp-router` is verified
+- **THEN** no `package-lock.json` exists anywhere in the repository, all mutations were made via pnpm, and all overrides are specified under `pnpm.overrides`
+
+#### Scenario: bugs found during verification are fixed
+- **WHEN** a verification command fails where the remediation session recorded a pass, or a defect is found in migration-touched code
+- **THEN** the bug is fixed within the remediation's scope, the failing command is re-run and passes, and the fix is recorded in evidence with file paths
+
+#### Scenario: evidence is literal-safe
+- **WHEN** evidence records package names, versions, or model identifiers
+- **THEN** literals are programmatically derived from lockfiles, manifests, or command output read back from disk, not hand-typed from memory
