@@ -92,3 +92,17 @@ The migration SHALL require independently recorded replacement evidence and expl
 
 - **WHEN** a request targets all worktrees, a directory glob, an unbounded set, or any path set without one exact authorized source path per operation
 - **THEN** the request SHALL be rejected before mutation and SHALL report that bulk deletion is unsupported.
+
+### Requirement: Authorized manual copy transactions satisfy atomic safety
+
+The migration SHALL permit targeted manual copying of individual source files or metadata pointers under explicit user authorization naming the exact source paths, provided each transaction preserves the iCloud source, uses atomic installation with read-back verification, and records per-file evidence.
+
+#### Scenario: Authorized manual copy succeeds
+
+- **WHEN** user authorization names exact source paths for manual capture into local evidence or restricted recovery
+- **THEN** each file is copied using a temporary destination on the same local filesystem with flush/fsync, atomically installed without overwriting, read-back verified by size and SHA-256, and recorded in restricted external evidence while preserving the iCloud source.
+
+#### Scenario: Unauthorized or unbounded manual copy is rejected
+
+- **WHEN** manual copy is attempted without explicit exact-path authorization or with broad/unbounded directory wildcards
+- **THEN** the operation SHALL be rejected before any write or mutation occurs.
