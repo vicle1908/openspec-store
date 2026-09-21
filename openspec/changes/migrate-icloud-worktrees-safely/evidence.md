@@ -1,7 +1,7 @@
 # Migration and Verification Evidence: migrate-icloud-worktrees-safely
 
 **Date:** 2026-09-21
-**Status:** In Progress (63,659 Files Verified / ~51.4% Global Hydration)
+**Status:** In Progress (67,624 Files Verified / ~54.6% Global Hydration)
 
 ## 1. Global Inventory & Progress Delta
 
@@ -10,16 +10,20 @@ Across all non-excluded directories in `WHO-project` (`.git*`, `.venv`, cache, a
 | Zone | Total Candidate Files | Hydrated & Verified (Local) | Dataless (iCloud) | Status |
 |---|---|---|---|---|
 | `vds-skills/` | 1,050 | 1,050 | 0 | **100% Complete** |
-| `vds-scripts/` | 63,966 | 9,262 | 54,704 | 14.5% (In Progress) |
-| `worktrees/` (46 worktrees) | 58,858 | 53,347 | 5,511 | 90.6% (In Progress) |
-| **Global Total** | **123,874** | **63,659** | **60,215** | **51.4%** |
+| `vds-scripts/` | 63,966 | 9,698 | 54,268 | 15.2% (In Progress) |
+| `worktrees/` (46 worktrees) | 58,858 | 56,876 | 1,982 | **96.6% Delivered** |
+| **Global Total** | **123,874** | **67,624** | **56,250** | **54.6%** |
 
 ### Dataless Concentration Analysis
-- **`vds-scripts/graphify-out`**: 48,230 dataless files (80.1% of the remaining project backlog).
-- **Core Orchestrator Packages**: 6,474 dataless files across `memory_orchestrator`, `reports`, `code`, `audit_orchestrator`, `vds_cli`, and others (active background download underway).
-- **Worktrees Backlog**: Down to ~5,511 dataless files across all 46 worktrees (over 90% delivered).
+- **`vds-scripts/graphify-out`**: 47,802 dataless files (85.0% of the entire remaining project backlog).
+- **Core Orchestrator Packages**: ~6,466 dataless files across `memory_orchestrator`, `reports`, `code`, `audit_orchestrator`, `vds_cli`, and others (active background download underway).
+- **Worktrees Backlog**: Down to ~1,982 dataless files across all 46 worktrees (96.6% delivered).
 - **Completed Worktrees & Packages**:
   - `vds-skills/`: 100% complete (1,050/1,050).
+  - `worktrees/vds-scripts-checklist-query-cli`: 100% complete (1,745/1,745).
+  - `worktrees/vds-scripts-circular-dependency-skill-20260321`: 100% complete (1,641/1,641).
+  - `worktrees/vds-scripts-lsp-cleanup`: 100% complete (1,815/1,815).
+  - `worktrees/vds-scripts-par-live-investigation-20260322`: 100% complete (1,697/1,697).
   - `worktrees/vds-scripts-payment-material-fixes`: 100% complete (1,738/1,738).
   - `worktrees/vds-scripts-phase128`: 100% complete (1,709/1,709).
   - `worktrees/vds-scripts-phase133-cl003-shared-lib`: 100% complete (1,723/1,726).
@@ -27,12 +31,12 @@ Across all non-excluded directories in `WHO-project` (`.git*`, `.venv`, cache, a
 
 ## 2. Ingestion & Destination Verification (Task 4.1 Milestone)
 
-- **Total Ingested & Verified Files:** 63,659 files recorded in `migration-manifest.json`.
-- **Integrity Check:** `content_migration.py --verify-only` against destination returned `{"failed": 0, "verified": 63659}`. 100% of copied files match SHA-256 digests and byte counts with zero failures.
+- **Total Ingested & Verified Files:** 67,624 files recorded in `migration-manifest.json`.
+- **Integrity Check:** `content_migration.py --verify-only` against destination returned `{"failed": 0, "verified": 67624}`. 100% of copied files match SHA-256 digests and byte counts with zero failures.
 - **Milestone Highlights:**
-  - Surpassed the **50% global hydration milestone** (63,659 / 123,874 files verified).
-  - Worktrees reached **90.6% delivery** (53,347 files verified).
-  - Total progress advanced from 17,135 to 63,659 files (+46,524 newly copied files).
+  - Surpassed **54.6% global delivery** (67,624 / 123,874 files verified).
+  - Worktrees reached **96.6% delivery** (56,876 files verified; only ~1,982 files remaining).
+  - Overall progress advanced from 17,135 to 67,624 files (+50,489 newly copied files).
 - **Background Hydration Pipeline:**
   - Dynamic prioritized ingestion runner (`run_hydration_loop.py`) committed to `icloud-migration-tools` (`c4452ff`).
   - macOS `bird` daemon (PID 45724) actively streaming dataless APFS blocks in the background.
