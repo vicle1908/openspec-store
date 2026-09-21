@@ -1,7 +1,7 @@
 # Migration and Verification Evidence: migrate-icloud-worktrees-safely
 
 **Date:** 2026-09-21
-**Status:** In Progress (51,473 Files Verified / ~41.5% Global Hydration)
+**Status:** In Progress (52,834 Files Verified / ~42.7% Global Hydration)
 
 ## 1. Global Inventory & Progress Delta
 
@@ -11,16 +11,16 @@ Across all non-excluded directories in `WHO-project` (`.git*`, `.venv`, cache, a
 |---|---|---|---|---|
 | `vds-skills/` | 1,050 | 1,050 | 0 | **100% Complete** |
 | `vds-scripts/` | 63,966 | 8,740 | 55,226 | 13.7% (In Progress) |
-| `worktrees/` (46 worktrees) | 58,858 | 41,683 | 17,175 | 70.8% (In Progress) |
-| **Global Total** | **123,874** | **51,473** | **72,401** | **41.5%** |
+| `worktrees/` (46 worktrees) | 58,858 | 43,044 | 15,814 | 73.1% (In Progress) |
+| **Global Total** | **123,874** | **52,834** | **71,040** | **42.7%** |
 
 ## 2. Ingestion & Destination Verification (Task 4.1 Milestone)
 
-- **Total Ingested & Verified Files:** 51,473 files recorded in `migration-manifest.json`.
-- **Integrity Check:** `content_migration.py --verify-only` against destination returned `{"failed": 0, "verified": 51473}`. 100% of copied files match SHA-256 digests and byte counts with zero failures.
-- **Milestone Highlight:**
+- **Total Ingested & Verified Files:** 52,834 files recorded in `migration-manifest.json`.
+- **Integrity Check:** `content_migration.py --verify-only` against destination returned `{"failed": 0, "verified": 52834}`. 100% of copied files match SHA-256 digests and byte counts with zero failures.
+- **Milestone Highlights:**
   - `vds-skills/`: 100% delivered (1,050/1,050 files verified on local disk).
-  - `worktrees/`: Rapid materialization across active worktrees (now >70% verified).
+  - `worktrees/`: Over 73% delivered (43,044 files verified across active worktrees).
 - **Background Hydration Pipeline:**
   - Cocoa hydration triggers active across all candidate subpaths via `hydrate_pilot.swift`.
   - Dynamic partitioned ingestion runner: `run_hydration_loop.py` scanning all 46 worktrees and `vds-scripts` directories without global tree overhead.
