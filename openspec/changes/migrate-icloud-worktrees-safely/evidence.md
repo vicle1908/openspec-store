@@ -1,7 +1,7 @@
 # Migration and Verification Evidence: migrate-icloud-worktrees-safely
 
 **Date:** 2026-09-21
-**Status:** In Progress (70,009 Files Verified / ~56.5% Global Hydration)
+**Status:** In Progress (75,261 Files Verified / ~60.8% Global Hydration)
 
 ## 1. Global Inventory & Progress Delta
 
@@ -10,12 +10,12 @@ Across all non-excluded directories in `WHO-project` (`.git*`, `.venv`, cache, a
 | Zone | Total Candidate Files | Hydrated & Verified (Local) | Dataless (iCloud) | Status |
 |---|---|---|---|---|
 | `vds-skills/` | 1,050 | 1,050 | 0 | **100% Complete** |
-| `vds-scripts/` | 63,966 | 10,190 | 53,776 | 15.9% (In Progress) |
+| `vds-scripts/` | 63,966 | 15,442 | 48,524 | 24.1% (In Progress) |
 | `worktrees/` (46 worktrees) | 58,858 | 58,769 | 89 | **99.85% Delivered** |
-| **Global Total** | **123,874** | **70,009** | **53,865** | **56.5%** |
+| **Global Total** | **123,874** | **75,261** | **48,613** | **60.8%** |
 
 ### Dataless Concentration Analysis
-- **`vds-scripts/graphify-out`**: ~47,308 dataless files (87.8% of the entire remaining project backlog).
+- **`vds-scripts/graphify-out`**: ~42,056 dataless files (86.5% of the remaining project backlog, actively streaming).
 - **Core Orchestrator Packages**: ~6,468 dataless files across `memory_orchestrator`, `reports`, `code`, `audit_orchestrator`, `vds_cli`, and others (active background download underway).
 - **Worktrees Backlog**: Down to only 89 dataless files across all 46 worktrees combined (99.85% delivered).
 - **Completed Worktrees & Packages**:
@@ -25,12 +25,12 @@ Across all non-excluded directories in `WHO-project` (`.git*`, `.venv`, cache, a
 
 ## 2. Ingestion & Destination Verification (Task 4.1 Milestone)
 
-- **Total Ingested & Verified Files:** 70,009 files recorded in `migration-manifest.json`.
-- **Integrity Check:** `content_migration.py --verify-only` against destination returned `{"failed": 0, "verified": 70009}`. 100% of copied files match SHA-256 digests and byte counts with zero failures.
+- **Total Ingested & Verified Files:** 75,261 files recorded in `migration-manifest.json`.
+- **Integrity Check:** `content_migration.py --verify-only` against destination returned `{"failed": 0, "verified": 75261}`. 100% of copied files match SHA-256 digests and byte counts with zero failures.
 - **Milestone Highlights:**
-  - Surpassed **56.5% global delivery** (70,009 / 123,874 files verified).
-  - Worktrees reached **99.85% delivery** (58,769 / 58,858 files verified; only 89 files remaining).
-  - Total progress advanced from 17,135 to 70,009 files (+52,874 newly copied files).
+  - Surpassed **60.8% global delivery** (75,261 / 123,874 files verified).
+  - Worktrees sustained **99.85% delivery** (58,769 / 58,858 files verified; only 89 files remaining).
+  - Total progress advanced from 17,135 to 75,261 files (+58,126 newly copied files).
 - **Background Hydration Pipeline:**
   - Dynamic prioritized ingestion runner (`run_hydration_loop.py`) committed to `icloud-migration-tools` (`c4452ff`).
   - macOS `bird` daemon (PID 45724) actively streaming dataless APFS blocks in the background.
