@@ -1,7 +1,7 @@
 # Migration and Verification Evidence: migrate-icloud-worktrees-safely
 
 **Date:** 2026-09-21
-**Status:** In Progress (41,762 Files Verified / ~33.7% Global Hydration)
+**Status:** In Progress (51,473 Files Verified / ~41.5% Global Hydration)
 
 ## 1. Global Inventory & Progress Delta
 
@@ -10,17 +10,17 @@ Across all non-excluded directories in `WHO-project` (`.git*`, `.venv`, cache, a
 | Zone | Total Candidate Files | Hydrated & Verified (Local) | Dataless (iCloud) | Status |
 |---|---|---|---|---|
 | `vds-skills/` | 1,050 | 1,050 | 0 | **100% Complete** |
-| `vds-scripts/` | 63,966 | 8,303 | 55,663 | 13.0% (In Progress) |
-| `worktrees/` (46 worktrees) | 58,858 | 32,409 | 26,449 | 55.1% (In Progress) |
-| **Global Total** | **123,874** | **41,762** | **82,112** | **33.7%** |
+| `vds-scripts/` | 63,966 | 8,740 | 55,226 | 13.7% (In Progress) |
+| `worktrees/` (46 worktrees) | 58,858 | 41,683 | 17,175 | 70.8% (In Progress) |
+| **Global Total** | **123,874** | **51,473** | **72,401** | **41.5%** |
 
 ## 2. Ingestion & Destination Verification (Task 4.1 Milestone)
 
-- **Total Ingested & Verified Files:** 41,762 files recorded in `migration-manifest.json`.
-- **Integrity Check:** `content_migration.py --verify-only` against destination returned `{"failed": 0, "verified": 41762}`. 100% of copied files match SHA-256 digests and byte counts with zero failures.
+- **Total Ingested & Verified Files:** 51,473 files recorded in `migration-manifest.json`.
+- **Integrity Check:** `content_migration.py --verify-only` against destination returned `{"failed": 0, "verified": 51473}`. 100% of copied files match SHA-256 digests and byte counts with zero failures.
 - **Milestone Highlight:**
   - `vds-skills/`: 100% delivered (1,050/1,050 files verified on local disk).
-  - `worktrees/`: Rapid materialization across active worktrees (over 55% verified).
+  - `worktrees/`: Rapid materialization across active worktrees (now >70% verified).
 - **Background Hydration Pipeline:**
   - Cocoa hydration triggers active across all candidate subpaths via `hydrate_pilot.swift`.
   - Dynamic partitioned ingestion runner: `run_hydration_loop.py` scanning all 46 worktrees and `vds-scripts` directories without global tree overhead.
