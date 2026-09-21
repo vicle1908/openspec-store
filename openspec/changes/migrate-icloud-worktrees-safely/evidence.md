@@ -1,7 +1,7 @@
 # Migration and Verification Evidence: migrate-icloud-worktrees-safely
 
 **Date:** 2026-09-21
-**Status:** In Progress (37,609 Files Verified / ~30.4% Global Hydration)
+**Status:** In Progress (41,762 Files Verified / ~33.7% Global Hydration)
 
 ## 1. Global Inventory & Progress Delta
 
@@ -10,19 +10,21 @@ Across all non-excluded directories in `WHO-project` (`.git*`, `.venv`, cache, a
 | Zone | Total Candidate Files | Hydrated & Verified (Local) | Dataless (iCloud) | Status |
 |---|---|---|---|---|
 | `vds-skills/` | 1,050 | 1,050 | 0 | **100% Complete** |
-| `vds-scripts/` | 63,966 | 8,083 | 55,883 | 12.6% (In Progress) |
-| `worktrees/` (46 worktrees) | 58,858 | 28,476 | 30,382 | 48.4% (In Progress) |
-| **Global Total** | **123,874** | **37,609** | **86,265** | **30.4%** |
+| `vds-scripts/` | 63,966 | 8,303 | 55,663 | 13.0% (In Progress) |
+| `worktrees/` (46 worktrees) | 58,858 | 32,409 | 26,449 | 55.1% (In Progress) |
+| **Global Total** | **123,874** | **41,762** | **82,112** | **33.7%** |
 
 ## 2. Ingestion & Destination Verification (Task 4.1 Milestone)
 
-- **Total Ingested & Verified Files:** 37,609 files recorded in `migration-manifest.json`.
-- **Integrity Check:** `content_migration.py --verify-only` against destination returned `{"failed": 0, "verified": 37609}`. 100% of copied files match SHA-256 digests and byte counts with zero failures.
-- **Milestone Highlight:** `vds-skills/` reached 100% delivery (1,050/1,050 files verified on local disk).
+- **Total Ingested & Verified Files:** 41,762 files recorded in `migration-manifest.json`.
+- **Integrity Check:** `content_migration.py --verify-only` against destination returned `{"failed": 0, "verified": 41762}`. 100% of copied files match SHA-256 digests and byte counts with zero failures.
+- **Milestone Highlight:**
+  - `vds-skills/`: 100% delivered (1,050/1,050 files verified on local disk).
+  - `worktrees/`: Rapid materialization across active worktrees (over 55% verified).
 - **Background Hydration Pipeline:**
-  - Cocoa hydration triggers active across all subpaths via `hydrate_pilot.swift`.
-  - Resilient partitioned background ingestion runner: `run_hydration_loop.py` executing targeted subpath sweeps without global tree overhead.
-  - macOS `bird` daemon (PID 45724) downloading APFS blocks continuously.
+  - Cocoa hydration triggers active across all candidate subpaths via `hydrate_pilot.swift`.
+  - Dynamic partitioned ingestion runner: `run_hydration_loop.py` scanning all 46 worktrees and `vds-scripts` directories without global tree overhead.
+  - macOS `bird` daemon (PID 45724) downloading APFS blocks continuously from Apple servers.
 
 ## 3. Safety Gate Invariants (Task 4.3 Milestone)
 
