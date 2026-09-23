@@ -24,9 +24,18 @@ The migration pipeline SHALL copy the identified residual developer assets from 
 - **THEN** only the 30 Python, README, and configuration files SHALL be transferred to `~/Developer/study-examples/investing-for-programmers/`
 - **AND** all parent and sibling PDF/ePub book files in `books/` SHALL remain untouched in iCloud Drive.
 
-#### Scenario: Utility setup script is migrated to scripts directory
-- **WHEN** migrating `Downloads/setup-fable-5.sh`
-- **THEN** the script SHALL be installed at `~/Developer/scripts/setup-fable-5.sh` with executable permissions preserved.
+#### Scenario: Utility setup script is quarantined if secrets are detected
+- **WHEN** inspecting `Downloads/setup-fable-5.sh` and detecting embedded credentials or API keys
+- **THEN** the script SHALL be isolated in `~/Developer/sensitive-quarantine/downloads/setup-fable-5.sh` with mode `0600`.
+
+#### Scenario: Study code zip archives are extracted and purged from books directory
+- **WHEN** migrating study code archives `books/.../code.zip` and `books/.../sckotlin-code.zip`
+- **THEN** the archives SHALL be extracted into `~/Developer/study-examples/` subdirectories
+- **AND** the source zip archives SHALL be purged from iCloud while preserving all book documents (.pdf, .epub).
+
+#### Scenario: Residual workplace credentials and environment configs are quarantined
+- **WHEN** migrating `ghtk/soft/charles/charlesKey.rtf` and `ghtk/zshrc/.zshrc`
+- **THEN** the credential assets SHALL be installed in `~/Developer/sensitive-quarantine/ghtk/` with file permissions `0600`.
 
 ### Requirement: Residual cloud source purge is bounded and gated on 100% digest verification
 

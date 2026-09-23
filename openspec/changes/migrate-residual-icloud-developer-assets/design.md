@@ -34,13 +34,18 @@ Total remaining scope: **439 files (~37.4 MB, 435 dataless)**.
 
 To ensure clear separation between active working repositories and historical snapshots, assets are routed to distinct local destinations:
 
-| Residual Asset | iCloud Source Path | Local Destination | Manifest Name |
+| Residual Asset | iCloud Source Path | Local Destination | Manifest / Verification Type |
 |---|---|---|---|
 | MCP Router Trial Snapshot | `Documents/Codex/2026-07-22/try/work/mcp-router-src` | `~/Developer/mcp-router-backup-20260722` | `manifest-mcp-router-backup-20260722.json` |
 | Security Guide | `Documents/PRODUCTION_SECRETS_SECURITY_GUIDE.md` | `~/Developer/docs/PRODUCTION_SECRETS_SECURITY_GUIDE.md` | `manifest-production-secrets-guide.json` |
 | Lending Miniapp Docs | `Desktop/Desktop - Cuong’s iMac - 1/lending-miniapp-fe` | `~/Developer/lending-miniapp-docs` | `manifest-lending-miniapp-docs.json` |
-| Investing Code Samples | `books/.../investing-for-programmers-main` | `~/Developer/study-examples/investing-for-programmers` | `manifest-investing-for-programmers.json` |
-| Setup Script | `Downloads/setup-fable-5.sh` | `~/Developer/scripts/setup-fable-5.sh` | `manifest-setup-fable-5.json` |
+| Investing Code Samples | `books/.../investing-for-programmers-main` | `~/Developer/study-examples/investing-for-programmers` | Git repository / Directory manifest |
+| Docker Study Code | `books/.../code.zip` | `~/Developer/study-examples/docker-in-a-month-of-lunches` | Zip extraction / Directory manifest |
+| Kotlin Study Code | `books/.../sckotlin-code.zip` | `~/Developer/study-examples/kotlin-coroutine-confidence` | Zip extraction / Directory manifest |
+| Setup Script (Quarantined) | `Downloads/setup-fable-5.sh` | `~/Developer/sensitive-quarantine/downloads/setup-fable-5.sh` | Quarantine `0600` / SHA-256 verified |
+| Charles Proxy License | `ghtk/soft/charles/charlesKey.rtf` | `~/Developer/sensitive-quarantine/ghtk/charlesKey.rtf` | Quarantine `0600` / SHA-256 verified |
+| GHTK Shell Config | `ghtk/zshrc/.zshrc` | `~/Developer/ghtk-scripts/zshrc/.zshrc` & `sensitive-quarantine/ghtk/.zshrc` | Quarantine `0600` / Scripts verified |
+| Ascend Configs | `ascend/PH/localize`, `MM/LoyaltyApp/config` | `~/Developer/ascend-configs/` | Directory verified |
 
 *Rationale:* The active checkout of `mcp-router` at `~/Developer/mcp-router` is currently dirty and under active development. Storing the 2026-07-22 trial snapshot at `~/Developer/mcp-router-backup-20260722` prevents file collisions and maintains complete historical provenance.
 

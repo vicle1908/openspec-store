@@ -11,10 +11,12 @@ Migrating these final assets into structured local directories under `~/Develope
 - **Migrate Historical MCP Router Snapshot**: Hydrate and atomically copy `Documents/Codex/2026-07-22/try/work/mcp-router-src` (393 files, 391 dataless) to `~/Developer/mcp-router-backup-20260722/`, preserving full internal package and app directory structure (`apps/`, `packages/`, `docs/`, `tools/`).
 - **Migrate Security Guide**: Hydrate and copy `Documents/PRODUCTION_SECRETS_SECURITY_GUIDE.md` to `~/Developer/docs/PRODUCTION_SECRETS_SECURITY_GUIDE.md`.
 - **Migrate Lending Miniapp Documentation**: Hydrate and copy `Desktop/Desktop - Cuong’s iMac - 1/lending-miniapp-fe` (14 files, 12 dataless) to `~/Developer/lending-miniapp-docs/`, preserving the `diagrams/` subdirectory.
-- **Migrate Study Source Code**: Hydrate and copy `books/ai/2025/Investing for Programmers/investing-for-programmers-main` (30 files, 30 dataless) to `~/Developer/study-examples/investing-for-programmers/`.
-- **Migrate Setup Script**: Copy `Downloads/setup-fable-5.sh` to `~/Developer/scripts/setup-fable-5.sh`.
-- **Asynchronous Cocoa Hydration**: Use `hydrate_pilot.swift` to trigger background materialization via Apple's native `FileManager.default.startDownloadingUbiquitousItem(at:)`, followed by non-blocking `os.lstat` polling (`st_blocks > 0`) and atomic ingestion via `content_migration.py`.
-- **Manifest Recording and Digest Verification**: Generate individual JSON manifests for each migrated asset and verify 100% SHA-256 digest and byte-count equality via `--verify-only`.
+- **Migrate Study Source Code**: Hydrate and copy `books/ai/2025/Investing for Programmers/investing-for-programmers-main` (59 files) to `~/Developer/study-examples/investing-for-programmers/`.
+- **Extract & Migrate Study Code Archives**: Extract and migrate `books/.../code.zip` to `~/Developer/study-examples/docker-in-a-month-of-lunches` (3,932 files) and `books/.../sckotlin-code.zip` to `~/Developer/study-examples/kotlin-coroutine-confidence` (1,535 files).
+- **Quarantine Sensitive Scripts & Credentials**: Quarantine `Downloads/setup-fable-5.sh` (embedded API key) to `~/Developer/sensitive-quarantine/downloads/setup-fable-5.sh` (`0600`), `ghtk/soft/charlesKey.rtf` (`0600`), and `ghtk/zshrc/.zshrc` (`0600` quarantine / `~/Developer/ghtk-scripts/zshrc/.zshrc`).
+- **Migrate Ascend Configurations**: Transfer `localized_strings_ph.json`, `LoyaltyApp/config`, and MM config zip to `~/Developer/ascend-configs/`.
+- **Asynchronous Cocoa Hydration**: Use native `FileManager.default.startDownloadingUbiquitousItem(at:)` for background materialization, followed by non-blocking `os.lstat` polling (`st_blocks > 0`) and atomic ingestion.
+- **Manifest Recording and Digest Verification**: Generate manifests and verify 100% SHA-256 digest and byte-count equality via `--verify-only`.
 - **Controlled Fail-Closed Purge**: After two-way reconciliation passes with 0 failures, safely unlink the migrated cloud source files and prune empty parent directories, while strictly protecting all personal non-code files.
 
 ## Capabilities
