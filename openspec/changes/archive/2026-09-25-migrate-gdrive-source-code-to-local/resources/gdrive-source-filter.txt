@@ -1,0 +1,75 @@
+# Whitelist: Source Code, Manifests, Schemas, and Documentation
++ *.kt
++ *.java
++ *.swift
++ *.go
++ *.py
++ *.sh
++ *.sql
++ *.c
++ *.cpp
++ *.h
++ *.puml
++ *.md
++ AGENTS.md
++ CLAUDE.md
++ go.mod
++ go.sum
++ pyproject.toml
++ uv.lock
++ build.gradle*
++ settings.gradle*
++ gradle.properties
++ gradlew
++ gradlew.bat
++ Package.swift
++ *.xcodeproj/project.pbxproj
++ *.xcworkspace/contents.xcworkspacedata
++ Dockerfile*
++ docker-compose*.yml
++ Makefile
++ *.patch
++ *.toml
++ *.yaml
++ *.yml
++ *.json
++ *.xml
+
+# Blacklist: Compiled Binaries, Frameworks, and Archives
+- qi-gen-proxy
+- *.xcframework/**
+- *.framework/**
+- Pods/**
+- *.apk
+- *.aab
+- *.ipa
+- *.pt
+- *.onnx
+- *.tar.gz
+- *.zip
+- *.so
+- *.dylib
+- *.bin
+- *.exe
+
+# Blacklist: Dependency Caches, Virtualenvs, and Build Trees
+- .gradle/**
+- build/**
+- DerivedData/**
+- .venv/**
+- node_modules/**
+- __pycache__/**
+- *.pyc
+- .pytest_cache/**
+- .gitnexus/**
+
+# Blacklist: Sensitive Credentials (Handled via Dedicated Quarantine Phase)
+- acme.json
+- *.jks
+- *.keystore
+- *.pem
+- *.p12
+- *.p8
+
+# Catch-all
+- *

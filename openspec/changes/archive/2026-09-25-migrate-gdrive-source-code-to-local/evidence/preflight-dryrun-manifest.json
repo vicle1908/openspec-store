@@ -1,0 +1,74 @@
+{
+  "qi-bridge": {
+    "remote": "tdt/qi-bridge",
+    "target_local": "~/Developer/qi-bridge",
+    "eligible_files_count": 13,
+    "files_sample": [
+      "AGENTS.md",
+      ".gitnexus/",
+      "go.mod",
+      "proxy.go",
+      ".gitnexus/parsedfile-cache/",
+      ".gitnexus/parse-cache/",
+      ".gitnexus/meta.json",
+      ".gitnexus/gitnexus.json",
+      ".gitnexus/parsedfile-cache/index.json",
+      ".gitnexus/parsedfile-cache/c7635fbf7555488743f499a2eed49a5b70503527c19c8b5e39dcda02266fe628/"
+    ]
+  },
+  "tdt-tools": {
+    "remote": "tdt/tdt-tools",
+    "target_local": "~/Developer/ops-tools/tdt-tools",
+    "eligible_files_count": 4,
+    "files_sample": [
+      "webhook-rotate.sh",
+      "secondary-hook.py",
+      "ngrok-webhook-secondary.sh",
+      "incident-report.sh"
+    ]
+  },
+  "bootstrap-nexus": {
+    "remote": "tdt/bootstrap-nexus-for-mobile",
+    "target_local": "~/Developer/ops-tools/bootstrap-nexus",
+    "eligible_files_count": 10,
+    "files_sample": [
+      "AGENTS.md",
+      ".gitnexus/",
+      "docker-compose.yml",
+      "README.md",
+      "scripts/",
+      "scripts/bootstrap-nexus.sh",
+      ".gitnexus/parse-cache/",
+      ".gitnexus/meta.json",
+      ".gitnexus/gitnexus.json",
+      ".gitnexus/parse-cache/index.json"
+    ]
+  },
+  "docker-traefik": {
+    "remote": "Docker/traefik",
+    "target_local": "~/Developer/infra/traefik",
+    "eligible_files_count": 3,
+    "files_sample": [
+      "docker-compose.yml",
+      "acme.json",
+      "traefik.toml"
+    ]
+  },
+  "fpt-ingenico": {
+    "remote": "Fpt/Ingenico",
+    "target_local": "~/Developer/infra/fpt-ingenico",
+    "eligible_files_count": 18,
+    "files_sample": [
+      "development_guides/",
+      "DLS/",
+      "CM/",
+      "RAM/",
+      "detekt.yml",
+      "Update_config.patch",
+      "development_guides/.doctrees/",
+      "development_guides/_images/",
+      "development_guides/_sources/",
+      "development_guides/_static/"
+    ]
+  }
+}
