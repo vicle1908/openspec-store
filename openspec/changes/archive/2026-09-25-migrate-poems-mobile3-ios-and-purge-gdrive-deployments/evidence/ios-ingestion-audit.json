@@ -1,0 +1,18 @@
+{
+  "source_remote": "gdrive-tdt:tdt/poems-mobile3-ios",
+  "local_destination": "/Users/androidteam/Developer/mobile/poems-mobile3-ios",
+  "total_files": 2303,
+  "payload_size_mb": 17.42,
+  "swift_files_count": 1834,
+  "xcode_project_files_count": 12,
+  "git_baseline_commit": "d1f88c2",
+  "excluded_artifacts": [
+    "Pods/**",
+    "Framework/**",
+    "ENETSLib.xcframework/**",
+    "ThreeDS_SDK.xcframework/**",
+    "DerivedData/**",
+    ".gitnexus/**"
+  ],
+  "verification_status": "PASSED"
+}

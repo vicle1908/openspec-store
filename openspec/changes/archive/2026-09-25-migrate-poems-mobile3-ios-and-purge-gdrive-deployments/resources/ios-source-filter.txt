@@ -1,0 +1,47 @@
+# Exclude first: Third-party frameworks, CocoaPods cache trees, build outputs, binaries
+- Pods/**
+- Framework/**
+- *.xcframework/**
+- *.framework/**
+- DerivedData/**
+- .gitnexus/**
+- build/**
+- *.ipa
+- *.zip
+- *.tar.gz
+- *.a
+- *.dylib
+
+# Include: iOS/Swift source code, configs, tests, and manifests
++ *.swift
++ *.h
++ *.m
++ *.c
++ *.cpp
++ *.puml
++ *.md
++ AGENTS.md
++ CLAUDE.md
++ PROMPT.md
++ Gemfile*
++ Podfile*
++ *.podspec*
++ *.xcworkspace/contents.xcworkspacedata
++ *.xcodeproj/project.pbxproj
++ *.storyboard
++ *.xib
++ *.plist
++ *.strings
++ *.stringsdict
++ *.json
++ *.xml
++ *.yml
++ *.yaml
++ *.properties
++ *.rswiftignore
++ *.swiftlint.yml
++ *.sh
++ *.py
+
+# Catch-all
+- *
