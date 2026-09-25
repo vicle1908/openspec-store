@@ -1,0 +1,547 @@
+[
+  {
+    "name": ".DS_Store",
+    "type": "file",
+    "size": "24K"
+  },
+  {
+    "name": ".agentmemory",
+    "type": "dir",
+    "size": "33M"
+  },
+  {
+    "name": ".agents",
+    "type": "dir",
+    "size": "2.2M"
+  },
+  {
+    "name": ".cagent",
+    "type": "dir",
+    "size": "408K"
+  },
+  {
+    "name": ".claude",
+    "type": "dir",
+    "size": "158M"
+  },
+  {
+    "name": ".claude-server-commander",
+    "type": "dir",
+    "size": "6.1M"
+  },
+  {
+    "name": ".claude-server-commander-logs",
+    "type": "dir",
+    "size": "164K"
+  },
+  {
+    "name": ".claude.json",
+    "type": "file",
+    "size": "52K"
+  },
+  {
+    "name": ".claude.json.backup",
+    "type": "file",
+    "size": "12K"
+  },
+  {
+    "name": ".codex",
+    "type": "dir",
+    "size": "428M"
+  },
+  {
+    "name": ".codex_cursor",
+    "type": "file",
+    "size": "4.0K"
+  },
+  {
+    "name": ".dockerignore",
+    "type": "file",
+    "size": "4.0K"
+  },
+  {
+    "name": ".gemini",
+    "type": "dir",
+    "size": "4.0K"
+  },
+  {
+    "name": ".gitnexus",
+    "type": "dir",
+    "size": "764K"
+  },
+  {
+    "name": ".happy2",
+    "type": "dir",
+    "size": "2.8M"
+  },
+  {
+    "name": ".hermes",
+    "type": "dir",
+    "size": "16K"
+  },
+  {
+    "name": ".infinity_cache",
+    "type": "dir",
+    "size": "0B"
+  },
+  {
+    "name": ".knowledge-refresh",
+    "type": "dir",
+    "size": "1.1M"
+  },
+  {
+    "name": ".knowledge-refresh-test-s1lr2rxj",
+    "type": "dir",
+    "size": "3.2M"
+  },
+  {
+    "name": ".mypy_cache",
+    "type": "dir",
+    "size": "106M"
+  },
+  {
+    "name": ".opencode",
+    "type": "dir",
+    "size": "32K"
+  },
+  {
+    "name": ".phase6-field-audit",
+    "type": "dir",
+    "size": "4.0K"
+  },
+  {
+    "name": ".pytest_cache",
+    "type": "dir",
+    "size": "312K"
+  },
+  {
+    "name": ".qoder",
+    "type": "dir",
+    "size": "152K"
+  },
+  {
+    "name": ".ruff_cache",
+    "type": "dir",
+    "size": "12M"
+  },
+  {
+    "name": ".tmp",
+    "type": "dir",
+    "size": "268K"
+  },
+  {
+    "name": ".workspace-lifecycle",
+    "type": "dir",
+    "size": "20K"
+  },
+  {
+    "name": ".workspace-lifecycle-dryrun-2026-09",
+    "type": "dir",
+    "size": "0B"
+  },
+  {
+    "name": ".workspace-retention",
+    "type": "dir",
+    "size": "20K"
+  },
+  {
+    "name": ".worktree-execution-contracts-consumers.md",
+    "type": "file",
+    "size": "24K"
+  },
+  {
+    "name": ".worktree-execution-contracts-core.md",
+    "type": "file",
+    "size": "24K"
+  },
+  {
+    "name": ".worktrees",
+    "type": "dir",
+    "size": "13M"
+  },
+  {
+    "name": ".zed",
+    "type": "dir",
+    "size": "0B"
+  },
+  {
+    "name": "AGENTS.md",
+    "type": "file",
+    "size": "28K"
+  },
+  {
+    "name": "CLAUDE.md",
+    "type": "link",
+    "size": "0B"
+  },
+  {
+    "name": "GEMINI.md",
+    "type": "file",
+    "size": "4.0K"
+  },
+  {
+    "name": "agent-core",
+    "type": "dir",
+    "size": "1.1G"
+  },
+  {
+    "name": "agent-docs-sync",
+    "type": "dir",
+    "size": "913M"
+  },
+  {
+    "name": "agent-harness",
+    "type": "dir",
+    "size": "955M"
+  },
+  {
+    "name": "ai-harness-skills",
+    "type": "dir",
+    "size": "260M"
+  },
+  {
+    "name": "ai-review",
+    "type": "dir",
+    "size": "98M"
+  },
+  {
+    "name": "ai-rules",
+    "type": "dir",
+    "size": "2.3M"
+  },
+  {
+    "name": "ai-training-materials",
+    "type": "dir",
+    "size": "12M"
+  },
+  {
+    "name": "airbridge",
+    "type": "dir",
+    "size": "128M"
+  },
+  {
+    "name": "ascend-configs",
+    "type": "dir",
+    "size": "29M"
+  },
+  {
+    "name": "browser-cli",
+    "type": "dir",
+    "size": "348M"
+  },
+  {
+    "name": "camunda-loan-approval",
+    "type": "dir",
+    "size": "2.2M"
+  },
+  {
+    "name": "camunda7",
+    "type": "dir",
+    "size": "8.8M"
+  },
+  {
+    "name": "claude-code-provider-adapter",
+    "type": "dir",
+    "size": "1.3M"
+  },
+  {
+    "name": "claude-icloud-backup",
+    "type": "dir",
+    "size": "64K"
+  },
+  {
+    "name": "claudia",
+    "type": "dir",
+    "size": "8.1M"
+  },
+  {
+    "name": "code-daily-scan",
+    "type": "dir",
+    "size": "949M"
+  },
+  {
+    "name": "content-migration-manifests",
+    "type": "dir",
+    "size": "10M"
+  },
+  {
+    "name": "cursor-account-manager-build",
+    "type": "dir",
+    "size": "148M"
+  },
+  {
+    "name": "cursor-rules",
+    "type": "dir",
+    "size": "182M"
+  },
+  {
+    "name": "data",
+    "type": "dir",
+    "size": "1.4M"
+  },
+  {
+    "name": "docs",
+    "type": "dir",
+    "size": "24K"
+  },
+  {
+    "name": "ghtk-android-drawables",
+    "type": "dir",
+    "size": "20K"
+  },
+  {
+    "name": "ghtk-catalog-v2",
+    "type": "dir",
+    "size": "156K"
+  },
+  {
+    "name": "ghtk-detekt",
+    "type": "dir",
+    "size": "68K"
+  },
+  {
+    "name": "ghtk-project-assets",
+    "type": "dir",
+    "size": "44K"
+  },
+  {
+    "name": "ghtk-scripts",
+    "type": "dir",
+    "size": "220K"
+  },
+  {
+    "name": "ghtk-training-cicd",
+    "type": "dir",
+    "size": "20K"
+  },
+  {
+    "name": "githubusers",
+    "type": "dir",
+    "size": "168K"
+  },
+  {
+    "name": "go-microservices",
+    "type": "dir",
+    "size": "1.3G"
+  },
+  {
+    "name": "goose-docs",
+    "type": "dir",
+    "size": "5.9G"
+  },
+  {
+    "name": "hermes-webui",
+    "type": "dir",
+    "size": "639M"
+  },
+  {
+    "name": "icloud-migration-tools",
+    "type": "dir",
+    "size": "1.4M"
+  },
+  {
+    "name": "infra",
+    "type": "dir",
+    "size": "296K"
+  },
+  {
+    "name": "invest-bots",
+    "type": "dir",
+    "size": "382M"
+  },
+  {
+    "name": "jira-daily-reports",
+    "type": "dir",
+    "size": "168M"
+  },
+  {
+    "name": "jira-epic-report",
+    "type": "dir",
+    "size": "138M"
+  },
+  {
+    "name": "jira-kanban-from-spreadsheet",
+    "type": "dir",
+    "size": "345M"
+  },
+  {
+    "name": "jira-skill",
+    "type": "dir",
+    "size": "356M"
+  },
+  {
+    "name": "lending-miniapp-docs",
+    "type": "dir",
+    "size": "144K"
+  },
+  {
+    "name": "main-db-migrations",
+    "type": "dir",
+    "size": "48K"
+  },
+  {
+    "name": "mcp-router",
+    "type": "dir",
+    "size": "1.4G"
+  },
+  {
+    "name": "mcp-router-backup-20260722",
+    "type": "dir",
+    "size": "32M"
+  },
+  {
+    "name": "mcp-servers",
+    "type": "dir",
+    "size": "2.1G"
+  },
+  {
+    "name": "mcp-suite",
+    "type": "dir",
+    "size": "10M"
+  },
+  {
+    "name": "microservices",
+    "type": "dir",
+    "size": "9.9M"
+  },
+  {
+    "name": "mobile",
+    "type": "dir",
+    "size": "62M"
+  },
+  {
+    "name": "ntu-keynote",
+    "type": "dir",
+    "size": "71M"
+  },
+  {
+    "name": "openspec-store",
+    "type": "dir",
+    "size": "726M"
+  },
+  {
+    "name": "ops-automation-suite",
+    "type": "dir",
+    "size": "40M"
+  },
+  {
+    "name": "ops-tools",
+    "type": "dir",
+    "size": "352K"
+  },
+  {
+    "name": "prime-agent",
+    "type": "dir",
+    "size": "494M"
+  },
+  {
+    "name": "qi-bridge",
+    "type": "dir",
+    "size": "196K"
+  },
+  {
+    "name": "qi_config.yaml",
+    "type": "file",
+    "size": "4.0K"
+  },
+  {
+    "name": "realtime",
+    "type": "dir",
+    "size": "1.8G"
+  },
+  {
+    "name": "recovery-pilot",
+    "type": "dir",
+    "size": "88K"
+  },
+  {
+    "name": "scripts",
+    "type": "dir",
+    "size": "120K"
+  },
+  {
+    "name": "sensitive-quarantine",
+    "type": "dir",
+    "size": "2.5M"
+  },
+  {
+    "name": "skills-lock.json",
+    "type": "file",
+    "size": "4.0K"
+  },
+  {
+    "name": "study-examples",
+    "type": "dir",
+    "size": "74M"
+  },
+  {
+    "name": "tdt-core",
+    "type": "dir",
+    "size": "350M"
+  },
+  {
+    "name": "tdt-observability",
+    "type": "dir",
+    "size": "89M"
+  },
+  {
+    "name": "tdt-scheduler",
+    "type": "dir",
+    "size": "60M"
+  },
+  {
+    "name": "tdt-sheets",
+    "type": "dir",
+    "size": "314M"
+  },
+  {
+    "name": "tdt-v2-accept",
+    "type": "dir",
+    "size": "40K"
+  },
+  {
+    "name": "tmp",
+    "type": "dir",
+    "size": "116K"
+  },
+  {
+    "name": "tmz-case-challenge",
+    "type": "dir",
+    "size": "1.9M"
+  },
+  {
+    "name": "vds",
+    "type": "dir",
+    "size": "0B"
+  },
+  {
+    "name": "vds-content-migration",
+    "type": "dir",
+    "size": "6.3G"
+  },
+  {
+    "name": "viettel-excel-updater",
+    "type": "dir",
+    "size": "1.5M"
+  },
+  {
+    "name": "webhook-receiver",
+    "type": "dir",
+    "size": "83M"
+  },
+  {
+    "name": "wiki",
+    "type": "dir",
+    "size": "1.4M"
+  },
+  {
+    "name": "wiki-mcp-server",
+    "type": "dir",
+    "size": "34M"
+  },
+  {
+    "name": "workspace-python-template",
+    "type": "dir",
+    "size": "464K"
+  }
+]

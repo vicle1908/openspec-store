@@ -1,0 +1,63 @@
+{
+  "platform": [
+    "claude-code-provider-adapter",
+    "go-microservices",
+    "qi-bridge",
+    "mcp-router",
+    "openspec-store",
+    "prime-agent",
+    "hermes-webui",
+    "goose-docs"
+  ],
+  "tdt": [
+    "agent-core",
+    "tdt-core",
+    "tdt-observability",
+    "tdt-scheduler",
+    "tdt-sheets",
+    "agent-docs-sync",
+    "agent-harness",
+    "ai-harness-skills",
+    "ai-review",
+    "jira-skill",
+    "jira-daily-reports",
+    "jira-epic-report",
+    "jira-kanban-from-spreadsheet",
+    "webhook-receiver",
+    "ops-automation-suite",
+    "browser-cli",
+    "code-daily-scan",
+    "realtime",
+    "poems-mobile3-android",
+    "poems-mobile3-ios",
+    "poems-mobile3-docs",
+    "tdt-tools",
+    "bootstrap-nexus"
+  ],
+  "vds": [
+    "viettel-excel-updater",
+    "DOPS-project",
+    "EKYC-project",
+    "INSURANCE-project",
+    "LEP-project",
+    "LIB-project",
+    "PAR-project",
+    "SAVING-project",
+    "WHO-project"
+  ],
+  "ascend": [
+    "ascend-configs",
+    "tmz-case-challenge"
+  ],
+  "ghtk": [
+    "ghtk-android-drawables",
+    "ghtk-catalog-v2",
+    "ghtk-detekt",
+    "ghtk-project-assets",
+    "ghtk-scripts",
+    "ghtk-training-cicd"
+  ],
+  "fpt": [
+    "fpt-ingenico"
+  ]
+}
