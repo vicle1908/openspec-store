@@ -81,7 +81,7 @@ and reports are committed. Per official openspec.dev/docs/stores:
 After archiving a change, commit the store:
 
 ```bash
-cd ~/Developer/openspec-store
+cd ~/Developer/platform/openspec-store
 git add openspec/
 git commit -m "archive: <change-name> — merged delta specs into main specs"
 ```
@@ -91,7 +91,7 @@ git commit -m "archive: <change-name> — merged delta specs into main specs"
 After syncing from external sources (GDrive, team repos), commit the store:
 
 ```bash
-cd ~/Developer/openspec-store
+cd ~/Developer/platform/openspec-store
 git add openspec/
 git commit -m "sync: pulled specs/archives from <source>"
 ```
