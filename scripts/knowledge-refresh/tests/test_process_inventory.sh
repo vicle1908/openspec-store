@@ -6,7 +6,7 @@
 
 set -uo pipefail
 
-SCRIPT="/Users/androidteam/Developer/openspec-store/scripts/knowledge-refresh/refresh-knowledge-indexes.sh"
+SCRIPT="${KNOWLEDGE_REFRESH_SCRIPT:-/Users/androidteam/Developer/scripts/knowledge-refresh/refresh-knowledge-indexes.sh}"
 TMPDIR_TEST="$(mktemp -d)"
 LOG_FILE="$TMPDIR_TEST/log.txt"
 INVENTORY_FILE="$TMPDIR_TEST/inventory.tsv"
