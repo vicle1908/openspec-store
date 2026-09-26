@@ -20,3 +20,8 @@ graphify-out/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+
+# GitNexus and Graphify
+.gitnexus/
+.gitnexusrc
+.graphify/
