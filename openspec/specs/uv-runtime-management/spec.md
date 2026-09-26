@@ -4,6 +4,7 @@
 Define uv dependency and runtime boundaries for TDT repositories in the canonical non-legacy cloud workspace. The top-level workspace is a container for multiple independent repositories, not a Git repo and not a uv workspace.
 
 ## Requirements
+
 ### Requirement: Canonical workspace location
 All active development SHALL run from `$HOME/Developer/tdt/`.
 
@@ -35,18 +36,17 @@ The top-level workspace SHALL remain a container only; each Python repo SHALL ow
 - **AND** its dev environment SHALL be created with `uv sync --locked` from that repo root.
 
 ### Requirement: Reproducible uv-managed dependencies
-`webhook-receiver/uv.lock` and `ai-review/uv.lock` SHALL be authoritative for development, verification, and production runtime.
+All Python repositories in the workspace SHALL maintain authoritative `uv.lock` files locked against modern, unconstrained dependency specifications, and SHALL NOT enforce legacy upper bounds (`<`).
 
 #### Scenario: Developer setup uses locked environment
-- **WHEN** a developer prepares `webhook-receiver`
-- **THEN** they SHALL run `cd $HOME/Developer/tdt/webhook-receiver && uv sync --locked`
-- **AND** commands SHALL run via `uv run ...` unless `.venv` is intentionally invoked.
-- **AND** **WHEN** a developer prepares `ai-review`
-- **THEN** they SHALL run `cd $HOME/Developer/tdt/ai-review && uv sync --locked`.
+- **WHEN** a developer prepares any Python repository in the workspace
+- **THEN** they SHALL run `uv sync --locked --all-extras` from that repo root
+- **AND** commands SHALL run via `uv run ...`
+- **AND** the lockfile SHALL resolve to latest remote package releases without artificial version ceilings.
 
 #### Scenario: Lockfile validity is checked before rollout
 - **WHEN** deployment verification is performed
-- **THEN** `uv lock --check` SHALL pass in `webhook-receiver`, `ai-review`, `tdt-core`, and `jira-daily-reports`
+- **THEN** `uv lock --check` SHALL pass in all repositories across the workspace
 - **AND** deployment SHALL fail fast if any lockfile is stale.
 
 ### Requirement: Production runtime uses uv sync, not copied virtual environments

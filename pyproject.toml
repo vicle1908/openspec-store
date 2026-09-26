@@ -1,9 +1,9 @@
 [project]
 name = "openspec-store"
-version = "0.1.0"
+version = "0.2.0"
 description = "OpenSpec central store validation and tooling"
 readme = "README.md"
-requires-python = ">=3.14,<3.15"
+requires-python = ">=3.14"
 dependencies = []
 
 [dependency-groups]
