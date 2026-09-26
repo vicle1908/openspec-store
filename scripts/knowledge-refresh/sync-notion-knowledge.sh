@@ -18,7 +18,8 @@ readonly NTN_BIN="/Users/androidteam/.local/bin/ntn"
 # Directory & Manifest Paths
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly WORKSPACE_ROOT="${HOME}/Developer"
-readonly OPENSPEC_STORE_ROOT="${WORKSPACE_ROOT}/openspec-store"
+readonly OPENSPEC_STORE_ROOT="${WORKSPACE_ROOT}/platform/openspec-store"
+export OPENSPEC_STORE_ROOT
 readonly STATE_DIR="${WORKSPACE_ROOT}/.knowledge-refresh"
 readonly MANIFEST_FILE="${STATE_DIR}/notion-sync-manifest.json"
 readonly LOG_FILE="${STATE_DIR}/notion-sync.log"
@@ -357,11 +358,16 @@ generate_and_sync_specs() {
   local catalog_file="${STATE_DIR}/openspec-domain-catalog.md"
 
   python3 - << 'PYEOF'
-import os, glob, json
+import os, glob, json, sys
 from datetime import datetime, timezone
 
-store_specs = "/Users/androidteam/Developer/openspec-store/openspec/specs"
+store_root = os.environ.get("OPENSPEC_STORE_ROOT", "/Users/androidteam/Developer/platform/openspec-store")
+store_specs = os.path.join(store_root, "openspec", "specs")
 all_specs = glob.glob(f"{store_specs}/**/spec.md", recursive=True)
+
+if not all_specs:
+    print(f"ERROR: Spec discovery found 0 specs at {store_specs}. Aborting fail-closed.", file=sys.stderr)
+    sys.exit(1)
 
 # Categorization domains
 domains = {
@@ -408,6 +414,29 @@ for s in sorted(all_specs):
     else:
         domains["General Domain Capabilities"].append((cap, purpose))
 
+# Discover active changes dynamically
+changes_dir = os.path.join(store_root, "openspec", "changes")
+active_changes = []
+if os.path.isdir(changes_dir):
+    for entry in sorted(os.listdir(changes_dir)):
+        p = os.path.join(changes_dir, entry)
+        if os.path.isdir(p) and entry != "archive" and not entry.startswith("."):
+            tasks_file = os.path.join(p, "tasks.md")
+            completed, total = 0, 0
+            if os.path.isfile(tasks_file):
+                try:
+                    with open(tasks_file, "r", encoding="utf-8") as tf:
+                        for line in tf:
+                            if "- [x]" in line or "- [X]" in line:
+                                completed += 1
+                                total += 1
+                            elif "- [ ]" in line:
+                                total += 1
+                except Exception:
+                    pass
+            status = f"{completed}/{total}" if total > 0 else "In-Progress"
+            active_changes.append((entry, completed, total, status))
+
 out_path = "/Users/androidteam/Developer/.knowledge-refresh/openspec-domain-catalog.md"
 with open(out_path, "w", encoding="utf-8") as f:
     f.write("# OpenSpec Specifications & Governance Catalog\n\n")
@@ -416,10 +445,12 @@ with open(out_path, "w", encoding="utf-8") as f:
     f.write("## Active Changes Ledger\n\n")
     f.write("| Change Name | Completed Tasks | Total Tasks | Status |\n")
     f.write("| :--- | :--- | :--- | :--- |\n")
-    f.write("| `sync-ecosystem-knowledge-notion` | In-Progress | 9 | Applying |\n")
-    f.write("| `add-enterprise-ai-training-series` | 22 | 31 | In-Progress |\n")
-    f.write("| `migrate-icloud-worktrees-safely` | 11 | 15 | In-Progress |\n")
-    f.write("| `adopt-uv-wiki-mcp-server` | 3 | 11 | In-Progress |\n\n")
+    if active_changes:
+        for ch_name, comp, tot, stat in active_changes:
+            f.write(f"| `{ch_name}` | {comp} | {tot} | {stat} |\n")
+    else:
+        f.write("| *None* | 0 | 0 | Clean |\n")
+    f.write("\n")
 
     f.write("## Specifications by Architecture Domain\n\n")
     for dom_name, specs in domains.items():
@@ -431,7 +462,7 @@ with open(out_path, "w", encoding="utf-8") as f:
             purp_clean = purp.replace("|", "\\|")[:120]
             f.write(f"| `{cap}` | {purp_clean} |\n")
         if len(specs) > 15:
-            f.write(f"| *... and {len(specs) - 15} more capabilities* | *See openspec-store/openspec/specs/* |\n")
+            f.write(f"| *... and {len(specs) - 15} more capabilities* | *See platform/openspec-store/openspec/specs/* |\n")
         f.write("\n")
 PYEOF
 
