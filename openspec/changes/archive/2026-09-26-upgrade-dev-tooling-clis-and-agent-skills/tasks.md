@@ -1,0 +1,34 @@
+## Tasks
+
+- [x] 1. Pre-upgrade baseline freeze and safety snapshots
+  - [x] 1.1 Snapshot installed Homebrew casks to `/tmp/brew-cask-baseline.txt`
+  - [x] 1.2 Snapshot global npm package state to `/tmp/npm-global-baseline.json`
+  - [x] 1.3 Record pre-upgrade strict validation baseline on `openspec-store` via `openspec validate --all --strict --store openspec-store`
+- [x] 2. Desktop applications, casks, and utility CLIs upgrade
+  - [x] 2.1 Upgrade standalone Homebrew casks: `chatgpt`, `cleanmymac`, `onedrive`, `tailscale-app`, `zed`, `gcloud-cli`, `postman-cli`, `cockpit-tools`
+  - [x] 2.2 Upgrade `docker-desktop` cask and verify `docker ps` and Kind cluster connectivity
+  - [x] 2.3 Upgrade global npm utilities in `~/.npm-global`: `@brightdata/cli`, `@kilocode/cli`, `@qoder-ai/qodercli`, `codexuse-cli`, `happy`
+  - [x] 2.4 Align `gitnexus` to `1.6.12` in `~/.npm-global`
+  - [x] 2.5 Upgrade Graphify AST engine via `uv tool upgrade graphifyy` (0.9.65 -> 0.9.68)
+- [x] 3. Cross-agent skills ecosystem manifest reconciliation
+  - [x] 3.1 Regenerate platform-specific Graphify skills via `graphify install --platform pi`, `opencode`, `copilot`
+  - [x] 3.2 Update `openspec-store/scripts/sync-workspace-agent-skills.py` workspace path resolution for `platform/` layout
+  - [x] 3.3 Execute `python3 ~/Developer/platform/openspec-store/scripts/sync-workspace-agent-skills.py --check` and verify exit code 0
+- [x] 4. Coding agent CLIs and extensions upgrade
+  - [x] 4.1 Update Claude Code via `claude update` and verify `claude --version` is 2.1.283
+  - [x] 4.2 Verify Claude Code `~/.zshrc` provider routing wrappers (`shopapikey`, `cockpit`, `omniroute`)
+  - [x] 4.3 Upgrade `@openai/codex` to 0.157.0 in `~/.npm-global` and verify headless invocation
+  - [x] 4.4 Upgrade `opencode-ai` to 1.18.32 in `~/.npm-global`
+  - [x] 4.5 Upgrade Pi extensions (`pi-subagents`, `pi-mcp-adapter`, `pi-web-access`, `pi-lens`, `pi-intercom`) in `~/.npm-global`
+  - [x] 4.6 Upgrade Homebrew casks: `droid`, `orca`, `antigravity-cli`, `copilot-cli`
+  - [x] 4.7 Execute live single-shot headless PONG probes across all coding agents
+- [x] 5. OpenSpec CLI upgrade and store validation gate
+  - [x] 5.1 Upgrade `@fission-ai/openspec` to 1.13.2 in `~/.npm-global`
+  - [x] 5.2 Execute full store strict validation: `openspec validate --all --strict --store openspec-store`
+  - [x] 5.3 Verify zero new schema or validation errors against the pre-upgrade baseline
+- [x] 6. Unified daily scheduled maintenance and check-and-update automation
+  - [x] 6.1 Create unified runner script `~/Developer/scripts/workstation-daily-update.sh` with `--check` and `--apply` modes
+  - [x] 6.2 Filter npm package updates to exclude local git packages (`prime-agent`)
+  - [x] 6.3 Deploy and register LaunchAgent `~/Library/LaunchAgents/com.developer.workstation-daily-update.plist`
+  - [x] 6.4 Unload and retire obsolete LaunchAgents (`com.user.brew-npm-update` and `com.microservices.developer-workstation-tool-update`)
+  - [x] 6.5 Verify `workstation-daily-update.sh --check` dry-run execution

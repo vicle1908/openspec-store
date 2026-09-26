@@ -24,6 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import dryrun  # noqa: E402
 import manifest  # noqa: E402
+import pytest  # noqa: E402
 import retention  # noqa: E402
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
@@ -59,6 +60,11 @@ def run_scan(report_dir: Path) -> dict:
 
 def entry_by_path(document: dict, path: str) -> dict:
     return next(e for e in document["entries"] if e["canonical_path"] == path)
+
+
+@pytest.fixture
+def document(tmp_path: Path) -> dict:
+    return run_scan(tmp_path)
 
 
 def test_expected_classifications_and_blockers(document: dict) -> None:

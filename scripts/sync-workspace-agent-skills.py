@@ -17,7 +17,7 @@ from pathlib import Path
 
 HOME = Path.home()
 STORE = Path(__file__).resolve().parents[1]
-WORKSPACE = STORE.parent
+WORKSPACE = STORE.parent if (STORE.parent / ".agents").exists() else STORE.parent.parent
 WORKSPACE_AGENTS = WORKSPACE / ".agents" / "skills"
 WORKSPACE_CLAUDE_SKILLS = WORKSPACE / ".claude" / "skills"
 WORKSPACE_CLAUDE_COMMANDS = WORKSPACE / ".claude" / "commands" / "opsx"
@@ -136,7 +136,7 @@ def reconcile_links(
         if points_to(target, source):
             continue
         if target.exists() or target.is_symlink():
-            if equivalent(target, source):
+            if not target.exists() or equivalent(target, source):
                 removed.append(name)
                 created.append(name)
                 if not check:
