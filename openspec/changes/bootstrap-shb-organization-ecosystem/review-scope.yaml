@@ -1,0 +1,43 @@
+change_name: bootstrap-shb-organization-ecosystem
+
+repositories:
+  - /Users/androidteam/Developer/platform/openspec-store
+
+specs:
+  - specs/shb-core-foundation/spec.md
+  - specs/shb-agent-runtime/spec.md
+  - specs/shb-planning-harness/spec.md
+  - specs/shb-agent-skills/spec.md
+  - specs/shb-mcp-servers/spec.md
+  - specs/shb-review-and-quality/spec.md
+  - specs/shb-browser-cli/spec.md
+  - specs/shb-webhook-ingress/spec.md
+  - specs/shb-observability-telemetry/spec.md
+  - specs/shb-ecosystem-tooling/spec.md
+
+docs:
+  - proposal.md
+  - design.md
+  - tasks.md
+  - /Users/androidteam/Developer/AGENTS.md
+  - /Users/androidteam/Developer/scripts/knowledge-refresh/knowledge-refresh-inventory.tsv
+
+skills:
+  - openspec-workflow
+  - openspec-plan-review
+
+excluded:
+  - .env
+  - .git/
+  - node_modules/
+  - __pycache__/
+  - "*.pyc"
+  - user credential values
+  - ~/.tdt/.env
+  - ~/.vds/.env
+
+coverage_threshold: 80
+
+risk:
+  tier: standard
+  fresh_context: false
