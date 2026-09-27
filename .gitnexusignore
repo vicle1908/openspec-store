@@ -1,0 +1,21 @@
+# Generated outputs and build evidence
+artifacts/
+.knowledge-state/
+graphify-out/
+.graphify/
+.gitnexus/
+node_modules/
+coverage/
+htmlcov/
+dist/
+build/
+.venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Credentials and local runtime state
+.env
+.env.*
+!.env.example
