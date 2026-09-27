@@ -8,8 +8,9 @@ The workspace is establishing Saigon - Hanoi Commercial Joint Stock Bank (SHB) a
 
 Following detailed audits of `~/Developer/tdt/` (23 repositories) and `~/Developer/vds/` (10 banking project suites and 38 agent skills), the rollout strictly follows a **Python-First Agentic Precedence**:
 
-### Wave 1: Python, Agent, CLI Tools & Skills (Active — Ready to Apply)
-Wave 1 establishes the autonomous toolchain, agent execution runtimes, developer CLIs, and engineering skills catalog necessary to inspect, plan, write, and review codebases. All Wave 1 repositories are standardized on Python `>=3.14` and `uv`:
+### Python Autonomous Agent & Tooling Architecture
+
+The ecosystem establishes the autonomous toolchain, agent execution runtimes, developer CLIs, and engineering skills catalog necessary to inspect, plan, write, and review codebases. All 12 repositories are standardized on Python `>=3.14` and `uv`:
 
 | Target SHB Repository | Source Organization & Repo | Content Brought In / Ingested | Key Adaptations & Sanitizations |
 |---|---|---|---|
@@ -22,29 +23,29 @@ Wave 1 establishes the autonomous toolchain, agent execution runtimes, developer
 | **`shb-browser-cli`** | `tdt/browser-cli` | Playwright browser automation, Chrome DevTools Protocol (CDP) session attach, persistent storage states, PDF/DOCX/table document extraction (bank statements, credit agreements). | Dedicated cookie store for SHB intranet portals. Extractor pipelines tailored for bank statements and credit agreements. Rebranded CLI to `shb-browser-cli`. |
 | **`shb-webhook-receiver`** | `tdt/webhook-receiver` | FastAPI webhook ingress, HMAC signature verification, GitLab/Jira event triggers, Dead Letter Queue (DLQ) replay, health monitoring. | Scoped to SHB event webhooks. Rebranded CLIs to `shb-webhook-receiver` and `shb-replay-dlq`. |
 | **`shb-jira-tools`** | `tdt/jira-skill` + `tdt/jira-daily-reports` | Jira Cloud/Server API integration, ADF comment formatting, JQL search helpers, sprint tracking, and epic progress reporting. | Consolidated Jira tools into single focused repository for SHB project tracking. Rebranded CLI to `shb-jira`. |
-| **`shb-observability`** | `tdt/tdt-observability` | Centralized OTel observability stack, telemetry dashboard (Streamlit + DuckDB), log collectors, and service health pollers. | Parameterized for SHB local port allocations and agent telemetry tracking. |
-| **`shb-tools`** | `tdt/tdt-tools` + `tdt/bootstrap-nexus` + `vds/WHO-project/vds-scripts` | Operational automation scripts, incident reporting utilities, Docker Compose service stacks (Postgres, Redis, OTel), Nginx reverse proxy configs, and CLI routing orchestration (`shb-cli`). | Parameterized for SHB local development environments and multi-repo script dispatching. |
+| **`shb-mcp-servers`** | Greenfield | Model Context Protocol JSON-RPC 2.0 stdio & SSE servers for banking tools. | Exposes accounts, transactions, MR diff inspection, and Jira issue lookups. |
+| **`shb-observability`** | `tdt/tdt-observability` | Centralized OTel observability stack, telemetry dashboard, log collectors, and service health pollers. | Parameterized for SHB local port allocations and agent telemetry tracking. |
+| **`shb-tools`** | `tdt/tdt-tools` + `tdt/bootstrap-nexus` + `vds/WHO-project/vds-scripts` | Operational automation scripts, incident reporting utilities, Docker Compose service stacks (Postgres, Redis, OTel), Nginx reverse proxy configs. | Parameterized for SHB local development environments and multi-repo script dispatching. |
 
-### Scope Boundary: Java Microservices Not Brought In Yet (Wave 2 Deferral)
+### Scope Boundary: Fully Decoupled Python Engineering Platform
 
-All Java microservices from VDS (`SAVING-project`, `EKYC-project`, `LEP-project`, `PAR-project`) or other legacy stacks are **explicitly excluded** from the current change. We will **NOT** bring Java microservices in yet:
-- **Zero Java Dependencies**: No JVM, JDK, Gradle wrappers, or Maven `pom.xml` dependencies are introduced in this change.
-- **Python & Agent Prioritization**: The current rollout focuses exclusively on the autonomous Python agent runtime (`shb-agent-core`), planning harness (`shb-agent-harness`), schema contracts (`shb-ai-harness-skills`), 38+ engineering skills (`shb-agent-skills`), MR review engine (`shb-ai-review`), developer CLIs (`shb-browser-cli`), event webhooks (`shb-webhook-receiver`), Jira tools (`shb-jira-tools`), MCP servers (`shb-mcp-servers`), and operational observability (`shb-observability`, `shb-tools`).
-- **Rationale**: Building the autonomous Python agent harness, automated MR code review, and developer CLIs first equips the engineering team with the AI apparatus necessary to inspect, refactor, and test Java microservices later.
-- **Future Wave 2 Change**: Ingestion and refactoring of Java Spring Boot microservices will be governed by a separate, dedicated OpenSpec change once the autonomous agent infrastructure is operational.
+The SHB engineering ecosystem is completely self-contained in a single unified Python and tooling architecture. All legacy Java microservices are completely excluded:
+- **Zero Java Dependencies**: No JVM, JDK, Gradle wrappers, or Maven `pom.xml` dependencies exist in this ecosystem.
+- **Unified Architecture**: The rollout focuses exclusively on the autonomous Python agent runtime, planning harness, schema contracts, engineering skills, review engines, developer CLIs, event webhooks, Jira tools, MCP servers, and operational observability across 12 independent repositories.
+- **Zero Additional Waves**: There are no additional waves, secondary phases, or pending Java migrations.
 
 ## What Changes
 
 - Provision `~/Developer/shb/` as an independent organizational namespace holding decoupled Git repositories.
 - Ingest and sanitize source trees from `tdt` and `vds`, removing legacy git commit histories to start clean repository lifecycles in `shb`.
-- Standardize all Wave 1 repositories on Python `>=3.14`, `uv` package management, `hatchling` build backends, Ruff (line length 100), and strict Mypy.
+- Standardize all repositories on Python `>=3.14`, `uv` package management, `hatchling` build backends, Ruff (line length 100), and strict Mypy.
 - Enforce strict credential and configuration isolation in `~/.shb/` (mode 0700) and `~/.shb/.env` (mode 0600), asserting zero leakage from `~/.tdt/` or `~/.vds/`.
 - Wire inter-repository dependencies locally via `[tool.uv.sources]` editable paths.
-- Register all Wave 1 repositories in `~/Developer/scripts/knowledge-refresh/knowledge-refresh-inventory.tsv` for nightly GitNexus and Graphify code intelligence.
+- Register all repositories in `~/Developer/scripts/knowledge-refresh/knowledge-refresh-inventory.tsv` for nightly GitNexus and Graphify code intelligence.
 - Update central OpenSpec store contexts and workspace `AGENTS.md` to establish SHB as a core active organization.
 
 ### Non-Goals
-- Ingesting Java Spring Boot microservices during Wave 1 bootstrap.
+- Ingesting, porting, or deploying Java Spring Boot/Gradle/Maven microservices (`EKYC-project`, `SAVING-project`, `LEP-project`, `PAR-project`) — completely out of scope.
 - Modifying or breaking existing active repositories in `tdt/`, `platform/`, `vds/`, or `ascend/`.
 - Creating a Git submodule hierarchy or monorepo wrapper under `~/Developer/shb/` (each must remain an independent Git repository).
 - Sharing runtime secret files between `~/.tdt/`, `~/.vds/`, and `~/.shb/`.

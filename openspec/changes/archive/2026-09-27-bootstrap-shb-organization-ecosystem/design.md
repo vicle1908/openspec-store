@@ -30,7 +30,7 @@ See `proposal.md` for executive motivation, the Wave 1 repository matrix, and sc
 - Register all repositories in workspace code intelligence (`knowledge-refresh-inventory.tsv` for GitNexus and Graphify).
 
 **Non-Goals:**
-- Ingesting, porting, or deploying Java Spring Boot microservices (`EKYC-project`, `SAVING-project`, `LEP-project`, `PAR-project` from `vds`) during Wave 1 — **we will NOT bring Java microservices in yet** (explicitly deferred to a dedicated Wave 2 change).
+- Ingesting, porting, or deploying Java Spring Boot microservices (`EKYC-project`, `SAVING-project`, `LEP-project`, `PAR-project` from `vds`) — **completely out of scope; no Java stacks are brought in**.
 - Creating a Git submodule hierarchy or monorepo wrapper inside `shb/` (each must remain an independent Git repository).
 - Sharing secrets, runtime environments, or cache directories between `~/.tdt/`, `~/.vds/`, and `~/.shb/`.
 - Mutating or breaking existing repositories in `tdt/`, `platform/`, or `vds/`.
@@ -38,20 +38,20 @@ See `proposal.md` for executive motivation, the Wave 1 repository matrix, and sc
 
 ## Technical Decisions
 
-### Decision 0: Explicit Deferral of Java Microservices (Not Bringing Java Microservices In Yet)
-- **Mandate**: Java microservices from `vds` (`SAVING-project`, `EKYC-project`, `LEP-project`, `PAR-project`) and any other legacy enterprise stacks are explicitly out of scope for the current change. We will **NOT** bring Java microservices in yet.
+### Decision 0: Complete Exclusion of Legacy Java Microservices
+
+- **Mandate**: Java microservices from `vds` (`SAVING-project`, `EKYC-project`, `LEP-project`, `PAR-project`) and any other legacy enterprise stacks are completely out of scope. There are no secondary waves or deferred Java migrations.
 - **Architectural Rationale**:
-  1. *Toolchain & Runtime Isolation*: Heavy JVM runtimes, Gradle daemons, Maven repository bloat, and Nexus proxy friction compete with the lightweight, sub-second Python agent workflows.
-  2. *Agent & Verification First Precedence*: Establishing the autonomous ReAct agent runtime (`shb-agent-core`), ticket planning harness (`shb-agent-harness`), schema contracts (`shb-ai-harness-skills`), automated code reviewer (`shb-ai-review`), and Model Context Protocol servers (`shb-mcp-servers`) equips the engineering team with the AI apparatus necessary to inspect, refactor, and test Java microservices later.
-  3. *Clean-Break Governance*: Wave 1 remains 100% Python `>=3.14`, `uv`, and cloud-native observability. A future dedicated OpenSpec change will govern the ingestion of Java microservices once autonomous agent verification gates are established in production.
+  1. *Toolchain & Runtime Isolation*: Heavy JVM runtimes, Gradle daemons, Maven repository bloat, and Nexus proxy friction are eliminated in favor of lightweight, sub-second Python agent workflows.
+  2. *Clean-Break Architecture*: The SHB ecosystem is 100% standardized on Python `>=3.14`, `uv`, and cloud-native observability across 12 independent repositories.
+  3. *Zero Pending Waves*: The architecture is complete and self-contained; no future Java waves remain.
 
 ### Decision 1: Python-First Agentic Architecture
-- **Choice**: Focus Wave 1 strictly on the 11 Python, Agent, CLI, and Skill repositories:
+- **Choice**: Focus strictly on the 11 Python, Agent, CLI, and Skill repositories:
   - **Foundational Runtime**: Core SDK (`shb-core`) and Agent Runtime (`shb-agent-core`) delivering Pydantic AI v2 loop, multi-provider model fallback (`infer_model`), and DBOS durable execution.
   - **Planning & Skills**: `shb-agent-harness` (12-stage ticket lifecycle), `shb-ai-harness-skills` (harness-13 schemas), and `shb-agent-skills` (harvested 38+ engineering skills from VDS).
   - **Ingress & Quality**: `shb-ai-review` (automated MR review), `shb-webhook-receiver` (FastAPI event ingress), and `shb-jira-tools` (Jira delivery tracking).
-  - **Tools & Infra**: `shb-browser-cli` (CDP attach & document extraction), `shb-observability` (OTel dashboard & pollers), and `shb-tools` (operational Docker orchestration).
-- **Rationale**: Setting up the Python agent and review tooling first provides the autonomous agents necessary to subsequently inspect, refactor, and test Java microservices when they are brought in during Wave 2.
+  - **Tools & Infra**: `shb-browser-cli` (CDP attach & document extraction), `shb-mcp-servers` (MCP JSON-RPC stdio/SSE servers), `shb-observability` (OTel metrics & pollers), and `shb-tools` (operational Docker orchestration).
 
 ### Decision 2: Sourcing, Ingestion, and Decoupling Pipeline
 - **Choice**: Clean-slate repository initialization with selective file ingestion from upstream counterparts.

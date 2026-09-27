@@ -23,8 +23,7 @@ context: |
   - Agent Framework: Pydantic AI v2, DBOS durable execution
 
   ## SHB Banking Ecosystem (Python 3.14, uv)
-  - Wave 1 (Active Python Agent Platform): shb-core (SDK & auth), shb-agent-core (Pydantic AI v2), shb-agent-harness (12-stage LangGraph), shb-ai-harness-skills (harness-13 schemas), shb-agent-skills (38+ engineering skills from vds-skills), shb-browser-cli (Playwright CDP), shb-ai-review (automated MR reviews), shb-webhook-receiver (FastAPI webhook & DLQ), shb-jira-tools (Jira delivery tracking & ADF), shb-observability (OTel collector & dashboard), shb-tools (operational automation & docker nexus).
-  - Wave 2 (Deferred Java Domain Services): shb-ekyc-service, shb-savings-account, shb-lending-engine, shb-merchant-payment.
+  - Autonomous Agent Platform (12 Repositories): shb-core (SDK & auth), shb-agent-core (Pydantic AI v2), shb-agent-harness (12-stage LangGraph), shb-ai-harness-skills (harness-13 schemas), shb-agent-skills (38+ engineering skills from vds-skills), shb-browser-cli (Playwright CDP), shb-ai-review (automated MR reviews), shb-webhook-receiver (FastAPI webhook & DLQ), shb-jira-tools (Jira delivery tracking & ADF), shb-mcp-servers (MCP stdio/SSE servers), shb-observability (OTel collector & dashboard), shb-tools (operational automation & docker nexus).
   - Centralized OpenSpec store under specs/shb-*/. Each repo has SPEC_INDEX.md.
 
   ## OmniRoute (AI Gateway)
