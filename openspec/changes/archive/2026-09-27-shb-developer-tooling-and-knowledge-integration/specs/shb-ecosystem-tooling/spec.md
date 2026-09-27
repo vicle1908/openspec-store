@@ -1,23 +1,6 @@
-# shb-ecosystem-tooling Specification
+# Spec Delta: shb-ecosystem-tooling
 
-## Purpose
-Establishes multi-repository layout standards, Python package tooling, quality verification gates, and code intelligence registration for Saigon - Hanoi Bank (SHB).
-
-## Requirements
-
-### Requirement: Independent Multi-Repository Directory Structure
-The `shb` organization SHALL reside at `~/Developer/shb/` as an organizational directory where each child repository is an independent Git repository possessing its own `.git` directory, version control history, and lifecycle.
-
-#### Scenario: Repository isolation verification
-- **WHEN** Git status is checked within any repository under `~/Developer/shb/`
-- **THEN** the repository operates as an independent Git work tree without treating neighboring repositories as submodules or parent directories
-
-### Requirement: Python Packaging and Quality Standardization
-All Python repositories in the `shb` ecosystem SHALL use `uv` for dependency management with Python version requirements `>=3.14`, Ruff for linting and formatting (line length 100), and strict Mypy type checking.
-
-#### Scenario: Dependency synchronization and test execution
-- **WHEN** an engineer executes `uv sync` followed by `uv run pytest` in any SHB repository
-- **THEN** virtual environments are provisioned with pinned dependencies and the test suite executes successfully without root cache pollution
+## MODIFIED Requirements
 
 ### Requirement: Code Intelligence and Knowledge Refresh Registration
 The SHB repositories SHALL be registered in `~/Developer/scripts/knowledge-refresh/knowledge-refresh-inventory.tsv` to ensure inclusion in nightly GitNexus code intelligence and Graphify knowledge graph indexing, and every active repository SHALL maintain up-to-date semantic and structural knowledge indices.
@@ -33,6 +16,8 @@ The SHB repositories SHALL be registered in `~/Developer/scripts/knowledge-refre
 #### Scenario: Global knowledge graph registration
 - **WHEN** `graphify global list` is executed
 - **THEN** all 12 SHB repositories SHALL appear in the global graph registry with non-zero node counts
+
+## ADDED Requirements
 
 ### Requirement: In-Repository Knowledge Configuration and Git Hygiene
 Every SHB repository SHALL include an in-repo `.gitnexusrc` configuration file specifying local embedding models and concurrency parameters, SHALL maintain a tracked `graphify-out/graph.json` AST knowledge graph with automated merge drivers, and SHALL configure `.gitignore` to prevent tracking of LadybugDB vector indexes.
