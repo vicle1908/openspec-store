@@ -7,7 +7,7 @@ Define automated, non-destructive GitNexus and official Graphify-Labs Graphify i
 
 ### Requirement: Official provider identity
 
-The workspace refresh mechanism SHALL use GitNexus `1.6.9` and Graphify from `https://github.com/Graphify-Labs/graphify`, package `graphifyy`, CLI `graphify`, pinned at `0.9.42` for this change.
+The workspace refresh mechanism SHALL use GitNexus `1.6.12` and Graphify from `https://github.com/Graphify-Labs/graphify`, package `graphifyy`, CLI `graphify`, pinned at `0.9.71` for this change.
 
 #### Scenario: Provider identity is verified
 
