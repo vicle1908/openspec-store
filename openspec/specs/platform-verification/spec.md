@@ -2,7 +2,9 @@
 
 ## Purpose
 The platform implements Normative scenarios have automated evidence Every normative scenario in this change SHALL map to at least one stable verification ID in a machine-readable traceability manifest. Each entry SHALL identify the owning capability, test tier, executable c
+
 ## Requirements
+
 ### Requirement: Normative scenarios have automated evidence
 
 > **Status**: IMPLEMENTED. Traceability manifest exists; normative scenarios mapped to verification IDs.
@@ -15,9 +17,11 @@ Every normative scenario in this change SHALL map to at least one stable verific
 
 ### Requirement: Pull requests pass deterministic fast gates
 
-> **Status**: IMPLEMENTED. CI gates exist for formatting, architecture, tests, Buf lint, migration parsing.
+Every pull request SHALL pass formatting, generated-code cleanliness, dependency and architecture checks, Buf lint and breaking checks, migration parsing, unit tests, race-enabled tests for concurrent packages, and required integration tests. CI SHALL use the pinned Go toolchain (at patch level 1.26.6 or later within the Go 1.26 line), SHALL disable result caching for release-significant test runs, and SHALL publish machine-readable test and coverage output.
 
-Every pull request SHALL pass formatting, generated-code cleanliness, dependency and architecture checks, Buf lint and breaking checks, migration parsing, unit tests, race-enabled tests for concurrent packages, and required integration tests. CI SHALL use the pinned Go toolchain, SHALL disable result caching for release-significant test runs, and SHALL publish machine-readable test and coverage output.
+#### Scenario: Go toolchain incorporates security patch releases
+- **WHEN** pull request verification gates execute in CI with vulnerability scanning (`govulncheck`)
+- **THEN** CI SHALL provision Go 1.26.6 or higher so that standard library packages (`net/http`) contain official vulnerability resolutions.
 
 #### Scenario: Pull request changes command concurrency
 - **WHEN** a pull request changes command handling, repository concurrency, consumer receipt handling, or worker lifecycle code

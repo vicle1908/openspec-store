@@ -134,11 +134,14 @@ ecosystem scenario.
 
 Every service integration and focused ecosystem run SHALL write a
 schema-versioned `go-microservices.testcontainers-ecosystem/v1` manifest. The
-manifest MUST record source revision, dirty state, run identity, cohort,
-evidence class, host platform, declared and resolved images, selected topology,
-required checks, child artifacts and hashes, start and finish times, redacted
-diagnostics, ownership, and cleanup. The only accepted classes SHALL be
-`service-integration` and `focused-ecosystem`.
+aggregate verification gate SHALL validate that the aggregate evidence manifest
+matches either `go-microservices.testcontainers-aggregate/v1` or
+`microservices.testcontainers-aggregate/v1`. The manifest MUST record source
+revision, dirty state, run identity, cohort, evidence class, host platform,
+declared and resolved images, selected topology, required checks, child
+artifacts and hashes, start and finish times, redacted diagnostics, ownership,
+and cleanup. The only accepted classes SHALL be `service-integration` and
+`focused-ecosystem`.
 
 #### Scenario: Passing service integration evidence is retained
 
@@ -159,6 +162,21 @@ diagnostics, ownership, and cleanup. The only accepted classes SHALL be
 
 - **WHEN** manifest or retained log validation detects a credential, password-bearing DSN, Docker authentication value, or provider payload
 - **THEN** the selected target fails evidence validation and retains only a redacted diagnostic category
+
+#### Scenario: Post-rename aggregate evidence is validated
+
+- **WHEN** the aggregate evidence collector outputs a manifest with schema `go-microservices.testcontainers-aggregate/v1`
+- **THEN** the evidence validator SHALL accept the schema and proceed with child manifest integrity validation
+
+#### Scenario: Legacy aggregate evidence remains accepted
+
+- **WHEN** an aggregate evidence manifest with schema `microservices.testcontainers-aggregate/v1` is validated
+- **THEN** the evidence validator SHALL accept the schema without emitting an unsupported schema error
+
+#### Scenario: Unrecognized schema is rejected
+
+- **WHEN** an aggregate manifest specifies an unknown schema version
+- **THEN** the validator SHALL fail closed and report an unsupported schema error
 
 ### Requirement: Container-backed integration execution is explicit and fail closed
 
