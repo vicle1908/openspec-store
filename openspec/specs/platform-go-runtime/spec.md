@@ -5,18 +5,17 @@
 This spec defines the Go toolchain pin, the Fx-based dependency-injection pattern, and the canonical `cmd/` / `internal/` layout. Every service MUST target Go 1.26.5 with the same module-graph behavior, and MUST construct its app via `fx.New(New<App>())` so the wiring is statically validated at boot.
 
 ## Requirements
+
 ### Requirement: Go 1.26.5 toolchain pinned per module
 
-> **Status**: IMPLEMENTED. All services pin Go 1.26.5 toolchain; CI enforces version via verify-go-version.
-
-Every service `go.mod` SHALL pin the toolchain as `go 1.26.5`. New service modules created via `go mod init` on Go 1.26 binaries start with `go 1.25.0` (Go 1.26's new default that encourages forward/backward compatibility); the platform's CI SHALL bump the directive to `go 1.26.5` and verify a `go build ./...` and `go test ./...` pass before the PR merges. The platform's `Makefile` template includes a target `verify-go-version` that fails if the toolchain is anything other than `1.26.5+`.
+Every service `go.mod` SHALL pin the toolchain as `go 1.27.1`. The platform's CI SHALL verify a `go build ./...` and `go test ./...` pass before any PR merges. The platform's `Makefile` template includes a target `verify-go-version` that fails if the toolchain is anything other than `1.27.1+`.
 
 #### Scenario: A new service module is bootstrapped on Go 1.26
 - **WHEN** a developer runs `go mod init` against a fresh `services/customer-service/`
-- **THEN** `go.mod` initially contains `go 1.25.0`; the platform's `bootstrap.sh` (run as a pre-PR step) bumps it to `go 1.26.5`
+- **THEN** `go.mod` directive is aligned to `go 1.27.1`; the platform's `bootstrap.sh` ensures compatibility with `1.27.1+`
 
 #### Scenario: A PR fails CI if the toolchain is not 1.26.5
-- **WHEN** a service's `go.mod` says `go 1.25.x`
+- **WHEN** a service's `go.mod` specifies a Go toolchain older than `1.27.1`
 - **THEN** the `verify-go-version` CI check fails with a clear message
 
 ### Requirement: Green Tea GC enabled by default
