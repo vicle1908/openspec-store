@@ -1,9 +1,6 @@
-# shb-mcp-servers Specification
+# shb-mcp-servers Specification Delta
 
-## Purpose
-Provides Model Context Protocol (MCP) server endpoints, transport adapters, and tool definitions for autonomous agents in the Saigon - Hanoi Bank (SHB) ecosystem.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Standardized MCP Server Transports
 The `shb-mcp-servers` package SHALL implement Model Context Protocol compliant servers using the official FastMCP SDK (`from mcp.server.fastmcp import FastMCP`), exposing asynchronous stdio and Server-Sent Events (SSE) transports with automatic Pydantic schema validation.
@@ -30,10 +27,3 @@ The system SHALL provide dedicated MCP tool modules, resource templates (`shb://
 #### Scenario: Compliance audit prompt invocation
 - **WHEN** an agent requests the `audit-ticket-compliance` prompt template
 - **THEN** the MCP server SHALL return the standardized banking compliance audit prompt instructions
-
-### Requirement: Command-Line Interface and Server Daemon
-The package SHALL provide an executable CLI entrypoint named `shb-mcp` allowing operators and agent configuration managers to inspect and launch MCP servers.
-
-#### Scenario: Server inspection invocation
-- **WHEN** an operator runs `shb-mcp list-tools`
-- **THEN** the CLI outputs all available MCP tools, parameter schemas, and transport binding specifications
