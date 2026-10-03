@@ -53,10 +53,18 @@ An earlier analysis in this effort claimed the MCP surface cost approximately 11
 
 ---
 
-## 5. Upstream Follow-Ups (non-blocking)
+## 5. Upstream Follow-Ups — Resolved
 
-1. **Pi 1.0.0 changed the default TUI mode to fullscreen.** `tuiMode` is unset, so fullscreen is in effect. Setting `"regular"` restores normal scrollback. User preference; does not affect this change's specs.
-2. **`graphify` skill provenance is stale; adopt the upstream Pi variant.** Correction: the source repository was renamed from `safishamsi/graphify` to `Graphify-Labs/graphify` (the old URL returns HTTP 301). The recorded `skillPath` (`graphify/SKILL.md`) no longer exists; upstream now generates per-agent variants via its own generator `tools/skillgen`, including a Pi-specific `graphify/skill-pi.md` on default branch `v8`. The installed workspace copy is the **generic** variant and is roughly five months stale (lock hash `f61ec25c`, 2026-05-05). An earlier note in this evidence claiming the installed copy references a non-existent `Task` tool, and treating the Pi variant as the stale one, is **withdrawn** — the `Task` text belongs to the generic variant, and `graphify/skill-pi.md` is the correct Pi content. Action: re-pin the lock source to `Graphify-Labs/graphify`, point `skillPath` at `graphify/skill-pi.md`, and re-sync. Deferrable; non-blocking for this change.
+1. **Pi 1.0.0 fullscreen default — decision: keep the official default.** `tuiMode` remains unset, so fullscreen stays in effect and no settings write was required. Recorded as an explicit decision (task 8.1), not an unaddressed gap. All fullscreen sub-settings remain at their documented defaults.
+2. **`graphify` skill — decision: option A, do not install the Pi variant.** The source repository was renamed from `safishamsi/graphify` to `Graphify-Labs/graphify` (old URL returns HTTP 301); the recorded path `graphify/SKILL.md` no longer exists; upstream generates per-agent variants via `tools/skillgen` on default branch `v8`. An earlier note claiming the installed copy referenced a non-existent `Task` tool is **withdrawn**.
+
+   Resolution: the `graphifyy` CLI (`~/.local/bin/graphify`, 0.9.74) owns and self-refreshes the skill. `graphify install --platform agents` advanced `~/.agents/skills/graphify` from 0.9.71 to 0.9.74; only the version marker changed, because `SKILL.md` was already byte-identical to upstream `graphify/skill-agents.md` (41,456 bytes). `graphify install --platform copilot` brought `~/.copilot` from 0.9.69 to 0.9.74, and the CLI reports **zero** remaining staleness warnings.
+
+   The Pi-specific path (`graphify install --platform pi`, which writes `~/.pi/agent/skills/graphify/SKILL.md`) was **deliberately not used**, because it targets the product-specific root that task 4.3 removed under the requirement that agents discover shared skills through standard `.agents/skills` locations without copied directories under product-specific configuration roots. Pi discovers `graphify` through `~/.agents/skills/graphify`, which resolves to `~/Developer/.agents/skills/graphify` and is current at 0.9.74. Amending the governing spec to permit a product-specific Pi copy was declined.
+
+   Note: the local `skill-pi.md` remains an older rendering (48,797 bytes, 2026-05-05) versus upstream v8 (41,732 bytes). It is unused under option A; no action taken.
+
+   This also corrected an inaccurate earlier framing: the skill content was **not** stale, only its version marker.
 
 ---
 
