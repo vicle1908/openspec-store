@@ -6,7 +6,7 @@ Provides shared infrastructure, credential management, client factories, and bas
 ## Requirements
 
 ### Requirement: Unified Environment and Credential Loading
-The `shb-core` package SHALL load configuration and credentials from `~/.shb/.env` by default, falling back to process environment variables without accessing or loading `~/.tdt/.env`.
+The `shb-core` package SHALL load configuration and credentials from `~/.shb/.env` using `python-dotenv>=1.2.4` and `pydantic>=2.13.5`, falling back to process environment variables without accessing or loading `~/.tdt/.env`.
 
 #### Scenario: Dedicated environment file loaded
 - **WHEN** an application imports `shb_core` configuration without explicit path overrides
