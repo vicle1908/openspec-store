@@ -123,6 +123,14 @@ Cron reports MUST include both fields independently.
 - Replace values with `<REDACTED>` in committed evidence.
 - MCP tokens in configs are operational state, not secrets — but must not appear in OpenSpec artifacts, reports, or cron output.
 
+## Archive Evidence
+
+Changes that perform verification record their evidence in a single `evidence.md` file inside the change directory. The requirement is stated in `operations.archive.guidance` in `openspec/config.yaml` and enforced by the `cleanup-archive-verification` and `archive-integrity-reconciliation` capabilities.
+
+- An archived change directory is **immutable**. Adding, removing, editing, moving, or rewriting files there is prohibited — including adding an `evidence.md`.
+- When an archived change needs remediation, corrective evidence is written to a **new active change**, which restores the archive to its pre-edit state.
+- The legacy `evidence/` directory form is grandfathered for changes already archived with it and is not migrated.
+
 ## Rollback Requirements
 
 Each tool upgrade MUST retain:
