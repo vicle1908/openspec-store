@@ -65,6 +65,14 @@ operations:
     guidance:
       - Ensure the affected change has no incomplete tasks, then sync any modified delta specs to main specs before archiving.
       - Validate the archived state, confirm the spec sync preserved all scenarios, and record the archived change for downstream verification.
+      - When a change performed verification work, record its evidence in a
+        single `evidence.md` file inside the change directory before archiving;
+        a change that performed no verification is not required to carry one.
+      - Never add, remove, edit, move, or rewrite files in an already-archived
+        change directory. Archived changes are immutable. Corrective evidence
+        and corrections are written to a new active change, which restores the
+        archive to its pre-edit state. The legacy `evidence/` directory form is
+        grandfathered for changes already archived with it and is not migrated.
 
 rules:
   proposal:
