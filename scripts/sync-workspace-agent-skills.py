@@ -66,6 +66,42 @@ def skill_roots(root: Path) -> tuple[dict[str, Path], list[str]]:
     return direct, containers
 
 
+# Directories that make an agent treat a skill directory as a plugin container,
+# causing a case-sensitive catalog walk to stop before reaching SKILL.md. They are
+# not part of the Agent Skills layout and are absent from upstream skill sources.
+NON_OFFICIAL_ENTRY_DIRS = (".cursor-plugin", "cursor-plugin", "claude-plugin")
+
+
+def malformed_entries(root: Path) -> list[str]:
+    """Report skill entries that resolve but are not discoverable.
+
+    APFS is case-insensitive, so a lowercase `skill.md` satisfies a path check while a
+    case-sensitive catalog walk skips it. A plugin-container directory likewise stops
+    the walk before SKILL.md. Both defects are invisible to a plain existence check.
+    """
+    findings: list[str] = []
+    if not root.is_dir():
+        return findings
+    for path in sorted(root.iterdir()):
+        if path.name.startswith(".") or not path.is_dir():
+            continue
+        if not (path / "SKILL.md").is_file():
+            continue
+        try:
+            names = os.listdir(path)
+        except OSError:
+            continue
+        if "SKILL.md" not in names:
+            variants = sorted(name for name in names if name.lower() == "skill.md")
+            findings.append(f"{path.name}:entry-not-canonical-case(has {','.join(variants)})")
+        present = sorted(name for name in names if name in NON_OFFICIAL_ENTRY_DIRS)
+        if present:
+            findings.append(
+                f"{path.name}:plugin-container-dir(shadows SKILL.md:{','.join(present)})"
+            )
+    return findings
+
+
 def points_to(link: Path, target: Path) -> bool:
     return link.is_symlink() and Path(os.path.realpath(link)) == target.resolve()
 
@@ -83,9 +119,7 @@ def equivalent(left: Path, right: Path) -> bool:
         return file_digest(left) == file_digest(right)
     if left.is_dir() and right.is_dir():
         left_files = {
-            path.relative_to(left): file_digest(path)
-            for path in left.rglob("*")
-            if path.is_file()
+            path.relative_to(left): file_digest(path) for path in left.rglob("*") if path.is_file()
         }
         right_files = {
             path.relative_to(right): file_digest(path)
@@ -100,7 +134,7 @@ def remove_path(path: Path) -> None:
     if path.is_symlink() or path.is_file():
         path.unlink()
     elif path.is_dir():
-        shutil.rmtree(path)
+        shutil.rmtree(path, ignore_errors=True)
 
 
 def reconcile_links(
@@ -123,7 +157,10 @@ def reconcile_links(
         if not path.is_symlink():
             continue
         target = Path(os.path.realpath(path))
-        if not any(target == root.resolve() or root.resolve() in target.parents for root in managed_target_roots):
+        if not any(
+            target == root.resolve() or root.resolve() in target.parents
+            for root in managed_target_roots
+        ):
             continue
         expected = desired.get(path.name)
         if expected is None or target != expected.resolve():
@@ -174,9 +211,7 @@ def main() -> int:
     # to the matching generated target instead of copying files between adapters.
     standard_openspec = {name: STORE_STANDARD / name for name in OPEN_SPEC_NAMES}
     claude_openspec = {name: STORE_CLAUDE_SKILLS / name for name in OPEN_SPEC_NAMES}
-    claude_commands = {
-        path.name: path for path in sorted(STORE_CLAUDE_COMMANDS.glob("*.md"))
-    }
+    claude_commands = {path.name: path for path in sorted(STORE_CLAUDE_COMMANDS.glob("*.md"))}
 
     results = {
         "workspace_agents": reconcile_links(
@@ -229,7 +264,12 @@ def main() -> int:
     if containers:
         print("containers=" + ",".join(containers))
 
-    failed = False
+    malformed = malformed_entries(WORKSPACE_AGENTS)
+    print(f"malformed_entries={len(malformed)}")
+    for finding in malformed:
+        print("malformed_entries.finding=" + finding)
+
+    failed = bool(malformed)
     for label, result in results.items():
         print(
             f"{label}: created={len(result.created)} removed={len(result.removed)} "

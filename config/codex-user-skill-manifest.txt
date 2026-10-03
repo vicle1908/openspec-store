@@ -24,3 +24,34 @@ openspec-propose
 openspec-sync-specs
 openspec-update-change
 openspec-verify-change
+# Agent memory and session continuity skills (declared 2026-10-03: previously linked
+# but undeclared, so reconciliation would prune them and drop cwd-independent coverage).
+agentmemory-agents
+agentmemory-architecture
+agentmemory-config
+agentmemory-hooks
+agentmemory-mcp-tools
+agentmemory-rest-api
+commit-context
+commit-history
+find-docs
+forget
+iris-development
+lesson
+memory-discipline
+notion-cli
+recall
+recap
+remember
+session-history
+write-agentmemory-skill
+# Redis design and operations skills.
+redis-clustering
+redis-connections
+redis-core
+redis-observability
+redis-search
+redis-security
+redis-semantic-cache
+# Proprietary local knowledge search; canonical content is workspace-owned with no upstream.
+qi-hybrid-search
