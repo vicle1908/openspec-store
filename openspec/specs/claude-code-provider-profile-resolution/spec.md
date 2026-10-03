@@ -7,16 +7,17 @@ Define the persistent credential-free defaults surface for Claude Code provider 
 
 ### Requirement: Global settings SHALL provide shopapikey defaults while remaining credential-free
 
-The `~/.claude/settings.json` file SHALL contain the shopapikey model, base URL, resolution aliases, effort level, and capability declarations as global defaults so that bare `claude` invocations and other compatible applications use shopapikey without any launcher or `--settings` flag. The file MUST NOT contain `ANTHROPIC_AUTH_TOKEN` or any secret values.
+The `~/.claude/settings.json` file SHALL contain the phanmemvip-provider model, base URL, resolution aliases, effort level, and capability declarations as global defaults so that bare `claude` invocations and other compatible applications use the phanmemvip provider without any launcher or `--settings` flag. The selected model SHALL be `codex-x` (the phanmemvip codex-x channel), and the `[1m]` context-window suffix SHALL NOT be applied to `codex-x` because its 1M provider-side capacity is not established. The file MUST NOT contain `ANTHROPIC_AUTH_TOKEN` or any secret values.
 
 #### Scenario: settings.json provides shopapikey defaults
 
 - **WHEN** `~/.claude/settings.json` is loaded
-- **THEN** it MUST contain a top-level `model` key set to `Claude-Fable[1m]`
+- **THEN** it MUST contain a top-level `model` key set to `codex-x`
 - **AND** its `env` block MUST contain `ANTHROPIC_BASE_URL=https://api.phanmemvip.shop`
-- **AND** its `env` block MUST contain `ANTHROPIC_MODEL=Claude-Fable[1m]`
-- **AND** its `env` block MUST contain `ANTHROPIC_DEFAULT_FABLE_MODEL=Claude-Fable[1m]`
+- **AND** its `env` block MUST contain `ANTHROPIC_MODEL=codex-x`
+- **AND** its `env` block MUST contain `ANTHROPIC_DEFAULT_FABLE_MODEL=codex-x`
 - **AND** its `env` block MUST contain `CLAUDE_CODE_EFFORT_LEVEL=xhigh`
+- **AND** no model selector in the file SHALL carry the `[1m]` suffix
 
 #### Scenario: settings.json contains no auth tokens
 
@@ -122,6 +123,7 @@ Each provider profile JSON under `~/.claude/profiles/` SHALL contain a top-level
 - **WHEN** `~/.claude/profiles/` is listed
 - **THEN** no `giaoduc.json` file SHALL exist
 - **AND** no `giaoduc-key.sh` helper SHALL exist under `~/.claude/helpers/`
+
 ### Requirement: Active launchers SHALL pass `--settings` to Claude Code
 
 Each launcher function in `~/.zshrc` SHALL call `_claude_with_profile` with the corresponding profile path, passing `--settings <profile>` to Claude Code. The launcher MUST NOT use the old `_claude_model_default` helper. The launcher MUST defensively unset `ANTHROPIC_AUTH_TOKEN` before exec. The launcher MUST validate credential availability by invoking the profile's `apiKeyHelper` in a child process with stdout and stderr redirected to `/dev/null` (helper preflight). A preflight failure MUST produce a non-zero exit with stderr naming the provider and stating credential unavailability. Claude Code MUST NOT be launched on preflight failure. The Claude Code launcher set SHALL include `shopapikey()`, `cockpit()`, and `omniroute()`; no `giaoduc()` launcher SHALL exist.
@@ -164,6 +166,7 @@ Each launcher function in `~/.zshrc` SHALL call `_claude_with_profile` with the 
 - **THEN** the launcher MUST exit non-zero
 - **AND** stderr MUST name the provider and state that the credential is unavailable
 - **AND** Claude Code MUST NOT be launched
+
 ### Requirement: Missing token for an active launcher SHALL produce a clear error
 
 When a provider's `apiKeyHelper` script cannot retrieve its credential, the launcher MUST exit with a clear error message naming the provider and stating credential unavailability. The launcher MUST NOT expose the helper script's stdout. No Claude process MUST be launched.
