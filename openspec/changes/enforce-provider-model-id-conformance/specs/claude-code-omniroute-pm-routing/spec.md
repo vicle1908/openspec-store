@@ -1,14 +1,4 @@
-# claude-code-omniroute-pm-routing Specification
-
-## Purpose
-Defines how the `omniroute()` zsh launcher routes Claude Code through the
-local OmniRoute AI gateway's native Anthropic Messages endpoint (`/v1/messages`)
-using the phanmemvip `pm/` model channel: the launcher function contract in
-`~/.zshrc`, the credential-free `omniroute-pm.json` profile with its
-`apiKeyHelper` gate, `[1m]` wire-suffix stripping, and the failure diagnostics
-when the helper or `claude` binary is missing.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: OmniRoute pm launcher SHALL route Claude Code through the gateway Messages endpoint
 
@@ -33,26 +23,6 @@ binary before launch and fail with a diagnostic otherwise.
 - **AND** the selected model MUST NOT carry the `[1m]` suffix, because the client catalog does not describe the suffixed phanmemvip alias
 - **AND** the wire model MUST preserve the `pm/` channel prefix the gateway requires
 - **AND** the request MUST succeed against the phanmemvip channel
-### Requirement: The omniroute profile SHALL be credential-free and helper-gated
-
-`~/.claude/profiles/omniroute-pm.json` MUST be mode 600, MUST NOT contain any
-secret values, and MUST declare `apiKeyHelper` pointing at
-`~/.claude/helpers/omniroute-key.sh`. The helper MUST write exactly one line
-(the `OMNIROUTE_API_KEY` shared-tier value) to stdout, resolve the value
-env-first, and fall back to a restricted single-key parse of `~/.zshenv`
-without sourcing it.
-
-#### Scenario: Profile is credential-free
-
-- **WHEN** `~/.claude/profiles/omniroute-pm.json` is inspected
-- **THEN** it MUST NOT contain `ANTHROPIC_AUTH_TOKEN`, `API_KEY`, `TOKEN`, or `SECRET` in its `env` block
-- **AND** its permissions MUST be `600`
-
-#### Scenario: Helper supplies the shared-tier key when OmniRoute is keyed
-
-- **WHEN** the helper runs in a zsh environment and `OMNIROUTE_API_KEY` is exported by the managed shared-agent-secrets block
-- **THEN** the helper MUST print exactly that value as a single line
-- **AND** with the variable absent from the environment, the helper MUST recover the value by parsing `~/.zshenv` for that single key without sourcing the file
 
 ### Requirement: The gateway alias SHALL be declared to Claude Code
 
