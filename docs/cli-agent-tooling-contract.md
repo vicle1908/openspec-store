@@ -17,11 +17,12 @@ document.
 | engine | Built-in Python AST + tree-sitter |
 | global graph | `~/.graphify/global-graph.json` |
 | artifact root | `graphify-out/` per repository |
-| supported platforms | hermes, pi, claude, codex, opencode |
-| supported platforms verified | `graphify install --help` (Aug 2026) |
+| supported platforms | 22 platforms: claude, codex, opencode, kilo, aider, copilot, claw, droid, trae, trae-cn, hermes, kiro, pi, phanmem.site, antigravity, antigravity-windows, windows, kimi, amp, agents, devin, gemini, cursor |
+| supported platforms verified | `graphify install --help` (Oct 2026) |
 | version discovery | `graphify --version` |
 | skill generation | `graphify install --platform <name>` |
-| version marker | Pi: `.graphify_version` file; Hermes: no explicit version field |
+| version marker | `.graphify_version` file on every installed platform (e.g. `~/.agents/skills/graphify/.graphify_version`); auto-refreshed on `graphify --version`, which warns per-platform when a skill is older than the installed package |
+| cross-framework target | `graphify install --platform agents` writes the spec's user-global `~/.agents/skills/` (alias: `skills`) |
 
 ### GitNexus
 
@@ -144,15 +145,19 @@ Rollback procedure: reinstall the prior pinned version, restore skill files from
 A tool can be installed without being configured (e.g., GitNexus in Goose).
 A tool can be configured without being verified (e.g., agentmemory in Claude).
 
-## Agent Compatibility Matrix (Verified Aug 2026)
+## Agent Compatibility Matrix (Verified Oct 2026)
 
 | Agent | Graphify | GitNexus | Agentmemory | MCP Router |
 |---|---|---|---|---|
 | Hermes v0.20.0 | Installed + skill generated | Installed + skill present | Configured (3 refs) | Embedded |
-| Pi v0.84.1 | Installed + skill generated | Installed (npm:pi-gitnexus) | Optional adapter | Via pi-mcp-adapter |
-| Claude v2.1.226 | Installed + skill generated | Installed + 6 skills | Optional adapter | Via MCP |
+| Pi v1.0.0 | Discovered via standard `~/.agents/skills` (no product-specific copy) | Installed (npm:pi-gitnexus) | Local extension `~/.pi/agent/extensions/agentmemory` | Built-in `mcp` extension; server via `~/.pi/agent/mcp.json` |
+| Claude v2.1.288 | Installed + skill generated | Installed + 6 skills | Optional adapter | Via MCP |
 | Goose v1.45.0 | Skill symlink exists | Not configured | Not an adapter target | stdio extension |
 | OpenCode v1.18.16 | Not configured | Not configured | Optional adapter | stdio |
-| Codex v0.147.0 | Installed + skill generated | Not configured | Not wired | Not configured |
+| Codex v0.160.0 | Installed + skill generated | Not configured | Not wired | Not configured |
 | Prime Agent v0.8.1-beta.564.1.d60fab8 | Not configured | Not configured | Not wired | Configured (stdio) |
 | agy v1.1.11 | Not configured | Not configured | Not wired | Not configured |
+
+### Pi skill placement
+
+Pi discovers shared Agent Skills through supported repository or user-level `.agents/skills` locations. Product-specific roots such as `~/.pi/agent/skills` MUST NOT hold copies of skills available through standard discovery. `graphify install --platform pi` targets `~/.pi/agent/skills/graphify/SKILL.md` and is therefore **not** used; Pi reaches graphify through `~/.agents/skills/graphify`. See `workspace-openspec-skill-discovery` and `agent-skill-distribution`.
