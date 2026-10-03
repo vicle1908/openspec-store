@@ -27,5 +27,5 @@
 
 ## 6. Commit
 
-- [ ] 6.1 Commit the reversion, the recovered evidence, the guidance edit, and this change's artifacts as a single scoped commit whose message states explicitly that the archive was restored (not altered). Verify the commit lists only the affected archive path removal, this change's directory, and `openspec/config.yaml`, and that no other archived change appears in the diff.
-- [ ] 6.2 Confirm the archived change matches its pre-edit content after the commit. Verify that diffing the archived directory against its state at the violation's parent commit `ed231341` (the pre-edit revision, i.e. `6f274f8d^`) reports no difference.
+- [x] 6.1 Commit the reversion, the recovered evidence, the guidance edit, and this change's artifacts as a single scoped commit whose message states explicitly that the archive was restored (not altered). Verify the commit lists only the affected archive path removal, this change's directory, and `openspec/config.yaml`, and that no other archived change appears in the diff.
+- [x] 6.2 Confirm the archived change matches its pre-edit content after the commit. Verify that diffing the archived directory against its state at the violation's parent commit `ed231341` (the pre-edit revision, i.e. `6f274f8d^`) reports no difference.
