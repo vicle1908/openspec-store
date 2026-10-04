@@ -245,6 +245,82 @@ agent_cli_coverage() {
   done
 }
 
+# Declared script provenance manifest (executed path, recorded path, authority).
+SCRIPT_MANIFEST="${STORE_DIR}/config/script-provenance-manifest.tsv"
+
+# Compare each executed script against its recorded mirror by CONTENT digest.
+# Content only: mode and mtime are deliberately ignored, so a chmod is not drift.
+# Never writes to either copy; reporting drift must not repair it.
+# Sets SCRIPT_DRIFT (0 = none, 1 = drift or missing record) and counts.
+detect_script_drift() {
+  SCRIPT_DRIFT=0
+  SCRIPT_DRIFT_COUNT=0
+  SCRIPT_MISSING_COUNT=0
+  SCRIPT_CHECKED=0
+
+  if [[ ! -r "${SCRIPT_MANIFEST}" ]]; then
+    echo "      - manifest not readable: ${SCRIPT_MANIFEST}"
+    SCRIPT_DRIFT=1
+    return 0
+  fi
+
+  local exec_path rec_path _authority
+  while IFS=$'\t' read -r exec_path rec_path _authority; do
+    # Skip comments and blank lines
+    [[ -z "${exec_path}" || "${exec_path}" == \#* ]] && continue
+
+    local name
+    name="$(basename "${exec_path}")"
+
+    if [[ ! -f "${exec_path}" ]]; then
+      echo "      - ${name}: MISSING executed copy (${exec_path})"
+      SCRIPT_MISSING_COUNT=$((SCRIPT_MISSING_COUNT + 1))
+      SCRIPT_DRIFT=1
+      continue
+    fi
+
+    if [[ "${rec_path}" == "-" || -z "${rec_path}" ]]; then
+      echo "      - ${name}: NO RECORDED COPY"
+      SCRIPT_MISSING_COUNT=$((SCRIPT_MISSING_COUNT + 1))
+      SCRIPT_DRIFT=1
+      continue
+    fi
+
+    local rec_abs="${STORE_DIR}/${rec_path}"
+    if [[ ! -f "${rec_abs}" ]]; then
+      echo "      - ${name}: recorded copy absent (${rec_path})"
+      SCRIPT_MISSING_COUNT=$((SCRIPT_MISSING_COUNT + 1))
+      SCRIPT_DRIFT=1
+      continue
+    fi
+
+    SCRIPT_CHECKED=$((SCRIPT_CHECKED + 1))
+
+    # Content digest only. shasum reads bytes; mode/owner/mtime are ignored.
+    local exec_digest rec_digest
+    exec_digest="$(shasum -a 256 "${exec_path}" 2>/dev/null | awk '{print $1}')"
+    rec_digest="$(shasum -a 256 "${rec_abs}" 2>/dev/null | awk '{print $1}')"
+
+    if [[ -z "${exec_digest}" || -z "${rec_digest}" ]]; then
+      echo "      - ${name}: could not digest one or both copies"
+      SCRIPT_DRIFT=1
+      SCRIPT_DRIFT_COUNT=$((SCRIPT_DRIFT_COUNT + 1))
+      continue
+    fi
+
+    if [[ "${exec_digest}" == "${rec_digest}" ]]; then
+      echo "      - ${name}: in sync"
+    else
+      echo "      - ${name}: DRIFTED (executed ${exec_digest:0:12} != recorded ${rec_digest:0:12})"
+      SCRIPT_DRIFT=1
+      SCRIPT_DRIFT_COUNT=$((SCRIPT_DRIFT_COUNT + 1))
+    fi
+  done <"${SCRIPT_MANIFEST}"
+
+  echo "    checked=${SCRIPT_CHECKED} drifted=${SCRIPT_DRIFT_COUNT} missing_record=${SCRIPT_MISSING_COUNT}"
+  return 0
+}
+
 run_pipeline() {
   echo "======================================================================"
   echo "$(date '+%Y-%m-%d %H:%M:%S %Z') — Workstation Daily Update [MODE=${MODE}]"
@@ -252,7 +328,7 @@ run_pipeline() {
 
   # 1. Homebrew
   echo ""
-  echo ">>> [Stage 1/8] Homebrew Maintenance"
+  echo ">>> [Stage 1/9] Homebrew Maintenance"
   brew update 2>&1 || true
   if [[ "${MODE}" == "check" ]]; then
     brew outdated --formula 2>&1 || true
@@ -264,14 +340,14 @@ run_pipeline() {
 
   # 2. Bun Runtime & Globals
   echo ""
-  echo ">>> [Stage 2/8] Bun Runtime & Globals"
+  echo ">>> [Stage 2/9] Bun Runtime & Globals"
   if command -v bun &>/dev/null; then
     bun upgrade 2>&1 || true
   fi
 
   # 3. Global NPM Packages (Filtered to exclude local git packages like prime-agent)
   echo ""
-  echo ">>> [Stage 3/8] Global NPM Packages (Filtered)"
+  echo ">>> [Stage 3/9] Global NPM Packages (Filtered)"
   if [[ "${MODE}" == "check" ]]; then
     npm outdated -g --prefix "${HOME}/.npm-global" 2>&1 || true
   else
@@ -288,7 +364,7 @@ run_pipeline() {
 
   # 4. Python / uv Tools
   echo ""
-  echo ">>> [Stage 4/8] Python / uv Tools"
+  echo ">>> [Stage 4/9] Python / uv Tools"
   if command -v uv &>/dev/null; then
     if [[ "${MODE}" == "check" ]]; then
       uv tool list 2>&1 || true
@@ -300,7 +376,7 @@ run_pipeline() {
 
   # 5. Coding Agent CLIs (declared covered set; each update time-bounded)
   echo ""
-  echo ">>> [Stage 5/8] Coding Agent CLIs (covered set)"
+  echo ">>> [Stage 5/9] Coding Agent CLIs (covered set)"
   # Called directly (not via $(...)) so the function's AGENT_FAILED assignment
   # survives; a command substitution would run it in a subshell and lose it.
   AGENT_FAILED=0
@@ -320,7 +396,7 @@ run_pipeline() {
 
   # 6. Cross-Agent Skills Synchronization & Parity
   echo ""
-  echo ">>> [Stage 6/8] Cross-Agent Skills Parity Check"
+  echo ">>> [Stage 6/9] Cross-Agent Skills Parity Check"
   SYNC_FAILED=0
   if [[ -f "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" ]]; then
     if ! python3 "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" --check 2>&1; then
@@ -341,9 +417,21 @@ run_pipeline() {
     echo "ERROR: skills out of sync after reconciliation — unresolved or malformed skill entries remain."
   fi
 
-  # 7. Upstream skill-content refresh (runs AFTER parity, BEFORE validation)
+  # 7. Script provenance drift (executed copy vs recorded mirror)
   echo ""
-  echo ">>> [Stage 7/8] Skill Content Refresh (canonical store)"
+  echo ">>> [Stage 7/9] Script Provenance Drift Check"
+  SCRIPT_DRIFT=0
+  detect_script_drift
+  if (( SCRIPT_DRIFT != 0 )); then
+    echo "    WARNING: executed scripts differ from their recorded mirrors (or lack a record)."
+    echo "    Reported only — neither copy is modified. Reconcile deliberately after review."
+  else
+    echo "    No script drift found: every executed script matches its recorded mirror."
+  fi
+
+  # 8. Upstream skill-content refresh (runs AFTER parity, BEFORE validation)
+  echo ""
+  echo ">>> [Stage 8/9] Skill Content Refresh (canonical store)"
   REFRESH_REFRESHED=0
   REFRESH_ALREADY=0
   REFRESH_AMBIGUOUS=0
@@ -366,7 +454,7 @@ run_pipeline() {
 
   # 8. OpenSpec Store Validation Gate
   echo ""
-  echo ">>> [Stage 8/8] OpenSpec Store Strict Validation"
+  echo ">>> [Stage 9/9] OpenSpec Store Strict Validation"
   if command -v openspec &>/dev/null; then
     openspec validate --all --strict --store openspec-store 2>&1 || {
       echo "WARNING: OpenSpec validation reported issues."
@@ -381,6 +469,9 @@ run_pipeline() {
   fi
   if [[ "${AGENT_FAILED}" -ne 0 ]]; then
     echo "DEGRADED: one or more agent CLI updates failed."
+  fi
+  if (( SCRIPT_DRIFT != 0 )); then
+    echo "DEGRADED: executed scripts drifted from their recorded mirrors (or lack a record)."
   fi
   if [[ "${SYNC_FAILED}" -ne 0 ]]; then
     echo "$(date '+%Y-%m-%d %H:%M:%S %Z') — FAILED [MODE=${MODE}]: unresolved skill links remain"

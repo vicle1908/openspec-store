@@ -25,13 +25,13 @@
 
 ## 4. Drift detection in the daily job
 
-- [ ] 4.1 Add a `detect_script_drift()` helper to `~/Developer/scripts/workstation-daily-update.sh` that reads the manifest, computes a SHA-256 over each executed/recorded pair, and prints one line per pair with its state; verify by running it while the copies agree and confirming it reports no drift.
-- [ ] 4.2 Compare content only, not mode or mtime; verify by changing only the permission bits on a recorded copy (`chmod`) and confirming the helper still reports agreement, then restoring the mode.
-- [ ] 4.3 Make the helper report a drifted script by name and indicate which copy differs; verify by appending a temporary marker to a recorded copy, confirming the helper names that script, then reverting the marker and confirming agreement returns.
-- [ ] 4.4 Confirm the helper never writes to either copy; verify by hashing both copies before and after a drift-detecting run, including the deliberately drifted case, and asserting both hashes are unchanged.
-- [ ] 4.5 Add the drift stage to the pipeline after the skills parity check and before the store validation gate, renumbering the stage banners; verify the banners read `1/9` through `9/9` in order and that the parity banner precedes the drift banner which precedes the validation banner.
-- [ ] 4.6 Report drift through a `SCRIPT_DRIFT` flag in the run summary as a degradation, without triggering the parity stage's fail-closed exit; verify by forcing drift and confirming the run prints a drift degradation, still reaches the validation gate, and does not return the fail-closed failure status.
-- [ ] 4.7 Ensure the drift stage exits successfully when every pair agrees; verify by running it with consistent copies and confirming exit `0` and an explicit no-drift report.
+- [x] 4.1 Add a `detect_script_drift()` helper to `~/Developer/scripts/workstation-daily-update.sh` that reads the manifest, computes a SHA-256 over each executed/recorded pair, and prints one line per pair with its state; verify by running it while the copies agree and confirming it reports no drift.
+- [x] 4.2 Compare content only, not mode or mtime; verify by changing only the permission bits on a recorded copy (`chmod`) and confirming the helper still reports agreement, then restoring the mode.
+- [x] 4.3 Make the helper report a drifted script by name and indicate which copy differs; verify by appending a temporary marker to a recorded copy, confirming the helper names that script, then reverting the marker and confirming agreement returns.
+- [x] 4.4 Confirm the helper never writes to either copy; verify by hashing both copies before and after a drift-detecting run, including the deliberately drifted case, and asserting both hashes are unchanged.
+- [x] 4.5 Add the drift stage to the pipeline after the skills parity check and before the store validation gate, renumbering the stage banners; verify the banners read `1/9` through `9/9` in order and that the parity banner precedes the drift banner which precedes the validation banner.
+- [x] 4.6 Report drift through a `SCRIPT_DRIFT` flag in the run summary as a degradation, without triggering the parity stage's fail-closed exit; verify by forcing drift and confirming the run prints a drift degradation, still reaches the validation gate, and does not return the fail-closed failure status.
+- [x] 4.7 Ensure the drift stage exits successfully when every pair agrees; verify by running it with consistent copies and confirming exit `0` and an explicit no-drift report.
 
 ## 5. Verification and integration
 
