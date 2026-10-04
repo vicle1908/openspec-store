@@ -26,5 +26,5 @@
 - [x] 4.1 Author `evidence.md` in the change directory from output read back from disk
 - [x] 4.2 Record the `$HOME` manifest footgun and the correct invocation discipline
 - [x] 4.3 Run `openspec validate --all` and confirm the delta spec validates
-- [ ] 4.4 Sync the delta spec into the main `npm-audit-remediation` spec at archive time
-- [ ] 4.5 Archive the change and commit the store
+- [x] 4.4 Sync the delta spec into the main `npm-audit-remediation` spec at archive time
+- [x] 4.5 Archive the change and commit the store
