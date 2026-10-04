@@ -1,0 +1,29 @@
+# Script provenance manifest
+#
+# Declares, for every maintenance script under ~/Developer/scripts/, where the
+# executed copy lives, where its recorded (version-controlled) mirror lives in
+# this store, and which copy is authoritative.
+#
+# Format: <executed path><TAB><recorded path or -><TAB><authority>
+#   authority is always `executed`: ~/Developer/scripts/ is what launchd runs,
+#   and the store copy under scripts/ is a recorded mirror for history and
+#   recovery. The store copy is never executed (no LaunchAgent references
+#   openspec-store/scripts), so recording a script cannot change job behavior.
+#
+# A `-` in the recorded column means no recorded mirror exists yet; the drift
+# check reports that as a missing record rather than as agreement.
+#
+# Drift between an executed copy and its recorded mirror is detected by SHA-256
+# content digest (not mtime, not mode) and reported by the daily maintenance job
+# as a degradation. Drift is never auto-repaired: reconciling requires a
+# deliberate change.
+#
+# Maintained by: change version-workspace-scripts-and-detect-copy-drift
+
+/Users/androidteam/Developer/scripts/workstation-daily-update.sh	scripts/workstation-daily-update.sh	executed
+/Users/androidteam/Developer/scripts/workspace-worktree-scan.sh	scripts/workspace-worktree-scan.sh	executed
+/Users/androidteam/Developer/scripts/knowledge-refresh/refresh-knowledge-indexes.sh	scripts/knowledge-refresh/refresh-knowledge-indexes.sh	executed
+/Users/androidteam/Developer/scripts/knowledge-refresh/knowledge-status.sh	scripts/knowledge-refresh/knowledge-status.sh	executed
+/Users/androidteam/Developer/scripts/knowledge-refresh/sync-notion-knowledge.sh	scripts/knowledge-refresh/sync-notion-knowledge.sh	executed
+/Users/androidteam/Developer/scripts/knowledge-refresh/install-hooks.sh	scripts/knowledge-refresh/install-hooks.sh	executed
+/Users/androidteam/Developer/scripts/knowledge-refresh/install-launchagent.sh	scripts/knowledge-refresh/install-launchagent.sh	executed

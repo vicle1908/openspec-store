@@ -2,15 +2,15 @@
 
 ## 1. Declare the script provenance manifest
 
-- [ ] 1.1 Add a manifest under `openspec-store/config/` listing every executed maintenance script with its executed path, recorded path, and which copy is authoritative; verify the manifest parses and names each of the seven scripts under `~/Developer/scripts/`, and that `workstation-daily-update.sh` and `workspace-worktree-scan.sh` are marked as having no recorded copy yet.
-- [ ] 1.2 Verify the manifest names only paths that currently exist, so it cannot declare a script that is not installed; verify by resolving every executed path in the manifest and confirming each is a readable file.
+- [x] 1.1 Add a manifest under `openspec-store/config/` listing every executed maintenance script with its executed path, recorded path, and which copy is authoritative; verify the manifest parses and names each of the seven scripts under `~/Developer/scripts/`, and that `workstation-daily-update.sh` and `workspace-worktree-scan.sh` are marked as having no recorded copy yet.
+- [x] 1.2 Verify the manifest names only paths that currently exist, so it cannot declare a script that is not installed; verify by resolving every executed path in the manifest and confirming each is a readable file.
 
 ## 2. Record the unversioned executed scripts
 
-- [ ] 2.1 Copy `~/Developer/scripts/workstation-daily-update.sh` into `openspec-store/scripts/` as a recorded mirror and confirm the copy is byte-identical to the executed file (`shasum -a 256` of both match); verify the recorded file is tracked by `git ls-files` after adding.
-- [ ] 2.2 Copy `~/Developer/scripts/workspace-worktree-scan.sh` into `openspec-store/scripts/` as a recorded mirror and confirm byte-identity the same way; verify it is tracked.
-- [ ] 2.3 Confirm the recorded copies are inert, i.e. no LaunchAgent executes them; verify by grepping every plist in `~/Library/LaunchAgents/` for `openspec-store/scripts` and confirming no match, and that both jobs still reference their `~/Developer/scripts/` paths.
-- [ ] 2.4 Update the manifest to record the two newly recorded paths as present; verify the manifest states a recorded path for every executed script it lists.
+- [x] 2.1 Copy `~/Developer/scripts/workstation-daily-update.sh` into `openspec-store/scripts/` as a recorded mirror and confirm the copy is byte-identical to the executed file (`shasum -a 256` of both match); verify the recorded file is tracked by `git ls-files` after adding.
+- [x] 2.2 Copy `~/Developer/scripts/workspace-worktree-scan.sh` into `openspec-store/scripts/` as a recorded mirror and confirm byte-identity the same way; verify it is tracked.
+- [x] 2.3 Confirm the recorded copies are inert, i.e. no LaunchAgent executes them; verify by grepping every plist in `~/Library/LaunchAgents/` for `openspec-store/scripts` and confirming no match, and that both jobs still reference their `~/Developer/scripts/` paths.
+- [x] 2.4 Update the manifest to record the two newly recorded paths as present; verify the manifest states a recorded path for every executed script it lists.
 
 ## 3. Reconcile the recorded knowledge-refresh pair
 
