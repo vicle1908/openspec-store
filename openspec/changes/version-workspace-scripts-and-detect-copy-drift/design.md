@@ -130,6 +130,26 @@ reconciliation (`4741f899`) demonstrates why an automatic overwrite is
 dangerous — if the executed copy held uncommitted operator changes, an automatic
 reconciliation would destroy them while reporting success.
 
+### Decision: Correct the conflicting requirement rather than contradict it
+
+The change modifies `organization-namespaces`'s "Tooling and script path
+resolution invariants" requirement so its inventory assertion is expressed as the
+two copies agreeing, instead of naming a fixed 20-repository count, and so its
+freshness assertion reflects the observed non-zero result rather than asserting a
+zero exit.
+
+*Rationale:* leaving the requirement unmodified while reconciling the inventory to
+32 entries would create a spec that the archived change directly violates, and a
+future reader could not tell which statement was authoritative. The alternative —
+forcing the inventory back to 20 entries to satisfy the old number — was rejected
+because all 32 executed entries resolve to real Git repositories, so truncating
+the list would silently drop 12 repositories from indexing to preserve a stale
+assertion.
+
+*Note on scope:* only the wording of that one requirement changes. Its other two
+scenarios, which constrain path resolution and fail-closed behaviour, are carried
+through unmodified.
+
 ### Decision: The recorded approval digest is regenerated with its inventory
 
 Reconciling the recorded `knowledge-refresh-inventory.tsv` from 20 to 32 entries

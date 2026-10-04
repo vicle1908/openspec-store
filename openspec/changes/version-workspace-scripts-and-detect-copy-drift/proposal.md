@@ -49,6 +49,17 @@ None. This change extends requirements already owned by an existing capability.
   inventory can disagree with the executed one. New requirements are needed for
   versioned provenance, an explicit source of truth, and drift detection.
 
+- `organization-namespaces`: its requirement "Tooling and script path resolution
+  invariants" states that the inventory and approval digest "SHALL match with
+  identical canonical 20-repo paths" across both copies, and that
+  `refresh-knowledge-indexes.sh --check` "SHALL exit successfully with return
+  code 0". Both assertions are contradicted by the artifacts that actually run:
+  the executed inventory lists 32 repositories, and the freshness check returns
+  `1` (observed `Total: 32 FRESH: 7 STALE: 25`). The count assertion must be
+  restated in terms of the two copies agreeing, rather than naming a fixed
+  number that no longer holds, and the `--check` exit assertion must reflect the
+  observed non-zero freshness result.
+
 ## Impact
 
 - **Not under version control today** (`~/Developer` is not a Git repository and
@@ -66,6 +77,16 @@ None. This change extends requirements already owned by an existing capability.
     the two copies carry different digests (executed `c855c50d…`, recorded
     `5a0366fa…`); each is self-consistent with its own inventory, so no job is
     currently failing.
+- **A conflicting existing requirement must be reconciled, not silently overwritten**:
+  the capability `organization-namespaces` requires, in its requirement "Tooling
+  and script path resolution invariants", that `knowledge-refresh-inventory.tsv`
+  and `knowledge-refresh-approval.sha256` "match with identical canonical
+  **20-repo** paths" across both copies, and that
+  `refresh-knowledge-indexes.sh --check` exit `0`. Both claims are false today:
+  the executed inventory lists **32** repositories, and the script's freshness
+  check returns `1` (reported `Total: 32 FRESH: 7 STALE: 25`). Reconciling the
+  recorded copy therefore requires correcting that requirement and its scenario
+  in the same change, rather than contradicting it silently.
 - **Scheduled jobs affected**: `com.developer.workstation-daily-update` (daily
   08:00) and `com.developer.index-refresh` (daily 02:30) both execute the
   installed copies under `~/Developer/scripts/`, not the recorded copies. The
@@ -87,9 +108,15 @@ None. This change extends requirements already owned by an existing capability.
     `workspace-index-freshness`; this change aligns the recorded copy with the
     executed one rather than changing which repositories are approved.
 - **Non-goals**:
-  - Not changing which repositories the knowledge-refresh job indexes. The
-    executed inventory (32 entries) is treated as accurate because every entry
-    resolves to a directory that exists; only the stale recorded copy changes.
+  - Not changing which repositories the knowledge-refresh job indexes. Every entry
+    in the executed inventory (32) resolves to an existing Git repository on disk,
+    so the executed list is treated as accurate and only the stale recorded copy
+    changes. Confirming that list is the right *set* to index is a separate
+    question this change does not settle.
+  - Not implementing a freshness or refresh capability in
+    `refresh-knowledge-indexes.sh`, and not making its freshness check exit `0`.
+    The corrected requirement records the observed non-zero result; changing the
+    script's behavior is separate work.
   - Not fixing the unrelated defect that `kilo update` exits zero while reporting
     an error, nor the `docfork/docs` upstream path ambiguity; both are recorded in
     the `automate-skill-content-refresh` change.

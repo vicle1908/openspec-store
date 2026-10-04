@@ -18,6 +18,7 @@
 - [ ] 3.2 Regenerate `openspec-store/scripts/knowledge-refresh/knowledge-refresh-approval.sha256` over the reconciled inventory in the documented `<sha256>  <filename>` format; verify `shasum -a 256` of the recorded inventory equals the digest recorded beside it.
 - [ ] 3.3 Confirm reconciling the recorded copy did not alter the executed copy or the running job's approval state; verify the executed inventory still matches its own digest, so `com.developer.index-refresh` continues to pass its approval gate.
 - [ ] 3.4 Confirm the remaining six knowledge-refresh files stay byte-identical between the two copies; verify with a diff over each recorded file against its executed counterpart and report any that differ.
+- [ ] 3.5 Correct the conflicting requirement in `organization-namespaces` ("Tooling and script path resolution invariants") so it no longer names a fixed 20-repository count and no longer asserts a zero exit from the freshness check; verify with `openspec show organization-namespaces --type spec --store openspec-store` that the requirement names no repository count and that both copies agreeing is the assertion, while its path-resolution and fail-closed scenarios remain intact.
 
 ## 4. Drift detection in the daily job
 
@@ -33,6 +34,7 @@
 
 - [ ] 5.1 Verify the daily job still honors `--check`: run it in check mode and confirm the drift stage reports without mutating either copy; verify with a SHA-256 tree digest of `openspec-store/scripts/` taken before and after, asserting equality.
 - [ ] 5.2 Run the full daily job end-to-end and confirm the drift stage reports agreement, all nine stages execute, and `openspec validate --all --strict --store openspec-store` reports zero regressions; verify the validation totals show no failures.
+- [ ] 5.7 Confirm no requirement anywhere still asserts a fixed 20-repository knowledge-refresh inventory; verify by searching all specs for the literal count and confirming every remaining reference describes agreement between the copies rather than a fixed number.
 - [ ] 5.3 Confirm idempotence: run the job twice in immediate succession and verify the second run reports the same drift state as the first.
 - [ ] 5.4 Confirm no LaunchAgent change is required; verify with `plutil -p` on both plists that their program paths and schedules are unchanged from before this change.
 - [ ] 5.5 Record verification evidence in `evidence.md` in the change directory, per the store's `cleanup-archive-verification` requirement; verify the file exists and contains the exact commands and observed outputs, including the deliberate-drift and permission-only-change cases.
