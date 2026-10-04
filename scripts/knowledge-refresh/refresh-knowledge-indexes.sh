@@ -1064,8 +1064,13 @@ PY
           fi
         fi
         printf "%-30s  GitNexus=%-10s  Graphify=%-10s  HEAD=%s\n" "$name" "$gn_fresh" "$gf_fresh" "${head_rev:0:7}"
-        # Exit code: 0=all fresh, 1=any stale or missing
-        if [[ "$gn_fresh" == "STALE" || "$gf_fresh" == "STALE" || "$gn_fresh" == "missing" || "$gf_fresh" == "missing" ]]; then
+        # Exit code: 0=all fresh, 1=any stale or missing.
+        # Graphify staleness is displayed as "STALE (<rev> != <rev>)" so the
+        # differing revisions are visible, so match the STALE prefix rather than
+        # the bare string; an exact match would never fire on the decorated form
+        # and would report a stale Graphify index as fresh.
+        if [[ "$gn_fresh" == STALE* || "$gf_fresh" == STALE* || \
+              "$gn_fresh" == "missing" || "$gf_fresh" == "missing" ]]; then
           return 1
         fi
         return 0

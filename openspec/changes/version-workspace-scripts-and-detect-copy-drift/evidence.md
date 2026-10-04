@@ -276,9 +276,6 @@ All artifacts and recorded mirrors are committed: `de38a342`, `8f6a68bd`,
 
 ## Residual risks
 
-- **`sync-notion-knowledge.sh` remains drifted** (executed newer, adds two
-  existing wiki entity paths). Reported by the drift stage; reconciling it is
-  deliberate follow-up work, deliberately not absorbed here.
 - **A recorded mirror can go stale again.** That is the point of the drift
   stage: it now surfaces within a day rather than being discovered by accident.
   A prior one-off reconciliation (`4741f899`) did not hold.
@@ -286,11 +283,106 @@ All artifacts and recorded mirrors are committed: `de38a342`, `8f6a68bd`,
   STALE: 25`), so `refresh-knowledge-indexes.sh --check` exits `1`. That is a
   true freshness result. This change corrects the requirement that demanded
   exit `0`; refreshing the indexes is separate work.
-- **Latent defect not fixed** (out of scope, recorded): in single-repository mode
-  the script sets the Graphify state to `"STALE (<rev> != <rev>)"` but tests for
-  the bare string `"STALE"`, so a repository with a stale Graphify index and a
-  fresh GitNexus index is reported fresh and the check returns `0`. The
-  full-inventory path is unaffected.
 - **Symlinking the duplicated copies instead of duplicating them** is deferred;
   the manifest now records the relationship so a future change can alter it
   deliberately.
+
+---
+
+## 6. Follow-up fixes found during implementation (tasks 6.1–6.5)
+
+### 6.1 The last drifted script reconciled
+
+`sync-notion-knowledge.sh`: the executed copy (mtime `2026-10-04 10:17`) was
+newer and listed two wiki entity paths the recorded copy lacked:
+
+```text
+349,350d348
+<     "wiki/entities/shb.md"
+<     "wiki/entities/omniroute.md"
+```
+
+Both referenced files exist, so the edit is complete. The recorded copy now
+equals the executed copy:
+
+```text
+IDENTICAL (30e19f65dee6951a4e5c32d0e50fa4302ccd65f6bbc2809241b2705ecdb8b336)
+```
+
+### 6.2 Single-repository staleness classification fixed
+
+**Defect**: in single-repository mode the script set the Graphify state to
+`"STALE (<rev> != <rev>)"` and then tested for the bare string `"STALE"`, so a
+repository with a stale Graphify index and a fresh GitNexus index was reported
+fresh and the check returned `0`. The full-inventory path was unaffected because
+it assigns the bare `"STALE"`.
+
+**Fix**: match the `STALE` prefix so the decorated form still classifies as
+stale while the display keeps showing which revisions differ.
+
+**Before/after of the exact comparison**:
+
+```text
+gf_fresh = 'STALE (4c2a51a != 171d789)'
+RESULT: return 0 (reported FRESH)   <- before (bug)
+RESULT: return 1 (stale DETECTED)   <- after (fixed)
+```
+
+**No regression in the full-inventory path**:
+
+```text
+$ refresh-knowledge-indexes.sh --check
+rc=1
+refresh: inventory approved (c855c50d5b11...)
+refresh: Total: 32  FRESH: 7  STALE: 25  MISSING: 0
+```
+
+The approval gate still passes and the freshness result is unchanged.
+
+### 6.3 Store test suite still passes
+
+```text
+$ bash openspec-store/scripts/knowledge-refresh/tests/test_process_inventory.sh
+rc=0
+=== RESULTS: 22 passed, 0 failed ===
+```
+
+### 6.4 Drift stage now reports a fully clean tree
+
+```text
+      - workstation-daily-update.sh: in sync
+      - workspace-worktree-scan.sh: in sync
+      - refresh-knowledge-indexes.sh: in sync
+      - knowledge-status.sh: in sync
+      - sync-notion-knowledge.sh: in sync
+      - install-hooks.sh: in sync
+      - install-launchagent.sh: in sync
+    checked=7 drifted=0 missing_record=0
+```
+
+End-to-end run after the fixes:
+
+```text
+rc=0   stages: 9   Totals: 438 passed, 0 failed (438 items)
+No script drift found: every executed script matches its recorded mirror.
+```
+
+The script-drift degradation no longer appears in the run summary; only the
+unrelated pre-existing agent-CLI degradation (`kilo`) remains.
+
+### 6.5 No new shellcheck findings from the fix
+
+`shellcheck` reports no finding in the edited region. The four findings present
+(SC2155/SC2034 on lines 16, 19, 32, 252) are pre-existing and untouched by this
+change.
+
+### Note: a transient syntax error during verification
+
+One verification run reported `line 493: unexpected EOF while looking for
+matching '"'` and exited `2`. This was **not** a defect in the change: the
+script was being rewritten by a concurrent process during that run (its mtime
+fell inside the run window, and the error referenced a line beyond the file's
+length). Re-verified against a stable file (md5 unchanged across a 6-second
+window): syntax valid, `shellcheck` clean, recorded mirror identical, and the
+full run completed `rc=0` with nine stages.
+

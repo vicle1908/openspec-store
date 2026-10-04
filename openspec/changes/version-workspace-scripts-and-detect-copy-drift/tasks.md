@@ -42,3 +42,11 @@
 - [x] 5.5 Record verification evidence in `evidence.md` in the change directory, per the store's `cleanup-archive-verification` requirement; verify the file exists and contains the exact commands and observed outputs, including the deliberate-drift and permission-only-change cases.
 - [x] 5.6 Commit the change artifacts and the newly recorded script copies so they are protected from the untracked-path removal observed on 2026-10-04; verify with `git ls-files` that every artifact and recorded script is tracked.
 - [x] 5.7 Confirm no requirement anywhere still asserts a fixed 20-repository knowledge-refresh inventory; verify by searching all specs for the literal count and confirming every remaining reference describes agreement between the copies rather than a fixed number.
+
+## 6. Follow-up fixes found during implementation
+
+- [x] 6.1 Reconcile `sync-notion-knowledge.sh` in the recorded tree from the executed copy, which is newer and lists `wiki/entities/shb.md` and `wiki/entities/omniroute.md`; verify both copies are byte-identical and the drift stage reports the file as in sync.
+- [x] 6.2 Fix the single-repository staleness classification in `refresh-knowledge-indexes.sh`: it formats the Graphify state as `STALE (<rev> != <rev>)` but tested for the bare string `STALE`, so a repository with a stale Graphify index and a fresh GitNexus index was reported fresh and the check exited `0`; verify the decorated form now classifies as stale, the display still shows the differing revisions, and the full-inventory path is unchanged.
+- [x] 6.3 Confirm the store's knowledge-refresh test suite still passes after the script fix; verify `test_process_inventory.sh` reports zero failures.
+- [x] 6.4 Re-run the drift stage end-to-end and confirm every declared script reports in sync with `drifted=0`.
+- [x] 6.5 Confirm the script fix introduces no new `shellcheck` findings; verify the reported findings are the pre-existing set only.

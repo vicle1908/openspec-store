@@ -31,3 +31,9 @@ Automated workspace maintenance scripts, LaunchAgents, and knowledge synchroniza
 - **WHEN** `refresh-knowledge-indexes.sh` runs its freshness check and every indexed repository is fresh
 - **THEN** the script SHALL report the per-repository freshness state and a total
 - **AND** it SHALL exit zero
+
+#### Scenario: Single-repository mode classifies staleness the same way
+- **WHEN** `refresh-knowledge-indexes.sh` checks one repository and that repository's Graphify index is stale while its GitNexus index is fresh
+- **THEN** it SHALL report the repository as stale
+- **AND** it SHALL exit non-zero
+- **AND** the reported state SHALL show which revisions differ without that displayed text preventing the stale classification

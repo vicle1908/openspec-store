@@ -150,6 +150,32 @@ assertion.
 scenarios, which constrain path resolution and fail-closed behaviour, are carried
 through unmodified.
 
+### Decision: Fix the single-repository staleness misclassification
+
+In single-repository mode the Graphify state is displayed as
+`STALE (<rev> != <rev>)` so the differing revisions are visible, but the exit
+test compared it to the bare string `STALE`. The test now matches the `STALE`
+prefix, so the decorated display still classifies as stale.
+
+*Rationale:* the displayed text is genuinely useful (it names both revisions),
+so removing the decoration would lose diagnostic value; the defect was in the
+comparison, not the message. Changing the comparison keeps both properties. The
+full-inventory branch was already correct because it assigns the bare `STALE`,
+so it is untouched.
+
+### Decision: Reconcile the remaining drifted script rather than reporting it
+
+The drift stage's first run surfaced `sync-notion-knowledge.sh` as drifted, with
+the executed copy newer by two wiki entity paths that both exist. Because the
+executed copy is authoritative and the difference is complete and verified, the
+recorded mirror is brought in line so the tree reaches a clean state.
+
+*Rationale:* leaving a known, verified, complete difference in place would leave
+the drift stage permanently reporting a degradation, which trains a reader to
+ignore it. Reporting-without-reconciling is the right default for an *unknown*
+difference (the previous change's position), not for one already inspected and
+confirmed.
+
 ### Decision: The recorded approval digest is regenerated with its inventory
 
 Reconciling the recorded `knowledge-refresh-inventory.tsv` from 20 to 32 entries

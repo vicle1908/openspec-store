@@ -21,6 +21,15 @@ actually executes, so a script can be lost with no revision history and a
 - Add a drift check that compares an executed script against its recorded copy
   and reports a mismatch, so divergence is detected by the scheduled maintenance
   job instead of being discovered by accident.
+- Reconcile the remaining drifted knowledge-refresh script
+  (`sync-notion-knowledge.sh`), whose executed copy is newer and lists two wiki
+  entity paths the recorded copy lacks, so the recorded tree matches what runs.
+- Fix a latent defect in `refresh-knowledge-indexes.sh` single-repository mode:
+  it formats the Graphify state as `STALE (<rev> != <rev>)` but then tests for the
+  bare string `STALE`, so a repository whose Graphify index is stale while its
+  GitNexus index is fresh is reported fresh and the check exits `0`. The check
+  must classify staleness correctly in both modes while still showing which
+  revisions differ.
 - Report drift as a degradation in the daily job rather than silently, and
   without rewriting either copy on its own initiative.
 - **BREAKING**: the recorded copy of `knowledge-refresh-inventory.tsv` currently
@@ -126,17 +135,8 @@ None. This change extends requirements already owned by an existing capability.
     indexed is not reopened here.
   - Not implementing a freshness or refresh capability in
     `refresh-knowledge-indexes.sh`, and not making its freshness check exit `0`.
-    The corrected requirement records the freshness outcome; changing the script's
-    behaviour, or refreshing the 25 stale indexes so the check can pass, is
-    separate work.
-  - Not fixing a separate defect found while researching this requirement: in
-    single-repository mode (`--repo`), the script sets the Graphify state to
-    `"STALE (<rev> != <rev>)"` but then tests for the bare string `"STALE"`, so a
-    repository whose Graphify index is stale while its GitNexus index is fresh is
-    reported as fresh and the check returns `0`. The full-inventory path is
-    unaffected because it assigns the bare `"STALE"`. This is recorded here
-    because it was discovered during this research, not because this change fixes
-    it.
+    The corrected requirement records the freshness outcome; refreshing the 25
+    stale indexes so the check can pass is separate work.
   - Not fixing the unrelated defect that `kilo update` exits zero while reporting
     an error, nor the `docfork/docs` upstream path ambiguity; both are recorded in
     the `automate-skill-content-refresh` change.
