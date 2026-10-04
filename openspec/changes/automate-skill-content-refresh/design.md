@@ -180,16 +180,33 @@ prior archived change did. Rejected: that pins versions (`claude` `2.1.283`,
 `codex` `0.157.0`) which drift immediately and turn the spec into a maintenance
 liability; the capability should own the *behavior*, not the version numbers.
 
-### Decision: Treat an error report with a zero exit as an update failure
+### Decision: Report the zero-exit error without depending on the printed text
 
-After each agent update, the stage also inspects the captured output for an error
-signal and reports the agent failed when it finds one, even though the exit status
-was zero.
+The stage records agent failure in a shell variable assigned by the reporting
+function itself, and the pipeline calls that function **directly** rather than
+through a command substitution, so the assignment is not lost to a subshell. The
+run summary reads that variable.
 
-*Rationale:* verified by experiment — `kilo update` returns `0` while printing
-`Error: Failed to change directory to …` and performing no update. Trusting exit
-status alone would report a silent no-op as success, which is the same class of
-blind spot this change exists to remove.
+*Rationale:* an earlier revision called the function as `out="$(f)"` and then
+detected failure by grepping the captured text for `FAILED`. That works by
+accident at best: (a) the function's own `AGENT_FAILED=1` assignments were dead
+code, because a command substitution runs in a subshell; and (b) the grep matches
+the stage's own status lines, so it would also fire on a benign mention of the
+word in updater output. Verified with a probe: the inner assignment is lost
+(`AGENT_FAILED=0` after a subshell call). The variable is therefore the signal of
+record and the text match is removed.
+
+### Decision: Anchor the error pattern to error-position text
+
+The zero-exit error check matches only text where an error marker begins a line
+(after optional whitespace) or an explicit `failed to <verb>` phrasing, rather
+than the words `error`, `cannot`, or `not found` anywhere in the output.
+
+*Rationale:* the broad pattern false-positives on healthy output that merely
+mentions those words (for example a progress line reporting zero failures). A
+false failure is a reported degradation, so it is safer than a false success, but
+it still erodes trust in the report. Verified against eight cases: four true
+positives match, four benign strings do not.
 
 ### Decision: Pass `--skip-confirmation` where a tool would otherwise prompt
 

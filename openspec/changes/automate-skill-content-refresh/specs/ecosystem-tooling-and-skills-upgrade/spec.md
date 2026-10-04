@@ -119,6 +119,34 @@ An agent CLI update that exits with a success status while reporting an error SH
 - **THEN** the stage SHALL report that agent as failed
 - **AND** the run SHALL report a degraded agent-update outcome
 
+#### Scenario: A healthy updater is not reported as failed
+- **WHEN** an agent CLI updater exits zero and its output contains no error report
+- **THEN** the stage SHALL report that agent as updated
+- **AND** the run SHALL NOT report a degraded agent-update outcome
+
+#### Scenario: The failure outcome survives to the run summary
+- **WHEN** the stage reports any agent as failed
+- **THEN** the recorded agent-failure outcome SHALL reach the run's final summary
+- **AND** it SHALL NOT depend on re-matching the stage's own printed text
+
+### Requirement: Check mode does not mutate
+
+When the maintenance job runs in check mode, the agent CLI and skill-content stages SHALL report their findings without applying any update.
+
+#### Scenario: Check mode leaves skill content unchanged
+- **WHEN** the maintenance job runs in check mode
+- **THEN** the skill-content stage SHALL NOT replace or remove any skill content
+- **AND** the reported outcome SHALL indicate that no content was applied
+
+#### Scenario: Check mode leaves agent CLIs unchanged
+- **WHEN** the maintenance job runs in check mode
+- **THEN** the agent CLI stage SHALL NOT invoke any agent updater
+- **AND** it SHALL report the covered set and which covered agents are installed
+
+#### Scenario: Apply mode still updates
+- **WHEN** the maintenance job runs in apply mode
+- **THEN** the agent CLI and skill-content stages SHALL perform their updates as specified
+
 ### Requirement: Refresh lockfile integrity is not asserted from an internal digest
 
 The refresh stage SHALL NOT treat the lockfile lock digest as an authoritative drift signal, and SHALL determine whether content changed from the pulled content itself.

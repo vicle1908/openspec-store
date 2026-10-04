@@ -144,6 +144,42 @@ AGENT_FAILED=1
 - **4.5** `kilo` exited `0` while printing
   `Error: Failed to change directory to …`; reported as
   `FAILED (rc=0 but reported an error)` and `AGENT_FAILED=1`.
+- **4.6** Outcome carriage. The function sets `AGENT_FAILED` itself and the
+  pipeline calls it **directly**, so the assignment reaches the summary.
+
+  Regression found and fixed in this revision — an earlier version called the
+  function as `out="$(agent_cli_coverage 2>&1)"`. Because a command substitution
+  runs in a subshell, every `AGENT_FAILED=1` inside the function was dead code;
+  the only thing that made it work was an outer `grep -q 'FAILED'` over the
+  captured text, which also matched the updater's *own* raw error line
+  (`Error: Failed to change directory …`) rather than the stage's status line.
+
+  - **Probe**: with the subshell form, `AGENT_FAILED=0` after the call
+    (inner assignment lost); with a direct call, `AGENT_FAILED=1`.
+  - **Fix**: call directly; remove the text re-match.
+  - **Verified**: full run prints `DEGRADED: one or more agent CLI updates failed.`
+    and `— Complete [MODE=apply]` with exit `0`.
+
+  Also removed a dead `installed_seen` accumulator that was written but never
+  read. `shellcheck` reports clean on the script after these changes.
+
+### 4.7 Zero-exit error pattern does not false-positive (task 6.8)
+
+Pattern under test: `^[[:space:]]*(error|fatal)[: ]|failed to [a-z]`
+
+| Input | Expected | Observed |
+| ----- | -------- | -------- |
+| `Error: Failed to change directory to /private/tmp/update` | match | match |
+| `  error: something broke` | match | match |
+| `failed to write config` | match | match |
+| `Fatal: cannot continue` | match | match |
+| `note: 0 FAILED tests` | no match | no match |
+| `no error detected; all good` | no match | no match |
+| `Claude Code is up to date (2.1.289)` | no match | no match |
+| `4 packages not found to update` | no match | no match |
+
+All 8 cases behaved as intended. The earlier broad pattern
+(`(^|[^a-z])error[: ]|failed to|cannot|not found`) matched the benign rows.
 
 ---
 
@@ -203,7 +239,9 @@ the timeout bounds, the zero-exit-error rule, and the manual command.
 
 - **Command**: `openspec validate --all --strict --store openspec-store`
 - **Observed**: `✓ change/automate-skill-content-refresh`,
-  `Totals: 437 passed, 0 failed (437 items)`.
+  `Totals: 436 passed, 0 failed (436 items)`.
+  (An earlier run in the same session reported 437; the count varies with how
+  many changes other sessions have archived, not with this change's validity.)
 
 ### 6.5 Idempotence
 
@@ -228,6 +266,43 @@ Identical outcome, same single path-ambiguous entry.
   ```
 
 No plist change was required.
+
+### 6.9 Check mode is non-mutating (tasks 6.9 / requirement "Check mode does not mutate")
+
+Regression found in this revision: the agent-CLI stage and the skill-refresh
+stage ran their apply path regardless of mode, so `--check` updated agent CLIs
+and pulled skill content. Stages 1, 3, and 4 were already mode-gated; stages 5
+and 7 were not.
+
+- **Fix**: both stages now branch on mode. In check mode the agent stage reports
+  the covered set and each installed version without invoking an updater; the
+  refresh stage reports the store path and upstream-locked entry count without
+  pulling.
+- **Verification** — `SKILL.md` tree digest before and after a `--check` run:
+
+  ```text
+  before: 4d74121465745bdef18566af3ed5f00fe317d6a8fd0baa6813b03caf17bc125e
+  check rc=0
+  after : 4d74121465745bdef18566af3ed5f00fe317d6a8fd0baa6813b03caf17bc125e
+  PASS: --check did NOT mutate skill content
+  ```
+
+- **Check-mode output observed**:
+
+  ```text
+  >>> [Stage 5/8] Coding Agent CLIs (covered set)
+      supported/covered set: claude,codex,opencode,kilo,auggie,qoder,pi
+      installed: claude (2.1.289 (Claude Code))
+      ...
+      (check mode: no agent CLI updates applied)
+  >>> [Stage 7/8] Skill Content Refresh (canonical store)
+      (check mode: no skill content applied)
+      upstream-locked entries: 43
+  ```
+
+- **Apply mode re-verified after the change**: exit `0`, `drift=1 refreshed=42
+  already_current=0 path_ambiguous=1 failed=0`, degraded report for `kilo`,
+  `Totals: 436 passed, 0 failed`.
 
 ---
 
