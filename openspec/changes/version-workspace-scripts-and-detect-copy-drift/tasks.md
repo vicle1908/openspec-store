@@ -1,0 +1,39 @@
+# Tasks
+
+## 1. Declare the script provenance manifest
+
+- [ ] 1.1 Add a manifest under `openspec-store/config/` listing every executed maintenance script with its executed path, recorded path, and which copy is authoritative; verify the manifest parses and names each of the seven scripts under `~/Developer/scripts/`, and that `workstation-daily-update.sh` and `workspace-worktree-scan.sh` are marked as having no recorded copy yet.
+- [ ] 1.2 Verify the manifest names only paths that currently exist, so it cannot declare a script that is not installed; verify by resolving every executed path in the manifest and confirming each is a readable file.
+
+## 2. Record the unversioned executed scripts
+
+- [ ] 2.1 Copy `~/Developer/scripts/workstation-daily-update.sh` into `openspec-store/scripts/` as a recorded mirror and confirm the copy is byte-identical to the executed file (`shasum -a 256` of both match); verify the recorded file is tracked by `git ls-files` after adding.
+- [ ] 2.2 Copy `~/Developer/scripts/workspace-worktree-scan.sh` into `openspec-store/scripts/` as a recorded mirror and confirm byte-identity the same way; verify it is tracked.
+- [ ] 2.3 Confirm the recorded copies are inert, i.e. no LaunchAgent executes them; verify by grepping every plist in `~/Library/LaunchAgents/` for `openspec-store/scripts` and confirming no match, and that both jobs still reference their `~/Developer/scripts/` paths.
+- [ ] 2.4 Update the manifest to record the two newly recorded paths as present; verify the manifest states a recorded path for every executed script it lists.
+
+## 3. Reconcile the recorded knowledge-refresh pair
+
+- [ ] 3.1 Bring `openspec-store/scripts/knowledge-refresh/knowledge-refresh-inventory.tsv` in line with the executed inventory, which lists 32 repositories against the recorded 20; verify entry counts match (`grep -vc '^#'` on both reports 32) and that no entry present in the executed copy is absent from the recorded copy.
+- [ ] 3.2 Regenerate `openspec-store/scripts/knowledge-refresh/knowledge-refresh-approval.sha256` over the reconciled inventory in the documented `<sha256>  <filename>` format; verify `shasum -a 256` of the recorded inventory equals the digest recorded beside it.
+- [ ] 3.3 Confirm reconciling the recorded copy did not alter the executed copy or the running job's approval state; verify the executed inventory still matches its own digest, so `com.developer.index-refresh` continues to pass its approval gate.
+- [ ] 3.4 Confirm the remaining six knowledge-refresh files stay byte-identical between the two copies; verify with a diff over each recorded file against its executed counterpart and report any that differ.
+
+## 4. Drift detection in the daily job
+
+- [ ] 4.1 Add a `detect_script_drift()` helper to `~/Developer/scripts/workstation-daily-update.sh` that reads the manifest, computes a SHA-256 over each executed/recorded pair, and prints one line per pair with its state; verify by running it while the copies agree and confirming it reports no drift.
+- [ ] 4.2 Compare content only, not mode or mtime; verify by changing only the permission bits on a recorded copy (`chmod`) and confirming the helper still reports agreement, then restoring the mode.
+- [ ] 4.3 Make the helper report a drifted script by name and indicate which copy differs; verify by appending a temporary marker to a recorded copy, confirming the helper names that script, then reverting the marker and confirming agreement returns.
+- [ ] 4.4 Confirm the helper never writes to either copy; verify by hashing both copies before and after a drift-detecting run, including the deliberately drifted case, and asserting both hashes are unchanged.
+- [ ] 4.5 Add the drift stage to the pipeline after the skills parity check and before the store validation gate, renumbering the stage banners; verify the banners read `1/9` through `9/9` in order and that the parity banner precedes the drift banner which precedes the validation banner.
+- [ ] 4.6 Report drift through a `SCRIPT_DRIFT` flag in the run summary as a degradation, without triggering the parity stage's fail-closed exit; verify by forcing drift and confirming the run prints a drift degradation, still reaches the validation gate, and does not return the fail-closed failure status.
+- [ ] 4.7 Ensure the drift stage exits successfully when every pair agrees; verify by running it with consistent copies and confirming exit `0` and an explicit no-drift report.
+
+## 5. Verification and integration
+
+- [ ] 5.1 Verify the daily job still honors `--check`: run it in check mode and confirm the drift stage reports without mutating either copy; verify with a SHA-256 tree digest of `openspec-store/scripts/` taken before and after, asserting equality.
+- [ ] 5.2 Run the full daily job end-to-end and confirm the drift stage reports agreement, all nine stages execute, and `openspec validate --all --strict --store openspec-store` reports zero regressions; verify the validation totals show no failures.
+- [ ] 5.3 Confirm idempotence: run the job twice in immediate succession and verify the second run reports the same drift state as the first.
+- [ ] 5.4 Confirm no LaunchAgent change is required; verify with `plutil -p` on both plists that their program paths and schedules are unchanged from before this change.
+- [ ] 5.5 Record verification evidence in `evidence.md` in the change directory, per the store's `cleanup-archive-verification` requirement; verify the file exists and contains the exact commands and observed outputs, including the deliberate-drift and permission-only-change cases.
+- [ ] 5.6 Commit the change artifacts and the newly recorded script copies so they are protected from the untracked-path removal observed on 2026-10-04; verify with `git ls-files` that every artifact and recorded script is tracked.
