@@ -66,3 +66,29 @@ never conflated.
 
 - **WHEN** no covered agent CLI's version authority conflicts with its installing manager
 - **THEN** the runner SHALL report no drift findings
+
+### Requirement: Every declared CLI has a declared update path
+
+Coverage SHALL require every installed agent CLI to have a declared update path, which for a
+self-updating CLI SHALL be its self-update verb. The runner SHALL invoke each declared update
+path as a backstop on every run, and SHALL report a CLI that has no declared update path as
+lacking one rather than silently leaving it unmanaged.
+
+#### Scenario: Declared CLI has a self-update path
+
+- **WHEN** a declared agent CLI provides a self-update verb
+- **THEN** that verb SHALL be recorded as its declared update path
+- **AND** the runner SHALL invoke it during the agent-CLI stage
+
+#### Scenario: Declared CLI has no update path
+
+- **WHEN** a declared agent CLI provides neither a self-update verb nor a native background
+  auto-update
+- **THEN** the runner SHALL report the CLI as having no available update path
+- **AND** it MUST NOT resolve the gap by invoking a package manager's upgrade path
+
+#### Scenario: Backstop run leaves current tools unchanged
+
+- **WHEN** the runner invokes the declared update path of an already-current CLI
+- **THEN** the CLI's version SHALL remain unchanged and the invocation SHALL succeed
+- **AND** the run summary MUST NOT record an update failure for it

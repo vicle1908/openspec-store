@@ -76,3 +76,41 @@ version-authority drift defect.
 - **THEN** the inventory SHALL record the version authority as unknown together with the evidence
   gaps
 - **AND** it MUST NOT report the tool as reconciled
+
+### Requirement: Self-update is the preferred update path and the pipeline backstop
+
+Where a tool can update itself, that self-update SHALL be the preferred update path, and any
+native background auto-update the tool offers SHALL be left enabled. The maintenance pipeline
+SHALL additionally invoke the self-update verb as a backstop for every declared tool that
+provides one, so that a tool whose background auto-update is absent or silently broken is still
+brought current. The pipeline MUST NOT substitute a package manager's upgrade path for a tool
+whose version authority is its self-updater.
+
+#### Scenario: Native background auto-update is enabled
+
+- **WHEN** a tool offers a native background auto-update and it is configured on
+- **THEN** the inventory SHALL record the native auto-update as enabled and as the primary
+  update path
+- **AND** the tool SHALL NOT be reported for lacking an update path
+
+#### Scenario: Pipeline invokes self-update as a backstop
+
+- **WHEN** the maintenance pipeline runs its agent-CLI stage
+- **THEN** it SHALL invoke the self-update verb of every declared tool that provides one,
+  including tools whose native background auto-update is already enabled
+- **AND** it MUST NOT invoke a package manager's upgrade path for any of them
+
+#### Scenario: Backstop invocation is idempotent
+
+- **WHEN** a declared tool's self-update verb is invoked while the tool is already at the latest
+  version
+- **THEN** the invocation SHALL complete successfully without changing the installed version
+- **AND** the run MUST NOT report an update failure for it
+
+#### Scenario: Tool provides no self-update path
+
+- **WHEN** a declared tool provides no self-update verb and no native background auto-update
+- **THEN** the inventory SHALL report the tool as having no available update path rather than
+  substituting a package manager's upgrade
+- **AND** the report SHALL identify the tool's installation channel so the gap can be resolved
+  deliberately

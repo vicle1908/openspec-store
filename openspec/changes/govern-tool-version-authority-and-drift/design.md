@@ -61,6 +61,8 @@ change left open.
 
 **Goals:**
 - Give every tool exactly one version authority.
+- Prefer each tool's own self-update, and use the maintenance pipeline as an idempotent backstop
+  so tools without native auto-update still advance.
 - Report version-authority conflicts as a defect distinct from coverage or update failures.
 - Prefer *documented* channels, and record multiple documented channels rather than choosing on
   preference.
@@ -108,15 +110,56 @@ change left open.
 - **Alternative considered**: reporting drift as a coverage finding. Rejected — coverage is about
   declaration, drift is about version ownership.
 
-### Decision 5: Prefer documented channels, and delegate the tie to version authority
+### Decision 5: Self-update is preferred; the daily run is the idempotent backstop
+
+- **Rationale**: Where a tool updates itself, that self-update is the only path that cannot
+  drift. Measured: every declared CLI provides a non-interactive self-update verb, and invoking
+  one while already current is a no-op — `claude update` printed `Claude Code is up to date
+  (2.1.289)` and exited 0. Only `claude` currently has native background auto-update enabled
+  (`autoUpdate: true` in its settings); `codex`, `Claude-Fable`, `opencode`, `kilo`, `auggie`, and
+  `pi` have none, so without the backstop nothing would update them. Running the backstop for
+  every declared tool — including those with auto-update already on — keeps one code path, is
+  idempotent, and catches a tool whose background auto-update has silently broken.
+- **Alternative considered**: letting each tool's auto-update be the only mechanism. Rejected —
+  six of the declared CLIs have no auto-update, so they would fall behind indefinitely.
+- **Alternative considered**: skipping the backstop for tools whose auto-update is enabled.
+  Rejected — it adds a per-tool branch and loses the ability to detect a broken auto-updater.
+
+### Decision 6: A measurement failure is a degraded finding, not a failure
+
+- **Rationale**: The script already establishes this precedent: only stage 6 (an unresolved
+  skill link, which can make later stages act on a wrong tree) is fail-closed, while every
+  read-only reporting stage sets a flag and prints a `DEGRADED` line and the run still exits 0.
+  A crash in a read-only reporter degrades observability, not correctness, so it must not make
+  page measurement stricter than an unresolved link. A failed measurement is also a *different
+  fact* from a measured breach: `SNAPSHOT_STORE_EXCEEDED` means "measured and over ceiling",
+  whereas a crash means "could not measure". The two SHALL be carried as separate flags so the
+  summary never claims a breach that was never measured.
+- **Alternative considered**: reusing the content flag for a measurement failure. Rejected — it
+  would report a ceiling breach that no measurement supports.
+- **Alternative considered**: failing the run closed on a reporter crash. Rejected — it inverts
+  the existing severity ordering and would make read-only reporting stricter than a
+  state-affecting failure.
+
+### Decision 7: A package manager's bin directory does not imply package-manager ownership
+
+- **Rationale**: Six tools *appear* package-manager-managed because they are symlinked into
+  `/opt/homebrew/bin`, while resolving into an ecosystem manager's module directory. Any
+  ownership rule that trusts the bin directory would misattribute them and then "upgrade" them
+  through the wrong manager.
+- **Alternative considered**: treating `bin` location as ownership evidence. Rejected on the
+  measured counterexample.
+
+### Decision 8: Prefer documented channels, and delegate the tie to version authority
 
 - **Rationale**: Official documentation for `codex` and `claude` names both npm and Homebrew, so
-  a preference rule cannot decide. The spec requires recording every documented channel and
-  resolving the choice by version authority, which is the only rule that prevents drift.
+  a preference rule cannot decide between them. The spec requires recording every documented
+  channel and resolving the choice by version authority, which is the only rule that prevents
+  drift.
 - **Alternative considered**: hardcoding "Homebrew wins". Rejected — it would push a
   self-updating tool onto a pinning formula (`opencode`) and create drift where none need exist.
 
-### Transaction boundaries
+## Transaction boundaries
 
 - All new behaviour is read-only reporting: it measures self-update capability and asset
   deferral, and reports conflicts. It does not change any tool's version.
@@ -145,11 +188,13 @@ change left open.
 2. Report the current drift set (`codex`, `Claude-Fable`, `opencode`) as findings, distinct from
    coverage and failure findings.
 3. Declare each covered CLI's update verb against its version authority, so the recorded verb
-   matches the mechanism that owns version.
-4. Where a drift is later corrected, do it by choosing a channel whose asset defers version, or
+   matches the mechanism that owns version, and confirm each declared tool has an update path.
+4. Run the self-update backstop for every declared tool and confirm it is idempotent — invoking an
+   already-current tool must succeed without changing its version.
+5. Where a drift is later corrected, do it by choosing a channel whose asset defers version, or
    by letting the tool own version — never by removing the tool. Verify resolution and execution
    afterwards.
-5. Rollback: this change is reporting and declaration only; no tool version is modified, so no
+6. Rollback: this change is reporting and declaration only; no tool version is modified, so no
    rollback step is required for the plan itself.
 
 ## Open Questions
@@ -159,3 +204,6 @@ change left open.
   conflict, not resolving it a particular way.
 - Whether a self-updating tool with a pinning asset should be *prevented* from being installed
   that way, or merely reported — deferrable; reporting is the required floor in either case.
+- Whether the pipeline should later stop invoking the backstop for tools whose native
+  auto-update is confirmed working — deferrable; invoking it unconditionally is the safer
+  default and is idempotent either way.
