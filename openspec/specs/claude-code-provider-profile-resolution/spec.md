@@ -7,17 +7,17 @@ Define the persistent credential-free defaults surface for Claude Code provider 
 
 ### Requirement: Global settings SHALL provide shopapikey defaults while remaining credential-free
 
-The `~/.claude/settings.json` file SHALL contain the phanmemvip-provider model, base URL, resolution aliases, effort level, and capability declarations as global defaults so that bare `claude` invocations and other compatible applications use the phanmemvip provider without any launcher or `--settings` flag. The selected model SHALL be `codex-x` (the phanmemvip codex-x channel), and the `[1m]` context-window suffix SHALL NOT be applied to `codex-x` because its 1M provider-side capacity is not established. The file MUST NOT contain `ANTHROPIC_AUTH_TOKEN` or any secret values.
+The `~/.claude/settings.json` file SHALL contain the Claude model, base URL, resolution aliases, effort level, and capability declarations as global defaults so that bare `claude` invocations and other compatible applications use the phanmemvip provider without any launcher or `--settings` flag. The selected model SHALL be `Claude-Fable[1m]` (the Claude model with the 1M context-window selector). The `[1m]` suffix SHALL be applied to the Claude Code default selector; Claude Code strips it before transmission, so it is a selector-side stance and MUST NOT be interpreted as proof of provider-side 1M capacity. The file MUST NOT contain `ANTHROPIC_AUTH_TOKEN` or any secret values.
 
 #### Scenario: settings.json provides shopapikey defaults
 
 - **WHEN** `~/.claude/settings.json` is loaded
-- **THEN** it MUST contain a top-level `model` key set to `codex-x`
+- **THEN** it MUST contain a top-level `model` key set to `Claude-Fable[1m]`
 - **AND** its `env` block MUST contain `ANTHROPIC_BASE_URL=https://api.phanmemvip.shop`
-- **AND** its `env` block MUST contain `ANTHROPIC_MODEL=codex-x`
-- **AND** its `env` block MUST contain `ANTHROPIC_DEFAULT_FABLE_MODEL=codex-x`
+- **AND** its `env` block MUST contain `ANTHROPIC_MODEL=Claude-Fable[1m]`
+- **AND** its `env` block MUST contain `ANTHROPIC_DEFAULT_FABLE_MODEL=Claude-Fable[1m]`
 - **AND** its `env` block MUST contain `CLAUDE_CODE_EFFORT_LEVEL=xhigh`
-- **AND** no model selector in the file SHALL carry the `[1m]` suffix
+- **AND** the default model selector MUST carry the `[1m]` suffix
 
 #### Scenario: settings.json contains no auth tokens
 
