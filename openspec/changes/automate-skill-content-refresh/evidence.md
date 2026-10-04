@@ -74,10 +74,29 @@ Test harness result: `pass=5 fail=0`.
 
 ### 2.3 Refresh failure does not abort later stages
 
-- **Observed**: full run reaches `Stage 8/8` and prints
-  `Totals: 437 passed, 0 failed`, then reports the degradation and
-  `— Complete [MODE=apply]` with exit `0`. A refresh failure therefore does not
-  suppress validation.
+**Direct failure injection** (stronger than the earlier indirect observation): run the
+refresh with all proxies pointed at a dead port (`HTTPS_PROXY=HTTP_PROXY=ALL_PROXY=http://127.0.0.1:9`).
+
+- **Observed (stage in isolation)**:
+
+  ```text
+  drift=1 refreshed=0 already_current=0 path_ambiguous=0 failed=1
+  REFRESH FAILED: skills update returned rc=1 (upstream unreachable or output unrecognized)
+  rc-of-refresh-stage=0 (non-fatal)
+  REFRESH_FAILED=1
+  ```
+
+- **Observed (full pipeline, same dead proxy)**: every stage still executed —
+  `Stage 5/8` through `Stage 8/8` — and the run ended:
+
+  ```text
+  DEGRADED: skill content refresh failed (rc/timeout); upstream may be unreachable.
+  DEGRADED: one or more agent CLI updates failed.
+  — Complete [MODE=apply]
+  ```
+
+  with exit `0`, and the parity fail-closed path did not trigger. A refresh failure
+  is therefore reported and non-fatal, exactly as the spec requires.
 
 ### 2.4 Parity fail-closed behavior unchanged
 
@@ -321,6 +340,15 @@ the filesystem level with no git recovery path.
 
 ## Residual risks
 
+- **The deliverable script is not under version control.**
+  `~/Developer/scripts/workstation-daily-update.sh` is the file this change edits,
+  and no Git repository tracks it (`~/Developer` is not a repo). Its sibling
+  scripts are additionally recorded in this store at
+  `scripts/knowledge-refresh/`, but there is no such record for this script, so
+  there is no revision history and no recovery path if the file is lost or
+  corrupted. The planning artifacts are committed here; the script itself is not.
+  Versioning it into the store (as its siblings are) is a separate change and is
+  **not** absorbed into this one.
 - **`kilo update` fails upstream** with `Error: Failed to change directory to …`
   and exit `0`. This stage now *detects and reports* it, but the underlying
   upstream defect is out of scope and unfixed.
@@ -333,3 +361,13 @@ the filesystem level with no git recovery path.
   02:35, before the change existed), and workspace-retention/workspace-lifecycle
   (scope excludes `openspec/changes`; explicitly protects active changes). The
   removal happened outside git; no dangling object references the change.
+- **Source-vs-installed script duplication.** The knowledge-refresh scripts exist
+  as two byte-identical copies (an unversioned installed copy under
+  `~/Developer/scripts/` and a tracked copy under
+  `openspec-store/scripts/knowledge-refresh/`) with different inodes. They have
+  already drifted: the tracked inventory records 20 repositories while the
+  installed, executed copy records 32 (it includes 12 `shb/*` repos). Both pairs
+  are internally self-consistent, so no job is currently broken, and a prior
+  reconciliation (`4741f899`) did not hold. This change does **not** touch that
+  tree; it is recorded here because the same duplication pattern is why this
+  change deliberately *copies* the timeout helper instead of sourcing it.

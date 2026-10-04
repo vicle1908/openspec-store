@@ -50,3 +50,5 @@
 ## 7. Change-durability hardening
 
 - [x] 7.1 Commit the change artifacts to the store's git so they are protected from the untracked-path removal observed on 2026-10-04; verify with `git -C ~/Developer/platform/openspec-store ls-files openspec/changes/automate-skill-content-refresh` that every artifact is tracked.
+- [x] 7.2 Confirm the deliverable's helper is self-contained rather than sourced from the duplicated knowledge-refresh tree, so an edit to either copy cannot change this script's behavior; verify by confirming the script contains no `source` of that tree and that its `run_with_timeout` definition is functionally identical to the sibling's.
+- [x] 7.3 Record in `evidence.md` that the deliverable script is tracked by no Git repository and that versioning it is a separate change; verify the residual-risk entry names the script path and states there is no revision history or recovery path for it.
