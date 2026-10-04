@@ -196,7 +196,9 @@ opencode:OpenCode:upgrade
 kilo:Kilo:update
 auggie:Auggie:update --skip-confirmation
 qoder:Claude-Fable:update
-pi:Pi:update --self"
+pi:Pi:update --self
+prime-agent:Prime Agent:update
+grok:Grok:update"
 
 AGENT_CLI_KNOWN_UNCOVERED="droid"
 
@@ -335,6 +337,7 @@ run_pipeline() {
     brew outdated --cask --greedy 2>&1 || true
   else
     brew upgrade --formula 2>&1 || true
+    brew upgrade --cask 2>&1 || true
     brew cleanup -s 2>&1 || true
   fi
 
