@@ -196,11 +196,9 @@ opencode:OpenCode:upgrade
 kilo:Kilo:update
 auggie:Auggie:update --skip-confirmation
 qoder:Claude-Fable:update
-pi:Pi:update --self
-prime-agent:Prime Agent:update
-grok:Grok:update"
+pi:Pi:update --self"
 
-AGENT_CLI_KNOWN_UNCOVERED="droid"
+AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent"
 
 # Update every covered agent CLI that is installed; report the declared set and
 # any installed agent CLI left uncovered. Each updater is time-bounded.
@@ -242,7 +240,7 @@ agent_cli_coverage() {
   local known
   for known in ${AGENT_CLI_KNOWN_UNCOVERED}; do
     if command -v "${known}" &>/dev/null; then
-      echo "      - uncovered: ${known} (installed, no scriptable update verb; self-updates in-app)"
+      echo "      - uncovered: ${known} (installed, managed by Homebrew or package manager)"
     fi
   done
 }
