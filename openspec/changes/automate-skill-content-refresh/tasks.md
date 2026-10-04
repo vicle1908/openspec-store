@@ -46,4 +46,4 @@
 
 ## 7. Change-durability hardening
 
-- [ ] 7.1 Commit the change artifacts to the store's git so they are protected from the untracked-path removal observed on 2026-10-04; verify with `git -C ~/Developer/platform/openspec-store ls-files openspec/changes/automate-skill-content-refresh` that every artifact is tracked.
+- [x] 7.1 Commit the change artifacts to the store's git so they are protected from the untracked-path removal observed on 2026-10-04; verify with `git -C ~/Developer/platform/openspec-store ls-files openspec/changes/automate-skill-content-refresh` that every artifact is tracked.
