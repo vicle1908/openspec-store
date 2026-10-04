@@ -17,7 +17,7 @@
 ## 3. Path-ambiguity handling
 
 - [x] 3.1 Count entries from the `Multiple current paths match … skipping them` warning into a distinct `path_ambiguous` bucket that is neither refreshed nor failed; verify that a project-scope run reports `path_ambiguous=1` (for `docfork-docs`) and does not increment the failed count.
-- [ ] 3.2 Assert that a run whose only unrefreshed entry is path-ambiguous still concludes successfully; verify by running the full script in apply mode and confirming the run completes without the fail-closed exit path being triggered.
+- [x] 3.2 Assert that a run whose only unrefreshed entry is path-ambiguous still concludes successfully; verify by running the full script in apply mode and confirming the run completes without the fail-closed exit path being triggered.
 - [x] 3.3 Record in the log that the path-ambiguous entry is informational, including the upstream source name, so a reviewer can distinguish it from staleness; verify the log line names `docfork/docfork` and does not label the entry stale or broken.
 
 ## 4. Agent CLI coverage
@@ -36,13 +36,13 @@
 
 ## 6. Documentation and integration verification
 
-- [ ] 6.1 Document the refresh stage, its five outcomes, the timeout bound, and the path-ambiguity exception in the workstation maintenance notes that accompany `workstation-daily-update.sh`; verify the documented manual command reproduces the logged outcome when run as written.
-- [ ] 6.2 Verify that drift is observable before content is replaced: capture the stage's reported drift-availability line and confirm it is emitted before any `Updating <name>` line; verify by diffing line order in the captured output.
-- [ ] 6.3 Document explicitly that `skills update` has no dry-run mode, so readers do not assume a `--check`/`--dry-run` exists; verify by running `skills update --help` and confirming no such flag is listed.
-- [ ] 6.4 Run the full script end-to-end and confirm the log records all five outcome fields and that `openspec validate --all --strict --store openspec-store` still reports zero regressions; verify the validation totals show the same pass count as the pre-change baseline.
-- [ ] 6.5 Verify idempotence by running apply mode twice in immediate succession and confirming the second run reports no content change (already-current) and the same single path-ambiguous entry; verify by diffing the logged outcome fields of the two runs.
-- [ ] 6.6 Confirm no plist change is needed and the modified script is picked up by the existing schedule; verify by running `plutil -p ~/Library/LaunchAgents/com.developer.workstation-daily-update.plist` and confirming it still points at `~/Developer/scripts/workstation-daily-update.sh` with the 08:00 calendar interval.
-- [ ] 6.7 Record verification evidence in `evidence.md` inside the change directory, per the store's `cleanup-archive-verification` requirement; verify the file exists and contains the exact commands and observed outputs for each completed group.
+- [x] 6.1 Document the refresh stage, its five outcomes, the timeout bound, and the path-ambiguity exception in the workstation maintenance notes that accompany `workstation-daily-update.sh`; verify the documented manual command reproduces the logged outcome when run as written.
+- [x] 6.2 Verify that drift is observable before content is replaced: capture the stage's reported drift-availability line and confirm it is emitted before any `Updating <name>` line; verify by diffing line order in the captured output.
+- [x] 6.3 Document explicitly that `skills update` has no dry-run mode, so readers do not assume a `--check`/`--dry-run` exists; verify by running `skills update --help` and confirming no such flag is listed.
+- [x] 6.4 Run the full script end-to-end and confirm the log records all five outcome fields and that `openspec validate --all --strict --store openspec-store` still reports zero regressions; verify the validation totals show the same pass count as the pre-change baseline.
+- [x] 6.5 Verify idempotence by running apply mode twice in immediate succession and confirming the second run reports no content change (already-current) and the same single path-ambiguous entry; verify by diffing the logged outcome fields of the two runs.
+- [x] 6.6 Confirm no plist change is needed and the modified script is picked up by the existing schedule; verify by running `plutil -p ~/Library/LaunchAgents/com.developer.workstation-daily-update.plist` and confirming it still points at `~/Developer/scripts/workstation-daily-update.sh` with the 08:00 calendar interval.
+- [x] 6.7 Record verification evidence in `evidence.md` inside the change directory, per the store's `cleanup-archive-verification` requirement; verify the file exists and contains the exact commands and observed outputs for each completed group.
 
 ## 7. Change-durability hardening
 
