@@ -16,17 +16,17 @@
 
 ## 3. Path-ambiguity handling
 
-- [ ] 3.1 Count entries from the `Multiple current paths match … skipping them` warning into a distinct `path_ambiguous` bucket that is neither refreshed nor failed; verify that a project-scope run reports `path_ambiguous=1` (for `docfork-docs`) and does not increment the failed count.
+- [x] 3.1 Count entries from the `Multiple current paths match … skipping them` warning into a distinct `path_ambiguous` bucket that is neither refreshed nor failed; verify that a project-scope run reports `path_ambiguous=1` (for `docfork-docs`) and does not increment the failed count.
 - [ ] 3.2 Assert that a run whose only unrefreshed entry is path-ambiguous still concludes successfully; verify by running the full script in apply mode and confirming the run completes without the fail-closed exit path being triggered.
-- [ ] 3.3 Record in the log that the path-ambiguous entry is informational, including the upstream source name, so a reviewer can distinguish it from staleness; verify the log line names `docfork/docfork` and does not label the entry stale or broken.
+- [x] 3.3 Record in the log that the path-ambiguous entry is informational, including the upstream source name, so a reviewer can distinguish it from staleness; verify the log line names `docfork/docfork` and does not label the entry stale or broken.
 
 ## 4. Agent CLI coverage
 
-- [ ] 4.1 Replace the single `claude update` call with a loop over the declared covered set (`claude`, `codex`, `opencode`, `kilo`, `auggie`, `qoder`, `pi`), using each tool's own verb, and log the declared set; verify the loop updates every covered agent that is installed and the log records the covered set.
-- [ ] 4.2 Pass `auggie update --skip-confirmation` so the stage never blocks on a confirmation prompt under launchd, and verify by running the stage with stdin closed (`</dev/null`) and confirming it completes without waiting.
-- [ ] 4.3 Skip a covered-but-absent agent without reporting a failure, and report an installed agent outside the covered set as uncovered; verify by running the loop and confirming no absent agent produces an error and that `droid` (native, no scriptable update verb) is reported as uncovered.
-- [ ] 4.4 Bound each agent update with the timeout helper so a hanging updater cannot stall the job, and continue to the next agent on timeout while reporting that agent as failed; verify by running the loop with an artificially low bound and confirming the loop completes and reports the timeout for the affected agent.
-- [ ] 4.5 Detect an updater that exits zero while reporting an error and report it as a failure rather than a successful update; verify against `kilo update` (which prints `Error: Failed to change directory to …` and exits `0`) and confirm the stage reports that agent as failed and the run reports a degraded agent outcome.
+- [x] 4.1 Replace the single `claude update` call with a loop over the declared covered set (`claude`, `codex`, `opencode`, `kilo`, `auggie`, `qoder`, `pi`), using each tool's own verb, and log the declared set; verify the loop updates every covered agent that is installed and the log records the covered set.
+- [x] 4.2 Pass `auggie update --skip-confirmation` so the stage never blocks on a confirmation prompt under launchd, and verify by running the stage with stdin closed (`</dev/null`) and confirming it completes without waiting.
+- [x] 4.3 Skip a covered-but-absent agent without reporting a failure, and report an installed agent outside the covered set as uncovered; verify by running the loop and confirming no absent agent produces an error and that `droid` (native, no scriptable update verb) is reported as uncovered.
+- [x] 4.4 Bound each agent update with the timeout helper so a hanging updater cannot stall the job, and continue to the next agent on timeout while reporting that agent as failed; verify by running the loop with an artificially low bound and confirming the loop completes and reports the timeout for the affected agent.
+- [x] 4.5 Detect an updater that exits zero while reporting an error and report it as a failure rather than a successful update; verify against `kilo update` (which prints `Error: Failed to change directory to …` and exits `0`) and confirm the stage reports that agent as failed and the run reports a degraded agent outcome.
 
 ## 5. Time-bounded refresh
 
