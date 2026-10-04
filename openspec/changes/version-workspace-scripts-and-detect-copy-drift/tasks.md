@@ -35,10 +35,10 @@
 
 ## 5. Verification and integration
 
-- [ ] 5.1 Verify the daily job still honors `--check`: run it in check mode and confirm the drift stage reports without mutating either copy; verify with a SHA-256 tree digest of `openspec-store/scripts/` taken before and after, asserting equality.
-- [ ] 5.2 Run the full daily job end-to-end and confirm the drift stage reports agreement, all nine stages execute, and `openspec validate --all --strict --store openspec-store` reports zero regressions; verify the validation totals show no failures.
-- [ ] 5.7 Confirm no requirement anywhere still asserts a fixed 20-repository knowledge-refresh inventory; verify by searching all specs for the literal count and confirming every remaining reference describes agreement between the copies rather than a fixed number.
-- [ ] 5.3 Confirm idempotence: run the job twice in immediate succession and verify the second run reports the same drift state as the first.
-- [ ] 5.4 Confirm no LaunchAgent change is required; verify with `plutil -p` on both plists that their program paths and schedules are unchanged from before this change.
-- [ ] 5.5 Record verification evidence in `evidence.md` in the change directory, per the store's `cleanup-archive-verification` requirement; verify the file exists and contains the exact commands and observed outputs, including the deliberate-drift and permission-only-change cases.
-- [ ] 5.6 Commit the change artifacts and the newly recorded script copies so they are protected from the untracked-path removal observed on 2026-10-04; verify with `git ls-files` that every artifact and recorded script is tracked.
+- [x] 5.1 Verify the daily job still honors `--check`: run it in check mode and confirm the drift stage reports without mutating either copy; verify with a SHA-256 tree digest of `openspec-store/scripts/` taken before and after, asserting equality.
+- [x] 5.2 Run the full daily job end-to-end and confirm the drift stage reports agreement, all nine stages execute, and `openspec validate --all --strict --store openspec-store` reports zero regressions; verify the validation totals show no failures.
+- [x] 5.3 Confirm idempotence: run the job twice in immediate succession and verify the second run reports the same drift state as the first.
+- [x] 5.4 Confirm no LaunchAgent change is required; verify with `plutil -p` on both plists that their program paths and schedules are unchanged from before this change.
+- [x] 5.5 Record verification evidence in `evidence.md` in the change directory, per the store's `cleanup-archive-verification` requirement; verify the file exists and contains the exact commands and observed outputs, including the deliberate-drift and permission-only-change cases.
+- [x] 5.6 Commit the change artifacts and the newly recorded script copies so they are protected from the untracked-path removal observed on 2026-10-04; verify with `git ls-files` that every artifact and recorded script is tracked.
+- [x] 5.7 Confirm no requirement anywhere still asserts a fixed 20-repository knowledge-refresh inventory; verify by searching all specs for the literal count and confirming every remaining reference describes agreement between the copies rather than a fixed number.
