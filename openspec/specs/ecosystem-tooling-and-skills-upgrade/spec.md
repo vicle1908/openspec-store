@@ -78,7 +78,6 @@ The system SHALL deploy a unified daily maintenance script supporting `--check` 
 - **AND** `~/Developer/scripts/workstation-daily-update.sh` SHALL execute across Homebrew, Bun, filtered npm, uv tools, coding agents, skills sync, and store validation
 - **AND** `com.developer.workstation-daily-update.plist` SHALL be loaded into launchd and scheduled for daily execution at 08:00 AM.
 
-
 ### Requirement: Two-Tier Coding Agent Management and Homebrew-First Alignment
 The workstation coding agent maintenance lifecycle SHALL adhere to a two-tier operational hierarchy:
 1. **Tier 1 (Homebrew-First Preferred Channel)**: Coding agents distributed as Homebrew formulae or casks (`block-goose-cli`, `block-goose`, `grok-build`, `pi-coding-agent`) SHALL be managed and upgraded through Homebrew automation (`brew upgrade --formula` and `brew upgrade --cask`).
@@ -99,6 +98,7 @@ The workstation coding agent maintenance lifecycle SHALL adhere to a two-tier op
 - **THEN** `prime-agent` SHALL be included in the covered agent set
 - **AND** in check mode it SHALL report its active version (`installed: prime-agent (0.9.8)`)
 - **AND** in apply mode it SHALL invoke `prime-agent update` bounded by `AGENT_UPDATE_TIMEOUT`
+
 ### Requirement: Canonical skill store entries resolve to readable content
 
 Every entry in the canonical store `~/Developer/.agents/skills/` SHALL resolve to a readable `SKILL.md` containing parseable frontmatter. A self-referential or dangling symlink SHALL be reported as a broken entry.
@@ -169,3 +169,234 @@ The scheduled skills maintenance step SHALL treat any unresolved canonical or fa
 #### Scenario: Clean state passes the maintenance run
 - **WHEN** the scheduled skills parity step runs and no skill link is unresolved
 - **THEN** the step SHALL report success.
+
+### Requirement: Scheduled upstream skill content refresh
+
+The daily maintenance job SHALL refresh upstream-sourced skill content in the canonical store as a scheduled stage, so that content currency does not depend on a human running the skills CLI by hand.
+
+#### Scenario: Upstream content is refreshed on schedule
+- **WHEN** the daily maintenance job runs and upstream-sourced skills have newer content available
+- **THEN** it SHALL pull the updated content into the canonical store without interactive prompts
+- **AND** the refreshed entries SHALL resolve to readable `SKILL.md` content
+
+#### Scenario: Refresh runs after link parity and before store validation
+- **WHEN** the daily maintenance job executes its stages
+- **THEN** the content refresh SHALL run after the skills parity check
+- **AND** it SHALL run before the OpenSpec store validation gate
+
+#### Scenario: Local skills are not refreshed from upstream
+- **WHEN** a skill in the canonical store has no declared upstream source
+- **THEN** the refresh SHALL NOT modify or remove that skill
+
+### Requirement: Skill content refresh outcomes are reported
+
+The refresh stage SHALL report a per-run outcome distinguishing refresh-available, refreshed, already-current, path-ambiguous, and refresh-failed, and SHALL record the outcome in the maintenance log.
+
+#### Scenario: Outcome summary is recorded
+- **WHEN** the refresh stage completes
+- **THEN** the maintenance log SHALL record how many entries were refreshed, already current, skipped as path-ambiguous, and failed
+
+#### Scenario: Drift is visible without application
+- **WHEN** the refresh stage detects that upstream content differs from the local canonical store
+- **THEN** it SHALL report that entries were refreshed
+- **AND** the report SHALL be distinguishable from a run where no entry changed
+
+### Requirement: Drift is observable before content is replaced
+
+The refresh stage SHALL determine whether upstream content differs from the canonical store before it replaces any skill content, and SHALL report drift availability independently of whether that content is then applied.
+
+#### Scenario: Drift check does not mutate
+- **WHEN** the refresh stage evaluates whether any upstream content has changed
+- **THEN** it SHALL report drift availability before any skill content is replaced
+
+#### Scenario: Unchanged content is reported as already current
+- **WHEN** the refresh stage runs and no upstream content differs from the canonical store
+- **THEN** it SHALL report that no entry changed
+- **AND** the reported outcome SHALL be distinguishable from a run that replaced content
+
+### Requirement: Path-ambiguous upstream skills are informational
+
+When upstream publishes the same skill at multiple paths, the refresh SHALL classify the resulting skip as an informational condition and SHALL NOT treat it as stale, broken, or failing.
+
+#### Scenario: Multi-path upstream entry is reported as informational
+- **WHEN** upstream publishes one skill at more than one path and the refresh tool declines to choose between them
+- **THEN** the refresh SHALL report the entry as path-ambiguous
+- **AND** the run SHALL NOT classify that entry as stale, broken, or failed
+
+#### Scenario: Path-ambiguous entry does not fail the maintenance run
+- **WHEN** the only unrefreshed entry in a run is path-ambiguous
+- **THEN** the maintenance run SHALL still be able to conclude successfully
+
+### Requirement: Refresh failures degrade without masking
+
+An unreachable upstream or failed content refresh SHALL be reported as a degradation and SHALL NOT be reported as a silent success.
+
+#### Scenario: Unreachable upstream is reported
+- **WHEN** upstream content cannot be reached during the scheduled refresh
+- **THEN** the refresh SHALL report the failure for the affected entries
+- **AND** the maintenance run SHALL NOT report the refresh stage as fully successful
+
+#### Scenario: A failed refresh does not abort unrelated stages
+- **WHEN** the refresh stage fails for one or more entries
+- **THEN** the remaining maintenance stages SHALL still execute
+
+#### Scenario: Transient network failure is distinguishable from drift
+- **WHEN** the refresh fails because of a network condition rather than a content difference
+- **THEN** the reported outcome SHALL identify a refresh failure rather than a refreshed or already-current result
+
+### Requirement: Refresh is time-bounded
+
+Each refresh invocation SHALL be time-bounded, and a refresh that exceeds its bound SHALL be reported as a refresh failure rather than being allowed to run indefinitely.
+
+#### Scenario: A hung refresh is abandoned and reported
+- **WHEN** a refresh invocation exceeds its configured time bound
+- **THEN** it SHALL be terminated
+- **AND** its outcome SHALL be reported as a refresh failure
+
+#### Scenario: A hung refresh does not stall the maintenance run
+- **WHEN** a refresh invocation is terminated for exceeding its bound
+- **THEN** the remaining maintenance stages SHALL still execute
+
+### Requirement: Coding agent CLI coverage reflects installed agents
+
+The coding agent CLI stage SHALL update every agent CLI in the stage's declared covered set that is installed, and SHALL report both the covered set and any installed agent CLI outside it.
+
+#### Scenario: All installed agent CLIs are updated
+- **WHEN** the coding agent CLI stage runs and more than one agent CLI from the covered set is installed
+- **THEN** each installed agent CLI in the covered set SHALL be updated by the stage
+
+#### Scenario: The covered set is declared
+- **WHEN** the coding agent CLI stage runs
+- **THEN** it SHALL report which agent CLIs the covered set contains
+- **AND** the covered set SHALL NOT be inferred only from what happens to be installed
+
+#### Scenario: Uncovered agents are reported
+- **WHEN** an installed agent CLI is not in the covered set
+- **THEN** the stage SHALL report it as uncovered
+
+#### Scenario: Absent agents are skipped without error
+- **WHEN** an agent CLI in the covered set is not installed
+- **THEN** the stage SHALL skip it without reporting a failure
+
+### Requirement: A zero-exit updater that reports an error is a failure
+
+An agent CLI update that exits with a success status while reporting an error SHALL be reported as a failure rather than as a successful update.
+
+#### Scenario: Error output with a zero exit is reported as failure
+- **WHEN** an agent CLI updater exits zero and its output reports an error
+- **THEN** the stage SHALL report that agent as failed
+- **AND** the run SHALL report a degraded agent-update outcome
+
+#### Scenario: A healthy updater is not reported as failed
+- **WHEN** an agent CLI updater exits zero and its output contains no error report
+- **THEN** the stage SHALL report that agent as updated
+- **AND** the run SHALL NOT report a degraded agent-update outcome
+
+#### Scenario: The failure outcome survives to the run summary
+- **WHEN** the stage reports any agent as failed
+- **THEN** the recorded agent-failure outcome SHALL reach the run's final summary
+- **AND** it SHALL NOT depend on re-matching the stage's own printed text
+
+### Requirement: Check mode does not mutate
+
+When the maintenance job runs in check mode, the agent CLI and skill-content stages SHALL report their findings without applying any update.
+
+#### Scenario: Check mode leaves skill content unchanged
+- **WHEN** the maintenance job runs in check mode
+- **THEN** the skill-content stage SHALL NOT replace or remove any skill content
+- **AND** the reported outcome SHALL indicate that no content was applied
+
+#### Scenario: Check mode leaves agent CLIs unchanged
+- **WHEN** the maintenance job runs in check mode
+- **THEN** the agent CLI stage SHALL NOT invoke any agent updater
+- **AND** it SHALL report the covered set and which covered agents are installed
+
+#### Scenario: Apply mode still updates
+- **WHEN** the maintenance job runs in apply mode
+- **THEN** the agent CLI and skill-content stages SHALL perform their updates as specified
+
+### Requirement: Refresh lockfile integrity is not asserted from an internal digest
+
+The refresh stage SHALL NOT treat the lockfile lock digest as an authoritative drift signal, and SHALL determine whether content changed from the pulled content itself.
+
+#### Scenario: Internal digest does not gate the refresh
+- **WHEN** the refresh stage evaluates whether an entry needs refreshing
+- **THEN** it SHALL NOT compare the lockfile lock digest against a locally computed content digest as its drift signal
+
+#### Scenario: Content comparison uses the pulled content
+- **WHEN** the refresh stage determines whether an entry changed
+- **THEN** it SHALL base that determination on the content the refresh produced
+
+### Requirement: Executed maintenance scripts are version controlled
+
+Every script that a scheduled job executes from the workstation scripts directory SHALL have a copy recorded under version control in the OpenSpec store, so each script has revision history and a recovery path.
+
+#### Scenario: A scheduled script has a recorded copy
+- **WHEN** a LaunchAgent executes a script from `~/Developer/scripts/`
+- **THEN** a copy of that script SHALL exist under version control in the store's `scripts/` tree
+- **AND** the recorded copy SHALL be retrievable from the store's history
+
+#### Scenario: A script executed with no recorded copy is reported
+- **WHEN** a script is executed from the workstation scripts directory and no recorded copy exists in the store
+- **THEN** the discrepancy SHALL be reported
+- **AND** the script SHALL be named in the report
+
+#### Scenario: History survives loss of the executed copy
+- **WHEN** the executed copy of a version-controlled script is lost or corrupted
+- **THEN** its content SHALL be recoverable from the recorded copy without relying on any other backup
+
+### Requirement: Each script has one declared source of truth
+
+For each script that exists both as an executed copy and a recorded copy, the relationship SHALL be declared explicitly, and the copies SHALL NOT be treated as independently editable.
+
+#### Scenario: The source of truth is declared
+- **WHEN** a script exists as both an executed copy and a recorded copy
+- **THEN** which of the two is authoritative SHALL be stated, rather than left implicit
+- **AND** the declared relationship SHALL be discoverable without inspecting file contents
+
+#### Scenario: Copies are not left as unrelated duplicates
+- **WHEN** a script is present as two separate files that are byte-identical
+- **THEN** the duplication SHALL be resolved so the relationship is declared
+- **AND** the two copies SHALL NOT remain independently editable with no recorded link
+
+### Requirement: Installed-copy drift is detected and reported
+
+The scheduled maintenance job SHALL compare the executed copy of a version-controlled script against its recorded copy and SHALL report any difference.
+
+#### Scenario: Drift is reported
+- **WHEN** the executed copy of a script differs in content from its recorded copy
+- **THEN** the maintenance job SHALL report that script as drifted
+- **AND** the report SHALL name the script and indicate which copy differs
+
+#### Scenario: Drift is a reported degradation, not a silent success
+- **WHEN** drift is detected during a maintenance run
+- **THEN** the run SHALL report a degraded outcome
+- **AND** the run SHALL NOT conclude reporting that the scripts are consistent
+
+#### Scenario: Agreement is reported
+- **WHEN** the executed and recorded copies of every checked script agree
+- **THEN** the maintenance job SHALL report that no script drift was found
+
+#### Scenario: Reconciliation follows the installed copy
+- **WHEN** a recorded inventory disagrees with the installed inventory
+- **THEN** every repository listed only in the installed inventory SHALL be confirmed to exist as a repository before it is recorded
+- **AND** a repository that exists only in the recorded inventory SHALL be reported rather than dropped
+
+#### Scenario: Drift detection does not rewrite either copy
+- **WHEN** drift is detected
+- **THEN** the maintenance job SHALL NOT modify the executed copy or the recorded copy
+- **AND** reconciling the difference SHALL require a deliberate change
+
+### Requirement: Inventory approval digest accompanies its inventory
+
+When a recorded inventory of repositories differs from the inventory its approval digest was computed over, the digest SHALL be regenerated in the same change, so the recorded pair remains internally consistent.
+
+#### Scenario: A reconciled inventory carries a matching digest
+- **WHEN** a recorded repository inventory is brought in line with the executed inventory
+- **THEN** the recorded approval digest SHALL be recomputed over the reconciled inventory
+- **AND** the recorded digest SHALL match the recorded inventory
+
+#### Scenario: A mismatched pair is reported
+- **WHEN** a recorded inventory's content does not hash to the digest recorded beside it
+- **THEN** the pair SHALL be reported as inconsistent
+- **AND** the affected inventory SHALL be named in the report
