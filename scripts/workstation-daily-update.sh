@@ -430,17 +430,21 @@ run_pipeline() {
     echo "    No script drift found: every executed script matches its recorded mirror."
   fi
 
-  # 8. Upstream skill-content refresh (runs AFTER parity, BEFORE validation)
-  echo ""
   # 8. Snapshot Store Growth Bounds
   echo ""
   echo ">>> [Stage 8/12] Snapshot Store Growth Bounds"
   SNAPSHOT_STORE_EXCEEDED=0
+  SNAPSHOT_MEASURE_FAILED=0
   if [[ -f "${STORE_DIR}/scripts/measure-snapshot-growth.py" ]]; then
     local snap_out snap_rc=0
     snap_out="$(run_with_timeout 60 python3 "${STORE_DIR}/scripts/measure-snapshot-growth.py" 2>&1)" || snap_rc=$?
     echo "${snap_out}"
-    if grep -q "Status: EXCEEDED" <<<"${snap_out}"; then
+    # A nonzero exit means the measurement could not be produced. That is a
+    # DIFFERENT fact from a measured breach, so it keeps its own flag: the
+    # summary must never claim a ceiling breach that was never measured.
+    if (( snap_rc != 0 )); then
+      SNAPSHOT_MEASURE_FAILED=1
+    elif grep -q "Status: EXCEEDED" <<<"${snap_out}"; then
       SNAPSHOT_STORE_EXCEEDED=1
     fi
   fi
@@ -449,11 +453,14 @@ run_pipeline() {
   echo ""
   echo ">>> [Stage 9/12] Toolchain Inventory & Prefix Reconciliation"
   PREFIX_SPLIT_DETECTED=0
+  INVENTORY_MEASURE_FAILED=0
   if [[ -f "${STORE_DIR}/scripts/inventory-workstation-toolchain.py" ]]; then
     local inv_out inv_rc=0
     inv_out="$(run_with_timeout 60 python3 "${STORE_DIR}/scripts/inventory-workstation-toolchain.py" 2>&1)" || inv_rc=$?
     echo "${inv_out}"
-    if grep -q "Status:                      SPLIT_DETECTED" <<<"${inv_out}"; then
+    if (( inv_rc != 0 )); then
+      INVENTORY_MEASURE_FAILED=1
+    elif grep -q "Status:                      SPLIT_DETECTED" <<<"${inv_out}"; then
       PREFIX_SPLIT_DETECTED=1
     fi
   fi
@@ -462,12 +469,13 @@ run_pipeline() {
   echo ""
   echo ">>> [Stage 10/12] Agent CLI Coverage Reconciliation"
   AGENT_UNDECLARED_COUNT=0
+  AGENT_COVERAGE_MEASURE_FAILED=0
   if [[ -f "${STORE_DIR}/scripts/reconcile-agent-cli-coverage.py" ]]; then
     local rec_out rec_rc=0
     rec_out="$(run_with_timeout 60 python3 "${STORE_DIR}/scripts/reconcile-agent-cli-coverage.py" 2>&1)" || rec_rc=$?
     echo "${rec_out}"
     if (( rec_rc != 0 )); then
-      AGENT_UNDECLARED_COUNT=1
+      AGENT_COVERAGE_MEASURE_FAILED=1
     fi
   fi
 
@@ -494,7 +502,7 @@ run_pipeline() {
     echo "    skills CLI not found — skipping content refresh"
   fi
 
-  # 8. OpenSpec Store Validation Gate
+  # 12. OpenSpec Store Validation Gate
   echo ""
   echo ">>> [Stage 12/12] OpenSpec Store Strict Validation"
   if command -v openspec &>/dev/null; then
@@ -523,6 +531,15 @@ run_pipeline() {
   fi
   if (( AGENT_UNDECLARED_COUNT != 0 )); then
     echo "DEGRADED: undeclared agent CLI installations detected."
+  fi
+  if (( SNAPSHOT_MEASURE_FAILED != 0 )); then
+    echo "DEGRADED: snapshot-store measurement could not be produced (reporter failed); store state is unknown, not clear."
+  fi
+  if (( INVENTORY_MEASURE_FAILED != 0 )); then
+    echo "DEGRADED: toolchain inventory measurement could not be produced (reporter failed); prefix state is unknown, not clear."
+  fi
+  if (( AGENT_COVERAGE_MEASURE_FAILED != 0 )); then
+    echo "DEGRADED: agent-CLI coverage measurement could not be produced (reporter failed); coverage state is unknown, not clear."
   fi
   if [[ "${SYNC_FAILED}" -ne 0 ]]; then
     echo "$(date '+%Y-%m-%d %H:%M:%S %Z') — FAILED [MODE=${MODE}]: unresolved skill links remain"

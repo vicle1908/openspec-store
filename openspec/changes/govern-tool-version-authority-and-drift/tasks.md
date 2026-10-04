@@ -14,7 +14,7 @@
 - [ ] 2.2 Record the consequence in each drift finding, that a package-manager upgrade reverts the self-updated version; verify the finding text states the reversion consequence
 - [ ] 2.3 Verify drift is reported as a distinct finding class and never as an undeclared-coverage finding or an update failure; verify a run with drift present reports drift and not coverage or failure findings for those CLIs
 - [ ] 2.4 Verify a self-updating tool whose asset defers version produces no drift finding; verify `claude` and `droid` produce no drift finding
-- [ ] 2.5 Implement measurement-failure reporting as a DEGRADED finding with its own flag, separate from the content flag; verify a reporter crash sets the measurement-failure flag and does not set the content flag, so the summary never claims a breach that was not measured
+- [x] 2.5 Implement measurement-failure reporting as a DEGRADED finding with its own flag, separate from the content flag; verify a reporter crash sets the measurement-failure flag and does not set the content flag, so the summary never claims a breach that was not measured
 - [ ] 2.6 Document the drift finding, the measurement-failure distinction, and their separation from coverage and failure findings in `docs/` and verify the documented example matches a real run
 
 ## 3. Declared Update Verb Follows the Version Authority
@@ -45,6 +45,8 @@
 - [ ] 5.1 Add the read-only version-authority, drift, and self-update-backstop stages to `~/Developer/scripts/workstation-daily-update.sh`, time-bounded and reported like the existing stages; verify a full run completes and reports all stages
 - [ ] 5.2 Verify `~/Developer/scripts/workstation-daily-update.sh` and its recorded mirror at `openspec-store/scripts/workstation-daily-update.sh` remain byte-identical after the change; verify the provenance drift stage reports `drifted=0` for it
 - [ ] 5.3 Verify that any new executed script added by this change is registered in `openspec-store/config/script-provenance-manifest.tsv`, because the drift stage is manifest-driven and an unregistered script is invisible to it; verify stage 7 covers every script this change adds
+  - **Scope note (verified):** the scripts this change touches are invoked as `python3 "${STORE_DIR}/scripts/<name>.py"`, so the store copy IS the executed copy. The provenance guarantee tracks only the *duplication* case — a script with an executed copy outside the store and a recorded mirror inside it. Store-owned scripts are therefore exempt by construction and need no manifest row (`reconcile-agent-cli-coverage.py` already has none, as does `sync-workspace-agent-skills.py`).
+  - **The rule to keep:** if any of these scripts ever gains an executed copy under `~/Developer/scripts/` (a copy step, sync, or shim), it becomes a drift candidate and MUST get a manifest row at that point. No manifest change is expected from this change; re-verify rather than assume.
 - [ ] 5.4 Verify the new stages require no network access; verify they complete with networking unavailable
 - [ ] 5.5 Verify version-authority drift, a measurement failure, an undeclared CLI, and an update failure are each surfaced distinctly in the run summary; verify a run containing all four reports them as four separate findings
 - [ ] 5.6 Verify the pipeline reports the baseline cleanly when no drift, no measurement failure, no undeclared CLI, and no update failure exists; verify the summary reports no findings in that state
