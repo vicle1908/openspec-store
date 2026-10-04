@@ -15,6 +15,7 @@
 ## 3. Reconcile the recorded knowledge-refresh pair
 
 - [ ] 3.1 Bring `openspec-store/scripts/knowledge-refresh/knowledge-refresh-inventory.tsv` in line with the executed inventory, which lists 32 repositories against the recorded 20; verify entry counts match (`grep -vc '^#'` on both reports 32) and that no entry present in the executed copy is absent from the recorded copy.
+- [ ] 3.1b Confirm the reconciliation direction by evidence before recording it: verify each of the 12 added `shb/*` repositories exists as a Git repository and carries a live `.gitnexus` or `graphify-out` index, and that no repository appears only in the recorded copy, so reconciling cannot silently drop an indexed repository or omit a gone one.
 - [ ] 3.2 Regenerate `openspec-store/scripts/knowledge-refresh/knowledge-refresh-approval.sha256` over the reconciled inventory in the documented `<sha256>  <filename>` format; verify `shasum -a 256` of the recorded inventory equals the digest recorded beside it.
 - [ ] 3.3 Confirm reconciling the recorded copy did not alter the executed copy or the running job's approval state; verify the executed inventory still matches its own digest, so `com.developer.index-refresh` continues to pass its approval gate.
 - [ ] 3.4 Confirm the remaining six knowledge-refresh files stay byte-identical between the two copies; verify with a diff over each recorded file against its executed counterpart and report any that differ.

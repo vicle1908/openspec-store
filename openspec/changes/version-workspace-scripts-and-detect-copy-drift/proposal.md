@@ -108,11 +108,16 @@ None. This change extends requirements already owned by an existing capability.
     `workspace-index-freshness`; this change aligns the recorded copy with the
     executed one rather than changing which repositories are approved.
 - **Non-goals**:
-  - Not changing which repositories the knowledge-refresh job indexes. Every entry
-    in the executed inventory (32) resolves to an existing Git repository on disk,
-    so the executed list is treated as accurate and only the stale recorded copy
-    changes. Confirming that list is the right *set* to index is a separate
-    question this change does not settle.
+  - Not changing which repositories the knowledge-refresh job indexes. The
+    direction of reconciliation is settled by evidence rather than assumption:
+    every one of the 32 installed entries resolves to an existing Git repository,
+    all 12 entries missing from the recorded copy (the `shb/*` set) carry live
+    `.gitnexus` and `graphify-out` indexes exactly as the non-`shb` entries do,
+    and the installed inventory was edited (2026-09-27) after the recorded copy
+    was last reconciled (2026-09-26). Taking the recorded 20-entry copy as
+    authoritative would therefore drop 12 actively indexed repositories. Only the
+    stale recorded copy changes; deciding whether the shb ecosystem *should* be
+    indexed is not reopened here.
   - Not implementing a freshness or refresh capability in
     `refresh-knowledge-indexes.sh`, and not making its freshness check exit `0`.
     The corrected requirement records the observed non-zero result; changing the

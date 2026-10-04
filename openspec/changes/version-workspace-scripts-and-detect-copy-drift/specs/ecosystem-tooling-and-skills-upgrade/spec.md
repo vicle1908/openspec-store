@@ -52,6 +52,11 @@ The scheduled maintenance job SHALL compare the executed copy of a version-contr
 - **WHEN** the executed and recorded copies of every checked script agree
 - **THEN** the maintenance job SHALL report that no script drift was found
 
+#### Scenario: Reconciliation follows the installed copy
+- **WHEN** a recorded inventory disagrees with the installed inventory
+- **THEN** every repository listed only in the installed inventory SHALL be confirmed to exist as a repository before it is recorded
+- **AND** a repository that exists only in the recorded inventory SHALL be reported rather than dropped
+
 #### Scenario: Drift detection does not rewrite either copy
 - **WHEN** drift is detected
 - **THEN** the maintenance job SHALL NOT modify the executed copy or the recorded copy
