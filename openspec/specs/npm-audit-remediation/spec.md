@@ -6,15 +6,35 @@ Governs remediation contracts, dependency upgrade matrices, peer-resolution conf
 ## Requirements
 
 ### Requirement: Workstation Root Manifest Peer Conflict Resolution
-The workstation root package manifest (`/Users/androidteam/package.json`) SHALL resolve all peer dependency conflicts and version deadlocks between `newman` and its reporter plugins by pinning semver-compatible major versions, updating overrides to non-vulnerable thresholds, and ensuring `npm audit` and `npm outdated` exit without `ERESOLVE` errors.
+The relocated workstation toolchain manifest (`~/.local/share/home-toolchain/package.json`) SHALL
+retain the peer-resolution outcome achieved before relocation: `newman` and its reporter plugin
+pinned to semver-compatible majors, overrides held at non-vulnerable thresholds, and `npm install`
+completing without `ERESOLVE` errors and without `--force` or `--legacy-peer-deps`. No manifest
+SHALL exist at `$HOME`.
 
 #### Scenario: newman and htmlextra peer alignment
-- **WHEN** `newman` is updated to `^6.2.2` and `adm-zip` override is updated to `0.6.1` in `/Users/androidteam/package.json`
-- **THEN** npm installs cleanly without `--force` or `--legacy-peer-deps`, and peer dependency resolution succeeds
+- **WHEN** `newman` is pinned to `^6.2.2` and `newman-reporter-htmlextra` to `^1.23.1` in
+  `~/.local/share/home-toolchain/package.json`, with the `adm-zip` override held at `0.6.1`
+- **THEN** npm installs cleanly without `--force` or `--legacy-peer-deps`, and peer dependency
+  resolution succeeds
+
+#### Scenario: relocated manifest preserves the peer resolution
+
+- **WHEN** `~/.local/share/home-toolchain/package.json` declares `newman@^6.2.2` and
+  `newman-reporter-htmlextra@^1.23.1` and `npm install` is executed there
+- **THEN** the install completes with exit code 0 without `--force` or `--legacy-peer-deps`, and
+  no `ERESOLVE` error is emitted
 
 #### Scenario: npm audit execution after upgrade
-- **WHEN** `npm audit` is executed in `/Users/androidteam`
-- **THEN** the command evaluates the dependency graph without `ERESOLVE` errors, and the 28 vulnerabilities associated with the Newman v4 dependency chain are resolved
+- **WHEN** `npm audit` is executed in `~/.local/share/home-toolchain`
+- **THEN** the command evaluates the dependency graph without `ERESOLVE` errors, and reports
+  the 12 high advisories recorded as irreducible rather than the historical Newman v4 chain count
+
+#### Scenario: no manifest remains at the home directory
+
+- **WHEN** the home directory is inspected
+- **THEN** no `package.json`, `package-lock.json`, or `node_modules` exists directly in `$HOME`,
+  and `npm prefix` executed from any workspace directory resolves to that directory
 
 ### Requirement: Transitive Vulnerability Elimination via Package Overrides
 Node.js package manifests across `mcp-router`, `prime-agent`, and `realtime/frontend` SHALL declare explicit version overrides for transitive dependencies with published security advisories where parent packages have not released updated dependency ranges. In dual-manager environments like `realtime/frontend`, overrides MUST be synchronized across both `overrides` and `pnpm.overrides` to ensure deterministic resolution.
@@ -141,11 +161,32 @@ Electron desktop applications in monorepos (`apps/electron` in `platform/mcp-rou
 - **THEN** native modules (`argon2`, `better-sqlite3`) compile and link successfully against the target Electron ABI
 
 ### Requirement: Root Manifest Transitive Override Hardening
-The workstation root manifest (`/Users/androidteam/package.json`) SHALL declare strict version overrides for transitive HTTP, form handling, and parser libraries (`axios`, `form-data`, `js-yaml`, `yaml`) required by Git-native API testing tooling (`@usebruno/cli`), ensuring `npm audit` reports zero non-residual vulnerabilities.
+The relocated workstation toolchain manifest SHALL declare strict version overrides for the
+transitive HTTP, form handling, and parser libraries required by the Git-native API testing
+tooling (`axios`, `form-data`, `js-yaml`, `yaml`, `@faker-js/faker`), and SHALL record which
+residual advisories remain regardless of those overrides, because no published version resolves
+them.
 
 #### Scenario: elimination of bruno transitive CVEs
-- **WHEN** overrides for `axios@^1.20.0`, `form-data@4.0.6`, `js-yaml@>=4.3.2`, and `yaml@>=2.8.3` are active in `/Users/androidteam/package.json`
-- **THEN** `npm audit` reports zero vulnerabilities associated with Bruno dependencies
+- **WHEN** overrides for `axios@^1.20.0`, `form-data@4.0.6`, `js-yaml@>=4.3.2`, and
+  `yaml@>=2.8.3` are active in `~/.local/share/home-toolchain/package.json`
+- **THEN** `npm audit` reports no vulnerabilities attributable to the Bruno dependency chain
+  other than the `@faker-js/faker` residual, which is recorded as irreducible because raising
+  it breaks `newman` and `bru`
+
+#### Scenario: override set survives relocation intact
+
+- **WHEN** the relocated manifest is inspected
+- **THEN** it declares the same override set as before relocation, and `axios@^1.20.0`,
+  `form-data@4.0.6`, `js-yaml@>=4.3.2`, and `yaml@>=2.8.3` are all present and active
+
+#### Scenario: residual set is recorded rather than claimed resolved
+
+- **WHEN** `npm audit` is executed against the relocated manifest
+- **THEN** the residuals rooted in `@faker-js/faker`, `braces`, and `node-forge` are recorded as
+  irreducible with their no-fix evidence, and the remediation does NOT claim zero vulnerabilities
+  for the Bruno dependency chain, because `@faker-js/faker` cannot be raised without breaking
+  `newman` and `bru`
 
 ### Requirement: Downgrade-Only Remedy Indicates Unpatched Upstream
 
@@ -169,16 +210,17 @@ and SHALL NOT apply the proposed downgrade.
   remediation step
 
 ### Requirement: Workstation Root Manifest Residual Identity Coverage
-
-The unpatched-upstream residual inventory SHALL cover `/Users/androidteam/package.json`
-alongside the repository surfaces already governed, and SHALL record each residual by package
-name, advisory identity, and dependency path.
+The unpatched-upstream residual inventory SHALL cover the relocated workstation toolchain manifest
+(`~/.local/share/home-toolchain/package.json`) alongside the repository surfaces already governed,
+and SHALL record each residual by package name, advisory identity, and dependency path. No
+inventory entry SHALL reference a manifest in `$HOME`, which no longer exists.
 
 #### Scenario: residual inventory enumerates the workstation root manifest
 
-- **WHEN** `npm audit` is executed in `/Users/androidteam` on 2026-10-04
+- **WHEN** `npm audit` is executed in `~/.local/share/home-toolchain` on 2026-10-04
 - **THEN** evidence enumerates the reported advisories by package and dependency chain,
-  recording the total as 19 vulnerabilities (2 moderate, 17 high)
+  recording the total as 12 high vulnerabilities and attributing them to the `@faker-js/faker`,
+  `braces`, and `node-forge` roots
 
 #### Scenario: residual surfaces are attributed distinctly
 
@@ -201,14 +243,14 @@ resulting invocation discipline.
   root
 
 ### Requirement: Archived Prior Art Reconciliation Before New Remediation
-
-Before a remediation change asserts a dependency upgrade is outstanding, the change SHALL
-check the store's archive for a completed change covering the same manifest, so the upgrade is
-not repeated.
+Before a remediation change asserts a dependency upgrade is outstanding, the change SHALL check
+the store's archive for a completed change covering the same manifest, so the upgrade is not
+repeated.
 
 #### Scenario: already-archived upgrades are recognised
 
-- **WHEN** a remediation proposal is authored for `/Users/androidteam/package.json`
+- **WHEN** a remediation proposal is authored for the relocated toolchain manifest at
+  `~/.local/share/home-toolchain/package.json`
 - **THEN** the proposal references the archived changes that already performed the
   `newman`/`newman-reporter-htmlextra`/`@usebruno/cli` upgrades and does not re-execute them
 
