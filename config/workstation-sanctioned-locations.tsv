@@ -1,0 +1,6 @@
+# Sanctioned workstation tool installation locations
+# location	type	description	authoritative_rule
+~/.npm-global	npm_global_prefix	Declared npm global prefix for workstation CLIs	match_declared_prefix
+~/.local/share/home-toolchain	relocated_toolbelt	Isolated package manifest for toolbelt CLIs	active_toolbelt
+/opt/homebrew	system_package_manager	Homebrew system package manager prefix	system_primary
+~/.local/share	language_tool_managers	Language and runtime tool managers (uv, mise, etc.)	vendor_isolated

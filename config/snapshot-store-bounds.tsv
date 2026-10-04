@@ -1,0 +1,3 @@
+# Snapshot store bounds and owner repack commands
+# store_path	size_ceiling	owner_repack_command	owner_tool
+~/.agentmemory/snapshots	1G	git -C ~/.agentmemory/snapshots repack -a -d -f --depth=250 --window=250	agentmemory

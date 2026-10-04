@@ -328,7 +328,7 @@ run_pipeline() {
 
   # 1. Homebrew
   echo ""
-  echo ">>> [Stage 1/9] Homebrew Maintenance"
+  echo ">>> [Stage 1/12] Homebrew Maintenance"
   brew update 2>&1 || true
   if [[ "${MODE}" == "check" ]]; then
     brew outdated --formula 2>&1 || true
@@ -341,14 +341,14 @@ run_pipeline() {
 
   # 2. Bun Runtime & Globals
   echo ""
-  echo ">>> [Stage 2/9] Bun Runtime & Globals"
+  echo ">>> [Stage 2/12] Bun Runtime & Globals"
   if command -v bun &>/dev/null; then
     bun upgrade 2>&1 || true
   fi
 
   # 3. Global NPM Packages (Filtered to exclude local git packages like prime-agent)
   echo ""
-  echo ">>> [Stage 3/9] Global NPM Packages (Filtered)"
+  echo ">>> [Stage 3/12] Global NPM Packages (Filtered)"
   if [[ "${MODE}" == "check" ]]; then
     npm outdated -g --prefix "${HOME}/.npm-global" 2>&1 || true
   else
@@ -365,7 +365,7 @@ run_pipeline() {
 
   # 4. Python / uv Tools
   echo ""
-  echo ">>> [Stage 4/9] Python / uv Tools"
+  echo ">>> [Stage 4/12] Python / uv Tools"
   if command -v uv &>/dev/null; then
     if [[ "${MODE}" == "check" ]]; then
       uv tool list 2>&1 || true
@@ -377,7 +377,7 @@ run_pipeline() {
 
   # 5. Coding Agent CLIs (declared covered set; each update time-bounded)
   echo ""
-  echo ">>> [Stage 5/9] Coding Agent CLIs (covered set)"
+  echo ">>> [Stage 5/12] Coding Agent CLIs (covered set)"
   # Called directly (not via $(...)) so the function's AGENT_FAILED assignment
   # survives; a command substitution would run it in a subshell and lose it.
   AGENT_FAILED=0
@@ -397,7 +397,7 @@ run_pipeline() {
 
   # 6. Cross-Agent Skills Synchronization & Parity
   echo ""
-  echo ">>> [Stage 6/9] Cross-Agent Skills Parity Check"
+  echo ">>> [Stage 6/12] Cross-Agent Skills Parity Check"
   SYNC_FAILED=0
   if [[ -f "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" ]]; then
     if ! python3 "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" --check 2>&1; then
@@ -420,7 +420,7 @@ run_pipeline() {
 
   # 7. Script provenance drift (executed copy vs recorded mirror)
   echo ""
-  echo ">>> [Stage 7/9] Script Provenance Drift Check"
+  echo ">>> [Stage 7/12] Script Provenance Drift Check"
   SCRIPT_DRIFT=0
   detect_script_drift
   if (( SCRIPT_DRIFT != 0 )); then
@@ -432,7 +432,48 @@ run_pipeline() {
 
   # 8. Upstream skill-content refresh (runs AFTER parity, BEFORE validation)
   echo ""
-  echo ">>> [Stage 8/9] Skill Content Refresh (canonical store)"
+  # 8. Snapshot Store Growth Bounds
+  echo ""
+  echo ">>> [Stage 8/12] Snapshot Store Growth Bounds"
+  SNAPSHOT_STORE_EXCEEDED=0
+  if [[ -f "${STORE_DIR}/scripts/measure-snapshot-growth.py" ]]; then
+    local snap_out snap_rc=0
+    snap_out="$(run_with_timeout 60 python3 "${STORE_DIR}/scripts/measure-snapshot-growth.py" 2>&1)" || snap_rc=$?
+    echo "${snap_out}"
+    if grep -q "Status: EXCEEDED" <<<"${snap_out}"; then
+      SNAPSHOT_STORE_EXCEEDED=1
+    fi
+  fi
+
+  # 9. Toolchain Inventory & Prefix Reconciliation
+  echo ""
+  echo ">>> [Stage 9/12] Toolchain Inventory & Prefix Reconciliation"
+  PREFIX_SPLIT_DETECTED=0
+  if [[ -f "${STORE_DIR}/scripts/inventory-workstation-toolchain.py" ]]; then
+    local inv_out inv_rc=0
+    inv_out="$(run_with_timeout 60 python3 "${STORE_DIR}/scripts/inventory-workstation-toolchain.py" 2>&1)" || inv_rc=$?
+    echo "${inv_out}"
+    if grep -q "Status:                      SPLIT_DETECTED" <<<"${inv_out}"; then
+      PREFIX_SPLIT_DETECTED=1
+    fi
+  fi
+
+  # 10. Agent CLI Coverage Reconciliation
+  echo ""
+  echo ">>> [Stage 10/12] Agent CLI Coverage Reconciliation"
+  AGENT_UNDECLARED_COUNT=0
+  if [[ -f "${STORE_DIR}/scripts/reconcile-agent-cli-coverage.py" ]]; then
+    local rec_out rec_rc=0
+    rec_out="$(run_with_timeout 60 python3 "${STORE_DIR}/scripts/reconcile-agent-cli-coverage.py" 2>&1)" || rec_rc=$?
+    echo "${rec_out}"
+    if (( rec_rc != 0 )); then
+      AGENT_UNDECLARED_COUNT=1
+    fi
+  fi
+
+  # 11. Upstream skill-content refresh (runs AFTER parity, BEFORE validation)
+  echo ""
+  echo ">>> [Stage 11/12] Skill Content Refresh (canonical store)"
   REFRESH_REFRESHED=0
   REFRESH_ALREADY=0
   REFRESH_AMBIGUOUS=0
@@ -455,7 +496,7 @@ run_pipeline() {
 
   # 8. OpenSpec Store Validation Gate
   echo ""
-  echo ">>> [Stage 9/9] OpenSpec Store Strict Validation"
+  echo ">>> [Stage 12/12] OpenSpec Store Strict Validation"
   if command -v openspec &>/dev/null; then
     openspec validate --all --strict --store openspec-store 2>&1 || {
       echo "WARNING: OpenSpec validation reported issues."
@@ -473,6 +514,15 @@ run_pipeline() {
   fi
   if (( SCRIPT_DRIFT != 0 )); then
     echo "DEGRADED: executed scripts drifted from their recorded mirrors (or lack a record)."
+  fi
+  if (( SNAPSHOT_STORE_EXCEEDED != 0 )); then
+    echo "DEGRADED: one or more Git snapshot stores exceed declared size ceilings."
+  fi
+  if (( PREFIX_SPLIT_DETECTED != 0 )); then
+    echo "DEGRADED: npm global prefix split detected (effective prefix != declared prefix)."
+  fi
+  if (( AGENT_UNDECLARED_COUNT != 0 )); then
+    echo "DEGRADED: undeclared agent CLI installations detected."
   fi
   if [[ "${SYNC_FAILED}" -ne 0 ]]; then
     echo "$(date '+%Y-%m-%d %H:%M:%S %Z') — FAILED [MODE=${MODE}]: unresolved skill links remain"
