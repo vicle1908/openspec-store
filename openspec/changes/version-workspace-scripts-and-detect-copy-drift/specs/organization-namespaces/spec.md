@@ -23,6 +23,11 @@ Automated workspace maintenance scripts, LaunchAgents, and knowledge synchroniza
 - **AND** the set of repositories SHALL be taken from the installed inventory rather than from a count fixed in this requirement
 
 #### Scenario: Freshness check reports a non-fresh workspace without false success
-- **WHEN** `refresh-knowledge-indexes.sh` runs its freshness check and one or more indexed repositories are stale
+- **WHEN** `refresh-knowledge-indexes.sh` runs its freshness check and one or more indexed repositories are stale or missing
 - **THEN** the script SHALL report the per-repository freshness state and a total
-- **AND** it SHALL NOT report success while repositories remain stale
+- **AND** it SHALL exit non-zero rather than reporting success
+
+#### Scenario: Freshness check reports an all-fresh workspace
+- **WHEN** `refresh-knowledge-indexes.sh` runs its freshness check and every indexed repository is fresh
+- **THEN** the script SHALL report the per-repository freshness state and a total
+- **AND** it SHALL exit zero

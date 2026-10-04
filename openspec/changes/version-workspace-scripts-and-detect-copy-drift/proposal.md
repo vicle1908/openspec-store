@@ -53,12 +53,18 @@ None. This change extends requirements already owned by an existing capability.
   invariants" states that the inventory and approval digest "SHALL match with
   identical canonical 20-repo paths" across both copies, and that
   `refresh-knowledge-indexes.sh --check` "SHALL exit successfully with return
-  code 0". Both assertions are contradicted by the artifacts that actually run:
-  the executed inventory lists 32 repositories, and the freshness check returns
-  `1` (observed `Total: 32 FRESH: 7 STALE: 25`). The count assertion must be
-  restated in terms of the two copies agreeing, rather than naming a fixed
-  number that no longer holds, and the `--check` exit assertion must reflect the
-  observed non-zero freshness result.
+  code 0". The count assertion is stale: it described a snapshot of the workspace
+  on 2026-09-26 (the origin change's own text reads "both source and workstation
+  reflect all 20 canonical repository paths"), while the executed inventory has
+  listed 32 repositories since 2026-09-27. The exit assertion is a different kind
+  of problem: `--check` **is** a real, first-class flag with a documented contract
+  ("Exit code: 0=all fresh, 1=any stale or missing"), and it correctly returns
+  `1` today because 25 of the 32 indexed repositories are genuinely stale
+  (observed `Total: 32 FRESH: 7 STALE: 25`). So the requirement asserts a
+  workspace condition that is currently false, not a flag that is broken. Both
+  assertions must be restated: the count as agreement between the copies rather
+  than a fixed number, and the exit as a freshness outcome rather than an
+  unconditional zero.
 
 ## Impact
 
@@ -120,8 +126,17 @@ None. This change extends requirements already owned by an existing capability.
     indexed is not reopened here.
   - Not implementing a freshness or refresh capability in
     `refresh-knowledge-indexes.sh`, and not making its freshness check exit `0`.
-    The corrected requirement records the observed non-zero result; changing the
-    script's behavior is separate work.
+    The corrected requirement records the freshness outcome; changing the script's
+    behaviour, or refreshing the 25 stale indexes so the check can pass, is
+    separate work.
+  - Not fixing a separate defect found while researching this requirement: in
+    single-repository mode (`--repo`), the script sets the Graphify state to
+    `"STALE (<rev> != <rev>)"` but then tests for the bare string `"STALE"`, so a
+    repository whose Graphify index is stale while its GitNexus index is fresh is
+    reported as fresh and the check returns `0`. The full-inventory path is
+    unaffected because it assigns the bare `"STALE"`. This is recorded here
+    because it was discovered during this research, not because this change fixes
+    it.
   - Not fixing the unrelated defect that `kilo update` exits zero while reporting
     an error, nor the `docfork/docs` upstream path ambiguity; both are recorded in
     the `automate-skill-content-refresh` change.
