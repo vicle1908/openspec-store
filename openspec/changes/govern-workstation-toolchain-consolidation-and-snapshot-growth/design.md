@@ -71,8 +71,8 @@ Homebrew ownership research (which CLI Homebrew actually ships):
 | `Anthropic` | formula `Anthropic` is a **different tool** (a regex library, deprecated 2027-01-11) | vendor download (`~/.grok/downloads/…`) |
 
 Two collisions are recorded rather than assumed away: Homebrew's `opencode` formula comes from a
-third-party tap and *shadows* `homebrew/core/opencode`; and Homebrew's `Anthropic` formula is
-unrelated to the installed installer, whose asset is named `grok-build`.
+third-party tap and *shadows* `homebrew/core/opencode`; and Homebrew's `grok` formula is
+unrelated to the coding agent CLI, whose official asset is cask `grok-build`.
 
 Agent-CLI coverage gap in `~/Developer/scripts/workstation-daily-update.sh`:
 
@@ -136,13 +136,13 @@ installed but undeclared: happy cursor-agent hermes-agent buzz cce
   manager otherwise, rather than mandating an unavailable migration.
 - **Alternative considered**: a blanket "prefer Homebrew" rule. Rejected — it would mark
   available-only-via-npm tools as permanently non-compliant, and would push the naive migration
-  of `Anthropic` onto an unrelated regex-library formula.
+  of `grok` onto an unrelated deprecated regex-library formula.
 
 ### Decision 3: Record name collisions explicitly
 
-- **Rationale**: Two measured collisions would cause damage if assumed benign. Moving `Anthropic`
-  to Homebrew's `Anthropic` formula would install a deprecated regex library in place of the
-  installer. Homebrew's `opencode` formula comes from a third-party tap that shadows
+- **Rationale**: Two measured collisions would cause damage if assumed benign. Moving `grok`
+  to Homebrew's `grok` formula would install a deprecated regex library in place of the
+  agent CLI. Homebrew's `opencode` formula comes from a third-party tap that shadows
   `homebrew/core/opencode`, so the tap of record must be stated. Both are recorded as facts the
   inventory reports, not decisions the migration makes silently.
 - **Alternative considered**: relying on exact name matching. Rejected — name matching is

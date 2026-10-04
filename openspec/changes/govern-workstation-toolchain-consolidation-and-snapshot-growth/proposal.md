@@ -29,9 +29,9 @@ Whether a CLI *should* move to Homebrew depends on whether Homebrew actually shi
 | `buzz` | cask `buzz` | external download |
 | `Claude-Fable` | **none** | npm-global, symlinked into `/opt/homebrew/bin` |
 | `kilo`, `auggie`, `cce`, `pi`, `prime-agent`, `happy` | **none** | npm-global / external |
-| `Anthropic` | formula `Anthropic` is a **different tool** (a regex library, deprecated 2027-01-11) | external download (`~/.grok/downloads/…`) |
+| `grok` | cask `grok-build` (formula `grok` is a different tool: a regex library, deprecated 2027-01-11) | **brew-managed cask ✓** |
 
-Two name collisions must be recorded rather than assumed away: Homebrew's `opencode` formula comes from a third-party tap and *shadows* `homebrew/core/opencode`, and Homebrew's `Anthropic` formula is unrelated to the installed installer, whose asset is actually named `grok-build`.
+Two name collisions must be recorded rather than assumed away: Homebrew's `opencode` formula comes from a third-party tap and *shadows* `homebrew/core/opencode`, and Homebrew's `grok` formula is an unrelated deprecated regex library while the official coding agent is cask `grok-build`.
 
 ## What Changes
 
