@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import plistlib
 import re
 import shutil
 import subprocess
@@ -16,6 +17,13 @@ import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
+
+# Add script directory for shared updater registry import
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from toolchain_updater_registry import (  # noqa: E402
+    get_supported_updater,
+    is_global_pause_active,
+)
 
 
 def get_dir_size_bytes(path: Path) -> int:
@@ -113,6 +121,7 @@ class AuthorityReconciliation:
     target_misalignment_count: int
     unknown_count: int
     items: list[ToolAuthorityItem] = field(default_factory=list)
+    scheduled_writers: dict[str, Any] = field(default_factory=dict)
 
 def check_prefix_reconciliation(declared_prefix: str) -> PrefixReconciliation:
     try:
@@ -212,8 +221,11 @@ def derive_install_root_and_source(resolved_path: str) -> tuple[str, str]:
         idx = parts.index("share")
         if idx + 1 < len(parts):
             return str(Path(*parts[:idx + 2])), "vendor_download"
+    # 6. Check for package.json in parent directories (npm package bundle without explicit node_modules in path)
+    for parent in [p] + list(p.parents)[:4]:
+        if (parent / "package.json").is_file():
+            return str(parent), "npm"
     return str(p.parent), "standalone"
-
 
 def audit_claude_autoupdate() -> dict[str, Any]:
     """Audit Claude Code background auto-update settings non-destructively as-is."""
@@ -365,8 +377,15 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
         ],
     }
 
-    items: list[ToolAuthorityItem] = []
+    # Audit scheduled writers upfront to link matching candidate writers to tools
+    scheduled_writers = audit_scheduled_writers()
+    candidate_writers = scheduled_writers.get("candidate_writers", [])
 
+    claude_cfg = audit_claude_autoupdate()
+    grok_cfg = audit_grok_autoupdate()
+    global_pause = is_global_pause_active({"claude": claude_cfg, "grok": grok_cfg})
+
+    items: list[ToolAuthorityItem] = []
     for name in tools_to_evaluate:
         auth_path = shutil.which(name)
         doc_channels = documented_channels_map.get(name, [])
@@ -461,44 +480,69 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
             compatible_command = None
 
         elif name == "pi":
-            authority = "vendor_download"
-            writer = "pi"
-            updater_dispatch = "native"
-            delegating_to = None
-            update_verb = "pi update --self"
-            selected_channel = "managed installer (https://pi.dev/install.sh)"
-            active_install_root = str(home / ".pi" / "agent" / "install")
-            prefix_aligned = True
-            drift_status = "clean"
-            consequence = None
-            compatible_command = "pi update --self"
+            dyn_root, src = derive_install_root_and_source(resolved_path)
+            decl = get_supported_updater("pi", src)
+            if not decl or decl.status != "covered":
+                authority = "unknown"
+                writer = "unknown"
+                updater_dispatch = "none"
+                delegating_to = None
+                update_verb = None
+                drift_status = "unknown"
+                consequence = f"No verified updater in registry for pi ({src})"
+                active_install_root = dyn_root
+                prefix_aligned = True
+                compatible_command = None
+            else:
+                authority = "vendor_download"
+                writer = "pi"
+                updater_dispatch = decl.updater_dispatch
+                delegating_to = decl.delegating_to
+                update_verb = decl.supported_verb
+                selected_channel = "managed installer (https://pi.dev/install.sh)"
+                active_install_root = str(home / ".pi" / "agent" / "install")
+                prefix_aligned = True
+                drift_status = "clean"
+                consequence = None
+                compatible_command = decl.supported_verb
 
         elif name == "opencode":
             dyn_root, src = derive_install_root_and_source(resolved_path)
             active_install_root = dyn_root
-            if src == "brew-formula":
+            decl = get_supported_updater("opencode", src)
+            if not decl or decl.status != "covered":
+                authority = "unknown"
+                writer = "unknown"
+                updater_dispatch = "none"
+                delegating_to = None
+                update_verb = None
+                drift_status = "unknown"
+                consequence = f"No verified updater in registry for opencode ({src})"
+                prefix_aligned = True
+                compatible_command = None
+            elif src == "brew-formula":
                 authority = "brew-formula"
                 writer = "brew"
-                updater_dispatch = "delegating"
-                delegating_to = "brew"
-                update_verb = "opencode upgrade"
+                updater_dispatch = decl.updater_dispatch
+                delegating_to = decl.delegating_to
+                update_verb = decl.supported_verb
                 selected_channel = "brew-formula"
                 drift_status = "clean"
                 consequence = None
                 prefix_aligned = True
-                compatible_command = "opencode upgrade"
+                compatible_command = decl.supported_verb
             else:
                 authority = "npm-global"
                 writer = "npm"
-                updater_dispatch = "native"
-                delegating_to = None
-                update_verb = "opencode upgrade"
+                updater_dispatch = decl.updater_dispatch
+                delegating_to = decl.delegating_to
+                update_verb = decl.supported_verb
                 target_prefix = target_prefix_resolved
                 prefix_aligned = active_install_root.startswith(target_prefix)
                 drift_status = "clean" if prefix_aligned else "target_misalignment"
                 selected_channel = f"npm ({active_install_root})"
                 consequence = None if prefix_aligned else f"Active root {active_install_root} misaligned with prefix {target_prefix}"
-                compatible_command = "opencode upgrade"
+                compatible_command = decl.supported_verb
         elif name == "grok":
             auto_cfg = audit_grok_autoupdate()
             dyn_root, _ = derive_install_root_and_source(resolved_path)
@@ -525,47 +569,71 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
                 consequence = None
                 compatible_command = "brew upgrade --cask grok-build"
         elif name == "claude":
-            auto_cfg = audit_claude_autoupdate()
-            authority = "native"
-            writer = "claude"
-            updater_dispatch = "native"
-            delegating_to = None
-            selected_channel = "vendor_download (native standalone)"
-            dyn_root, _ = derive_install_root_and_source(resolved_path)
+            dyn_root, src = derive_install_root_and_source(resolved_path)
             active_install_root = dyn_root
-            prefix_aligned = True
-            is_paused = (auto_cfg.get("DISABLE_UPDATES") == "1" or auto_cfg.get("env.DISABLE_UPDATES") == "1")
-            if is_paused:
+            decl = get_supported_updater("claude", src)
+            if not decl or decl.status != "covered":
+                authority = "unknown"
+                writer = "unknown"
+                updater_dispatch = "none"
+                delegating_to = None
                 update_verb = None
-                drift_status = "clean"
-                consequence = "Updates paused by user policy (DISABLE_UPDATES=1)"
+                drift_status = "unknown"
+                consequence = f"No verified updater in registry for claude ({src})"
+                prefix_aligned = True
                 compatible_command = None
             else:
-                update_verb = "claude update"
-                drift_status = "clean"
-                consequence = None
-                compatible_command = "claude update"
+                auto_cfg = claude_cfg
+                authority = "native"
+                writer = "claude"
+                updater_dispatch = decl.updater_dispatch
+                delegating_to = decl.delegating_to
+                selected_channel = "vendor_download (native standalone)"
+                prefix_aligned = True
+                is_paused = global_pause
+                if is_paused:
+                    update_verb = None
+                    drift_status = "clean"
+                    consequence = "Updates paused by user policy (DISABLE_UPDATES)"
+                    compatible_command = None
+                else:
+                    update_verb = decl.supported_verb
+                    drift_status = "clean"
+                    consequence = None
+                    compatible_command = decl.supported_verb
         elif name == "codex":
             dyn_root, src = derive_install_root_and_source(resolved_path)
             active_install_root = dyn_root
-            authority = "npm-global"
-            writer = "npm"
-            updater_dispatch = "native"
-            delegating_to = None
-            update_verb = "codex update"
-            target_prefix = target_prefix_resolved
-            if not active_install_root.startswith(target_prefix):
-                prefix_aligned = False
-                drift_status = "target_misalignment"
-                selected_channel = f"npm (active: {active_install_root})"
-                consequence = f"Update action writes to {declared_prefix} while active binary resolves to {active_install_root}, leaving active binary stale and unupdated"
-                compatible_command = f"npm install -g --prefix {derive_npm_prefix(active_install_root)} @openai/codex"
-            else:
+            decl = get_supported_updater("codex", src)
+            if not decl or decl.status != "covered":
+                authority = "unknown"
+                writer = "unknown"
+                updater_dispatch = "none"
+                delegating_to = None
+                update_verb = None
+                drift_status = "unknown"
+                consequence = f"No verified updater in registry for codex ({src})"
                 prefix_aligned = True
-                drift_status = "clean"
-                selected_channel = f"npm ({declared_prefix})"
-                consequence = None
-                compatible_command = "codex update"
+                compatible_command = None
+            else:
+                authority = "npm-global"
+                writer = "npm"
+                updater_dispatch = decl.updater_dispatch
+                delegating_to = decl.delegating_to
+                update_verb = decl.supported_verb
+                target_prefix = target_prefix_resolved
+                if not active_install_root.startswith(target_prefix):
+                    prefix_aligned = False
+                    drift_status = "target_misalignment"
+                    selected_channel = f"npm (active: {active_install_root})"
+                    consequence = f"Update action writes to {declared_prefix} while active binary resolves to {active_install_root}, leaving active binary stale and unupdated"
+                    compatible_command = f"npm install -g --prefix {declared_prefix} @openai/codex"
+                else:
+                    prefix_aligned = True
+                    drift_status = "clean"
+                    selected_channel = f"npm ({declared_prefix})"
+                    consequence = None
+                    compatible_command = decl.supported_verb
         elif name == "gitnexus":
             dyn_root, src = derive_install_root_and_source(resolved_path)
             active_install_root = dyn_root
@@ -588,18 +656,38 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
                 consequence = None
                 compatible_command = None
         elif name == "qoder":
-            authority = "native"
-            writer = "qoder"
-            updater_dispatch = "native"
-            delegating_to = None
-            update_verb = "qoder update"
-            selected_channel = "vendor_download (ad-hoc wrapper at ~/.qoder/entry/qoder)"
-            drift_status = "clean"
-            consequence = None
-            active_install_root = str(Path(auth_path).parent)
-            prefix_aligned = True
-            compatible_command = "qoder update"
-
+            dyn_root, src = derive_install_root_and_source(resolved_path)
+            active_install_root = dyn_root
+            decl = get_supported_updater("qoder", src)
+            if not decl or decl.status != "covered":
+                authority = "unknown"
+                writer = "unknown"
+                updater_dispatch = "none"
+                delegating_to = None
+                update_verb = None
+                drift_status = "unknown"
+                consequence = f"No verified updater in registry for qoder ({src})"
+                prefix_aligned = True
+                compatible_command = None
+            else:
+                authority = "npm-global"
+                writer = "npm"
+                updater_dispatch = decl.updater_dispatch
+                delegating_to = decl.delegating_to
+                update_verb = decl.supported_verb
+                target_prefix = target_prefix_resolved
+                if not active_install_root.startswith(target_prefix):
+                    prefix_aligned = False
+                    drift_status = "target_misalignment"
+                    selected_channel = f"npm-wrapper (active target: {active_install_root})"
+                    consequence = f"Wrapper targets {active_install_root} instead of declared prefix {declared_prefix}"
+                    compatible_command = f"npm install -g --prefix {declared_prefix} @qoder-ai/qodercli"
+                else:
+                    prefix_aligned = True
+                    drift_status = "clean"
+                    selected_channel = f"npm-wrapper ({declared_prefix})"
+                    consequence = None
+                    compatible_command = decl.supported_verb
         elif name == "qodercli":
             dyn_root, src = derive_install_root_and_source(resolved_path)
             active_install_root = dyn_root
@@ -625,41 +713,59 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
         elif name == "prime-agent":
             dyn_root, src = derive_install_root_and_source(resolved_path)
             active_install_root = dyn_root
-            prefix_aligned = True
-            if "/opt/homebrew" in resolved_path or "package_wrapper" in src:
-                authority = "package-wrapper"
-                writer = "package-manager"
-                updater_dispatch = "none"
-                delegating_to = None
-                update_verb = None
-                selected_channel = f"package_wrapper ({active_install_root})"
-                drift_status = "clean"
-                consequence = None
-                compatible_command = None
-            else:
-                authority = "native"
-                writer = "prime-agent"
-                updater_dispatch = "native"
-                delegating_to = None
-                update_verb = "prime-agent update"
-                selected_channel = "vendor_download (official R2 Mach-O channel)"
-                drift_status = "clean"
-                consequence = None
-                compatible_command = "prime-agent update"
-        elif name in ("kilo", "auggie"):
-            authority = "native"
+            authority = "npm-global"
             writer = "npm"
-            updater_dispatch = "native"
+            updater_dispatch = "none"
             delegating_to = None
-            update_verb = "kilo update" if name == "kilo" else "auggie update --skip-confirmation"
-            selected_channel = "npm-global"
-            active_install_root = str(Path(resolved_path).parent.parent)
+            update_verb = None
+            target_prefix = target_prefix_resolved
+            prefix_aligned = active_install_root.startswith(target_prefix)
+            drift_status = "clean" if prefix_aligned else "target_misalignment"
+            selected_channel = f"npm-bundle ({active_install_root}; uncovered in pipeline)"
+            consequence = None if prefix_aligned else f"Active root {active_install_root} misaligned with declared prefix {declared_prefix}; package is uncovered"
+            compatible_command = f"npm install -g --prefix {declared_prefix} prime-agent" if not prefix_aligned else None
+            orthogonal_findings.append(f"Unmanaged package bundle in {active_install_root} (lacks Homebrew receipt)")
+        elif name == "kilo":
+            dyn_root, src = derive_install_root_and_source(resolved_path)
+            active_install_root = dyn_root
+            decl = get_supported_updater("kilo", src)
+            authority = "npm-global"
+            writer = "npm"
+            updater_dispatch = "none"
+            delegating_to = None
+            update_verb = decl.supported_verb if decl else "kilo upgrade"
+            selected_channel = f"npm-global (@kilocode/cli; supported CLI: {update_verb}, uncovered in pipeline)"
             target_prefix = target_prefix_resolved
             prefix_aligned = active_install_root.startswith(target_prefix)
             drift_status = "clean" if prefix_aligned else "target_misalignment"
             consequence = None if prefix_aligned else f"Active root {active_install_root} misaligned with prefix {target_prefix}"
-            compatible_command = update_verb
-
+            compatible_command = None
+        elif name == "auggie":
+            dyn_root, src = derive_install_root_and_source(resolved_path)
+            active_install_root = str(Path(resolved_path).parent.parent)
+            decl = get_supported_updater("auggie", src)
+            if not decl or decl.status != "covered":
+                authority = "unknown"
+                writer = "unknown"
+                updater_dispatch = "none"
+                delegating_to = None
+                update_verb = None
+                drift_status = "unknown"
+                consequence = f"No verified updater in registry for auggie ({src})"
+                prefix_aligned = True
+                compatible_command = None
+            else:
+                authority = "native"
+                writer = "npm"
+                updater_dispatch = decl.updater_dispatch
+                delegating_to = decl.delegating_to
+                update_verb = decl.supported_verb
+                selected_channel = "npm-global (@augmentcode/auggie)"
+                target_prefix = target_prefix_resolved
+                prefix_aligned = active_install_root.startswith(target_prefix)
+                drift_status = "clean" if prefix_aligned else "target_misalignment"
+                consequence = None if prefix_aligned else f"Active root {active_install_root} misaligned with prefix {target_prefix}"
+                compatible_command = decl.supported_verb
         elif name == "hermes-agent":
             authority = "native"
             writer = "git"
@@ -739,6 +845,20 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
             consequence = "Tool authority unclassified"
             compatible_command = None
 
+        for cw in candidate_writers:
+            kw = name.lower()
+            label_lower = cw.get("label", "").lower()
+            base_lower = cw.get("executable_baseline", "").lower()
+            pattern = rf"\b{re.escape(kw)}\b"
+            if re.search(pattern, label_lower) or re.search(pattern, base_lower):
+                orthogonal_findings.append(f"Scheduled background job detected: {cw['type']} '{cw['label']}'")
+
+        # Apply global pause policy across all covered tools
+        if global_pause and update_verb and name != "claude":
+            update_verb = None
+            consequence = "Updates paused by user policy (DISABLE_UPDATES)"
+            compatible_command = None
+
         items.append(
             ToolAuthorityItem(
                 name=name,
@@ -772,6 +892,7 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
     has_drift = (len(target_misaligned) > 0) or (len(conflicts) > 0) or (len(unknowns) > 0)
     status = "drift_detected" if has_drift else "reconciled"
 
+    # scheduled_writers already audited upfront
     return AuthorityReconciliation(
         status=status,
         drift_count=len(target_misaligned) + len(conflicts),
@@ -779,8 +900,146 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
         target_misalignment_count=len(target_misaligned),
         unknown_count=len(unknowns),
         items=items,
+        scheduled_writers=scheduled_writers,
     )
 
+
+def audit_scheduled_writers() -> dict[str, Any]:
+    """Value-blind inspection of accessible user and system LaunchAgents and crontab.
+
+    Extracts structural labels, executable baselines, schedule triggers, and env keys.
+    Omit all environment variable values, tokens, and secrets.
+    """
+    home = Path.home()
+    scanned_locations = [
+        str(home / "Library" / "LaunchAgents"),
+        "/Library/LaunchAgents",
+    ]
+    excluded_boundaries = [
+        "Root-owned LaunchDaemons (/Library/LaunchDaemons, /System/Library/LaunchDaemons)",
+        "System-internal launchd domains (/System/Library/LaunchAgents)",
+        "Container and virtualization daemon engines (Docker, Podman)",
+        "Arbitrary shell script indirection and nested wrapper sub-processes",
+    ]
+
+    candidate_writers: list[dict[str, Any]] = []
+    agent_keywords = ("brew", "npm", "bun", "uv", "claude", "codex", "opencode", "auggie", "qoder", "pi", "kilo")
+
+    for loc in scanned_locations:
+        p = Path(loc)
+        if not p.is_dir():
+            continue
+        try:
+            for plist_file in p.glob("*.plist"):
+                try:
+                    with open(plist_file, "rb") as f:
+                        data = plistlib.load(f)
+                    if not isinstance(data, dict):
+                        continue
+                    label = str(data.get("Label", plist_file.stem))
+                    prog = data.get("Program")
+                    args = data.get("ProgramArguments", [])
+                    exec_baseline = str(prog) if prog else (str(args[0]) if args else "unknown")
+
+                    match = False
+                    for kw in agent_keywords:
+                        pattern = rf"\b{re.escape(kw)}\b"
+                        if re.search(pattern, label, re.IGNORECASE) or re.search(pattern, exec_baseline, re.IGNORECASE):
+                            match = True
+                            break
+                        for a in args:
+                            if re.search(pattern, str(a), re.IGNORECASE):
+                                match = True
+                                break
+                    if match:
+                        schedule = {}
+                        if "StartInterval" in data:
+                            schedule["interval_seconds"] = data["StartInterval"]
+                        if "StartCalendarInterval" in data:
+                            schedule["calendar"] = "present"
+                        if "RunAtLoad" in data:
+                            schedule["run_at_load"] = bool(data["RunAtLoad"])
+
+                        env_keys: list[str] = []
+                        if "EnvironmentVariables" in data and isinstance(data["EnvironmentVariables"], dict):
+                            env_keys = sorted(data["EnvironmentVariables"].keys())
+
+                        candidate_writers.append({
+                            "type": "launch_agent",
+                            "source_file": str(plist_file),
+                            "label": label,
+                            "executable_baseline": exec_baseline,
+                            "schedule": schedule,
+                            "env_keys": env_keys,  # VALUE-BLIND: key names only, never values
+                        })
+                except Exception:
+                    continue
+        except Exception:
+            continue
+
+    # User crontab inspection
+    try:
+        res = subprocess.run(["crontab", "-l"], capture_output=True, text=True, timeout=5)
+        if res.returncode == 0 and res.stdout:
+            for line in res.stdout.splitlines():
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split()
+                if not parts:
+                    continue
+                schedule_spec = ""
+                cmd_tokens = []
+                if parts[0].startswith("@"):
+                    schedule_spec = parts[0]
+                    cmd_tokens = parts[1:]
+                elif len(parts) >= 6:
+                    schedule_spec = " ".join(parts[:5])
+                    cmd_tokens = parts[5:]
+                else:
+                    continue
+
+                if not cmd_tokens:
+                    continue
+
+                # Extract inline environment variable assignments without disclosing values
+                env_keys: list[str] = []
+                idx = 0
+                while idx < len(cmd_tokens):
+                    tok = cmd_tokens[idx]
+                    if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", tok):
+                        key_name = tok.split("=", 1)[0]
+                        env_keys.append(key_name)
+                        idx += 1
+                    else:
+                        break
+
+                if idx < len(cmd_tokens):
+                    cmd_baseline = os.path.basename(cmd_tokens[idx])
+                else:
+                    cmd_baseline = "unknown"
+
+                # Check keywords against command baseline and cron line
+                match = any(re.search(rf"\b{re.escape(kw)}\b", line, re.IGNORECASE) for kw in agent_keywords)
+                if match:
+                    candidate_writers.append({
+                        "type": "user_crontab",
+                        "source_file": "crontab -l",
+                        "label": "user_crontab_entry",
+                        "executable_baseline": cmd_baseline,
+                        "schedule": {"cron_spec": schedule_spec},
+                        "env_keys": sorted(env_keys),  # VALUE-BLIND: key names only, never values
+                    })
+    except Exception:
+        pass
+
+    return {
+        "scan_boundaries": {
+            "scanned_paths": scanned_locations + ["crontab -l"],
+            "excluded_limitations": excluded_boundaries,
+        },
+        "candidate_writers": candidate_writers,
+    }
 
 def inventory_tools() -> list[ToolInventoryItem]:
     home = Path.home()
@@ -858,7 +1117,7 @@ def inventory_tools() -> list[ToolInventoryItem]:
         if brew_bin.is_symlink():
             try:
                 target = brew_bin.resolve()
-                if "node_modules" in str(target) or ".npm" in str(target):
+                if ("node_modules" in str(target) or ".npm" in str(target)) and "Cellar" not in target.parts and "Caskroom" not in target.parts:
                     is_hb_adjacent = True
             except Exception:
                 pass
@@ -918,22 +1177,26 @@ def inventory_tools() -> list[ToolInventoryItem]:
                         )
                     )
 
-        # Check single primary if not found in npm dirs
-        if not copies and auth_path != "not_found":
-            resolved_auth = Path(auth_path).resolve()
-            sz = resolved_auth.stat().st_size if resolved_auth.exists() else 0
-            manager = "brew" if "/Cellar/" in str(resolved_auth) or "/Caskroom/" in str(resolved_auth) else "system"
-            copies.append(
-                ToolCopy(
+        # Ensure authoritative copy is always first in copies list (copies[0])
+        auth_idx = next((i for i, c in enumerate(copies) if c.is_authoritative), -1)
+        if auth_idx > 0:
+            copies.insert(0, copies.pop(auth_idx))
+        elif auth_idx == -1 and auth_path != "not_found":
+            try:
+                resolved_auth = Path(auth_path).resolve()
+                sz = get_dir_size_bytes(resolved_auth) if resolved_auth.is_dir() else (resolved_auth.stat().st_size if resolved_auth.exists() else 0)
+                manager = "brew" if ("/Cellar/" in str(resolved_auth) or "/Caskroom/" in str(resolved_auth)) else "system"
+                auth_copy = ToolCopy(
                     location_path=str(resolved_auth),
                     owning_manager=manager,
                     size_bytes=sz,
                     size_human=format_bytes(sz),
                     is_authoritative=True,
-                    is_symlinked_from_brew_bin=False,
+                    is_symlinked_from_brew_bin=(resolved_auth == brew_bin.resolve()) if brew_bin.is_symlink() else False,
                 )
-            )
-
+                copies.insert(0, auth_copy)
+            except Exception:
+                pass
         has_dups = len(copies) > 1
         est_reclaim = sum(c.size_bytes for c in copies if not c.is_authoritative) if has_dups else 0
 

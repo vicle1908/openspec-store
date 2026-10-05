@@ -15,6 +15,10 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from toolchain_updater_registry import get_supported_updater, is_truthy_pause  # noqa: E402
+
 
 @dataclass
 class AgentCLIRecord:
@@ -87,7 +91,11 @@ def classify_source(binary_path: str) -> tuple[str, str]:
         return "package_manager", "Homebrew (formula/cask)"
     elif "/.npm-global/" in resolved or "/node_modules/" in resolved or "/home-toolchain/" in resolved:
         return "ecosystem_manager", "npm"
-    elif "/.local/share/claude/" in resolved or "/.grok/downloads/" in resolved or "/.hermes/" in resolved or "/.pi/" in resolved:
+    p = Path(resolved)
+    for parent in [p] + list(p.parents)[:4]:
+        if (parent / "package.json").is_file():
+            return "ecosystem_manager", "npm"
+    if "/.local/share/claude/" in resolved or "/.grok/downloads/" in resolved or "/.hermes/" in resolved or "/.pi/" in resolved:
         return "vendor_download", "vendor release channel"
     elif "/Applications/" in resolved:
         return "package_manager", "macOS Application bundle"
@@ -118,16 +126,6 @@ def find_agent_binary(name: str) -> str | None:
     return None
 
 
-RECOGNIZED_COVERED_COMMANDS: dict[str, str] = {
-    "claude": "claude update",
-    "codex": "codex update",
-    "opencode": "opencode upgrade",
-    "auggie": "auggie update --skip-confirmation",
-    "qoder": "qoder update",
-    "pi": "pi update --self",
-}
-
-
 def evaluate_update_path(
     name: str,
     status: str,
@@ -136,6 +134,7 @@ def evaluate_update_path(
     source_detail: str,
 ) -> tuple[bool, str]:
     """Check if the CLI has a compatible supported native update path or manager path."""
+    decl = get_supported_updater(name, source_type)
     if status == "covered":
         if not update_verb:
             return False, "covered CLI missing update verb"
@@ -143,10 +142,16 @@ def evaluate_update_path(
             return False, f"incompatible update verb: '{update_verb}' for npm-managed installation"
         if "Homebrew" in source_detail and update_verb.startswith("npm "):
             return False, f"incompatible update verb: '{update_verb}' for Homebrew-managed installation"
-        expected_verb = RECOGNIZED_COVERED_COMMANDS.get(name)
-        if not expected_verb or update_verb != expected_verb:
-            return False, f"unsupported or unrecognized update command: '{update_verb}' for {name}"
+        if not decl or decl.status != "covered":
+            return False, f"unsupported or unverified covered tool: '{name}' for source '{source_type}'"
+        if update_verb != decl.supported_verb:
+            return False, f"unsupported or unrecognized update command: '{update_verb}' for {name} (expected '{decl.supported_verb}')"
         return True, f"native/delegated update verb: '{update_verb}'"
+    if name == "kilo":
+        supported_cmd = decl.supported_verb if decl else "kilo upgrade"
+        return True, f"managed by ecosystem manager ({source_detail}; supported CLI: '{supported_cmd}', uncovered in pipeline)"
+    if name == "prime-agent":
+        return True, f"managed by ecosystem manager ({source_detail}; uncovered in pipeline)"
     if source_type == "package_manager":
         return True, f"managed by package manager ({source_detail})"
     if source_type == "ecosystem_manager":
@@ -155,10 +160,7 @@ def evaluate_update_path(
         return True, "governed by Git checkout / hermes update"
     if name == "grok":
         return True, "governed by Homebrew cask grok-build / vendor download channel"
-    if name == "prime-agent":
-        return True, "governed by prime-agent update / official Mach-O channel"
     return False, "lacks native updater and supported package manager"
-
 
 def audit_background_auto_update_settings() -> dict[str, Any]:
     """Non-destructively audit native background auto-update configuration and environment keys."""
@@ -190,7 +192,7 @@ def audit_background_auto_update_settings() -> dict[str, Any]:
                     claude_keys[k] = data[k]
             env_block = data.get("env", {})
             if isinstance(env_block, dict):
-                for k in ["autoUpdatesChannel", "DISABLE_AUTOUPDATER", "DISABLE_UPDATES", "CLAUDE_CODE_PACKAGE_MANAGER_AUTO_UPDATE"]:
+                for k in ["autoUpdatesChannel", "DISABLE_AUTOUPDATER", "DISABLE_UPDATES"]:
                     if k in env_block:
                         claude_keys[f"env.{k}"] = env_block[k]
             if claude_keys:
@@ -239,6 +241,19 @@ def audit_background_auto_update_settings() -> dict[str, Any]:
                 }
         except Exception:
             pass
+
+    is_paused = any(
+        is_truthy_pause(settings["environment"][k])
+        for k in ("DISABLE_UPDATES", "DISABLE_AUTOUPDATER")
+        if k in settings["environment"]
+    )
+    for cfg_data in settings["configurations"].values():
+        cfg_settings = cfg_data.get("settings", {})
+        for k in ("DISABLE_UPDATES", "env.DISABLE_UPDATES", "DISABLE_AUTOUPDATER", "env.DISABLE_AUTOUPDATER"):
+            if k in cfg_settings and is_truthy_pause(cfg_settings[k]):
+                is_paused = True
+                break
+    settings["is_paused"] = is_paused
 
     return settings
 
@@ -357,7 +372,7 @@ def main() -> int:
         if bg_settings.get("environment"):
             print("  Environment:")
             for k, v in sorted(bg_settings["environment"].items()):
-                print(f"    {k}: {v}")
+                print(f"    {k}: is_paused={is_truthy_pause(v)}")
         else:
             print("  Environment: (none set)")
 

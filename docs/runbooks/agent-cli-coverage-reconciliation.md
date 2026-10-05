@@ -6,8 +6,8 @@ The workstation maintenance pipeline enforces explicit coverage declarations for
 ## 1. Active Roster and Classification
 - **Covered (6)**: `claude`, `codex`, `opencode`, `auggie`, `qoder`, `pi` (updated via scriptable verbs under timeout fences).
 - **Uncovered Declared (10)**:
-  - Package manager / Cask / npm managed: `droid`, `goose`, `cursor-agent`, `buzz`, `kilo`.
-  - Upstream release channel / Standalone: `grok`, `prime-agent`, `hermes-agent`, `happy`, `cce`.
+  - Package manager / Cask / npm managed: `droid`, `goose`, `cursor-agent`, `buzz`, `kilo`, `prime-agent`.
+  - Upstream release channel / Git / Standalone: `grok`, `hermes-agent`, `happy`, `cce`.
 
 ### Classification Categories
 1. **`covered`**: Installed agent CLI declared in `AGENT_CLI_COVERED` with a verified automated update path (native self-updater or compatible delegator).
@@ -18,8 +18,8 @@ The workstation maintenance pipeline enforces explicit coverage declarations for
 Discovery resolves active binaries through symlinks and shell wrapper scripts rather than relying solely on surface paths:
 - **Qoder CLI**: The binary identity is `qoder`. The active binary at `~/.qoder/entry/qoder` is an entry wrapper that routes to `qodercli` (`@qoder-ai/qodercli` bundle under the npm ecosystem). Source classification inspects the underlying package target.
 - **Hermes Agent**: Resolves wrapper scripts executing the canonical Git checkout and Python virtual environment (`~/.hermes/hermes-agent/...`).
-- **Update Path Evaluation**: Every declared CLI is checked for a compatible native updater command or supported package manager path. Tools lacking both (such as standalone binary `cce`) are surfaced in `lacking_update_path` reports without silent fallback.
-
+- **Update Path Evaluation**: Every declared CLI is checked against a conservative supported-updater registry for its active installation source. Unsupported commands or manager mismatches (such as `brew upgrade` for an npm package or arbitrary non-empty commands) fail-closed.
+- **Kilo CLI Status**: The obsolete `kilo update` command is eliminated; Kilo is declared as `uncovered_declared` (ecosystem manager `npm`) because its native updater is currently unmanaged/failing locally.
 ## 2. Reconciliation Command & Options
 To audit coverage and verify zero undeclared tools:
 ```bash
@@ -80,3 +80,10 @@ The reconciliation script performs a non-destructive, audit-as-is check of nativ
    - If standalone CLI with scriptable, non-interactive updater: declare in `AGENT_CLI_COVERED` with update command.
    - If manual or wrapped CLI: declare in `AGENT_CLI_KNOWN_UNCOVERED`.
 3. Verify clean reconciliation: `python3 scripts/reconcile-agent-cli-coverage.py` must report `Undeclared Count:       0` with exit code 0.
+
+## 6. Pipeline Mutation Gating & Roster Normalization
+
+The daily maintenance pipeline (`workstation-daily-update.sh`) enforces strict preflight mutation gating derived from inventory and coverage audits:
+1. **Split Homebrew Rosters**: Preflight authority evaluation generates independent `DENY_ROSTER_BREW_FORMULAE` and `DENY_ROSTER_BREW_CASKS`. A drift or misalignment finding on a Homebrew cask does not suppress unrelated formula upgrades, and a formula finding does not suppress unrelated casks.
+2. **Normalized Package Filtering**: Outdated package output from `npm outdated -g --parseable` has version suffixes stripped (e.g. `sub(/@[^@]*$/, "", pkg)`) before applying anchored deny filters. This preserves scoped package prefixes (e.g. `@openai/codex`) while ensuring denied packages are reliably excluded from `npm install -g`.
+3. **Currency Decoupling**: Successful updater runs where before and after versions match are reported as `(idempotent, currency unverified)`. The status `currency verified` is strictly reserved for tools whose currency was corroborated against an authoritative upstream release channel API.

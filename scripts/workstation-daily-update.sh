@@ -215,11 +215,12 @@ agent_cli_coverage() {
     fi
 
     # Pre-mutation safety and policy guards
-    local is_paused=0 p_item
-    if [[ "${bin}" == "claude" ]] && [[ "${DISABLE_UPDATES:-0}" == "1" || "${DISABLE_UPDATES:-}" == "true" ]]; then
-      is_paused=1
+    if (( GLOBAL_PAUSE != 0 )); then
+      echo "      - ${label} (${bin}): update paused by policy (DISABLE_UPDATES), skipped"
+      continue
     fi
-    if (( is_paused == 0 )) && [[ -n "${paused_roster}" ]]; then
+    local is_paused=0 p_item
+    if [[ -n "${paused_roster}" ]]; then
       while IFS= read -r p_item; do
         [[ -z "${p_item}" ]] && continue
         if [[ "${bin}" == "${p_item}" ]]; then
@@ -229,14 +230,13 @@ agent_cli_coverage() {
       done <<<"${paused_roster}"
     fi
     if (( is_paused != 0 )); then
-      echo "      - ${label} (${bin}): update paused by policy (DISABLE_UPDATES=1), skipped"
+      echo "      - ${label} (${bin}): update paused by policy (DISABLE_UPDATES), skipped"
       continue
     fi
-
     local is_denied=0 d_item
     while IFS= read -r d_item; do
       [[ -z "${d_item}" ]] && continue
-      if [[ "${bin}" == "${d_item}" || ( "${bin}" == "qoder" && "${d_item}" == "qodercli" ) ]]; then
+      if [[ "${bin}" == "${d_item}" ]]; then
         is_denied=1
         break
       fi
@@ -301,9 +301,9 @@ agent_cli_coverage() {
         echo "      - ${label} (${bin}): FAILED (post-update active executable outside known active root ${known_root}: ${active_real})"
         AGENT_FAILED=1
       elif [[ -n "${v_before}" && "${v_before}" == "${v_after}" ]]; then
-        echo "      - ${label} (${bin}): already up to date (${v_after}) [active: ${active_path} -> ${active_real}] (idempotent/current)"
+        echo "      - ${label} (${bin}): update completed; local version unchanged (${v_after}) [active: ${active_path} -> ${active_real}] (idempotent, currency unverified)"
       else
-        echo "      - ${label} (${bin}): updated (${v_before} -> ${v_after}) [active: ${active_path} -> ${active_real}] (currency verified)"
+        echo "      - ${label} (${bin}): updated (${v_before} -> ${v_after}) [active: ${active_path} -> ${active_real}] (local version changed, currency unverified)"
       fi
     fi
   done <<<"${AGENT_CLI_COVERED}"
@@ -405,21 +405,25 @@ run_pipeline() {
   # Pre-flight Authority & Mutation Safety Check
   PREFLIGHT_FAILED=0
   DENY_ROSTER=""
-  DENY_ROSTER_BREW=""
+  DENY_ROSTER_BREW_FORMULAE=""
+  DENY_ROSTER_BREW_CASKS=""
   DENY_ROSTER_NPM=""
   PAUSED_ROSTER=""
+  GLOBAL_PAUSE=0
   if [[ -f "${STORE_DIR}/scripts/inventory-workstation-toolchain.py" ]]; then
     local pre_out pre_rc=0
     pre_out="$(python3 "${STORE_DIR}/scripts/inventory-workstation-toolchain.py" --json 2>/dev/null)" || pre_rc=$?
     if (( pre_rc == 0 )) && [[ -n "${pre_out}" ]]; then
       local parse_rc=0
-      local parse_out
       parse_out="$(python3 -c '
-import sys, json
+import sys, json, os
+sys.path.insert(0, sys.argv[1])
+from toolchain_updater_registry import is_truthy_pause, is_global_pause_active
 try:
     data = json.load(sys.stdin)
     items = data["authority_reconciliation"].get("items", [])
-    deny_all, deny_brew, deny_npm, paused = [], [], [], []
+    deny_all, deny_brew_formulae, deny_brew_casks, deny_npm, paused = [], [], [], [], []
+    global_pause = is_global_pause_active()
     for it in items:
         name = it.get("name")
         if not name:
@@ -427,37 +431,59 @@ try:
         drift = it.get("drift_status")
         writer = it.get("writer", "")
         auth = it.get("authority", "")
+        chan = it.get("selected_channel", "") or ""
         if drift in ("unknown", "target_misalignment", "conflict"):
             deny_all.append(name)
-            if "brew" in writer or "brew" in auth:
-                deny_brew.append(name)
+            if "cask" in auth or "cask" in writer or "cask" in chan:
+                deny_brew_casks.append(name)
+            elif "formula" in auth or "brew" in writer or "brew" in auth:
+                deny_brew_formulae.append(name)
             if "npm" in writer or "npm" in auth:
                 deny_npm.append(name)
-        if name == "claude":
-            auto_cfg = it.get("auto_updates_config", {})
-            for k in ("DISABLE_UPDATES", "env.DISABLE_UPDATES"):
-                val = auto_cfg.get(k)
-                if val in (1, "1", True, "true", "True"):
-                    paused.append(name)
-                    break
+        auto_cfg = it.get("auto_updates_config", {})
+        for k in ("DISABLE_UPDATES", "env.DISABLE_UPDATES", "DISABLE_AUTOUPDATER", "env.DISABLE_AUTOUPDATER"):
+            val = auto_cfg.get(k)
+            if is_truthy_pause(val):
+                paused.append(name)
+                global_pause = True
+                break
     print("STATUS:" + data["authority_reconciliation"].get("status", "unknown"))
+    print("GLOBAL_PAUSE:" + ("1" if global_pause else "0"))
     print("ALL:")
     for x in deny_all: print(x)
-    print("BREW:")
-    for x in deny_brew: print(x)
+    print("BREW_FORMULAE:")
+    for x in deny_brew_formulae: print(x)
+    print("BREW_CASKS:")
+    for x in deny_brew_casks: print(x)
     print("NPM:")
     for x in deny_npm: print(x)
     print("PAUSED:")
     for x in paused: print(x)
 except Exception:
     sys.exit(1)
-' <<<"${pre_out}")" || parse_rc=$?
+' "${STORE_DIR}/scripts" <<<"${pre_out}")" || parse_rc=$?
 
       if (( parse_rc == 0 )) && [[ -n "${parse_out}" ]]; then
         local auth_status
         auth_status="$(sed -n "s/^STATUS://p" <<<"${parse_out}" | head -1)"
-        DENY_ROSTER="$(sed -n "/^ALL:/,/^BREW:/{ /^ALL:/d; /^BREW:/d; p; }" <<<"${parse_out}")"
-        DENY_ROSTER_BREW="$(sed -n "/^BREW:/,/^NPM:/{ /^BREW:/d; /^NPM:/d; p; }" <<<"${parse_out}")"
+        GLOBAL_PAUSE="$(sed -n "s/^GLOBAL_PAUSE://p" <<<"${parse_out}" | head -1)"
+        GLOBAL_PAUSE="${GLOBAL_PAUSE:-0}"
+        if (( GLOBAL_PAUSE == 0 )); then
+          local env_pause_val
+          for env_pause_val in "${DISABLE_UPDATES:-0}" "${DISABLE_AUTOUPDATER:-0}"; do
+            local norm_p
+            norm_p="$(echo "${env_pause_val}" | tr "[:upper:]" "[:lower:]" | xargs)"
+            case "${norm_p}" in
+              1|true|yes|on|enabled)
+                GLOBAL_PAUSE=1
+                break
+                ;;
+            esac
+          done
+        fi
+        DENY_ROSTER="$(sed -n "/^ALL:/,/^BREW_FORMULAE:/{ /^ALL:/d; /^BREW_FORMULAE:/d; p; }" <<<"${parse_out}")"
+        DENY_ROSTER_BREW_FORMULAE="$(sed -n "/^BREW_FORMULAE:/,/^BREW_CASKS:/{ /^BREW_FORMULAE:/d; /^BREW_CASKS:/d; p; }" <<<"${parse_out}")"
+        DENY_ROSTER_BREW_CASKS="$(sed -n "/^BREW_CASKS:/,/^NPM:/{ /^BREW_CASKS:/d; /^NPM:/d; p; }" <<<"${parse_out}")"
         DENY_ROSTER_NPM="$(sed -n "/^NPM:/,/^PAUSED:/{ /^NPM:/d; /^PAUSED:/d; p; }" <<<"${parse_out}")"
         PAUSED_ROSTER="$(sed -n "/^PAUSED:/,\$ { /^PAUSED:/d; p; }" <<<"${parse_out}")"
 
@@ -489,14 +515,26 @@ except Exception:
   else
     if (( PREFLIGHT_FAILED != 0 )); then
       echo "    SKIPPED: broad formula/cask upgrades suppressed (preflight authority check failed)"
-    elif [[ -n "${DENY_ROSTER_BREW}" ]]; then
-      local deny_brew_csv
-      deny_brew_csv="$(paste -sd, - <<<"${DENY_ROSTER_BREW}")"
-      echo "    SKIPPED: broad formula/cask upgrades suppressed (authority drift/conflict/misalignment detected for Homebrew assets: ${deny_brew_csv})"
+    elif (( GLOBAL_PAUSE != 0 )); then
+      echo "    SKIPPED: Homebrew maintenance paused by policy (DISABLE_UPDATES)"
     else
       brew update 2>&1 || true
-      brew upgrade --formula 2>&1 || true
-      brew upgrade --cask 2>&1 || true
+      if [[ -n "${DENY_ROSTER_BREW_FORMULAE}" ]]; then
+        local deny_form_csv
+        deny_form_csv="$(paste -sd, - <<<"${DENY_ROSTER_BREW_FORMULAE}")"
+        echo "    SKIPPED: formula upgrades suppressed (authority drift/conflict/misalignment detected: ${deny_form_csv})"
+      else
+        brew upgrade --formula 2>&1 || true
+      fi
+
+      if [[ -n "${DENY_ROSTER_BREW_CASKS}" ]]; then
+        local deny_cask_csv
+        deny_cask_csv="$(paste -sd, - <<<"${DENY_ROSTER_BREW_CASKS}")"
+        echo "    SKIPPED: cask upgrades suppressed (authority drift/conflict/misalignment detected: ${deny_cask_csv})"
+      else
+        brew upgrade --cask 2>&1 || true
+      fi
+
       brew cleanup -s 2>&1 || true
     fi
   fi
@@ -509,6 +547,8 @@ except Exception:
       echo "    check mode: bun upgrade suppressed"
     elif (( PREFLIGHT_FAILED != 0 )); then
       echo "    SKIPPED: bun upgrade suppressed (preflight authority check failed)"
+    elif (( GLOBAL_PAUSE != 0 )); then
+      echo "    SKIPPED: Bun upgrade paused by policy (DISABLE_UPDATES)"
     else
       bun upgrade 2>&1 || true
     fi
@@ -520,34 +560,36 @@ except Exception:
   if [[ "${MODE}" == "check" ]]; then
     npm outdated -g --prefix "${HOME}/.npm-global" 2>&1 || true
   elif (( PREFLIGHT_FAILED != 0 )); then
-    echo "    SKIPPED: global npm package updates suppressed (preflight authority check failed)"
+    echo "    SKIPPED: global npm upgrades suppressed (preflight authority check failed)"
+  elif (( GLOBAL_PAUSE != 0 )); then
+    echo "    SKIPPED: global npm upgrades paused by policy (DISABLE_UPDATES)"
   else
     # Parse outdated npm packages, strictly excluding private/git packages, known native governed packages, and tools active outside ~/.npm-global
-    local npm_filter='^prime-agent$|^@anthropic-ai/claude-code$'
+    local npm_filter='^prime-agent(@[^@]*)?$|^@anthropic-ai/claude-code(@[^@]*)?$'
     if [[ -n "${DENY_ROSTER_NPM}" ]]; then
       while IFS= read -r denied_npm_tool; do
         [[ -z "${denied_npm_tool}" ]] && continue
         case "${denied_npm_tool}" in
           codex)
-            npm_filter="${npm_filter}|^@openai/codex$"
+            npm_filter="${npm_filter}|^(@openai/codex)(@[^@]*)?$"
             ;;
           qoder|qodercli)
-            npm_filter="${npm_filter}|^@qoder-ai/qodercli$|^@qoder-ai/qoder$"
+            npm_filter="${npm_filter}|^(@qoder-ai/qodercli|@qoder-ai/qoder)(@[^@]*)?$"
             ;;
           kilo)
-            npm_filter="${npm_filter}|^@kilocode/cli$|^kilo$"
+            npm_filter="${npm_filter}|^(@kilocode/cli|kilo)(@[^@]*)?$"
             ;;
           auggie)
-            npm_filter="${npm_filter}|^@augmentcode/auggie$|^auggie$"
+            npm_filter="${npm_filter}|^(@augmentcode/auggie|auggie)(@[^@]*)?$"
             ;;
           pi)
-            npm_filter="${npm_filter}|^@earendil-works/pi-coding-agent$|^pi$"
+            npm_filter="${npm_filter}|^(@earendil-works/pi-coding-agent|pi)(@[^@]*)?$"
             ;;
           bru)
-            npm_filter="${npm_filter}|^@usebruno/cli$|^bru$"
+            npm_filter="${npm_filter}|^(@usebruno/cli|bru)(@[^@]*)?$"
             ;;
           *)
-            npm_filter="${npm_filter}|^${denied_npm_tool}$"
+            npm_filter="${npm_filter}|^(${denied_npm_tool})(@[^@]*)?$"
             ;;
         esac
       done <<<"${DENY_ROSTER_NPM}"
@@ -555,9 +597,9 @@ except Exception:
     local real_codex
     real_codex="$(realpath "$(command -v codex)" 2>/dev/null || which codex 2>/dev/null || true)"
     if [[ -n "${real_codex}" && "${real_codex}" != "${HOME}/.npm-global"* ]]; then
-      npm_filter="${npm_filter}|^@openai/codex$"
+      npm_filter="${npm_filter}|^(@openai/codex)(@[^@]*)?$"
     fi
-    OUTDATED_PKGS=$(npm outdated -g --parseable --prefix "${HOME}/.npm-global" 2>/dev/null | awk -F: '{print $4}' | grep -v -E "${npm_filter}" || true)
+    OUTDATED_PKGS=$(npm outdated -g --parseable --prefix "${HOME}/.npm-global" 2>/dev/null | awk -F: '{pkg=$4; sub(/@[^@]*$/, "", pkg); print (pkg != "" ? pkg : $4)}' | grep -v -E "${npm_filter}" || true)
     if [[ -n "${OUTDATED_PKGS}" ]]; then
       echo "Updating eligible global npm packages: ${OUTDATED_PKGS}"
       # shellcheck disable=SC2086
@@ -575,6 +617,8 @@ except Exception:
       uv tool list 2>&1 || true
     elif (( PREFLIGHT_FAILED != 0 )); then
       echo "    SKIPPED: uv tool upgrades suppressed (preflight authority check failed)"
+    elif (( GLOBAL_PAUSE != 0 )); then
+      echo "    SKIPPED: uv tool upgrades paused by policy (DISABLE_UPDATES)"
     else
       uv tool upgrade graphifyy 2>&1 || true
       uv tool upgrade tavily-cli 2>&1 || true
@@ -611,11 +655,13 @@ except Exception:
     if ! python3 "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" --check 2>&1; then
       echo "Skills out of sync. Reconciling..."
       if [[ "${MODE}" == "apply" ]]; then
-        python3 "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" 2>&1 || true
-        # Re-verify after reconciliation: reconcile only owns links pointing into
-        # managed roots, so unmanaged broken links survive it and must fail the run.
-        if ! python3 "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" --check 2>&1; then
-          SYNC_FAILED=1
+        if (( GLOBAL_PAUSE != 0 )); then
+          echo "    SKIPPED: skills reconciliation paused by policy (DISABLE_UPDATES)"
+        else
+          python3 "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" 2>&1 || true
+          if ! python3 "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" --check 2>&1; then
+            SYNC_FAILED=1
+          fi
         fi
       else
         SYNC_FAILED=1
@@ -732,6 +778,8 @@ except Exception:
       echo "    canonical store: ${WORKSPACE_DIR}/.agents/skills"
       echo "    upstream-locked entries: $(python3 -c "import json,sys;print(len(json.load(open('${WORKSPACE_DIR}/skills-lock.json'))['skills']))" 2>/dev/null || echo unknown)"
       echo "    NOTE: run without --check to refresh; drift is reported by the refresh stage"
+    elif (( GLOBAL_PAUSE != 0 )); then
+      echo "    SKIPPED: skill content refresh paused by policy (DISABLE_UPDATES)"
     else
       refresh_skill_content || true
       echo "    summary: refreshed=${REFRESH_REFRESHED} already_current=${REFRESH_ALREADY} path_ambiguous=${REFRESH_AMBIGUOUS} failed=${REFRESH_FAILED}"

@@ -31,11 +31,13 @@ Where Homebrew provides a formula or cask, that channel is preferred over unsign
 - `buzz` -> cask `buzz`
 - `grok` -> cask `grok-build` (Homebrew formula `grok` is an unrelated deprecated regex tool; must NOT be used)
 - `opencode` -> formula `opencode` (from third-party tap; shadows `homebrew/core/opencode`)
-- `prime-agent` -> none (official R2 Mach-O binary channel)
+- `prime-agent` -> none (unmanaged npm package bundle at `/opt/homebrew/lib/prime-agent` or official Mach-O channel)
 
 ## 4. Duplication & Reclamation Safety
-Duplication is reported with measured sizes. Reclamation is **strictly gated** on explicit authorization and must be verified by post-reclamation execution checks (`gitnexus --version`, `bru --version`). Direct deletion by duplication detection alone is prohibited.
+Duplication is reported with measured sizes. The active authoritative copy is **always included** in duplication output before other discovered copies are appended, ensuring accurate multi-copy counts and reclaimable space estimates. Reclamation is **strictly gated** on explicit authorization and must be verified by post-reclamation execution checks (`gitnexus --version`, `bru --version`). Direct deletion by duplication detection alone is prohibited.
 
+### Homebrew Node-backed Formula Provenance
+Homebrew formulas that embed `node_modules` under `Cellar/<formula>/<version>/libexec/lib/node_modules/` (such as `newman`) remain strictly Homebrew-owned (`brew-formula`). The inventory evaluates `Cellar` prior to `node_modules` and does not falsely flag official Homebrew formulas as `is_homebrew_adjacent`.
 ## 5. Version Authority Model and Actual Writers
 
 Each installed development tool has **exactly one elected version authority**: the single mechanism permitted to advance or pin the installed version. The version authority model enforces the distinction between an updater dispatch entrypoint (how a user or script invokes an update) and the actual version writer (the process or package manager that physically mutates the installation).
@@ -66,7 +68,8 @@ A tool's effective write target (evaluated across environment variables, package
 - **Target-Misalignment Risk**:
   Occurs when an update action targets a directory or prefix different from the active installation root.
   - *Example*: The active `codex` executable resolves to `/opt/homebrew/lib/node_modules/@openai/codex/bin/codex.js` (installed under `/opt/homebrew`), while the workstation's declared npm global prefix is `~/.npm-global`. Invoking `codex update` or `npm install -g @openai/codex` without prefix alignment targets `~/.npm-global/lib/node_modules/@openai/codex`, leaving the active binary on `$PATH` stale and unupdated.
-  - *Mitigation*: Run `npm install -g --prefix /opt/homebrew @openai/codex`, or migrate the active installation root to align with `~/.npm-global`.
+  - *Mitigation*: Run `npm install -g --prefix ~/.npm-global @openai/codex` (always targeting the declared sanctioned prefix, never an inferred system prefix), or migrate the active installation root to align with `~/.npm-global`.
+  - *Wrapper Inheritance*: Wrappers (such as `qoder` at `~/.qoder/entry/qoder`) inherit the resolved target's install root and drift status; a misaligned wrapper target (e.g. `qodercli` under `/opt/homebrew`) gates both the wrapper and the target from automated updates without requiring tool-name-specific shell exceptions.
 - **Orthogonal Location Findings**:
   Installations in unsanctioned or unscoped directories (such as `gitnexus` in `~/.local/lib/node_modules` or `qoder` in `~/.qoder/entry/qoder`) are reported as orthogonal findings without masking version authority.
 
@@ -93,3 +96,20 @@ python3 platform/openspec-store/scripts/inventory-workstation-toolchain.py --jso
 
 - **Reconciled Status**: Reports `Status:                      RECONCILED` when all tools have aligned single writers and no conflicting uncoordinated update paths.
 - **Drift Detected Status**: Reports `Status:                      DRIFT_DETECTED` when uncoordinated independent writers, incompatible write targets, or target prefix misalignments are detected.
+
+## 10. Bounded Scheduled-Writer Discovery & Value-Blind Safety
+
+The inventory conducts value-blind discovery of scheduled update daemons across:
+- User LaunchAgents (`~/Library/LaunchAgents/*.plist`)
+- System LaunchAgents (`/Library/LaunchAgents/*.plist`)
+- User crontab (`crontab -l`)
+
+**Safety & Value-Blind Boundaries**:
+- **Value-Blind**: Extracts only job labels, executable baselines, schedule frequencies, and environment variable key names. Environment values, tokens, and secrets are strictly omitted.
+- **Explicit Boundaries**: Privileged root LaunchDaemons (`/Library/LaunchDaemons`, `/System/Library/LaunchDaemons`), system-internal launchd domains, container daemon engines (Docker/Podman), and indirect shell scripts are outside the scan boundary and recorded as explicit non-exhaustive limitations rather than assuming conflict absence.
+
+## 11. Post-Update Idempotence vs. Channel Currency
+
+A successful update command where before-and-after versions match (`v_before == v_after`) is evidence of local execution **idempotence**, but does not prove **currency** against the remote release channel.
+- Unchanged versions without an authenticated remote registry check are classified as `(idempotent, currency unverified)`.
+- The label `currency verified` is strictly reserved for tools whose active version was verified against an authoritative upstream release channel API.
