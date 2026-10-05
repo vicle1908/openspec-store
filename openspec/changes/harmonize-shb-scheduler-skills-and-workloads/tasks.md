@@ -7,7 +7,7 @@
 
 ## 2. Settlement Reconciliation Workflow (`shb-schedule`)
 
-- [ ] 2.1 Implement `src/shb_schedule/workflows/recon.py` defining `@DBOS.step` and `@DBOS.workflow` for `eod_settlement_recon_workflow` backed by `shb_tools.recon.engine.ReconciliationEngine`
+- [ ] 2.1 Implement `src/shb_schedule/workflows/recon.py` defining transaction sourcing (`load_settlement_transactions`) and execution (`execute_settlement_reconciliation`) steps, and `@DBOS.workflow` for `eod_settlement_recon_workflow` backed by `shb_tools.recon.engine.ReconciliationEngine`
 - [ ] 2.2 Register `eod-settlement-recon` and callable path in `shb_schedule.manifests.registry.APPROVED_WORKFLOWS`
 - [ ] 2.3 Create and install schedule manifest `~/.shb/schedules/eod-settlement-recon.yaml` (`0 23 * * *`)
 

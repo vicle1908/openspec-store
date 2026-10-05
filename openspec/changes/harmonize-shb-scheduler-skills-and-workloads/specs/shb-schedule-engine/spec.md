@@ -7,7 +7,7 @@ The `shb-schedule` package SHALL provide durable workflow implementations and ap
 
 #### Scenario: Scheduled settlement reconciliation execution
 - **WHEN** the `daily-eod-settlement-recon` schedule is triggered by cron (23:00 HCM) or on-demand
-- **THEN** it executes `eod_settlement_recon_workflow` delegating to `shb_tools.recon.engine.ReconciliationEngine`
+- **THEN** it executes `eod_settlement_recon_workflow`, sources internal and clearing transactions via `load_settlement_transactions`, and reconciles ledgers via `shb_tools.recon.engine.ReconciliationEngine`
 - **AND** records matched transactions, discrepancies, and orphan counts in DBOS execution history
 
 #### Scenario: Scheduled compliance scan execution

@@ -38,11 +38,12 @@ The SHB scheduler infrastructure (`shb-schedule`) is established, strictly valid
 - Update `shb-agent-skills/registry.yaml` metadata.
 
 ### 2. Settlement Reconciliation Workflow (`shb_schedule.workflows.recon`)
-- `@DBOS.step`: `execute_settlement_reconciliation(internal_transactions: list[dict[str, Any]], clearing_transactions: list[dict[str, Any]], reconciliation_date: str) -> ReconciliationReport`
-  Invokes `ReconciliationEngine().reconcile()` and returns structured matched, discrepancy, orphan counts.
-- `@DBOS.workflow`: `eod_settlement_recon_workflow(*args: Any, **kwargs: Any) -> ReconciliationReport`
-  Coordinates step, logs execution history, and returns audit telemetry.
-
+- `@DBOS.step`: `load_settlement_transactions(date_str: str, context: dict[str, Any] | None = None) -> dict[str, Any]`
+  Sources `internal_transactions` and `clearing_transactions` from manifest context, local settlement ledger JSON (`~/.shb/settlement/{date}.json`), or default banking sample fixtures.
+- `@DBOS.step`: `execute_settlement_reconciliation(internal_transactions: list[dict[str, Any]], clearing_transactions: list[dict[str, Any]], reconciliation_date: str) -> dict[str, Any]`
+  Invokes `ReconciliationEngine().reconcile()` and returns a JSON-serializable dictionary of matched, discrepancy, and orphan tallies.
+- `@DBOS.workflow`: `eod_settlement_recon_workflow(*args: Any, reconciliation_date: str | None = None, **kwargs: Any) -> dict[str, Any]`
+  Resolves the target date, orchestrates the loading and reconciliation steps, and records audit telemetry in DBOS execution history.
 ### 3. Compliance Scanner Workflow (`shb_schedule.workflows.compliance`)
 - `@DBOS.step`: `git_check_dirty_tree(repo_dir: Path) -> dict[str, Any]` (reuses existing step).
 - `@DBOS.step`: `execute_repo_compliance_scan(repo_dir: Path) -> ComplianceReport`
