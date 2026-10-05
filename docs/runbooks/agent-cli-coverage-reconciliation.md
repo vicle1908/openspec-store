@@ -4,9 +4,9 @@
 The workstation maintenance pipeline enforces explicit coverage declarations for all installed AI coding agent CLIs. Tools are never silently updated or uninstalled; every installed CLI is either declared as covered with an automated update verb, or explicitly declared as uncovered.
 
 ## 1. Active Roster and Classification
-- **Covered (7)**: `claude`, `codex`, `opencode`, `kilo`, `auggie`, `qoder`, `pi` (updated via scriptable verbs under timeout fences).
-- **Uncovered Declared (9)**:
-  - Package manager / Cask managed: `droid`, `goose`, `cursor-agent`, `buzz`.
+- **Covered (6)**: `claude`, `codex`, `opencode`, `auggie`, `qoder`, `pi` (updated via scriptable verbs under timeout fences).
+- **Uncovered Declared (10)**:
+  - Package manager / Cask / npm managed: `droid`, `goose`, `cursor-agent`, `buzz`, `kilo`.
   - Upstream release channel / Standalone: `grok`, `prime-agent`, `hermes-agent`, `happy`, `cce`.
 
 ### Classification Categories

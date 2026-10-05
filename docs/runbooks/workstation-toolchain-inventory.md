@@ -41,7 +41,7 @@ Duplication is reported with measured sizes. Reclamation is **strictly gated** o
 Each installed development tool has **exactly one elected version authority**: the single mechanism permitted to advance or pin the installed version. The version authority model enforces the distinction between an updater dispatch entrypoint (how a user or script invokes an update) and the actual version writer (the process or package manager that physically mutates the installation).
 
 1. **Tool-Native Authority**:
-   Tools that manage their own versioning via native self-updaters (e.g. `claude update`, `kilo update`, `auggie update --skip-confirmation`, `hermes update`) elect `native` authority. The tool itself (or internal updater script) acts as the version writer.
+   Tools that manage their own versioning via native self-updaters (e.g. `claude update`, `auggie update --skip-confirmation`, `hermes update`) elect `native` authority. The tool itself (or internal updater script) acts as the version writer.
 2. **Package Manager Authority**:
    Tools installed and managed by system or ecosystem package managers without self-updating commands (e.g. `goose`, `newman` under Homebrew formulae; `droid`, `cursor-agent`, `buzz` under Homebrew casks; `happy` under npm-global; `bru` under home-toolchain) elect their package manager (`brew-formula`, `brew-cask`, `npm-global`, `home-toolchain`) as the version authority.
 3. **Compatible Manager Delegation**:
@@ -54,9 +54,9 @@ Each installed development tool has **exactly one elected version authority**: t
 ## 6. Updater Dispatch Classification
 
 Updaters are classified into four distinct dispatch types:
-- **`native`**: The tool directly mutates its own installation (e.g. `claude`, `kilo`, `auggie`, `hermes-agent`, `qoder`).
+- **`native`**: The tool directly mutates its own installation (e.g. `claude`, `auggie`, `hermes-agent`, `qoder`).
 - **`delegating`**: The tool provides an update verb but verifies its installation context and invokes its owning package manager (e.g. `opencode` -> `brew`, `grok` -> `brew`).
-- **`none`**: The tool provides no scriptable self-update subcommand and relies solely on package manager upgrade cycles or manual vendor updates (e.g. `droid`, `goose`, `cursor-agent`, `buzz`, `happy`, `newman`, `bru`).
+- **`none`**: The tool provides no scriptable self-update subcommand and relies solely on package manager upgrade cycles or manual vendor updates (e.g. `droid`, `goose`, `cursor-agent`, `buzz`, `happy`, `kilo`, `newman`, `bru`).
 - **`unknown`**: Provenance or update capability is ambiguous or undocumented (e.g. `cce`).
 
 ## 7. Prefix Target Alignment & Misalignment Risk

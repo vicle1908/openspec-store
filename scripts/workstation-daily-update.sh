@@ -193,17 +193,17 @@ refresh_skill_content() {
 AGENT_CLI_COVERED="claude:Claude Code:update
 codex:OpenAI Codex:update
 opencode:OpenCode:upgrade
-kilo:Kilo:update
 auggie:Auggie:update --skip-confirmation
 qoder:Qoder:update
 pi:Pi:update --self"
 
-AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent happy cursor-agent hermes-agent buzz cce"
+AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent happy cursor-agent hermes-agent buzz cce kilo"
 
 # Update every covered agent CLI that is installed; report the declared set and
 # any installed agent CLI left uncovered. Each updater is time-bounded.
 agent_cli_coverage() {
   local deny_roster="${1:-${DENY_ROSTER:-}}"
+  local paused_roster="${2:-${PAUSED_ROSTER:-}}"
   echo "    covered set: $(cut -d: -f1 <<<"${AGENT_CLI_COVERED}" | paste -sd, -)"
 
   local bin label args
@@ -215,7 +215,20 @@ agent_cli_coverage() {
     fi
 
     # Pre-mutation safety and policy guards
-    if [[ "${bin}" == "claude" ]] && [[ "${DISABLE_UPDATES:-0}" == "1" ]]; then
+    local is_paused=0 p_item
+    if [[ "${bin}" == "claude" ]] && [[ "${DISABLE_UPDATES:-0}" == "1" || "${DISABLE_UPDATES:-}" == "true" ]]; then
+      is_paused=1
+    fi
+    if (( is_paused == 0 )) && [[ -n "${paused_roster}" ]]; then
+      while IFS= read -r p_item; do
+        [[ -z "${p_item}" ]] && continue
+        if [[ "${bin}" == "${p_item}" ]]; then
+          is_paused=1
+          break
+        fi
+      done <<<"${paused_roster}"
+    fi
+    if (( is_paused != 0 )); then
       echo "      - ${label} (${bin}): update paused by policy (DISABLE_UPDATES=1), skipped"
       continue
     fi
@@ -240,6 +253,8 @@ agent_cli_coverage() {
       continue
     fi
 
+    local pre_real=""
+    pre_real="$(realpath "$(command -v "${bin}")" 2>/dev/null || which "${bin}" 2>/dev/null || true)"
     local v_before="" v_after=""
     v_before="$("${bin}" --version 2>&1 | head -1 | strip_ansi || true)"
 
@@ -249,7 +264,7 @@ agent_cli_coverage() {
     out="$(printf '%s' "$out" | strip_ansi)"
     printf '%s\n' "$out" | tail -3 | sed 's/^/        /'
 
-    # Some agents (e.g. kilo) exit 0 while printing an error and doing nothing,
+    # Some agents exit 0 while printing an error and doing nothing,
     # so exit status alone is not sufficient evidence of a successful update.
     # Anchored to explicit error markers at the start of a line to avoid
     # matching a benign mention of these words in a progress line.
@@ -269,11 +284,24 @@ agent_cli_coverage() {
       if [[ -n "${active_path}" ]]; then
         active_real="$(realpath "${active_path}" 2>/dev/null || which "${bin}" 2>/dev/null || true)"
       fi
-      if [[ ! -x "${active_real}" ]]; then
+      local known_root=""
+      for root_cand in "${HOME}/.npm-global" "${HOME}/.pi" "${HOME}/.local" "/opt/homebrew"; do
+        if [[ -n "${pre_real}" && "${pre_real}" == "${root_cand}"* ]]; then
+          known_root="${root_cand}"
+          break
+        fi
+      done
+      if [[ -z "${v_after}" ]] || grep -qiE '^[[:space:]]*(error|fatal)[: ]|failed' <<<"${v_after}"; then
+        echo "      - ${label} (${bin}): FAILED (post-update version probe empty or reported error: '${v_after}')"
+        AGENT_FAILED=1
+      elif [[ ! -x "${active_real}" ]]; then
         echo "      - ${label} (${bin}): FAILED (post-update active executable missing or not executable: ${active_real})"
         AGENT_FAILED=1
+      elif [[ -n "${known_root}" && "${active_real}" != "${known_root}"* ]]; then
+        echo "      - ${label} (${bin}): FAILED (post-update active executable outside known active root ${known_root}: ${active_real})"
+        AGENT_FAILED=1
       elif [[ -n "${v_before}" && "${v_before}" == "${v_after}" ]]; then
-        echo "      - ${label} (${bin}): already up to date (${v_after}) [active: ${active_path} -> ${active_real}] (currency verified)"
+        echo "      - ${label} (${bin}): already up to date (${v_after}) [active: ${active_path} -> ${active_real}] (idempotent/current)"
       else
         echo "      - ${label} (${bin}): updated (${v_before} -> ${v_after}) [active: ${active_path} -> ${active_real}] (currency verified)"
       fi
@@ -379,6 +407,7 @@ run_pipeline() {
   DENY_ROSTER=""
   DENY_ROSTER_BREW=""
   DENY_ROSTER_NPM=""
+  PAUSED_ROSTER=""
   if [[ -f "${STORE_DIR}/scripts/inventory-workstation-toolchain.py" ]]; then
     local pre_out pre_rc=0
     pre_out="$(python3 "${STORE_DIR}/scripts/inventory-workstation-toolchain.py" --json 2>/dev/null)" || pre_rc=$?
@@ -390,18 +419,27 @@ import sys, json
 try:
     data = json.load(sys.stdin)
     items = data["authority_reconciliation"].get("items", [])
-    deny_all, deny_brew, deny_npm = [], [], []
+    deny_all, deny_brew, deny_npm, paused = [], [], [], []
     for it in items:
-        if it.get("drift_status") in ("unknown", "target_misalignment", "conflict") and it.get("name"):
-            name = it["name"]
+        name = it.get("name")
+        if not name:
+            continue
+        drift = it.get("drift_status")
+        writer = it.get("writer", "")
+        auth = it.get("authority", "")
+        if drift in ("unknown", "target_misalignment", "conflict"):
             deny_all.append(name)
-            channels = it.get("documented_channels", [])
-            writer = it.get("writer", "")
-            auth = it.get("authority", "")
-            if any("brew" in c for c in channels) or "brew" in writer or "brew" in auth:
+            if "brew" in writer or "brew" in auth:
                 deny_brew.append(name)
-            if any("npm" in c for c in channels) or "npm" in writer or "npm" in auth:
+            if "npm" in writer or "npm" in auth:
                 deny_npm.append(name)
+        if name == "claude":
+            auto_cfg = it.get("auto_updates_config", {})
+            for k in ("DISABLE_UPDATES", "env.DISABLE_UPDATES"):
+                val = auto_cfg.get(k)
+                if val in (1, "1", True, "true", "True"):
+                    paused.append(name)
+                    break
     print("STATUS:" + data["authority_reconciliation"].get("status", "unknown"))
     print("ALL:")
     for x in deny_all: print(x)
@@ -409,6 +447,8 @@ try:
     for x in deny_brew: print(x)
     print("NPM:")
     for x in deny_npm: print(x)
+    print("PAUSED:")
+    for x in paused: print(x)
 except Exception:
     sys.exit(1)
 ' <<<"${pre_out}")" || parse_rc=$?
@@ -418,7 +458,8 @@ except Exception:
         auth_status="$(sed -n "s/^STATUS://p" <<<"${parse_out}" | head -1)"
         DENY_ROSTER="$(sed -n "/^ALL:/,/^BREW:/{ /^ALL:/d; /^BREW:/d; p; }" <<<"${parse_out}")"
         DENY_ROSTER_BREW="$(sed -n "/^BREW:/,/^NPM:/{ /^BREW:/d; /^NPM:/d; p; }" <<<"${parse_out}")"
-        DENY_ROSTER_NPM="$(sed -n "/^NPM:/,\$ { /^NPM:/d; p; }" <<<"${parse_out}")"
+        DENY_ROSTER_NPM="$(sed -n "/^NPM:/,/^PAUSED:/{ /^NPM:/d; /^PAUSED:/d; p; }" <<<"${parse_out}")"
+        PAUSED_ROSTER="$(sed -n "/^PAUSED:/,\$ { /^PAUSED:/d; p; }" <<<"${parse_out}")"
 
         if [[ "${auth_status}" == "reconciled" ]]; then
           echo ">>> Pre-flight Authority & Safety Check: verified (reconciled)"
@@ -486,13 +527,29 @@ except Exception:
     if [[ -n "${DENY_ROSTER_NPM}" ]]; then
       while IFS= read -r denied_npm_tool; do
         [[ -z "${denied_npm_tool}" ]] && continue
-        if [[ "${denied_npm_tool}" == "codex" ]]; then
-          npm_filter="${npm_filter}|^@openai/codex$"
-        elif [[ "${denied_npm_tool}" == "qodercli" ]]; then
-          npm_filter="${npm_filter}|^@qoder-ai/qodercli$"
-        else
-          npm_filter="${npm_filter}|^${denied_npm_tool}$"
-        fi
+        case "${denied_npm_tool}" in
+          codex)
+            npm_filter="${npm_filter}|^@openai/codex$"
+            ;;
+          qoder|qodercli)
+            npm_filter="${npm_filter}|^@qoder-ai/qodercli$|^@qoder-ai/qoder$"
+            ;;
+          kilo)
+            npm_filter="${npm_filter}|^@kilocode/cli$|^kilo$"
+            ;;
+          auggie)
+            npm_filter="${npm_filter}|^@augmentcode/auggie$|^auggie$"
+            ;;
+          pi)
+            npm_filter="${npm_filter}|^@earendil-works/pi-coding-agent$|^pi$"
+            ;;
+          bru)
+            npm_filter="${npm_filter}|^@usebruno/cli$|^bru$"
+            ;;
+          *)
+            npm_filter="${npm_filter}|^${denied_npm_tool}$"
+            ;;
+        esac
       done <<<"${DENY_ROSTER_NPM}"
     fi
     local real_codex
@@ -543,7 +600,7 @@ except Exception:
   elif (( PREFLIGHT_FAILED != 0 )); then
     echo "    SKIPPED: agent CLI updates suppressed (preflight authority check failed)"
   else
-    agent_cli_coverage "${DENY_ROSTER}"
+    agent_cli_coverage "${DENY_ROSTER}" "${PAUSED_ROSTER}"
   fi
 
   # 6. Cross-Agent Skills Synchronization & Parity
@@ -737,8 +794,10 @@ except Exception:
   echo "======================================================================"
 }
 
-if [[ "${MODE}" == "check" ]]; then
-  run_pipeline
-else
-  run_pipeline | tee -a "${LOG_FILE}"
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  if [[ "${MODE}" == "check" ]]; then
+    run_pipeline
+  else
+    run_pipeline | tee -a "${LOG_FILE}"
+  fi
 fi

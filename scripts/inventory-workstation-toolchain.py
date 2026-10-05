@@ -162,11 +162,38 @@ def is_path_sanctioned(p: Path) -> bool:
         pass
     return False
 
+def derive_npm_prefix(install_root: str | Path) -> str:
+    """Derive npm prefix dynamically from install root containing node_modules."""
+    p = Path(install_root)
+    parts = p.parts
+    if "node_modules" in parts:
+        idx = parts.index("node_modules")
+        parent = Path(*parts[:idx])
+        if parent.name == "lib":
+            return str(parent.parent)
+        return str(parent)
+    return str(p)
+
+
 def derive_install_root_and_source(resolved_path: str) -> tuple[str, str]:
     """Derive install root and source detail dynamically from resolved path."""
     p = Path(resolved_path)
     parts = p.parts
-    # 1. Node modules package
+    # 1. Homebrew Cellar formula
+    if "Cellar" in parts:
+        idx = parts.index("Cellar")
+        if idx + 2 < len(parts):
+            return str(Path(*parts[:idx + 3])), "brew-formula"
+        elif idx + 1 < len(parts):
+            return str(Path(*parts[:idx + 2])), "brew-formula"
+    # 2. Homebrew Caskroom
+    if "Caskroom" in parts:
+        idx = parts.index("Caskroom")
+        if idx + 2 < len(parts):
+            return str(Path(*parts[:idx + 3])), "brew-cask"
+        elif idx + 1 < len(parts):
+            return str(Path(*parts[:idx + 2])), "brew-cask"
+    # 3. Node modules package
     if "node_modules" in parts:
         idx = parts.index("node_modules")
         if idx + 1 < len(parts) and parts[idx + 1].startswith("@") and idx + 2 < len(parts):
@@ -175,21 +202,6 @@ def derive_install_root_and_source(resolved_path: str) -> tuple[str, str]:
         elif idx + 1 < len(parts):
             pkg_root = Path(*parts[:idx + 2])
             return str(pkg_root), "npm"
-    # 2. Homebrew Cellar formula
-    if "Cellar" in parts:
-        idx = parts.index("Cellar")
-        if idx + 2 < len(parts):
-            return str(Path(*parts[:idx + 3])), "brew-formula"
-        elif idx + 1 < len(parts):
-            return str(Path(*parts[:idx + 2])), "brew-formula"
-    # 3. Homebrew Caskroom
-    if "Caskroom" in parts:
-        idx = parts.index("Caskroom")
-        if idx + 2 < len(parts):
-            return str(Path(*parts[:idx + 3])), "brew-cask"
-        elif idx + 1 < len(parts):
-            return str(Path(*parts[:idx + 2])), "brew-cask"
-    # 4. Applications bundle
     if "Applications" in parts:
         for parent in [p] + list(p.parents):
             if parent.suffix == ".app":
@@ -547,7 +559,7 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
                 drift_status = "target_misalignment"
                 selected_channel = f"npm (active: {active_install_root})"
                 consequence = f"Update action writes to {declared_prefix} while active binary resolves to {active_install_root}, leaving active binary stale and unupdated"
-                compatible_command = f"npm install -g --prefix {Path(active_install_root).parents[2] if 'node_modules' in active_install_root else active_install_root} @openai/codex"
+                compatible_command = f"npm install -g --prefix {derive_npm_prefix(active_install_root)} @openai/codex"
             else:
                 prefix_aligned = True
                 drift_status = "clean"

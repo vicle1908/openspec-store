@@ -118,6 +118,16 @@ def find_agent_binary(name: str) -> str | None:
     return None
 
 
+RECOGNIZED_COVERED_COMMANDS: dict[str, str] = {
+    "claude": "claude update",
+    "codex": "codex update",
+    "opencode": "opencode upgrade",
+    "auggie": "auggie update --skip-confirmation",
+    "qoder": "qoder update",
+    "pi": "pi update --self",
+}
+
+
 def evaluate_update_path(
     name: str,
     status: str,
@@ -126,18 +136,21 @@ def evaluate_update_path(
     source_detail: str,
 ) -> tuple[bool, str]:
     """Check if the CLI has a compatible supported native update path or manager path."""
-    if status == "covered" and update_verb:
+    if status == "covered":
+        if not update_verb:
+            return False, "covered CLI missing update verb"
         if "npm" in source_detail and update_verb.startswith("brew "):
             return False, f"incompatible update verb: '{update_verb}' for npm-managed installation"
         if "Homebrew" in source_detail and update_verb.startswith("npm "):
             return False, f"incompatible update verb: '{update_verb}' for Homebrew-managed installation"
+        expected_verb = RECOGNIZED_COVERED_COMMANDS.get(name)
+        if not expected_verb or update_verb != expected_verb:
+            return False, f"unsupported or unrecognized update command: '{update_verb}' for {name}"
         return True, f"native/delegated update verb: '{update_verb}'"
     if source_type == "package_manager":
         return True, f"managed by package manager ({source_detail})"
     if source_type == "ecosystem_manager":
         return True, f"managed by ecosystem manager ({source_detail})"
-    if update_verb:
-        return True, f"update verb: '{update_verb}'"
     if name == "hermes-agent":
         return True, "governed by Git checkout / hermes update"
     if name == "grok":
@@ -293,7 +306,7 @@ def main() -> int:
     parser.add_argument("--json", action="store_true", help="Output machine-readable JSON")
     parser.add_argument(
         "--include-uncovered",
-        default="droid,goose,grok,prime-agent,happy,cursor-agent,hermes-agent,buzz,cce",
+        default="droid,goose,grok,prime-agent,happy,cursor-agent,hermes-agent,buzz,cce,kilo",
         help="Comma-separated declared uncovered CLIs",
     )
     parser.add_argument(
@@ -307,14 +320,13 @@ def main() -> int:
         "claude": "claude update",
         "codex": "codex update",
         "opencode": "opencode upgrade",
-        "kilo": "kilo update",
         "auggie": "auggie update --skip-confirmation",
         "qoder": "qoder update",
         "pi": "pi update --self",
     }
 
     if args.simulate_initial:
-        uncovered = ["droid", "goose", "grok", "prime-agent"]
+        uncovered = ["droid", "goose", "grok", "prime-agent", "kilo"]
     else:
         uncovered = [x.strip() for x in args.include_uncovered.split(",") if x.strip()]
 
