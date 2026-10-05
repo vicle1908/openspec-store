@@ -13,7 +13,7 @@
 
 ## 3. Compliance Scanner Workflow (`shb-schedule`)
 
-- [ ] 3.1 Implement `src/shb_schedule/workflows/compliance.py` defining `@DBOS.step` and `@DBOS.workflow` for `nightly_compliance_scan_workflow` backed by `shb_tools.compliance.scanner.ComplianceScanner` with dirty-worktree guards
+- [ ] 3.1 Implement `src/shb_schedule/workflows/compliance.py` defining `@DBOS.step` and `@DBOS.workflow` for `nightly_compliance_scan_workflow` backed by `shb_tools.scanner.engine.ComplianceScanner` with dirty-worktree guards
 - [ ] 3.2 Register `nightly-compliance-scan` and callable path in `shb_schedule.manifests.registry.APPROVED_WORKFLOWS`
 - [ ] 3.3 Create and install schedule manifest `~/.shb/schedules/nightly-compliance-scan.yaml` (`0 1 * * *`)
 

@@ -12,7 +12,7 @@ Harmonizing `scheduler-skill` to native `shb-schedule` standards and onboarding 
 
 - **Rewrite `scheduler-skill` in `shb-agent-skills`**: Modernize `skills/scheduler-skill/SKILL.md` and `registry.yaml` to document native `shb-schedule` CLI tools (`validate`, `list`, `run-now`, `reload`, `service`), `shb-schedule/v1` manifest specifications, and `/scheduler/health` endpoints, completely eliminating alien `vds-cli` references.
 - **Onboard EOD Settlement Reconciliation Workflow**: Export and allowlist `eod_settlement_recon_workflow` in `shb-schedule`, backed by `shb_tools.recon.engine.ReconciliationEngine`, and ship declarative schedule manifest `eod-settlement-recon.yaml` (executing daily at 23:00 HCM).
-- **Onboard Nightly Compliance Scan Workflow**: Export and allowlist `nightly_compliance_scan_workflow` in `shb-schedule`, backed by `shb_tools.compliance.scanner.ComplianceScanner`, and ship declarative schedule manifest `nightly-compliance-scan.yaml` (executing daily at 01:00 HCM) with dirty worktree protection.
+- **Onboard Nightly Compliance Scan Workflow**: Export and allowlist `nightly_compliance_scan_workflow` in `shb-schedule`, backed by `shb_tools.scanner.engine.ComplianceScanner`, and ship declarative schedule manifest `nightly-compliance-scan.yaml` (executing daily at 01:00 HCM) with dirty worktree protection.
 - **Update Workflow Registry Allowlist**: Register new callable paths in `shb_schedule.manifests.registry.APPROVED_WORKFLOWS`.
 
 ## Capabilities
@@ -30,6 +30,6 @@ Harmonizing `scheduler-skill` to native `shb-schedule` standards and onboarding 
 
 ## Non-Goals
 
-- Modifying the underlying algorithms in `shb_tools.recon` or `shb_tools.compliance`.
+- Modifying the underlying algorithms in `shb_tools.recon` or `shb_tools.scanner`.
 - Re-introducing multi-writer microservice schedule mutation (all schedules remain file-declared under `~/.shb/schedules/`).
 - Auto-remediating PCI-DSS violations during unattended runs (violations are strictly audited and logged).

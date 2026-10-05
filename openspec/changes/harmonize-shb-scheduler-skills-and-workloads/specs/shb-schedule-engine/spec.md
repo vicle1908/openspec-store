@@ -12,5 +12,5 @@ The `shb-schedule` package SHALL provide durable workflow implementations and ap
 
 #### Scenario: Scheduled compliance scan execution
 - **WHEN** the `daily-nightly-compliance-scan` schedule is triggered by cron (01:00 HCM) or on-demand
-- **THEN** it executes `nightly_compliance_scan_workflow` evaluating SHB repositories for PAN masking and secrets
+- **THEN** it executes `nightly_compliance_scan_workflow` delegating to `shb_tools.scanner.engine.ComplianceScanner`
 - **AND** skips repositories with uncommitted changes while reporting scan violations in structured workflow telemetry
