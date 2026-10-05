@@ -195,14 +195,15 @@ codex:OpenAI Codex:update
 opencode:OpenCode:upgrade
 kilo:Kilo:update
 auggie:Auggie:update --skip-confirmation
-qoder:Claude-Fable:update
+qoder:Qoder:update
 pi:Pi:update --self"
 
-AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent"
+AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent happy cursor-agent hermes-agent buzz cce"
 
 # Update every covered agent CLI that is installed; report the declared set and
 # any installed agent CLI left uncovered. Each updater is time-bounded.
 agent_cli_coverage() {
+  local deny_roster="${1:-${DENY_ROSTER:-}}"
   echo "    covered set: $(cut -d: -f1 <<<"${AGENT_CLI_COVERED}" | paste -sd, -)"
 
   local bin label args
@@ -212,6 +213,36 @@ agent_cli_coverage() {
       echo "      - ${label} (${bin}): not installed, skipped"
       continue
     fi
+
+    # Pre-mutation safety and policy guards
+    if [[ "${bin}" == "claude" ]] && [[ "${DISABLE_UPDATES:-0}" == "1" ]]; then
+      echo "      - ${label} (${bin}): update paused by policy (DISABLE_UPDATES=1), skipped"
+      continue
+    fi
+
+    local is_denied=0 d_item
+    while IFS= read -r d_item; do
+      [[ -z "${d_item}" ]] && continue
+      if [[ "${bin}" == "${d_item}" || ( "${bin}" == "qoder" && "${d_item}" == "qodercli" ) ]]; then
+        is_denied=1
+        break
+      fi
+    done <<<"${deny_roster}"
+    if (( is_denied != 0 )); then
+      echo "      - ${label} (${bin}): SKIPPED (authority gate: tool in deny roster due to drift, target misalignment, or conflict)"
+      continue
+    fi
+
+    local real_bin
+    real_bin="$(realpath "$(command -v "${bin}")" 2>/dev/null || which "${bin}")"
+    if [[ "${bin}" == "codex" ]] && [[ "${real_bin}" != "${HOME}/.npm-global"* ]]; then
+      echo "      - ${label} (${bin}): SKIPPED (target prefix misalignment: active binary resolves to ${real_bin} outside declared prefix ${HOME}/.npm-global)"
+      continue
+    fi
+
+    local v_before="" v_after=""
+    v_before="$("${bin}" --version 2>&1 | head -1 | strip_ansi || true)"
+
     local out rc=0
     # shellcheck disable=SC2086  # ${args} intentionally word-splits into argv
     out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" "${bin}" ${args} 2>&1)" || rc=$?
@@ -232,7 +263,20 @@ agent_cli_coverage() {
       echo "      - ${label} (${bin}): FAILED (rc=0 but reported an error)"
       AGENT_FAILED=1
     else
-      echo "      - ${label} (${bin}): updated"
+      v_after="$("${bin}" --version 2>&1 | head -1 | strip_ansi || true)"
+      local active_path active_real=""
+      active_path="$(command -v "${bin}" 2>/dev/null || true)"
+      if [[ -n "${active_path}" ]]; then
+        active_real="$(realpath "${active_path}" 2>/dev/null || which "${bin}" 2>/dev/null || true)"
+      fi
+      if [[ ! -x "${active_real}" ]]; then
+        echo "      - ${label} (${bin}): FAILED (post-update active executable missing or not executable: ${active_real})"
+        AGENT_FAILED=1
+      elif [[ -n "${v_before}" && "${v_before}" == "${v_after}" ]]; then
+        echo "      - ${label} (${bin}): already up to date (${v_after}) [active: ${active_path} -> ${active_real}] (currency verified)"
+      else
+        echo "      - ${label} (${bin}): updated (${v_before} -> ${v_after}) [active: ${active_path} -> ${active_real}] (currency verified)"
+      fi
     fi
   done <<<"${AGENT_CLI_COVERED}"
 
@@ -325,35 +369,138 @@ run_pipeline() {
   echo "======================================================================"
   echo "$(date '+%Y-%m-%d %H:%M:%S %Z') — Workstation Daily Update [MODE=${MODE}]"
   echo "======================================================================"
+  if [[ "${MODE}" == "check" ]]; then
+    export HOMEBREW_NO_AUTO_UPDATE=1
+    export HOMEBREW_NO_INSTALL_CLEANUP=1
+  fi
+
+  # Pre-flight Authority & Mutation Safety Check
+  PREFLIGHT_FAILED=0
+  DENY_ROSTER=""
+  DENY_ROSTER_BREW=""
+  DENY_ROSTER_NPM=""
+  if [[ -f "${STORE_DIR}/scripts/inventory-workstation-toolchain.py" ]]; then
+    local pre_out pre_rc=0
+    pre_out="$(python3 "${STORE_DIR}/scripts/inventory-workstation-toolchain.py" --json 2>/dev/null)" || pre_rc=$?
+    if (( pre_rc == 0 )) && [[ -n "${pre_out}" ]]; then
+      local parse_rc=0
+      local parse_out
+      parse_out="$(python3 -c '
+import sys, json
+try:
+    data = json.load(sys.stdin)
+    items = data["authority_reconciliation"].get("items", [])
+    deny_all, deny_brew, deny_npm = [], [], []
+    for it in items:
+        if it.get("drift_status") in ("unknown", "target_misalignment", "conflict") and it.get("name"):
+            name = it["name"]
+            deny_all.append(name)
+            channels = it.get("documented_channels", [])
+            writer = it.get("writer", "")
+            auth = it.get("authority", "")
+            if any("brew" in c for c in channels) or "brew" in writer or "brew" in auth:
+                deny_brew.append(name)
+            if any("npm" in c for c in channels) or "npm" in writer or "npm" in auth:
+                deny_npm.append(name)
+    print("STATUS:" + data["authority_reconciliation"].get("status", "unknown"))
+    print("ALL:")
+    for x in deny_all: print(x)
+    print("BREW:")
+    for x in deny_brew: print(x)
+    print("NPM:")
+    for x in deny_npm: print(x)
+except Exception:
+    sys.exit(1)
+' <<<"${pre_out}")" || parse_rc=$?
+
+      if (( parse_rc == 0 )) && [[ -n "${parse_out}" ]]; then
+        local auth_status
+        auth_status="$(sed -n "s/^STATUS://p" <<<"${parse_out}" | head -1)"
+        DENY_ROSTER="$(sed -n "/^ALL:/,/^BREW:/{ /^ALL:/d; /^BREW:/d; p; }" <<<"${parse_out}")"
+        DENY_ROSTER_BREW="$(sed -n "/^BREW:/,/^NPM:/{ /^BREW:/d; /^NPM:/d; p; }" <<<"${parse_out}")"
+        DENY_ROSTER_NPM="$(sed -n "/^NPM:/,\$ { /^NPM:/d; p; }" <<<"${parse_out}")"
+
+        if [[ "${auth_status}" == "reconciled" ]]; then
+          echo ">>> Pre-flight Authority & Safety Check: verified (reconciled)"
+        else
+          echo ">>> Pre-flight Authority & Safety Check: verified (${auth_status}, mutation gating active)"
+        fi
+      else
+        PREFLIGHT_FAILED=1
+        echo ">>> Pre-flight Authority & Safety Check: FAILED (JSON parse error or missing authority_reconciliation)"
+      fi
+    else
+      PREFLIGHT_FAILED=1
+      echo ">>> Pre-flight Authority & Safety Check: FAILED (inventory reporter error)"
+    fi
+  else
+    PREFLIGHT_FAILED=1
+    echo ">>> Pre-flight Authority & Safety Check: FAILED (inventory reporter missing: ${STORE_DIR}/scripts/inventory-workstation-toolchain.py)"
+  fi
 
   # 1. Homebrew
   echo ""
   echo ">>> [Stage 1/12] Homebrew Maintenance"
-  brew update 2>&1 || true
   if [[ "${MODE}" == "check" ]]; then
-    brew outdated --formula 2>&1 || true
-    brew outdated --cask --greedy 2>&1 || true
+    echo "    check mode: brew update suppressed"
+    HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 brew outdated --formula 2>&1 || true
+    HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 brew outdated --cask --greedy 2>&1 || true
   else
-    brew upgrade --formula 2>&1 || true
-    brew upgrade --cask 2>&1 || true
-    brew cleanup -s 2>&1 || true
+    if (( PREFLIGHT_FAILED != 0 )); then
+      echo "    SKIPPED: broad formula/cask upgrades suppressed (preflight authority check failed)"
+    elif [[ -n "${DENY_ROSTER_BREW}" ]]; then
+      local deny_brew_csv
+      deny_brew_csv="$(paste -sd, - <<<"${DENY_ROSTER_BREW}")"
+      echo "    SKIPPED: broad formula/cask upgrades suppressed (authority drift/conflict/misalignment detected for Homebrew assets: ${deny_brew_csv})"
+    else
+      brew update 2>&1 || true
+      brew upgrade --formula 2>&1 || true
+      brew upgrade --cask 2>&1 || true
+      brew cleanup -s 2>&1 || true
+    fi
   fi
 
   # 2. Bun Runtime & Globals
   echo ""
   echo ">>> [Stage 2/12] Bun Runtime & Globals"
   if command -v bun &>/dev/null; then
-    bun upgrade 2>&1 || true
+    if [[ "${MODE}" == "check" ]]; then
+      echo "    check mode: bun upgrade suppressed"
+    elif (( PREFLIGHT_FAILED != 0 )); then
+      echo "    SKIPPED: bun upgrade suppressed (preflight authority check failed)"
+    else
+      bun upgrade 2>&1 || true
+    fi
   fi
 
-  # 3. Global NPM Packages (Filtered to exclude local git packages like prime-agent)
+  # 3. Global NPM Packages (Filtered to exclude local git packages and authority-denied tools)
   echo ""
   echo ">>> [Stage 3/12] Global NPM Packages (Filtered)"
   if [[ "${MODE}" == "check" ]]; then
     npm outdated -g --prefix "${HOME}/.npm-global" 2>&1 || true
+  elif (( PREFLIGHT_FAILED != 0 )); then
+    echo "    SKIPPED: global npm package updates suppressed (preflight authority check failed)"
   else
-    # Parse outdated npm packages, strictly excluding private/git packages
-    OUTDATED_PKGS=$(npm outdated -g --parseable --prefix "${HOME}/.npm-global" 2>/dev/null | awk -F: '{print $4}' | grep -v '^prime-agent$' || true)
+    # Parse outdated npm packages, strictly excluding private/git packages, known native governed packages, and tools active outside ~/.npm-global
+    local npm_filter='^prime-agent$|^@anthropic-ai/claude-code$'
+    if [[ -n "${DENY_ROSTER_NPM}" ]]; then
+      while IFS= read -r denied_npm_tool; do
+        [[ -z "${denied_npm_tool}" ]] && continue
+        if [[ "${denied_npm_tool}" == "codex" ]]; then
+          npm_filter="${npm_filter}|^@openai/codex$"
+        elif [[ "${denied_npm_tool}" == "qodercli" ]]; then
+          npm_filter="${npm_filter}|^@qoder-ai/qodercli$"
+        else
+          npm_filter="${npm_filter}|^${denied_npm_tool}$"
+        fi
+      done <<<"${DENY_ROSTER_NPM}"
+    fi
+    local real_codex
+    real_codex="$(realpath "$(command -v codex)" 2>/dev/null || which codex 2>/dev/null || true)"
+    if [[ -n "${real_codex}" && "${real_codex}" != "${HOME}/.npm-global"* ]]; then
+      npm_filter="${npm_filter}|^@openai/codex$"
+    fi
+    OUTDATED_PKGS=$(npm outdated -g --parseable --prefix "${HOME}/.npm-global" 2>/dev/null | awk -F: '{print $4}' | grep -v -E "${npm_filter}" || true)
     if [[ -n "${OUTDATED_PKGS}" ]]; then
       echo "Updating eligible global npm packages: ${OUTDATED_PKGS}"
       # shellcheck disable=SC2086
@@ -369,6 +516,8 @@ run_pipeline() {
   if command -v uv &>/dev/null; then
     if [[ "${MODE}" == "check" ]]; then
       uv tool list 2>&1 || true
+    elif (( PREFLIGHT_FAILED != 0 )); then
+      echo "    SKIPPED: uv tool upgrades suppressed (preflight authority check failed)"
     else
       uv tool upgrade graphifyy 2>&1 || true
       uv tool upgrade tavily-cli 2>&1 || true
@@ -391,8 +540,10 @@ run_pipeline() {
       fi
     done <<<"${AGENT_CLI_COVERED}"
     echo "    (check mode: no agent CLI updates applied)"
+  elif (( PREFLIGHT_FAILED != 0 )); then
+    echo "    SKIPPED: agent CLI updates suppressed (preflight authority check failed)"
   else
-    agent_cli_coverage
+    agent_cli_coverage "${DENY_ROSTER}"
   fi
 
   # 6. Cross-Agent Skills Synchronization & Parity
@@ -447,6 +598,9 @@ run_pipeline() {
     elif grep -q "Status: EXCEEDED" <<<"${snap_out}"; then
       SNAPSHOT_STORE_EXCEEDED=1
     fi
+  else
+    SNAPSHOT_MEASURE_FAILED=1
+    echo "ERROR: reporter missing: ${STORE_DIR}/scripts/measure-snapshot-growth.py"
   fi
 
   # 9. Toolchain Inventory & Prefix Reconciliation
@@ -454,15 +608,26 @@ run_pipeline() {
   echo ">>> [Stage 9/12] Toolchain Inventory & Prefix Reconciliation"
   PREFIX_SPLIT_DETECTED=0
   INVENTORY_MEASURE_FAILED=0
+  AUTHORITY_DRIFT_DETECTED=0
   if [[ -f "${STORE_DIR}/scripts/inventory-workstation-toolchain.py" ]]; then
     local inv_out inv_rc=0
     inv_out="$(run_with_timeout 60 python3 "${STORE_DIR}/scripts/inventory-workstation-toolchain.py" 2>&1)" || inv_rc=$?
     echo "${inv_out}"
-    if (( inv_rc != 0 )); then
+    local has_inv_header=0
+    grep -q "=== Workstation Prefix Reconciliation ===" <<<"${inv_out}" && has_inv_header=1
+    if (( inv_rc != 0 )) || (( has_inv_header == 0 )); then
       INVENTORY_MEASURE_FAILED=1
-    elif grep -q "Status:                      SPLIT_DETECTED" <<<"${inv_out}"; then
-      PREFIX_SPLIT_DETECTED=1
+    else
+      if grep -q "Status:                      SPLIT_DETECTED" <<<"${inv_out}"; then
+        PREFIX_SPLIT_DETECTED=1
+      fi
+      if grep -q "Status:                      DRIFT_DETECTED" <<<"${inv_out}"; then
+        AUTHORITY_DRIFT_DETECTED=1
+      fi
     fi
+  else
+    INVENTORY_MEASURE_FAILED=1
+    echo "ERROR: reporter missing: ${STORE_DIR}/scripts/inventory-workstation-toolchain.py"
   fi
 
   # 10. Agent CLI Coverage Reconciliation
@@ -474,9 +639,25 @@ run_pipeline() {
     local rec_out rec_rc=0
     rec_out="$(run_with_timeout 60 python3 "${STORE_DIR}/scripts/reconcile-agent-cli-coverage.py" 2>&1)" || rec_rc=$?
     echo "${rec_out}"
-    if (( rec_rc != 0 )); then
+    local has_header=0
+    grep -q "=== Workstation Agent CLI Coverage Reconciliation ===" <<<"${rec_out}" && has_header=1
+
+    if (( rec_rc == 0 )) && (( has_header == 1 )); then
+      AGENT_UNDECLARED_COUNT=0
+    elif (( rec_rc == 1 )) && (( has_header == 1 )) && ! grep -qi "Traceback" <<<"${rec_out}"; then
+      local parsed_count
+      parsed_count="$(sed -n 's/.*Undeclared Count:[[:space:]]*\([0-9][0-9]*\).*/\1/p' <<<"${rec_out}" | head -1)"
+      if [[ -n "${parsed_count}" ]] && (( parsed_count > 0 )); then
+        AGENT_UNDECLARED_COUNT="${parsed_count}"
+      else
+        AGENT_COVERAGE_MEASURE_FAILED=1
+      fi
+    else
       AGENT_COVERAGE_MEASURE_FAILED=1
     fi
+  else
+    AGENT_COVERAGE_MEASURE_FAILED=1
+    echo "ERROR: reporter missing: ${STORE_DIR}/scripts/reconcile-agent-cli-coverage.py"
   fi
 
   # 11. Upstream skill-content refresh (runs AFTER parity, BEFORE validation)
@@ -532,6 +713,9 @@ run_pipeline() {
   if (( AGENT_UNDECLARED_COUNT != 0 )); then
     echo "DEGRADED: undeclared agent CLI installations detected."
   fi
+  if (( AUTHORITY_DRIFT_DETECTED != 0 )); then
+    echo "DEGRADED: version-authority drift or target-misalignment detected."
+  fi
   if (( SNAPSHOT_MEASURE_FAILED != 0 )); then
     echo "DEGRADED: snapshot-store measurement could not be produced (reporter failed); store state is unknown, not clear."
   fi
@@ -540,6 +724,9 @@ run_pipeline() {
   fi
   if (( AGENT_COVERAGE_MEASURE_FAILED != 0 )); then
     echo "DEGRADED: agent-CLI coverage measurement could not be produced (reporter failed); coverage state is unknown, not clear."
+  fi
+  if (( PREFLIGHT_FAILED != 0 )); then
+    echo "DEGRADED: pre-flight authority check failed; mutating stages were suppressed."
   fi
   if [[ "${SYNC_FAILED}" -ne 0 ]]; then
     echo "$(date '+%Y-%m-%d %H:%M:%S %Z') — FAILED [MODE=${MODE}]: unresolved skill links remain"

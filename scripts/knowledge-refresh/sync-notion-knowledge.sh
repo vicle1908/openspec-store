@@ -348,6 +348,7 @@ sync_entities() {
     "wiki/entities/notion-cli.md"
     "wiki/entities/shb.md"
     "wiki/entities/omniroute.md"
+    "wiki/entities/pi.md"
   )
   for file in "${files[@]}"; do
     sync_document "$file" "entities"
