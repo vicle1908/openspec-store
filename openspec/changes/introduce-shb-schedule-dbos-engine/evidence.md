@@ -1,7 +1,7 @@
 # Evidence: introduce-shb-schedule-dbos-engine
 
 **Date:** 2026-10-05  
-**Target Repository:** `/Users/androidteam/Developer/shb/shb-schedule` (Git commit: `5b9342b`)  
+**Target Repository:** `/Users/androidteam/Developer/shb/shb-schedule` (Git commit: `63df9aa`)  
 **Status:** Completed & 100% Verified  
 
 ---
@@ -15,7 +15,7 @@
 
 ## 2. Unit and Integration Test Suite
 Command: `uv run pytest -v`  
-Output: **19 passed, 1 warning in 20.90s**
+Output: **22 passed, 1 warning in 23.42s**
 - `tests/test_cli.py`:
   - `test_cli_help`: PASSED
   - `test_cli_validate_and_list`: PASSED
@@ -41,9 +41,10 @@ Output: **19 passed, 1 warning in 20.90s**
   - `test_duplicate_daemon_lock_conflict`: PASSED
 - `tests/test_reconciliation.py`:
   - `test_reconciliation_add_update_retire`: PASSED
+  - `test_reconciliation_with_dbos_runtime`: PASSED
+  - `test_reconciliation_detects_non_cron_attribute_changes`: PASSED
 - `tests/test_server.py`:
   - `test_health_server_lifespan_and_endpoints`: PASSED
-
 ---
 
 ## 3. Code Hygiene & Type Safety
