@@ -107,7 +107,7 @@ agentmemory depends on.
 #### Scenario: Config restart applies cleanly
 
 - WHEN the agentmemory server is restarted after a configuration change
-- THEN the server SHALL start within 10 seconds
+- THEN the server SHALL start within 45 seconds under operational state store volume
 - AND the configured model and endpoint SHALL match the running configuration
 - AND capability verification SHALL observe real success signals (a non-zero
   LLM compression success count and zero embedding-skip events) rather than

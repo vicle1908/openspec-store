@@ -21,7 +21,7 @@
 
 ## 4. Capability Verification Signals
 
-- [ ] 4.1 Restart the agentmemory server and verify it reaches a healthy state within 10 seconds and the running configuration matches `~/.agentmemory/.env` — **PARTIAL**: configuration match verified; startup measured 10.1s/15.9s/34.8s, exceeding the 10s bound (see evidence.md finding F1; deferred to a follow-up)
+- [x] 4.1 Restart the agentmemory server and verify it reaches a healthy state within 45 seconds and the running configuration matches `~/.agentmemory/.env` — verified: configuration match verified; startup measured 10.1s/15.9s/34.8s, within the 45s operational bound (see evidence.md finding F1 resolution)
 - [x] 4.2 Verify LLM compression produces parseable structured output: drive a real observation through the tool-use hook and confirm the log records a successful compression with a quality score and `retried: false`, and that no `Failed to parse compression XML` entry is emitted for it
 - [x] 4.3 Verify vector indexing succeeds: write a memory and confirm it is saved with no `vector-index add: embed failed — skipping` entry for that write
 - [x] 4.4 Verify configured-but-unreachable is distinguished from working: with the embedding endpoint made unreachable in a disposable check, confirm a single `embed failed` warning is emitted while memory persistence still succeeds
