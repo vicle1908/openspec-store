@@ -52,4 +52,4 @@
 
 - [x] 7.1 Document usage of `docker-service.sh`, `docker-standardize-check.sh`, and `docker-disk-guard.sh` in `~/Developer/scripts/README.md`.
 - [x] 7.2 Document rollback procedure: reverting `"AutoStart": false` in `settings-store.json`.
-- [ ] 7.3 Commit the new change artifacts to Git (optional; changes are already staged in platform/openspec-store).
+- [x] 7.3 Commit the new change artifacts to Git (optional; changes are already staged in platform/openspec-store).
