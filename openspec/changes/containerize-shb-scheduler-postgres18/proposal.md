@@ -2,22 +2,23 @@
 
 ## Why
 
-The SHB `shb-schedule` daemon currently relies on host-specific process managers (`launchd` on macOS, manual systemd on Linux) and a local SQLite WAL database, creating platform fragmentation, concurrency limits, and operational uncertainty for team servers, CI, and cloud deployments. Standardizing on a containerized architecture using DBOS Transact, Docker Compose, and PostgreSQL 18.6 provides uniform scheduling across all environments while preserving existing CLI workflows for development.
+The SHB `shb-schedule` daemon currently relies on host-specific process managers (`launchd` on macOS, manual systemd on Linux) and a local SQLite WAL database, creating platform fragmentation, concurrency limits, and operational uncertainty for team servers, CI, and cloud deployments. Standardizing on a containerized architecture using DBOS Transact, Docker Compose, and PostgreSQL 18.6 (`postgres:18.6-alpine`) provides uniform scheduling across all environments while preserving existing CLI workflows for development.
 
 ## What Changes
 
-- **New Capability**: `specs/shb-schedule-engine/spec.md` (delta to existing capability) — adds Docker Compose orchestration for the scheduler with PostgreSQL 18.6 backend, eliminating host-dependent service installers.
+- **New Capability**: `specs/shb-schedule-engine/spec.md` (delta to existing capability) — adds Docker Compose orchestration for the scheduler with PostgreSQL 18.6-alpine backend, eliminating host-dependent service installers.
 - **Modified Capability**: `shb-agent-skills/skills/scheduler-skill/SKILL.md` — update documentation to reference containerized deployment patterns (`docker compose up`, `docker compose exec`, health checks).
-- **Deprecated Artifact**: `src/shb_schedule/service/launchd.py` — removed from implementation; replaced by `compose.yaml` + `compose.override.yaml`.
+- **Removed Artifact**: `src/shb_schedule/service/launchd.py` — removed from implementation; replaced by `compose.yaml` + `compose.override.yaml`.
 - **New Artifacts**:
-  - `shb-schedule/Dockerfile` (multi-stage build, Python 3.14 slim, uv lock sync, no host binaries).
-  - `shb-schedule/compose.yaml` (base production profile: postgres 18.6-alpine, shb-scheduler image, volume isolation).
-  - `shb-schedule/compose.override.yaml` (local dev: port mapping, optional workspace bind-mount).
+  - `shb-schedule/Dockerfile` (multi-stage build, `python:3.14-slim` base, `ghcr.io/astral-sh/uv:0.12.23` pinned, `uv sync --frozen --no-dev --no-editable`, entrypoint `shb-schedule serve --host 0.0.0.0 --port 9110`).
+  - `shb-schedule/Dockerfile.dockerignore` (positioned for `context: ..`, excluding `.venv/`, `.gitnexus/`, `graphify-out/`, `__pycache__/`, `.git/`).
+  - `shb-schedule/compose.yaml` (base production profile: `postgres:18.6-alpine` with explicit `pg_isready` healthcheck, `shb-scheduler` image, named volume `shb-scheduler-pgdata`).
+  - `shb-schedule/compose.override.yaml` (local dev: host port `127.0.0.1:9110:9110`, optional workspace bind-mount).
   - `~/.shb/schedules/*.yaml` manifests are mounted read-only; no source code repositories are mounted in base production mode.
 
 **Non-Breaking**: The CLI commands (`shb-schedule validate`, `list`, `run-now`, `reload`) remain available via `docker compose exec`. Local SQLite mode remains opt-in via environment variable overrides (`SHB_SCHEDULER_BACKEND=sqlite`).
 
-**Breaking**: Deprecation of `shb-schedule service install` as a host-launcher; users must adopt container management or use explicit environment overrides.
+**Breaking**: Removal of `shb-schedule service install` as a host-launcher command; users manage the scheduler lifecycle through Docker Compose or explicit environment overrides.
 
 ## Capabilities
 
@@ -44,7 +45,7 @@ The SHB `shb-schedule` daemon currently relies on host-specific process managers
 ## Impact
 
 - **Operational Simplicity**: One command (`docker compose up`) brings up scheduler with PostgreSQL, health probes, and logs. No host dependencies beyond Docker daemon.
-- **Concurrent Execution**: PostgreSQL row-level locking enables multiple worker processes without deadlocks.
+- **Concurrent Execution**: PostgreSQL MVCC row-level locking (`SKIP LOCKED`) enables concurrent queue workers and on-demand CLI triggers (`run-now`) without SQLite lock contention, while daemon leader election remains single-owner via `fcntl.flock`.
 - **Platform Independence**: Identical behavior on macOS (Docker Desktop), Linux (systemd + dockerd), CI runners, and cloud VMs.
 - **Audit Readiness**: All execution history persisted to Postgres, queryable via SQL or via OpenSpec store audit tools.
 
