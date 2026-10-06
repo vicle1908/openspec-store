@@ -2,35 +2,44 @@
 
 ## Why
 
-Discrete decision-making in multi-agent workflows currently incurs excessive latency and cost by forcing full autoregressive LLM generations or relying on brittle regex patterns for split-second choices.
+Discrete decision-making in multi-agent workflows currently incurs excessive latency and cost by forcing full autoregressive LLM generations, or relies on brittle regex patterns for split-second choices. In `agent-core`, tool authorization guards, LangGraph conditional branching, skill dispatch, and evaluation scoring repeatedly either pay seconds of token generation overhead or fall back to rigid pattern matching that misses obfuscated commands.
 
-In `agent-core`, tool authorization guards, LangGraph conditional branching, skill dispatch, and evaluation scoring repeatedly either pay 1.5–5 seconds of token generation overhead or fall back to rigid regex pattern matching that misses obfuscated commands. TypeSafe AI's Jev introduces a specialized "System One" decision model that evaluates typed probabilistic questions (`bool`, `choice`, `score`) in sub-200ms with calibrated confidence and zero output token cost. Adopting Jev equips `agent-core` with high-speed semantic pre-flight guardrails, deterministic graph routing, candidate skill refinement, and fast evaluation judges while maintaining full decoupling from streaming chat protocols.
+TypeSafe's Jev is a System One model: it evaluates typed questions against a state and returns typed values and calibrated probabilities that code can branch on directly — no text generation, no parsing, no output-token cost. Adopting it equips `agent-core` with fast semantic pre-flight guardrails, deterministic graph routing, candidate skill reranking, and fast evaluation judges, while staying fully decoupled from streaming chat protocols.
 
 ## What Changes
 
-- **Add Jev System One Client & Settings to `agent-core`**: Implement `JevSettings` (`JEV_` prefix) in `agent_core.foundation.settings` and provide a dedicated `JevDecisionClient` for evaluating typed probabilistic questions (`bool`, `choice`, `score`) with timeout, circuit breaking, and mock capabilities.
-- **Semantic Pre-Flight Tool Guardrail (`JevToolGuardrail`)**: Introduce a high-speed pre-flight authorization guard in `agent_core.tool_registry.guardrails` that intercepts potentially destructive shell/write tool calls before execution or human approval deferral, catching obfuscated commands that bypass regex without LLM generation latency.
-- **Probabilistic LangGraph Routing Nodes**: Enhance `WorkflowEngine` in `agent_core.orchestration.graph` with a `JevConditionalRouter` that evaluates state dictionaries against defined choice targets in ~80ms instead of requiring heavy LLM routing steps or brittle key-presence flags.
-- **Two-Stage Skill Matcher Refinement**: Update `SkillMatcher` in `agent_core.skill_system.matcher` with an optional Jev reranking stage (`a_match_jev()`) that selects the best matching skill candidate from vector retrieval top-K results.
-- **Fast Evaluation Scorers (`JevEvaluator`)**: Provide non-generative evaluators compatible with `pydantic-evals` and `agent_core.observability.scorers.runner` to score correctness, relevance, and severity across traces without LLM-as-a-judge token costs.
-- **Fail-Closed Fallback & Protocol Decoupling**: Isolate Jev as a dedicated System One decision provider without mutating `tdt-core`'s strict generative `ProviderProtocol` enum, ensuring fallback to default rule-based gates when `TYPESAFE_API_KEY` is absent or unreachable.
+- **Add a System One decision client to `agent-core`** using the official `typesafe-sdk` (`TypeSafeClient` / `AsyncTypeSafeClient` and its `system_one` method), with a typed `JevSettings` (`JEV_` prefix) in `agent_core.foundation.settings` and credential handling aligned to the SDK's `TYPESAFE_API_KEY`.
+- **Model the three real primitives.** TypeSafe exposes `Noul` (yes/no probability), `Choice`, and `Score`. There is no boolean primitive; a yes/no judgment is a `Noul`, whose single probability carries both answer and certainty.
+- **Semantic pre-flight tool guardrail** in `agent_core.tool_registry.guardrails`: one atomic `Noul` per destructive condition, combined by code with code-controlled weights, gated by a confidence threshold scaled to the invocation's risk class. It catches obfuscated commands that bypass regex, without generation latency, and never bypasses human approval.
+- **Confidence-gated graph routing** in `agent_core.orchestration.graph`: a `Choice`-based router that treats confidence as a second decision axis, so a low-confidence answer escalates rather than silently selecting the highest-probability branch.
+- **Per-candidate skill reranking** in `agent_core.skill_system.matcher`: one `Noul` per query-candidate pair, ordered by the returned probability, replacing the design's single-choice comparison across candidates.
+- **Non-generative evaluation scorers**: `JevEvaluator` scoring independent rubric dimensions and composing them in code, compatible with `agent_core.observability.scorers.runner`.
+- **One reviewable decision module** holding every question, criterion, weight, and threshold, so judgments can be reviewed and retuned without editing the logic that consumes them.
+- **Fail-closed degradation**: when the credential is absent or the service is unreachable, security-critical checks fail closed to the existing authority checks and blocklists, while skills and evaluations fall back to lexical/vector logic.
+- **BREAKING**: none. Jev is additive and optional; every existing generative path is preserved.
+
+### Non-Goals
+
+- Modifying `tdt-core.provider_model_profile.ProviderProtocol`, which remains dedicated to streaming generative backends. Jev emits no tokens.
+- Replacing human-in-the-loop approval (`ApprovalMode.AUTHENTICATED_SUBJECT`). Jev is an early risk classifier, never an approval bypass.
+- Generating free-form text or explainability prose.
+- Validating live decision quality. This change delivers the integration and its fail-closed behavior; thresholds require calibration against real traffic, which is explicitly deferred.
 
 ## Capabilities
 
 ### New Capabilities
-- `jev-decision-runtime`: Fast System One decision evaluation, pre-flight tool guardrails, LangGraph routing, candidate skill refinement, and evaluation scorers for agent-core.
+
+- `jev-decision-runtime`: Owns the System One decision client, its settings and credential handling, the pre-flight tool guardrail, confidence-gated graph routing, per-candidate skill reranking, the non-generative evaluation scorer, the centralized question/threshold definitions, and decision observability.
 
 ### Modified Capabilities
-- None. (Existing `agent-core` authority policies and `WorkflowEngine` public interfaces remain backward-compatible).
 
-## Non-Goals
-
-- **Replacing Generative Models ("System Two")**: Jev cannot generate conversational prose, write code diffs, or synthesize plans. Main reasoning agents will continue using Claude, GPT, or Gemini.
-- **Mutating `tdt-core` ProviderProtocol**: Jev does not implement `messages`, `openai_chat`, or `responses` streaming wire protocols; it is decoupled from generative model route chains.
-- **Bypassing Human Approval**: Jev serves as an early filter and risk-scorer, never as an escalation bypass for operations requiring authenticated subject approval.
+None. The affected `agent-core` subsystems gain an optional decision path behind a disabled-by-default setting; no existing requirement's behavior changes for callers that do not enable it.
 
 ## Impact
 
-- **Affected Ownership Boundaries**:
-  - `agent-core`: Runtime settings (`foundation/settings.py`), dependency additions (`pydantic-ai-slim[typesafe]` or `typesafe-sdk`), tool registry guardrails (`tool_registry/guardrails.py`), orchestration routers (`orchestration/graph.py`), skill matching (`skill_system/matcher.py`), and evaluation scorers (`observability/scorers/jev_scorer.py`).
-  - `openspec-store`: Change specs, designs, and task tracking under `agent-core-integrate-jev-system-one`.
+- **Target repository**: `~/Developer/tdt/agent-core` (`agent_core` package). Source tree is clean; the only working-tree changes are generated `graphify-out/*` artifacts.
+- **New dependency**: `typesafe-sdk` (0.7.2, verified resolvable via `uv`). Optional; the runtime must operate with the package absent or the feature disabled.
+- **Files**: `agent_core/foundation/jev.py` and settings additions; `agent_core/tool_registry/guardrails.py`; `agent_core/orchestration/graph.py`; `agent_core/skill_system/matcher.py`; `agent_core/observability/scorers/jev_scorer.py`; a centralized decision-questions module; tracing additions; tests.
+- **Credentials**: requires `TYPESAFE_API_KEY`. **Not present on this machine**, so live-path verification is deferred to the operator. Mock and fail-closed paths are fully verifiable now.
+- **Regression risk**: measured against the existing suite — 916 tests, 0 failures, 0 errors, 11 skipped (recorded baseline).
+- **Operational**: TypeSafe enforces a 64k-token request budget, a 32k budget for state plus the longest question, and rate limits that the SDK retries with backoff. Debug-level SDK logging emits request and response bodies, so state SHALL NOT carry secrets.

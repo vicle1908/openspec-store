@@ -1,31 +1,62 @@
 # Tasks
 
-## 1. Core Jev Decision Client & Settings
+## 1. Dependency and settings foundation
 
-- [ ] 1.1 Add optional `typesafe` dependency support to `agent-core/pyproject.toml` (`typesafe-sdk` or `pydantic-ai-slim[typesafe]`). Verification: run `uv sync` and verify successful dependency resolution.
-- [ ] 1.2 Implement `JevSettings` in `agent_core/foundation/settings.py` with `JEV_` environment variable prefix and secret isolation. Verification: unit tests in `tests/test_settings.py` checking defaults and environment variable overrides.
-- [ ] 1.3 Implement `JevDecisionClient` in `agent_core/foundation/jev.py` handling `bool`, `choice`, and `score` questions with timeout (500ms), circuit breaking, and mock capabilities for hermetic unit testing. Verification: unit tests in `tests/test_jev_client.py` covering success and timeout fallback.
+- [ ] 1.1 Add the optional `typesafe-sdk` dependency to `agent-core/pyproject.toml` and verify `uv sync` resolves it; confirm the package imports while the feature remains disabled and absent from any required runtime path
+- [ ] 1.2 Implement `JevSettings` in `agent_core/foundation/settings.py` with the `JEV_` prefix covering `enabled` (default false), a pinned model identifier, request timeout, retry counts, and `fail_closed`; verify with unit tests asserting the defaults and the `JEV_` environment overrides
+- [ ] 1.3 Verify the loaded settings strip any `typesafe_api_key` found in layered YAML, emit a warning, and leave `TYPESAFE_API_KEY` as the sole credential source; verify with a unit test that no secret reaches the settings object
 
-## 2. Pre-Flight Tool Guardrail Integration
+## 2. System One decision client
 
-- [ ] 2.1 Implement `JevToolGuardrail` in `agent_core/tool_registry/guardrails.py` wrapping sensitive tools (e.g. `ShellTool`, file mutators) to evaluate `is_destructive` and risk levels before execution, enforcing that high-authority tools still progress to mandatory approval checks. Verification: unit tests verifying dangerous command interception vs benign command authority progression.
-- [ ] 2.2 Wire `JevToolGuardrail` into `AgentRuntime` tool execution path in `agent_core/_ai/tools.py` with fail-closed fallback to standard authority checks when the service is unreachable. Verification: test fail-closed behavior when `TYPESAFE_API_KEY` is unset or times out.
+- [ ] 2.1 Implement `JevDecisionClient` in `agent_core/foundation/jev.py` wrapping `TypeSafeClient`/`AsyncTypeSafeClient` and `system_one`, accepting a `state` and a question map of `Noul`/`Choice`/`Score`, and returning typed answers keyed by question id; verify with unit tests asserting a `Noul` answer exposes a 0-to-1 probability and a `Choice`/`Score` answer exposes both its value and its confidence
+- [ ] 2.2 Verify the client sends multiple questions for one state in a single `system_one` request, with a test asserting one transport call per evaluation rather than one per question
+- [ ] 2.3 Capture and surface the response's answering `model` identifier and `request_id` on every result; verify with a test asserting both are recorded and that the answering model is not assumed to equal the requested alias
+- [ ] 2.4 Implement the failure paths and verify each with a test: a missing credential raises an explicit configuration error without hanging; an invalid credential surfaces as a construction-time configuration error rather than a per-call failure; a timeout or rate-limit response fails according to the retry policy and does not retry unbounded
+- [ ] 2.5 Implement a mock transport exercising the full client surface and verify the success, timeout, missing-credential, and invalid-credential paths pass without network access, so the suite is hermetic while no credential exists
 
-## 3. Workflow Engine LangGraph Decision Routing
+## 3. Centralized decision definitions
 
-- [ ] 3.1 Implement `JevConditionalRouter` in `agent_core/orchestration/graph.py` translating state attributes into discrete target edge selections with fallback to default edges on unrecognized outputs. Verification: test state routing across multiple targets in a test LangGraph workflow.
-- [ ] 3.2 Update `WorkflowEngine._wire_edges` to support direct `JevConditionalRouter` specifications alongside existing static `EdgeCondition` rules. Verification: integration test running an end-to-end graph transition.
+- [ ] 3.1 Create a single decisions module holding every question, criterion, weight, and confidence threshold used by the guardrail, router, reranker, and evaluator, and verify by inspection that no consumer embeds a question string or threshold of its own
+- [ ] 3.2 Verify each judgment is atomic: one question per condition, with compound judgments decomposed; verify with a test asserting the guardrail's condition set contains one question per destructive condition and no compound question
+- [ ] 3.3 Verify a weight or threshold change is made in the decisions module alone, with a test that alters a threshold constant and observes the composed outcome change without editing consuming logic
 
-## 4. Skill Matcher Second-Stage Reranking
+## 4. Pre-flight tool guardrail
 
-- [ ] 4.1 Extend `SkillMatcher` in `agent_core/skill_system/matcher.py` with an optional `a_match_jev()` method to disambiguate top-K retrieved candidates using Jev's `choice` question, falling back to initial ranks on error. Verification: unit tests verifying candidate reranking when lexical/semantic scores are closely tied.
+- [ ] 4.1 Implement `JevToolGuardrail` in `agent_core/tool_registry/guardrails.py` evaluating one `Noul` per destructive condition and combining the probabilities with the code-controlled weights from the decisions module; verify with unit tests covering a destructive invocation and a benign one
+- [ ] 4.2 Implement risk-scaled gating with three outcomes — proceed, block or require approval, and escalate to human review — where the threshold derives from the invocation's `AuthorityClass`; verify with tests at each outcome for a low-risk and a high-risk class
+- [ ] 4.3 Verify that a genuinely uncertain judgment escalates rather than resolving either way, with a test placing a condition near its decision boundary and asserting human review
+- [ ] 4.4 Verify a high-authority tool never bypasses human approval: a benign evaluation advances to the standard authority check and never past `ApprovalMode.AUTHENTICATED_SUBJECT`; verify with a test asserting the approval requirement still applies
+- [ ] 4.5 Wire the guardrail into the `AgentRuntime` tool execution path in `agent_core/_ai/tools.py` ahead of subprocess spawning, disabled by default; verify with a test that the guard does not run when the setting is disabled
+- [ ] 4.6 Verify fail-closed behavior: with the credential unset, with a simulated timeout, and with a simulated service error, a high-authority invocation falls through to the standard authority approval and existing blocklists and is never permitted to execute unreviewed
+- [ ] 4.7 Implement a circuit breaker so a failing service stops being called for a bounded interval, and verify it opens after consecutive failures and does not add unbounded latency to the tool path
 
-## 5. Non-Generative Evaluation Scorers
+## 5. Confidence-gated graph routing
 
-- [ ] 5.1 Implement `JevEvaluator` in `agent_core/observability/scorers/jev_scorer.py` conforming to `pydantic-evals.evaluators.Evaluator` interface. Verification: unit tests verifying rubric evaluation against sample outputs.
-- [ ] 5.2 Integrate `JevEvaluator` with `agent_core/observability/scorers/runner.py` and benchmark on `agent_core/evaluation/datasets/jira_triage.py`. Verification: run evaluation runner and confirm score extraction without LLM generation tokens.
+- [ ] 5.1 Implement a `Choice`-based conditional router in `agent_core/orchestration/graph.py` selecting among the criteria's target nodes from the active state; verify with a test routing a state dictionary across multiple targets in a test LangGraph workflow
+- [ ] 5.2 Verify low-confidence routing does not silently select the highest-probability branch, with a test asserting a below-threshold answer routes to the configured review or fallback edge
+- [ ] 5.3 Verify an unrecognized target returns the configured default edge without raising, and that a network error or timeout routes to the error edge descriptor (`EdgeCondition.ON_FAILURE`); verify with a test for each path
+- [ ] 5.4 Update `WorkflowEngine._wire_edges` to accept the decision router alongside existing static `EdgeCondition` rules, and verify with an end-to-end graph transition test
 
-## 6. End-to-End Verification & Observability
+## 6. Per-candidate skill reranking
 
-- [ ] 6.1 Add OpenTelemetry tracing and span attributes for Jev decision queries (latency, question type, confidence scores) in `agent_core/foundation/tracing.py`. Verification: check OTel spans emitted during a guarded agent step.
-- [ ] 6.2 Run full `pytest` regression suite across `agent-core` to ensure zero breaking changes in standard generative agent paths. Verification: run `uv run pytest tests/` with all existing tests passing.
+- [ ] 6.1 Extend `SkillMatcher` in `agent_core/skill_system/matcher.py` with an optional `a_match_jev()` that asks one `Noul` per query-candidate pair keyed by a code-generated question id and orders candidates by the returned probability; verify with a unit test asserting the ordering changes when lexical and semantic scores are closely tied
+- [ ] 6.2 Verify reranking only reorders the retrieved shortlist and never introduces a candidate first-stage retrieval did not return, with a test asserting the output set is a subset of the input set
+- [ ] 6.3 Verify a reranking timeout or service error falls back to the initial blended ranking order, with a test asserting the ordering is unchanged on failure
+
+## 7. Non-generative evaluation scorer
+
+- [ ] 7.1 Implement `JevEvaluator` in `agent_core/observability/scorers/jev_scorer.py` conforming to the `pydantic_evals` evaluator interface, scoring each rubric dimension independently with `Score` or `Noul` and composing the dimensions in code; verify with unit tests scoring sample outputs and asserting the per-dimension answers remain inspectable
+- [ ] 7.2 Integrate `JevEvaluator` with `agent_core/observability/scorers/runner.py` and exercise it against `agent_core/evaluation/datasets/jira_triage.py`; verify the runner completes and extracts scores without invoking generative completion
+- [ ] 7.3 Verify an evaluation error records a failed assertion with an error indicator and allows the remaining dataset run to complete, with a test injecting a service failure mid-run
+
+## 8. Observability
+
+- [ ] 8.1 Add OpenTelemetry spans for Jev decisions in `agent_core/foundation/tracing.py` carrying the answering model identifier, the question ids, the returned probabilities or confidences, and the observed latency; verify with a test asserting the span and its attributes are emitted for a guarded step
+- [ ] 8.2 Verify no state body containing credentials or secrets is emitted at any log level, with a test asserting the SDK logger is not configured at debug in the runtime path and that a secret-bearing state never appears in captured log output
+
+## 9. Integration verification
+
+- [ ] 9.1 Run the full `agent-core` suite and compare against the recorded baseline of 916 passed with 0 failures, 0 errors, and 11 skipped; verify the delta introduces no new failure and fix any regression rather than accepting it
+- [ ] 9.2 Verify the feature is inert when disabled: with `JEV_ENABLED` unset, existing generative agent paths behave identically to the pre-change baseline, confirmed by the suite and by the guard not running
+- [ ] 9.3 Verify the runtime operates with `typesafe-sdk` absent from the environment, so the dependency remains genuinely optional
+- [ ] 9.4 Record the deferred live-path verification explicitly: the mock and fail-closed paths are verified now, and live decision quality, threshold calibration, and per-`AuthorityClass` threshold values remain open pending a `TYPESAFE_API_KEY`

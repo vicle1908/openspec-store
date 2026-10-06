@@ -1,0 +1,28 @@
+schema: review-scope/v1
+change: agent-core-integrate-jev-system-one
+risk:
+  tier: standard
+  fresh_context: false
+lenses:
+  - id: spec-compliance
+    provider: hermes
+    edges: [spec-to-code, spec-to-docs, spec-to-tests, knowledge-to-code]
+  - id: security
+    provider: claude
+    edges: [all]
+  - id: quality-tests
+    provider: codex
+    edges: [spec-to-tests, code-to-tests, code-to-docs]
+  - id: architecture
+    provider: agy
+    edges: [code-to-skills, docs-to-skills]
+  - id: product-scope
+    provider: kimi
+    edges: [skills-to-specs, scope-check]
+  - id: failure-modes
+    provider: opencode
+    edges: [internal-consistency, failure-modes]
+boundaries:
+  typesafe_sdk: ["Noul", "Choice", "Score"]
+  latency_envelope: "<200ms"
+  fallback: "fail-closed"

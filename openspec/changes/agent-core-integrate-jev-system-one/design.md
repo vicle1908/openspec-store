@@ -1,98 +1,116 @@
-# Design: Jev System One Decision Architecture
+# Design: Jev Decision Runtime
 
 ## Context
 
-`agent-core` hosts the shared agent runtime across the TDT ecosystem. Currently, discrete decisions (such as tool pre-flight risk checks, edge routing in LangGraph workflows, skill candidate matching, and evaluation scoring) either rely on static regex pattern matching (`_DANGEROUS_PATTERNS` in `ShellTool`) or full generative LLM execution (`pydantic-ai` models). Full generative calls add 1.5–5 seconds of latency and token generation costs, while regex patterns are brittle against command obfuscation or variable semantics.
+See `proposal.md` — Why.
+
+The design is written against the **current** TypeSafe API, verified during implementation planning:
+
+- Primitives are `Noul` (yes/no probability), `Choice`, and `Score`. There is no boolean primitive; a yes/no judgment is a `Noul`, and a `Noul` answer carries no separate `confidence` because its single probability already expresses both answer and certainty.
+- The official SDK is `typesafe-sdk` (0.7.2): `TypeSafeClient` / `AsyncTypeSafeClient` with `client.system_one(state, questions, ...)`. Answers are read through typed accessors (`response.nouls`, `.choices`, `.scores`), the `answers` map, or a `response_model`.
+- `Choice` and `Score` answers carry `probabilities` and a derived `confidence` on a 0-to-1 scale; the response also reports the versioned `model` that answered and a `request_id`.
+- Every question in a request sees the same `state` and is evaluated in parallel and in isolation. Asking several questions in one request barely changes latency — the documented fan-out benchmark is 13 batched questions at roughly 11.5x lower cost and 9.6x lower latency than 13 separate calls.
+- Request budget is 64k tokens (state plus all questions), or 32k for state plus the longest question. Text only; English is the strongest language.
+- Model `jev-1.13.0` is current, behind the aliases `jev-latest` and `jev-preview`. An alias moves between releases, so the response's versioned `model` field must be recorded.
+- The credential is `TYPESAFE_API_KEY`. An invalid key raises during client construction, before any request or retry.
+- An official agent skill ships current guidance (`typesafe-ai/skills`); it has been installed into the workspace so this design can be checked against live docs rather than recalled.
+
+**Constraint:** no `TYPESAFE_API_KEY` exists on this machine yet. The full decision path is therefore designed and unit-tested against a mock transport, and the live path is explicitly deferred.
 
 ## Goals / Non-Goals
 
-**Goals:**
-- Provide a non-generative System One decision evaluation layer (`JevDecisionClient`) in `agent-core`.
-- Implement `JevSettings` (`JEV_` prefix) adhering to the foundation settings pattern with strict secret isolation.
-- Implement `JevToolGuardrail` for sub-200ms semantic safety evaluation prior to shell or filesystem operations.
-- Introduce `JevConditionalRouter` for deterministic, low-latency edge dispatch in `WorkflowEngine` graphs.
-- Implement `JevEvaluator` for `pydantic-evals` dataset evaluation to enable high-throughput test assertions without generative LLM overhead.
-- Provide clean degradation/fallback when `TYPESAFE_API_KEY` is not present, failing closed for security-critical checks and failing over to lexical/vector logic for skills and evaluations.
+### Goals
 
-**Non-Goals:**
-- Do not modify `tdt-core.provider_model_profile.ProviderProtocol` (which remains dedicated to streaming chat/responses generative backends).
-- Do not replace human-in-the-loop approval requirements (`ApprovalMode.AUTHENTICATED_SUBJECT`); Jev acts as an early risk classifier, never as a bypass for high-authority tools.
-- Do not generate free-form text or explainability paragraphs.
+- Give `agent-core` a sub-second, typed decision layer that returns values code can branch on, with no generated text and no output-token cost.
+- Make every security-relevant decision fail closed and escalate rather than guess.
+- Keep every question, weight, and threshold in one reviewable place.
 
-## Architecture & Data Flow
+### Non-Goals
 
-```
-                      +-----------------------------+
-                      |   Task / User Instruction   |
-                      +-----------------------------+
-                                     |
-                                     v
-                       +---------------------------+
-                       |    System 2 Agent Loop    |
-                       | (Claude 3.7 / GPT-5 / OMP)|
-                       +---------------------------+
-                                     |
-                       Proposes Tool Call / Transition
-                                     |
-                                     v
-                      +-------------------------------+
-                      | Jev System One Decision Model |
-                      |    (TypeSafe AI: 80-200ms)    |
-                      +-------------------------------+
-                        /        |          \         \
-                       /         |           \         \
-             [Tool Guard]  [Graph Route]  [Skill Pick] [Eval Scorer]
-                  |              |             |             |
-                  v              v             v             v
-           is_destructive?   next_node?    best_match?   correct?
-            (bool / score)    (choice)      (choice)      (score)
-                  |              |             |             |
-        +---------+---------+    |             |             v
-        |                   |    |             |        Record Metric
-     [True]              [False] v             v        in EvalRecord
-        |                   | Dispatch     Bind Skill   (Langfuse/
-        v                   v to Node       to Deps      MLflow)
- [Require Approval]   [Authority Policy
- [or Block Exec]       & Approval Check]
-                           |
-                    +------+------+
-                    |             |
-                [Approved]    [Denied]
-                    |             |
-                    v             v
-                [Execute]     [Halt / Error]
-```
+- Calibrating thresholds against real traffic. This design fixes the mechanism and the place thresholds live; picking their values requires data.
+- Streaming, free-form generation, or explainability prose.
+- Any change to generative provider routing.
 
 ## Decisions
 
-### D1: Decoupled Decision Client vs. Generative Model Provider
-- **Decision:** Implement Jev via a standalone `JevDecisionClient` (leveraging `TypeSafeClient` or direct HTTP post to `https://api.typesafe.ai/v1/systemone`) and optional `TypeSafeModel` from `pydantic-ai-slim[typesafe]`, rather than shoehorning Jev into `tdt-core`'s `ProviderProtocol`.
-- **Rationale:** `ProviderProtocol` strictly models token-streaming generative chat APIs (`messages`, `openai_chat`, `responses`). Jev does not speak SSE chat completions or emit tokens. Decoupling preserves `tdt-core` type invariants.
+### D1: Use the official SDK rather than direct HTTP
 
-### D2: Fail-Closed Security Policy in `JevToolGuardrail`
-- **Decision:** If `JevToolGuardrail` encounters a network error, timeout, or missing API key when evaluating high-authority tools (such as shell commands or unconstrained writes), it fails closed by falling back to `AuthorityClass` mandatory approval and regex blocking.
-- **Rationale:** Tool execution security must never degrade to open execution when an external classifier fails.
+The client wraps `typesafe-sdk` instead of posting to `/v1/systemone` directly. The SDK supplies typed questions and answers, retry-with-backoff honouring rate-limit signalling, and error objects carrying status and request id.
 
-### D3: LangGraph Edge Router Integration via EdgeDescriptor
-- **Decision:** Implement `JevConditionalRouter` as a routing handler integrated through `WorkflowEngine`'s edge compilation and routing metadata (`_build_route_map` and conditional edge wiring), rather than calling non-existent public graph methods.
-- **Rationale:** `WorkflowEngine` declares nodes and edges using `NodeDescriptor` and `EdgeDescriptor`. Adding decision-driven routing extends edge definitions cleanly while remaining fully compatible with LangGraph's underlying conditional edges.
+**Alternative considered:** direct HTTP. Rejected — it would reimplement retry, error mapping, and typing, and would drift from the published contract.
 
-### D4: Layered Configuration via JevSettings
-- **Decision:** Implement `JevSettings` as a subclass of `pydantic_settings.BaseSettings` with `SettingsConfigDict(env_prefix="JEV_")` registered in `agent_core.foundation.settings`.
-- **Rationale:** Follows `agent-core`'s standard pattern (`AgentSettings`, `MemorySettings`, `ToolsSettings`, `ObservabilitySettings`). API keys are never read from YAML, enforcing secret isolation.
+### D2: Model a yes/no judgment as a `Noul`, never a boolean
 
-### D5: Fast Non-Generative Evaluation Scorers
-- **Decision:** Implement `JevEvaluator` conforming to the `pydantic_evals.evaluators.Evaluator` interface, compatible with `run_evaluation()` in `agent_core.observability.scorers.runner`.
-- **Rationale:** Datasets like `jira_triage` (priority, category, team) and `code_review` (severity, bug detection) can be evaluated in parallel batches without spending tokens on frontier generative LLMs.
+There is no boolean primitive. A `Noul` returns a probability, which means the caller receives answer and certainty together and can choose its own threshold. A boolean-shaped wrapper around a `Noul` would discard exactly the information the guardrail needs.
 
-## Transaction Boundaries
+**Alternative considered:** coerce `Noul` to `bool` at the client boundary. Rejected — it forces a threshold inside the client, hiding a policy decision that belongs to the caller.
 
-- **Stateless Evaluator Boundary:** `JevDecisionClient` is strictly stateless. Each call to evaluate a state against questions does not initiate, join, or commit database transactions.
-- **Orchestration State Persistence:** In `agent_core.orchestration.graph`, routing decisions returned by `JevConditionalRouter` are pure functions of the node's returned state dictionary. Checkpointing and durable state commits occur only within the configured LangGraph checkpointer (e.g., PostgreSQL or SQLite checkpointers in `pydantic_ai_harness.step_persistence` / `langgraph-checkpoint-postgres`) before and after node execution.
-- **Authority Nonce & Approval Lifecycle:** Jev operates strictly prior to approval request construction and does not mint, commit, or consume approval nonces. When Jev flags an operation as high risk, it triggers the standard `ApprovalRequired` exception. Approval nonces are generated and stored exclusively during the authenticated subject approval workflow, and are consumed atomically by `authorize_operation()` only when final authorized execution begins.
+### D3: One atomic question per condition; combine in code
+
+Each destructive condition is its own `Noul`, and the code combines probabilities with weights the code owns. Compound questions degrade on this class of model, and separate questions keep each judgment independently reviewable and independently tunable.
+
+**Alternative considered:** a single question such as "is this destructive?" Rejected — it collapses conditions that carry different risk, and a single probability cannot express which condition fired.
+
+### D4: Risk-scaled confidence thresholds, with escalation between the extremes
+
+The guardrail uses three outcomes rather than two: act when the combined risk is clearly below the threshold for the invocation's risk class, block or require approval when clearly above, and escalate to human review in between. `confidence` is the second axis — the answer says *what*, the confidence says *whether to act*.
+
+**Alternative considered:** a single global threshold. Rejected — the consequences of a wrong call differ sharply between a read-only and a destructive invocation.
+
+**Alternative considered:** treat any nonzero risk as blocking. Rejected — it would make the guardrail unusable and push callers to disable it.
+
+### D5: Reranking scores each candidate independently
+
+The matcher asks one `Noul` per query-candidate pair and orders by the returned probability. Independent pair scoring is what makes scores comparable; a single choice across candidates makes them compete inside one question and loses the ordering signal.
+
+**Alternative considered:** one `Choice` over the candidate list. Rejected — it yields a winner but not a calibrated ordering, and the shortlist is deliberately larger than the number of candidates worth choosing between.
+
+### D6: Centralize questions, criteria, weights, and thresholds
+
+Every judgment definition lives in one module. Official guidance is explicit that questions and thresholds are the reviewable artifact, and that they benefit from collaborative editing rather than being buried in consuming logic.
+
+**Alternative considered:** define questions next to each consumer. Rejected — it scatters the policy surface a reviewer must inspect.
+
+### D7: The credential is transport config, not application settings
+
+`JevSettings` configures the model identifier, timeout, retry policy, and fail-closed behavior. The credential comes from `TYPESAFE_API_KEY`, and a key found in the layered YAML is stripped with a warning.
+
+**Alternative considered:** hold the key in `JevSettings`. Rejected — it would put a secret in the application settings surface, contradicting the existing secret-isolation convention.
+
+### D8: Pin the model identifier once thresholds exist
+
+The default is a pinned `jev-1.13.0` rather than `jev-latest`, because the response's `model` field is the only way to attribute a decision to a version and a moving alias would silently change calibrated behavior.
+
+**Alternative considered:** follow `jev-latest` for automatic improvements. Rejected for the guardrail, where an unreviewed behavior change is unacceptable; acceptable for exploratory, non-gating uses.
+
+### D9: Fail closed for security, fall back for the rest
+
+When the credential is absent or the service is unreachable, a high-authority tool invocation falls through to the existing authority checks and blocklists and does not execute unreviewed. Skill reranking and evaluation fall back to their previous ordering and scoring, because a wrong skill ranking is recoverable and a wrongly executed command is not.
+
+**Alternative considered:** fail closed everywhere. Rejected — it would make the evaluator and matcher brittle for no safety gain.
 
 ## Risks / Trade-offs
 
-- **External Dependency Latency:** Network roundtrip to `api.typesafe.ai` adds ~80–200ms. *Mitigation:* Apply strict 500ms timeout with circuit breaker.
-- **Lack of Explanations:** Jev returns calibrated probabilities without rationale text. *Mitigation:* For auditing, log the question prompt, decision, and confidence score; if human approval is triggered, the human inspects the raw command arguments.
-- **API Key Requirement:** Requires `TYPESAFE_API_KEY`. *Mitigation:* Graceful opt-in; when disabled or unconfigured, agents default to legacy regex and rule-based behavior.
+- **[No credential, so the live path is unverified]** → The mock and fail-closed paths are unit-tested now; the live path is verified when the operator supplies a key, and this is recorded as an open item rather than assumed working.
+- **[Thresholds are uncalibrated]** → Thresholds live in one module, are disabled by default, and the guardrail escalates in the uncertain band instead of acting.
+- **[An unavailable service degrades tool security]** → Mitigation: fail-closed behavior keeps the existing authority checks authoritative.
+- **[Alias drift changes decisions silently]** → Mitigation: pin the model identifier, and record the answering model from each response.
+- **[Request budget exceeded by a large state]** → Mitigation: the guardrail sends a bounded projection of the invocation, not the whole conversation; state plus the longest question must fit the 32k budget.
+- **[Debug logging emits state bodies]** → The SDK redacts secret headers but not bodies. Mitigation: never place credentials in `state`, and keep the SDK logger below debug in normal operation.
+- **[Guardrail latency on the critical path]** → A network round trip adds latency to every guarded invocation. Mitigation: a bounded timeout with fail-closed behavior, one batched request rather than several, and a circuit breaker that stops calling a failing service.
+
+## Migration Plan
+
+1. Add the optional dependency and confirm resolution.
+2. Implement settings and the decision client with a mock transport, and unit-test the success, timeout, missing-credential, and invalid-credential paths.
+3. Implement the centralized question and threshold module.
+4. Implement the guardrail and wire it into tool execution, disabled by default.
+5. Implement routing, reranking, and the evaluator.
+6. Add tracing attributes and confirm no state body is logged.
+7. Run the full suite and compare against the recorded 916-test baseline; any new failure is a regression to fix, not to accept.
+
+**Rollback:** the feature is disabled by default and additive; disabling the setting restores the prior behavior with no code change. The dependency can be dropped without touching existing paths.
+
+## Open Questions
+
+- What confidence thresholds should the guardrail use per `AuthorityClass`? Deferrable: the mechanism is fixed and the values are deliberately left to calibration against real traffic, which does not change the specs, approach, or task breakdown.
