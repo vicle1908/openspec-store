@@ -2,7 +2,7 @@
 
 ## 1. Container Image and Ignore Rules
 
-- [ ] 1.1 Create `shb-schedule/Dockerfile` as a multi-stage build (python:3.14-slim base, uv install, `COPY` sibling `shb-core`, `shb-tools`, and `shb-schedule` sources, `uv sync --frozen`, non-root user, entrypoint `shb-schedule serve --port 9110`); verify `docker build` completes successfully with build context set to the `~/Developer/shb` parent.
+- [ ] 1.1 Create `shb-schedule/Dockerfile` as a multi-stage build (python:3.14-slim base, uv install, `COPY` sibling `shb-core`, `shb-tools`, and `shb-schedule` sources, `uv sync --frozen`, non-root user, entrypoint `shb-schedule serve --host 0.0.0.0 --port 9110`); verify `docker build` completes successfully with build context set to the `~/Developer/shb` parent.
 - [ ] 1.2 Create `shb-schedule/.dockerignore` excluding `.gitnexus/`, `graphify-out/`, `__pycache__/`, `.venv/`, and test caches; verify the built image does not contain those paths (`docker run --rm <image> ls -a`).
 
 ## 2. Docker Compose Stack

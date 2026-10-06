@@ -1,0 +1,28 @@
+schema: review-scope/v1
+change: containerize-shb-scheduler-postgres18
+risk:
+  tier: standard
+  fresh_context: false
+lenses:
+  - id: spec-compliance
+    provider: hermes
+    edges: [spec-to-code, spec-to-docs, spec-to-tests, knowledge-to-code]
+  - id: security
+    provider: claude
+    edges: [all]
+  - id: quality-tests
+    provider: codex
+    edges: [spec-to-tests, code-to-tests, code-to-docs]
+  - id: architecture
+    provider: agy
+    edges: [code-to-skills, docs-to-skills]
+  - id: product-scope
+    provider: kimi
+    edges: [skills-to-specs, scope-check]
+  - id: failure-modes
+    provider: opencode
+    edges: [internal-consistency, failure-modes]
+boundaries:
+  allowlist_repos: ["~/Developer/shb/shb-schedule", "~/Developer/shb/shb-agent-skills"]
+  dbos_runtime: ["python-dbos", "docker-compose", "postgres-18.6"]
+  isolation: clean-break-from-tdt

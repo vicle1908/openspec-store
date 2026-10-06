@@ -44,6 +44,9 @@ Delete `src/shb_schedule/service/launchd.py`, the `service` Typer sub-app, and t
 - DBOS system-schema creation and migrations execute inside DBOS launch, within the `shb_scheduler` schema; Compose startup ordering is gated by the DB health check.
 - Each scheduled workflow execution is a durable DBOS transaction with step-level retries; no cross-schema writes.
 
+### 8. Container network binding and lock isolation
+- In the container environment, `SHB_SCHEDULER_HOST` is set to `0.0.0.0` (or passed as `--host 0.0.0.0` in entrypoint) so that Docker's port bridge (`127.0.0.1:9110:9110`) correctly routes inbound HTTP requests from the host. Outside Docker, the local CLI default remains `127.0.0.1` for developer safety.
+- The single-owner leader lock file resides inside the container's private ephemeral filesystem (`/tmp/shb-schedule.lock`), isolating daemon flock semantics from host mount latencies or network filesystem locking restrictions.
 ## Risks / Trade-offs
 
 - **[Worktown bind-mount UID mismatch on Linux]** → Base profile avoids repository mounts entirely; the optional dev override documents `git config --global --add safe.directory` and read-only mounts to prevent writes.
