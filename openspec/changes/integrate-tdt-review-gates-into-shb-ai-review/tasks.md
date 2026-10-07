@@ -17,12 +17,11 @@
 - [ ] 3.2 Implement discussion publisher in `shb_review/gitlab/posting.py` mapping hunk-gated findings to inline discussion notes, enforcing comment caps (default 15), and publishing markdown summaries with fingerprint markers
 - [ ] 3.3 Add unit tests with mock GitLab API fixtures verifying discussion generation, deduplication, and resolution tracking in `tests/test_gitlab_posting.py`
 
-## 4. Diff Test Coverage Gatekeeper (`mr-coverage`)
+## 4. MR Review Coverage Scanner (`mr-coverage`)
 
-- [ ] 4.1 Implement patch coverage calculation in `shb_review/coverage/scanner.py` using standard-library `xml.etree.ElementTree` to intersect git diff changed lines with Cobertura/coverage XML reports
-- [ ] 4.2 Expose the `mr-coverage` Typer CLI command in `shb_review/coverage/cli.py` and register the `mr-coverage = "shb_review.coverage.cli:app"` console script entrypoint in `shb-ai-review/pyproject.toml`
-- [ ] 4.3 Add unit tests for `mr-coverage` verifying threshold evaluation, table formatting, and exit code 0/1 contracts in `tests/test_coverage_gate.py`
-
+- [ ] 4.1 Implement `CoverageScanner` and `CoverageGap` in `shb_review/coverage/scanner.py` evaluating `--rows-json` MR state snapshots to detect missing, stale, or failed reviews
+- [ ] 4.2 Expose the `mr-coverage` Typer CLI command in `shb_review/coverage/cli.py` (with `scan`, `status`, `health` subcommands) and register `mr-coverage = "shb_review.coverage.cli:app"` in `shb-ai-review/pyproject.toml`
+- [ ] 4.3 Add unit tests for `mr-coverage` verifying gap detection, row JSON parsing, and exit code 0/1 contracts in `tests/test_coverage_scanner.py`
 ## 5. Review Orchestrator Integration & End-to-End Verification
 
 - [ ] 5.1 Integrate `GitWorktreeManager`, `HunkGate`, and `GitLabReviewPublisher` into `shb_review/orchestrator.py`

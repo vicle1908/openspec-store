@@ -32,8 +32,7 @@ Two services: `db` (`postgres:18.6-alpine`) and `scheduler` (built image). Use `
 ### 2. Database provenance: fresh, named volume
 PostgreSQL data lives in a Docker **named volume** (not a bind mount) to avoid crash-unsafe behavior on macOS Docker Desktop VirtioFS bind mounts. Rationale: (a) PostgreSQL `initdb` enforces strict POSIX modes (`0700`/`0750`) and fails when the container `postgres` UID/GID cannot `chmod` files on a macOS-owned VirtioFS path; (b) VirtioFS `fsync` latency risks WAL torn-page corruption; (c) the OmniRoute project already documents that VirtioFS bind mounts corrupt SQLite WAL DBs. A named volume resides on the Linux VM ext4 block device (`Docker.raw`), giving correct POSIX permissions, fast `fsync`, and crash-safe WAL. Alternative considered: host bind mount — rejected for the corruption risk and permission drift on Linux.
 
-Top-level `volumes:` MUST declare `shb-scheduler-pgdata:` and the `db` service mounts it at `/var/lib/postgresql/data`.
-
+**PostgreSQL 18 Volume Layout:** In official `postgres:18+` images, `PGDATA` defaults to `/var/lib/postgresql/18/docker`. When mounting the named volume `shb-scheduler-pgdata` to `/var/lib/postgresql/data`, the `db` container environment MUST explicitly set `PGDATA=/var/lib/postgresql/data/pgdata` (or mount the volume at `/var/lib/postgresql`). This prevents PostgreSQL 18 from writing outside the volume into ephemeral container storage.
 ### 3. Image build context and sibling dependencies
 Build with `context: ..` (the `~/Developer/shb` parent) so the Dockerfile can `COPY` `shb-core`, `shb-tools`, and `shb-schedule` into the image and run `uv sync --frozen`. Rationale: the package declares editable local-path sibling dependencies, so the image must contain those sources. Alternative considered: Buildx `additional_contexts` — viable but requires newer Compose/Buildx; `context: ..` is universally supported.
 

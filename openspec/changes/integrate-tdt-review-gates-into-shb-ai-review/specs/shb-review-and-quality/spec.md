@@ -35,13 +35,13 @@ Review checkouts, AST parsers, and coverage engines SHALL operate within isolate
 - **AND** all file evaluations SHALL run against that worktree
 - **AND** the worktree SHALL be pruned cleanly upon review completion or error
 
-### Requirement: Standalone MR Coverage Verification CLI
-The package SHALL provide an executable command `mr-coverage` that evaluates changed-line test coverage for a target git revision range or GitLab merge request.
+### Requirement: Standalone MR Review Coverage Scanner CLI
+The package SHALL provide an executable command `mr-coverage` that evaluates review coverage across merge request state snapshots, detecting missing, stale, or failed review coverage.
 
-#### Scenario: Sufficient patch coverage passes gate
-- **WHEN** `mr-coverage` is invoked against an MR whose modified executable lines meet or exceed the required threshold (default 80%)
-- **THEN** the command SHALL exit with code 0 and emit a summary table of covered and uncovered lines
+#### Scenario: Full review coverage passes scan
+- **WHEN** `mr-coverage scan` is invoked against review state rows where all open merge requests have matching reviewed SHAs and passing review verdicts
+- **THEN** the command SHALL emit zero coverage gaps and exit with code 0
 
-#### Scenario: Insufficient patch coverage fails gate
-- **WHEN** `mr-coverage` is invoked against an MR whose modified executable lines fall below the required threshold
-- **THEN** the command SHALL exit with non-zero exit code 1 and list all uncovered lines
+#### Scenario: Missing or stale review coverage fails scan
+- **WHEN** `mr-coverage scan` detects an MR row with missing review records, commit SHA mismatches, or failed prior reviews
+- **THEN** the command SHALL output `CoverageGap` entries identifying each unaddressed MR and exit with non-zero exit code 1

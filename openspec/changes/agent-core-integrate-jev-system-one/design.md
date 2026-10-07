@@ -6,13 +6,13 @@ See `proposal.md` — Why.
 
 The design is written against the **current** TypeSafe API, verified during implementation planning:
 
-- Primitives are `Noul` (yes/no probability), `Choice`, and `Score`. There is no boolean primitive; a yes/no judgment is a `Noul`, and a `Noul` answer carries no separate `confidence` because its single probability already expresses both answer and certainty.
+- Primitives are `Noul` (yes/no probability), `Choice`, and `Score`. There is no boolean primitive; a yes/no judgment is a `Noul`, and a `Noul` answer carries no separate `confidence` field because its single probability $p \in [0.0, 1.0]$ expresses both answer and certainty (normalized certainty is derived as $|2p - 1|$).
 - The official SDK is `typesafe-sdk` (0.7.2): `TypeSafeClient` / `AsyncTypeSafeClient` with `client.system_one(state, questions, ...)`. Answers are read through typed accessors (`response.nouls`, `.choices`, `.scores`), the `answers` map, or a `response_model`.
-- `Choice` and `Score` answers carry `probabilities` and a derived `confidence` on a 0-to-1 scale; the response also reports the versioned `model` that answered and a `request_id`.
+- `Choice` answers carry `probabilities` and a derived `confidence` on a 0-to-1 scale; `Score` answers evaluate state against $N$ ordered levels ($0 \dots N-1$) returning expected values in $[0.0, N-1]$ along with distribution probabilities and confidence. The response also reports the versioned `model` that answered and a `request_id`.
 - Every question in a request sees the same `state` and is evaluated in parallel and in isolation. Asking several questions in one request barely changes latency — the documented fan-out benchmark is 13 batched questions at roughly 11.5x lower cost and 9.6x lower latency than 13 separate calls.
 - Request budget is 64k tokens (state plus all questions), or 32k for state plus the longest question. Text only; English is the strongest language.
 - Model `jev-1.13.0` is current, behind the aliases `jev-latest` and `jev-preview`. An alias moves between releases, so the response's versioned `model` field must be recorded.
-- The credential is `TYPESAFE_API_KEY`. An invalid key raises during client construction, before any request or retry.
+- The credential is `TYPESAFE_API_KEY`. A missing key raises `TypeSafeError` during client construction; an invalid, revoked, or unauthorized key raises `TypeSafeAuthenticationError` on the first API call.
 - An official agent skill ships current guidance (`typesafe-ai/skills`); it has been installed into the workspace so this design can be checked against live docs rather than recalled.
 
 **Constraint:** no `TYPESAFE_API_KEY` exists on this machine yet. The full decision path is therefore designed and unit-tested against a mock transport, and the live path is explicitly deferred.

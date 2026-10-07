@@ -13,7 +13,7 @@ The `shb-ai-review` package currently implements standalone Pydantic models (`Re
 - Provide `HunkGate` in `shb_review/validation/hunk_gate.py` using binary interval search (`bisect`) to ensure findings are strictly positioned on changed diff lines.
 - Provide `ReviewDeduplicator` in `shb_review/validation/deduplicator.py` to prevent duplicate notes on re-runs.
 - Provide `GitWorktreeManager` in `shb_review/worktree/manager.py` to isolate checkouts and protect workspace cleanliness.
-- Provide standalone CLI `mr-coverage` and module `shb_review/coverage/scanner.py` for diff patch test coverage verification.
+- Provide standalone CLI `mr-coverage` and module `shb_review/coverage/scanner.py` for merge request review coverage and gap scanning.
 
 **Non-Goals:**
 - Do not build a complex multi-process background worker daemon or persistent Celery queue; operations run synchronously in CLI or CI environments.
@@ -27,7 +27,7 @@ Align `shb-ai-review` with the mature modular design from `tdt/ai-review`:
 - `shb_review/gitlab/`: `client.py` (GitLab API client via `python-gitlab`), `posting.py` (discussion publisher).
 - `shb_review/validation/`: `hunk_gate.py` (diff hunk line filtering), `deduplicator.py` (fingerprint deduplication).
 - `shb_review/worktree/`: `manager.py` (disposable git worktree management).
-- `shb_review/coverage/`: `scanner.py` (changed-line coverage evaluator), `cli.py` (`mr-coverage` entrypoint).
+- `shb_review/coverage/`: `scanner.py` (MR review gap scanner), `cli.py` (`mr-coverage` entrypoint).
 
 *Rationale*: Clean separation of concerns allows individual components to be unit tested in isolation without mocking entire CI runs.
 

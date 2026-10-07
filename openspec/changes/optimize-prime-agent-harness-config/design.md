@@ -192,12 +192,8 @@ unintended skill set.
 **D5: Add cost and thinking-level metadata rather than synthesizing it.**
 
 Rates and level mappings are provider facts, so they are declared per model, not
-defaulted. Where a rate is genuinely unknown, the model is left identifiable as
-unreported rather than given a fabricated zero — a `0` rate is
-indistinguishable from a real free tier in the usage report. Alternatives
-considered: (a) compute cost client-side from a table — rejected, it duplicates a
-surface the runtime already owns; (b) leave it — rejected, `$0.00` for every
-session is an actively misleading signal.
+defaulted. Where a rate is genuinely unknown, the model is left un-priced by omitting the `cost` object (conforming to TypeBox's `Type.Optional(Type.Object({ input: Type.Number(), ... }))` schema) rather than given a fabricated zero — a `0` rate is
+indistinguishable from a real free tier in the usage report. Alternatives considered: (a) compute cost client-side from a table — rejected, it duplicates a surface the runtime already owns; (b) leave it — rejected, `$0.00` for every session is an actively misleading signal.
 
 **D6: Configure recovery explicitly instead of relying on park behavior.**
 
