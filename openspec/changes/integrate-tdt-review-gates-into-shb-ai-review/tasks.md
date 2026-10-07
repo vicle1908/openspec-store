@@ -13,14 +13,14 @@
 
 ## 3. GitLab MR Client & Discussion Publisher
 
-- [ ] 3.1 Implement GitLab MR client in `shb_review/gitlab/client.py` using `python-gitlab` to fetch MR details, changes, and existing discussions
-- [ ] 3.2 Implement discussion publisher in `shb_review/gitlab/posting.py` mapping hunk-gated findings to inline discussion notes, enforcing comment caps, and publishing markdown summaries
+- [ ] 3.1 Declare `python-gitlab>=8.5.0` in `shb-ai-review/pyproject.toml` dependencies, run `uv sync`, and implement GitLab MR client in `shb_review/gitlab/client.py` using `python-gitlab` to fetch MR details, changes, and existing discussions
+- [ ] 3.2 Implement discussion publisher in `shb_review/gitlab/posting.py` mapping hunk-gated findings to inline discussion notes, enforcing comment caps (default 15), and publishing markdown summaries with fingerprint markers
 - [ ] 3.3 Add unit tests with mock GitLab API fixtures verifying discussion generation, deduplication, and resolution tracking in `tests/test_gitlab_posting.py`
 
 ## 4. Diff Test Coverage Gatekeeper (`mr-coverage`)
 
-- [ ] 4.1 Implement patch coverage calculation in `shb_review/coverage/scanner.py` intersecting git diff changed lines with Cobertura/coverage XML reports
-- [ ] 4.2 Expose the `mr-coverage` CLI command in `shb_review/coverage/cli.py` and register the console script entrypoint in `shb-ai-review/pyproject.toml`
+- [ ] 4.1 Implement patch coverage calculation in `shb_review/coverage/scanner.py` using standard-library `xml.etree.ElementTree` to intersect git diff changed lines with Cobertura/coverage XML reports
+- [ ] 4.2 Expose the `mr-coverage` Typer CLI command in `shb_review/coverage/cli.py` and register the `mr-coverage = "shb_review.coverage.cli:app"` console script entrypoint in `shb-ai-review/pyproject.toml`
 - [ ] 4.3 Add unit tests for `mr-coverage` verifying threshold evaluation, table formatting, and exit code 0/1 contracts in `tests/test_coverage_gate.py`
 
 ## 5. Review Orchestrator Integration & End-to-End Verification
