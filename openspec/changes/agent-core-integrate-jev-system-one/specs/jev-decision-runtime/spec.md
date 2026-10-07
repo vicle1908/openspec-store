@@ -7,7 +7,7 @@ Provides sub-second, deterministic System One decision primitives — Noul yes/n
 
 ### Requirement: System One Decision Client
 
-The agent runtime SHALL provide a dedicated System One decision client that evaluates a `state` against a map of typed questions using TypeSafe's three primitives — `Noul` (yes/no), `Choice`, and `Score` — and returns typed answers. The client SHALL use the official `typesafe-sdk` client (`TypeSafeClient` or `AsyncTypeSafeClient`) and its `system_one` method rather than a hand-rolled HTTP call, and SHALL read answers through the SDK's typed accessors (`response.nouls`, `response.choices`, `response.scores`) or the `answers` map.
+The agent runtime SHALL provide a dedicated System One decision client that evaluates a `state` against a map of typed questions using TypeSafe's three primitives — `Noul` (yes/no), `Choice`, and `Score` — and returns typed answers. The client SHALL use the official `typesafe-sdk` client rather than a hand-rolled HTTP call, and SHALL read answers through the SDK's typed accessors or the `answers` map.
 
 #### Scenario: Successful decision evaluation
 - **WHEN** the client evaluates a state against a question map with a configured `TYPESAFE_API_KEY`
@@ -68,7 +68,7 @@ The client SHALL obtain its credential from `TYPESAFE_API_KEY`, SHALL fail fast 
 
 ### Requirement: Pre-Flight Tool Guardrail
 
-The tool registry SHALL support an optional pre-flight semantic safety guardrail that intercepts tool invocations before execution or authority approval. The guardrail SHALL ask one atomic `Noul` per destructive condition so each judgment is independent, SHALL combine the probabilities in code, and SHALL apply a confidence threshold scaled to the invocation's risk. The guardrail SHALL NOT downgrade or bypass AuthorityClass requirements; for tools with `AuthorityClass.high_authority=True`, a benign evaluation permits progress to standard authority approval gating but SHALL NEVER bypass human approval.
+The tool registry SHALL support an optional pre-flight semantic safety guardrail that intercepts tool invocations before execution or authority approval. The guardrail SHALL evaluate destructive conditions independently, combine probabilities in code, and apply risk-scaled thresholds. The guardrail SHALL NOT downgrade or bypass AuthorityClass requirements, and high-authority tools SHALL NEVER bypass human approval.
 
 #### Scenario: Atomic conditions are judged independently
 - **WHEN** the guardrail evaluates a tool invocation
