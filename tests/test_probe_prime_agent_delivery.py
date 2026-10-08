@@ -5,6 +5,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import math
+import os
 import sys
 import urllib.request
 from pathlib import Path
@@ -707,6 +708,199 @@ def test_main_empty_targets_exit_contract(tmp_path: Any = None) -> None:
         if os.path.exists(tf_path):
             os.remove(tf_path)
 
+def test_endpoint_url_resolution_direct_and_prefixed() -> None:
+    with patch("urllib.request.build_opener") as mock_opener:
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = json.dumps({"model": "m", "usage": {"input_tokens": 10}}).encode("utf-8")
+        mock_resp.__enter__.return_value = mock_resp
+        mock_resp.__exit__.return_value = None
+        mock_opener.return_value.open.return_value = mock_resp
+
+        # 1. Base ending with /v1
+        probe.make_request("http://example.com/v1", "key", "openai-responses", "m", None, "u")
+        req1 = mock_opener.return_value.open.call_args[0][0]
+        assert req1.full_url == "http://example.com/v1/responses"
+
+        # 2. Base ending with /responses
+        probe.make_request("http://example.com/v1/responses", "key", "openai-responses", "m", None, "u")
+        req2 = mock_opener.return_value.open.call_args[0][0]
+        assert req2.full_url == "http://example.com/v1/responses"
+
+        # 3. Base without /v1
+        probe.make_request("http://example.com", "key", "openai-responses", "m", None, "u")
+        req3 = mock_opener.return_value.open.call_args[0][0]
+        assert req3.full_url == "http://example.com/v1/responses"
+
+        # 4. Anthropic ending with /messages
+        probe.make_request("http://example.com/v1/messages", "key", "anthropic-messages", "m", None, "u")
+        req4 = mock_opener.return_value.open.call_args[0][0]
+        assert req4.full_url == "http://example.com/v1/messages"
+
+
+def test_probe_script_http_fixture_scenarios() -> None:
+    import http.server
+    import threading
+    import tempfile
+    import io
+
+    class ComprehensiveFixtureHandler(http.server.BaseHTTPRequestHandler):
+        mode = "reasoning"
+
+        def do_POST(self) -> None:
+            length = int(self.headers.get("Content-Length", 0))
+            body_bytes = self.rfile.read(length) if length else b"{}"
+            body = json.loads(body_bytes.decode("utf-8")) if body_bytes else {}
+            instructions = body.get("instructions", "")
+            is_challenge = "CRITICAL VERIFICATION INSTRUCTION" in instructions
+
+            if self.mode == "error_500":
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(b"Server Error")
+                return
+
+            if self.mode == "error_401":
+                self.send_response(401)
+                self.end_headers()
+                self.wfile.write(b"Unauthorized")
+                return
+
+            if self.mode == "malformed_json":
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(b"{invalid-json")
+                return
+
+            if self.mode == "reasoning":
+                if is_challenge:
+                    import re
+                    m = re.search(r"NONCE_[a-f0-9]+", instructions)
+                    nonce = m.group(0) if m else "NONE"
+                    data = {
+                        "model": "reasoning-fixture-model",
+                        "usage": {"input_tokens": 1400},
+                        "output": [
+                            {
+                                "type": "reasoning",
+                                "summary": [{"type": "summary_text", "text": f"Found token {nonce}"}],
+                            },
+                            {
+                                "type": "message",
+                                "content": [{"type": "text", "text": "Task complete."}],
+                            },
+                        ],
+                    }
+                else:
+                    data = {
+                        "model": "reasoning-fixture-model",
+                        "usage": {"input_tokens": 50},
+                        "output": [
+                            {
+                                "type": "reasoning",
+                                "summary": [{"type": "summary_text", "text": "No token."}],
+                            },
+                        ],
+                    }
+            elif self.mode == "zero_baseline":
+                if is_challenge:
+                    import re
+                    m = re.search(r"NONCE_[a-f0-9]+", instructions)
+                    nonce = m.group(0) if m else "NONE"
+                    data = {
+                        "model": "zero-fixture-model",
+                        "usage": {"input_tokens": 300},
+                        "output": [{"content": [{"type": "output_text", "text": f"Echo: {nonce}"}]}],
+                    }
+                else:
+                    data = {
+                        "model": "zero-fixture-model",
+                        "usage": {"input_tokens": 0},
+                        "output": [{"content": [{"type": "output_text", "text": "No token."}]}],
+                    }
+
+            payload = json.dumps(data).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+        def log_message(self, format: str, *args: Any) -> None:
+            pass
+
+    server = http.server.HTTPServer(("127.0.0.1", 0), ComprehensiveFixtureHandler)
+    port = server.server_port
+    t = threading.Thread(target=server.serve_forever, daemon=True)
+    t.start()
+
+    try:
+        def run_probe_main(mode: str) -> tuple[int, Any]:
+            ComprehensiveFixtureHandler.mode = mode
+            with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tf:
+                json.dump({
+                    "providers": {
+                        "fixture-prov": {
+                            "baseUrl": f"http://127.0.0.1:{port}",
+                            "apiKey": "test-token",
+                            "api": "openai-responses",
+                            "models": [{"id": "fixture-model"}]
+                        }
+                    }
+                }, tf)
+                tf_name = tf.name
+            try:
+                buf = io.StringIO()
+                with patch("sys.argv", ["probe.py", "--models-json", tf_name, "--provider", "fixture-prov", "--model", "fixture-model", "--json"]):
+                    with patch("sys.stdout", buf):
+                        exit_code = probe.main()
+                res = json.loads(buf.getvalue())
+                return exit_code, res
+            finally:
+                if os.path.exists(tf_name):
+                    os.remove(tf_name)
+
+        # 1. Reasoning summary fixture: PASS
+        code_rs, res_rs = run_probe_main("reasoning")
+        assert code_rs == 0
+        assert len(res_rs) == 1
+        assert res_rs[0]["verdict"] == "PASS"
+        assert res_rs[0]["delta_input_tokens"] == 1350
+        assert res_rs[0]["echoed_challenge"] is True
+        assert res_rs[0]["actual_model"] == "reasoning-fixture-model"
+
+        # 2. Zero baseline fixture: PASS
+        code_zb, res_zb = run_probe_main("zero_baseline")
+        assert code_zb == 0
+        assert len(res_zb) == 1
+        assert res_zb[0]["verdict"] == "PASS"
+        assert res_zb[0]["baseline_input_tokens"] == 0
+        assert res_zb[0]["challenge_input_tokens"] == 300
+        assert res_zb[0]["delta_input_tokens"] == 300
+        assert res_zb[0]["echoed_challenge"] is True
+
+        # 3. HTTP 500 error: FAIL, exit code 1
+        code_500, res_500 = run_probe_main("error_500")
+        assert code_500 == 1
+        assert res_500[0]["verdict"] == "FAIL"
+        assert "HTTP 500" in res_500[0]["error"]
+
+        # 4. HTTP 401 error: FAIL, exit code 1
+        code_401, res_401 = run_probe_main("error_401")
+        assert code_401 == 1
+        assert res_401[0]["verdict"] == "FAIL"
+        assert "HTTP 401" in res_401[0]["error"]
+
+        # 5. Malformed JSON error: FAIL, exit code 1
+        code_mj, res_mj = run_probe_main("malformed_json")
+        assert code_mj == 1
+        assert res_mj[0]["verdict"] == "FAIL"
+        assert "JSONDecodeError" in res_mj[0]["error"]
+
+    finally:
+        server.shutdown()
+        server.server_close()
+
 
 if __name__ == "__main__":
     test_resolve_credential_literal_and_env()
@@ -729,4 +923,6 @@ if __name__ == "__main__":
     test_probe_registration_zero_vs_missing_baseline_http()
     test_probe_registration_corrupt_cache_counter_fails_closed()
     test_main_empty_targets_exit_contract()
-    print("All 20 regression tests passed successfully!")
+    test_endpoint_url_resolution_direct_and_prefixed()
+    test_probe_script_http_fixture_scenarios()
+    print("All 22 regression tests passed successfully!")

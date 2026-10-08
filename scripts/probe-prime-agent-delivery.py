@@ -225,6 +225,8 @@ def extract_content_text(data: Dict[str, Any], protocol: str) -> str:
                                         txt = c.get("text")
                                         if isinstance(txt, str) and txt:
                                             collected.append(txt)
+                                    elif "text" in c and isinstance(c["text"], str) and c["text"]:
+                                        collected.append(c["text"])
                                 elif isinstance(c, str) and c:
                                     collected.append(c)
                         elif isinstance(content, str) and content:
@@ -307,7 +309,12 @@ def make_request(
 
     base = base_url.rstrip("/")
     if protocol == "anthropic-messages":
-        url = f"{base}/v1/messages" if not base.endswith("/v1") else f"{base}/messages"
+        if base.endswith("/messages"):
+            url = base
+        elif base.endswith("/v1"):
+            url = f"{base}/messages"
+        else:
+            url = f"{base}/v1/messages"
         payload: Dict[str, Any] = {
             "model": model_id,
             "max_tokens": max_tokens,
@@ -317,11 +324,12 @@ def make_request(
             payload["system"] = system_prompt
     else:
         # OpenAI Responses API - route without legacy ?beta=true
-        if base.endswith("/v1"):
+        if base.endswith("/responses"):
+            url = base
+        elif base.endswith("/v1"):
             url = f"{base}/responses"
         else:
             url = f"{base}/v1/responses"
-
         payload: Dict[str, Any] = {
             "model": model_id,
             "input": [{"role": "user", "content": user_prompt}],
