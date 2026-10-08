@@ -410,6 +410,101 @@ def test_extract_content_text_adversarial_shapes() -> None:
     assert probe.extract_content_text(["invalid"], "openai-responses") == ""
 
 
+def test_extract_content_text_openai_responses_reasoning_summary() -> None:
+    # 1. Summary as list of blocks with text and content blocks
+    data_summary_list = {
+        "output": [
+            {
+                "type": "reasoning",
+                "summary": [
+                    {"type": "summary_text", "text": "Thinking about step A."},
+                    {"type": "summary_text", "text": "Resolved step B."},
+                ],
+                "content": [
+                    {"type": "reasoning_text", "text": "Detailed derivation of B."},
+                ],
+            },
+            {
+                "type": "message",
+                "content": [{"type": "text", "text": "Final answer."}],
+            },
+        ]
+    }
+    extracted = probe.extract_content_text(data_summary_list, "openai-responses")
+    assert "Thinking about step A." in extracted
+    assert "Resolved step B." in extracted
+    assert "Detailed derivation of B." in extracted
+    assert "Final answer." in extracted
+
+    # 2. Summary as string and empty content
+    data_summary_str = {
+        "output": [
+            {
+                "type": "reasoning",
+                "summary": "Direct reasoning summary string.",
+            }
+        ]
+    }
+    extracted_str = probe.extract_content_text(data_summary_str, "openai-responses")
+    assert "Direct reasoning summary string." in extracted_str
+
+    # 3. Reasoning with nonce echoes correctly in probe_registration
+    def fake_open_reasoning(req: urllib.request.Request, timeout: float = 30.0) -> MagicMock:
+        body = json.loads(req.data.decode("utf-8"))
+        instructions = body.get("instructions", "")
+        if "NONCE_" in instructions:
+            import re
+            m = re.search(r"NONCE_[a-f0-9]+", instructions)
+            nonce = m.group(0) if m else "NONE"
+            resp_data = {
+                "model": "reasoning-model",
+                "usage": {"input_tokens": 1500},
+                "output": [
+                    {
+                        "type": "reasoning",
+                        "summary": [{"type": "summary_text", "text": f"Found token {nonce} in system prompt."}],
+                        "content": [{"type": "reasoning_text", "text": "Verified authenticity."}],
+                    },
+                    {
+                        "type": "message",
+                        "content": [{"type": "text", "text": "Done."}],
+                    },
+                ],
+            }
+        else:
+            resp_data = {
+                "model": "reasoning-model",
+                "usage": {"input_tokens": 50},
+                "output": [
+                    {
+                        "type": "reasoning",
+                        "summary": [{"type": "summary_text", "text": "No token present."}],
+                    },
+                    {
+                        "type": "message",
+                        "content": [{"type": "text", "text": "No token."}],
+                    },
+                ],
+            }
+        resp = MagicMock()
+        resp.read.return_value = json.dumps(resp_data).encode("utf-8")
+        resp.__enter__.return_value = resp
+        resp.__exit__.return_value = None
+        return resp
+
+    with patch("urllib.request.OpenerDirector.open", side_effect=fake_open_reasoning):
+        res = probe.probe_registration(
+            provider_name="test-prov",
+            model_id="reasoning-model",
+            base_url="http://127.0.0.1:1234/v1",
+            api_key="sk-test",
+            protocol="openai-responses",
+            challenge_length=5000,
+        )
+        assert res["verdict"] == "PASS"
+        assert res["echoed_challenge"] is True
+        assert res["delta_input_tokens"] == 1450
+
 def test_probe_registration_missing_baseline_tokens_fails() -> None:
     def fake_open(req: urllib.request.Request, timeout: float = 30.0) -> MagicMock:
         body = json.loads(req.data.decode("utf-8"))
@@ -629,8 +724,9 @@ if __name__ == "__main__":
     test_make_request_oversize_response_bound()
     test_make_request_malformed_json_and_encoding()
     test_extract_content_text_adversarial_shapes()
+    test_extract_content_text_openai_responses_reasoning_summary()
     test_probe_registration_missing_baseline_tokens_fails()
     test_probe_registration_zero_vs_missing_baseline_http()
     test_probe_registration_corrupt_cache_counter_fails_closed()
     test_main_empty_targets_exit_contract()
-    print("All 19 regression tests passed successfully!")
+    print("All 20 regression tests passed successfully!")

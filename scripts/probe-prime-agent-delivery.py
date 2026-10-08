@@ -202,28 +202,46 @@ def extract_content_text(data: Dict[str, Any], protocol: str) -> str:
         if isinstance(output_items, list):
             for item in output_items:
                 if isinstance(item, dict):
-                    content = item.get("content")
-                    if isinstance(content, list):
-                        for c in content:
-                            if isinstance(c, dict):
-                                if c.get("type") in ("text", "output_text"):
-                                    txt = c.get("text")
-                                    if isinstance(txt, str) and txt:
-                                        collected.append(txt)
-                            elif isinstance(c, str) and c:
-                                collected.append(c)
-                    elif isinstance(content, str) and content:
-                        collected.append(content)
+                    if item.get("type") == "reasoning":
+                        summary = item.get("summary")
+                        if isinstance(summary, list):
+                            for block in summary:
+                                if isinstance(block, dict) and block.get("text"):
+                                    collected.append(block["text"])
+                        elif isinstance(summary, str) and summary:
+                            collected.append(summary)
+
+                        content = item.get("content")
+                        if isinstance(content, list):
+                            for block in content:
+                                if isinstance(block, dict) and block.get("text"):
+                                    collected.append(block["text"])
+                    else:
+                        content = item.get("content")
+                        if isinstance(content, list):
+                            for c in content:
+                                if isinstance(c, dict):
+                                    if c.get("type") in ("text", "output_text"):
+                                        txt = c.get("text")
+                                        if isinstance(txt, str) and txt:
+                                            collected.append(txt)
+                                elif isinstance(c, str) and c:
+                                    collected.append(c)
+                        elif isinstance(content, str) and content:
+                            collected.append(content)
 
                     if "reasoning" in item:
                         r = item["reasoning"]
                         if isinstance(r, dict):
                             summary = r.get("summary")
-                            if isinstance(summary, str) and summary:
+                            if isinstance(summary, list):
+                                for block in summary:
+                                    if isinstance(block, dict) and block.get("text"):
+                                        collected.append(block["text"])
+                            elif isinstance(summary, str) and summary:
                                 collected.append(summary)
                         elif isinstance(r, str) and r:
                             collected.append(r)
-
                     if item.get("type") == "function_call":
                         args = item.get("arguments")
                         if isinstance(args, str) and args:
