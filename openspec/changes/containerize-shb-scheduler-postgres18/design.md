@@ -52,12 +52,18 @@ Delete `src/shb_schedule/service/launchd.py`, the `service` Typer sub-app, and t
 ### 7. Transaction boundaries & concurrency model
 - DBOS system-schema creation and migrations execute inside `DBOS.launch()`, within the `shb_scheduler` schema; Compose startup ordering is gated by the DB health check.
 - Each scheduled workflow execution is a durable DBOS transaction with step-level retries; no cross-schema writes. DBOS queue workers use `SELECT ... FOR UPDATE SKIP LOCKED` (PostgreSQL MVCC row locks), so concurrent `run-now` triggers and queue workers do not hit SQLite-style "database is locked" errors.
-- **Single-owner leader election:** `shb-schedule serve` takes an `fcntl.flock` on a lock file. Only one daemon process may be the active leader at a time; PostgreSQL concurrency benefits concurrent *queue workers and CLI triggers*, not multiple concurrent daemon leaders. (See Decision 8 for lock placement in-container.)
+- **Single-owner leader election:** In containerized/PostgreSQL mode, `shb-schedule serve` acquires a non-blocking PostgreSQL session advisory lock (`pg_try_advisory_lock` with deterministic application and schema namespace keys). Only one container process may be the active leader at a time across the entire database/schema namespace; competing daemons exit cleanly (code 0) or serve read-only standby health (HTTP 503). In local SQLite mode, leadership is governed by `FileLeaderLock` via `fcntl.flock`.
 
 ### 8. Container network binding and lock isolation
 - In the container environment, the daemon MUST listen on `0.0.0.0` so Docker's port bridge (`127.0.0.1:9110:9110`) correctly routes inbound host requests. **Subtle trap (verified in `cli.py`):** the `serve` command hardcodes its Typer default `host='127.0.0.1'` (from `constants.DEFAULT_HEALTH_HOST`) and ignores `settings.host`/`SHB_SCHEDULER_HOST` when bare `shb-schedule serve` is invoked. Therefore the container **entrypoint MUST explicitly pass `--host 0.0.0.0`** (or `cli.py` must be patched to default host to `settings.host`). Outside Docker, the local CLI default remains `127.0.0.1` for developer safety.
-- The single-owner leader lock file resides inside the container's private ephemeral filesystem (`/tmp/shb-schedule.lock`), isolating daemon `flock` semantics from host mount latencies or network filesystem locking restrictions.
+- In PostgreSQL mode, leader election is governed directly by PostgreSQL session-level advisory locks, providing cross-container coordination without relying on shared filesystem mounts. In local SQLite mode, `FileLeaderLock` uses the user's private runtime lock file (`~/.shb/shb-schedule.lock`).
 
+
+### 9. Fail-closed workflow execution on absent inputs
+In base production mode, the container mounts only schedule manifests (`~/.shb/schedules`) and no host working trees or live transaction ledgers. Workflows must execute fail-closed when prerequisite inputs are absent:
+- `eod-settlement-recon` removes hardcoded sample transaction fallbacks. When neither internal nor clearing transactions are provided, it returns `ACTION_REQUIRED` with zero counts rather than faking `BALANCED`.
+- `daily-shb-docs-sync` and `nightly-compliance-scan` report `PARTIAL` rather than `SUCCESS` when all target repositories are unmounted or missing.
+- Workflows support explicit input configuration via manifest context or environment variables (`SHB_WORKSPACE_DIR`, `SHB_RECON_LEDGER_PATH`), allowing developers and test harnesses to mount synthetic fixtures via `compose.override.yaml` without mutating base production contracts.
 ## Risks / Trade-offs
 
 - **[Worktown bind-mount UID mismatch on Linux]** → Base profile avoids repository mounts entirely; the optional dev override documents `git config --global --add safe.directory` and read-only mounts to prevent writes.

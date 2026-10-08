@@ -30,10 +30,7 @@ ancestor chain. `~/.agents/skills` is 51 symlinks into
 independently — so one physical skill set is exposed through two roots, with ~50
 colliding names deduplicated by canonical path at load time.
 
-**Measured surface.** On the `phanmemvip/codex-x` path (which does receive the
-prompt): 12,728 prompt tokens at `/tmp` and 29,476 at `~/Developer`. Ablation
-attributes ~9.2k and ~18.1k tokens to the skills inventory respectively, and
-~7.8k at `~/Developer` to the 505-line, 30 KB `~/Developer/AGENTS.md`.
+**Measured surface (Historical baseline vs active runtime).** Earlier historical surveys under unpruned exploratory harnesses recorded 12,728 prompt tokens at `/tmp` and 29,476 at `~/Developer`, attributing ~9.2k and ~18.1k tokens to the skills inventory and ~7.8k to `~/Developer/AGENTS.md`. In the active, installed TypeScript runtime v0.9.8, however, live measurement under standard session configuration demonstrates that the skills inventory contributes only minimal tokens (~56 tokens) when `~/.prime/agent/skills/` is unpopulated, while `~/Developer/AGENTS.md` accounts for the predominant delta (1,237 tokens at `/tmp` vs 9,064 tokens at `~/Developer`). The earlier ~18k survey figures are preserved as historical exploration context rather than active runtime fact.
 
 **The delivery defect.** Two providers share `baseUrl
 https://api.phanmemvip.shop/v1` but differ in credential. Probing both directly
@@ -174,26 +171,15 @@ are not accepted by the MCP settings surface and inlining would put a credential
 in a config file. Because the kernel environment is captured at spawn, the repair
 requires a daemon and kernel restart to take effect.
 
-**D4: Bound the prompt by removing duplicated discovery at the source, and by
-relocating task-specific context out of the always-loaded ancestor path.**
+**D4: Keep changes Prime-scoped: preserve shared workspace files and skills links, leveraging Prime-specific CLI controls for prompt budgeting.**
 
-Alternatives considered: (a) pass `--no-skills` — rejected, it removes the
-capability rather than the duplication; (b) prune `~/.agents/skills` fanout links
-to only the projects in use — chosen for the duplication, and it is already the
-sanctioned shape under `workspace-openspec-skill-discovery`, which requires those
-entries to be links rather than copies; (c) shrink `~/Developer/AGENTS.md` — chosen
-for the context cost, consistent with `agent-instruction-hygiene`'s 150-line
-target, keeping load-bearing boundaries in the discovered file and moving
-task-specific content to an explicitly-referenced location. Relying on the
-loader's canonical-path dedup was rejected: it prevents double-listing but does
-not remove the traversal, and the surviving inventory still reflects an
-unintended skill set.
+Prompt surface ablation demonstrates that workspace context files contribute significantly to the assembled prompt. However, `~/Developer/AGENTS.md` (505 lines) and all 51 symlinks in `~/.agents/skills` (resolving to 62 `SKILL.md` files) are shared across eight other client environments in the workspace (including Hermes, Codex, OpenCode, Goose, Pi). Per explicit user decision, these shared workspace roots remain completely intact to eliminate cross-client regression risks. Prompt budgeting is achieved exclusively via Prime Agent's native `-ns` (`--no-skills`) and `-nc` (`--no-context-files`) runtime flags when lightweight turns are required.
 
-**D5: Add cost and thinking-level metadata rather than synthesizing it.**
+**Safety Policy:** The `-nc` (`--no-context-files`) flag strips `AGENTS.md` load-bearing safety boundaries and MUST strictly be an explicit per-turn opt-in used for diagnostic measurement or scoped ablation. It SHALL NEVER be made an inherited default or permanent policy setting.
 
-Rates and level mappings are provider facts, so they are declared per model, not
-defaulted. Where a rate is genuinely unknown, the model is left un-priced by omitting the `cost` object (conforming to TypeBox's `Type.Optional(Type.Object({ input: Type.Number(), ... }))` schema) rather than given a fabricated zero — a `0` rate is
-indistinguishable from a real free tier in the usage report. Alternatives considered: (a) compute cost client-side from a table — rejected, it duplicates a surface the runtime already owns; (b) leave it — rejected, `$0.00` for every session is an actively misleading signal.
+**D5: Declare known rates or omit unpriced models conforming to optional schema; map thinking levels explicitly.**
+
+Rates and level mappings are provider facts, so they are declared per model, not defaulted. Where a rate is genuinely unknown, the model is left un-priced by omitting the `cost` object (conforming to TypeBox's `Type.Optional(Type.Object({ input: Type.Number(), ... }))` schema) rather than given a fabricated zero — a `0` rate is indistinguishable from a real free tier in the usage report. While the client runtime defaults usage cost display to $0.00 when rates are omitted, audit evidence and probe reporting explicitly record unpriced endpoints as unknown/unreported rather than free. Alternatives considered: (a) compute cost client-side from an external catalog — rejected, introduces out-of-band pricing drift; (b) fabricate placeholder rates — rejected, misrepresents financial reporting. Thinking levels are explicitly mapped via `thinkingLevelMap` to prevent silent clamping or discards.
 
 **D6: Configure recovery explicitly instead of relying on park behavior.**
 
@@ -240,17 +226,8 @@ export to be observed. No step leaves a partially-written configuration.
 - **Restarting the daemon interrupts running sessions** → verification is
   performed after restart, and sessions that must survive are identified before
   the restart rather than after.
-- **Relocating content out of `~/Developer/AGENTS.md` removes guidance from the
-  always-loaded surface** for every agent in the workspace, not just Prime Agent
-  → load-bearing safety boundaries stay in the discovered file; only
-  task-specific material moves, and it stays reachable by explicit path. This is
-  the `agent-instruction-hygiene` contract, not a new trade-off.
-- **Pruning `~/.agents/skills` links may remove a skill a workflow relies on**
-  → links are removed only for skills whose canonical root remains discoverable
-  from the workspace, and the pre-change link set is retained for rollback.
-- **Declared cost rates can drift from real provider pricing** → rates are
-  treated as metadata with a recorded provenance and a re-verification task, not
-  as an authoritative billing record.
+- **Preserving shared workspace roots and skills links** means Prime Agent continues loading workspace context by default → per user decision, all 51 shared skill symlinks and `~/Developer/AGENTS.md` (505 lines) remain untouched to prevent cross-client regression across all other 8 consumer CLIs. Prompt budgeting is controlled via Prime-specific per-turn execution flags (`-ns`, `-nc`).
+- **The `-nc` flag strips workspace safety context** → strictly restricted to explicit per-turn diagnostic opt-in; never inherited or configured as a default.
 - **The non-delivering registration stays reachable** and can be selected
   manually → the selection is left intact for the other eight consumer CLIs, and
   the new spec requirement constrains the default rather than removing the entry.
@@ -266,15 +243,10 @@ export to be observed. No step leaves a partially-written configuration.
    prompt-token measurement to confirm the assembled prompt is now delivered.
 4. Repair the MCP reference and restart the daemon and kernel; confirm the
    previously failing stdio handshake now resolves.
-5. Apply the prompt-surface reduction last, since it changes what every agent in
-   the workspace loads; re-measure the inventory and re-run the skill-index
-   validation the workspace already uses.
+5. Verify prompt-surface budgeting using Prime-specific runtime controls (`-ns`, `-nc`) without modifying any shared workspace files or skills links; re-run the workspace skill-index validation to confirm all shared links remain intact.
 6. Verify each step against the new capability's scenarios.
 
-**Rollback:** restore the captured `settings.json` and `models.json` wholesale,
-restore the `~/.agents/skills` link set, and restart the daemon. The MCP export is
-inert if the reference is restored first, so profile and configuration roll back
-independently.
+**Rollback:** restore the captured `settings.json` and `models.json` wholesale, leaving all shared workspace files and skills links undisturbed. Restart the daemon if needed. The MCP export is inert if the reference is restored first, so profile and configuration roll back independently.
 
 ## Open Questions
 

@@ -56,7 +56,7 @@ Each `mcpServers` stdio `env` entry SHALL name a variable that is exported into 
 
 ### Requirement: The always-loaded prompt surface SHALL be bounded and counted
 
-The skills inventory and discovered project-context files SHALL be measured in prompt tokens for the active working directory, and their combined size SHALL be recorded. A single discovered context file SHALL NOT dominate the prompt by loading unconditionally into every descendant session.
+The skills inventory and discovered project-context files SHALL be measured in prompt tokens for the active working directory, and their combined size SHALL be recorded. Where workspace context files and shared skills links are shared across multiple agent runtimes, they SHALL be preserved, and prompt budgeting SHALL be controlled via Prime-specific execution controls.
 
 #### Scenario: Prompt cost is attributed by ablation
 
@@ -64,28 +64,21 @@ The skills inventory and discovered project-context files SHALL be measured in p
 - **THEN** the token delta SHALL attribute cost to the skills inventory and to the context files
 - **AND** the measurement SHALL be recorded per working directory
 
-#### Scenario: An oversized workspace context file is relocated
+#### Scenario: Shared workspace context and skills remain intact
 
-- **WHEN** a discovered context file exceeds the applicable instruction-hygiene line target
-- **THEN** task-specific content SHALL move to an on-demand location while load-bearing boundaries remain in the discovered file
-- **AND** the relocated content SHALL remain reachable by an explicit path
+- **WHEN** prompt surface budgeting is configured
+- **THEN** shared workspace context files and shared skills fanout symlinks SHALL NOT be deleted or mutated globally
+- **AND** Prime-specific execution flags (`-ns`, `-nc`) SHALL be strictly explicit per-turn opt-ins rather than inherited defaults to preserve load-bearing workspace safety boundaries
+### Requirement: Registered models SHALL declare known cost rates and explicit reasoning metadata
 
-#### Scenario: Duplicated skill discovery is eliminated rather than deduplicated at load
+Each model registered for Prime Agent SHALL declare known cost rates or omit cost when unverified, and SHALL declare an explicit thinking-level mapping where the model supports reasoning. Models without established rates SHALL be recorded as unreported in audit evidence without fabricating zero rates, while recognizing the runtime defaults usage cost display to zero.
 
-- **WHEN** the same skill is reachable from more than one discovery root
-- **THEN** the redundant exposure SHALL be removed at the source
-- **AND** the remaining inventory SHALL report a count that matches the intended skill set
-
-### Requirement: Registered models SHALL carry complete usage and reasoning metadata
-
-Each model registered for Prime Agent SHALL declare cost metadata and, where the model supports reasoning, a thinking-level mapping. A model lacking cost metadata SHALL NOT silently report zero cost for its usage.
-
-#### Scenario: Cost metadata produces non-zero usage reporting
+#### Scenario: Cost rates reflect verified pricing while unverified models remain unreported
 
 - **WHEN** a session runs on a registered model and usage is reported
-- **THEN** the reported cost SHALL reflect the declared per-model rates
-- **AND** a model with no declared rates SHALL be identifiable as unreported rather than free
-
+- **THEN** the model entry SHALL declare its verified input and output rates where established
+- **AND** a subscription or proxy model with unestablished rates SHALL omit the cost object
+- **AND** external audit and probe evidence SHALL record the omitted rate as unreported rather than free, while recognizing the runtime defaults usage cost display to zero
 #### Scenario: Thinking level is mapped or clamped explicitly
 
 - **WHEN** a global default thinking level is configured and a model declares a supported-level mapping

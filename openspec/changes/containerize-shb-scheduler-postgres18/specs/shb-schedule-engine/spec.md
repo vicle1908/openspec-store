@@ -3,7 +3,7 @@
 ## ADDED Requirements
 
 ### Requirement: Containerized Orchestration via Docker Compose
-The `shb-schedule` service SHALL be deployable and operable exclusively through a Docker Compose stack comprising a `postgres:18.6-alpine` database service and the scheduler application container, with no dependency on host init systems (`launchd`, `systemd`) or host-installed binaries.
+The `shb-schedule` service SHALL provide standardized containerized orchestration through Docker Compose comprising a `postgres:18.6-alpine` database service and the scheduler container, eliminating dependencies on host init systems (`launchd`, `systemd`) while preserving opt-in local SQLite mode for development.
 
 #### Scenario: Bringing up the scheduler stack
 - **WHEN** an operator runs `docker compose up -d` within the `shb-schedule` project root
@@ -67,3 +67,55 @@ The scheduler SHALL NOT expose a host service-installation command; operators SH
 - **THEN** the command help SHALL NOT list a `service` command group
 - **AND** invoking `shb-schedule service install` SHALL fail as an unrecognized command
 - **AND** the scheduler documentation SHALL describe containerized operation instead of host LaunchAgent or systemd installation
+
+### Requirement: Fail-Closed Workflow Execution on Absent Input
+Workflows dispatched by the scheduler SHALL execute fail-closed when prerequisite input data or target file systems are absent. Workflows SHALL NOT synthesize default sample records or report success when target environments are missing.
+
+#### Scenario: Settlement reconciliation without input ledgers
+- **WHEN** `eod-settlement-recon` is invoked without internal or clearing transaction data
+- **THEN** the workflow SHALL report `ACTION_REQUIRED` status
+- **AND** it SHALL NOT return `BALANCED` or fall back to hardcoded sample transactions
+
+#### Scenario: Documentation and compliance workflows with unmounted workspaces
+- **WHEN** `daily-shb-docs-sync` or `nightly-compliance-scan` is invoked with zero target repositories available
+- **THEN** the workflow SHALL report `PARTIAL` status
+- **AND** it SHALL NOT report `SUCCESS`
+
+#### Scenario: Explicit fixture input provision
+- **WHEN** input ledgers or repository workspaces are provided via manifest context or environment variables
+- **THEN** the workflows SHALL process the provided data and report genuine evaluation status
+
+## MODIFIED Requirements
+
+### Requirement: Declarative Manifest System and Safe Hot-Reloading
+The service SHALL discover and parse `shb-schedule/v1` YAML manifests, with automatic backfill disabled by default. Hot-reload SHALL be triggerable via loopback HTTP POST `/scheduler/reload`, `SIGUSR1` signal, or mtime changes on `.reload` sentinels across candidate paths including read-only mount locations and configured sentinel paths, retaining the last known-good registry on validation or reconciliation failure.
+
+#### Scenario: Manifest validation and variable substitution
+- **WHEN** a YAML manifest containing environment placeholders is loaded
+- **THEN** the service SHALL substitute variables against `~/.shb/.env` without shell evaluation, validate the complete manifest set against the strict Pydantic v2 schema, resolve approved workflow callables, collect declared queues, and reject the candidate set if any manifest is invalid
+
+#### Scenario: Hot-reload on sentinel file change
+- **WHEN** the `.reload` sentinel is touched or `SIGUSR1` is received
+- **THEN** the service SHALL validate and reconcile the complete candidate registry before applying it
+- **AND** retain the last known-good registry if validation, import, queue, or reconciliation fails
+- **AND** SHALL preserve active connections and valid running workflows
+
+#### Scenario: Hot-reload via daemon HTTP endpoint
+- **WHEN** a client issues `POST /scheduler/reload` or invokes `shb-schedule reload`
+- **THEN** the service SHALL reconcile schedules against mounted manifests without requiring filesystem write access to the manifest directory
+- **AND** return a summary response detailing added, updated, retired, and retained schedules
+
+### Requirement: Canonical Scheduler Ownership and Concurrency Locking
+The SHB ecosystem SHALL have one canonical schedule owner. Only the active `shb-schedule` daemon SHALL apply recurring schedules. In containerized/PostgreSQL mode, leadership SHALL be governed by a non-blocking PostgreSQL session advisory lock; in local SQLite mode, via `fcntl.flock` on `~/.shb/shb-schedule.lock`. A second active daemon SHALL fail closed or expose read-only health state rather than applying schedules concurrently.
+
+#### Scenario: Duplicate scheduler startup
+- **WHEN** a second scheduler daemon starts while another owner holds the lock
+- **THEN** it SHALL NOT replace or mutate the active schedule set
+- **AND** it SHALL NOT attempt to bind to the primary daemon's HTTP health port (9110)
+- **AND** it SHALL report the ownership conflict through logs and exit cleanly without terminating the primary process
+
+#### Scenario: Multi-container PostgreSQL leadership governance
+- **WHEN** multiple scheduler containers connect to the same PostgreSQL database and schema
+- **THEN** only the container acquiring the database session advisory lock SHALL become leader and register schedules
+- **AND** competing daemons SHALL exit cleanly with status code 0 (or serve read-only standby health returning 503 if configured)
+- **AND** loss of database connectivity SHALL cause the leader to fail closed to standby mode within bounded time

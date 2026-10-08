@@ -15,6 +15,7 @@ The SHB `shb-schedule` daemon currently relies on host-specific process managers
   - `shb-schedule/compose.yaml` (base production profile: `postgres:18.6-alpine` with explicit `pg_isready` healthcheck, `shb-scheduler` image, named volume `shb-scheduler-pgdata`).
   - `shb-schedule/compose.override.yaml` (local dev: host port `127.0.0.1:9110:9110`, optional workspace bind-mount).
   - `~/.shb/schedules/*.yaml` manifests are mounted read-only; no source code repositories are mounted in base production mode.
+- **Fail-Closed Workflow Contracts**: Workflows fail closed on absent inputs in manifest-only containers: `eod-settlement-recon` removes sample transaction fallbacks to report `ACTION_REQUIRED` instead of faking `BALANCED`; `daily-shb-docs-sync` and `nightly-compliance-scan` report `PARTIAL` rather than `SUCCESS` when all target repositories are unmounted.
 
 **Non-Breaking**: The CLI commands (`shb-schedule validate`, `list`, `run-now`, `reload`) remain available via `docker compose exec`. Local SQLite mode remains opt-in via environment variable overrides (`SHB_SCHEDULER_BACKEND=sqlite`).
 
@@ -45,7 +46,7 @@ The SHB `shb-schedule` daemon currently relies on host-specific process managers
 ## Impact
 
 - **Operational Simplicity**: One command (`docker compose up`) brings up scheduler with PostgreSQL, health probes, and logs. No host dependencies beyond Docker daemon.
-- **Concurrent Execution**: PostgreSQL MVCC row-level locking (`SKIP LOCKED`) enables concurrent queue workers and on-demand CLI triggers (`run-now`) without SQLite lock contention, while daemon leader election remains single-owner via `fcntl.flock`.
+- **Concurrent Execution**: PostgreSQL MVCC row-level locking (`SKIP LOCKED`) enables concurrent queue workers and on-demand CLI triggers (`run-now`) without SQLite lock contention, while daemon leader election remains single-owner across container boundaries via PostgreSQL session advisory locking (with local SQLite mode retaining `fcntl.flock`).
 - **Platform Independence**: Identical behavior on macOS (Docker Desktop), Linux (systemd + dockerd), CI runners, and cloud VMs.
 - **Audit Readiness**: All execution history persisted to Postgres, queryable via SQL or via OpenSpec store audit tools.
 

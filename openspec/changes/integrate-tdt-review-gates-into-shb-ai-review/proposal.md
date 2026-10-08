@@ -8,15 +8,17 @@ The `shb-ai-review` service currently only executes basic local regex and heuris
 
 - **Implement GitLab MR Review Client and Discussion Posting**: Port and modernize GitLab MR diff inspection and discussion posting from `tdt/ai-review/src/ai_review/gitlab/review_posting.py` into `shb-ai-review`, enabling automated posting of structured inline comments and discussion resolutions.
 - **Implement Diff Hunk Gating (`HunkGate`)**: Port `hunk_gate.py` to ensure AI-generated review comments strictly attach to modified lines within valid git diff hunks, completely preventing off-diff hallucinated comments.
-- **Implement Deduplication & Severity Classification**: Port `deduplicator.py` and `severity.py` to prevent duplicate review comments across repeated CI runs or updated MR revisions while classifying issues into `BLOCKING`, `MAJOR`, and `NIT`.
+- **Implement Deduplication & Severity Classification**: Port `deduplicator.py` to prevent duplicate review comments across repeated CI runs or updated MR revisions while classifying issues by severity (`BLOCKER`, `CRITICAL`, `MAJOR`, `MINOR`, `INFO`).
 - **Implement Isolated Git Worktree Manager**: Port `worktree/manager.py` to allow the review engine to check out base and head commits in disposable temporary worktrees without dirtying developer or CI working directories.
-- **Implement MR Review Coverage Scanner CLI (`mr-coverage`)**: Provide the standalone `mr-coverage` entrypoint in `shb_review/coverage/` and `pyproject.toml` to audit merge request review state snapshots, identifying missing reviews, stale reviews on updated commit SHAs, and previous review failures.
+- **Implement MR Review Coverage Scanner CLI (`mr-coverage scan`)**: Provide the standalone `mr-coverage` entrypoint in `shb_review/coverage/` and `pyproject.toml` to audit merge request review state snapshots, identifying missing reviews, stale reviews on updated commit SHAs, and previous review failures.
+- **Implement Changed-Line Test Coverage Gating (`mr-coverage diff`)**: Provide patch coverage calculation from git diff additions against Cobertura XML reports, enforcing configured threshold gates.
+- **Implement Configured AI Review Dispatch**: Support opt-in AI review via Pydantic AI v2 with structured output models, execution tools disabled, and outbound credential redaction.
 
 ## Capabilities
 
 ### Modified Capabilities
 
-- `shb-review-and-quality`: Extends the existing specification to mandate line-level git diff hunk gating, isolated worktree evaluation, review deduplication across MR revisions, and the standalone `mr-coverage` review coverage audit gatekeeper.
+- `shb-review-and-quality`: Extends the existing specification to mandate line-level git diff hunk gating, isolated worktree evaluation, review deduplication across MR revisions, standalone `mr-coverage` review coverage audit and patch test coverage gating, and opt-in AI review dispatch with strict prompt isolation.
 
 ## Non-Goals
 
