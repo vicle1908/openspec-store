@@ -88,6 +88,13 @@ Where a consumer CLI registers the shopapikey Claude model, its model ID SHALL b
 - **AND** it SHALL NOT carry an Anthropic-only `extra_headers` block
 - **AND** the `shopapikey-claude-fable` model entry SHALL have `model = "Claude-Fable"`
 
+#### Scenario: Prime Agent SHALL NOT default to a non-delivering shopapikey selection
+
+- **WHEN** `~/.prime/agent/settings.json` is inspected
+- **THEN** `defaultProvider`/`defaultModel` SHALL NOT name a shopapikey model registration whose endpoint returns a constant prompt-token count independent of the assembled system prompt
+- **AND** the corrected default SHALL be a registration verified to deliver the harness system prompt
+- **AND** the other eight consumer CLIs' shopapikey registrations SHALL be unchanged by that correction
+
 ### Requirement: Consumer CLI migrations SHALL be smoke-verified
 
 Each migrated consumer CLI SHALL pass a non-interactive smoke test against its phanmemvip registration before the change is archived.
