@@ -5,12 +5,36 @@ Establishes the durable task scheduling engine, declarative schedule manifests, 
 
 ## Requirements
 
-### Requirement: Durable Workflow Execution and Determinism Invariants
-The `shb-schedule` service SHALL provide durable workflow execution with recoverable execution history, retry behavior, and step replay semantics backed by `dbos>=3.1.0`. Workflows decorated with `@DBOS.workflow` SHALL accept `(scheduled_at, context)` positional parameters when dispatched on a schedule and SHALL remain strictly deterministic; all non-deterministic operations including system clock readings (`datetime.now(timezone.utc)`), filesystem mutations, and external subprocess execution SHALL be strictly encapsulated inside `@DBOS.step` functions with explicit timeouts. Local execution SHALL support an embedded user-home SQLite database in WAL mode (`PRAGMA journal_mode=WAL;`), and enterprise execution SHALL support PostgreSQL 18 in a dedicated `shb_scheduler` schema. External side effects SHALL be treated as idempotent-or-guarded operations; the service SHALL NOT claim transactional exactly-once behavior for arbitrary external subprocesses.
+### Requirement: Durable Workflow Execution
+The `shb-schedule` service SHALL provide durable workflow execution with recoverable execution history, retry behavior, and step replay semantics backed by `dbos>=3.1.0`.
 
 #### Scenario: Engine initialization and lifecycle
 - **WHEN** `shb-schedule serve` is executed
 - **THEN** the service SHALL load configuration using the SHB configuration convention, resolve the database path under the current user's `~/.shb/` directory (`0700` dir / `0600` file) unless explicitly configured, acquire a kernel-level single-owner lock, initialize DBOS via an ASGI lifespan context manager, perform persisted-state reconciliation, and expose the health endpoint on port `9110` by default
+
+### Requirement: Deterministic Workflow Boundaries
+Workflows decorated with `@DBOS.workflow` SHALL accept `(scheduled_at, context)` positional parameters when dispatched on a schedule and SHALL remain strictly deterministic. Non-deterministic operations, including system clock readings, filesystem mutations, and external subprocess execution, SHALL be encapsulated inside `@DBOS.step` functions with explicit timeouts.
+
+#### Scenario: Scheduled workflow context and step boundaries
+- **WHEN** DBOS dispatches a workflow from a schedule
+- **THEN** the workflow SHALL receive its scheduled time and context positionally
+- **AND** nondeterministic operations SHALL execute only through bounded step functions
+
+### Requirement: Local and Enterprise Persistence
+Local execution SHALL support an embedded user-home SQLite database in WAL mode (`PRAGMA journal_mode=WAL;`), and enterprise execution SHALL support PostgreSQL 18 in a dedicated `shb_scheduler` schema.
+
+#### Scenario: Persistence backend selection
+- **WHEN** local defaults are used
+- **THEN** the service SHALL use the configured user-home SQLite WAL database
+- **AND** when enterprise PostgreSQL configuration is supplied, DBOS state SHALL be isolated in the `shb_scheduler` schema
+
+### Requirement: External Side-Effect Semantics
+External side effects SHALL be idempotent or guarded. The service SHALL NOT claim transactional exactly-once behavior for arbitrary external subprocesses.
+
+#### Scenario: External side effect retry
+- **WHEN** a workflow step invokes an external subprocess and the step is retried
+- **THEN** the operation SHALL use an idempotency guard or equivalent duplicate-prevention mechanism
+- **AND** the service SHALL not report arbitrary subprocess effects as transactional exactly-once
 
 #### Scenario: Hermetic test passthrough
 - **WHEN** `SHB_SCHEDULER_ENABLED=false` is set in the runtime environment
