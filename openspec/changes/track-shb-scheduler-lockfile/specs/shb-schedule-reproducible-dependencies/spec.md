@@ -17,7 +17,12 @@ The scheduler repository SHALL track `uv.lock` in version control and SHALL pres
 #### Scenario: Frozen container installation uses the lockfile
 - **WHEN** the scheduler image build runs `uv sync --frozen`
 - **THEN** the build SHALL read the committed `uv.lock`
-- **AND** dependency resolution SHALL fail rather than silently regenerate or bypass the lockfile if it is stale
+- **AND** the installation SHALL NOT regenerate the lockfile or re-resolve dependencies
+
+#### Scenario: Lockfile metadata validation
+- **WHEN** `uv lock --check` is run before frozen installation
+- **THEN** stale project metadata SHALL cause a non-zero validation result without rewriting `uv.lock`
+- **AND** frozen installation SHALL not be represented as a freshness check
 
 ### Requirement: Runtime Lock Ignore Boundary
 The repository SHALL continue ignoring local runtime lock files and database state without excluding the committed dependency lockfile.

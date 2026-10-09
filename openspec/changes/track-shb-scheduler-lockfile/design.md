@@ -9,10 +9,10 @@ See proposal.md for motivation. The scheduler's `.gitignore` currently ignores e
 **Goals:**
 - Track only the project dependency lockfile while retaining local runtime-state exclusions.
 - Verify the lockfile is present, tracked, and accepted by `uv sync --frozen`.
-- Keep the change limited to the scheduler repository's ignore policy and OpenSpec artifacts.
+- Keep runtime edits bounded to the seven source-lint diagnostics, retaining asynchronous reload tasks and reloader encapsulation without changing workflow semantics.
 
 **Non-Goals:**
-- No dependency upgrade or lockfile regeneration unless frozen verification proves the existing lockfile is stale.
+- No dependency upgrade or lockfile regeneration. Check metadata freshness with `uv lock --check`; frozen sync does not perform that check.
 - No changes to runtime lock paths, database files, Docker/Compose behavior, or generated Graphify output.
 
 ## Decisions
@@ -24,7 +24,10 @@ Keep the broad `*.lock` rule for local runtime state and add `!uv.lock` immediat
 Before editing, confirm `git check-ignore -v uv.lock` identifies the broad rule and `git ls-files uv.lock` is empty. After editing, verify `git check-ignore -v uv.lock` no longer reports it as ignored and `git ls-files --error-unmatch uv.lock` succeeds after staging/commit.
 
 ### 3. Use frozen dependency verification
-Run `uv sync --frozen --no-dev --no-editable` in the scheduler repository or the existing container build path. Do not regenerate `uv.lock`; a stale lockfile is a failure requiring explicit follow-up rather than silent update.
+Run `uv lock --check` to verify metadata freshness, and retain `uv sync --frozen --no-dev --no-editable` for installation from the unchanged lockfile. `--frozen` deliberately skips freshness validation; `--locked` or `uv lock --check` rejects stale metadata without rewriting the lockfile.
+
+### 4. Source-lint gate extension approved during apply
+Resolve the seven reported source diagnostics only: simplify equivalent boolean conditions in config/health, combine connection/cursor contexts in ownership, replace health's private-lock access with a public reloader idle-wait operation, and retain every pending signal-triggered task until completion. Do not add suppression directives, change permissions/ownership semantics, or bypass source lint. Preserve reload serialization, standby fencing, and shutdown ordering.
 
 ## Risks / Trade-offs
 
