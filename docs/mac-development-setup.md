@@ -19,8 +19,8 @@ Every development CLI is governed by exactly one authoritative installation owne
 | **uv** | Core Formula | `brew "uv"` | `brew upgrade uv` | `uv --version` | Fast Python package and environment manager. |
 | **Qoder** | Standalone Script | Vendor Standalone | `qoder update` | `qoder --version` | **Standalone Exception**. Managed via `~/.local/bin/qodercli` and `~/.qoder/entry` dispatcher. |
 | **GitNexus** | npm Registry | npm Global Prefix (`~/.npm-global`) | `npm --prefix "$HOME/.npm-global" install --global gitnexus@latest` | `gitnexus --version && gitnexus status` | **npm Global Exception**. Distributed via npm; compiles native `@ladybugdb/core` bindings into explicit user prefix. |
-| **Newman** | Pinned JS Toolbelt | Isolated Toolchain | npm in isolated root | `newman --version` | **Isolated Toolchain Exception**. Retained at 6.2.2 in `~/.local/share/home-toolchain`. |
-| **Bruno** | Pinned JS Toolbelt | Isolated Toolchain | npm in isolated root | `bru --version` | **Isolated Toolchain Exception**. Retained at 4.2.1 in `~/.local/share/home-toolchain`. |
+| **Newman** | Pinned JS Toolbelt / Formula | Isolated Toolchain (Pending Decision) | npm in isolated root | `newman --version` (active) / `~/.local/share/home-toolchain/node_modules/.bin/newman --version` | **Dual State / Pending Operator Choice**. Active PATH resolves `/opt/homebrew/bin/newman` (Homebrew formula 6.2.2, unmanaged in `config/Brewfile`). Isolated copy verified at 6.2.2 in `~/.local/share/home-toolchain` with reporter and legacy Faker compatibility intact. Parent decision pending on Homebrew formula adoption vs. `~/.local/bin/newman` symlink. |
+| **Bruno** | Pinned JS Toolbelt | Isolated Toolchain | npm in isolated root | `bru --version` | **Isolated Toolchain Exception**. Active verified at 4.2.0 via `~/.local/bin/bru -> ~/.local/share/home-toolchain/node_modules/.bin/bru`. Target 4.2.1 is declared/desired, not current. Package upgrade requires operator authorization. |
 | **Prime Agent** | Local Dev Exception | Local Node Entry | Manual / Pinned | `prime-agent --version` | **Local Dev Exception**. Observed Node.js entry point at `/opt/homebrew/bin/prime-agent` (version 0.9.8). Consult the source checkout's applicable repository policy before building or relinking; this runbook does not authorize those operations. |
 | **Docker** | Docker Desktop | Docker Desktop / Cask | Desktop App Updater | `docker --version && docker compose version` | Official Docker Desktop application managing VM and Docker CLI. Protects persistent volumes. |
 | **AgentMemory** | npm Global | npm Global Prefix | npm in global prefix | `curl -fsS http://localhost:3111/agentmemory/health` | **npm Global Exception**. Package `@agentmemory/agentmemory` pins `iii-engine` 0.22.1. |
@@ -136,6 +136,37 @@ cd ~/.local/share/home-toolchain
 npm ci --no-audit --no-fund
 ```
 - Active binaries: `~/.local/share/home-toolchain/node_modules/.bin/newman`, `bru`
+
+#### Active vs. Declared Target State (Audited 2026-10-09)
+
+1. **Newman (v6.2.2)**:
+   - **Declared Target**: Isolated toolchain binary at `~/.local/share/home-toolchain/node_modules/.bin/newman`.
+   - **Active Host Resolution**: `/opt/homebrew/bin/newman` (Homebrew formula 6.2.2 in Cellar; unmanaged in `config/Brewfile`). `~/.local/bin/newman` is not linked.
+   - **Read-Only Verification**:
+     ```bash
+     which -a newman
+     /opt/homebrew/bin/newman --version
+     /Users/androidteam/.local/share/home-toolchain/node_modules/.bin/newman --version
+     shasum -a 256 ~/.local/share/home-toolchain/package-lock.json
+     ```
+   - **Isolated Toolchain Verification**: Pinned 6.2.2 binary verified with `newman-reporter-htmlextra` (1.23.1) and legacy Faker metadata paths (`postman-collection/node_modules/@faker-js/faker` 5.5.3) executing against loopback endpoints without modifying package-lock integrity (`cd970d60c61ed7ccf8845f3cf2cb605e325155cc7ee87be13e0d52d9fe918e74`).
+   - **Parent Decision & Operator Gate**: Normalizing Newman requires choosing between:
+     - *Option A*: Adopt Homebrew formula as authoritative (add `brew "newman"` to `config/Brewfile` and retire isolated toolbelt package).
+     - *Option B*: Enforce isolated toolbelt ownership (symlink `~/.local/bin/newman -> ~/.local/share/home-toolchain/node_modules/.bin/newman` and uninstall Homebrew formula).
+     *Operator Gate*: Any symlink creation, brew formula uninstall, or PATH change requires explicit operator authorization.
+
+2. **Bruno (v4.2.0 Active vs. v4.2.1 Declared Target)**:
+   - **Declared Target**: `@usebruno/cli` 4.2.1 (intended/target version).
+   - **Active Host Resolution**: `~/.local/bin/bru` -> `~/.local/share/home-toolchain/node_modules/.bin/bru` (v4.2.0).
+   - **Target vs. Current Distinction**: Target is 4.2.1; active installed version is 4.2.0 as locked in `~/.local/share/home-toolchain/package-lock.json`. 4.2.1 is NOT currently installed on the host.
+   - **Read-Only Verification**:
+     ```bash
+     which -a bru
+     realpath ~/.local/bin/bru
+     /Users/androidteam/.local/share/home-toolchain/node_modules/.bin/bru --version
+     /Users/androidteam/.local/bin/bru --version
+     ```
+   - **Parent Decision & Operator Gate**: Upgrading to 4.2.1 requires an operator-approved package update (`npm install @usebruno/cli@4.2.1` in `~/.local/share/home-toolchain`) and lockfile change. In-place package mutations without explicit approval are forbidden.
 
 ### Prime Agent (Local Dev Exception)
 - Active entry point: `/opt/homebrew/bin/prime-agent` (Node.js script entry point; verified v0.9.8)
@@ -311,13 +342,16 @@ When migrating or verifying a secondary machine:
    uv --version
    qoder --version
    gitnexus --version && gitnexus status
-   newman --version
-   bru --version
+   which -a newman bru
+   /opt/homebrew/bin/newman --version
+   /Users/androidteam/.local/share/home-toolchain/node_modules/.bin/newman --version
+   /Users/androidteam/.local/bin/bru --version
    prime-agent --version
    curl -fsS http://localhost:3111/agentmemory/health
    docker --version && docker compose version
    ```
 5. Confirm zero duplicate binary resolution via `which -a <tool>`.
    *Note on Brewfile Casks & Formulae:* On any target Mac, `brew bundle install` provisions declared casks (including `cask "codex"`) and formulae (including `brew "bun"`). Verify binary receipts (`brew list --cask`, `brew list --formula`) and active paths (`which -a codex bun`) to confirm clean Homebrew resolution without uncoordinated package manager duplicates.
+   *Note on Newman & Bruno Dual State:* Active `newman` currently resolves to Homebrew Formula `/opt/homebrew/bin/newman` (6.2.2), while isolated `~/.local/share/home-toolchain/node_modules/.bin/newman` also verifies at 6.2.2. Active `bru` resolves via `~/.local/bin/bru` to isolated `~/.local/share/home-toolchain/node_modules/.bin/bru` at 4.2.0 (desired target 4.2.1 pending operator-authorized upgrade).
 6. Verification Semantics:
    A unified verification PASS indicates that the read-only inspection protocol was executed successfully and declared manifests align without tool invocation errors. Any future host mutations, duplicate removals, or service changes require explicit operator authorization and verified read-back checks.
