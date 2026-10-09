@@ -112,9 +112,8 @@ class TestLayeredProfiles(unittest.TestCase):
         self.assertIn('brew "git"', content)
         self.assertIn('brew "node"', content)
         self.assertIn('brew "uv"', content)
-        self.assertIn('cask "cursor-cli"', content)
-        # Must not claim npm-owned tools
-        self.assertNotIn('cask "codex"', content)
+        self.assertIn('brew "bun"', content)
+        self.assertIn('cask "codex"', content)
         self.assertNotIn('cask "qoder"', content)
 
     def test_npm_global_profile_contains_sanctioned_tools(self):

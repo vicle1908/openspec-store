@@ -2,184 +2,150 @@
 
 ## Purpose
 
-This capability defines reproducible, owner-aware macOS development tooling that can be inspected, bootstrapped, verified, and documented across workstations without migrating secrets, persistent volumes, or machine-local state.
+This capability defines reproducible, owner-aware macOS development tooling governed by standard Homebrew declarative configuration and native operator runbooks, minimizing customization and avoiding custom automation code.
 
 ## ADDED Requirements
 
-### Requirement: Tool ownership and update authority SHALL be explicit
+### Requirement: Tool ownership and update authority SHALL follow vendor-supported precedence
 
-Every managed development tool SHALL declare exactly one authoritative installation owner, active executable path pattern, update authority, release channel, dispatch mode (`native`, `delegating`, `none`), and verification smoke command within the versioned manifest. A tool with multiple installations across different roots SHALL be reported as drifted until duplicate copies are reconciled under explicit gates.
+Development tooling configuration SHALL declare exactly one authoritative installation owner and update authority per tool, prioritizing official Homebrew packages where vendor-supported, and classifying vendor standalone installers or global package managers as documented runbook exceptions. Conflicting duplicate installations SHALL be flagged for operator review without automated unmanaged deletion.
 
-#### Scenario: Duplicate executable resolution
-- **WHEN** the inventory finds multiple installations for one executable across different roots (e.g. Homebrew, npm-global, standalone)
-- **THEN** verification SHALL report the resolved active executable, all detected duplicate paths, and the owner mismatch without deleting any file
+#### Scenario: Vendor-supported Homebrew package precedence
+- **WHEN** an official Homebrew formula or cask is maintained and documented by the tool's upstream vendor (e.g. `cask "codex"`, `brew "bun"`, `brew "node"`, `brew "uv"`)
+- **THEN** the configuration SHALL assign Homebrew as the authoritative installation owner and update authority
+- **AND** the tool's update command SHALL map to standard Homebrew verbs (`brew upgrade --cask <tool>` or `brew upgrade <tool>`)
 
-#### Scenario: Aligned executable
-- **WHEN** the resolved active executable matches the declared authoritative installation owner and path pattern
-- **THEN** verification SHALL report the tool as aligned and record its active version evidence
+#### Scenario: Documented vendor standalone exception
+- **WHEN** a tool has an official standalone binary installer but no maintained official Homebrew formula or tap (e.g. `qoder`)
+- **THEN** the configuration SHALL classify the tool as a vendor standalone exception
+- **AND** the setup runbook SHALL document the vendor-supported installation command and built-in update dispatcher (`qoder update`)
 
-#### Scenario: Unsanctioned or ambiguous updater
-- **WHEN** a maintenance updater is configured to update a tool from a package manager that does not own the active executable
-- **THEN** the update runner SHALL suppress automated mutation for that tool and record the updater as misaligned
+#### Scenario: Documented npm global exception
+- **WHEN** a tool requires global npm installation and compiles native dependencies but lacks an official Homebrew package (e.g. `gitnexus`)
+- **THEN** the configuration SHALL classify the tool as an npm global exception
+- **AND** the setup runbook SHALL document the exact native npm installation command (`npm install -g gitnexus@latest`)
 
-#### Scenario: Updater dispatch classification matches vendor authority
-- **WHEN** an updater is registered for a tool in the updater registry
-- **THEN** the registration SHALL record the authoritative writer binary, dispatch mode (`native`, `delegating`, `none`), and supported verb
-- **AND** an npm-installed tool lacking a native updater command (e.g. `codex`) SHALL NOT be dispatched via an invalid self-update command
+#### Scenario: Preserved isolated toolchain exception
+- **WHEN** tools require pinned runtime dependencies or specific legacy compatibility that conflict with global packages (e.g. `newman` with Faker v5 compatibility)
+- **THEN** the configuration SHALL retain the tool in an isolated directory toolchain (`~/.local/share/home-toolchain`)
+- **AND** the configuration SHALL NOT force global migration or unmanaged deletion of the isolated lockfile
 
-### Requirement: Central authoring and external execution SHALL be strictly gated
+#### Scenario: Duplicate executable reported without unmanaged deletion
+- **WHEN** multiple installations for a CLI are detected across different roots (e.g. Homebrew, npm-global, standalone)
+- **THEN** the operator inventory inspection SHALL report the active path and all duplicate locations
+- **AND** the tooling SHALL NOT perform automated or unmanaged deletion of detected duplicate files
 
-Workstation automation SHALL separate central schema and manifest authoring in `platform/openspec-store` from external execution on host roots and remote services. Any modification to external directories (`~/Developer/scripts/`, `~/.zshrc`, `~/.zshenv`, `~/Library/LaunchAgents/`, `/opt/homebrew`, `~/.npm-global`, Notion, AgentMemory) SHALL require explicit external scope authorization and an External Execution Packet.
+### Requirement: Workstation configuration SHALL be declared via standard Homebrew Bundle and runbook
 
-#### Scenario: Central authoring root boundary
-- **WHEN** planning artifacts, schemas, or manifest templates are authored or revised
-- **THEN** all file writes SHALL remain within `platform/openspec-store`
-- **AND** central `/opsx:apply` `allowedEditRoots` SHALL NOT authorize modifications outside `platform/openspec-store`
+Workstation tooling SHALL be declared centrally in `platform/openspec-store` using a standard `config/Brewfile` (restricting stanzas to `tap`, `brew`, and `cask`) and an operator setup runbook in `docs/mac-development-setup.md`. The configuration SHALL avoid custom schemas, embedded shell hooks, or multi-ecosystem extensions, relying strictly on native Homebrew commands for inspection and installation.
 
-#### Scenario: External execution packet verification
-- **WHEN** an authorized external execution action completes
-- **THEN** the runner SHALL emit an execution packet recording target root, source commit, bounded command, timestamps, exit code, item counts, source-preservation status, read-back verification data, and evidence hashes
+#### Scenario: Declarative Brewfile authoring
+- **WHEN** workstation tools are declared in `config/Brewfile`
+- **THEN** the file SHALL declare only intentional direct tools using standard `tap`, `brew`, and `cask` stanzas
+- **AND** the file SHALL NOT contain embedded Ruby scripts, shell execution hooks, or credentials
 
-#### Scenario: Missing external authorization blocks mutation
-- **WHEN** an external action lacks an explicit scope authorization or exact-path approval
-- **THEN** the workflow SHALL fail closed, emitting a blocked status without altering any host file or service
+#### Scenario: Read-only bundle check with no upgrades by default
+- **WHEN** preflight verification is executed against `config/Brewfile`
+- **THEN** the operator SHALL run `HOMEBREW_NO_AUTO_UPDATE=1 brew bundle check --file config/Brewfile --no-upgrade`
+- **AND** the check SHALL report missing dependencies without triggering automatic updates or package installations
 
-### Requirement: Bootstrap SHALL be user-portable and render concrete launchd paths
+#### Scenario: Repeated bundle install is idempotent
+- **WHEN** `brew bundle install --file config/Brewfile --no-upgrade` is executed repeatedly against an aligned workstation
+- **THEN** Homebrew SHALL confirm that all declared formulae, casks, and taps are satisfied
+- **AND** no redundant rebuilds, package mutations, or configuration alterations SHALL occur
 
-The bootstrap engine SHALL derive user paths and the Homebrew prefix from the active environment. It SHALL render concrete absolute paths into LaunchAgent plists before registration. Portable manifests SHALL exclude secrets, private keys, signed-in state, and Docker volumes.
+#### Scenario: Rejection of unmanaged ecosystem DSL extensions
+- **WHEN** non-Homebrew packages (such as npm, uv, or cargo tools) are evaluated for inclusion in `config/Brewfile`
+- **THEN** the configuration SHALL exclude them from the Brewfile to prevent dual-writer conflicts
+- **AND** non-Homebrew tools SHALL be managed exclusively via their native package commands documented in the runbook
 
-#### Scenario: Different username and home directory
-- **WHEN** bootstrap runs under a different macOS username or home directory path
-- **THEN** generated shell configuration and LaunchAgent plists SHALL target the active user's home directory without referencing `/Users/androidteam`
+### Requirement: External execution and machine mutations SHALL require explicit operator authorization
 
-#### Scenario: launchd template variable rendering
-- **WHEN** a LaunchAgent plist is rendered from its template
-- **THEN** all registered variables (`{{HOME}}`, `{{HOMEBREW_PREFIX}}`, `{{WORKSPACE_ROOT}}`, `{{OPENSPEC_STORE_ROOT}}`) SHALL be replaced with concrete absolute paths
-- **AND** verification SHALL confirm that no unexpanded placeholders or shell variables exist in the rendered plist
+All host-modifying actions—including package installations, upgrades, duplicate removals, service changes, and launchd adjustments—SHALL be executed directly by the human operator under explicit scope authorization. Planning artifacts in `platform/openspec-store` SHALL NOT execute host mutations, and operations SHALL NOT perform broad destructive filesystem deletions.
 
-#### Scenario: Secret-bearing state exclusion
-- **WHEN** a candidate file contains credentials, API keys, or signed-in session state (such as `.zshenv`)
-- **THEN** bootstrap SHALL exclude the file from tracking and template generation, reporting the required manual secret injection step
+#### Scenario: Central store authoring boundary
+- **WHEN** planning artifacts, Brewfile manifests, or setup runbooks are authored or updated
+- **THEN** all file writes SHALL remain strictly within `platform/openspec-store`
+- **AND** no external host directories, user profiles, or system roots SHALL be modified by planning tools
 
-#### Scenario: Repeat bootstrap is idempotent
-- **WHEN** bootstrap runs repeatedly against an already configured workstation
-- **THEN** no duplicate symlinks, duplicate PATH entries, or broken file states SHALL be created
-- **AND** verification SHALL report that all existing configurations are already aligned
+#### Scenario: Operator-scoped external execution
+- **WHEN** package installations, removals, or service adjustments are required on the host
+- **THEN** the actions SHALL be performed manually by the operator under explicit scope authorization
+- **AND** the setup runbook SHALL provide exact, copy-pasteable native commands rather than executing automated scripts
 
-#### Scenario: Unsupported CPU architecture or missing prerequisite
-- **WHEN** bootstrap executes on an unsupported CPU architecture or is missing required development prerequisites (such as Xcode Command Line Tools)
-- **THEN** bootstrap SHALL fail closed with an informative diagnostic error and exit code non-zero without writing partial configurations
+#### Scenario: No unmanaged files cleanup or broad deletion
+- **WHEN** disk hygiene or duplicate removal is performed
+- **THEN** broad destructive commands (`rm -rf`, `brew bundle --force --cleanup`) SHALL NOT be executed
+- **AND** removals SHALL target only specific, verified duplicate paths confirmed safe by the operator
 
-### Requirement: Verification SHALL fail closed on unsafe drift and service collisions
+#### Scenario: Pre- and post-mutation native verification smoke checks
+- **WHEN** an approved tool is installed, updated, or normalized
+- **THEN** the operator SHALL execute native smoke checks (`<tool> --version`, `<tool> help`) before and after the mutation
+- **AND** if post-mutation verification fails, the operator SHALL halt further changes
 
-Workstation verification SHALL fail closed when an active executable lacks a declared owner, an update target differs from the active path, required prerequisites are missing, or mutually exclusive services claim the same development port. Verification SHALL generate structured audit evidence without performing destructive modifications.
+#### Scenario: Rollback limitation acknowledged without guaranteed downgrade
+- **WHEN** an upgraded package exhibits functional regressions
+- **THEN** the runbook SHALL acknowledge that Homebrew does not guarantee automatic version rollbacks when older bottle revisions are purged upstream
+- **AND** recovery procedures SHALL prescribe manual reinstallation of cached bottles or explicit fallback version recipes
 
-#### Scenario: Update target mismatch
-- **WHEN** a scheduled updater targets a different prefix than the active executable
-- **THEN** verification SHALL classify the tool as misaligned and SHALL suppress that tool's automated mutation
+### Requirement: Concurrency and maintenance runner controls SHALL use native operator mechanisms
 
-#### Scenario: Port collision reported without killing or stopping services
-- **WHEN** two installed services or background daemons claim the same development port (e.g. Ollama daemon and Docker runner on port 11434)
-- **THEN** verification SHALL report the port collision and foreign PID in a quarantine report
-- **AND** verification SHALL NOT terminate arbitrary processes, restart services, or reconfigure network bindings
+Potential concurrency conflicts between manual package management and scheduled maintenance runners SHALL be managed using native operating system and process controls without modifying maintenance script code. Process-level pause flags SHALL be distinguished from persistent launchd job scheduling.
 
-#### Scenario: AgentMemory health verification via `/agentmemory/health` and package metadata
-- **WHEN** AgentMemory health is evaluated
-- **THEN** the probe SHALL request HTTP GET `/agentmemory/health` on port 3111
-- **AND** the probe SHALL verify that installed package metadata aligns with the pinned `iii-engine` version
-- **AND** the probe SHALL NOT evaluate health using root `/` which returns 404
+#### Scenario: Distinguishing process pause from scheduled job state
+- **WHEN** `DISABLE_UPDATES=1` is exported in a user shell or environment
+- **THEN** the setting SHALL pause mutation stages only for runner processes that inherit that environment variable
+- **AND** the setting SHALL NOT be claimed to pause or suspend already running or persistently scheduled launchd jobs
 
-#### Scenario: Incompatible AgentMemory engine or API process quarantined
-- **WHEN** port 49134 has an incompatible engine or port 3111 is occupied by an unexpected API process
-- **THEN** the verification engine SHALL record the offending PID, port, and version evidence in a quarantine audit
-- **AND** the engine SHALL NOT execute an un-gated process kill or mutate the SQLite database
+#### Scenario: Operator-initiated persistent launchd pause
+- **WHEN** manual toolchain updates or maintenance operations are performed by the operator
+- **THEN** the operator SHALL persistently pause the scheduled daily updater using native launchctl commands (`launchctl disable` and `launchctl bootout`)
+- **AND** no code modifications SHALL be made to `workstation-daily-update.sh` or its LaunchAgent plist
 
-### Requirement: Package changes SHALL be staged with pre- and post-mutation native smoke checks
+#### Scenario: Resuming scheduled maintenance after manual intervention
+- **WHEN** manual maintenance is completed and verified
+- **THEN** the operator SHALL conditionally re-enable the scheduled updater using native launchctl commands (`launchctl enable` and `launchctl bootstrap`) only after verifying runner compatibility
+- **AND** the scheduled runner SHALL NOT be resumed if it would cause uncoordinated writer collisions with migrated Homebrew packages
 
-Toolchain maintenance workflows SHALL distinguish inspection, normalization, removal, upgrade, and rollback stages. Any upgrade or removal action SHALL require both pre-mutation and post-mutation native smoke checks.
+### Requirement: Persistent state, secrets, and Docker volumes SHALL be protected
 
-#### Scenario: Upgrade candidate staging and native smoke check
-- **WHEN** an installed package has an available upstream release
-- **THEN** the workflow SHALL run the tool's pre-mutation native smoke check (`<tool> --version`, `<tool> help`, or MCP status)
-- **AND** after applying the update, the workflow SHALL run the post-mutation native smoke check and record active version readback
+Development configuration and hygiene runbooks SHALL protect persistent local data, secret-bearing dotfiles, and named Docker volumes. Secrets and machine-local credentials SHALL be excluded from central manifests and runbooks, and Docker cleanup instructions SHALL enforce volume-preserving prune semantics.
 
-#### Scenario: Command failure with exit zero detected
-- **WHEN** an updater command exits with status code 0 but emits an error message or fails to change directory
-- **THEN** the runner SHALL classify the update as FAILED rather than successful
+#### Scenario: Nonportable secrets and credentials exclusion
+- **WHEN** configuration manifests and runbooks are authored in `platform/openspec-store`
+- **THEN** secret-bearing files (`~/.zshenv`), API keys, SSH keys, session tokens, and local passwords SHALL be strictly excluded
+- **AND** documentation SHALL instruct operators to provide secrets out-of-band on secondary machines
 
-#### Scenario: Already at target version (already_target)
-- **WHEN** an updater runs and the tool was already at the target release version
-- **THEN** the runner SHALL record the outcome as `already_target` provided the post-mutation smoke check passes
-- **AND** the runner SHALL NOT treat unchanged version as a failure
+#### Scenario: Protection of named Docker volumes
+- **WHEN** routine Docker hygiene or disk cleanup instructions are documented
+- **THEN** named Docker volumes—including OmniRoute's named SQLite volume `omniroute-data` (hyphenated) and database volumes—SHALL be explicitly documented as protected
+- **AND** destructive commands that purge named volumes (`docker system prune --volumes` or `docker compose down -v`) SHALL be explicitly warned against
 
-#### Scenario: Duplicate removal authorized only after five-point check
-- **WHEN** a duplicate or shadowed installation is proposed for removal
-- **THEN** removal SHALL be blocked unless all five checks pass:
-  1. Reference check confirms no script or wrapper depends on the target path
-  2. Process check confirms no active process holds open handles to the binary
-  3. Manifest reconciliation confirms the retained path is declared authoritative
-  4. Dependency check confirms shared libraries and modules remain operational
-  5. Explicit external gate authorization exists for the exact target path
+#### Scenario: Volume-preserving Docker prune enforcement
+- **WHEN** disk reclamation is performed by the operator
+- **THEN** the runbook SHALL prescribe volume-preserving commands (`docker system prune` without `--volumes` and without `-a`)
+- **AND** all existing named volumes and persistent container storage SHALL remain completely intact
 
-#### Scenario: Partial or failed rollback detected (no false green)
-- **WHEN** an upgrade fails post-mutation smoke checks and rollback is triggered
-- **THEN** the workflow SHALL verify that the previous binary is fully restored and passes native smoke checks
-- **AND** if rollback is partial or fails, the workflow SHALL report a hard BLOCKER rather than a clean rollback
+### Requirement: Knowledge documentation SHALL be maintained manually without automated publication
 
-### Requirement: Shell startup optimization SHALL be measured and maintain PATH precedence
+Toolchain setup, architectural decisions, and runbooks SHALL be maintained as local Markdown documents within `platform/openspec-store`. Operator documentation for AgentMemory and Notion SHALL prescribe manual CLI and REST operations, bypassing unverified automated synchronization scripts without implementing code changes.
 
-Interactive shells (`~/.zshrc`) and scheduled maintenance runners (`workstation-daily-update.sh`) SHALL share the same documented PATH precedence policy. Shell startup optimizations SHALL be empirically measured using repeated cold and warm benchmarks, deferring expensive completions and runtimes while preserving immediate command availability.
+#### Scenario: Central runbook documentation as source of truth
+- **WHEN** workstation configuration, vendor decisions, or setup steps are documented
+- **THEN** `docs/mac-development-setup.md` in `platform/openspec-store` SHALL serve as the version-controlled source of truth
+- **AND** no custom documentation generation or synchronization engines SHALL be implemented
 
-#### Scenario: PATH consistency between interactive and scheduled runners
-- **WHEN** a command is resolved from an interactive zsh shell and from `workstation-daily-update.sh`
-- **THEN** both environments SHALL resolve the identical authoritative binary on PATH
+#### Scenario: Manual AgentMemory health check and decision recording
+- **WHEN** AgentMemory service health or decisions are evaluated
+- **THEN** health SHALL be verified via HTTP GET `http://localhost:3111/agentmemory/health` against the pinned engine
+- **AND** toolchain decisions SHALL be recorded via supported AgentMemory CLI or REST tools without raw SQLite database edits
 
-#### Scenario: Safe startup measurement with repeated medians and variance
-- **WHEN** shell startup performance is benchmarked
-- **THEN** the harness SHALL measure repeated cold and warm execution times across N runs (at least 5 runs each)
-- **AND** the report SHALL publish median times and variance rather than unverified fixed targets
-
-#### Scenario: Lazy runtime initialization preserves command resolution
-- **WHEN** NVM or versioned runtime loading is deferred
-- **THEN** system Node SHALL remain immediately available from Homebrew
-- **AND** any invocation requiring a versioned Node runtime SHALL trigger lazy initialization without breaking execution
-
-### Requirement: Persistent development data and Docker volumes SHALL be protected
-
-Routine workstation maintenance and cleanup workflows SHALL protect persistent named Docker volumes and local databases. Broad, un-gated system prunes SHALL be prohibited.
-
-#### Scenario: Protected named Docker volume preserved during cleanup
-- **WHEN** a routine disk hygiene or Docker cleanup command runs
-- **THEN** named volumes declared in the protected inventory (including OmniRoute's `omniroute_data` and persistent database volumes) SHALL remain intact
-
-#### Scenario: Generic broad prune prohibited
-- **WHEN** automated or scheduled maintenance runs
-- **THEN** generic broad prunes (`docker system prune -a --volumes -f`) SHALL NOT be executed
-- **AND** cleanup SHALL be restricted to volume-preserving prune commands (`docker system prune` without `--volumes` or `--all`)
-
-### Requirement: Knowledge synchronization SHALL be fail-closed, write-receipt gated, and idempotent
-
-Knowledge synchronization via `sync-notion-knowledge.sh` SHALL publish sanitized, human-facing onboarding and architecture runbooks to Notion without disclosing local usernames, tokens, or credentials. State progression in `MANIFEST_FILE` SHALL strictly require confirmed write receipts from the Notion API.
-
-#### Scenario: Idempotent knowledge sync yields fresh_noop
-- **WHEN** sanitized source Markdown content matches the recorded document SHA-256 in `MANIFEST_FILE`
-- **THEN** synchronization SHALL report `fresh_noop` without executing Notion API write requests
-
-#### Scenario: Dynamic home redaction and residual secret scanning
-- **WHEN** source documents contain local home directories or sensitive patterns
-- **THEN** dynamic regex SHALL replace `/Users/[^/]+/` with `~/` or `~/Developer/`
-- **AND** a residual secret scanner SHALL verify that no tokens matching credential patterns exist in the payload before transmission
-
-#### Scenario: Write receipt required before manifest SHA update
-- **WHEN** `ntn pages edit` or `ntn pages create` executes
-- **THEN** `MANIFEST_FILE` SHALL ONLY be updated with the new SHA-256 hash when the command exits 0 and returns a valid JSON payload containing a page ID
-- **AND** if the write command fails or returns non-zero, the previous SHA SHALL be retained
-
-#### Scenario: Offline sync preserves unchanged manifest for retry
-- **WHEN** network connectivity is unavailable during synchronization
-- **THEN** synchronization SHALL fail closed without advancing document SHA-256 hashes
-- **AND** the subsequent sync run SHALL automatically retry the pending documents
-
-#### Scenario: Genuinely read-only dry run
-- **WHEN** `sync-notion-knowledge.sh` runs with `--dry-run`
-- **THEN** the script SHALL NOT touch log files, create missing manifest directories, or mutate section page IDs in `MANIFEST_FILE`
+#### Scenario: Offline documentation availability
+- **WHEN** the workstation operates without internet connectivity
+- **THEN** all setup runbooks and `Brewfile` declarations in `platform/openspec-store` SHALL remain fully readable offline for inspection
+- **AND** documentation SHALL explicitly state that package installations or formula updates require network connectivity or pre-warmed local bottle caches
+- **AND** offline inspection SHALL NOT trigger network retry machinery or produce stalled synchronization locks
+#### Scenario: Prohibition of automated external publication during planning
+- **WHEN** planning artifacts are authored and revised
+- **THEN** no automated publication to Notion or external services SHALL be executed
+- **AND** unedited `sync-notion-knowledge.sh` SHALL be bypassed in favor of documented, operator-verified `ntn pages` commands when publication is explicitly authorized

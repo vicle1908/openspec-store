@@ -1,22 +1,35 @@
-# Workstation Brewfile - Declarative Homebrew Profile
-# Managed by portable-mac-development-workstation
+# ==============================================================================
+# Canonical Workstation Homebrew Bundle Manifest
+# Store: platform/openspec-store (config/Brewfile)
+# Purpose: Declarative, owner-aware development tooling for macOS
+# Invariant: Standard tap, brew, and cask stanzas only. No embedded scripts/secrets.
+# ==============================================================================
 
-# Taps
-tap "anomalyco/tap"
-tap "homebrew/bundle"
-tap "homebrew/core"
-tap "homebrew/cask"
+# Primary Runtimes & Package Managers (Core Formulae)
+# ------------------------------------------------------------------------------
+brew "node"      # JavaScript runtime and npm CLI
+brew "pnpm"      # Fast, disk-efficient package manager
+brew "bun"       # All-in-one JavaScript/TypeScript runtime & toolkit
+brew "uv"        # Extremely fast Python package and environment manager
 
-# Sanctioned CLI Formulae
-brew "git"
-brew "node"
-brew "uv"
-brew "anomalyco/tap/opencode"
-brew "block-goose-cli"
-brew "hermes-agent"
+# ------------------------------------------------------------------------------
+# Core Development & System Utilities
+# ------------------------------------------------------------------------------
+brew "git"       # Version control system
+brew "gh"        # GitHub official CLI
+brew "ripgrep"   # Fast line-oriented regex search tool
+brew "jq"        # Command-line JSON processor
+brew "fzf"       # Command-line fuzzy finder
+brew "zsh"       # Modern shell
 
-# Sanctioned Casks
-cask "cursor-cli"
-cask "droid"
-cask "grok-build"
-cask "buzz"
+# ------------------------------------------------------------------------------
+brew "libpq"     # PostgreSQL client utilities (psql)
+brew "redis"     # Redis in-memory data store and client (redis-cli)
+
+# ------------------------------------------------------------------------------
+# Official Developer Applications & CLIs (Casks)
+# ------------------------------------------------------------------------------
+cask "codex"           # Official OpenAI Codex CLI application
+cask "docker-desktop"  # Docker Desktop application managing LinuxKit VM
+cask "iterm2"          # Terminal emulator for macOS
+cask "visual-studio-code" # Source-code editor
