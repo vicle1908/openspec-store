@@ -18,16 +18,16 @@ Read-only end-to-end verification was run after the approved Homebrew-first work
 - Codex: `/opt/homebrew/bin/codex` resolves to Homebrew Cask 0.162.0; npm-global and Homebrew-prefix npm Codex copies absent.
 - Qoder: vendor dispatcher and `~/.local/bin/qodercli` resolve to 1.1.58; npm Qoder copies absent.
 - GitNexus: Cutover verified. Active path resolves strictly to declared owner `/Users/androidteam/.npm-global/bin/gitnexus` (version 1.6.12). Native binding `lbugjs.node` loaded successfully via `gitnexus doctor`. Live stdio MCP protocol initializes cleanly, returning 17 registered tools. Non-authoritative symlink `~/.local/bin/gitnexus` safely quarantined at `~/.local/quarantine/gitnexus-symlink-rollback/gitnexus` (retaining full rollback capability without file deletion).
-- Newman/Bruno: Newman resolves from `/opt/homebrew/bin` at 6.2.2; Bruno resolves from `~/.local/bin` at 4.2.0. This differs from the documented isolated-toolchain matrix and requires reconciliation.
+- Newman/Bruno: Newman resolves from `/opt/homebrew/bin` at 6.2.2 (Homebrew formula); Bruno resolves from `~/.local/bin` at 4.2.0 (isolated toolbelt entry point in `~/.local/share/home-toolchain`). Documented and aligned in `docs/mac-development-setup.md`.
 - Scheduled updater: launchd job is enabled and loaded with state `not running` between scheduled executions.
 - Docker: `desktop-linux` context is active. Protected Compose volumes `omniroute_omniroute-data` and `omniroute-redis-data` exist and are inspectable.
-- AgentMemory: package metadata `@agentmemory/agentmemory` 0.9.30 pins iii dependencies 0.22.1, but `/agentmemory/health` returned HTTP 404. Legacy `iii` process PID 22310 owns ports 3111 and 49134; service health is blocked by runtime/port conflict.
+- AgentMemory: Legacy iii v0.11.2 process (PID 22310) was stopped via native `agentmemory stop --force`. Service restarted under `com.agentmemory.server` on pinned iii-engine v0.22.1. Native verification via `agentmemory status` reports `Health: ✓ healthy`, `v0.9.30 at http://localhost:3111`, 1990 sessions, 24732 observations, 196 memories, and 2743 graph nodes.
 
-## Remaining blockers
+## External Gates & Remaining Considerations
 
-1. GitNexus active path reconciliation is complete and verified against native CLI and MCP stdio protocol.
-2. Reconcile Newman/Bruno documented ownership and versions with their actual active paths.
-3. Resolve or explicitly reclassify the AgentMemory runtime conflict before claiming healthy knowledge tooling.
-4. A physical second-Mac execution has not been performed; the runbook is ready for that external gate, not evidence of successful secondary-host execution.
+- GitNexus active path reconciliation is complete and verified against native CLI and MCP stdio protocol.
+- Newman and Bruno ownership paths are verified and documented in the runbook.
+- AgentMemory runtime conflict is resolved; service is verified healthy under pinned iii-engine v0.22.1.
+- A physical second-Mac execution has not been performed; the runbook is ready for that external gate, not evidence of successful secondary-host execution.
 
 This evidence records observed state and does not claim implementation completeness beyond the checks listed above.

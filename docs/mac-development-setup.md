@@ -23,7 +23,7 @@ Every development CLI is governed by exactly one authoritative installation owne
 | **Bruno** | Pinned JS Toolbelt | Isolated Toolchain | npm in isolated root | `bru --version` | **Isolated Toolchain Exception**. Active verified at 4.2.0 via `~/.local/bin/bru -> ~/.local/share/home-toolchain/node_modules/.bin/bru`. Target 4.2.1 is declared/desired, not current. Package upgrade requires operator authorization. |
 | **Prime Agent** | Local Dev Exception | Local Node Entry | Manual / Pinned | `prime-agent --version` | **Local Dev Exception**. Observed Node.js entry point at `/opt/homebrew/bin/prime-agent` (version 0.9.8). Consult the source checkout's applicable repository policy before building or relinking; this runbook does not authorize those operations. |
 | **Docker** | Docker Desktop | Docker Desktop / Cask | Desktop App Updater | `docker --version && docker compose version` | Official Docker Desktop application managing VM and Docker CLI. Protects persistent volumes. |
-| **AgentMemory** | npm Global | npm Global Prefix | npm in global prefix | `curl -fsS http://localhost:3111/agentmemory/health` | **npm Global Exception**. Package `@agentmemory/agentmemory` pins `iii-engine` 0.22.1. |
+| **AgentMemory** | npm Global | npm Global Prefix (`~/.npm-global`) | npm in global prefix | `agentmemory status` | **npm Global Exception**. Package `@agentmemory/agentmemory` (v0.9.30) pins `iii-engine` 0.22.1. Native health check verified healthy via `agentmemory status`. |
 
 ---
 
@@ -299,13 +299,11 @@ brew services stop redis
 - Service is supervised via `~/Library/LaunchAgents/com.agentmemory.server.plist`.
 - Health check:
   ```bash
-  # Check health endpoint with fail-on-error flag (root path '/' returns 404; check /agentmemory/health specifically)
-  curl -fsS http://localhost:3111/agentmemory/health
-  # Or inspect HTTP status and response body explicitly:
-  curl -s -w "\nHTTP_STATUS: %{http_code}\n" http://localhost:3111/agentmemory/health
+  # Check health via native authenticated CLI:
+  agentmemory status
   ```
-  *Health Contract:* A healthy AgentMemory instance responds with HTTP status `200` and JSON `{"status":"ok",...}`. HTTP `503` (degraded/standby) or connection failure MUST NOT be masked by silent `curl -s`.
-- If port 3111 or 49134 is occupied by an orphaned or incompatible engine process, operator must inspect and resolve port occupancy before restarting the service via `launchctl kickstart -k gui/$(id -u)/com.agentmemory.server`.
+  *Health Contract:* The native CLI authenticates with the internal client secret and queries health, session counts, and graph status. Direct curl requests to `/agentmemory/health` require bearer authentication via `Authorization: Bearer <secret>`.
+- If port 49134 or 3111 is occupied by an orphaned or incompatible engine process, operator runs `agentmemory stop --force` to clear the conflicting engine before restarting the launchd service via `launchctl kickstart -k gui/$(id -u)/com.agentmemory.server`.
 - The local SQLite WAL database must remain intact with zero schema mutations.
 
 ---
