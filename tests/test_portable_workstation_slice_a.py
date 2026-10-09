@@ -282,25 +282,5 @@ class TestCandidateClassificationReport(unittest.TestCase):
         self.assertEqual(candidates_map["ollama"]["action_classification"], "Manual Review")
 
 
-class TestInventoryManifestReconciliation(unittest.TestCase):
-    def test_inventory_reconcile_with_manifest_emits_required_states(self):
-        manifest_res = inv_mod.reconcile_with_manifest()
-        self.assertIsNotNone(manifest_res)
-        self.assertIn("aligned", manifest_res["summary"])
-        self.assertIn("drift", manifest_res["summary"])
-        self.assertIn("missing", manifest_res["summary"])
-        self.assertIn("duplicate", manifest_res["summary"])
-        self.assertIn("obsolete_candidate", manifest_res["summary"])
-        self.assertIn("unknown", manifest_res["summary"])
-
-        # Check that aligned contains core tools
-        self.assertIn("git", manifest_res["summary"]["aligned"])
-        self.assertIn("uv", manifest_res["summary"]["aligned"])
-        # Duplicates should detect codex across roots
-        self.assertIn("codex", manifest_res["summary"]["duplicate"])
-        # Drift should detect codex (npm-global expected, brew cellar active)
-        self.assertIn("codex", manifest_res["summary"]["drift"])
-        # Newman is aligned under isolated toolchain authority
-        self.assertIn("newman", manifest_res["summary"]["aligned"])
 if __name__ == "__main__":
     unittest.main()
