@@ -1,0 +1,22 @@
+# Workstation Brewfile - Declarative Homebrew Profile
+# Managed by portable-mac-development-workstation
+
+# Taps
+tap "anomalyco/tap"
+tap "homebrew/bundle"
+tap "homebrew/core"
+tap "homebrew/cask"
+
+# Sanctioned CLI Formulae
+brew "git"
+brew "node"
+brew "uv"
+brew "anomalyco/tap/opencode"
+brew "block-goose-cli"
+brew "hermes-agent"
+
+# Sanctioned Casks
+cask "cursor-cli"
+cask "droid"
+cask "grok-build"
+cask "buzz"

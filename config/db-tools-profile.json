@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "profile": "db-tools",
+  "description": "Optional database development capability profile",
+  "tools": [
+    {
+      "name": "psql",
+      "authoritative_owner": "brew-formula",
+      "package": "libpq",
+      "description": "PostgreSQL interactive terminal client"
+    },
+    {
+      "name": "redis-cli",
+      "authoritative_owner": "brew-formula",
+      "package": "redis",
+      "description": "Redis command line interface"
+    }
+  ]
+}

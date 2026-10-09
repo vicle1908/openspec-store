@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "profile": "uv-tools",
+  "description": "Sanctioned CLI tools installed and isolated via uv tool",
+  "tools": [
+    {
+      "name": "ruff",
+      "package": "ruff",
+      "version": "latest",
+      "description": "Extremely fast Python linter and formatter"
+    },
+    {
+      "name": "pytest",
+      "package": "pytest",
+      "version": "latest",
+      "description": "Python test runner"
+    }
+  ]
+}

@@ -38,7 +38,7 @@ set -euo pipefail
 umask 022
 
 export HOME="${HOME:-/Users/androidteam}"
-export PATH="${HOME}/.npm-global/bin:${HOME}/.bun/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${HOME}/.local/bin"
+export PATH="${HOME}/.npm-global/bin:${HOME}/.local/bin:${HOME}/.bun/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export STORE_DIR="${HOME}/Developer/platform/openspec-store"
 export WORKSPACE_DIR="${HOME}/Developer"
 
@@ -252,6 +252,10 @@ agent_cli_coverage() {
       echo "      - ${label} (${bin}): SKIPPED (target prefix misalignment: active binary resolves to ${real_bin} outside declared prefix ${HOME}/.npm-global)"
       continue
     fi
+    if [[ "${bin}" == "qoder" ]] && [[ "${real_bin}" != "${HOME}/.local"* && "${real_bin}" != "${HOME}/.qoder"* ]]; then
+      echo "      - ${label} (${bin}): SKIPPED (target prefix misalignment: active binary resolves to ${real_bin} outside declared standalone roots)"
+      continue
+    fi
 
     local pre_real=""
     pre_real="$(realpath "$(command -v "${bin}")" 2>/dev/null || which "${bin}" 2>/dev/null || true)"
@@ -259,8 +263,14 @@ agent_cli_coverage() {
     v_before="$("${bin}" --version 2>&1 | head -1 | strip_ansi || true)"
 
     local out rc=0
-    # shellcheck disable=SC2086  # ${args} intentionally word-splits into argv
-    out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" "${bin}" ${args} 2>&1)" || rc=$?
+    if [[ "${bin}" == "codex" ]]; then
+      out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" npm --prefix "${HOME}/.npm-global" install --global @openai/codex 2>&1)" || rc=$?
+    elif [[ "${bin}" == "qoder" && -x "${HOME}/.qoder/entry" ]]; then
+      out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" "${HOME}/.qoder/entry" update 2>&1)" || rc=$?
+    else
+      # shellcheck disable=SC2086  # ${args} intentionally word-splits into argv
+      out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" "${bin}" ${args} 2>&1)" || rc=$?
+    fi
     out="$(printf '%s' "$out" | strip_ansi)"
     printf '%s\n' "$out" | tail -3 | sed 's/^/        /'
 

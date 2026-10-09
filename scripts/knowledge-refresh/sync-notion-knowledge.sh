@@ -12,22 +12,21 @@
 set -euo pipefail
 
 # Environment & Binary
-export PATH="/Users/androidteam/.npm-global/bin:/Users/androidteam/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
-readonly NTN_BIN="/Users/androidteam/.local/bin/ntn"
+export PATH="${HOME}/.npm-global/bin:${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
+readonly NTN_BIN="${NTN_BIN:-${HOME}/.local/bin/ntn}"
 
 # Directory & Manifest Paths
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly WORKSPACE_ROOT="${HOME}/Developer"
-readonly OPENSPEC_STORE_ROOT="${WORKSPACE_ROOT}/platform/openspec-store"
+readonly WORKSPACE_ROOT="${WORKSPACE_ROOT:-${HOME}/Developer}"
+readonly OPENSPEC_STORE_ROOT="${OPENSPEC_STORE_ROOT:-${WORKSPACE_ROOT}/platform/openspec-store}"
 export OPENSPEC_STORE_ROOT
-readonly STATE_DIR="${WORKSPACE_ROOT}/.knowledge-refresh"
-readonly MANIFEST_FILE="${STATE_DIR}/notion-sync-manifest.json"
-readonly LOG_FILE="${STATE_DIR}/notion-sync.log"
+readonly STATE_DIR="${STATE_DIR:-${WORKSPACE_ROOT}/.knowledge-refresh}"
+readonly MANIFEST_FILE="${MANIFEST_FILE:-${STATE_DIR}/notion-sync-manifest.json}"
+readonly LOG_FILE="${LOG_FILE:-${STATE_DIR}/notion-sync.log}"
 
-# Notion Knowledge Targets
-readonly KNOWLEDGE_ROOT_ID="3d7c4b21-deb4-8100-99c0-cfe30ef437ee"
-readonly PACING_DELAY_SEC=0.5
-
+# Notion Knowledge Targets (Parameterized via Environment)
+KNOWLEDGE_ROOT_ID="${NOTION_KNOWLEDGE_ROOT_ID:-}"
+PACING_DELAY_SEC="${PACING_DELAY_SEC:-0.5}"
 # Section Display Names
 readonly SECTION_NAME_CONCEPTS="Ecosystem Concepts & Architecture"
 readonly SECTION_NAME_ENTITIES="Ecosystem Component Entities"
@@ -57,20 +56,100 @@ done
 # Logging helper (directs to log file and stderr so stdout captures stay clean)
 log() {
   local level="$1" msg="$2"
-  printf '[%s] [%s] %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$level" "$msg" | tee -a "$LOG_FILE" >&2
+  if [[ "$DRY_RUN" == "true" ]]; then
+    printf '[%s] [%s] %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$level" "$msg" >&2
+  else
+    printf '[%s] [%s] %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$level" "$msg" | tee -a "$LOG_FILE" >&2
+  fi
 }
 
-# Fail-closed secret sanitization & path normalization
+# Fail-closed secret sanitization & dynamic path normalization
 # Returns sanitized content via stdout
 sanitize_content() {
   sed -E \
-    -e 's/(MCPR_TOKEN|AGENTMEMORY_URL|AGENTMEMORY_SECRET|GITNEXUS_EMBEDDING_API_KEY|GITNEXUS_MCP_AUTH_TOKEN|GITNEXUS_WIKI_API_KEY|GITHUB_TOKEN|GEMINI_API_KEY|GOOGLE_API_KEY|OPENAI_API_KEY|ANTHROPIC_API_KEY|NEO4J_PASSWORD|FALKORDB_PASSWORD|GRAPHIFY_POSTGRES_DSN)=[^[:space:]]+/\1=REDACTED/g' \
-    -e 's/((api[_-]?key|auth[_-]?token|bearer[_-]?token|password|secret|token)=)[^[:space:]]+/\1REDACTED/Ig' \
-    -e 's#(https?://)[^/@[:space:]]+:[^/@[:space:]]+@#\1REDACTED@#g' \
-    -e 's#/Users/androidteam/Developer/#~/Developer/#g' \
-    -e 's#/Users/androidteam/#~/#g'
+    -e 's/(MCPR_TOKEN|AGENTMEMORY_URL|AGENTMEMORY_SECRET|GITNEXUS_EMBEDDING_API_KEY|GITNEXUS_MCP_AUTH_TOKEN|GITNEXUS_WIKI_API_KEY|GITHUB_TOKEN|GEMINI_API_KEY|GOOGLE_API_KEY|OPENAI_API_KEY|ANTHROPIC_API_KEY|NEO4J_PASSWORD|FALKORDB_PASSWORD|GRAPHIFY_POSTGRES_DSN)=["'"'"']?[^[:space:]"'"'"']+["'"'"']?/\1=REDACTED/g' \
+    -e 's/((api[_-]?key|auth[_-]?token|bearer[_-]?token|password|secret|token)=)["'"'"']?[^[:space:]"'"'"']+["'"'"']?/\1REDACTED/Ig' \
+    -e 's#([a-zA-Z0-9+.-]+://)[^/@[:space:]]+:[^/@[:space:]]+@#\1REDACTED@#g' \
+    -e 's#/Users/[a-zA-Z0-9_.-]+/Developer/#~/Developer/#g' \
+    -e 's#/Users/[a-zA-Z0-9_.-]+(/|[:"'\''`[:space:]]|$)#~\1#g'
 }
 
+# Residual secret scanner with explicit disclosure allowlist
+# Fails closed if any unredacted credential, token, or private key is detected
+scan_residual_secrets() {
+  local content="$1"
+  SCAN_PAYLOAD="$content" python3 - << 'PYEOF'
+import sys, os, re
+
+content = os.environ.get("SCAN_PAYLOAD", "")
+
+ALLOWLIST = {
+    "redacted", "<redacted>", "[redacted]", "xxx", "test", "dummy", "example",
+    "placeholder", "<token>", "<key>", "your_api_key", "your-api-key", "none", "null"
+}
+
+# 1. Private keys
+if re.search(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----", content):
+    print("Residual secret scan: Detected private key block in payload", file=sys.stderr)
+    sys.exit(1)
+
+# 2. Known token signatures
+token_patterns = [
+    r"\b(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9_]{16,}\b",
+    r"\bsk-[A-Za-z0-9_-]{20,}\b",
+    r"\bsk-ant-[A-Za-z0-9_-]{20,}\b",
+    r"\bAIza[0-9A-Za-z\-_]{35}\b",
+    r"\bxox[baprs]-[0-9]{10,}-[0-9]{10,}-[a-zA-Z0-9]{24,}\b",
+]
+for pat in token_patterns:
+    for m in re.finditer(pat, content):
+        val = m.group(0).lower()
+        if not any(al in val for al in ALLOWLIST):
+            print(f"Residual secret scan: Detected unredacted token ({m.group(0)[:8]}...)", file=sys.stderr)
+            sys.exit(1)
+
+# 3. Known secret environment variable assignments
+secret_env_vars = [
+    "MCPR_TOKEN", "AGENTMEMORY_SECRET", "GITNEXUS_EMBEDDING_API_KEY",
+    "GITNEXUS_MCP_AUTH_TOKEN", "GITNEXUS_WIKI_API_KEY", "GITHUB_TOKEN",
+    "GEMINI_API_KEY", "GOOGLE_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
+    "NEO4J_PASSWORD", "FALKORDB_PASSWORD", "GRAPHIFY_POSTGRES_DSN"
+]
+for env_var in secret_env_vars:
+    for m in re.finditer(rf"\b{env_var}=([^\s\"\'\`]+)", content):
+        val = m.group(1).strip()
+        if val != "REDACTED" and val.lower() not in ALLOWLIST and not val.startswith("$"):
+            print(f"Residual secret scan: Detected unredacted secret assignment: {env_var}", file=sys.stderr)
+            sys.exit(1)
+
+# 4. Generic credential assignments
+for m in re.finditer(r"\b(api[_-]?key|auth[_-]?token|bearer[_-]?token|password|secret|token)=([^\s\"\'\`]+)", content, re.IGNORECASE):
+    val = m.group(2).strip().lower()
+    if val != "redacted" and val not in ALLOWLIST and not val.startswith("$"):
+        print(f"Residual secret scan: Detected unredacted credential assignment: {m.group(1)}", file=sys.stderr)
+        sys.exit(1)
+
+sys.exit(0)
+PYEOF
+}
+ensure_manifest() {
+  if [[ "$DRY_RUN" == "true" ]]; then
+    return 0
+  fi
+  mkdir -p "$STATE_DIR"
+  touch "$LOG_FILE"
+  if [[ ! -f "$MANIFEST_FILE" ]] || ! jq -e . "$MANIFEST_FILE" >/dev/null 2>&1; then
+    cat <<EOF > "$MANIFEST_FILE"
+{
+  "version": "1.0",
+  "knowledge_root_id": "${KNOWLEDGE_ROOT_ID}",
+  "sections": {},
+  "documents": {},
+  "last_synced_at": null
+}
+EOF
+  fi
+}
 # Initialize manifest if missing
 ensure_manifest() {
   mkdir -p "$STATE_DIR"
@@ -95,32 +174,62 @@ bootstrap_section() {
   local section_title="$2"
   local section_desc="$3"
 
-  ensure_manifest
-
-  # 1. Check if already recorded in manifest
-  local recorded_id
-  recorded_id="$(jq -r ".sections[\"${section_key}\"] // empty" "$MANIFEST_FILE")"
-  if [[ -n "$recorded_id" ]]; then
-    echo "$recorded_id"
+  # 1. Environment variable override
+  local env_id=""
+  case "$section_key" in
+    concepts) env_id="${NOTION_SECTION_CONCEPTS_ID:-}" ;;
+    entities) env_id="${NOTION_SECTION_ENTITIES_ID:-}" ;;
+    specs) env_id="${NOTION_SECTION_SPECS_ID:-}" ;;
+    freshness) env_id="${NOTION_SECTION_FRESHNESS_ID:-}" ;;
+  esac
+  if [[ -n "$env_id" ]]; then
+    echo "$env_id"
     return 0
   fi
 
-  # 2. Inspect child pages of Knowledge Root via regex
+  # 2. Check if already recorded in manifest
+  if [[ -f "$MANIFEST_FILE" ]]; then
+    local recorded_id
+    recorded_id="$(jq -r "try (.sections[\"${section_key}\"]) // empty" "$MANIFEST_FILE" 2>/dev/null || true)"
+    if [[ -n "$recorded_id" ]]; then
+      echo "$recorded_id"
+      return 0
+    fi
+  fi
+
+  # 3. Dry-run mode: strictly read-only, never mutate manifest or call ntn
+  if [[ "$DRY_RUN" == "true" ]]; then
+    log "INFO" "[DRY-RUN] Section '${section_title}' (${section_key}) discovery simulated"
+    echo "dry-run-section-${section_key}-id"
+    return 0
+  fi
+
+  ensure_manifest
+
+  # 4. Require KNOWLEDGE_ROOT_ID for live discovery/creation
+  if [[ -z "$KNOWLEDGE_ROOT_ID" ]]; then
+    log "ERROR" "KNOWLEDGE_ROOT_ID is required to bootstrap section '${section_title}' but is unset"
+    return 1
+  fi
+
+  # 5. Inspect child pages of Knowledge Root via regex
   log "INFO" "Discovering child pages of Knowledge Root to locate section '${section_title}'..."
-  local root_md
-  root_md="$("$NTN_BIN" pages get "$KNOWLEDGE_ROOT_ID" 2>/dev/null || true)"
+  local root_md="" root_status=0
+  root_md="$("$NTN_BIN" pages get "$KNOWLEDGE_ROOT_ID" 2>/dev/null)" || root_status=$?
 
   local discovered_id=""
-  while IFS= read -r line; do
-    if [[ "$line" =~ \<page\ url=\"https://app\.notion\.com/p/([0-9a-f]+)\"\>(.+)\</page\> ]]; then
-      local page_id="${BASH_REMATCH[1]}"
-      local page_title="${BASH_REMATCH[2]}"
-      if [[ "$page_title" == "$section_title" ]]; then
-        discovered_id="$page_id"
-        break
+  if [[ $root_status -eq 0 && -n "$root_md" ]]; then
+    while IFS= read -r line; do
+      if [[ "$line" =~ \<page\ url=\"https://app\.notion\.com/p/([0-9a-f]+)\"\>(.+)\</page\> ]]; then
+        local page_id="${BASH_REMATCH[1]}"
+        local page_title="${BASH_REMATCH[2]}"
+        if [[ "$page_title" == "$section_title" ]]; then
+          discovered_id="$page_id"
+          break
+        fi
       fi
-    fi
-  done <<< "$root_md"
+    done <<< "$root_md"
+  fi
 
   if [[ -n "$discovered_id" ]]; then
     log "INFO" "Discovered existing section page for '${section_title}' (ID: ${discovered_id})"
@@ -132,13 +241,7 @@ bootstrap_section() {
     return 0
   fi
 
-  # 3. Create new section page if dry-run is disabled
-  if [[ "$DRY_RUN" == "true" ]]; then
-    log "INFO" "[DRY-RUN] Would create section page '${section_title}' under Knowledge Root"
-    echo "dry-run-section-id"
-    return 0
-  fi
-
+  # 6. Create new section page under Knowledge Root
   log "INFO" "Creating new section page '${section_title}' under Knowledge Root..."
   local content
   content="$(cat <<EOF
@@ -148,45 +251,37 @@ title: ${section_title}
 
 # ${section_title}
 
-> Automated Ecosystem Knowledge Hub Section  
+> Automated Ecosystem Knowledge Hub Section
 > Last synchronized: $(date -u '+%Y-%m-%d %H:%M:%SZ')
 
 ${section_desc}
 EOF
 )"
 
-  local create_res
-  create_res="$(printf '%s' "$content" | "$NTN_BIN" pages create --parent "page:${KNOWLEDGE_ROOT_ID}" --json 2>/dev/null || true)"
-  local new_id
+  local create_res="" create_status=0
+  create_res="$(printf '%s' "$content" | "$NTN_BIN" pages create --parent "page:${KNOWLEDGE_ROOT_ID}" --json 2>&1)" || create_status=$?
+
+  if [[ $create_status -ne 0 ]]; then
+    log "ERROR" "Failed to create section page '${section_title}': exit code ${create_status}, output: ${create_res}"
+    return 1
+  fi
+
+  local new_id=""
   new_id="$(echo "$create_res" | jq -r '.id // empty' 2>/dev/null || true)"
 
   if [[ -z "$new_id" ]]; then
-    log "WARN" "JSON parse failed on section create, re-checking Knowledge root..."
-    sleep "$PACING_DELAY_SEC"
-    root_md="$("$NTN_BIN" pages get "$KNOWLEDGE_ROOT_ID" 2>/dev/null || true)"
-    while IFS= read -r line; do
-      if [[ "$line" =~ \<page\ url=\"https://app\.notion\.com/p/([0-9a-f]+)\"\>(.+)\</page\> ]]; then
-        if [[ "${BASH_REMATCH[2]}" == "$section_title" ]]; then
-          new_id="${BASH_REMATCH[1]}"
-          break
-        fi
-      fi
-    done <<< "$root_md"
-  fi
-
-  if [[ -n "$new_id" ]]; then
-    log "INFO" "Successfully created section '${section_title}' (ID: ${new_id})"
-    local tmp_manifest
-    tmp_manifest="$(mktemp "${MANIFEST_FILE}.tmp.XXXXXX")"
-    jq ".sections[\"${section_key}\"] = \"${new_id}\"" "$MANIFEST_FILE" > "$tmp_manifest"
-    mv "$tmp_manifest" "$MANIFEST_FILE"
-    sleep "$PACING_DELAY_SEC"
-    echo "$new_id"
-    return 0
-  else
-    log "ERROR" "Failed to create section page '${section_title}'"
+    log "ERROR" "Failed to parse page ID from section creation output: ${create_res}"
     return 1
   fi
+
+  log "INFO" "Successfully created section '${section_title}' (ID: ${new_id})"
+  local tmp_manifest
+  tmp_manifest="$(mktemp "${MANIFEST_FILE}.tmp.XXXXXX")"
+  jq ".sections[\"${section_key}\"] = \"${new_id}\"" "$MANIFEST_FILE" > "$tmp_manifest"
+  mv "$tmp_manifest" "$MANIFEST_FILE"
+  sleep "$PACING_DELAY_SEC"
+  echo "$new_id"
+  return 0
 }
 
 bootstrap_all_sections() {
@@ -213,9 +308,9 @@ sync_document() {
   # Extract or infer title
   local title="$override_title"
   if [[ -z "$title" ]]; then
-    title="$(grep -m1 '^title:' "$full_path" | sed -E 's/^title:[[:space:]]*["'"'"']?([^"'"'"']+)["'"'"']?/\1/' || true)"
+    title="$(grep -m1 '^title:' "$full_path" 2>/dev/null | sed -E 's/^title:[[:space:]]*["'"'"']?([^"'"'"']+)["'"'"']?/\1/' || true)"
     if [[ -z "$title" ]]; then
-      title="$(grep -m1 '^# ' "$full_path" | sed 's/^# //' || true)"
+      title="$(grep -m1 '^# ' "$full_path" 2>/dev/null | sed 's/^# //' || true)"
     fi
     if [[ -z "$title" ]]; then
       title="$(basename "$rel_path" .md)"
@@ -226,15 +321,21 @@ sync_document() {
   local body_content
   body_content="$(sanitize_content < "$full_path")"
 
+  # Residual secret scan - fail-closed before upload
+  if ! scan_residual_secrets "$body_content"; then
+    log "ERROR" "Residual secret scan failed for '${rel_path}'. Aborting fail-closed."
+    return 1
+  fi
+
   # Stable SHA-256 based on sanitized body content for idempotency
   local current_sha
   current_sha="$(printf '%s' "$body_content" | shasum -a 256 | awk '{print $1}')"
 
-  ensure_manifest
-
-  local recorded_sha recorded_page_id
-  recorded_sha="$(jq -r ".documents[\"${rel_path}\"].sha256 // empty" "$MANIFEST_FILE")"
-  recorded_page_id="$(jq -r ".documents[\"${rel_path}\"].page_id // empty" "$MANIFEST_FILE")"
+  local recorded_sha="" recorded_page_id=""
+  if [[ -f "$MANIFEST_FILE" ]]; then
+    recorded_sha="$(jq -r "try (.documents[\"${rel_path}\"].sha256) // empty" "$MANIFEST_FILE" 2>/dev/null || true)"
+    recorded_page_id="$(jq -r "try (.documents[\"${rel_path}\"].page_id) // empty" "$MANIFEST_FILE" 2>/dev/null || true)"
+  fi
 
   if [[ "$FORCE" != "true" ]] && [[ -n "$recorded_page_id" ]] && [[ "$recorded_sha" == "$current_sha" ]]; then
     log "INFO" "fresh_noop: ${rel_path} (Page ID: ${recorded_page_id})"
@@ -248,69 +349,85 @@ sync_document() {
     return 0
   fi
 
+  ensure_manifest
+
   local sanitized_content
   sanitized_content="$(cat <<EOF
 ---
 title: ${title}
 ---
 
-> **Ecosystem Knowledge Synchronization**  
+> **Ecosystem Knowledge Synchronization**
 > Source: \`${rel_path}\`
 
 ${body_content}
 EOF
 )"
 
-  local section_id
-  section_id="$(jq -r ".sections[\"${section_key}\"] // empty" "$MANIFEST_FILE")"
+  local section_id=""
+  case "$section_key" in
+    concepts) section_id="${NOTION_SECTION_CONCEPTS_ID:-}" ;;
+    entities) section_id="${NOTION_SECTION_ENTITIES_ID:-}" ;;
+    specs) section_id="${NOTION_SECTION_SPECS_ID:-}" ;;
+    freshness) section_id="${NOTION_SECTION_FRESHNESS_ID:-}" ;;
+  esac
+  if [[ -z "$section_id" && -f "$MANIFEST_FILE" ]]; then
+    section_id="$(jq -r ".sections[\"${section_key}\"] // empty" "$MANIFEST_FILE" 2>/dev/null || true)"
+  fi
   if [[ -z "$section_id" ]]; then
-    log "ERROR" "Section ID for '${section_key}' not found in manifest"
+    log "ERROR" "Section ID for '${section_key}' not found in environment or manifest"
     return 1
   fi
 
   if [[ -n "$recorded_page_id" ]]; then
     log "INFO" "Updating Notion page ${recorded_page_id} for '${title}' (${rel_path})..."
-    local edit_out
-    edit_out="$(printf '%s' "$sanitized_content" | "$NTN_BIN" pages edit "$recorded_page_id" --allow-deleting-content --json 2>&1 || true)"
+    local edit_out="" edit_status=0
+    edit_out="$(printf '%s' "$sanitized_content" | "$NTN_BIN" pages edit "$recorded_page_id" --allow-deleting-content --json 2>&1)" || edit_status=$?
     sleep "$PACING_DELAY_SEC"
+
+    if [[ $edit_status -ne 0 ]]; then
+      log "ERROR" "Failed to update page ${recorded_page_id} for '${title}' (${rel_path}): exit code ${edit_status}, output: ${edit_out}"
+      return 1
+    fi
+
+    local receipt_id=""
+    receipt_id="$(echo "$edit_out" | jq -r '.id // empty' 2>/dev/null || true)"
+    if [[ -z "$receipt_id" ]]; then
+      log "ERROR" "Write receipt validation failed for page ${recorded_page_id} ('${title}'): missing page ID in output: ${edit_out}"
+      return 1
+    fi
 
     local tmp_manifest
     tmp_manifest="$(mktemp "${MANIFEST_FILE}.tmp.XXXXXX")"
-    jq ".documents[\"${rel_path}\"] = {page_id: \"${recorded_page_id}\", sha256: \"${current_sha}\", title: \"${title}\", last_synced: \"$(date -u '+%Y-%m-%dT%H:%M:%SZ')\"}" "$MANIFEST_FILE" > "$tmp_manifest"
+    jq ".documents[\"${rel_path}\"] = {page_id: \"${receipt_id}\", sha256: \"${current_sha}\", title: \"${title}\", last_synced: \"$(date -u '+%Y-%m-%dT%H:%M:%SZ')\"}" "$MANIFEST_FILE" > "$tmp_manifest"
     mv "$tmp_manifest" "$MANIFEST_FILE"
-    log "INFO" "Successfully updated page ${recorded_page_id} for '${title}'"
+    log "INFO" "Successfully updated page ${receipt_id} for '${title}'"
   else
     log "INFO" "Creating new Notion page under section '${section_key}' for '${title}' (${rel_path})..."
-    local create_out new_page_id=""
-    create_out="$(printf '%s' "$sanitized_content" | "$NTN_BIN" pages create --parent "page:${section_id}" --json 2>&1 || true)"
-    new_page_id="$(echo "$create_out" | jq -r '.id // empty' 2>/dev/null || true)"
+    local create_out="" create_status=0
+    create_out="$(printf '%s' "$sanitized_content" | "$NTN_BIN" pages create --parent "page:${section_id}" --json 2>&1)" || create_status=$?
     sleep "$PACING_DELAY_SEC"
 
-    if [[ -z "$new_page_id" ]]; then
-      # Attempt regex discovery on section page
-      local section_md
-      section_md="$("$NTN_BIN" pages get "$section_id" 2>/dev/null || true)"
-      while IFS= read -r line; do
-        if [[ "$line" =~ \<page\ url=\"https://app\.notion\.com/p/([0-9a-f]+)\"\>(.+)\</page\> ]]; then
-          if [[ "${BASH_REMATCH[2]}" == "$title" ]]; then
-            new_page_id="${BASH_REMATCH[1]}"
-            break
-          fi
-        fi
-      done <<< "$section_md"
-    fi
-
-    if [[ -n "$new_page_id" ]]; then
-      local tmp_manifest
-      tmp_manifest="$(mktemp "${MANIFEST_FILE}.tmp.XXXXXX")"
-      jq ".documents[\"${rel_path}\"] = {page_id: \"${new_page_id}\", sha256: \"${current_sha}\", title: \"${title}\", last_synced: \"$(date -u '+%Y-%m-%dT%H:%M:%SZ')\"}" "$MANIFEST_FILE" > "$tmp_manifest"
-      mv "$tmp_manifest" "$MANIFEST_FILE"
-      log "INFO" "Successfully created page ${new_page_id} for '${title}'"
-    else
-      log "ERROR" "Failed to create page for '${title}' (${rel_path}): ${create_out}"
+    if [[ $create_status -ne 0 ]]; then
+      log "ERROR" "Failed to create page for '${title}' (${rel_path}): exit code ${create_status}, output: ${create_out}"
       return 1
     fi
+
+    local new_page_id=""
+    new_page_id="$(echo "$create_out" | jq -r '.id // empty' 2>/dev/null || true)"
+
+    if [[ -z "$new_page_id" ]]; then
+      log "ERROR" "Write receipt validation failed on create for '${title}' (${rel_path}): missing page ID: ${create_out}"
+      return 1
+    fi
+
+    local tmp_manifest
+    tmp_manifest="$(mktemp "${MANIFEST_FILE}.tmp.XXXXXX")"
+    jq ".documents[\"${rel_path}\"] = {page_id: \"${new_page_id}\", sha256: \"${current_sha}\", title: \"${title}\", last_synced: \"$(date -u '+%Y-%m-%dT%H:%M:%SZ')\"}" "$MANIFEST_FILE" > "$tmp_manifest"
+    mv "$tmp_manifest" "$MANIFEST_FILE"
+    log "INFO" "Successfully created page ${new_page_id} for '${title}'"
   fi
+  return 0
 }
 
 sync_concepts() {
@@ -358,13 +475,17 @@ sync_entities() {
 # Generate OpenSpec specifications domain catalog and sync to Notion
 generate_and_sync_specs() {
   log "INFO" "Generating OpenSpec Domain Catalog..."
+  if [[ "$DRY_RUN" == "true" ]]; then
+    log "INFO" "[DRY-RUN] Would generate domain catalog from OpenSpec specs and sync to specs"
+    return 0
+  fi
   local catalog_file="${STATE_DIR}/openspec-domain-catalog.md"
 
-  python3 - << 'PYEOF'
+  CATALOG_FILE="$catalog_file" python3 - << 'PYEOF'
 import os, glob, json, sys
 from datetime import datetime, timezone
 
-store_root = os.environ.get("OPENSPEC_STORE_ROOT", "/Users/androidteam/Developer/platform/openspec-store")
+store_root = os.environ.get("OPENSPEC_STORE_ROOT", os.path.expanduser("~/Developer/platform/openspec-store"))
 store_specs = os.path.join(store_root, "openspec", "specs")
 all_specs = glob.glob(f"{store_specs}/**/spec.md", recursive=True)
 
@@ -440,9 +561,8 @@ if os.path.isdir(changes_dir):
             status = f"{completed}/{total}" if total > 0 else "In-Progress"
             active_changes.append((entry, completed, total, status))
 
-out_path = "/Users/androidteam/Developer/.knowledge-refresh/openspec-domain-catalog.md"
+out_path = os.environ.get("CATALOG_FILE", os.path.expanduser("~/.knowledge-refresh/openspec-domain-catalog.md"))
 with open(out_path, "w", encoding="utf-8") as f:
-    f.write("# OpenSpec Specifications & Governance Catalog\n\n")
     f.write(f"> Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%SZ')}\n")
     f.write(f"> Total Governed Specifications: **{len(all_specs)}**\n\n")
     f.write("## Active Changes Ledger\n\n")
@@ -475,20 +595,23 @@ PYEOF
 # Generate Knowledge Health & Freshness Matrix and sync to Notion
 generate_and_sync_freshness() {
   log "INFO" "Generating Knowledge Health & Freshness Matrix..."
+  if [[ "$DRY_RUN" == "true" ]]; then
+    log "INFO" "[DRY-RUN] Would generate freshness matrix and sync to freshness"
+    return 0
+  fi
   local status_script="${WORKSPACE_ROOT}/scripts/knowledge-refresh/knowledge-status.sh"
   local status_json=""
   if [[ -x "$status_script" ]]; then
     status_json="$("$status_script" --json 2>/dev/null || true)"
   fi
+  local matrix_file="${STATE_DIR}/knowledge-freshness-matrix.md"
 
-  python3 - << 'PYEOF'
+  MATRIX_FILE="$matrix_file" python3 - << 'PYEOF'
 import json, os
 from datetime import datetime, timezone
 
-status_path = "/Users/androidteam/Developer/.knowledge-refresh/knowledge-freshness-matrix.md"
+status_path = os.environ.get("MATRIX_FILE", os.path.expanduser("~/.knowledge-refresh/knowledge-freshness-matrix.md"))
 raw_json = os.environ.get("STATUS_JSON", "")
-
-data = {}
 try:
     if raw_json:
         data = json.loads(raw_json)
@@ -542,9 +665,10 @@ if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
   return 0 2>/dev/null || exit 0
 fi
 
-ensure_manifest
+if [[ "$DRY_RUN" != "true" ]]; then
+  ensure_manifest
+fi
 bootstrap_all_sections
-
 case "$TARGET_SECTION" in
   concepts)
     sync_concepts

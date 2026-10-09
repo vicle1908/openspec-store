@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openspec.io/schemas/workstation-manifest.schema.json",
+  "title": "Workstation Toolchain Manifest",
+  "description": "Declarative ownership and version authority manifest for macOS development workstation tools, defining authoritative owners, active path patterns, update authorities, release channels, dispatch classifications, and verification smoke commands.",
+  "type": "object",
+  "required": [
+    "version",
+    "tools"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "profiles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "protected_volumes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sanctioned_roots": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tools": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "authoritative_owner",
+          "active_path_pattern",
+          "update_authority",
+          "release_channel",
+          "dispatch_classification",
+          "verification_smoke_command"
+        ],
+        "properties": {
+          "authoritative_owner": {
+            "type": "string",
+            "enum": [
+              "brew-formula",
+              "brew-cask",
+              "npm-global",
+              "isolated-node",
+              "uv",
+              "standalone",
+              "local-dev",
+              "system"
+            ]
+          },
+          "active_path_pattern": {
+            "type": "string",
+            "description": "Expected active executable path pattern with registered template placeholders (e.g. {{HOMEBREW_PREFIX}}, {{HOME}})"
+          },
+          "update_authority": {
+            "type": "string",
+            "enum": [
+              "brew",
+              "npm-global",
+              "isolated-node",
+              "vendor-download",
+              "uv",
+              "git",
+              "manual",
+              "none"
+            ]
+          },
+          "release_channel": {
+            "type": "string"
+          },
+          "dispatch_classification": {
+            "type": "string",
+            "enum": [
+              "native",
+              "delegating",
+              "none"
+            ]
+          },
+          "verification_smoke_command": {
+            "type": "string"
+          },
+          "writer_binary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "supported_verb": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "delegating_to": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "package_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "known_shadow_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "category": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

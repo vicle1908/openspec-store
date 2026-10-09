@@ -113,3 +113,45 @@ The inventory conducts value-blind discovery of scheduled update daemons across:
 A successful update command where before-and-after versions match (`v_before == v_after`) is evidence of local execution **idempotence**, but does not prove **currency** against the remote release channel.
 - Unchanged versions without an authenticated remote registry check are classified as `(idempotent, currency unverified)`.
 - The label `currency verified` is strictly reserved for tools whose active version was verified against an authoritative upstream release channel API.
+
+## 12. Unified Toolchain Verification Runner
+
+The unified read-only runner executes all five core health audits and emits a single, structured JSON evidence bundle with SHA-256 integrity hash:
+```bash
+python3 platform/openspec-store/scripts/verify-workstation-toolchain.py --json
+```
+
+Audits included:
+1. **Inventory Reconciliation**: Validates declared tool intent in `config/workstation-toolchain-manifest.json` against live host resolution.
+2. **Preflight**: Inspects macOS architecture, Homebrew prefix, Xcode CLI tools, Git, and runtimes without machine-local path dependencies.
+3. **Template Audit**: Renders LaunchAgent plists (`config/launchd/*.tmpl`) and verifies concrete paths with zero unresolved `{{...}}` tags.
+4. **Port Conflicts**: Inspects service ports (11434, 3111, 49134, and Docker Desktop) value-blind, quarantining collisions without killing processes.
+5. **Notion Sanitization**: Audits dynamic home redaction (`/Users/[^/]+/` -> `~/`), credential sanitization, and residual secret scanning.
+
+## 13. External Execution Packets (EEPs) and Governance Gates
+
+External mutations on host roots, LaunchAgents, and external package directories require an **External Execution Packet**:
+```bash
+python3 platform/openspec-store/scripts/create-external-execution-packet.py create \
+  --target-root "/opt/homebrew" \
+  --command "<bounded-command>" \
+  --scope-authorized \
+  --approved-by "<operator>" \
+  --approval-reason "<justification>" \
+  --target-root-approved
+```
+
+Validation gate:
+```bash
+python3 platform/openspec-store/scripts/create-external-execution-packet.py validate <packet.json>
+```
+Packets lacking explicit scope authorization default to `BLOCKED` status. A packet claiming `COMPLETED` without scope authorization fails validation.
+
+## 14. Fail-Closed Notion Knowledge Synchronization
+
+Knowledge sync (`scripts/knowledge-refresh/sync-notion-knowledge.sh`) guarantees:
+1. **Strict Read-Only `--dry-run`**: Zero filesystem mutations, no log touching, no manifest creation or section ID alteration.
+2. **Dynamic Home Redaction**: Dynamic regex `s#/Users/[^/]+/#~/#g` replaces arbitrary username paths with portable representations.
+3. **Residual Secret Scanning**: Fails closed before upload if private key blocks or high-entropy tokens are detected.
+4. **Write-Receipt Gating**: Requires exit code 0 and non-empty page ID from `ntn` before advancing document SHA-256 hashes in `notion-sync-manifest.json`.
+5. **Offline Resilience**: Network interruptions preserve unchanged hashes for automatic retry on subsequent runs.

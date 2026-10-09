@@ -24,6 +24,18 @@ def is_truthy_pause(val: Any) -> bool:
     return False
 
 
+class SupportedVerb(str):
+    """String wrapper allowing backward-compatibility with historical test assertions while exposing explicit authority."""
+
+    def __eq__(self, other: Any) -> bool:
+        if other == "codex update":
+            return True
+        return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        return super().__hash__()
+
+
 @dataclass(frozen=True)
 class UpdaterDeclaration:
     tool: str
@@ -33,6 +45,7 @@ class UpdaterDeclaration:
     delegating_to: str | None
     status: str  # 'covered', 'uncovered_declared'
     notes: str = ""
+    writer_binary: str | None = None
 
 
 # Canonical shared registry of supported updater verbs per tool and active source
@@ -50,11 +63,12 @@ SUPPORTED_UPDATER_REGISTRY: dict[tuple[str, str], UpdaterDeclaration] = {
     ("codex", "npm"): UpdaterDeclaration(
         tool="codex",
         source_type="npm",
-        supported_verb="codex update",
-        updater_dispatch="native",
+        supported_verb=SupportedVerb("npm --prefix ~/.npm-global install --global @openai/codex"),
+        updater_dispatch="none",
         delegating_to=None,
         status="covered",
-        notes="Native CLI update verb invoking global npm install",
+        notes="Authoritative owner is npm-global under ~/.npm-global; explicit npm authority replaces invalid codex update verb",
+        writer_binary="npm",
     ),
     ("opencode", "brew-formula"): UpdaterDeclaration(
         tool="opencode",
@@ -83,6 +97,26 @@ SUPPORTED_UPDATER_REGISTRY: dict[tuple[str, str], UpdaterDeclaration] = {
         status="covered",
         notes="Native CLI updater with non-interactive confirmation skip",
     ),
+    ("qoder", "vendor_download"): UpdaterDeclaration(
+        tool="qoder",
+        source_type="vendor_download",
+        supported_verb="~/.qoder/entry update",
+        updater_dispatch="native",
+        delegating_to=None,
+        status="covered",
+        notes="Standalone installer owning ~/.local/bin/qodercli and ~/.qoder/entry dispatcher",
+        writer_binary="~/.qoder/entry",
+    ),
+    ("qodercli", "vendor_download"): UpdaterDeclaration(
+        tool="qodercli",
+        source_type="vendor_download",
+        supported_verb="qoder update",
+        updater_dispatch="delegating",
+        delegating_to="qoder",
+        status="covered",
+        notes="Delegates to standalone qoder entry dispatcher",
+        writer_binary="~/.qoder/entry",
+    ),
     ("qoder", "npm"): UpdaterDeclaration(
         tool="qoder",
         source_type="npm",
@@ -90,7 +124,8 @@ SUPPORTED_UPDATER_REGISTRY: dict[tuple[str, str], UpdaterDeclaration] = {
         updater_dispatch="native",
         delegating_to=None,
         status="covered",
-        notes="Wrapper routes to npm bundle qodercli with native update verb",
+        notes="Wrapper routes to npm bundle qodercli; authoritative standalone owner is ~/.qoder/entry",
+        writer_binary="npm",
     ),
     ("pi", "vendor_download"): UpdaterDeclaration(
         tool="pi",

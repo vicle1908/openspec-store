@@ -1217,24 +1217,191 @@ def inventory_tools() -> list[ToolInventoryItem]:
         )
 
     return results
+def reconcile_with_manifest(
+    manifest_path: Path | str | None = None,
+    inventory_items: list[ToolInventoryItem] | None = None,
+    auth_items: list[ToolAuthorityItem] | None = None,
+) -> dict[str, Any] | None:
+    """Compare declared manifest intent with observed host resolution.
+
+    Reports aligned, drift, missing, duplicate, obsolete_candidate, and unknown states.
+    Read-only by contract: never modifies any file or directory.
+    """
+    if manifest_path is None:
+        default_manifest = Path(__file__).resolve().parent.parent / "config" / "workstation-toolchain-manifest.json"
+        if default_manifest.is_file():
+            manifest_path = default_manifest
+        else:
+            return None
+
+    m_path = Path(manifest_path)
+    if not m_path.is_file():
+        return None
+
+    try:
+        with open(m_path, "r", encoding="utf-8") as f:
+            manifest_data = json.load(f)
+    except Exception:
+        return None
+
+    declared_tools = manifest_data.get("tools", {})
+    home = Path.home()
+    brew_prefix = "/opt/homebrew" if os.uname().machine == "arm64" else "/usr/local"
+    if os.environ.get("HOMEBREW_PREFIX"):
+        brew_prefix = os.environ["HOMEBREW_PREFIX"]
+
+    # Build map of observed inventory tools, auto-running inventory if not supplied
+    if inventory_items is None:
+        inventory_items = inventory_tools()
+    if auth_items is None:
+        auth_items = evaluate_authority_and_drift().items
+
+    inv_map = {item.name: item for item in (inventory_items or [])}
+    auth_map = {item.name: item for item in (auth_items or [])}
+    aligned: list[dict[str, Any]] = []
+    drift: list[dict[str, Any]] = []
+    missing: list[dict[str, Any]] = []
+    duplicate: list[dict[str, Any]] = []
+    obsolete_candidate: list[dict[str, Any]] = []
+    unknown: list[dict[str, Any]] = []
+
+    # Check each declared tool against observed host resolution
+    for tool_name, t_meta in declared_tools.items():
+        active_bin = shutil.which(tool_name)
+        owner = t_meta.get("authoritative_owner", "unknown")
+        path_pattern = t_meta.get("active_path_pattern", "")
+        expected_path = path_pattern.replace("{{HOME}}", str(home)).replace("{{HOMEBREW_PREFIX}}", brew_prefix)
+
+        # Check duplicates from inventory
+        inv_item = inv_map.get(tool_name)
+        if inv_item and inv_item.has_duplication:
+            duplicate.append({
+                "name": tool_name,
+                "copies_count": len(inv_item.copies),
+                "reclaimable_human": inv_item.estimated_reclaimable_human,
+                "copies": [c.location_path for c in inv_item.copies],
+            })
+
+        if not active_bin:
+            missing.append({
+                "name": tool_name,
+                "state": "missing",
+                "expected_owner": owner,
+                "expected_path": expected_path,
+                "active_path": None,
+            })
+            continue
+
+        resolved_active = str(Path(active_bin).resolve())
+        # Evaluate alignment
+        auth_item = auth_map.get(tool_name)
+        is_aligned = False
+        if auth_item:
+            is_aligned = (auth_item.drift_status == "clean")
+        else:
+            # Heuristic match on expected path prefix/substring
+            if expected_path and (resolved_active == expected_path or active_bin == expected_path):
+                is_aligned = True
+            elif owner == "brew-formula" and ("/Cellar/" in resolved_active or "/opt/homebrew/" in resolved_active or "/usr/local/" in resolved_active):
+                is_aligned = True
+            elif owner == "brew-cask" and ("/Caskroom/" in resolved_active or "/Applications/" in resolved_active):
+                is_aligned = True
+            elif owner == "npm-global" and ".npm-global" in resolved_active:
+                is_aligned = True
+            elif owner == "isolated-node" and "home-toolchain" in resolved_active:
+                is_aligned = True
+            elif owner == "standalone" and (".local" in resolved_active or ".cargo" in resolved_active or ".pi" in resolved_active):
+                is_aligned = True
+
+        if is_aligned:
+            aligned.append({
+                "name": tool_name,
+                "state": "aligned",
+                "owner": owner,
+                "active_path": active_bin,
+                "resolved_path": resolved_active,
+            })
+        else:
+            drift.append({
+                "name": tool_name,
+                "state": "drift",
+                "declared_owner": owner,
+                "expected_path": expected_path,
+                "active_path": active_bin,
+                "resolved_path": resolved_active,
+                "consequence": f"Active path {resolved_active} does not match declared owner {owner}",
+            })
+
+    # Detect unknown tools on host (in inventory but not in manifest)
+    for inv_name in inv_map:
+        if inv_name not in declared_tools:
+            unknown.append({
+                "name": inv_name,
+                "state": "unknown",
+                "active_path": inv_map[inv_name].authoritative_path,
+            })
+
+    # Known obsolete candidates (e.g. deprecated python formula)
+    deprecated_candidates = ["python@3.10"]
+    for dep in deprecated_candidates:
+        dep_path = Path(brew_prefix) / "opt" / dep
+        if dep_path.exists():
+            obsolete_candidate.append({
+                "name": dep,
+                "state": "obsolete_candidate",
+                "location": str(dep_path),
+                "rationale": "Deprecated formula in Homebrew; audit dependencies before uninstallation",
+            })
+
+    overall_status = "drift" if (drift or missing) else "aligned"
+    return {
+        "manifest_path": str(m_path),
+        "status": overall_status,
+        "declared_tools_count": len(declared_tools),
+        "aligned_count": len(aligned),
+        "drift_count": len(drift),
+        "missing_count": len(missing),
+        "duplicate_count": len(duplicate),
+        "obsolete_candidate_count": len(obsolete_candidate),
+        "unknown_count": len(unknown),
+        "summary": {
+            "aligned": [i["name"] for i in aligned],
+            "drift": [i["name"] for i in drift],
+            "missing": [i["name"] for i in missing],
+            "duplicate": [i["name"] for i in duplicate],
+            "obsolete_candidate": [i["name"] for i in obsolete_candidate],
+            "unknown": [i["name"] for i in unknown],
+        },
+        "items": {
+            "aligned": aligned,
+            "drift": drift,
+            "missing": missing,
+            "duplicate": duplicate,
+            "obsolete_candidate": obsolete_candidate,
+            "unknown": unknown,
+        },
+    }
+
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Inventory workstation toolchain install locations.")
     parser.add_argument("--json", action="store_true", help="Output machine-readable JSON")
     parser.add_argument("--declared-prefix", default="~/.npm-global", help="Declared npm global prefix")
+    parser.add_argument("--manifest", help="Path to declarative workstation-toolchain-manifest.json")
     args = parser.parse_args()
 
     prefix_check = check_prefix_reconciliation(args.declared_prefix)
     inventory = inventory_tools()
-
     auth_reconciliation = evaluate_authority_and_drift(args.declared_prefix)
+    manifest_check = reconcile_with_manifest(args.manifest, inventory, auth_reconciliation.items)
 
     if args.json:
         data = {
             "prefix_reconciliation": asdict(prefix_check),
             "tools": [asdict(t) for t in inventory],
             "authority_reconciliation": asdict(auth_reconciliation),
+            "manifest_reconciliation": manifest_check,
             "proposes_deletion": False,
         }
         print(json.dumps(data, indent=2))
@@ -1287,6 +1454,20 @@ def main() -> int:
             if it.compatible_command and not it.prefix_aligned:
                 print(f"                     Compatible:    {it.compatible_command}")
 
+        if manifest_check:
+            print("\n=== Manifest Intent Reconciliation ===")
+            print(f"  Status:                      {manifest_check['status'].upper()}")
+            print(f"  Declared Tools:              {manifest_check['declared_tools_count']}")
+            print(f"  Aligned:                     {manifest_check['aligned_count']}")
+            print(f"  Drift:                       {manifest_check['drift_count']}")
+            print(f"  Missing:                     {manifest_check['missing_count']}")
+            print(f"  Duplicates:                  {manifest_check['duplicate_count']}")
+            print(f"  Obsolete Candidates:         {manifest_check['obsolete_candidate_count']}")
+            print(f"  Unknown Tools:               {manifest_check['unknown_count']}")
+            if manifest_check['summary']['drift']:
+                print(f"  Drift items:                 {', '.join(manifest_check['summary']['drift'])}")
+            if manifest_check['summary']['duplicate']:
+                print(f"  Duplicate items:             {', '.join(manifest_check['summary']['duplicate'])}")
         print("\nPolicy Enforcement: Proposes deletion = False (Strictly read-only; explicit authorization required)")
 
     return 0

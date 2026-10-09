@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "profile": "rust-dev",
+  "description": "Optional Rust development capability profile",
+  "tools": [
+    {
+      "name": "rustup",
+      "authoritative_owner": "standalone",
+      "package": null,
+      "description": "The Rust toolchain installer"
+    },
+    {
+      "name": "cargo",
+      "authoritative_owner": "standalone",
+      "package": null,
+      "description": "Rust package manager managed via rustup"
+    }
+  ]
+}
