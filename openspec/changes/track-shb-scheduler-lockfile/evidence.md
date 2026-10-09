@@ -80,3 +80,17 @@ Source: https://docs.astral.sh/uv/concepts/projects/sync/
 ## Remaining lifecycle boundary
 
 This is an apply completion record. The change remains active for the user's archive workflow; no completed historical archive is rewritten and no archive operation is performed by this apply step.
+
+## Final lifecycle receipt and bounded timestamps
+
+- Scope reconciliation and execution proof committed in OpenSpec store commit `4ce21c5f0b4bcf40f17ca17b5d467642775d7f76` before closing the remaining task checkboxes.
+- Source Ruff: 2026-10-09T06:34:08.051399Z through 06:34:08.301622Z, exit 0.
+- Mypy: 2026-10-09T06:34:08.301810Z through 06:34:09.696635Z, exit 0.
+- Full pytest: 2026-10-09T06:34:09.696785Z through 06:35:37.659076Z, exit 0, 73 passing tests.
+- Fresh local checkout and unchanged tracked-lock read-back: 2026-10-09T06:40:29.831033Z through 06:40:30.646127Z, command exits 0.
+- Matching metadata lock check: 2026-10-09T06:40:30.646551Z through 06:40:30.767915Z, exit 0.
+- Deliberately stale cloned metadata check: 2026-10-09T06:40:30.769035Z through 06:40:30.860830Z, expected exit 1, original and cloned lockfiles unchanged.
+- Final strict change validation: 2026-10-09T06:43:35.993508Z through 06:43:37.270021Z, exit 0, `valid: true`, `issues: []`.
+- Final apply instructions: 2026-10-09T06:43:37.270176Z through 06:43:38.313326Z, exit 0, `state: all_done`, `total: 7`, `complete: 7`, `remaining: 0`.
+- The original scheduler and corrective archive directories had zero changes relative to the recorded store baseline. Unrelated workstation files and generated Graphify outputs were excluded from all scoped commits.
+

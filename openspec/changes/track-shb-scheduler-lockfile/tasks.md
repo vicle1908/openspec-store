@@ -13,5 +13,5 @@
 ## 3. Final Verification and Delivery
 
 - [x] 3.1 Fix the seven diagnosed runtime-source Ruff issues approved during apply; preserve reload task lifetime, reloader encapsulation, ownership, and permissions. Run `uv lock --check`, scheduler tests, mypy, source lint, and isolated CLI/container smoke checks; preserve unrelated Graphify outputs and the lockfile hash.
-- [ ] 3.2 Inspect changed paths and commit only `.gitignore`, unchanged `uv.lock`, the four scoped source files, related behavior regression tests/documentation, and this change's OpenSpec artifacts. Verify a fresh local checkout retains the exact lockfile. Do not stage unrelated work or push.
-- [ ] 3.3 Run strict validation for the change and verify apply instructions report all implementation tasks complete (`all_done`).
+- [x] 3.2 Inspect changed paths and commit only `.gitignore`, unchanged `uv.lock`, the four scoped source files, related behavior regression tests/documentation, and this change's OpenSpec artifacts. Verify a fresh local checkout retains the exact lockfile. Do not stage unrelated work or push.
+- [x] 3.3 Run strict validation for the change and verify apply instructions report all implementation tasks complete (`all_done`).
