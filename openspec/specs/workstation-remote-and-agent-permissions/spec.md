@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Defines workstation standards for remote access software and AI coding assistant runtimes on macOS, enforcing single-version installation via Homebrew Cask and verifying complete system TCC permissions across Accessibility, Screen Recording, and Full Disk Access.
+Defines workstation standards for remote access software, AI coding assistant runtimes, and scripting automation interpreters on macOS, enforcing single-version installation via Homebrew Cask and verifying complete system TCC permissions across Accessibility, Screen Recording, Full Disk Access, and programmatic computer control.
 
 ## Requirements
 
@@ -43,3 +43,24 @@ Remote access utilities and automated AI coding assistants requiring screen capt
 - **WHEN** operator verification is executed against `/Library/Application Support/com.apple.TCC/TCC.db`
 - **THEN** audit queries SHALL verify `auth_value = 2` for all target client identifiers
 - **AND** the report SHALL emit client identities, service names, and authorization integers without logging sensitive session tokens or system credentials
+
+### Requirement: Runtime scripting interpreters and host automation runners SHALL maintain full computer control permissions
+
+Interpreters and automation harnesses executing on the workstation (Python, Ruby, OMP) SHALL maintain verified host permissions enabling unrestricted programmatic computer control, including accessibility tree inspection, synthetic event posting, screen buffer capture, and full filesystem traversal.
+
+#### Scenario: Python automation runtime control verification
+- **WHEN** Python automation scripts execute via host or `uv` environments (`cpython-3.11`, `cpython-3.12`)
+- **THEN** `ApplicationServices.AXIsProcessTrusted()` SHALL evaluate to true
+- **AND** CoreGraphics display bounds queries SHALL succeed without permission error
+- **AND** reading protected directories such as `/Library/Application Support/com.apple.TCC` SHALL succeed under Full Disk Access
+
+#### Scenario: Ruby automation runtime control verification
+- **WHEN** Ruby automation scripts execute via Homebrew Ruby runtimes
+- **THEN** `ApplicationServices.AXIsProcessTrusted()` SHALL evaluate to true
+- **AND** CoreGraphics display ID and bounds queries SHALL succeed without permission error
+- **AND** reading protected directories such as `/Library/Application Support/com.apple.TCC` SHALL succeed under Full Disk Access
+
+#### Scenario: OMP native computer-use harness capability verification
+- **WHEN** OMP computer-use APIs (`computer.capabilities()`, `computer.windows()`, `computer.screenshot()`, `computer.click()`, `win.ax()`) execute
+- **THEN** the capability report SHALL indicate `capturePermission: "granted"`, `inputPermission: "granted"`, and `axPermission: "granted"`
+- **AND** window enumeration, AX tree parsing, and synthetic input generation SHALL execute without runtime permission rejection
