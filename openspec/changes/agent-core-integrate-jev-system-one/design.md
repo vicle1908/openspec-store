@@ -89,6 +89,30 @@ When the credential is absent or the service is unreachable, a high-authority to
 
 **Alternative considered:** fail closed everywhere. Rejected — it would make the evaluator and matcher brittle for no safety gain.
 
+### D10: Support HTTP/2 transport multiplexing via `typesafe-sdk[http2]`
+
+The integration specifies `typesafe-sdk[http2]` to leverage persistent HTTP/2 connection multiplexing in `AsyncTypeSafeClient` and `TypeSafeClient`. Multiplexing removes per-request TCP/TLS handshake round trips and avoids socket churn under rapid tool or graph evaluations, keeping decision round-trips strictly within the sub-200ms envelope.
+
+**Alternative considered:** default HTTP/1.1 keep-alive only. Rejected — HTTP/2 provides superior multiplexing and lower latency when multiple tool calls or graph evaluations occur in quick succession behind local or network proxies.
+
+### D11: Native Pydantic response models for typed decision validation
+
+The client leverages TypeSafe's native `response_model` parameter accepting subclasses of `SystemOneResponse` (or Pydantic `BaseModel`). Callers can declare strongly typed schemas for their expected question sets (e.g. `ToolGuardResponse`, `GraphRoutingResponse`) and receive structured, validated objects rather than indexing raw dictionaries.
+
+**Alternative considered:** unvalidated dictionary access only (`result.nouls[...]`). Rejected — while low-level access remains supported, typed Pydantic models eliminate key typo bugs and align directly with `agent-core`'s Pydantic AI foundation.
+
+### D12: Support Pydantic AI Gateway and enterprise proxy endpoints
+
+In addition to direct TypeSafe endpoints via `TYPESAFE_API_KEY`, the client configuration supports Pydantic AI Gateway proxies via `PYDANTIC_AI_GATEWAY_API_KEY` and `TYPESAFE_BASE_URL` (`https://gateway-us.pydantic.dev/proxy/typesafe` or local gateway). This enables centralized enterprise governance, rate-limiting, and cost tracking across agent fleets.
+
+**Alternative considered:** hardcoded TypeSafe cloud URL. Rejected — prevents using local enterprise AI gateways or Pydantic AI Gateway proxies.
+
+### D13: Establish cross-ecosystem consumer contracts for downstream reuse
+
+Design the decision client and guardrail primitives as cleanly decoupled components so that sister repositories — specifically `shb-agent-core` (banking maker-checker gates, AML sanction screening pre-flight), `shb-agent-harness` (12-stage LangGraph conditional skip routing), and `ai-review` (fast diff classification) — can import or mirror the exact decision contracts without rewriting transport or retry logic.
+
+**Alternative considered:** ad-hoc implementations in each repository. Rejected — duplicates question definitions, retry logic, and fallback behaviors across repositories.
+
 ## Risks / Trade-offs
 
 - **[No credential, so the live path is unverified]** → The mock and fail-closed paths are unit-tested now; the live path is verified when the operator supplies a key, and this is recorded as an open item rather than assumed working.

@@ -2,9 +2,10 @@
 
 ## 1. Dependency and settings foundation
 
-- [ ] 1.1 Add the optional `typesafe-sdk` dependency to `agent-core/pyproject.toml` and verify `uv sync` resolves it; confirm the package imports while the feature remains disabled and absent from any required runtime path
-- [ ] 1.2 Implement `JevSettings` in `agent_core/foundation/settings.py` with the `JEV_` prefix covering `enabled` (default false), a pinned model identifier, request timeout, retry counts, and `fail_closed`; verify with unit tests asserting the defaults and the `JEV_` environment overrides
+- [ ] 1.1 Add the optional `typesafe-sdk[http2]` dependency to `agent-core/pyproject.toml` and verify `uv sync` resolves it; confirm the package imports while the feature remains disabled and absent from any required runtime path
+- [ ] 1.2 Implement `JevSettings` in `agent_core/foundation/settings.py` with the `JEV_` prefix covering `enabled` (default false), a pinned model identifier, request timeout, retry counts, `http2` transport flag, and `fail_closed`; verify with unit tests asserting the defaults and the `JEV_` environment overrides
 - [ ] 1.3 Verify the loaded settings strip any `typesafe_api_key` found in layered YAML, emit a warning, and leave `TYPESAFE_API_KEY` as the sole credential source; verify with a unit test that no secret reaches the settings object
+- [ ] 1.4 Add configuration support for Pydantic AI Gateway proxying (`PYDANTIC_AI_GATEWAY_API_KEY`, custom base URL `https://gateway-us.pydantic.dev/proxy/typesafe`); verify with a unit test that proxy base URL and gateway headers configure correctly without leaking keys
 
 ## 2. System One decision client
 
@@ -13,6 +14,7 @@
 - [ ] 2.3 Capture and surface the response's answering `model` identifier and `request_id` on every result; verify with a test asserting both are recorded and that the answering model is not assumed to equal the requested alias
 - [ ] 2.4 Implement the failure paths and verify each with a test: a missing credential raises a construction-time configuration error (`TypeSafeError`) without hanging; an unauthorized credential raises `TypeSafeAuthenticationError` on the first call without indefinite retries; a timeout or rate-limit response fails according to the retry policy and does not retry unbounded
 - [ ] 2.5 Implement a mock transport exercising the full client surface and verify the success, timeout, missing-credential, and invalid-credential paths pass without network access, so the suite is hermetic while no credential exists
+- [ ] 2.6 Implement support for native Pydantic response models via `response_model` (`SystemOneResponse` / `BaseModel`), verifying that question answers automatically parse and validate into strongly typed model instances without manual dictionary indexing
 
 ## 3. Centralized decision definitions
 
@@ -60,3 +62,8 @@
 - [ ] 9.2 Verify the feature is inert when disabled: with `JEV_ENABLED` unset, existing generative agent paths behave identically to the pre-change baseline, confirmed by the suite and by the guard not running
 - [ ] 9.3 Verify the runtime operates with `typesafe-sdk` absent from the environment, so the dependency remains genuinely optional
 - [ ] 9.4 Record the deferred live-path verification explicitly: the mock and fail-closed paths are verified now, and live decision quality, threshold calibration, and per-`AuthorityClass` threshold values remain open pending a `TYPESAFE_API_KEY`
+
+## 10. Cross-ecosystem consumer contracts
+
+- [ ] 10.1 Export reusable decision question definitions and schemas in a modular submodule so sister repositories (such as `shb-agent-core` and `shb-agent-harness`) can import decision contracts without coupling to `agent-core` internal paths; verify with an importability smoke test
+- [ ] 10.2 Define contract compatibility test fixtures demonstrating how `JevDecisionClient` and `Noul`/`Choice` primitives cleanly power banking maker-checker transfer gates, AML sanction screening pre-flight, and LangGraph 12-stage conditional skip routing without code duplication

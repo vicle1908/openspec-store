@@ -9,11 +9,15 @@ TypeSafe's Jev is a System One model: it evaluates typed questions against a sta
 ## What Changes
 
 - **Add a System One decision client to `agent-core`** using the official `typesafe-sdk` (`TypeSafeClient` / `AsyncTypeSafeClient` and its `system_one` method), with a typed `JevSettings` (`JEV_` prefix) in `agent_core.foundation.settings` and credential handling aligned to the SDK's `TYPESAFE_API_KEY`.
+- **Support HTTP/2 transport multiplexing (`typesafe-sdk[http2]`)** to enable connection reuse and eliminate per-request handshake overhead for sub-200ms decision paths.
 - **Model the three real primitives.** TypeSafe exposes `Noul` (yes/no probability), `Choice`, and `Score`. There is no boolean primitive; a yes/no judgment is a `Noul`, whose single probability carries both answer and certainty.
+- **Support typed Pydantic response models** via the SDK's native `response_model` parameter (`SystemOneResponse` / `BaseModel`), ensuring end-to-end schema validation aligned with `agent-core`'s Pydantic AI foundation.
+- **Support Pydantic AI Gateway proxying** (`PYDANTIC_AI_GATEWAY_API_KEY` / `TYPESAFE_BASE_URL`) alongside direct TypeSafe endpoints, enabling unified gateway governance across `agent-core` and sister ecosystems.
 - **Semantic pre-flight tool guardrail** in `agent_core.tool_registry.guardrails`: one atomic `Noul` per destructive condition, combined by code with code-controlled weights, gated by a confidence threshold scaled to the invocation's risk class. It catches obfuscated commands that bypass regex, without generation latency, and never bypasses human approval.
 - **Confidence-gated graph routing** in `agent_core.orchestration.graph`: a `Choice`-based router that treats confidence as a second decision axis, so a low-confidence answer escalates rather than silently selecting the highest-probability branch.
 - **Per-candidate skill reranking** in `agent_core.skill_system.matcher`: one `Noul` per query-candidate pair, ordered by the returned probability, replacing the design's single-choice comparison across candidates.
 - **Non-generative evaluation scorers**: `JevEvaluator` scoring independent rubric dimensions and composing them in code, compatible with `agent_core.observability.scorers.runner`.
+- **Ecosystem capability contracts**: Clean abstractions that allow downstream consumers (such as `shb-agent-core` and `shb-agent-harness` for banking guardrails, AML screening, and LangGraph 12-stage conditional skip routing) to consume System One decisions without duplicating transport logic.
 - **One reviewable decision module** holding every question, criterion, weight, and threshold, so judgments can be reviewed and retuned without editing the logic that consumes them.
 - **Fail-closed degradation**: when the credential is absent or the service is unreachable, security-critical checks fail closed to the existing authority checks and blocklists, while skills and evaluations fall back to lexical/vector logic.
 - **BREAKING**: none. Jev is additive and optional; every existing generative path is preserved.

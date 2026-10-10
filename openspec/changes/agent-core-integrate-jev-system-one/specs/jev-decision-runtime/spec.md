@@ -167,3 +167,39 @@ Jev decisions SHALL be observable through OpenTelemetry spans carrying decision 
 - **WHEN** a Jev decision completes
 - **THEN** a span SHALL be emitted carrying the model identifier that answered, the question identifiers, the returned probabilities or confidences, and the observed latency
 - **AND** logging at debug level SHALL NOT emit state bodies containing credentials or secrets
+
+### Requirement: HTTP/2 Transport Multiplexing
+
+The client transport SHALL support HTTP/2 multiplexing via `typesafe-sdk[http2]` to maintain persistent socket connections and eliminate per-request handshake overhead.
+
+#### Scenario: HTTP/2 connection pooling
+- **WHEN** the decision client initializes in an environment with `typesafe-sdk[http2]` installed
+- **THEN** the client SHALL enable HTTP/2 transport multiplexing
+- **AND** repeated decision calls SHALL reuse open sockets without renegotiating TLS handshakes
+
+### Requirement: Native Pydantic Response Models
+
+The client SHALL support structured validation using TypeSafe native response models subclassing `SystemOneResponse` or Pydantic `BaseModel`.
+
+#### Scenario: Strongly typed response parsing
+- **WHEN** a caller provides a typed `response_model` class to `system_one`
+- **THEN** the client SHALL return an instance of that model containing validated question answers
+- **AND** callers SHALL access answer fields directly without indexing raw dictionaries
+
+### Requirement: Pydantic AI Gateway Compatibility
+
+The configuration and client SHALL support proxying requests through Pydantic AI Gateway or enterprise proxies via `PYDANTIC_AI_GATEWAY_API_KEY` and base URL configuration.
+
+#### Scenario: Gateway proxy routing
+- **WHEN** `PYDANTIC_AI_GATEWAY_API_KEY` or custom `TYPESAFE_BASE_URL` is set
+- **THEN** the client SHALL route decision requests through the configured gateway endpoint
+- **AND** telemetry headers SHALL be passed transparently for unified fleet governance
+
+### Requirement: Reusable Cross-Ecosystem Decision Contracts
+
+The decision runtime SHALL expose modular interfaces so sister repositories can consume decision primitives without duplicating client or retry logic.
+
+#### Scenario: Downstream banking and planning integration
+- **WHEN** downstream packages such as `shb-agent-core` or `shb-agent-harness` import decision abstractions
+- **THEN** the runtime SHALL expose reusable question definitions and risk classifiers
+- **AND** callers SHALL execute custom domain gates such as transfer triage or stage skipping
