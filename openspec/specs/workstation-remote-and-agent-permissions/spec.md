@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Defines workstation standards for remote access software, AI coding assistant runtimes, and scripting automation interpreters on macOS, enforcing single-version installation via Homebrew Cask and verifying complete system TCC permissions across Accessibility, Screen Recording, Full Disk Access, and programmatic computer control.
+Defines workstation standards for remote access software, AI coding assistant runtimes, and scripting automation interpreters on macOS, enforcing single-version installation via Homebrew Cask, Gatekeeper quarantine bypass, and complete system TCC permissions across Accessibility, Screen Recording, Full Disk Access, and programmatic computer control.
 
 ## Requirements
 
@@ -64,3 +64,17 @@ Interpreters and automation harnesses executing on the workstation (Python, Ruby
 - **WHEN** OMP computer-use APIs (`computer.capabilities()`, `computer.windows()`, `computer.screenshot()`, `computer.click()`, `win.ax()`) execute
 - **THEN** the capability report SHALL indicate `capturePermission: "granted"`, `inputPermission: "granted"`, and `axPermission: "granted"`
 - **AND** window enumeration, AX tree parsing, and synthetic input generation SHALL execute without runtime permission rejection
+
+### Requirement: Homebrew Cask applications SHALL bypass Gatekeeper quarantine attributes
+
+Developer workstations SHALL configure Homebrew Cask options to prevent the attachment of `com.apple.quarantine` extended attributes on installed bundles, and existing application bundles SHALL maintain zero quarantine metadata.
+
+#### Scenario: Persistent Cask options configuration
+- **WHEN** user and system shell sessions initialize (`~/.zshrc`, `~/.zprofile`)
+- **THEN** `HOMEBREW_CASK_OPTS="--no-quarantine"` SHALL be exported
+- **AND** `brew config` SHALL report `HOMEBREW_CASK_OPTS: ["--no-quarantine"]`
+
+#### Scenario: Application bundle quarantine attribute elimination
+- **WHEN** installed bundles in `/Applications` and `/opt/homebrew/Caskroom` are inspected via `xattr`
+- **THEN** no `com.apple.quarantine` attribute SHALL be present
+- **AND** launching applications SHALL execute directly without Gatekeeper download confirmation dialogs
