@@ -6,7 +6,7 @@ Defines the architectural namespace topology, hygiene boundaries, file placement
 ## Requirements
 
 ### Requirement: Workspace domain taxonomy isolation
-The workspace root at `~/Developer/` SHALL maintain dedicated domain subtrees (`legacy/`, `apps/`, `study/`, `ai-tooling/`, `migration-archives/`) alongside existing subtrees (`mobile/`, `infra/`, `ops-tools/`), and SHALL NOT store unclassified standalone projects or static assets flat at the workspace root.
+The workspace root at `~/Developer/` SHALL maintain dedicated domain subtrees (`legacy/`, `apps/`, `study/`, `ai-tooling/`, `migration-archives/`) alongside organization subtrees (`platform/`, `tdt/`, `shb/`, `vds/`, `ascend/`, `ghtk/`, `fpt/`, `infra/`), and SHALL NOT store unclassified standalone projects or static assets flat at the workspace root.
 
 #### Scenario: Categorizing unclustered projects into domain subtrees
 - **WHEN** standalone projects or migrated assets are introduced to the workspace
