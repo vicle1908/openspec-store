@@ -4,38 +4,37 @@
 
 See `proposal.md - Why` for motivation. Technical constraints and observed system state:
 - **Adapter Topology**: `claude-code-provider-adapter` (Python 3.12, FastAPI, Uvicorn) was built to translate Claude Code's Anthropic Messages protocol into OpenAI Responses requests for Cockpit Tools (`http://host.docker.internal:51006/v1/responses`). It publishes `127.0.0.1:8788` to the host.
-- **Gateway Capability**: OmniRoute v3.8.51 running in container `omniroute` directly supports both Anthropic Messages (`/v1/messages` on port 20129) and OpenAI Responses (`openai-responses.ts`), while Cockpit Tools runs directly on the macOS host (listening on port 51006).
-- **Workspace Burden**: Running the adapter sidecar requires a separate Docker container, a user LaunchAgent (`com.workspace.claude-code-provider-adapter`), compose stack lifecycle hooks in `docker-service.sh`, and health monitoring in `omniroute-watchdog.sh`.
+- **Gateway Capability**: OmniRoute v3.8.51 running in container `omniroute` natively supports custom provider nodes with `api_type: "responses"` (`openai-compatible-responses-*`) pointing to OpenAI Responses endpoints, including `http://host.docker.internal:51006/v1`.
+- **Dialect Parity Verified**: Probing OmniRoute on `POST http://127.0.0.1:20129/v1/messages` with model `cockpit/gpt-5.6-luna` forwards the request directly to Cockpit Tools upstream (`host.docker.internal:51006`), returning the exact upstream response payload. This proves that OmniRoute completely supersedes the Python adapter.
 
 ## Goals / Non-Goals
 
 **Goals:**
-- Eliminate the standalone adapter container and its LaunchAgent, reducing host RAM usage and container count.
-- Update `docker-service.sh` and `omniroute-watchdog.sh` to supervise strictly `~/Omniroute`.
-- Reconcile `~/.zshrc` Claude Code launcher functions and profiles to remove references to port 8788 without breaking developer workflows.
+- Formally register Cockpit Tools as a first-class custom provider node in OmniRoute's SQLite database (`storage.sqlite`).
+- Reconcile `cockpit()` in `~/.zshrc` and `~/.claude/profiles/cockpit.json` to route to `http://localhost:20129` with model `cockpit/gpt-5.6-luna`.
+- Safely decommission `claude-code-provider-adapter`, unregister its LaunchAgent, and prune its references from `docker-service.sh` and `omniroute-watchdog.sh`.
 
 **Non-Goals:**
-- Deleting the `platform/claude-code-provider-adapter` repository directory (the repository remains archived for historical provenance).
 - Modifying Cockpit Tools' port 51006 daemon.
+- Deleting the `platform/claude-code-provider-adapter` repository directory (retained as an archive).
 
 ## Decisions
 
-### D1: Drain Container and Unload LaunchAgent
-*Alternative considered*: Leaving the container stopped but loaded in launchd.
-*Decision*: Fully drain the container via `docker compose down`, unload the LaunchAgent via `launchctl bootout "gui/$(id -u)/com.workspace.claude-code-provider-adapter"`, and rename/disable the plist.
-*Rationale*: Prevents launchd from attempting to restart a dead container or spamming log files.
+### D1: Register Cockpit as an `openai-compatible-responses` Node in OmniRoute
+*Decision*: Configure `provider_nodes` (`openai-compatible-responses-cockpit`) and `provider_connections` (`c0ckp1t0-0000-4000-a000-000000000001`), referencing encrypted `HERMES_CUSTOM_COCKPIT_API_KEY`.
+*Rationale*: Leverages OmniRoute's battle-tested `openai-responses.ts` request translator and streaming response translator, unifying all local agent proxying under a single gateway.
 
-### D2: Streamline `docker-service.sh` and `omniroute-watchdog.sh`
-*Alternative considered*: Keeping empty check loops.
-*Decision*: Prune `COMPOSE_STACKS` in `~/Developer/scripts/docker-service.sh` to solely `/Users/androidteam/Omniroute`. In `omniroute-watchdog.sh`, eliminate the port 8788 HTTP probe.
-*Rationale*: Reduces watchdog probe latency and ensures `docker-service.sh drain`, `stop`, `restart`, and `up` operate on the single authoritative gateway stack.
+### D2: Update Claude Code Cockpit Launcher & Profile
+*Decision*:
+- Update `~/.claude/profiles/cockpit.json` to set `ANTHROPIC_BASE_URL: "http://localhost:20129"`, model `cockpit/gpt-5.6-luna`, and `apiKeyHelper: "~/.claude/helpers/omniroute-key.sh"`.
+- Update `cockpit()` in `~/.zshrc` to point to port 20129.
+*Rationale*: All Claude Code launchers (`omniroute`, `shopapikey`, `cockpit`) now share the standardized OmniRoute loopback port and authentication helper.
 
-### D3: Reconcile Claude Code Launcher Configuration
-*Alternative considered*: Retaining `http://localhost:8788` with a proxy redirect.
-*Decision*: Update `cockpit()` in `~/.zshrc` and `~/.claude/profiles/cockpit.json` to route directly or use OmniRoute's native translation dialect.
-*Rationale*: Clean cutover without shims per workspace completeness rules.
+### D3: Drain Container and Unload LaunchAgent
+*Decision*: Execute `docker compose down` in `platform/claude-code-provider-adapter`, unload `com.workspace.claude-code-provider-adapter` via launchctl, and remove port 8788 probes from `docker-service.sh` and `omniroute-watchdog.sh`.
+*Rationale*: Eliminates a redundant container and background launchd daemon, saving host memory and CPU cycles.
 
 ## Risks / Trade-offs
 
-- **Risk: Breaking `cockpit()` CLI launcher**: If an active session invokes `cockpit` while port 8788 is down before the launcher function is updated, Claude Code fails with `ECONNREFUSED`.
-  - *Mitigation*: Update `~/.zshrc` and verify `omniroute`, `shopapikey`, and `cockpit` launchers before final cutover verification.
+- **Risk: Upstream Cockpit Account Availability**: Cockpit Tools upstream may return `auth_unavailable: No available account` when the user's upstream pool is exhausted.
+  - *Mitigation*: Both the legacy adapter on port 8788 and OmniRoute on port 20129 receive and return the exact same upstream error message from Cockpit Tools. OmniRoute does not alter or swallow upstream account errors.

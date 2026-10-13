@@ -4,7 +4,7 @@
 
 ### Requirement: OmniRoute pm launcher SHALL route Claude Code through the gateway Messages endpoint
 
-The `omniroute()` launcher in `~/.zshrc` SHALL select the `~/.claude/profiles/omniroute-pm.json` profile via `claude --settings`, set `ANTHROPIC_BASE_URL` to the OmniRoute loopback API port, unset `ANTHROPIC_AUTH_TOKEN`, and default the model to the phanmemvip channel Fable model. All Claude Code custom launcher profiles in the developer workspace SHALL route directly without intermediate container translation hops on port 8788.
+The `omniroute()` launcher in `~/.zshrc` SHALL select the `~/.claude/profiles/omniroute-pm.json` profile via `claude --settings`, set `ANTHROPIC_BASE_URL` to the OmniRoute loopback API port, unset `ANTHROPIC_AUTH_TOKEN`, and default the model to the phanmemvip channel Fable model. All Claude Code custom launcher profiles in the developer workspace (`omniroute`, `cockpit`, and `shopapikey`) SHALL route directly through OmniRoute's native Messages port (`http://127.0.0.1:20129`), eliminating intermediate container translation sidecars on port 8788.
 
 #### Scenario: Launcher routes through OmniRoute
 - **WHEN** `omniroute` is invoked in an interactive zsh shell
@@ -21,5 +21,5 @@ The `omniroute()` launcher in `~/.zshrc` SHALL select the `~/.claude/profiles/om
 
 #### Scenario: Direct native routing for coding agent profiles
 - **WHEN** any Claude Code launcher (`omniroute`, `cockpit`, or `shopapikey`) is executed
-- **THEN** requests MUST NOT route through port 8788 or require container `claude-code-provider-adapter` to be running
-- **AND** `omniroute` MUST continue communicating directly with `http://127.0.0.1:20129/v1/messages` using the `omniroute-pm.json` profile.
+- **THEN** requests MUST route directly to OmniRoute's native Messages endpoint on port 20129 without requiring container `claude-code-provider-adapter` to be running on port 8788
+- **AND** for `cockpit`, the requested model SHALL route to `cockpit/gpt-5.6-luna` using OmniRoute's registered Cockpit Responses provider node.
