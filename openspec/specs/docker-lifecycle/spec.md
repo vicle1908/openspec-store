@@ -132,8 +132,9 @@ Critical gateway and dependency containers SHALL configure and run with `HostCon
 A periodic system supervisor (`com.omniroute.watchdog`) SHALL monitor the health of the Docker daemon and local gateway stacks and auto-recover unhealthy or missing services, omitting decommissioned sidecar endpoints from health evaluation.
 
 #### Scenario: Unhealthy or halted container auto-recovery
-- **WHEN** `omniroute` container is halted or fails HTTP health probes
-- **THEN** `omniroute-watchdog.sh` SHALL execute `docker compose up -d` in the respective stack directory to restore service availability.
+- **WHEN** `omniroute` container is halted or fails HTTP health probes outside the startup grace period
+- **THEN** `omniroute-watchdog.sh` SHALL evaluate container status: if the container is running but unhealthy, it SHALL execute `docker compose restart omniroute-base`
+- **AND** if the container is halted or not running, it SHALL execute `docker compose up -d` in the respective stack directory to restore service availability.
 
 #### Scenario: Container startup grace period observed
 - **WHEN** `omniroute` is in the `starting` health status during initial boot
