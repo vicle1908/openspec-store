@@ -2,6 +2,7 @@
 
 ## Purpose
 This spec defines how each service registers its workflows and activities on its own Temporal task queue. Every service's `runWorker` role SHALL connect to the Temporal server, register its workflow functions on its assigned task queue, and register its activity implementations with explicit activity options (`StartToCloseTimeout`, `ScheduleToCloseTimeout`, retry policy). The registration SHALL use the platform's `platformtemporal.NewValidatedActivityOptions` helper so missing or invalid timeouts fail the worker boot.
+
 ## Requirements
 
 > **Status**: LOCAL IMPLEMENTED. The self-hosted topology bootstraps the
@@ -14,37 +15,7 @@ This spec defines how each service registers its workflows and activities on its
 
 ### Requirement: Every service has a runWorker role
 
-> **Status**: LOCAL IMPLEMENTED. Worker entry points, dependency-complete
-> registrations, lifecycle behavior, pollers, and direct Workflow execution
-> are verified across all eight services.
-
-Each service's `cmd/<service>/` SHALL have a `runWorker` function. The function:
-
-1. Loads the service's `Config` with the role-aware config loader (e.g., `config.Load(config.RoleWorker)`).
-2. Reads the Temporal connection settings: `cfg.Temporal.Address` (default `localhost:7233`), `cfg.Temporal.Namespace` (default `default`), `cfg.Temporal.TaskQueue` (default per service, see table below).
-3. Derives the `BuildID` via `platformtemporal.DeploymentVersion()` (which reads `PLATFORM_DEPLOYMENT_VERSION` → `GIT_SHA` → `dev` in that order, per `platform/temporal/deployment.go`); fails fast with a non-zero exit and stderr message `FAIL: DeploymentVersion is empty` if no source produces a value.
-4. Opens a Temporal client via the official SDK (`temporalclient.NewLazyClient(...)`).
-5. Constructs the `worker.Worker` via `worker.New(c, taskQueue, opts)`, where `opts.DeploymentOptions.UseVersioning = true`, the default versioning behavior is explicit, and `opts.DeploymentOptions.Version.DeploymentName` is the service's SDK-valid deployment identity rather than the task queue.
-6. Calls `w.RegisterWorkflowWithOptions(...)` for each workflow in the service's workflow set and `w.RegisterActivityWithOptions(...)` for each activity.
-7. Starts the worker with `w.Start()`; blocks on `<-ctx.Done()`; calls `w.Stop()` on shutdown.
-
-The function SHALL expose a `/health/ready` HTTP probe that returns `503 Service Unavailable` until the worker is registered and `200 OK` thereafter.
-
-The canonical task queues per service (matching the actual constants in the codebase) are:
-
-| Service | Task Queue (constant source) | Workflow(s) registered |
-|---|---|---|
-| `order-service` | `order-fulfillment.v1` (`internal/adapters/temporal/constants.go`) | `OrderFulfillmentWorkflow` (registered as `order.fulfillment.v1`) |
-| `payment-service` (new) | `payment.capture.v1` (proposed; no constant today) | `PaymentCaptureWorkflow` (proposed; registered as `payment.capture.v1`) |
-| `inventory-service` (new) | `inventory.reservation.v1` (proposed; no constant today) | `InventoryReservationWorkflow` (proposed; registered as `inventory.reservation.v1`) |
-| `shipping-service` (new) | `shipping.dispatch.v1` (proposed; no constant today) | `ShippingDispatchWorkflow` (proposed; registered as `shipping.dispatch.v1`) |
-| `notification-service` | `notification.dispatch.v1` (`internal/application/orchestration/workflow.go::DispatchTaskQueue`) | `NotificationFulfillmentWorkflow` (registered as `notification.dispatch.v1`) |
-| `customer-service` (purge) | `customer.purge.v1` (`internal/application/orchestration/workflow.go::TaskQueuePurge`) | `CustomerPurgeWorkflow` (registered as `customer.purge.v1`) |
-| `customer-service` (export) | `customer.gdpr.v1` (`internal/application/orchestration/workflow.go::TaskQueueExport`) | `CustomerGDPRExportWorkflow` (registered as `customer.gdpr.v1`) |
-| `reporting-service` | `reporting.admin.v1` (`internal/runtime/config.go::TemporalTaskQueue`) | `DailyRevenueRollupWorkflow` (registered as `ReportingDailyRevenueRollup`) |
-| `catalog-service` | `catalog.admin.v1` (`internal/application/orchestration/price_rollback.go::TaskQueue`) | `PriceRollbackWorkflow` (registered as `PriceRollbackWorkflow.v1`) |
-
-A single worker binary SHALL register on all task queues owned by its service. The customer-service's `runWorker` registers workflows on both `customer.purge.v1` and `customer.gdpr.v1`; the other services register on a single task queue.
+Each service's `cmd/<service>/` SHALL have a `runWorker` function. The function SHALL construct and manage the worker lifecycle using the shared `platformtemporal.NewManagedWorker` abstraction with bounded graceful shutdown. All Temporal workflows and activity registrations SHALL be sourced from the service's driven adapter package at `internal/adapters/temporal/`.
 
 #### Scenario: order-worker registers the workflow and activity set
 
@@ -78,6 +49,11 @@ A single worker binary SHALL register on all task queues owned by its service. T
 
 - **WHEN** the `catalog-worker` container starts with `CATALOG_TEMPORAL_ADDRESS=temporal:7233`, `TEMPORAL_TASK_QUEUE=catalog.admin.v1`
 - **THEN** the worker registers `PriceRollbackWorkflow` (as `PriceRollbackWorkflow.v1`) and the activity on task queue `catalog.admin.v1`
+
+#### Scenario: Order worker starts with platform managed worker lifecycle
+- **WHEN** the `order-worker` container starts with `ORDER_TEMPORAL_TASK_QUEUE=order-fulfillment.v1`
+- **THEN** the worker lifecycle is managed via `platformtemporal.NewManagedWorker`
+- **AND** the worker exposes fail-closed readiness and bounded graceful termination
 
 ### Requirement: WorkerDeploymentOptions is service-specific
 
@@ -476,3 +452,11 @@ responsibilities.
   a Temporal SDK subpackage
 - **THEN** registration/architecture validation fails
 
+### Requirement: Driven adapter packaging for Temporal bindings
+
+All Temporal workflow declarations, activity handlers, and worker registration adapters SHALL reside in the secondary driven adapter package `internal/adapters/temporal/`. Services SHALL NOT place Temporal SDK imports or workflow logic in `internal/application/orchestration/` or core domain packages.
+
+#### Scenario: Clean hexagonal isolation of Temporal SDK dependencies
+- **WHEN** a service implements Temporal workflows or activities
+- **THEN** all Temporal SDK types and registration hooks are confined to `internal/adapters/temporal/`
+- **AND** the core application domain does not import `go.temporal.io/sdk`
