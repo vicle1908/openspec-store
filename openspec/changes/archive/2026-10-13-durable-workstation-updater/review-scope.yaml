@@ -1,0 +1,32 @@
+schema_version: 1.1.0
+change: durable-workstation-updater
+tier: standard
+risk:
+  tier: standard
+  fresh_context: true
+
+scopes:
+  spec_compliance:
+    lens: spec_compliance
+    provider: hermes
+    description: Validate spec requirements, scenarios, and normative language alignment.
+  security:
+    lens: security
+    provider: claude
+    description: Audit noninteractive sudo prompts, file permissions, shell injection, and secret isolation.
+  quality_and_tests:
+    lens: quality_and_tests
+    provider: codex
+    description: Audit testability, idempotency, failure boundaries, and process safety.
+  architecture:
+    lens: architecture
+    provider: agy
+    description: Audit DBOS durable workflow integration, manifest schema, and deprecation boundaries.
+  product_scope:
+    lens: product_scope
+    provider: kimi
+    description: Audit scope boundaries, preventing overreach while covering all requested package ecosystems.
+  cross_cutting:
+    lens: cross_cutting
+    provider: opencode
+    description: Audit error handling, lock contention, log rotation, and edge-case telemetry.

@@ -412,6 +412,18 @@ run_pipeline() {
     export HOMEBREW_NO_INSTALL_CLEANUP=1
   fi
 
+  # Primary Delegation: Durable DBOS Execution via shb-schedule
+  if [[ "${MODE}" == "apply" ]] && command -v uv &>/dev/null && [[ -f "${HOME}/Developer/shb/shb-schedule/pyproject.toml" ]]; then
+    echo ">>> Dispatching primary execution to durable shb-schedule workflow..."
+    if uv run --directory "${HOME}/Developer/shb/shb-schedule" shb-schedule run-now workstation-daily-update; then
+      echo ">>> Durable shb-schedule execution completed successfully."
+      echo ">>> Telemetry record persisted to ~/Developer/data/updates/."
+      return 0
+    else
+      echo ">>> Warning: shb-schedule workflow degraded or failed. Falling back to native sequential runner..."
+    fi
+  fi
+
   # Pre-flight Authority & Mutation Safety Check
   PREFLIGHT_FAILED=0
   DENY_ROSTER=""
