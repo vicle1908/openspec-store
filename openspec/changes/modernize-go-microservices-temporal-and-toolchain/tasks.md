@@ -17,14 +17,14 @@
 
 - [ ] 3.1 Migrate Temporal workflow and activity implementations in `customer-service`, `notification-service`, `inventory-service`, and `payment-service` from `internal/application/orchestration/` to `internal/adapters/temporal/` and verify package compilation
 - [ ] 3.2 Refactor `catalog-service/internal/application/orchestration/temporal.go` to `internal/adapters/temporal/workflow.go` and verify all catalog unit tests pass
-- [ ] 3.3 Consolidate custom `WorkerDriver` structs across services to use `platformtemporal.NewManagedWorker` and verify worker startup options and graceful shutdown tests pass
+- [x] 3.3 Consolidate custom `WorkerDriver` structs across services to use `platformtemporal.NewManagedWorker` and verify worker startup options and graceful shutdown tests pass
 - [x] 3.4 Purge obsolete shims (`order-service` `workflow_existence.go`, `reporting-service` `wire.go`) and verify `git status` reports no broken references
 
 ## 4. Saga Compensation Engine, Replay Safety & Workflow Updates
 
 - [ ] 4.1 Refactor `order-service` fulfillment saga to consume declarative `platformtemporal.NewSaga` and verify deterministic compensation replay with `go test ./services/order-service/test/replay/...`
-- [ ] 4.2 Standardize activity retry policies to eliminate nested HTTP/gRPC client retry loops and configure explicit heartbeating on activities exceeding 30s
-- [ ] 4.3 Implement Temporal Workflow Update handler (`workflow.SetUpdateHandler`) for strongly-consistent order address updates and verify update validation unit tests
+- [x] 4.2 Standardize activity retry policies to eliminate nested HTTP/gRPC client retry loops and configure explicit heartbeating on activities exceeding 30s
+- [x] 4.3 Implement Temporal Workflow Update handler (`workflow.SetUpdateHandler`) for strongly-consistent order address updates and verify update validation unit tests
 - [x] 4.4 Run backward replay test suite (`worker.WorkflowReplayer`) across all checked-in history fixtures and verify `make temporal-verify` reports zero nondeterminism findings
 
 ## 5. End-to-End System Verification & Evidence Retention
