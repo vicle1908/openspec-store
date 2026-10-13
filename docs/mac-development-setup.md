@@ -177,7 +177,23 @@ npm ci --no-audit --no-fund
 
 ## 4. Maintenance Concurrency & Scheduled Runner Controls
 
-Workstations run scheduled daily maintenance via `com.developer.workstation-daily-update.plist` (registered in the user GUI domain and idle when no update window is active). To prevent package manager lock collisions during manual maintenance, use native launchd controls:
+Workstations run scheduled daily maintenance via `com.developer.workstation-daily-update.plist` (registered in the user GUI domain and idle when no update window is active), which delegates to the durable DBOS workflow `shb-schedule run-now workstation-daily-update` with native fallback.
+
+### 0. Durable Update Architecture & Workflow Steps
+The update engine executes as a durable, 9-step transactional pipeline governed by `shb-schedule` (`~/.shb/schedules/workstation-daily-update.yaml`, schedule `0 8 * * *` Asia/Ho_Chi_Minh, timeout 3600s):
+1. **Pre-flight Power & Lock Check**: Validates AC power (`pmset -g batt`), verifies 0 lockfile contentions, and respects `DISABLE_UPDATES`.
+2. **Homebrew Maintenance**: Upgrades formulae and casks non-interactively without `sudo`, inspecting active GUI process locks (`pgrep -x`) before cask upgrades.
+3. **Mac App Store (`mas`)**: Discovers outdated App Store apps via `mas outdated` and skips actively running apps without terminating sessions.
+4. **Bun Global Ecosystem**: Ensures `~/.bun/install/global/package.json` (mode `0600`) exists; runs `bun upgrade` and `bun update -g`.
+5. **Python / uv Standalone Tools**: Dynamically queries `uv tool list` and upgrades each managed venv using discrete `--` arguments.
+6. **Global NPM Packages**: Discovers outdated tools via `npm outdated -g --json`, shielding pinned coding agents (`codex`, `claude`, `pi`, `kilo`).
+7. **Coding Agent CLIs**: Executes time-bounded updates (900s) from static maps with pre/post-update version probes.
+8. **Remote Skills Refresh & Parity**: Runs `skills update -y` (1800s bound) and verifies symlink parity across `.agents/skills/`.
+9. **Integrity & Strict Store Validation**: Reconciles script copy provenance against `script-provenance-manifest.tsv` and runs `openspec validate --all --store openspec-store`.
+
+Every run persists an immutable JSON telemetry artifact to `~/Developer/data/updates/YYYY-MM-DD.json` (mode `0600`). If degraded or failed, alert payloads are dispatched to the Telegram channel (`Home` `88d95325258b`).
+
+To prevent package manager lock collisions during manual maintenance, use native launchd controls:
 
 ### 1. Read-Only Status Preflight Check
 Before touching runner state, inspect the exact service target and process table without mutations:
