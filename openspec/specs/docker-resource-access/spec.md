@@ -85,3 +85,8 @@ volumes, while strictly preserving all named volumes and recent images.
   2. `docker builder prune -f` (cleans dangling BuildKit build cache)
   3. `docker volume prune -f` (removes unused anonymous volumes only, preserving named volumes)
   and outputs the exact reclaimed byte count without touching any named data volumes
+
+#### Scenario: Storage headroom restoration above operational threshold
+
+- **WHEN** `docker-disk-guard.sh --prune` completes successfully on a host volume reporting critical low disk space
+- **THEN** available storage on `/System/Volumes/Data` MUST increase and the post-prune free space SHALL be reported in machine logs without corrupting any stateful named volumes.
