@@ -16,7 +16,7 @@
 ## 3. Temporal Packaging Standardization & De-duplication
 
 - [ ] 3.1 Migrate Temporal workflow and activity implementations in `customer-service`, `notification-service`, `inventory-service`, and `payment-service` from `internal/application/orchestration/` to `internal/adapters/temporal/` and verify package compilation
-- [ ] 3.2 Refactor `catalog-service/internal/application/orchestration/temporal.go` to `internal/adapters/temporal/workflow.go` and verify all catalog unit tests pass
+- [x] 3.2 Refactor `catalog-service/internal/application/orchestration/temporal.go` to `internal/adapters/temporal/workflow.go` and verify all catalog unit tests pass
 - [x] 3.3 Consolidate custom `WorkerDriver` structs across services to use `platformtemporal.NewManagedWorker` and verify worker startup options and graceful shutdown tests pass
 - [x] 3.4 Purge obsolete shims (`order-service` `workflow_existence.go`, `reporting-service` `wire.go`) and verify `git status` reports no broken references
 
