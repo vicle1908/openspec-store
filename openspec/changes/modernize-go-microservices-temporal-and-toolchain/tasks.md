@@ -22,7 +22,7 @@
 
 ## 4. Saga Compensation Engine, Replay Safety & Workflow Updates
 
-- [ ] 4.1 Refactor `order-service` fulfillment saga to consume declarative `platformtemporal.NewSaga` and verify deterministic compensation replay with `go test ./services/order-service/test/replay/...`
+- [x] 4.1 Refactor `order-service` fulfillment saga to consume declarative `platformtemporal.NewSaga` and verify deterministic compensation replay with `go test ./services/order-service/test/replay/...`
 - [x] 4.2 Standardize activity retry policies to eliminate nested HTTP/gRPC client retry loops and configure explicit heartbeating on activities exceeding 30s
 - [x] 4.3 Implement Temporal Workflow Update handler (`workflow.SetUpdateHandler`) for strongly-consistent order address updates and verify update validation unit tests
 - [x] 4.4 Run backward replay test suite (`worker.WorkflowReplayer`) across all checked-in history fixtures and verify `make temporal-verify` reports zero nondeterminism findings
