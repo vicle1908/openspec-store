@@ -4,7 +4,7 @@
 
 ### Requirement: OmniRoute pm launcher SHALL route Claude Code through the gateway Messages endpoint
 
-The `omniroute()` launcher in `~/.zshrc` SHALL select the `~/.claude/profiles/omniroute-pm.json` profile via `claude --settings`, set `ANTHROPIC_BASE_URL` to the OmniRoute loopback API port, unset `ANTHROPIC_AUTH_TOKEN`, and default the model to the phanmemvip channel Fable model. All Claude Code custom launcher profiles in the developer workspace (`omniroute`, `cockpit`, and `shopapikey`) SHALL route directly through OmniRoute's native Messages port (`http://127.0.0.1:20129`), eliminating intermediate container translation sidecars on port 8788.
+The `omniroute()` launcher in `~/.zshrc` SHALL select `omniroute-pm.json` via `claude --settings`, set `ANTHROPIC_BASE_URL` to the OmniRoute loopback port, unset `ANTHROPIC_AUTH_TOKEN`, and default model to `pm/Claude-Fable`. All Claude Code custom launcher profiles in the workspace (`omniroute`, `cockpit`, `shopapikey`) SHALL route directly through OmniRoute's Messages port (`http://127.0.0.1:20129`), eliminating intermediate container sidecars on port 8788.
 
 #### Scenario: Launcher routes through OmniRoute
 - **WHEN** `omniroute` is invoked in an interactive zsh shell
