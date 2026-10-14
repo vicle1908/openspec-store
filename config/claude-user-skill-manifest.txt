@@ -12,3 +12,6 @@ gitnexus-taint-analysis
 # Graphify keeps a Claude-specific adapter under ~/.claude/skills; the generic
 # workspace skill remains canonical for standard ~/.agents discovery.
 handoff
+# Temporal developer and operator skills.
+temporal-developer
+temporal-ops

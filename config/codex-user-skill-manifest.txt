@@ -53,5 +53,8 @@ redis-observability
 redis-search
 redis-security
 redis-semantic-cache
+# Temporal developer and operator skills.
+temporal-developer
+temporal-ops
 # Proprietary local knowledge search; canonical content is workspace-owned with no upstream.
 qi-hybrid-search
