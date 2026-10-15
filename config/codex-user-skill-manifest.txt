@@ -11,6 +11,13 @@ gitnexus-pr-review
 gitnexus-refactoring
 gitnexus-taint-analysis
 graphify
+# Google Workspace official agent skills (upstream: googleworkspace/cli).
+gws-calendar
+gws-docs
+gws-drive
+gws-gmail
+gws-sheets
+gws-tasks
 handoff
 openspec-apply-change
 openspec-archive-change
