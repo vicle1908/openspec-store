@@ -471,3 +471,10 @@ Supported coding-agent CLIs and editors (`pi`, `omp`, `codex`, `opencode`, `grok
 - **THEN** `model.provider` SHALL remain `moa`
 - **AND** `model.default` SHALL remain `default`
 - **AND** the primary aggregator model SHALL route to `omniroute:gemini-3.8-flash-high`
+
+#### Scenario: Kimi Code CLI defaults to OmniRoute Gemini 3.8 Flash High
+- **WHEN** Kimi Code CLI (`kimi`) is launched without an explicit model override
+- **THEN** it SHALL resolve `default_model = "gemini-3.8-flash-high"` in `~/.kimi-code/config.toml`
+- **AND** model `gemini-3.8-flash-high` SHALL route through provider `omniroute-anthropic` targeting `http://localhost:20128`
+- **AND** the model definition SHALL declare `max_context_size = 1000000`, `capabilities = ["thinking", "tool_use"]`, and `default_effort = "high"`
+- **AND** the configuration file SHALL maintain permission mode `0600`
