@@ -255,10 +255,10 @@ The Kimi coding agent SHALL be installed exclusively through Moonshot AI's offic
 - **AND** outdated Homebrew formulae (`kimi-code`) SHALL be uninstalled to avoid path shadowing and version drift
 
 #### Scenario: Single-owner PATH resolution
-- **WHEN** user and system login and interactive shells initialize (`~/.zprofile`, `~/.zshrc`)
-- **THEN** `export PATH="$HOME/.kimi-code/bin:$PATH"` SHALL be declared
-- **AND** `which kimi` SHALL resolve strictly to `/Users/androidteam/.kimi-code/bin/kimi`
-
+- **WHEN** user and system login, interactive, and non-login subshells execute
+- **THEN** `export PATH="$HOME/.kimi-code/bin:$PATH"` SHALL be declared in shell profiles
+- **AND** a companion symlink `~/.local/bin/kimi -> ~/.kimi-code/bin/kimi` SHALL ensure non-login subshells resolve the binary
+- **AND** all instances SHALL resolve to the single authoritative binary in `~/.kimi-code/bin/kimi`
 #### Scenario: Legacy data migration to kimi-code
 - **WHEN** legacy Kimi data exists in `~/.kimi`
 - **THEN** `kimi migrate --run` SHALL migrate configurations, MCP servers, history, and sessions into `~/.kimi-code`
