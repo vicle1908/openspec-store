@@ -58,6 +58,17 @@ Changes that perform verification SHALL record their verification evidence in a 
 - **THEN** its evidence is written to `evidence.md` in the change directory
 - **AND** the change does not also create an `evidence/` directory
 
+
+#### Scenario: Archive readiness gate enforces evidence.md and .openspec.yaml
+
+- **WHEN** `scripts/validate-archive-readiness.py` evaluates an active change containing verification tasks
+- **THEN** it SHALL verify that `.openspec.yaml` exists and that a non-empty `evidence.md` file exists in the change directory
+- **AND** if `evidence.md` is missing or empty, `validate-archive-readiness.py` SHALL report `NOT_READY` and exit non-zero
+
+#### Scenario: Forward reconciliation of scheduling archives missing evidence.md
+
+- **WHEN** an already-archived scheduling change (`2026-10-16-harden-shb-scheduler-docker-lifecycle` or `2026-10-13-durable-workstation-updater`) was archived without `evidence.md`
+- **THEN** its post-remediation verification ledger SHALL be recorded in `evidence.md` of the active corrective change while leaving `openspec/changes/archive/` byte-for-byte untouched
 #### Scenario: A change performs no verification
 
 - **WHEN** a change performs no verification work

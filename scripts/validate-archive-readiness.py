@@ -94,17 +94,31 @@ def validate_delta_spec(spec_path: Path) -> list[str]:
     return errors
 
 
-def check_change_readiness(change_dir: Path, store_root: Path) -> ReadinessReport:
+def check_change_readiness(
+    change_dir: Path,
+    store_root: Path,
+    is_range_audit: bool = False,
+) -> ReadinessReport:
     change_name = change_dir.name
     proposal_file = change_dir / "proposal.md"
     design_file = change_dir / "design.md"
     tasks_file = change_dir / "tasks.md"
     specs_dir = change_dir / "specs"
+    openspec_yaml = change_dir / ".openspec.yaml"
+    evidence_file = change_dir / "evidence.md"
+    evidence_dir = change_dir / "evidence"
+
+    has_evidence_md = evidence_file.exists() and evidence_file.stat().st_size > 0
+    has_legacy_evidence_dir = evidence_dir.is_dir() and any(
+        p.is_file() and p.stat().st_size > 0 for p in evidence_dir.rglob("*")
+    )
 
     artifacts_found = {
         "proposal": proposal_file.exists() and proposal_file.stat().st_size > 0,
         "design": design_file.exists() and design_file.stat().st_size > 0,
         "tasks": tasks_file.exists() and tasks_file.stat().st_size > 0,
+        "openspec_yaml": openspec_yaml.exists() and openspec_yaml.stat().st_size > 0,
+        "evidence": has_evidence_md or has_legacy_evidence_dir,
     }
 
     errors: list[str] = []
@@ -118,6 +132,8 @@ def check_change_readiness(change_dir: Path, store_root: Path) -> ReadinessRepor
     if not artifacts_found["tasks"]:
         errors.append("Missing or empty tasks.md")
 
+    if not is_range_audit and not artifacts_found["openspec_yaml"]:
+        errors.append("Missing or empty .openspec.yaml")
     # 2. Check task checklist completion
     task_summary = parse_tasks_md(tasks_file)
     if task_summary.total == 0 and artifacts_found["tasks"]:
@@ -125,6 +141,10 @@ def check_change_readiness(change_dir: Path, store_root: Path) -> ReadinessRepor
     elif task_summary.remaining > 0:
         errors.append(
             f"{task_summary.remaining} of {task_summary.total} tasks are incomplete in tasks.md"
+        )
+    if not is_range_audit and task_summary.total > 0 and not artifacts_found["evidence"]:
+        errors.append(
+            "Missing or empty evidence.md (required before archiving a change with tracked verification tasks)"
         )
 
     # 3. Check skip_specs / delta specs
@@ -200,7 +220,7 @@ def audit_git_range(git_range: str, store_root: Path) -> int:
     violations = 0
     for archive_name in sorted(archived_changes):
         archive_dir = store_root / "openspec" / "changes" / "archive" / archive_name
-        report = check_change_readiness(archive_dir, store_root)
+        report = check_change_readiness(archive_dir, store_root, is_range_audit=True)
         if report.exit_code != 0:
             print(f"VIOLATION: Archive {archive_name} failed readiness checks: {report.errors}", file=sys.stderr)
             violations += 1

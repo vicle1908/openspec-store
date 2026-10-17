@@ -16,10 +16,9 @@ Development tooling configuration SHALL declare exactly one authoritative instal
 - **AND** the tool's update command SHALL map to standard Homebrew verbs (`brew upgrade --cask <tool>` or `brew upgrade <tool>`)
 
 #### Scenario: Documented vendor standalone exception
-- **WHEN** a tool has an official standalone binary installer but no maintained official Homebrew formula or tap (e.g. `qoder`)
+- **WHEN** a tool has an official standalone binary installer but no maintained official Homebrew formula or tap (e.g. `qoder`, `kimi`)
 - **THEN** the configuration SHALL classify the tool as a vendor standalone exception
-- **AND** the setup runbook SHALL document the vendor-supported installation command and built-in update dispatcher (`qoder update`)
-
+- **AND** the setup runbook and `toolchain_updater_registry.py` SHALL document the vendor-supported installation root and built-in update dispatcher (`qodercli update`, `kimi update`)
 #### Scenario: Documented npm global exception
 - **WHEN** a tool requires global npm installation and compiles native dependencies but lacks an official Homebrew package (e.g. `gitnexus`)
 - **THEN** the configuration SHALL classify the tool as an npm global exception
@@ -35,6 +34,11 @@ Development tooling configuration SHALL declare exactly one authoritative instal
 - **THEN** the operator inventory inspection SHALL report the active path and all duplicate locations
 - **AND** the tooling SHALL NOT perform automated or unmanaged deletion of detected duplicate files
 
+
+#### Scenario: Decoupled version probing and standalone registry parity
+- **WHEN** the maintenance engine probes and updates covered coding agent CLIs (`claude`, `codex`, `pi`, `kilo`, `qoder`, `kimi`)
+- **THEN** pre- and post-update version checks SHALL invoke each agent's own binary (`codex --version`, `qodercli --version`, `kimi --version`) rather than probing the package manager executable (`npm --version`)
+- **AND** `STANDARD_PATH` SHALL include `~/.kimi-code/bin`, `~/.local/bin`, and `~/.npm-global/bin` so standalone binaries resolve deterministically
 ### Requirement: Workstation configuration SHALL be declared via standard Homebrew Bundle and runbook
 
 Workstation tooling SHALL be declared centrally in `platform/openspec-store` using a standard `config/Brewfile` (restricting stanzas to `tap`, `brew`, and `cask`) and an operator setup runbook in `docs/mac-development-setup.md`. The configuration SHALL avoid custom schemas, embedded shell hooks, or multi-ecosystem extensions, relying strictly on native Homebrew commands for inspection and installation.
@@ -158,8 +162,7 @@ The workstation maintenance engine SHALL discover outdated Mac App Store applica
 #### Scenario: Outdated Mac App Store discovery
 - **WHEN** the maintenance pipeline reaches the Mac App Store update step
 - **THEN** it SHALL execute `mas outdated` non-interactively to determine pending application updates
-- **AND** it SHALL parse each pending application's numeric identifier and exact application name matching regex `^[A-Za-z0-9._@/+-]+$`
-
+- **AND** it SHALL parse each pending application's numeric identifier and full multi-word application name (such as `Telegram 2` or `Parallels Desktop`) matching regex `^(\d+)\s+(.+?)\s+\((.+?)\s*->\s*(.+?)\)$` and character class `^[A-Za-z0-9 ._@/+-]+$`
 #### Scenario: Running application update exclusion
 - **WHEN** an outdated Mac App Store application is actively running in the host session (detected via `pgrep -x "$APP_NAME"`, ignoring updater subprocesses)
 - **THEN** the maintenance pipeline SHALL skip upgrading that application
@@ -169,8 +172,7 @@ The workstation maintenance engine SHALL discover outdated Mac App Store applica
 #### Scenario: Non-interactive unattended execution and privilege boundaries
 - **WHEN** `mas upgrade "$APP_ID"` is invoked for an idle application
 - **THEN** the command SHALL execute without `sudo` and without requesting interactive password or Keychain prompts
-- **AND** if an application requires graphical authentication or privilege escalation, the step SHALL fail-fast and record the item as skipped rather than blocking on standard input
-
+- **AND** multi-gigabyte bundles exceeding unattended window bounds (such as `Xcode` `497799835`) SHALL be explicitly skipped with a recorded reason rather than timing out at 300 seconds and degrading the run
 ---
 
 ### Requirement: Global package ecosystems SHALL maintain initialized manifests and non-interactive update paths
@@ -205,19 +207,19 @@ Daily workstation maintenance SHALL be orchestrated as a durable, multi-step wor
 #### Scenario: Declarative schedule manifest registered under shb-schedule
 - **WHEN** workstation update scheduling is inspected
 - **THEN** a validated YAML manifest conforming to `shb-schedule/v1` SHALL exist in `~/.shb/schedules/workstation-daily-update.yaml` with mode `0600` inside directory mode `0700`
-- **AND** the manifest SHALL declare schedule `0 8 * * *`, timezone `Asia/Ho_Chi_Minh`, timeout bounds of 3600s, and a maximum of 2 retry attempts
+- **AND** the manifest SHALL declare `execution_target: host`, schedule `0 8 * * *`, timezone `Asia/Ho_Chi_Minh`, timeout bounds of 3600s, and a maximum of 2 retry attempts
 
 #### Scenario: Step-level failure isolation and checkpoint recovery
 - **WHEN** a transient network or rate-limit error occurs during a specific step (e.g. remote skills git pull)
 - **THEN** the durable execution engine SHALL record the error for that step
-- **AND** prior successfully completed steps SHALL remain checkpointed in PostgreSQL without requiring full execution replay on retry
+- **AND** prior successfully completed steps SHALL remain checkpointed without requiring full execution replay on retry
+- **AND** `step_integrity_and_store_validation` SHALL execute `openspec validate` with explicit working directory `~/Developer/platform/openspec-store`
 
 #### Scenario: Secret isolation in telemetry and alerts
 - **WHEN** a maintenance run finishes or encounters failures
-- **THEN** the workflow SHALL load communication tokens strictly from `~/.shb/.env` at runtime
-- **AND** it SHALL NOT log, write to database checkpoints, or export secret values to run artifacts
-- **AND** alert notifications dispatched to the Telegram channel SHALL carry structured summary counts and stage names, strictly omitting raw stderr buffers
-
+- **THEN** the workflow SHALL load communication tokens strictly from `~/.shb/.env` at runtime without logging or exporting secret values
+- **AND** alert notifications SHALL be dispatched to the Telegram channel ONLY when the run status is degraded or failed (`status not in ("SUCCESS", "completed")`), never on clean `SUCCESS` runs
+- **AND** `workstation-daily-update.sh` SHALL NOT duplicate stdout lines via `tee -a` when standard output is already redirected to the log file by `launchd`
 #### Scenario: Structured JSON run telemetry file modes
 - **WHEN** a maintenance run completes
 - **THEN** the runner SHALL write an immutable telemetry report to `~/Developer/data/updates/YYYY-MM-DD.json` with file mode `0600` inside directory mode `0700`

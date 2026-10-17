@@ -95,7 +95,7 @@ def classify_source(binary_path: str) -> tuple[str, str]:
     for parent in [p] + list(p.parents)[:4]:
         if (parent / "package.json").is_file():
             return "ecosystem_manager", "npm"
-    if "/.local/share/claude/" in resolved or "/.grok/downloads/" in resolved or "/.hermes/" in resolved or "/.pi/" in resolved:
+    if "/.local/share/claude/" in resolved or "/.grok/downloads/" in resolved or "/.hermes/" in resolved or "/.pi/" in resolved or "/.kimi-code/" in resolved:
         return "vendor_download", "vendor release channel"
     elif "/Applications/" in resolved:
         return "package_manager", "macOS Application bundle"
@@ -121,6 +121,10 @@ def find_agent_binary(name: str) -> str | None:
             return str(cand)
     elif name == "pi":
         cand = home / ".pi" / "agent" / "bin" / "pi"
+        if cand.is_file() and os.access(cand, os.X_OK):
+            return str(cand)
+    elif name == "kimi":
+        cand = home / ".kimi-code" / "bin" / "kimi"
         if cand.is_file() and os.access(cand, os.X_OK):
             return str(cand)
     return None
@@ -266,6 +270,7 @@ def reconcile_agent_clis(declared_covered: dict[str, str], declared_uncovered: l
         "auggie",
         "qoder",
         "pi",
+        "kimi",
         "prime-agent",
         "grok",
         "goose",
@@ -338,6 +343,7 @@ def main() -> int:
         "auggie": "auggie update --skip-confirmation",
         "qoder": "qoder update",
         "pi": "pi update --self",
+        "kimi": "kimi update",
     }
 
     if args.simulate_initial:

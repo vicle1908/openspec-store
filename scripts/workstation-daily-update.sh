@@ -867,6 +867,8 @@ except Exception:
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   if [[ "${MODE}" == "check" ]]; then
     run_pipeline
+  elif [[ -f "${LOG_FILE}" ]] && [[ "$(stat -f '%d:%i' /dev/fd/1 2>/dev/null || true)" == "$(stat -f '%d:%i' "${LOG_FILE}" 2>/dev/null || true)" ]]; then
+    run_pipeline
   else
     run_pipeline | tee -a "${LOG_FILE}"
   fi

@@ -90,7 +90,7 @@ class TestProductionWrapperInheritance(unittest.TestCase):
         self.assertEqual(qoder_item.authority, "npm-global")
         self.assertEqual(qoder_item.drift_status, "target_misalignment")
         self.assertFalse(qoder_item.prefix_aligned)
-        self.assertIn("/opt/homebrew", qoder_item.active_install_root)
+        self.assertIn("/.qoder/bin/qodercli", qoder_item.active_install_root)
         self.assertIn("Wrapper targets", qoder_item.consequence)
         self.assertIn("~/.npm-global", qoder_item.compatible_command)
 
@@ -133,6 +133,11 @@ class TestSharedUpdaterRegistry(unittest.TestCase):
         self.assertEqual(opencode_decl.updater_dispatch, "delegating")
         self.assertEqual(opencode_decl.delegating_to, "brew")
 
+
+        kimi_decl = reg.get_supported_updater("kimi", "vendor_download")
+        self.assertIsNotNone(kimi_decl)
+        self.assertEqual(kimi_decl.supported_verb, "kimi update")
+        self.assertEqual(kimi_decl.updater_dispatch, "native")
     def test_unregistered_tool_fails_closed(self):
         decl = reg.get_supported_updater("unknown_agent", "vendor_download")
         self.assertIsNone(decl)

@@ -136,6 +136,15 @@ SUPPORTED_UPDATER_REGISTRY: dict[tuple[str, str], UpdaterDeclaration] = {
         status="covered",
         notes="Vendor release channel with --self update flag",
     ),
+    ("kimi", "vendor_download"): UpdaterDeclaration(
+        tool="kimi",
+        source_type="vendor_download",
+        supported_verb="kimi update",
+        updater_dispatch="native",
+        delegating_to=None,
+        status="covered",
+        notes="Official Moonshot AI standalone installer in ~/.kimi-code/bin/kimi",
+    ),
     # Declared uncovered tools
     ("kilo", "npm"): UpdaterDeclaration(
         tool="kilo",
