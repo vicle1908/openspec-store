@@ -38,7 +38,7 @@ set -euo pipefail
 umask 022
 
 export HOME="${HOME:-/Users/androidteam}"
-export PATH="${HOME}/.npm-global/bin:${HOME}/.local/bin:${HOME}/.bun/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="${HOME}/.kimi-code/bin:${HOME}/.npm-global/bin:${HOME}/.local/bin:${HOME}/.bun/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export STORE_DIR="${HOME}/Developer/platform/openspec-store"
 export WORKSPACE_DIR="${HOME}/Developer"
 
@@ -195,9 +195,10 @@ codex:OpenAI Codex:update
 opencode:OpenCode:upgrade
 auggie:Auggie:update --skip-confirmation
 qoder:Qoder:update
-pi:Pi:update --self"
+pi:Pi:update --self
+kimi:Kimi Code:update"
 
-AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent happy cursor-agent hermes-agent buzz cce kilo muse"
+AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent happy cursor-agent hermes-agent buzz cce kilo muse qwen"
 
 # Update every covered agent CLI that is installed; report the declared set and
 # any installed agent CLI left uncovered. Each updater is time-bounded.
@@ -295,7 +296,7 @@ agent_cli_coverage() {
         active_real="$(realpath "${active_path}" 2>/dev/null || which "${bin}" 2>/dev/null || true)"
       fi
       local known_root=""
-      for root_cand in "${HOME}/.npm-global" "${HOME}/.pi" "${HOME}/.local" "/opt/homebrew"; do
+      for root_cand in "${HOME}/.npm-global" "${HOME}/.pi" "${HOME}/.kimi-code" "${HOME}/.local" "/opt/homebrew"; do
         if [[ -n "${pre_real}" && "${pre_real}" == "${root_cand}"* ]]; then
           known_root="${root_cand}"
           break
@@ -402,6 +403,71 @@ detect_script_drift() {
   echo "    checked=${SCRIPT_CHECKED} drifted=${SCRIPT_DRIFT_COUNT} missing_record=${SCRIPT_MISSING_COUNT}"
   return 0
 }
+
+# Verify active canonical coding agent Mach-O CLI realpaths hold auth_value = 2
+# for kTCCServiceAccessibility and kTCCServiceScreenCapture in TCC.db (read-only).
+verify_tcc_provenance() {
+  echo "    verifying TCC provenance for active agent Mach-O binaries..."
+  if [[ "$(uname -s)" != "Darwin" ]]; then
+    echo "      - non-Darwin platform ($(uname -s)); skipping TCC provenance verification"
+    return 0
+  fi
+
+  local tcc_db="/Library/Application Support/com.apple.TCC/TCC.db"
+  if [[ ! -r "${tcc_db}" ]]; then
+    echo "      - TCC database not readable or present: ${tcc_db}"
+    return 0
+  fi
+
+  python3 -c '
+import os, sys, shutil, sqlite3
+from pathlib import Path
+
+CANONICAL_TCC_CLIS = ("omp", "node", "opencode", "goose", "claude", "kimi")
+REQUIRED_TCC_SERVICES = ("kTCCServiceAccessibility", "kTCCServiceScreenCapture")
+
+tcc_db = Path("/Library/Application Support/com.apple.TCC/TCC.db")
+if not tcc_db.exists():
+    print("      - TCC.db not present; skipping")
+    sys.exit(0)
+
+active_binaries = []
+for name in CANONICAL_TCC_CLIS:
+    bin_path = shutil.which(name)
+    if bin_path:
+        active_binaries.append(os.path.realpath(bin_path))
+
+try:
+    conn = sqlite3.connect(f"file:{tcc_db}?mode=ro", uri=True)
+    try:
+        cursor = conn.cursor()
+        verified_binaries = []
+        missing_binaries = []
+
+        for binary in active_binaries:
+            cursor.execute(
+                "SELECT service FROM access WHERE client = ? AND auth_value = 2 AND service IN (?, ?)",
+                (binary, "kTCCServiceAccessibility", "kTCCServiceScreenCapture"),
+            )
+            granted_services = {row[0] for row in cursor.fetchall()}
+            if set(REQUIRED_TCC_SERVICES).issubset(granted_services):
+                verified_binaries.append(binary)
+                print(f"      - {Path(binary).name}: verified (auth_value=2 in accessibility & screen capture) [{binary}]")
+            else:
+                missing = set(REQUIRED_TCC_SERVICES) - granted_services
+                missing_binaries.append(binary)
+                print(f"      - {Path(binary).name}: missing {sorted(missing)} [{binary}]")
+
+        if missing_binaries:
+            sys.exit(1)
+    finally:
+        conn.close()
+except (sqlite3.Error, OSError) as exc:
+    print(f"      - TCC.db read failed: {exc}")
+    sys.exit(0)
+'
+}
+
 
 run_pipeline() {
   echo "======================================================================"
@@ -705,6 +771,8 @@ except Exception:
   else
     echo "    No script drift found: every executed script matches its recorded mirror."
   fi
+  TCC_DRIFT=0
+  verify_tcc_provenance || TCC_DRIFT=1
 
   # 8. Snapshot Store Growth Bounds
   echo ""
@@ -842,6 +910,9 @@ except Exception:
   fi
   if (( AUTHORITY_DRIFT_DETECTED != 0 )); then
     echo "DEGRADED: version-authority drift or target-misalignment detected."
+  fi
+  if (( TCC_DRIFT != 0 )); then
+    echo "DEGRADED: one or more active CLI realpaths lack verified TCC provenance (auth_value != 2)."
   fi
   if (( SNAPSHOT_MEASURE_FAILED != 0 )); then
     echo "DEGRADED: snapshot-store measurement could not be produced (reporter failed); store state is unknown, not clear."

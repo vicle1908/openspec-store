@@ -6,8 +6,8 @@ It enforces fail-closed archive readiness gates:
 1. Every tracked task in tasks.md MUST be checked (- [x]). Unchecked tasks (- [ ]) block archive.
 2. Required planning artifacts (proposal.md, design.md, tasks.md) must exist and be non-empty.
 3. Delta specs (specs/**/*.md) must adhere to normative OpenSpec format unless skip_specs is enabled.
-4. If an EVIDENCE_MANIFEST.md exists, gate results and repository hashes must be consistent.
-5. In --range mode, audits recent commits to verify archived changes were not archived with incomplete tasks.
+4. Active changes and post-2026-10-17 archives with tracked tasks require .openspec.yaml and non-empty evidence.md.
+5. In --range mode, audits committed archives to enforce complete tasks, .openspec.yaml, and evidence.md while grandfathering archives dated on or before 2026-10-17.
 """
 
 from __future__ import annotations
@@ -28,6 +28,18 @@ NORMATIVE_SPEC_HEADERS = (
     "## REMOVED Requirements",
     "## Requirements",
 )
+ARCHIVE_DATE_PREFIX_PATTERN = re.compile(r"^(\d{4}-\d{2}-\d{2})-")
+GRANDFATHERED_ARCHIVE_CUTOFF = "2026-10-17"
+
+
+def is_grandfathered_archive(change_name: str, cutoff_date: str = GRANDFATHERED_ARCHIVE_CUTOFF) -> bool:
+    """Return True if archive name has a date prefix on or before the cutoff date."""
+    match = ARCHIVE_DATE_PREFIX_PATTERN.match(change_name)
+    if not match:
+        return False
+    archive_date = match.group(1)
+    return archive_date <= cutoff_date
+
 
 
 @dataclass
@@ -132,7 +144,9 @@ def check_change_readiness(
     if not artifacts_found["tasks"]:
         errors.append("Missing or empty tasks.md")
 
-    if not is_range_audit and not artifacts_found["openspec_yaml"]:
+    exempt_legacy_archive = is_range_audit and is_grandfathered_archive(change_name)
+
+    if not exempt_legacy_archive and not artifacts_found["openspec_yaml"]:
         errors.append("Missing or empty .openspec.yaml")
 
     # 2. Check task checklist completion
@@ -143,7 +157,7 @@ def check_change_readiness(
         errors.append(
             f"{task_summary.remaining} of {task_summary.total} tasks are incomplete in tasks.md"
         )
-    if not is_range_audit and task_summary.total > 0 and not artifacts_found["evidence"]:
+    if not exempt_legacy_archive and task_summary.total > 0 and not artifacts_found["evidence"]:
         errors.append(
             "Missing or empty evidence.md (required before archiving a change with tracked verification tasks)"
         )
@@ -220,6 +234,8 @@ def audit_git_range(git_range: str, store_root: Path) -> int:
     violations = 0
     for archive_name in sorted(archived_changes):
         archive_dir = store_root / "openspec" / "changes" / "archive" / archive_name
+        if not archive_dir.exists():
+            continue
         report = check_change_readiness(archive_dir, store_root, is_range_audit=True)
         if report.exit_code != 0:
             print(f"VIOLATION: Archive {archive_name} failed readiness checks: {report.errors}", file=sys.stderr)

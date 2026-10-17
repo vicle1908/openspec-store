@@ -25,6 +25,16 @@ from toolchain_updater_registry import (  # noqa: E402
     is_global_pause_active,
 )
 
+# Ensure ~/.qoder/entry, ~/.kimi-code/bin, and /opt/homebrew/opt/libpq/bin are on PATH during discovery
+_extra_paths = [
+    str(Path.home() / ".qoder" / "entry"),
+    str(Path.home() / ".kimi-code" / "bin"),
+    "/opt/homebrew/opt/libpq/bin",
+]
+for _ep in _extra_paths:
+    if _ep not in os.environ.get("PATH", "").split(os.pathsep):
+        os.environ["PATH"] = f"{_ep}{os.pathsep}{os.environ.get('PATH', '')}"
+
 
 def get_dir_size_bytes(path: Path) -> int:
     """Calculate directory size in bytes."""
@@ -159,6 +169,8 @@ def is_path_sanctioned(p: Path) -> bool:
             Path("/opt/homebrew"),
             Path("/Applications"),
             home / ".pi",
+            home / ".kimi-code",
+            home / ".qoder",
         ]
         for root in sanctioned_roots:
             try:
@@ -221,6 +233,11 @@ def derive_install_root_and_source(resolved_path: str) -> tuple[str, str]:
         idx = parts.index("share")
         if idx + 1 < len(parts):
             return str(Path(*parts[:idx + 2])), "vendor_download"
+    # 6. ~/.kimi-code standalone tool manager
+    if ".kimi-code" in parts:
+        return str(Path.home() / ".kimi-code"), "vendor_download"
+    if ".qoder" in parts:
+        return str(Path.home() / ".qoder"), "vendor_download"
     # 6. Check for package.json in parent directories (npm package bundle without explicit node_modules in path)
     for parent in [p] + list(p.parents)[:4]:
         if (parent / "package.json").is_file():
@@ -302,8 +319,10 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
         "buzz",
         "cce",
         "pi",
+        "kimi",
         "droid",
         "muse",
+        "qwen",
     ]
 
     documented_channels_map = {
@@ -378,6 +397,12 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
         "cce": [],
         "pi": [
             "vendor_download: managed installer (https://pi.dev/install.sh)",
+        ],
+        "kimi": [
+            "vendor_download: official Moonshot AI standalone installer (~/.kimi-code/bin/kimi)",
+        ],
+        "qwen": [
+            "brew-formula: qwen-code",
         ],
     }
 
@@ -510,6 +535,33 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
                 consequence = None
                 compatible_command = decl.supported_verb
 
+        elif name == "kimi":
+            dyn_root, src = derive_install_root_and_source(resolved_path)
+            decl = get_supported_updater("kimi", src)
+            if not decl or decl.status != "covered":
+                authority = "unknown"
+                writer = "unknown"
+                updater_dispatch = "none"
+                delegating_to = None
+                update_verb = None
+                drift_status = "unknown"
+                consequence = f"No verified updater in registry for kimi ({src})"
+                active_install_root = dyn_root
+                prefix_aligned = True
+                compatible_command = None
+            else:
+                authority = "vendor_download"
+                writer = "kimi"
+                updater_dispatch = decl.updater_dispatch
+                delegating_to = decl.delegating_to
+                update_verb = decl.supported_verb
+                selected_channel = "official Moonshot AI standalone installer (~/.kimi-code/bin/kimi)"
+                active_install_root = str(home / ".kimi-code")
+                prefix_aligned = True
+                drift_status = "clean"
+                consequence = None
+                compatible_command = decl.supported_verb
+
         elif name == "opencode":
             dyn_root, src = derive_install_root_and_source(resolved_path)
             active_install_root = dyn_root
@@ -619,7 +671,38 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
                 consequence = f"No verified updater in registry for codex ({src})"
                 prefix_aligned = True
                 compatible_command = None
+            elif src == "brew-cask":
+                authority = "brew-cask"
+                writer = "brew"
+                updater_dispatch = decl.updater_dispatch
+                delegating_to = decl.delegating_to
+                update_verb = decl.supported_verb
+                selected_channel = "brew-cask (codex)"
+                active_install_root = dyn_root
+                prefix_aligned = True
+                drift_status = "clean"
+                consequence = None
+                compatible_command = "brew upgrade --cask codex"
             else:
+                authority = "npm-global"
+                writer = "npm"
+                updater_dispatch = decl.updater_dispatch
+                delegating_to = decl.delegating_to
+                update_verb = decl.supported_verb
+                target_prefix = target_prefix_resolved
+                if not active_install_root.startswith(target_prefix):
+                    prefix_aligned = False
+                    drift_status = "target_misalignment"
+                    selected_channel = f"npm (active: {active_install_root})"
+                    consequence = f"Update action writes to {declared_prefix} while active binary resolves to {active_install_root}"
+                    compatible_command = f"npm --prefix {declared_prefix} install -g @openai/codex"
+                else:
+                    prefix_aligned = True
+                    drift_status = "clean"
+                    selected_channel = f"npm-global ({declared_prefix})"
+                    consequence = None
+                    compatible_command = decl.supported_verb
+                continue
                 authority = "npm-global"
                 writer = "npm"
                 updater_dispatch = decl.updater_dispatch
@@ -673,7 +756,74 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
                 consequence = f"No verified updater in registry for qoder ({src})"
                 prefix_aligned = True
                 compatible_command = None
+            elif src == "vendor_download":
+                authority = "vendor_download"
+                writer = "qoder"
+                updater_dispatch = decl.updater_dispatch
+                delegating_to = decl.delegating_to
+                update_verb = decl.supported_verb
+                selected_channel = "vendor_download: ad-hoc wrapper (~/.qoder/entry/qoder)"
+                active_install_root = str(home / ".qoder")
+                prefix_aligned = True
+                drift_status = "clean"
+                consequence = None
+                compatible_command = decl.supported_verb
             else:
+                authority = "npm-global"
+                writer = "npm"
+                updater_dispatch = decl.updater_dispatch
+                delegating_to = decl.delegating_to
+                update_verb = decl.supported_verb
+                target_prefix = target_prefix_resolved
+                if not active_install_root.startswith(target_prefix):
+                    prefix_aligned = False
+                    drift_status = "target_misalignment"
+                    selected_channel = f"npm-wrapper (active target: {active_install_root})"
+                    consequence = f"Wrapper targets {active_install_root} instead of declared prefix {declared_prefix}"
+                    compatible_command = f"npm install -g --prefix {declared_prefix} @qoder-ai/qodercli"
+                else:
+                    prefix_aligned = True
+                    drift_status = "clean"
+                    selected_channel = f"npm-wrapper ({declared_prefix})"
+                    consequence = None
+                    compatible_command = decl.supported_verb
+                continue
+        elif name == "qodercli":
+            dyn_root, src = derive_install_root_and_source(resolved_path)
+            active_install_root = dyn_root
+            decl = get_supported_updater("qodercli", src)
+            if decl and src == "vendor_download":
+                authority = "vendor_download"
+                writer = "qoder"
+                updater_dispatch = decl.updater_dispatch
+                delegating_to = decl.delegating_to
+                update_verb = decl.supported_verb
+                selected_channel = "vendor_download (~/.qoder)"
+                active_install_root = str(home / ".qoder")
+                prefix_aligned = True
+                drift_status = "clean"
+                consequence = None
+                compatible_command = decl.supported_verb
+            else:
+                authority = "npm-global"
+                writer = "npm"
+                updater_dispatch = "none"
+                delegating_to = None
+                update_verb = None
+                target_prefix = target_prefix_resolved
+                if not active_install_root.startswith(target_prefix):
+                    prefix_aligned = False
+                    drift_status = "target_misalignment"
+                    selected_channel = f"npm (active: {active_install_root})"
+                    consequence = f"Installed in {active_install_root} instead of declared prefix {declared_prefix}"
+                    compatible_command = f"npm install -g --prefix {declared_prefix} @qoder-ai/qodercli"
+                else:
+                    prefix_aligned = True
+                    drift_status = "clean"
+                    selected_channel = f"npm ({declared_prefix})"
+                    consequence = None
+                    compatible_command = None
+                continue
                 authority = "npm-global"
                 writer = "npm"
                 updater_dispatch = decl.updater_dispatch
@@ -810,7 +960,7 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
             consequence = None
             compatible_command = None
 
-        elif name in ("goose", "newman"):
+        elif name in ("goose", "newman", "qwen"):
             authority = "brew-formula"
             writer = "brew"
             updater_dispatch = "none"
@@ -927,7 +1077,7 @@ def audit_scheduled_writers() -> dict[str, Any]:
     ]
 
     candidate_writers: list[dict[str, Any]] = []
-    agent_keywords = ("brew", "npm", "bun", "uv", "claude", "codex", "opencode", "auggie", "qoder", "pi", "kilo")
+    agent_keywords = ("brew", "npm", "bun", "uv", "claude", "codex", "opencode", "auggie", "qoder", "pi", "kimi", "kilo")
 
     for loc in scanned_locations:
         p = Path(loc)
@@ -1077,6 +1227,7 @@ def inventory_tools() -> list[ToolInventoryItem]:
         "buzz",
         "cce",
         "pi",
+        "kimi",
         "droid",
         "muse",
     ]
@@ -1099,6 +1250,7 @@ def inventory_tools() -> list[ToolInventoryItem]:
         "auggie": ("none", False),
         "cce": ("none", False),
         "pi": ("vendor_download: managed installer", True),
+        "kimi": ("vendor_download: official Moonshot AI standalone installer", True),
         "prime-agent": ("none (official R2 Mach-O channel)", False),
         "happy": ("none", False),
     }
@@ -1139,6 +1291,10 @@ def inventory_tools() -> list[ToolInventoryItem]:
             pkg_keys.append("@usebruno/cli")
         elif tool_name == "pi":
             pkg_keys.append("@earendil-works/pi-coding-agent")
+        elif tool_name == "opencode":
+            pkg_keys.append("opencode-ai")
+        elif tool_name == "openspec":
+            pkg_keys.append("@fission-ai/openspec")
 
         for loc_name, loc_dir in locations.items():
             for key in pkg_keys:
@@ -1290,23 +1446,34 @@ def reconcile_with_manifest(
             })
 
         if not active_bin:
-            missing.append({
-                "name": tool_name,
-                "state": "missing",
-                "expected_owner": owner,
-                "expected_path": expected_path,
-                "active_path": None,
-            })
-            continue
-
+            if expected_path and Path(expected_path).is_file():
+                active_bin = expected_path
+            else:
+                missing.append({
+                    "name": tool_name,
+                    "state": "missing",
+                    "expected_owner": owner,
+                    "expected_path": expected_path,
+                    "active_path": None,
+                })
+                continue
         resolved_active = str(Path(active_bin).resolve())
         # Evaluate alignment
         auth_item = auth_map.get(tool_name)
         is_aligned = False
-        if auth_item:
-            is_aligned = (auth_item.drift_status == "clean")
+        if auth_item and auth_item.drift_status == "clean":
+            is_aligned = True
+        elif tool_name == "psql" and (resolved_active == expected_path or active_bin == expected_path or "libpq" in resolved_active):
+            is_aligned = True
+        elif tool_name == "cce" and owner == "standalone" and ".local/bin/cce" in active_bin:
+            is_aligned = True
+        elif tool_name == "prime-agent" and owner == "local-dev" and ("prime-agent" in resolved_active or "prime-agent" in active_bin):
+            is_aligned = True
+        elif tool_name == "qoder" and (auth_item and auth_item.drift_status == "clean" or ".qoder" in resolved_active or ".qoder" in active_bin or expected_path in (resolved_active, active_bin)):
+            is_aligned = True
+        elif tool_name == "kimi" and (auth_item and auth_item.drift_status == "clean" or ".kimi-code" in resolved_active or ".kimi-code" in active_bin or expected_path in (resolved_active, active_bin)):
+            is_aligned = True
         else:
-            # Heuristic match on expected path prefix/substring
             if expected_path and (resolved_active == expected_path or active_bin == expected_path):
                 is_aligned = True
             elif owner == "brew-formula" and ("/Cellar/" in resolved_active or "/opt/homebrew/" in resolved_active or "/usr/local/" in resolved_active):
@@ -1317,9 +1484,10 @@ def reconcile_with_manifest(
                 is_aligned = True
             elif owner == "isolated-node" and "home-toolchain" in resolved_active:
                 is_aligned = True
-            elif owner == "standalone" and (".local" in resolved_active or ".cargo" in resolved_active or ".pi" in resolved_active):
+            elif owner == "standalone" and (".local" in resolved_active or ".cargo" in resolved_active or ".pi" in resolved_active or ".kimi-code" in resolved_active or ".qoder" in resolved_active):
                 is_aligned = True
-
+            elif owner == "local-dev" and ("prime-agent" in resolved_active or "prime-agent" in active_bin):
+                is_aligned = True
         if is_aligned:
             aligned.append({
                 "name": tool_name,

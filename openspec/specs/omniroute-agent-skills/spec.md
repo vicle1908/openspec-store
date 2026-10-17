@@ -55,12 +55,16 @@ The workstation user environment SHALL export canonical environment variables fo
 
 ### Requirement: Ecosystem Knowledge Hub and Documentation Synchronization
 
-The repository workspace SHALL maintain an operational reference guide in `docs/omniroute-agent-skills.md` and keep `wiki/entities/omniroute.md` synchronized with the active skills catalog, management authorization model, and curl invocation patterns.
+The repository workspace SHALL maintain an operational reference guide in `docs/omniroute-agent-skills.md` and keep `wiki/entities/omniroute.md` synchronized with the active skills catalog, management authorization model, curl REST invocation patterns, and `omniroute` CLI bridge subcommand recipes.
 
 #### Scenario: Operational guide provides actionable agent recipes
 - **WHEN** an agent consults `docs/omniroute-agent-skills.md`
 - **THEN** the document details all 22 `omni-*` REST endpoints, expected authentication headers, and copy-paste curl commands
+- **AND** the document includes a complete CLI command reference covering the 21 `cli-*` skills executed via `~/.local/bin/omniroute`
 
+#### Scenario: Wiki entity reflects active host CLI bridge governance
+- **WHEN** `wiki/entities/omniroute.md` is inspected
+- **THEN** it SHALL describe the 21 `cli-*` skills as actively served through `~/.local/bin/omniroute` (`2026-10-15-introduce-omniroute-cli-bridge`) rather than deferred to a future change
 ### Requirement: Host CLI Bridge Execution and Stdout Stream Cleanliness
 
 The system SHALL provide an executable host CLI bridge at `~/.local/bin/omniroute` that invokes the OmniRoute CLI entrypoint via the host Bun runtime. The bridge MUST normalize `OMNIROUTE_BASE_URL` to strip a trailing `/v1`, and MUST filter startup banner lines matching `📋 Loaded env from` from standard output so structured output remains parseable.
@@ -106,6 +110,11 @@ The bridge SHALL pin `DATA_DIR` to an ephemeral directory for each invocation so
 - **AND** any local-database fallback resolves against the empty ephemeral directory
 - **AND** the command returns an empty result set or an error, never archived orphan records
 
+#### Scenario: Container unreachable fails closed without touching host SQLite
+- **WHEN** the `omniroute` container is stopped or port `20128` is unreachable
+- **THEN** running `omniroute providers list` or `omniroute keys list --output json` SHALL NOT open or modify `~/.omniroute/storage.sqlite`
+- **AND** the file modification timestamp and SHA-256 digest of `~/.omniroute/storage.sqlite` SHALL remain unchanged
+
 #### Scenario: Orphan leakage is demonstrably blocked by the DATA_DIR pin
 - **WHEN** `keys list --output json` runs against an unreachable server with the default `DATA_DIR`
 - **THEN** it returns records read from the stale orphan database instead of failing
@@ -134,3 +143,16 @@ The workstation interactive shell environment in `~/.zshrc` SHALL multiplex the 
 #### Scenario: Bare invocation preserves Claude Code launcher
 - **WHEN** a user enters `omniroute` or `omniroute -p "prompt"` in an interactive zsh terminal
 - **THEN** Claude Code launches with profile `omniroute-pm.json` and model `gemini-3.8-flash-high`
+
+### Requirement: Host CLI Bridge Loopback IPv4 Normalization and Ephemeral Cleanup
+
+The host CLI bridge at `~/.local/bin/omniroute` SHALL normalize `localhost` base URLs to `127.0.0.1` to avoid macOS IPv6 dual-stack resolution delays and MUST allocate and remove a unique per-invocation temporary `DATA_DIR` (`fs.mkdtempSync` and `fs.rmSync`) on process exit.
+
+#### Scenario: Localhost base URL is normalized to IPv4 loopback
+- **WHEN** `OMNIROUTE_BASE_URL` or `OMNIROUTE_URL` is set to `http://localhost:20128` or `http://localhost:20128/v1`
+- **THEN** the bridge SHALL normalize both `OMNIROUTE_BASE_URL` and `OMNIROUTE_URL` to `http://127.0.0.1:20128`
+
+#### Scenario: Per-invocation ephemeral DATA_DIR is removed upon completion
+- **WHEN** `~/.local/bin/omniroute` finishes executing any CLI subcommand
+- **THEN** the unique temporary directory created via `fs.mkdtempSync` for that invocation SHALL be removed before exit
+- **AND** consecutive offline fallback runs SHALL NOT share residual SQLite or `.env` state in `/tmp`

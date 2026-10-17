@@ -234,3 +234,16 @@ The system SHALL maintain a strict operational boundary between host toolchain m
 - **WHEN** headless banking workloads (`daily-shb-docs-sync`, `eod-settlement-recon`, `nightly-compliance-scan`) are dispatched inside the container
 - **THEN** the workflows SHALL connect to the isolated PostgreSQL backend and execute their steps cleanly
 - **AND** when target repositories or settlement ledgers are unmounted in base production mode, the workflows SHALL deterministically return fail-closed `PARTIAL` or `ACTION_REQUIRED` status rather than raising unhandled exceptions
+
+### Requirement: Container HTTP Endpoints SHALL Guard Unpersisted Host-Targeted Schedules
+
+The scheduler HTTP control plane (`GET /scheduler/schedules` and `POST /scheduler/schedules/{name}/trigger`) SHALL evaluate `ScheduleReconciler.should_persist(manifest)` so that host-targeted manifests (`execution_target: host`) on non-Darwin container runtimes are reported with their `execution_target` and `persisted: false` state and cannot be dispatched through `DBOS.trigger_schedule`.
+
+#### Scenario: Triggering a host-only schedule on a Linux container returns HTTP 409 instead of HTTP 500
+- **WHEN** an operator sends `POST /scheduler/schedules/workstation-daily-update/trigger` to the containerized Linux scheduler where `should_persist(manifest)` is `False`
+- **THEN** the endpoint SHALL return HTTP 409 Conflict with a structured diagnostic message explaining that `execution_target: host` schedules are not persisted in container DBOS
+- **AND** it SHALL NOT invoke `DBOS.trigger_schedule("workstation-daily-update")` or raise an unhandled 500 exception
+
+#### Scenario: Schedule listing includes execution_target and persistence state
+- **WHEN** `GET /scheduler/schedules` is queried on the scheduler server
+- **THEN** each returned schedule object SHALL include `execution_target` and `persisted` boolean fields reflecting `should_persist(manifest)`
