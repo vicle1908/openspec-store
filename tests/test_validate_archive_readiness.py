@@ -35,6 +35,8 @@ def test_ready_change_passes(store_env: Path) -> None:
     (change_dir / "proposal.md").write_text("# Proposal\nskip_specs: true\n", encoding="utf-8")
     (change_dir / "design.md").write_text("# Design\n", encoding="utf-8")
     (change_dir / "tasks.md").write_text("## Tasks\n- [x] Task 1\n- [x] Task 2\n", encoding="utf-8")
+    (change_dir / ".openspec.yaml").write_text("schema: spec-driven\n", encoding="utf-8")
+    (change_dir / "evidence.md").write_text("# Evidence\nVerified.\n", encoding="utf-8")
 
     report = validator.check_change_readiness(change_dir, store_env)
     assert report.status == "ready"
@@ -76,6 +78,8 @@ def test_delta_spec_validation(store_env: Path) -> None:
     (change_dir / "proposal.md").write_text("# Proposal\n", encoding="utf-8")
     (change_dir / "design.md").write_text("# Design\n", encoding="utf-8")
     (change_dir / "tasks.md").write_text("## Tasks\n- [x] Task 1\n", encoding="utf-8")
+    (change_dir / ".openspec.yaml").write_text("schema: spec-driven\n", encoding="utf-8")
+    (change_dir / "evidence.md").write_text("# Evidence\nVerified.\n", encoding="utf-8")
 
     specs_dir = change_dir / "specs" / "auth"
     specs_dir.mkdir(parents=True)

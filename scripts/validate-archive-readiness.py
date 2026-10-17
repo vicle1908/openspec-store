@@ -22,10 +22,6 @@ from pathlib import Path
 
 TASK_UNCHECKED_PATTERN = re.compile(r"^\s*-\s*\[\s*\]\s+(.+)$", re.MULTILINE)
 TASK_CHECKED_PATTERN = re.compile(r"^\s*-\s*\[[xX]\]\s+(.+)$", re.MULTILINE)
-VERIFICATION_TASK_PATTERN = re.compile(
-    r"\b(?:verify|verification|verifying|test|tests|validate|validation|evidence|smoke|audit|probe)\b",
-    re.IGNORECASE,
-)
 NORMATIVE_SPEC_HEADERS = (
     "## ADDED Requirements",
     "## MODIFIED Requirements",
@@ -136,24 +132,18 @@ def check_change_readiness(
     if not artifacts_found["tasks"]:
         errors.append("Missing or empty tasks.md")
 
-    # 2. Check task checklist completion
-    task_summary = parse_tasks_md(tasks_file)
-    has_verification_tasks = False
-    if artifacts_found["tasks"]:
-        has_verification_tasks = bool(
-            VERIFICATION_TASK_PATTERN.search(tasks_file.read_text(encoding="utf-8"))
-        )
-
-    if not is_range_audit and has_verification_tasks and not artifacts_found["openspec_yaml"]:
+    if not is_range_audit and not artifacts_found["openspec_yaml"]:
         errors.append("Missing or empty .openspec.yaml")
 
+    # 2. Check task checklist completion
+    task_summary = parse_tasks_md(tasks_file)
     if task_summary.total == 0 and artifacts_found["tasks"]:
         warnings.append("tasks.md has no checklist tasks (- [ ] or - [x])")
     elif task_summary.remaining > 0:
         errors.append(
             f"{task_summary.remaining} of {task_summary.total} tasks are incomplete in tasks.md"
         )
-    if not is_range_audit and has_verification_tasks and not artifacts_found["evidence"]:
+    if not is_range_audit and task_summary.total > 0 and not artifacts_found["evidence"]:
         errors.append(
             "Missing or empty evidence.md (required before archiving a change with tracked verification tasks)"
         )
