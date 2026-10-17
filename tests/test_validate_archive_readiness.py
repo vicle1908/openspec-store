@@ -90,3 +90,27 @@ def test_delta_spec_validation(store_env: Path) -> None:
     assert report.status == "ready"
     assert report.exit_code == 0
     assert report.delta_specs_count == 1
+
+
+def test_verification_tasks_require_openspec_yaml_and_evidence_md(store_env: Path) -> None:
+    change_dir = store_env / "openspec" / "changes" / "verified-change"
+    change_dir.mkdir()
+    (change_dir / "proposal.md").write_text("# Proposal\nskip_specs: true\n", encoding="utf-8")
+    (change_dir / "design.md").write_text("# Design\n", encoding="utf-8")
+    (change_dir / "tasks.md").write_text(
+        "## Tasks\n- [x] 1.1 Implement feature and verify unit tests pass\n",
+        encoding="utf-8",
+    )
+
+    report_missing = validator.check_change_readiness(change_dir, store_env)
+    assert report_missing.status == "invalid"
+    assert report_missing.exit_code == 4
+    assert any(".openspec.yaml" in err for err in report_missing.errors)
+    assert any("evidence.md" in err for err in report_missing.errors)
+
+    (change_dir / ".openspec.yaml").write_text("schema: spec-driven\n", encoding="utf-8")
+    (change_dir / "evidence.md").write_text("# Evidence\nAll tests passed.\n", encoding="utf-8")
+
+    report_ready = validator.check_change_readiness(change_dir, store_env)
+    assert report_ready.status == "ready"
+    assert report_ready.exit_code == 0

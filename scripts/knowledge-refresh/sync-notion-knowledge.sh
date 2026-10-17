@@ -439,9 +439,21 @@ sync_concepts() {
     "wiki/concepts/mcp-transport-layer.md"
     "wiki/concepts/openspec-change-lifecycle.md"
     "wiki/concepts/knowledge-graph-system.md"
+    "wiki/concepts/workspace-domain-topology.md"
+    "wiki/concepts/workstation-terminal-and-storage-resilience.md"
     "wiki/comparisons/knowledge-tools.md"
     "wiki/architecture/agent-core-llm-loading-and-cli-verification.md"
   )
+  local f rel
+  for f in "${WORKSPACE_ROOT}"/wiki/concepts/*.md; do
+    [[ -f "$f" ]] || continue
+    rel="wiki/concepts/$(basename "$f")"
+    local seen=false existing
+    for existing in "${files[@]}"; do
+      if [[ "$existing" == "$rel" ]]; then seen=true; break; fi
+    done
+    [[ "$seen" == "true" ]] || files+=("$rel")
+  done
   for file in "${files[@]}"; do
     sync_document "$file" "concepts"
   done
@@ -466,9 +478,21 @@ sync_entities() {
     "wiki/entities/shb.md"
     "wiki/entities/omniroute.md"
     "wiki/entities/pi.md"
+    "wiki/entities/goose.md"
+    "wiki/entities/kimi-code.md"
     "wiki/entities/shb-schedule.md"
     "wiki/entities/docker-workstation.md"
   )
+  local f rel
+  for f in "${WORKSPACE_ROOT}"/wiki/entities/*.md; do
+    [[ -f "$f" ]] || continue
+    rel="wiki/entities/$(basename "$f")"
+    local seen=false existing
+    for existing in "${files[@]}"; do
+      if [[ "$existing" == "$rel" ]]; then seen=true; break; fi
+    done
+    [[ "$seen" == "true" ]] || files+=("$rel")
+  done
   for file in "${files[@]}"; do
     sync_document "$file" "entities"
   done

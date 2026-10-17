@@ -115,12 +115,26 @@ def run_tool_smoke_check(
         cmd = f"{tool_name} --version"
 
     resolved_cmd = resolve_command_template(cmd)
-
     if runner is not None:
         rc, out, err_msg, dur_ms = runner(resolved_cmd, timeout)
     else:
+        if tool_cfg and isinstance(tool_cfg, dict) and tool_cfg.get("category") == "rust":
+            active_pat = tool_cfg.get("active_path_pattern", "")
+            resolved_bin = resolve_command_template(active_pat) if active_pat else ""
+            if (not resolved_bin or not Path(resolved_bin).exists()) and not shutil.which(tool_name):
+                return ToolSmokeResult(
+                    tool=tool_name,
+                    status="SKIPPED",
+                    command=resolved_cmd,
+                    stage=stage,
+                    exit_code=0,
+                    output="optional rust-dev profile not installed",
+                    version_readback="not installed (optional profile)",
+                    duration_ms=0.0,
+                    error=None,
+                    already_target=False,
+                )
         rc, out, err_msg, dur_ms = execute_smoke_command(resolved_cmd, timeout=timeout)
-
     readback = extract_version_readback(out)
 
     # Evaluate pass/fail conditions
@@ -193,9 +207,9 @@ def run_suite(
         )
         results[tool_name] = res
 
-    all_passed = all(r.status == "PASS" for r in results.values())
-    passed_count = sum(1 for r in results.values() if r.status == "PASS")
     failed_count = sum(1 for r in results.values() if r.status == "FAIL")
+    passed_count = sum(1 for r in results.values() if r.status in ("PASS", "SKIPPED"))
+    all_passed = failed_count == 0
 
     return {
         "status": "PASS" if all_passed else "FAIL",
@@ -234,7 +248,7 @@ def main() -> int:
         print(f"Overall Status: {suite_result['status']} ({suite_result['passed']}/{suite_result['total']} passed)")
         print("-" * 60)
         for name, r in suite_result["results"].items():
-            sym = "PASS" if r["status"] == "PASS" else "FAIL"
+            sym = "PASS" if r["status"] == "PASS" else ("SKIP" if r["status"] == "SKIPPED" else "FAIL")
             rb = f" [{r['version_readback']}]" if r["version_readback"] else ""
             err = f" - {r['error']}" if r["error"] else ""
             print(f"  [{sym}] {name:<15} ({r['duration_ms']}ms){rb}{err}")
