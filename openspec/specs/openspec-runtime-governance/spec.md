@@ -147,16 +147,16 @@ The migration SHALL record the complete pre-upgrade strict-validation baseline, 
 
 ### Requirement: Existing nearest-root topology remains authoritative
 
-The 1.7.0 migration SHALL retain `~/Developer/openspec/` as the centralized planning root discovered through the workspace-root symlink and parent-directory traversal. It MUST NOT configure a store, project store pointer, machine-global `defaultStore`, or workset as a source of truth in this change.
+The workstation SHALL use the registered standalone OpenSpec store `openspec-store` (`/Users/androidteam/Developer/platform/openspec-store`) and machine-global `defaultStore: "openspec-store"` as the authoritative central planning root across multi-repository workflows, without relying on a workspace-root `~/Developer/openspec` compatibility symlink.
 
 #### Scenario: Repository lacks a local OpenSpec symlink
-- **WHEN** a command runs from a TDT repository without its own `openspec` entry
-- **THEN** it SHALL resolve the workspace parent root with `source: nearest`
-- **AND** documentation SHALL describe that parent traversal rather than claim a nonexistent per-repository symlink
+- **WHEN** a command runs from a TDT or workspace repository without its own local `openspec/` root
+- **THEN** it SHALL resolve `/Users/androidteam/Developer/platform/openspec-store` with `source: "store"` and `store_id: "openspec-store"`
+- **AND** `openspec doctor --store openspec-store --json` SHALL report `"healthy": true`
 
 #### Scenario: Default store is considered
-- **WHEN** the nearest workspace root already resolves successfully
-- **THEN** the migration SHALL leave `defaultStore` unset because it would not win inside TDT and could affect unrelated directories outside TDT
+- **WHEN** `openspec config list --json` is inspected on the workstation
+- **THEN** `defaultStore` SHALL equal `"openspec-store"`
 
 ### Requirement: Privileged mutations require explicit authorization and protect secrets
 
@@ -183,3 +183,11 @@ The migration SHALL maintain a rollback path that restores OpenSpec 1.6.0 and it
 #### Scenario: Rollback completes
 - **WHEN** the prior version, profile, root resolution, managed asset inventory, and validation baseline are restored
 - **THEN** the migration SHALL report rollback verified and keep 1.7 activation disabled
+
+### Requirement: Single-owner OpenSpec CLI executable resolution
+
+The `openspec` CLI SHALL resolve from a single authoritative installation (`~/.npm-global/bin/openspec` `@fission-ai/openspec@1.14.3+`) without a duplicate shadowed Homebrew `openspec` formula binary on `PATH`.
+
+#### Scenario: Only one openspec binary exists on PATH
+- **WHEN** `which -a openspec` and `openspec --version` are executed
+- **THEN** `which -a openspec` SHALL return a single authoritative executable path reporting version `1.14.3` or newer

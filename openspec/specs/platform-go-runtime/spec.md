@@ -138,13 +138,12 @@ The ADR is updated whenever a new GODEBUG is set or unset.
 
 ### Requirement: Goroutine leak profile enabled in staging canary
 
-> **Status**: DEFERRED. Goroutine leak profile not yet enabled in staging/production.
-
-The platform SHALL enable the experimental goroutine leak profile (`GOEXPERIMENT=goroutineleakprofile`) in staging and one production canary per service. The profile is exposed at `/debug/pprof/goroutineleak` and Prometheus-scrapeable. The platform's alert fires when the leak count exceeds a service-specific threshold (default: 10 leaks over 24 hours).
+The platform SHALL expose the Go 1.27 generally available goroutine leak profile at `/debug/pprof/goroutineleak` in staging and production canary deployments without setting the retired `GOEXPERIMENT=goroutineleakprofile` build flag. The platform's alert SHALL fire when the scraped leak count exceeds a service-specific threshold (default: 10 leaks over 24 hours).
 
 #### Scenario: Canary exposes goroutine leak profile
-- **WHEN** a service runs in the production canary deployment
-- **THEN** the env var `GOEXPERIMENT=goroutineleakprofile` is set; the leak profile endpoint is reachable at `/debug/pprof/goroutineleak`; the Prometheus metrics expose the leak count
+- **WHEN** a service compiled with Go `1.27.2` runs in the staging or production canary deployment
+- **THEN** no `GOEXPERIMENT=goroutineleakprofile` variable SHALL be set
+- **AND** the leak profile endpoint SHALL be reachable at `/debug/pprof/goroutineleak` and Prometheus metrics SHALL expose the leak count
 
 ### Requirement: Migration to Go 1.27 SHALL be tracked in `docs/adr/0005-go-1.26-runtime.md`
 
@@ -155,3 +154,12 @@ The platform SHALL track the Go 1.27 migration (expected August 2026) for: `cryp
 #### Scenario: Pre-flight for 1.27 lands a discrete PR per service
 - **WHEN** Go 1.27 is released and the platform decides to migrate
 - **THEN** each service's `go.mod` bump from `1.26.5` to `1.27.0` is a discrete, reviewable PR that includes any necessary cipher-list / CurvePreferences changes per the `tls*` GODEBUG retirement
+
+### Requirement: Module go 1.27.2 directive and v2 tool block alignment across go-microservices
+
+`platform/go-microservices/platform/go.mod` and all `services/*/go.mod` files SHALL declare `go 1.27.2` (matching `.go-version`) and pin `github.com/golangci/golangci-lint/v2/cmd/golangci-lint` and `github.com/bufbuild/buf/cmd/buf` (`v1.71.0` module tool / `1.74.0` host CLI) in their `tool (...)` directive.
+
+#### Scenario: All go.mod files match .go-version 1.27.2 and v2 tool paths
+- **WHEN** `platform/go.mod` and `services/*/go.mod` in `platform/go-microservices` are inspected
+- **THEN** every `go.mod` file SHALL specify `go 1.27.2`
+- **AND** the `tool (...)` block SHALL reference `github.com/golangci/golangci-lint/v2/cmd/golangci-lint` rather than the v1 module path

@@ -138,3 +138,8 @@ The running `/Applications/MCP Router.app` bundle serving `127.0.0.1:3282` SHALL
 #### Scenario: Stateless HTTP aggregator handles consecutive POST /mcp requests
 - **WHEN** downstream MCP clients send multiple consecutive JSON-RPC `POST /mcp` requests to `127.0.0.1:3282`
 - **THEN** `MCPHttpServer` and `AggregatorServer` SHALL instantiate and clean up a fresh `Server` and stateless `StreamableHTTPServerTransport` per request without throwing stateless transport reuse errors
+
+#### Scenario: All workstation coding agent MCP surfaces authenticate with mode 0600 and full active server access
+- **WHEN** the 21 workstation coding agent MCP configurations (`omp`, `pi`, `claude-code`, `cursor`, `codex`, `hermes`, `opencode`, `zed`, `qwen`, `copilot`, `kimi`, `kimi-code`, `gemini-mcp`, `antigravity`, `goose`, `droid`, `kiro`, `qoder`, `grok`, `cline`, `vscode`) and `~/Library/Application Support/MCP Router/shared-config.json` are evaluated against `http://127.0.0.1:3282/mcp`
+- **THEN** every credential-bearing agent MCP configuration file SHALL have permission mode `0600`
+- **AND** every client token in `shared-config.json` SHALL grant access to all `14/14` active upstream MCP servers (`170` tools) and return HTTP `200` on `POST http://127.0.0.1:3282/mcp` `tools/list`
