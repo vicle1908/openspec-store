@@ -466,6 +466,8 @@ sync_entities() {
     "wiki/entities/shb.md"
     "wiki/entities/omniroute.md"
     "wiki/entities/pi.md"
+    "wiki/entities/shb-schedule.md"
+    "wiki/entities/docker-workstation.md"
   )
   for file in "${files[@]}"; do
     sync_document "$file" "entities"
