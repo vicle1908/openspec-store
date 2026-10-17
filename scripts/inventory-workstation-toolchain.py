@@ -303,6 +303,7 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
         "cce",
         "pi",
         "droid",
+        "muse",
     ]
 
     documented_channels_map = {
@@ -339,6 +340,9 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
         ],
         "droid": [
             "brew-cask: droid",
+        ],
+        "muse": [
+            "brew-cask: muse-code",
         ],
         "kilo": [
             "npm: @kilocode/cli",
@@ -819,7 +823,7 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
             consequence = None
             compatible_command = None
 
-        elif name in ("droid", "cursor-agent", "buzz"):
+        elif name in ("droid", "cursor-agent", "buzz", "muse"):
             authority = "brew-cask"
             writer = "brew"
             updater_dispatch = "none"
@@ -1074,6 +1078,7 @@ def inventory_tools() -> list[ToolInventoryItem]:
         "cce",
         "pi",
         "droid",
+        "muse",
     ]
 
     preferred_sources = {
@@ -1081,6 +1086,7 @@ def inventory_tools() -> list[ToolInventoryItem]:
         "claude": ("cask claude-code", True),
         "cursor-agent": ("cask cursor-cli", True),
         "droid": ("cask droid", True),
+        "muse": ("cask muse-code", True),
         "hermes-agent": ("formula hermes-agent", True),
         "buzz": ("cask buzz", True),
         "grok": ("cask grok-build", True),
@@ -1100,6 +1106,7 @@ def inventory_tools() -> list[ToolInventoryItem]:
     name_collisions = {
         "grok": "Homebrew formula 'grok' is an unrelated deprecated regex tool; official agent CLI is cask 'grok-build'",
         "opencode": "Homebrew formula 'opencode' originates from a third-party tap and shadows 'homebrew/core/opencode'",
+        "muse": "Homebrew cask 'muse' is an unrelated disabled desktop app (muse.ai); official Meta Muse Code CLI is cask 'muse-code'",
     }
 
     results: list[ToolInventoryItem] = []

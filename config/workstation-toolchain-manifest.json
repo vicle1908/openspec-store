@@ -41,7 +41,9 @@
       "happy",
       "cce",
       "pi",
-      "prime-agent"
+      "prime-agent",
+      "muse",
+      "kimi"
     ],
     "isolated-toolchain": [
       "newman",
@@ -305,13 +307,27 @@
       "category": "ai-agent",
       "notes": "Homebrew cask cursor-cli."
     },
+    "muse": {
+      "authoritative_owner": "brew-cask",
+      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/muse",
+      "update_authority": "brew",
+      "release_channel": "stable",
+      "dispatch_classification": "none",
+      "verification_smoke_command": "muse --version",
+      "writer_binary": "brew",
+      "supported_verb": "brew upgrade --cask muse-code",
+      "delegating_to": null,
+      "package_name": "muse-code",
+      "category": "ai-agent",
+      "notes": "Homebrew cask muse-code. Distinguish from unrelated disabled desktop cask muse."
+    },
     "buzz": {
       "authoritative_owner": "brew-cask",
       "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/buzz",
       "update_authority": "brew",
       "release_channel": "stable",
       "dispatch_classification": "native",
-      "verification_smoke_command": "buzz --version",
+      "verification_smoke_command": "defaults read /Applications/Buzz.app/Contents/Info.plist CFBundleShortVersionString && buzz --help >/dev/null",
       "writer_binary": "brew",
       "supported_verb": "brew upgrade --cask buzz",
       "delegating_to": null,
@@ -403,6 +419,20 @@
       "category": "ai-agent",
       "notes": "Local TypeScript build symlinked to Homebrew lib. Excluded from automated updates due to upstream Rust divergence."
     },
+    "kimi": {
+      "authoritative_owner": "standalone",
+      "active_path_pattern": "{{HOME}}/.kimi-code/bin/kimi",
+      "update_authority": "vendor-download",
+      "release_channel": "stable",
+      "dispatch_classification": "native",
+      "verification_smoke_command": "{{HOME}}/.kimi-code/bin/kimi --version",
+      "writer_binary": "kimi",
+      "supported_verb": "kimi update",
+      "delegating_to": null,
+      "package_name": null,
+      "category": "ai-agent",
+      "notes": "Official Moonshot AI standalone Kimi Code CLI in ~/.kimi-code/bin/kimi."
+    },
     "ruff": {
       "authoritative_owner": "uv",
       "active_path_pattern": "{{HOME}}/.local/bin/ruff",
@@ -433,11 +463,11 @@
     },
     "psql": {
       "authoritative_owner": "brew-formula",
-      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/psql",
+      "active_path_pattern": "{{HOMEBREW_PREFIX}}/opt/libpq/bin/psql",
       "update_authority": "brew",
       "release_channel": "stable",
       "dispatch_classification": "native",
-      "verification_smoke_command": "psql --version",
+      "verification_smoke_command": "{{HOMEBREW_PREFIX}}/opt/libpq/bin/psql --version",
       "writer_binary": "brew",
       "supported_verb": "brew upgrade libpq",
       "delegating_to": null,

@@ -197,7 +197,7 @@ auggie:Auggie:update --skip-confirmation
 qoder:Qoder:update
 pi:Pi:update --self"
 
-AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent happy cursor-agent hermes-agent buzz cce kilo"
+AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent happy cursor-agent hermes-agent buzz cce kilo muse"
 
 # Update every covered agent CLI that is installed; report the declared set and
 # any installed agent CLI left uncovered. Each updater is time-bounded.

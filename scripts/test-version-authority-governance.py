@@ -47,6 +47,12 @@ class TestCellarAndBundleProvenance(unittest.TestCase):
         self.assertEqual(src, "brew-cask")
         self.assertEqual(root, "/opt/homebrew/Caskroom/cursor-cli/2026.10.01")
 
+    def test_muse_code_caskroom_evaluated_as_brew_cask(self):
+        path = "/opt/homebrew/Caskroom/muse-code/1.4.10-R6427.1/muse-aarch64-macos"
+        root, src = inv.derive_install_root_and_source(path)
+        self.assertEqual(src, "brew-cask")
+        self.assertEqual(root, "/opt/homebrew/Caskroom/muse-code/1.4.10-R6427.1")
+
     def test_npm_global_scoped_evaluated_as_npm(self):
         path = "/Users/androidteam/.npm-global/lib/node_modules/@openai/codex/bin/codex.js"
         root, src = inv.derive_install_root_and_source(path)
@@ -117,7 +123,26 @@ class TestProductionKiloCommand(unittest.TestCase):
         self.assertEqual(item.updater_dispatch, "none")
 
 
+class TestMuseCodeAuthorityAndCollisionGovernance(unittest.TestCase):
+    def test_muse_collision_disambiguation_and_clean_drift(self):
+        tools = inv.inventory_tools()
+        muse_item = next((t for t in tools if t.name == "muse"), None)
+        self.assertIsNotNone(muse_item, "muse must be present in inventory")
+        self.assertIn("Homebrew cask 'muse' is an unrelated disabled desktop app", muse_item.name_collision)
+        self.assertEqual(muse_item.preferred_source, "cask muse-code")
+        self.assertTrue(muse_item.preferred_source_available)
+
+        rec = inv.evaluate_authority_and_drift(declared_prefix="~/.npm-global")
+        auth_item = next((it for it in rec.items if it.name == "muse"), None)
+        self.assertIsNotNone(auth_item, "muse must be present in authority reconciliation")
+        self.assertEqual(auth_item.drift_status, "clean")
+        self.assertEqual(auth_item.authority, "brew-cask")
+        self.assertEqual(auth_item.writer, "brew")
+        self.assertEqual(auth_item.updater_dispatch, "none")
+
+
 class TestSharedUpdaterRegistry(unittest.TestCase):
+
     def test_covered_tools_registered_with_verified_commands(self):
         claude_decl = reg.get_supported_updater("claude", "vendor_download")
         self.assertIsNotNone(claude_decl)
@@ -169,6 +194,23 @@ class TestSharedUpdaterRegistry(unittest.TestCase):
         ok, msg = cov.evaluate_update_path("codex", "covered", "codex invalid-subcmd", "ecosystem_manager", "npm")
         self.assertFalse(ok)
         self.assertIn("unsupported or unrecognized update command", msg)
+
+    def test_muse_registered_in_updater_registry(self):
+        decl = reg.get_supported_updater("muse", "brew-cask")
+        self.assertIsNotNone(decl)
+        self.assertEqual(decl.tool, "muse")
+        self.assertEqual(decl.source_type, "brew-cask")
+        self.assertEqual(decl.updater_dispatch, "none")
+        self.assertEqual(decl.delegating_to, "brew")
+        self.assertEqual(decl.status, "uncovered_declared")
+
+        decl_code = reg.get_supported_updater("muse-code", "brew-cask")
+        self.assertIsNotNone(decl_code)
+        self.assertEqual(decl_code.tool, "muse-code")
+        self.assertEqual(decl_code.source_type, "brew-cask")
+        self.assertEqual(decl_code.updater_dispatch, "none")
+        self.assertEqual(decl_code.delegating_to, "brew")
+        self.assertEqual(decl_code.status, "uncovered_declared")
 
 class TestRegistryEnforcementInInventory(unittest.TestCase):
     def test_cleared_registry_fails_closed_in_inventory(self):
