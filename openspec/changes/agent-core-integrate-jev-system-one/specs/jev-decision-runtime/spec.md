@@ -24,8 +24,8 @@ The agent runtime SHALL provide a dedicated System One decision client that eval
 #### Scenario: Answer provenance is recorded
 - **WHEN** the client completes a request
 - **THEN** it MUST surface the response's `model` identifier and `request_id`
+- **AND** because `SystemOneResponse.request_id` in `typesafe-sdk` 0.7.2 (`typesafe_sdk/_core/schemas/base.py:67-73`) raises `TypeSafeError("The response did not include a request ID.")` when the `x-typesafe-request-id` response header is absent, `JevDecisionClient` MUST safely extract `request_id` (catching `TypeSafeError` or reading `raw_http_response.headers.get("x-typesafe-request-id")` with a `None` or empty string fallback when absent)
 - **AND** SHALL NOT assume the answering model version, because an alias such as `jev-latest` moves between releases
-
 ### Requirement: Configuration Management for Jev System One
 
 The foundation settings module SHALL expose a typed `JevSettings` model bound to the `JEV_` environment variable prefix and `~/.tdt/config.yaml` layered configuration. Settings SHALL configure the model identifier, request timeout, and retry policy, and SHALL NOT be the source of the API credential.
@@ -39,8 +39,8 @@ The foundation settings module SHALL expose a typed `JevSettings` model bound to
 - **THEN** `JevSettings` SHALL reflect the overridden values with precedence over file-based configuration
 
 #### Scenario: Secret isolation in configuration
-- **WHEN** configuration is loaded from `~/.tdt/config.yaml` containing a `typesafe_api_key` key
-- **THEN** the loader SHALL strip the secret field, emit a user warning, and require the credential through `TYPESAFE_API_KEY` or an `.env` file
+- **WHEN** configuration is loaded from `~/.tdt/config.yaml` containing a top-level or nested `jev` `typesafe_api_key` or `pydantic_ai_gateway_api_key` key
+- **THEN** the loader SHALL strip the secret field, emit a `UserWarning`, and require the credential through `TYPESAFE_API_KEY` (or `PYDANTIC_AI_GATEWAY_API_KEY`) or an `.env` file
 - **AND** the SDK's own environment variables (`TYPESAFE_API_KEY`, `TYPESAFE_BASE_URL`, `TYPESAFE_DEFAULT_MODEL`) SHALL remain authoritative for transport concerns
 
 #### Scenario: Model identifier may be pinned
@@ -57,9 +57,9 @@ The client SHALL obtain its credential from `TYPESAFE_API_KEY`, SHALL fail fast 
 - **AND** the caller's fallback path SHALL run without hanging
 
 #### Scenario: Invalid credential fails before any request
-- **WHEN** an invalid credential is supplied
-- **THEN** the SDK SHALL raise during client construction, before any request or retry
-- **AND** the runtime SHALL treat this as a configuration error, not a per-call failure
+- **WHEN** a malformed or empty credential is supplied, or an unauthorized credential is rejected by the service
+- **THEN** a malformed or empty key SHALL raise `TypeSafeError` during client construction before any request, and an unauthorized key SHALL raise `TypeSafeAuthenticationError` on the first call without retries
+- **AND** the runtime SHALL treat this as a configuration/authentication error and trigger the caller's fallback or fail-closed path
 
 #### Scenario: Timeout and rate-limit handling
 - **WHEN** a request exceeds its configured timeout, or the service returns a rate-limit or overloaded status
@@ -111,6 +111,11 @@ The orchestration engine SHALL support decision-based edge routing in workflow g
 #### Scenario: State routing error handling
 - **WHEN** evaluation of state routing fails due to a network error or timeout
 - **THEN** the routing engine SHALL route execution to the error edge descriptor (`EdgeCondition.ON_FAILURE`)
+
+#### Scenario: Async-safe conditional routing in workflow engine
+- **WHEN** `WorkflowEngine.run()` or `resume()` executes a workflow graph via `await compiled.ainvoke(...)` in `src/agent_core/orchestration/graph.py:312-405`
+- **THEN** the decision router wired via `add_conditional_edges` in `WorkflowEngine._wire_edges` MUST execute as an `async def` routing function directly awaiting `AsyncTypeSafeClient` / `a_evaluate`
+- **AND** SHALL NOT invoke `asyncio.run()` or block the active asyncio event loop
 
 ### Requirement: Two-Stage Skill Candidate Selection
 
@@ -167,7 +172,7 @@ Jev decisions SHALL be observable through OpenTelemetry spans carrying decision 
 - **WHEN** a Jev decision completes
 - **THEN** a span SHALL be emitted carrying the model identifier that answered, the question identifiers, the returned probabilities or confidences, and the observed latency
 - **AND** logging at debug level SHALL NOT emit state bodies containing credentials or secrets
-
+- **AND** because `typesafe_sdk._core.transport.RequestState._log_wire` logs unredacted `request.content` when `"typesafe_sdk"` logger is at `DEBUG`, the runtime MUST clamp `logging.getLogger("typesafe_sdk")` to `>= logging.INFO` (or attach a body-redacting filter) and apply `_redact_secret_value` from `agent_core.foundation.tracing` when projecting bounded tool invocation state (<32k tokens)
 ### Requirement: HTTP/2 Transport Multiplexing
 
 The client transport SHALL support HTTP/2 multiplexing via `typesafe-sdk[http2]` to maintain persistent socket connections and eliminate per-request handshake overhead.
@@ -175,16 +180,18 @@ The client transport SHALL support HTTP/2 multiplexing via `typesafe-sdk[http2]`
 #### Scenario: HTTP/2 connection pooling
 - **WHEN** the decision client initializes in an environment with `typesafe-sdk[http2]` installed
 - **THEN** the client SHALL enable HTTP/2 transport multiplexing
+- **AND** when `http2=True` and `transport is None`, the client MUST pass the resolved timeout to `httpx2.AsyncClient(http2=True, timeout=timeout)` / `httpx2.Client(http2=True, timeout=timeout)` so `httpx2` does not fall back to its internal 5.0s default timeout
+- **AND** the client MUST expose `close()` / `aclose()` methods and implement sync/async context managers (`__enter__`/`__exit__`, `__aenter__`/`__aexit__`) for explicit lifecycle shutdown
 - **AND** repeated decision calls SHALL reuse open sockets without renegotiating TLS handshakes
-
 ### Requirement: Native Pydantic Response Models
 
-The client SHALL support structured validation using TypeSafe native response models subclassing `SystemOneResponse` or Pydantic `BaseModel`.
+The client SHALL support structured validation using TypeSafe native response models subclassing `SystemOneResponse` (or Pydantic `BaseModel`).
 
 #### Scenario: Strongly typed response parsing
 - **WHEN** a caller provides a typed `response_model` class to `system_one`
-- **THEN** the client SHALL return an instance of that model containing validated question answers
-- **AND** callers SHALL access answer fields directly without indexing raw dictionaries
+- **THEN** custom typed response schemas declaring top-level question fields MUST subclass `SystemOneResponse` so that `SystemOneResponse._decode()` lifts `decoded["answers"][field]` onto top-level model attributes and attaches `_request_id` and `raw_http_response` (as a plain `pydantic.BaseModel` passed to `parse_response()` validates un-lifted wire JSON `{"model": ..., "answers": {...}, "usage": ...}` without attribute lifting), or `JevDecisionClient` MUST normalize and lift `answers` when a plain `BaseModel` is supplied
+- **AND** the client SHALL return an instance of that model containing validated question answers
+- **AND** callers SHALL access answer fields directly as typed attributes without indexing raw dictionaries
 
 ### Requirement: Pydantic AI Gateway Compatibility
 
@@ -192,9 +199,9 @@ The configuration and client SHALL support proxying requests through Pydantic AI
 
 #### Scenario: Gateway proxy routing
 - **WHEN** `PYDANTIC_AI_GATEWAY_API_KEY` or custom `TYPESAFE_BASE_URL` is set
-- **THEN** the client SHALL route decision requests through the configured gateway endpoint
+- **THEN** because `typesafe_sdk._core.config.resolve_and_validate_api_key()` only checks the explicit `api_key` argument or `os.environ.get("TYPESAFE_API_KEY")`, `JevDecisionClient` MUST explicitly resolve `api_key = api_key or os.environ.get("TYPESAFE_API_KEY") or os.environ.get("PYDANTIC_AI_GATEWAY_API_KEY")` and pass `api_key` and `base_url=settings.jev.base_url or os.environ.get("TYPESAFE_BASE_URL") or None` into `TypeSafeClient` / `AsyncTypeSafeClient`
+- **AND** the client SHALL route decision requests through the configured gateway endpoint
 - **AND** telemetry headers SHALL be passed transparently for unified fleet governance
-
 ### Requirement: Reusable Cross-Ecosystem Decision Contracts
 
 The decision runtime SHALL expose modular interfaces so sister repositories can consume decision primitives without duplicating client or retry logic.

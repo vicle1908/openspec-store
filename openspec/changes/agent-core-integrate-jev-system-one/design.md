@@ -8,7 +8,7 @@ The design is written against the **current** TypeSafe API, verified during impl
 
 - Primitives are `Noul` (yes/no probability), `Choice`, and `Score`. There is no boolean primitive; a yes/no judgment is a `Noul`, and a `Noul` answer carries no separate `confidence` field because its single probability $p \in [0.0, 1.0]$ expresses both answer and certainty (normalized certainty is derived as $|2p - 1|$).
 - The official SDK is `typesafe-sdk` (0.7.2): `TypeSafeClient` / `AsyncTypeSafeClient` with `client.system_one(state, questions, ...)`. Answers are read through typed accessors (`response.nouls`, `.choices`, `.scores`), the `answers` map, or a `response_model`.
-- `Choice` answers carry `probabilities` and a derived `confidence` on a 0-to-1 scale; `Score` answers evaluate state against $N$ ordered levels ($0 \dots N-1$) returning expected values in $[0.0, N-1]$ along with distribution probabilities and confidence. The response also reports the versioned `model` that answered and a `request_id`.
+- `Choice` answers carry `probabilities` and a derived `confidence` on a 0-to-1 scale; `Score` answers evaluate state against $N$ ordered levels ($0 \dots N-1$) returning expected values in $[0.0, N-1]$ along with distribution probabilities and confidence. The response also reports the versioned `model` that answered and a `request_id`. Note that in `typesafe-sdk` 0.7.2 (`typesafe_sdk/_core/schemas/base.py:67-73`), `SystemOneResponse.request_id` raises `TypeSafeError("The response did not include a request ID.")` when the `x-typesafe-request-id` HTTP response header is absent. `JevDecisionClient` MUST safely extract `request_id` (catching `TypeSafeError` or reading `raw_http_response.headers.get("x-typesafe-request-id")` with a `None`/`""` fallback when absent).
 - Every question in a request sees the same `state` and is evaluated in parallel and in isolation. Asking several questions in one request barely changes latency — the documented fan-out benchmark is 13 batched questions at roughly 11.5x lower cost and 9.6x lower latency than 13 separate calls.
 - Request budget is 64k tokens (state plus all questions), or 32k for state plus the longest question. Text only; English is the strongest language.
 - Model `jev-1.13.0` is current, behind the aliases `jev-latest` and `jev-preview`. An alias moves between releases, so the response's versioned `model` field must be recorded.
@@ -35,7 +35,7 @@ The design is written against the **current** TypeSafe API, verified during impl
 
 ### D1: Use the official SDK rather than direct HTTP
 
-The client wraps `typesafe-sdk` instead of posting to `/v1/systemone` directly. The SDK supplies typed questions and answers, retry-with-backoff honouring rate-limit signalling, and error objects carrying status and request id.
+The client wraps `typesafe-sdk` instead of posting to `/v1/systemone` directly. The SDK supplies typed questions and answers, retry-with-backoff honouring rate-limit signalling, and error objects carrying status and request id. The client wrapper encapsulates safe `request_id` extraction, catching `TypeSafeError("The response did not include a request ID.")` or safely probing `raw_http_response.headers.get("x-typesafe-request-id")` with a `None`/`""` fallback when headers are stripped by intermediaries or omitted by mock transports.
 
 **Alternative considered:** direct HTTP. Rejected — it would reimplement retry, error mapping, and typing, and would drift from the published contract.
 
@@ -73,7 +73,7 @@ Every judgment definition lives in one module. Official guidance is explicit tha
 
 ### D7: The credential is transport config, not application settings
 
-`JevSettings` configures the model identifier, timeout, retry policy, and fail-closed behavior. The credential comes from `TYPESAFE_API_KEY`, and a key found in the layered YAML is stripped with a warning.
+`JevSettings` configures the model identifier, timeout, retry policy, base URL, and fail-closed behavior. The credential comes from `TYPESAFE_API_KEY` (or explicit `PYDANTIC_AI_GATEWAY_API_KEY` fallback), and a key found in the layered YAML is stripped with a warning. Because `typesafe_sdk._core.config.resolve_and_validate_api_key()` only inspects the explicit `api_key` argument or `os.environ.get("TYPESAFE_API_KEY")`, `JevDecisionClient` MUST explicitly resolve `api_key = api_key or os.environ.get("TYPESAFE_API_KEY") or os.environ.get("PYDANTIC_AI_GATEWAY_API_KEY")` and pass `api_key` and `base_url=settings.jev.base_url or os.environ.get("TYPESAFE_BASE_URL") or None` into `TypeSafeClient` / `AsyncTypeSafeClient`.
 
 **Alternative considered:** hold the key in `JevSettings`. Rejected — it would put a secret in the application settings surface, contradicting the existing secret-isolation convention.
 
@@ -91,19 +91,19 @@ When the credential is absent or the service is unreachable, a high-authority to
 
 ### D10: Support HTTP/2 transport multiplexing via `typesafe-sdk[http2]`
 
-The integration specifies `typesafe-sdk[http2]` to leverage persistent HTTP/2 connection multiplexing in `AsyncTypeSafeClient` and `TypeSafeClient`. Multiplexing removes per-request TCP/TLS handshake round trips and avoids socket churn under rapid tool or graph evaluations, keeping decision round-trips strictly within the sub-200ms envelope.
+The integration specifies `typesafe-sdk[http2]` to leverage persistent HTTP/2 connection multiplexing in `AsyncTypeSafeClient` and `TypeSafeClient` via `httpx2.AsyncClient(http2=True, timeout=timeout)` / `httpx2.Client(http2=True, timeout=timeout)` when no custom `transport` override is supplied (as `transport` and `http_client` are mutually exclusive in `typesafe_sdk`). Multiplexing removes per-request TCP/TLS handshake round trips and avoids socket churn under rapid tool or graph evaluations, keeping decision round-trips strictly within the sub-200ms envelope. Crucially, when `http2=True` and `transport is None`, `JevDecisionClient` must pass the resolved timeout to `httpx2.AsyncClient` / `httpx2.Client` as well as the SDK client so `httpx2` does not fall back to its internal 5.0s default timeout. In addition, `JevDecisionClient` MUST expose `close()` / `aclose()` methods and implement sync/async context managers (`__enter__`/`__exit__`, `__aenter__`/`__aexit__`) delegating to the underlying SDK client lifecycle.
 
 **Alternative considered:** default HTTP/1.1 keep-alive only. Rejected — HTTP/2 provides superior multiplexing and lower latency when multiple tool calls or graph evaluations occur in quick succession behind local or network proxies.
 
 ### D11: Native Pydantic response models for typed decision validation
 
-The client leverages TypeSafe's native `response_model` parameter accepting subclasses of `SystemOneResponse` (or Pydantic `BaseModel`). Callers can declare strongly typed schemas for their expected question sets (e.g. `ToolGuardResponse`, `GraphRoutingResponse`) and receive structured, validated objects rather than indexing raw dictionaries.
+The client leverages TypeSafe's native `response_model` parameter accepting subclasses of `SystemOneResponse` (or Pydantic `BaseModel`). In `typesafe-sdk` 0.7.2 (`typesafe_sdk/_core/schemas/base.py:84-99`, `response_types.py:72-123`), `SystemOneResponse._decode()` lifts `decoded["answers"][field]` onto top-level model attributes and attaches `_request_id` and `raw_http_response`, whereas a plain `pydantic.BaseModel` passed to `parse_response()` validates raw wire JSON (`{"model": ..., "answers": {...}, "usage": ...}`) without lifting answer fields. Therefore, custom typed response schemas declaring top-level question fields MUST subclass `SystemOneResponse` (or `JevDecisionClient` must normalize/lift `answers` when a plain `BaseModel` is supplied). Callers can declare strongly typed schemas for their expected question sets (e.g. `ToolGuardResponse`, `GraphRoutingResponse`) and receive structured, validated objects rather than indexing raw dictionaries.
 
 **Alternative considered:** unvalidated dictionary access only (`result.nouls[...]`). Rejected — while low-level access remains supported, typed Pydantic models eliminate key typo bugs and align directly with `agent-core`'s Pydantic AI foundation.
 
 ### D12: Support Pydantic AI Gateway and enterprise proxy endpoints
 
-In addition to direct TypeSafe endpoints via `TYPESAFE_API_KEY`, the client configuration supports Pydantic AI Gateway proxies via `PYDANTIC_AI_GATEWAY_API_KEY` and `TYPESAFE_BASE_URL` (`https://gateway-us.pydantic.dev/proxy/typesafe` or local gateway). This enables centralized enterprise governance, rate-limiting, and cost tracking across agent fleets.
+In addition to direct TypeSafe endpoints via `TYPESAFE_API_KEY`, the client configuration supports Pydantic AI Gateway proxies via `PYDANTIC_AI_GATEWAY_API_KEY` and `TYPESAFE_BASE_URL` (`https://gateway-us.pydantic.dev/proxy/typesafe` or local gateway). Because `typesafe_sdk._core.config.resolve_and_validate_api_key()` does not automatically recognize `PYDANTIC_AI_GATEWAY_API_KEY`, `JevDecisionClient` explicitly resolves the key and configures `base_url` on client instantiation, enabling centralized enterprise governance, rate-limiting, and cost tracking across agent fleets.
 
 **Alternative considered:** hardcoded TypeSafe cloud URL. Rejected — prevents using local enterprise AI gateways or Pydantic AI Gateway proxies.
 
@@ -112,6 +112,10 @@ In addition to direct TypeSafe endpoints via `TYPESAFE_API_KEY`, the client conf
 Design the decision client and guardrail primitives as cleanly decoupled components so that sister repositories — specifically `shb-agent-core` (banking maker-checker gates, AML sanction screening pre-flight), `shb-agent-harness` (12-stage LangGraph conditional skip routing), and `ai-review` (fast diff classification) — can import or mirror the exact decision contracts without rewriting transport or retry logic.
 
 **Alternative considered:** ad-hoc implementations in each repository. Rejected — duplicates question definitions, retry logic, and fallback behaviors across repositories.
+### D14: Async-safe LangGraph conditional routing
+
+In `agent_core.orchestration.graph` (`src/agent_core/orchestration/graph.py:312-405`), `WorkflowEngine.run()` and `resume()` invoke `await compiled.ainvoke(...)` inside an active asyncio event loop. The conditional router wired via `graph.add_conditional_edges` in `WorkflowEngine._wire_edges` MUST be an `async def` routing function invoking `AsyncTypeSafeClient` / `JevDecisionClient.a_evaluate` directly, never calling `asyncio.run()` or blocking synchronous operations inside an active event loop.
+
 
 ## Risks / Trade-offs
 
@@ -119,8 +123,9 @@ Design the decision client and guardrail primitives as cleanly decoupled compone
 - **[Thresholds are uncalibrated]** → Thresholds live in one module, are disabled by default, and the guardrail escalates in the uncertain band instead of acting.
 - **[An unavailable service degrades tool security]** → Mitigation: fail-closed behavior keeps the existing authority checks authoritative.
 - **[Alias drift changes decisions silently]** → Mitigation: pin the model identifier, and record the answering model from each response.
-- **[Request budget exceeded by a large state]** → Mitigation: the guardrail sends a bounded projection of the invocation, not the whole conversation; state plus the longest question must fit the 32k budget.
-- **[Debug logging emits state bodies]** → The SDK redacts secret headers but not bodies. Mitigation: never place credentials in `state`, and keep the SDK logger below debug in normal operation.
+- **[Request budget exceeded by a large state]** → Mitigation: the guardrail sends a bounded projection of the invocation (<32k tokens), not the whole conversation; state plus the longest question must fit the 32k budget. Invocation states are sanitized using `_redact_secret_value` from `agent_core.foundation.tracing`.
+- **[Debug logging emits unredacted wire content]** → In `typesafe_sdk._core.transport.RequestState._log_wire`, `request.content` is logged unredacted when `logging.getLogger("typesafe_sdk")` is at `DEBUG`. Mitigation: the runtime MUST clamp `logging.getLogger("typesafe_sdk")` to `>= logging.INFO` (or attach a body-redacting logging Filter), never place credentials in `state`, and apply `_redact_secret_value` from `agent_core.foundation.tracing` when projecting bounded tool invocation state (<32k tokens).
+- **[Strict typing & Ruff TC001/TC002 compliance]** → `src/agent_core/**` enforces Ruff `TC001`/`TC002` and `mypy --strict`. Mitigation: type-only imports placed under `if TYPE_CHECKING:`, optional `typesafe_sdk` imports safely guarded against runtime absence, and Pydantic `SystemOneResponse` runtime field annotations tagged with `# noqa: TC001, TC002`.
 - **[Guardrail latency on the critical path]** → A network round trip adds latency to every guarded invocation. Mitigation: a bounded timeout with fail-closed behavior, one batched request rather than several, and a circuit breaker that stops calling a failing service.
 
 ## Migration Plan
