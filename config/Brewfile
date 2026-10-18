@@ -5,6 +5,8 @@
 # Invariant: Standard tap, brew, and cask stanzas only. No embedded scripts/secrets.
 # ==============================================================================
 
+tap "anomalyco/tap"
+
 # Primary Runtimes & Package Managers (Core Formulae)
 # ------------------------------------------------------------------------------
 brew "node"      # JavaScript runtime and npm CLI
@@ -25,11 +27,22 @@ brew "zsh"       # Modern shell
 # ------------------------------------------------------------------------------
 brew "libpq"     # PostgreSQL client utilities (psql)
 brew "redis"     # Redis in-memory data store and client (redis-cli)
-
+brew "googleworkspace-cli" # Google Workspace CLI (gws)
+brew "ollama"    # Local LLM runner and model server
+brew "anomalyco/tap/opencode"
+brew "block-goose-cli"
+brew "newman"
+brew "qwen-code"
+brew "ruff"
 # ------------------------------------------------------------------------------
 # Official Developer Applications & CLIs (Casks)
 # ------------------------------------------------------------------------------
 cask "codex"           # Official OpenAI Codex CLI application
+cask "muse-code"       # Meta Muse Code CLI assistant
+cask "orca"            # Official Stably AI Orca IDE orchestrator (stablyai/orca/orca)
 cask "docker-desktop"  # Docker Desktop application managing LinuxKit VM
 cask "iterm2"          # Terminal emulator for macOS
 cask "visual-studio-code" # Source-code editor
+cask "copilot-cli"
+cask "droid"
+cask "grok-build"

@@ -17,10 +17,17 @@ Every development CLI is governed by exactly one authoritative installation owne
 | **Node.js** | Core Formula | `brew "node"` | `brew upgrade node` | `node --version && npm --version` | Standard system JavaScript runtime and npm package manager. |
 | **pnpm** | Core Formula | `brew "pnpm"` | `brew upgrade pnpm` | `pnpm --version` | Fast, disk-efficient package manager. |
 | **uv** | Core Formula | `brew "uv"` | `brew upgrade uv` | `uv --version` | Fast Python package and environment manager. |
-| **Qoder** | Standalone Script | Vendor Standalone | `qoder update` | `qoder --version` | **Standalone Exception**. Managed via `~/.local/bin/qodercli` and `~/.qoder/entry` dispatcher. |
+| **Qoder** | Standalone Script | Vendor Standalone | `~/.qoder/entry update` / `qoder update` | `qoder --version` | **Standalone Exception**. Managed via `~/.qoder/entry/qoder` dispatcher and `~/.local/bin/qodercli`. |
 | **GitNexus** | npm Registry | npm Global Prefix (`~/.npm-global`) | `npm --prefix "$HOME/.npm-global" install --global gitnexus@latest` | `gitnexus --version && gitnexus status` | **npm Global Exception**. Distributed via npm; compiles native `@ladybugdb/core` bindings into explicit user prefix. |
-| **Newman** | Pinned JS Toolbelt / Formula | Isolated Toolchain (Pending Decision) | npm in isolated root | `newman --version` (active) / `~/.local/share/home-toolchain/node_modules/.bin/newman --version` | **Dual State / Pending Operator Choice**. Active PATH resolves `/opt/homebrew/bin/newman` (Homebrew formula 6.2.2, unmanaged in `config/Brewfile`). Isolated copy verified at 6.2.2 in `~/.local/share/home-toolchain` with reporter and legacy Faker compatibility intact. Parent decision pending on Homebrew formula adoption vs. `~/.local/bin/newman` symlink. |
+| **OpenSpec** | npm Registry | npm Global Prefix (`~/.npm-global`) | `npm --prefix "$HOME/.npm-global" install --global @fission-ai/openspec` | `openspec --version` | **npm Global Authoritative Owner**. Governed under `~/.npm-global/bin/openspec`. |
+| **Newman** | Homebrew Formula | `brew "newman"` | `brew upgrade newman` | `newman --version` | **Homebrew Formula**. Authoritative package and update owner at `/opt/homebrew/bin/newman`. |
 | **Bruno** | Pinned JS Toolbelt | Isolated Toolchain | npm in isolated root | `bru --version` | **Isolated Toolchain Exception**. Active verified at 4.2.0 via `~/.local/bin/bru -> ~/.local/share/home-toolchain/node_modules/.bin/bru`. Target 4.2.1 is declared/desired, not current. Package upgrade requires operator authorization. |
+| **Muse Code** | Official Cask | `cask "muse-code"` | `brew upgrade --cask muse-code` | `muse --version` | **Official Homebrew Cask**. Meta Muse Code CLI assistant installed via Homebrew Cask. |
+| **Qwen Code** | Homebrew Formula | `brew "qwen-code"` | `brew upgrade qwen-code` | `qwen --version` | **Homebrew Formula**. Qwen Code CLI installed via `qwen-code` formula. |
+| **Hermes Agent** | Standalone Installer | Vendor Standalone | `hermes update` | `hermes --version` | **Standalone Exception**. Standalone runtime in `~/.hermes` and `~/.local/bin/hermes-agent`. |
+| **Notion CLI** | Standalone Binary | Vendor Standalone | `ntn update` | `ntn --version` | **Standalone Exception**. Managed standalone binary in `~/.local/bin/ntn`. |
+| **Google Workspace CLI** | Homebrew Formula | `brew "googleworkspace-cli"` | `brew upgrade googleworkspace-cli` | `gws --version` | **Homebrew Formula**. Google Workspace CLI (`gws`). |
+| **Ollama** | Homebrew Formula | `brew "ollama"` | `brew upgrade ollama` | `ollama --version` | **Homebrew Formula**. Local LLM runner and model server. |
 | **Prime Agent** | Local Dev Exception | Local Node Entry | Manual / Pinned | `prime-agent --version` | **Local Dev Exception**. Observed Node.js entry point at `/opt/homebrew/bin/prime-agent` (version 0.9.8). Consult the source checkout's applicable repository policy before building or relinking; this runbook does not authorize those operations. |
 | **Docker** | Docker Desktop | Docker Desktop / Cask | Desktop App Updater | `docker --version && docker compose version` | Official Docker Desktop application managing VM and Docker CLI. Protects persistent volumes. |
 | **AgentMemory** | npm Global | npm Global Prefix (`~/.npm-global`) | npm in global prefix | `agentmemory status` | **npm Global Exception**. Package `@agentmemory/agentmemory` (v0.9.30) pins `iii-engine` 0.22.1. Native health check verified healthy via `agentmemory status`. |
@@ -137,24 +144,17 @@ npm ci --no-audit --no-fund
 ```
 - Active binaries: `~/.local/share/home-toolchain/node_modules/.bin/newman`, `bru`
 
-#### Active vs. Declared Target State (Audited 2026-10-09)
+#### Active vs. Declared Target State
 
-1. **Newman (v6.2.2)**:
-   - **Declared Target**: Isolated toolchain binary at `~/.local/share/home-toolchain/node_modules/.bin/newman`.
-   - **Active Host Resolution**: `/opt/homebrew/bin/newman` (Homebrew formula 6.2.2 in Cellar; unmanaged in `config/Brewfile`). `~/.local/bin/newman` is not linked.
+1. **Newman (v6.2.3)**:
+   - **Authoritative Owner**: Homebrew Formula (`brew "newman"`).
+   - **Active Host Resolution**: `/opt/homebrew/bin/newman` (v6.2.3 in Cellar). Authoritative package and update owner.
+   - **De-duplication**: The duplicate unlinked copy under `~/.local/share/home-toolchain/node_modules/newman` (legacy 6.2.2) has been pruned via `npm prune --omit=peer`, leaving a single authoritative binary on `$PATH`.
    - **Read-Only Verification**:
      ```bash
      which -a newman
      /opt/homebrew/bin/newman --version
-     /Users/androidteam/.local/share/home-toolchain/node_modules/.bin/newman --version
-     shasum -a 256 ~/.local/share/home-toolchain/package-lock.json
      ```
-   - **Isolated Toolchain Verification**: Pinned 6.2.2 binary verified with `newman-reporter-htmlextra` (1.23.1) and legacy Faker metadata paths (`postman-collection/node_modules/@faker-js/faker` 5.5.3) executing against loopback endpoints without modifying package-lock integrity (`cd970d60c61ed7ccf8845f3cf2cb605e325155cc7ee87be13e0d52d9fe918e74`).
-   - **Parent Decision & Operator Gate**: Normalizing Newman requires choosing between:
-     - *Option A*: Adopt Homebrew formula as authoritative (add `brew "newman"` to `config/Brewfile` and retire isolated toolbelt package).
-     - *Option B*: Enforce isolated toolbelt ownership (symlink `~/.local/bin/newman -> ~/.local/share/home-toolchain/node_modules/.bin/newman` and uninstall Homebrew formula).
-     *Operator Gate*: Any symlink creation, brew formula uninstall, or PATH change requires explicit operator authorization.
-
 2. **Bruno (v4.2.0 Active vs. v4.2.1 Declared Target)**:
    - **Declared Target**: `@usebruno/cli` 4.2.1 (intended/target version).
    - **Active Host Resolution**: `~/.local/bin/bru` -> `~/.local/share/home-toolchain/node_modules/.bin/bru` (v4.2.0).
@@ -173,7 +173,17 @@ npm ci --no-audit --no-fund
 - Verification: `prime-agent --version`
 - *Source Checkout Policy*: Consult the applicable repository instructions in `~/Developer/platform/prime-agent` before any build, link, or update. This runbook does not authorize unbounded builds, `npm link`, or self-update operations. Retain the observed Node.js runtime entry until an explicit, verified installation decision is made.
 
----
+### Google Workspace CLI (`gws`)
+
+- **Authoritative Owner**: Homebrew Formula (`brew "googleworkspace-cli"`).
+- **Active Binary**: `/opt/homebrew/bin/gws`
+- **Verification**: `gws --version && gws auth status`
+- **Authentication & Encryption Health**:
+  When `gws auth status` reports `"encryption_valid": false` on `~/.config/gws/credentials.enc`, run:
+  ```bash
+  gws auth login
+  ```
+  to re-authenticate and re-encrypt the stored credentials.
 
 ## 4. Maintenance Concurrency & Scheduled Runner Controls
 
@@ -297,6 +307,7 @@ fi
 - **Never commit `.env` or credentials to git**.
 - Shared environment credentials reside exclusively in mode `0600` files (such as `~/.zshenv`).
 - Manifests and runbooks must never record API keys, tokens, or raw credentials.
+- Use `stat -L -f '%Mp%Lp %N'` when auditing MCP/provider configuration file permissions so symlinked paths (like `~/.gemini/antigravity/mcp_config.json`) resolve to their target file permissions (`0600`) rather than the symlink inode mode (`0777`).
 
 ---
 
@@ -321,6 +332,14 @@ brew services stop redis
   *Health Contract:* The native CLI authenticates with the internal client secret and queries health, session counts, and graph status. Direct curl requests to `/agentmemory/health` require bearer authentication via `Authorization: Bearer <secret>`.
 - If port 49134 or 3111 is occupied by an orphaned or incompatible engine process, operator runs `agentmemory stop --force` to clear the conflicting engine before restarting the launchd service via `launchctl kickstart -k gui/$(id -u)/com.agentmemory.server`.
 - The local SQLite WAL database must remain intact with zero schema mutations.
+
+#### Snapshot Store Integrity & Repack Maintenance
+- **Routine Integrity Check**: Execute `git -C ~/.agentmemory/snapshots fsck --connectivity-only` for routine `<1s` snapshot store checks vs full `git fsck --no-dangling` during repack maintenance windows.
+- **Repack Maintenance**: When loose objects accumulate, run the owner repack command:
+  ```bash
+  git -C ~/.agentmemory/snapshots -c pack.windowMemory=1g -c pack.threads=2 repack -a -d --window=10 --depth=10 && git -C ~/.agentmemory/snapshots prune-packed
+  ```
+  Follow with `git -C ~/.agentmemory/snapshots fsck --no-dangling` during the maintenance window to confirm complete pack integrity.
 
 ---
 
@@ -366,6 +385,6 @@ When migrating or verifying a secondary machine:
    ```
 5. Confirm zero duplicate binary resolution via `which -a <tool>`.
    *Note on Brewfile Casks & Formulae:* On any target Mac, `brew bundle install` provisions declared casks (including `cask "codex"`) and formulae (including `brew "bun"`). Verify binary receipts (`brew list --cask`, `brew list --formula`) and active paths (`which -a codex bun`) to confirm clean Homebrew resolution without uncoordinated package manager duplicates.
-   *Note on Newman & Bruno Dual State:* Active `newman` currently resolves to Homebrew Formula `/opt/homebrew/bin/newman` (6.2.2), while isolated `~/.local/share/home-toolchain/node_modules/.bin/newman` also verifies at 6.2.2. Active `bru` resolves via `~/.local/bin/bru` to isolated `~/.local/share/home-toolchain/node_modules/.bin/bru` at 4.2.0 (desired target 4.2.1 pending operator-authorized upgrade).
+   *Note on Newman & Bruno Toolchain State:* Active `newman` resolves to Homebrew Formula `/opt/homebrew/bin/newman` (6.2.3), with duplicate npm toolchain copies pruned. Active `bru` resolves via `~/.local/bin/bru` to isolated `~/.local/share/home-toolchain/node_modules/.bin/bru` at 4.2.0 (desired target 4.2.1 pending operator-authorized upgrade).
 6. Verification Semantics:
    A unified verification PASS indicates that the read-only inspection protocol was executed successfully and declared manifests align without tool invocation errors. Any future host mutations, duplicate removals, or service changes require explicit operator authorization and verified read-back checks.

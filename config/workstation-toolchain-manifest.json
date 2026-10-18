@@ -21,7 +21,8 @@
       "claude",
       "codex",
       "qoder",
-      "gitnexus"
+      "gitnexus",
+      "openspec"
     ],
     "ai-agents": [
       "claude",
@@ -43,7 +44,9 @@
       "pi",
       "prime-agent",
       "muse",
-      "kimi"
+      "kimi",
+      "qwen",
+      "orca"
     ],
     "isolated-toolchain": [
       "newman",
@@ -125,25 +128,26 @@
       "notes": "Official native standalone installer with auto-update."
     },
     "codex": {
-      "authoritative_owner": "npm-global",
-      "active_path_pattern": "{{HOME}}/.npm-global/bin/codex",
-      "update_authority": "npm-global",
-      "release_channel": "latest",
-      "dispatch_classification": "none",
+      "authoritative_owner": "brew-cask",
+      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/codex",
+      "update_authority": "brew",
+      "release_channel": "stable",
+      "dispatch_classification": "delegating",
       "verification_smoke_command": "codex --version",
-      "writer_binary": "npm",
-      "supported_verb": "npm --prefix {{HOME}}/.npm-global install --global @openai/codex",
-      "delegating_to": null,
-      "package_name": "@openai/codex",
+      "writer_binary": "brew",
+      "supported_verb": "brew upgrade --cask codex",
+      "delegating_to": "brew",
+      "package_name": "codex",
       "known_shadow_paths": [
+        "{{HOME}}/.npm-global/bin/codex",
         "{{HOME}}/.local/bin/codex"
       ],
       "category": "ai-agent",
-      "notes": "Authoritative owner is npm-global under ~/.npm-global. No documented native CLI update verb; npm binaries refuse self-update."
+      "notes": "Homebrew cask codex."
     },
     "qoder": {
       "authoritative_owner": "standalone",
-      "active_path_pattern": "{{HOME}}/.local/bin/qodercli",
+      "active_path_pattern": "{{HOME}}/.qoder/entry/qoder",
       "update_authority": "vendor-download",
       "release_channel": "stable",
       "dispatch_classification": "native",
@@ -190,21 +194,21 @@
       "notes": "Official distribution is npm-global. Migrating from isolated toolchain after native binding verification and MCP smoke test."
     },
     "newman": {
-      "authoritative_owner": "isolated-node",
-      "active_path_pattern": "{{HOME}}/.local/share/home-toolchain/bin/newman",
-      "update_authority": "isolated-node",
-      "release_channel": "pinned-6.2.2",
-      "dispatch_classification": "none",
+      "authoritative_owner": "brew-formula",
+      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/newman",
+      "update_authority": "brew",
+      "release_channel": "stable",
+      "dispatch_classification": "native",
       "verification_smoke_command": "newman --version",
-      "writer_binary": "npm",
-      "supported_verb": null,
+      "writer_binary": "brew",
+      "supported_verb": "brew upgrade newman",
       "delegating_to": null,
       "package_name": "newman",
       "known_shadow_paths": [
-        "{{HOMEBREW_PREFIX}}/bin/newman"
+        "{{HOME}}/.local/share/home-toolchain/bin/newman"
       ],
-      "category": "testing",
-      "notes": "Retained in isolated toolchain pinned to 6.2.2 with newman-reporter-htmlextra for Postman collection execution and Faker v5 compatibility."
+      "category": "tool",
+      "notes": "Homebrew formula newman."
     },
     "bru": {
       "authoritative_owner": "isolated-node",
@@ -252,18 +256,18 @@
       "notes": "Homebrew formula block-goose-cli."
     },
     "hermes-agent": {
-      "authoritative_owner": "brew-formula",
-      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/hermes",
-      "update_authority": "brew",
+      "authoritative_owner": "standalone",
+      "active_path_pattern": "{{HOME}}/.local/bin/hermes-agent",
+      "update_authority": "vendor-download",
       "release_channel": "stable",
       "dispatch_classification": "native",
       "verification_smoke_command": "hermes --version",
-      "writer_binary": "brew",
-      "supported_verb": "brew upgrade hermes-agent",
+      "writer_binary": "hermes",
+      "supported_verb": "hermes update",
       "delegating_to": null,
       "package_name": "hermes-agent",
       "category": "ai-agent",
-      "notes": "Homebrew formula hermes-agent."
+      "notes": "Standalone hermes-agent in ~/.local/bin/hermes-agent."
     },
     "grok": {
       "authoritative_owner": "brew-cask",
@@ -434,32 +438,32 @@
       "notes": "Official Moonshot AI standalone Kimi Code CLI in ~/.kimi-code/bin/kimi."
     },
     "ruff": {
-      "authoritative_owner": "uv",
-      "active_path_pattern": "{{HOME}}/.local/bin/ruff",
-      "update_authority": "uv",
-      "release_channel": "latest",
+      "authoritative_owner": "brew-formula",
+      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/ruff",
+      "update_authority": "brew",
+      "release_channel": "stable",
       "dispatch_classification": "native",
       "verification_smoke_command": "ruff --version",
-      "writer_binary": "uv",
-      "supported_verb": "uv tool upgrade ruff",
+      "writer_binary": "brew",
+      "supported_verb": "brew upgrade ruff",
       "delegating_to": null,
       "package_name": "ruff",
       "category": "linter",
-      "notes": "Fast Python linter and formatter installed via uv tool."
+      "notes": "Fast Python linter and formatter."
     },
     "pytest": {
-      "authoritative_owner": "uv",
-      "active_path_pattern": "{{HOME}}/.local/bin/pytest",
-      "update_authority": "uv",
-      "release_channel": "latest",
+      "authoritative_owner": "brew-formula",
+      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/pytest",
+      "update_authority": "brew",
+      "release_channel": "stable",
       "dispatch_classification": "native",
       "verification_smoke_command": "pytest --version",
-      "writer_binary": "uv",
-      "supported_verb": "uv tool upgrade pytest",
+      "writer_binary": "brew",
+      "supported_verb": "brew upgrade pytest",
       "delegating_to": null,
       "package_name": "pytest",
       "category": "testing",
-      "notes": "Python test runner installed via uv tool."
+      "notes": "Python test runner."
     },
     "psql": {
       "authoritative_owner": "brew-formula",
@@ -516,6 +520,66 @@
       "package_name": null,
       "category": "rust",
       "notes": "Rust package manager (profile: rust-dev)."
+    },
+    "qwen": {
+      "authoritative_owner": "brew-formula",
+      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/qwen",
+      "update_authority": "brew",
+      "release_channel": "stable",
+      "dispatch_classification": "none",
+      "verification_smoke_command": "qwen --version",
+      "writer_binary": "brew",
+      "supported_verb": "brew upgrade qwen-code",
+      "delegating_to": null,
+      "package_name": "qwen-code",
+      "category": "ai-agent",
+      "notes": "Homebrew formula qwen-code."
+    },
+    "openspec": {
+      "authoritative_owner": "npm-global",
+      "active_path_pattern": "{{HOME}}/.npm-global/bin/openspec",
+      "update_authority": "npm-global",
+      "release_channel": "latest",
+      "dispatch_classification": "none",
+      "verification_smoke_command": "openspec --version",
+      "writer_binary": "npm",
+      "supported_verb": "npm --prefix {{HOME}}/.npm-global install --global @fission-ai/openspec",
+      "delegating_to": null,
+      "package_name": "@fission-ai/openspec",
+      "known_shadow_paths": [
+        "{{HOMEBREW_PREFIX}}/bin/openspec"
+      ],
+      "category": "cli",
+      "notes": "OpenSpec change-driven development CLI."
+    },
+    "ntn": {
+      "authoritative_owner": "standalone",
+      "active_path_pattern": "{{HOME}}/.local/bin/ntn",
+      "update_authority": "vendor-download",
+      "release_channel": "stable",
+      "dispatch_classification": "native",
+      "verification_smoke_command": "ntn --version",
+      "writer_binary": "ntn",
+      "supported_verb": "ntn update",
+      "delegating_to": null,
+      "package_name": "ntn",
+      "category": "cli",
+      "notes": "Notion CLI tool in ~/.local/bin/ntn."
+    },
+    "orca": {
+      "authoritative_owner": "brew-cask",
+      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/orca",
+      "update_authority": "brew",
+      "release_channel": "stable",
+      "dispatch_classification": "delegating",
+      "verification_smoke_command": "orca --version",
+      "writer_binary": "brew",
+      "supported_verb": "brew upgrade --cask stablyai/orca/orca",
+      "delegating_to": "brew",
+      "package_name": "orca",
+      "known_shadow_paths": [],
+      "category": "ai-agent",
+      "notes": "Official Stably AI Orca IDE orchestrator cask (stablyai/orca/orca)."
     }
   }
 }

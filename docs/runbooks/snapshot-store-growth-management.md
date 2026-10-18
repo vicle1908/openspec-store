@@ -7,7 +7,7 @@ Workstation Git-backed snapshot stores (primarily `~/.agentmemory/snapshots`) re
 The size ceiling and owner repack commands are declared in `config/snapshot-store-bounds.tsv`:
 ```tsv
 # store_path	size_ceiling	owner_repack_command	owner_tool
-~/.agentmemory/snapshots	1G	git -C ~/.agentmemory/snapshots repack -a -d -f --depth=250 --window=250	agentmemory
+~/.agentmemory/snapshots	1G	git -C ~/.agentmemory/snapshots -c pack.windowMemory=1g -c pack.threads=2 repack -a -d --window=10 --depth=10 && git -C ~/.agentmemory/snapshots prune-packed	agentmemory
 ```
 
 ## 2. Measurement Command
@@ -25,7 +25,7 @@ Loose objects are bounded by repack, **never by direct filesystem deletion** (`r
 
 1. **Execute Owner Repack**:
    ```bash
-   git -C ~/.agentmemory/snapshots repack -a -d -f --depth=250 --window=250
+   git -C ~/.agentmemory/snapshots -c pack.windowMemory=1g -c pack.threads=2 repack -a -d --window=10 --depth=10 && git -C ~/.agentmemory/snapshots prune-packed
    ```
 2. **Prune Dereferenced Loose Objects**:
    ```bash
@@ -34,7 +34,10 @@ Loose objects are bounded by repack, **never by direct filesystem deletion** (`r
 3. **Verify Integrity**:
    ```bash
    git -C ~/.agentmemory/snapshots log --oneline -1
-   git -C ~/.agentmemory/snapshots fsck --full
+   # Routine check (<1s):
+   git -C ~/.agentmemory/snapshots fsck --connectivity-only
+   # Repack maintenance window deep check:
+   git -C ~/.agentmemory/snapshots fsck --no-dangling
    ```
 4. **Verify Owning Tool Access**:
    Ensure `agentmemory` opens the store and retrieves the newest snapshot.

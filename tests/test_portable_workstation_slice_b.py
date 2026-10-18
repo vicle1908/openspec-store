@@ -520,12 +520,10 @@ class TestReconciledToolchainUpdaterAndDailyRunner(unittest.TestCase):
         runner_path = SCRIPTS_DIR / "workstation-daily-update.sh"
         content = runner_path.read_text(encoding="utf-8")
 
-        # Codex target prefix check
-        self.assertIn('[[ "${bin}" == "codex" ]] && [[ "${real_bin}" != "${HOME}/.npm-global"* ]]', content)
         # Qoder target prefix check
         self.assertIn('[[ "${bin}" == "qoder" ]] && [[ "${real_bin}" != "${HOME}/.local"* && "${real_bin}" != "${HOME}/.qoder"* ]]', content)
-        # Codex explicit npm update execution
-        self.assertIn('npm --prefix "${HOME}/.npm-global" install --global @openai/codex', content)
+        # Codex update execution
+        self.assertIn('codex update', content)
 
 
 if __name__ == "__main__":

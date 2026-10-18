@@ -702,25 +702,6 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
                     selected_channel = f"npm-global ({declared_prefix})"
                     consequence = None
                     compatible_command = decl.supported_verb
-                continue
-                authority = "npm-global"
-                writer = "npm"
-                updater_dispatch = decl.updater_dispatch
-                delegating_to = decl.delegating_to
-                update_verb = decl.supported_verb
-                target_prefix = target_prefix_resolved
-                if not active_install_root.startswith(target_prefix):
-                    prefix_aligned = False
-                    drift_status = "target_misalignment"
-                    selected_channel = f"npm (active: {active_install_root})"
-                    consequence = f"Update action writes to {declared_prefix} while active binary resolves to {active_install_root}, leaving active binary stale and unupdated"
-                    compatible_command = f"npm install -g --prefix {declared_prefix} @openai/codex"
-                else:
-                    prefix_aligned = True
-                    drift_status = "clean"
-                    selected_channel = f"npm ({declared_prefix})"
-                    consequence = None
-                    compatible_command = decl.supported_verb
         elif name == "gitnexus":
             dyn_root, src = derive_install_root_and_source(resolved_path)
             active_install_root = dyn_root
@@ -823,47 +804,6 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
                     selected_channel = f"npm ({declared_prefix})"
                     consequence = None
                     compatible_command = None
-                continue
-                authority = "npm-global"
-                writer = "npm"
-                updater_dispatch = decl.updater_dispatch
-                delegating_to = decl.delegating_to
-                update_verb = decl.supported_verb
-                target_prefix = target_prefix_resolved
-                if not active_install_root.startswith(target_prefix):
-                    prefix_aligned = False
-                    drift_status = "target_misalignment"
-                    selected_channel = f"npm-wrapper (active target: {active_install_root})"
-                    consequence = f"Wrapper targets {active_install_root} instead of declared prefix {declared_prefix}"
-                    compatible_command = f"npm install -g --prefix {declared_prefix} @qoder-ai/qodercli"
-                else:
-                    prefix_aligned = True
-                    drift_status = "clean"
-                    selected_channel = f"npm-wrapper ({declared_prefix})"
-                    consequence = None
-                    compatible_command = decl.supported_verb
-        elif name == "qodercli":
-            dyn_root, src = derive_install_root_and_source(resolved_path)
-            active_install_root = dyn_root
-            authority = "npm-global"
-            writer = "npm"
-            updater_dispatch = "none"
-            delegating_to = None
-            update_verb = None
-            target_prefix = target_prefix_resolved
-            if not active_install_root.startswith(target_prefix):
-                prefix_aligned = False
-                drift_status = "target_misalignment"
-                selected_channel = f"npm (active: {active_install_root})"
-                consequence = f"Installed in {active_install_root} instead of declared prefix {declared_prefix}"
-                compatible_command = f"npm install -g --prefix {declared_prefix} @qoder-ai/qodercli"
-            else:
-                prefix_aligned = True
-                drift_status = "clean"
-                selected_channel = f"npm ({declared_prefix})"
-                consequence = None
-                compatible_command = None
-
         elif name == "prime-agent":
             dyn_root, src = derive_install_root_and_source(resolved_path)
             active_install_root = dyn_root
@@ -1528,7 +1468,9 @@ def reconcile_with_manifest(
                 "rationale": "Deprecated formula in Homebrew; audit dependencies before uninstallation",
             })
 
-    overall_status = "drift" if (drift or missing) else "aligned"
+    rust_dev_tools = set(manifest_data.get("profiles", {}).get("rust-dev", ["rustup", "cargo"]))
+    mandatory_missing = [m for m in missing if m["name"] not in rust_dev_tools]
+    overall_status = "drift" if (drift or mandatory_missing) else "aligned"
     return {
         "manifest_path": str(m_path),
         "status": overall_status,

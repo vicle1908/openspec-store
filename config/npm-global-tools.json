@@ -4,10 +4,10 @@
   "description": "Sanctioned globally installed npm tools managed under ~/.npm-global prefix",
   "tools": [
     {
-      "name": "codex",
-      "package": "@openai/codex",
+      "name": "openspec",
+      "package": "@fission-ai/openspec",
       "version": "latest",
-      "description": "OpenAI Codex CLI"
+      "description": "OpenSpec CLI"
     },
     {
       "name": "gitnexus",

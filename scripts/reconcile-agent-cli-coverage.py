@@ -89,14 +89,19 @@ def classify_source(binary_path: str) -> tuple[str, str]:
     resolved = resolve_binary_target(binary_path)
     if "/Cellar/" in resolved or "/Caskroom/" in resolved:
         return "package_manager", "Homebrew (formula/cask)"
-    elif "/.npm-global/" in resolved or "/node_modules/" in resolved or "/home-toolchain/" in resolved:
+    elif "/.npm-global/" in resolved or "/home-toolchain/" in resolved:
         return "ecosystem_manager", "npm"
+    if "/.local/share/claude/" in resolved or "/.grok/downloads/" in resolved or "/.hermes/" in resolved or "/.pi/" in resolved or "/.kimi-code/" in resolved or "/.qoder/" in resolved:
+        return "vendor_download", "vendor release channel"
     p = Path(resolved)
+    home = Path.home()
     for parent in [p] + list(p.parents)[:4]:
+        if parent in (home, home / ".local", home / ".local" / "bin"):
+            continue
         if (parent / "package.json").is_file():
             return "ecosystem_manager", "npm"
-    if "/.local/share/claude/" in resolved or "/.grok/downloads/" in resolved or "/.hermes/" in resolved or "/.pi/" in resolved or "/.kimi-code/" in resolved:
-        return "vendor_download", "vendor release channel"
+    if "/node_modules/" in resolved:
+        return "ecosystem_manager", "npm"
     elif "/Applications/" in resolved:
         return "package_manager", "macOS Application bundle"
     return "vendor_download", "standalone binary"
@@ -151,6 +156,8 @@ def evaluate_update_path(
         if update_verb != decl.supported_verb:
             return False, f"unsupported or unrecognized update command: '{update_verb}' for {name} (expected '{decl.supported_verb}')"
         return True, f"native/delegated update verb: '{update_verb}'"
+    if name == "cce":
+        return True, "pinned standalone binary (manual/no-op in pipeline)"
     if name == "kilo":
         supported_cmd = decl.supported_verb if decl else "kilo upgrade"
         return True, f"managed by ecosystem manager ({source_detail}; supported CLI: '{supported_cmd}', uncovered in pipeline)"
@@ -281,6 +288,8 @@ def reconcile_agent_clis(declared_covered: dict[str, str], declared_uncovered: l
         "buzz",
         "cce",
         "muse",
+        "qwen",
+        "ntn",
     ]
 
     records: list[AgentCLIRecord] = []
@@ -327,7 +336,7 @@ def main() -> int:
     parser.add_argument("--json", action="store_true", help="Output machine-readable JSON")
     parser.add_argument(
         "--include-uncovered",
-        default="droid,goose,grok,prime-agent,happy,cursor-agent,hermes-agent,buzz,cce,kilo,muse",
+        default="droid,goose,grok,prime-agent,happy,cursor-agent,hermes-agent,buzz,cce,kilo,muse,qwen",
         help="Comma-separated declared uncovered CLIs",
     )
     parser.add_argument(
@@ -345,6 +354,7 @@ def main() -> int:
         "qoder": "qoder update",
         "pi": "pi update --self",
         "kimi": "kimi update",
+        "ntn": "ntn update",
     }
 
     if args.simulate_initial:

@@ -261,6 +261,18 @@ gitnexus_refresh() {
     return 0
   fi
 
+  # Check gitnexus version
+  if [[ "${_MODE:-}" != "check" ]]; then
+    local gn_version
+    gn_version="$(gitnexus --version 2>/dev/null || echo "")"
+    if [[ "$gn_version" != *"1.6.12"* ]]; then
+      status="provider_mismatch"
+      warn "  GitNexus: provider version mismatch (${gn_version:-unknown} != 1.6.12) for ${name}"
+      log_line "$name" gitnexus "$status" "$(elapsed "$start_ts")" "expected=1.6.12;actual=${gn_version:-unknown}"
+      return 0
+    fi
+  fi
+
   # Check .gitnexus/ exists
   if [[ ! -d "${root}/.gitnexus" ]]; then
     status="skipped_uninitialized"
@@ -460,6 +472,18 @@ graphify_refresh() {
     note "  Graphify: not installed for ${name}"
     log_line "$name" graphify "$status" "$(elapsed "$start_ts")"
     return 0
+  fi
+
+  # Check graphify version
+  if [[ "${_MODE:-}" != "check" ]]; then
+    local gf_version
+    gf_version="$(graphify --version 2>/dev/null || echo "")"
+    if [[ "$gf_version" != *"0.9.92"* ]]; then
+      status="provider_mismatch"
+      warn "  Graphify: provider version mismatch (${gf_version:-unknown} != 0.9.92) for ${name}"
+      log_line "$name" graphify "$status" "$(elapsed "$start_ts")" "expected=0.9.92;actual=${gf_version:-unknown}"
+      return 0
+    fi
   fi
 
   # Check graphify-out/ exists
@@ -968,6 +992,7 @@ main() {
       *) usage >&2; return 2 ;;
     esac
   done
+  _MODE="$mode"
 
   # --force is only supported with --repo (batch mode always skips dirty repos)
   if [[ "$_FORCE" == "true" && "$mode" != "single" ]]; then

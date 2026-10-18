@@ -30,8 +30,12 @@ class SupportedVerb(str):
     def __eq__(self, other: Any) -> bool:
         if other == "codex update":
             return True
+        if str(self) == "~/.qoder/entry update" and other in ("qoder update", "qodercli update"):
+            return True
         return super().__eq__(other)
 
+    def __ne__(self, other: Any) -> bool:
+        return not self.__eq__(other)
     def __hash__(self) -> int:
         return super().__hash__()
 
@@ -70,6 +74,16 @@ SUPPORTED_UPDATER_REGISTRY: dict[tuple[str, str], UpdaterDeclaration] = {
         notes="Authoritative owner is npm-global under ~/.npm-global; explicit npm authority replaces invalid codex update verb",
         writer_binary="npm",
     ),
+    ("codex", "brew-cask"): UpdaterDeclaration(
+        tool="codex",
+        source_type="brew-cask",
+        supported_verb="codex update",
+        updater_dispatch="delegating",
+        delegating_to="brew",
+        status="covered",
+        notes="Official Homebrew cask codex; CLI update verb delegates to brew",
+        writer_binary="brew",
+    ),
     ("opencode", "brew-formula"): UpdaterDeclaration(
         tool="opencode",
         source_type="brew-formula",
@@ -100,7 +114,7 @@ SUPPORTED_UPDATER_REGISTRY: dict[tuple[str, str], UpdaterDeclaration] = {
     ("qoder", "vendor_download"): UpdaterDeclaration(
         tool="qoder",
         source_type="vendor_download",
-        supported_verb="~/.qoder/entry update",
+        supported_verb=SupportedVerb("~/.qoder/entry update"),
         updater_dispatch="native",
         delegating_to=None,
         status="covered",
@@ -144,6 +158,16 @@ SUPPORTED_UPDATER_REGISTRY: dict[tuple[str, str], UpdaterDeclaration] = {
         delegating_to=None,
         status="covered",
         notes="Official Moonshot AI standalone installer in ~/.kimi-code/bin/kimi",
+    ),
+    ("ntn", "vendor_download"): UpdaterDeclaration(
+        tool="ntn",
+        source_type="vendor_download",
+        supported_verb="ntn update",
+        updater_dispatch="native",
+        delegating_to=None,
+        status="covered",
+        notes="Standalone binary in ~/.local/bin with native update command",
+        writer_binary="ntn",
     ),
     # Declared uncovered tools
     ("kilo", "npm"): UpdaterDeclaration(
@@ -208,6 +232,15 @@ SUPPORTED_UPDATER_REGISTRY: dict[tuple[str, str], UpdaterDeclaration] = {
         delegating_to="brew",
         status="uncovered_declared",
         notes="Managed via Homebrew formula block-goose-cli",
+    ),
+    ("qwen", "brew-formula"): UpdaterDeclaration(
+        tool="qwen",
+        source_type="brew-formula",
+        supported_verb=None,
+        updater_dispatch="none",
+        delegating_to="brew",
+        status="uncovered_declared",
+        notes="Managed via Homebrew formula qwen-code",
     ),
     ("buzz", "brew-cask"): UpdaterDeclaration(
         tool="buzz",

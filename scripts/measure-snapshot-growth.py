@@ -2,6 +2,15 @@
 """Measure Git-backed snapshot store growth, evaluate against ceilings, and report repack actions.
 
 Standard library only. Read-only by contract: never executes repack or deletion.
+
+Recommended owner repack command:
+    git -C ~/.agentmemory/snapshots -c pack.windowMemory=1g -c pack.threads=2 repack -a -d --window=10 --depth=10 && git -C ~/.agentmemory/snapshots prune-packed
+
+Note on integrity checks:
+    Routine integrity check (<1s):
+        git -C ~/.agentmemory/snapshots fsck --connectivity-only
+    Full check during repack maintenance windows:
+        git -C ~/.agentmemory/snapshots fsck --no-dangling
 """
 
 from __future__ import annotations
@@ -70,6 +79,7 @@ class SnapshotMeasurement:
     estimated_reclaimable_human: str
     owner_repack_command: str
     prohibited_actions: list[str]
+    routine_integrity_check: str = "git -C ~/.agentmemory/snapshots fsck --connectivity-only"
 
 
 def measure_store(store_path_str: str, ceiling_str: str, owner_cmd: str) -> SnapshotMeasurement:
@@ -143,13 +153,14 @@ def measure_store(store_path_str: str, ceiling_str: str, owner_cmd: str) -> Snap
             "Direct deletion of loose Git objects",
             "Filesystem unlink of snapshot revisions without Git gc/repack",
         ],
+        routine_integrity_check=f"git -C {store_path_str} fsck --connectivity-only",
     )
 
 
 def load_config(config_path: Path) -> list[tuple[str, str, str]]:
     entries = []
     if not config_path.is_file():
-        return [("~/.agentmemory/snapshots", "1G", "git -C ~/.agentmemory/snapshots repack -a -d -f --depth=250 --window=250")]
+        return [("~/.agentmemory/snapshots", "1G", "git -C ~/.agentmemory/snapshots -c pack.windowMemory=1g -c pack.threads=2 repack -a -d --window=10 --depth=10 && git -C ~/.agentmemory/snapshots prune-packed")]
     for line in config_path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if not line or line.startswith("#"):
@@ -194,6 +205,7 @@ def main() -> int:
             print(f"  Status: {m.status.upper()} (Ceiling: {m.declared_ceiling}, Total: {m.total_size_human})")
             print(f"  Split: Loose={m.loose_size_human} ({m.loose_object_count} objects) vs Packed={m.packed_size_human} ({m.packed_object_count} objects in 1 pack)")
             print(f"  History: {m.commit_count} commits (Oldest: {m.oldest_commit_date}, Newest: {m.newest_commit_date})")
+            print(f"  Routine Integrity Check: {m.routine_integrity_check}")
             if m.reclaimable_by_repack:
                 print(f"  Reclaimable by Repack: YES (~{m.estimated_reclaimable_human})")
                 print(f"  Owner Repack Command: {m.owner_repack_command}")

@@ -196,7 +196,8 @@ opencode:OpenCode:upgrade
 auggie:Auggie:update --skip-confirmation
 qoder:Qoder:update
 pi:Pi:update --self
-kimi:Kimi Code:update"
+kimi:Kimi Code:update
+ntn:Notion CLI:ntn update"
 
 AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent happy cursor-agent hermes-agent buzz cce kilo muse qwen"
 
@@ -249,10 +250,6 @@ agent_cli_coverage() {
 
     local real_bin
     real_bin="$(realpath "$(command -v "${bin}")" 2>/dev/null || which "${bin}")"
-    if [[ "${bin}" == "codex" ]] && [[ "${real_bin}" != "${HOME}/.npm-global"* ]]; then
-      echo "      - ${label} (${bin}): SKIPPED (target prefix misalignment: active binary resolves to ${real_bin} outside declared prefix ${HOME}/.npm-global)"
-      continue
-    fi
     if [[ "${bin}" == "qoder" ]] && [[ "${real_bin}" != "${HOME}/.local"* && "${real_bin}" != "${HOME}/.qoder"* ]]; then
       echo "      - ${label} (${bin}): SKIPPED (target prefix misalignment: active binary resolves to ${real_bin} outside declared standalone roots)"
       continue
@@ -265,7 +262,9 @@ agent_cli_coverage() {
 
     local out rc=0
     if [[ "${bin}" == "codex" ]]; then
-      out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" npm --prefix "${HOME}/.npm-global" install --global @openai/codex 2>&1)" || rc=$?
+      out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" codex update 2>&1)" || rc=$?
+    elif [[ "${bin}" == "ntn" ]]; then
+      out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" ntn update 2>&1)" || rc=$?
     elif [[ "${bin}" == "qoder" && -x "${HOME}/.qoder/entry" ]]; then
       out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" "${HOME}/.qoder/entry" update 2>&1)" || rc=$?
     else

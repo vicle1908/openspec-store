@@ -122,7 +122,7 @@ class TestLayeredProfiles(unittest.TestCase):
         with open(npm_prof, "r", encoding="utf-8") as f:
             data = json.load(f)
         names = {t["name"] for t in data.get("tools", [])}
-        self.assertIn("codex", names)
+        self.assertNotIn("codex", names)
         self.assertIn("gitnexus", names)
 
     def test_uv_profile_contains_sanctioned_tools(self):
@@ -131,8 +131,8 @@ class TestLayeredProfiles(unittest.TestCase):
         with open(uv_prof, "r", encoding="utf-8") as f:
             data = json.load(f)
         names = {t["name"] for t in data.get("tools", [])}
-        self.assertIn("ruff", names)
-        self.assertIn("pytest", names)
+        self.assertIn("graphifyy", names)
+        self.assertIn("tavily-cli", names)
 
     def test_capability_profiles_exist(self):
         db_prof = CONFIG_DIR / "db-tools-profile.json"

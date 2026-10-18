@@ -4,16 +4,16 @@
   "description": "Sanctioned CLI tools installed and isolated via uv tool",
   "tools": [
     {
-      "name": "ruff",
-      "package": "ruff",
+      "name": "graphifyy",
+      "package": "graphifyy",
       "version": "latest",
-      "description": "Extremely fast Python linter and formatter"
+      "description": "Graphify knowledge graph CLI"
     },
     {
-      "name": "pytest",
-      "package": "pytest",
+      "name": "tavily-cli",
+      "package": "tavily-cli",
       "version": "latest",
-      "description": "Python test runner"
+      "description": "Tavily search CLI"
     }
   ]
 }
