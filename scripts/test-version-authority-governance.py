@@ -230,6 +230,12 @@ class TestRegistryEnforcementInInventory(unittest.TestCase):
             self.assertEqual(claude_it.updater_dispatch, "none")
             self.assertEqual(claude_it.drift_status, "unknown")
 
+            cce_it = next(i for i in rep.items if i.name == "cce")
+            self.assertIsNone(cce_it.update_verb)
+            self.assertEqual(cce_it.updater_dispatch, "none")
+            self.assertEqual(cce_it.drift_status, "unknown")
+            self.assertEqual(cce_it.authority, "unknown")
+            self.assertEqual(cce_it.writer, "unknown")
 
 class TestCrontabSecretRedactionAndMacros(unittest.TestCase):
     def test_crontab_inline_env_secrets_redacted_and_macros_handled(self):
@@ -363,6 +369,57 @@ class TestCurrencyWordingInvariant(unittest.TestCase):
         self.assertIn("(idempotent, currency unverified)", content)
         self.assertIn("(local version changed, currency unverified)", content)
 
+
+
+class TestCceStandaloneAuthority(unittest.TestCase):
+    def test_cce_authority_resolves_to_standalone_clean_under_normal_registry(self):
+        rep = inv.evaluate_authority_and_drift("~/.npm-global")
+        cce_it = next((i for i in rep.items if i.name == "cce"), None)
+        self.assertIsNotNone(cce_it, "cce must be evaluated in authority reconciliation")
+        self.assertEqual(cce_it.authority, "standalone")
+        self.assertEqual(cce_it.writer, "none")
+        self.assertEqual(cce_it.drift_status, "clean")
+        self.assertEqual(cce_it.updater_dispatch, "none")
+        self.assertIsNone(cce_it.update_verb)
+        self.assertEqual(cce_it.evidence_gaps, [])
+        self.assertEqual(cce_it.selected_channel, "pinned standalone binary")
+
+
+class TestOptionalRustDevProfileReconciliation(unittest.TestCase):
+    def test_reconcile_with_manifest_skips_uninstalled_rust_dev(self):
+        from unittest.mock import patch
+        clean_path = ":".join(p for p in os.environ.get("PATH", "").split(":") if "/.venv" not in p)
+        with patch.dict(os.environ, {"PATH": clean_path}):
+            res = inv.reconcile_with_manifest()
+            self.assertIsNotNone(res)
+            self.assertEqual(res["missing_count"], 0)
+            self.assertEqual(res["optional_skipped_count"], 2)
+            self.assertEqual(set(res["summary"]["optional_skipped"]), {"rustup", "cargo"})
+            self.assertNotIn("rustup", res["summary"]["missing"])
+            self.assertNotIn("cargo", res["summary"]["missing"])
+            self.assertEqual(res["status"], "aligned")
+
+class TestDiscoveryPathNormalization(unittest.TestCase):
+    def test_normalize_discovery_path_positions_homebrew_ahead_of_hermes_and_system(self):
+        simulated_path = "/Users/androidteam/.hermes/node/bin:/usr/bin:/bin:/opt/homebrew/bin:/opt/homebrew/sbin"
+        normalized = inv.normalize_discovery_path(simulated_path)
+        parts = normalized.split(":")
+        self.assertIn("/opt/homebrew/bin", parts)
+        self.assertIn("/opt/homebrew/sbin", parts)
+        brew_bin_idx = parts.index("/opt/homebrew/bin")
+        hermes_idx = parts.index("/Users/androidteam/.hermes/node/bin")
+        usr_bin_idx = parts.index("/usr/bin")
+        self.assertLess(brew_bin_idx, hermes_idx)
+        self.assertLess(brew_bin_idx, usr_bin_idx)
+
+    def test_normalize_discovery_path_preserves_synthetic_test_bin_at_index_zero(self):
+        simulated_path = "/tmp/synthetic_test/bin:/Users/androidteam/.hermes/node/bin:/usr/bin:/bin:/opt/homebrew/bin"
+        normalized = inv.normalize_discovery_path(simulated_path)
+        parts = normalized.split(":")
+        self.assertEqual(parts[0], "/tmp/synthetic_test/bin")
+        brew_bin_idx = parts.index("/opt/homebrew/bin")
+        hermes_idx = parts.index("/Users/androidteam/.hermes/node/bin")
+        self.assertLess(brew_bin_idx, hermes_idx)
 
 if __name__ == "__main__":
     unittest.main()

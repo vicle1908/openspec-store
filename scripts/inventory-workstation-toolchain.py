@@ -31,9 +31,62 @@ _extra_paths = [
     str(Path.home() / ".kimi-code" / "bin"),
     "/opt/homebrew/opt/libpq/bin",
 ]
-for _ep in _extra_paths:
-    if _ep not in os.environ.get("PATH", "").split(os.pathsep):
-        os.environ["PATH"] = f"{_ep}{os.pathsep}{os.environ.get('PATH', '')}"
+
+
+def normalize_discovery_path(raw_path: str | None = None, brew_dirs: list[str] | None = None) -> str:
+    """Normalize PATH so that /opt/homebrew/bin and /opt/homebrew/sbin precede lower-priority dirs.
+
+    Lower-priority directories include /usr/bin, /bin, /usr/sbin, /sbin, and isolated agent
+    runtimes (e.g. ~/.hermes/node/bin).
+    If /opt/homebrew/bin and /opt/homebrew/sbin exist on disk and appear after any lower-priority
+    directory or are missing, they are placed immediately ahead of the first lower-priority
+    directory, preserving any synthetic test directories (e.g. tmp_path/bin) prepended at index 0.
+    """
+    path_val = raw_path if raw_path is not None else os.environ.get("PATH", "")
+    parts = [p for p in path_val.split(os.pathsep) if p]
+
+    def _is_lower(p: str) -> bool:
+        norm = os.path.normpath(p)
+        return norm in ("/usr/bin", "/bin", "/usr/sbin", "/sbin") or "/.hermes/" in norm
+
+    lower_indices = [i for i, p in enumerate(parts) if _is_lower(p)]
+    first_lower = lower_indices[0] if lower_indices else len(parts)
+
+    # Ensure _extra_paths exist in parts; if missing, place before first_lower
+    missing_extra = [ep for ep in _extra_paths if ep not in parts and Path(ep).is_dir()]
+    if missing_extra:
+        parts = parts[:first_lower] + missing_extra + parts[first_lower:]
+        lower_indices = [i for i, p in enumerate(parts) if _is_lower(p)]
+        first_lower = lower_indices[0] if lower_indices else len(parts)
+
+    if brew_dirs is None:
+        brew_candidates = ["/opt/homebrew/bin", "/opt/homebrew/sbin"]
+        existing_brew = [b for b in brew_candidates if Path(b).is_dir()]
+    else:
+        existing_brew = brew_dirs
+
+    if existing_brew and lower_indices:
+        needs_move = False
+        for b in existing_brew:
+            if b not in parts or parts.index(b) > first_lower:
+                needs_move = True
+                break
+        if needs_move:
+            parts = [p for p in parts if p not in existing_brew]
+            first_lower = next((i for i, p in enumerate(parts) if _is_lower(p)), len(parts))
+            parts = parts[:first_lower] + existing_brew + parts[first_lower:]
+    elif existing_brew and not lower_indices:
+        for b in existing_brew:
+            if b not in parts:
+                parts.append(b)
+
+    result = os.pathsep.join(parts)
+    if raw_path is None:
+        os.environ["PATH"] = result
+    return result
+
+
+normalize_discovery_path()
 
 
 def get_dir_size_bytes(path: Path) -> int:
@@ -414,6 +467,7 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
     grok_cfg = audit_grok_autoupdate()
     global_pause = is_global_pause_active({"claude": claude_cfg, "grok": grok_cfg})
 
+    normalize_discovery_path()
     items: list[ToolAuthorityItem] = []
     for name in tools_to_evaluate:
         auth_path = shutil.which(name)
@@ -493,20 +547,35 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
 
         # Tool classification
         if name == "cce":
-            authority = "unknown"
-            writer = "unknown"
-            updater_dispatch = "none"
-            update_verb = None
-            delegating_to = None
-            selected_channel = "standalone binary"
-            evidence_gaps = [
-                "Standalone Mach-O binary in ~/.local/bin/cce has no package manager receipt, updater subcommand, or documented vendor release channel"
-            ]
-            drift_status = "unknown"
-            consequence = "Authority is unknown; automated mutations are gated until provenance is established"
-            active_install_root = str(Path(auth_path).parent)
-            prefix_aligned = True
-            compatible_command = None
+            decl = get_supported_updater("cce", "vendor_download")
+            if decl and decl.status in ("covered", "uncovered_declared"):
+                authority = "standalone"
+                writer = "none"
+                updater_dispatch = decl.updater_dispatch
+                update_verb = decl.supported_verb
+                delegating_to = decl.delegating_to
+                selected_channel = "pinned standalone binary"
+                evidence_gaps = []
+                drift_status = "clean"
+                consequence = None
+                active_install_root = str(Path(auth_path).parent)
+                prefix_aligned = True
+                compatible_command = decl.supported_verb
+            else:
+                authority = "unknown"
+                writer = "unknown"
+                updater_dispatch = "none"
+                update_verb = None
+                delegating_to = None
+                selected_channel = "standalone binary"
+                evidence_gaps = [
+                    "Standalone Mach-O binary in ~/.local/bin/cce has no package manager receipt, updater subcommand, or documented vendor release channel"
+                ]
+                drift_status = "unknown"
+                consequence = "Authority is unknown; automated mutations are gated until provenance is established"
+                active_install_root = str(Path(auth_path).parent)
+                prefix_aligned = True
+                compatible_command = None
 
         elif name == "pi":
             dyn_root, src = derive_install_root_and_source(resolved_path)
@@ -1203,6 +1272,8 @@ def inventory_tools() -> list[ToolInventoryItem]:
 
     results: list[ToolInventoryItem] = []
 
+    normalize_discovery_path()
+
     for tool_name in tools_to_check:
         auth_path = shutil.which(tool_name) or "not_found"
         pref_src, pref_avail = preferred_sources.get(tool_name, ("none", False))
@@ -1341,6 +1412,8 @@ def reconcile_with_manifest(
     if not m_path.is_file():
         return None
 
+    normalize_discovery_path()
+
     try:
         with open(m_path, "r", encoding="utf-8") as f:
             manifest_data = json.load(f)
@@ -1364,6 +1437,8 @@ def reconcile_with_manifest(
     aligned: list[dict[str, Any]] = []
     drift: list[dict[str, Any]] = []
     missing: list[dict[str, Any]] = []
+    optional_skipped: list[dict[str, Any]] = []
+    rust_dev_tools = set(manifest_data.get("profiles", {}).get("rust-dev", ["rustup", "cargo"]))
     duplicate: list[dict[str, Any]] = []
     obsolete_candidate: list[dict[str, Any]] = []
     unknown: list[dict[str, Any]] = []
@@ -1389,13 +1464,23 @@ def reconcile_with_manifest(
             if expected_path and Path(expected_path).is_file():
                 active_bin = expected_path
             else:
-                missing.append({
-                    "name": tool_name,
-                    "state": "missing",
-                    "expected_owner": owner,
-                    "expected_path": expected_path,
-                    "active_path": None,
-                })
+                if tool_name in rust_dev_tools:
+                    optional_skipped.append({
+                        "name": tool_name,
+                        "state": "optional_skipped",
+                        "profile": "rust-dev",
+                        "expected_owner": owner,
+                        "expected_path": expected_path,
+                        "active_path": None,
+                    })
+                else:
+                    missing.append({
+                        "name": tool_name,
+                        "state": "missing",
+                        "expected_owner": owner,
+                        "expected_path": expected_path,
+                        "active_path": None,
+                    })
                 continue
         resolved_active = str(Path(active_bin).resolve())
         # Evaluate alignment
@@ -1468,9 +1553,7 @@ def reconcile_with_manifest(
                 "rationale": "Deprecated formula in Homebrew; audit dependencies before uninstallation",
             })
 
-    rust_dev_tools = set(manifest_data.get("profiles", {}).get("rust-dev", ["rustup", "cargo"]))
-    mandatory_missing = [m for m in missing if m["name"] not in rust_dev_tools]
-    overall_status = "drift" if (drift or mandatory_missing) else "aligned"
+    overall_status = "drift" if (drift or missing) else "aligned"
     return {
         "manifest_path": str(m_path),
         "status": overall_status,
@@ -1478,6 +1561,7 @@ def reconcile_with_manifest(
         "aligned_count": len(aligned),
         "drift_count": len(drift),
         "missing_count": len(missing),
+        "optional_skipped_count": len(optional_skipped),
         "duplicate_count": len(duplicate),
         "obsolete_candidate_count": len(obsolete_candidate),
         "unknown_count": len(unknown),
@@ -1485,6 +1569,7 @@ def reconcile_with_manifest(
             "aligned": [i["name"] for i in aligned],
             "drift": [i["name"] for i in drift],
             "missing": [i["name"] for i in missing],
+            "optional_skipped": [i["name"] for i in optional_skipped],
             "duplicate": [i["name"] for i in duplicate],
             "obsolete_candidate": [i["name"] for i in obsolete_candidate],
             "unknown": [i["name"] for i in unknown],
@@ -1493,6 +1578,7 @@ def reconcile_with_manifest(
             "aligned": aligned,
             "drift": drift,
             "missing": missing,
+            "optional_skipped": optional_skipped,
             "duplicate": duplicate,
             "obsolete_candidate": obsolete_candidate,
             "unknown": unknown,

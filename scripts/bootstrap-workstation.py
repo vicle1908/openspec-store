@@ -16,7 +16,7 @@ import os
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 
@@ -121,6 +121,7 @@ def generate_dry_run_plan(
     workspace_root_override: str | None = None,
     store_root_override: str | None = None,
     candidate_test_files: list[str] | None = None,
+    profiles: Sequence[str] | None = None,
 ) -> BootstrapDryRunReport:
     """Compute target actions and validate security exclusions."""
     # 1. System info & preflight
@@ -195,15 +196,26 @@ def generate_dry_run_plan(
             with open(m_path, "r", encoding="utf-8") as f:
                 manifest_data = json.load(f)
             tools = manifest_data.get("tools", {})
+            rust_dev_tools = set(manifest_data.get("profiles", {}).get("rust-dev", ["rustup", "cargo"]))
+            active_profiles = set(profiles or [])
             for tool_name, t_meta in tools.items():
-                smoke = t_meta.get("verification_smoke_command")
-                if smoke:
-                    smoke_checks.append(smoke)
-                owner = t_meta.get("authoritative_owner")
                 path_pattern = t_meta.get("active_path_pattern", "")
                 resolved_active_path = path_pattern.replace("{{HOME}}", sys_info["home"]).replace(
                     "{{HOMEBREW_PREFIX}}", sys_info["homebrew_prefix"]
                 )
+
+                # Skip uninstalled rust-dev tools when rust-dev profile is not requested
+                if (
+                    tool_name in rust_dev_tools
+                    and "rust-dev" not in active_profiles
+                    and not Path(resolved_active_path).exists()
+                ):
+                    continue
+
+                smoke = t_meta.get("verification_smoke_command")
+                if smoke:
+                    smoke_checks.append(smoke)
+                owner = t_meta.get("authoritative_owner")
                 verb = t_meta.get("supported_verb")
                 if verb:
                     rendered_verb = verb.replace("{{HOME}}", sys_info["home"]).replace(
@@ -320,6 +332,7 @@ def main() -> int:
     parser.add_argument("--workspace-root", help="Override Workspace root")
     parser.add_argument("--openspec-store-root", help="Override OpenSpec store root")
     parser.add_argument("--arch", help="Override architecture (arm64, x86_64)")
+    parser.add_argument("--profile", dest="profiles", action="append", help="Requested toolchain profiles (e.g. rust-dev)")
 
     args = parser.parse_args()
 
@@ -337,6 +350,7 @@ def main() -> int:
         brew_prefix_override=args.homebrew_prefix,
         workspace_root_override=args.workspace_root,
         store_root_override=args.openspec_store_root,
+        profiles=args.profiles,
     )
 
     if args.json:
