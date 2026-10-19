@@ -482,5 +482,105 @@ class TestHomePrefixHijackReconciliation(unittest.TestCase):
             self.assertIn("bru", manifest_res["summary"]["unsanctioned"])
 
 
+
+class TestTCCProvenanceAndBashFallback(unittest.TestCase):
+    def test_workstation_daily_update_mirror_parity_and_bash_fail_closed(self):
+        import hashlib
+        import shutil
+        import sqlite3
+        import tempfile
+
+        import tcc_provenance as tcc_mod
+
+        store_script = SCRIPTS_DIR / "workstation-daily-update.sh"
+        host_script = Path.home() / "Developer" / "scripts" / "workstation-daily-update.sh"
+        if host_script.exists():
+            h_store = hashlib.sha256(store_script.read_bytes()).hexdigest()
+            h_host = hashlib.sha256(host_script.read_bytes()).hexdigest()
+            self.assertEqual(h_store, h_host, "Host and store workstation-daily-update.sh mirrors must be byte-identical")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+
+            # 1. Non-Darwin skip returns 0
+            proc_linux = subprocess.run(
+                ["bash", "-c", f'source "{store_script}" && verify_tcc_provenance'],
+                env={**os.environ, "TCC_UNAME_S_OVERRIDE": "Linux"},
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(proc_linux.returncode, 0)
+
+            # 2. Darwin missing DB returns nonzero
+            proc_missing_db = subprocess.run(
+                ["bash", "-c", f'source "{store_script}" && verify_tcc_provenance'],
+                env={
+                    **os.environ,
+                    "TCC_UNAME_S_OVERRIDE": "Darwin",
+                    "TCC_DB_PATH_OVERRIDE": str(tmp_path / "missing_TCC.db"),
+                },
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(proc_missing_db.returncode, 0)
+
+            # 3. Darwin missing helper returns nonzero
+            proc_missing_helper = subprocess.run(
+                ["bash", "-c", f'source "{store_script}" && verify_tcc_provenance'],
+                env={
+                    **os.environ,
+                    "TCC_UNAME_S_OVERRIDE": "Darwin",
+                    "TCC_PROVENANCE_HELPER": str(tmp_path / "no_helper.py"),
+                },
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(proc_missing_helper.returncode, 0)
+
+            if sys.platform == "darwin":
+                herdr_bin = tmp_path / "herdr"
+                herdr_bin.write_bytes(Path("/usr/bin/true").read_bytes())
+                herdr_bin.chmod(0o755)
+                csreq_true = tcc_mod.copy_designated_csreq_blob("/usr/bin/true")
+
+                db_path = tmp_path / "TCC.db"
+                conn = sqlite3.connect(str(db_path))
+                conn.execute(
+                    "CREATE TABLE access (service TEXT, client TEXT, client_type INTEGER, auth_value INTEGER, csreq BLOB);"
+                )
+                real_herdr = str(herdr_bin.resolve())
+                for svc in ("kTCCServiceAccessibility", "kTCCServiceScreenCapture", "kTCCServiceSystemPolicyAllFiles"):
+                    conn.execute("INSERT INTO access VALUES (?, ?, 1, 2, ?);", (svc, real_herdr, csreq_true))
+                conn.commit()
+                conn.close()
+
+                # Valid signed match exits 0
+                proc_ok = subprocess.run(
+                    ["bash", "-c", f'source "{store_script}" && verify_tcc_provenance --binary "{real_herdr}"'],
+                    env={
+                        **os.environ,
+                        "TCC_UNAME_S_OVERRIDE": "Darwin",
+                        "TCC_DB_PATH_OVERRIDE": str(db_path),
+                    },
+                    capture_output=True,
+                    text=True,
+                )
+                self.assertEqual(proc_ok.returncode, 0, proc_ok.stdout + proc_ok.stderr)
+
+                # Same-path signature replacement exits nonzero
+                herdr_bin.write_bytes(Path("/usr/bin/false").read_bytes())
+                herdr_bin.chmod(0o755)
+                proc_mismatch = subprocess.run(
+                    ["bash", "-c", f'source "{store_script}" && verify_tcc_provenance --binary "{real_herdr}"'],
+                    env={
+                        **os.environ,
+                        "TCC_UNAME_S_OVERRIDE": "Darwin",
+                        "TCC_DB_PATH_OVERRIDE": str(db_path),
+                    },
+                    capture_output=True,
+                    text=True,
+                )
+                self.assertNotEqual(proc_mismatch.returncode, 0)
+
 if __name__ == "__main__":
     unittest.main()

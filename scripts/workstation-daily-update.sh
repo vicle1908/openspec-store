@@ -403,68 +403,24 @@ detect_script_drift() {
   return 0
 }
 
-# Verify active canonical coding agent Mach-O CLI realpaths hold auth_value = 2
-# for kTCCServiceAccessibility and kTCCServiceScreenCapture in TCC.db (read-only).
+# Verify active canonical coding agent Mach-O CLI realpaths and shared Python
+# automation identities in TCC.db (read-only) with native csreq signature checks.
 verify_tcc_provenance() {
   echo "    verifying TCC provenance for active agent Mach-O binaries..."
-  if [[ "$(uname -s)" != "Darwin" ]]; then
-    echo "      - non-Darwin platform ($(uname -s)); skipping TCC provenance verification"
+  local uname_s="${TCC_UNAME_S_OVERRIDE:-$(uname -s)}"
+  if [[ "${uname_s}" != "Darwin" ]]; then
+    echo "      - non-Darwin platform (${uname_s}); skipping TCC provenance verification"
     return 0
   fi
 
-  local tcc_db="/Library/Application Support/com.apple.TCC/TCC.db"
-  if [[ ! -r "${tcc_db}" ]]; then
-    echo "      - TCC database not readable or present: ${tcc_db}"
-    return 0
+  local helper="${TCC_PROVENANCE_HELPER:-${STORE_DIR}/scripts/tcc_provenance.py}"
+  if [[ ! -f "${helper}" ]]; then
+    echo "      - ERROR: TCC provenance helper missing: ${helper}"
+    return 1
   fi
 
-  python3 -c '
-import os, sys, shutil, sqlite3
-from pathlib import Path
-
-CANONICAL_TCC_CLIS = ("omp", "node", "opencode", "goose", "claude", "kimi", "herdr")
-REQUIRED_TCC_SERVICES = ("kTCCServiceAccessibility", "kTCCServiceScreenCapture")
-
-tcc_db = Path("/Library/Application Support/com.apple.TCC/TCC.db")
-if not tcc_db.exists():
-    print("      - TCC.db not present; skipping")
-    sys.exit(0)
-
-active_binaries = []
-for name in CANONICAL_TCC_CLIS:
-    bin_path = shutil.which(name)
-    if bin_path:
-        active_binaries.append(os.path.realpath(bin_path))
-
-try:
-    conn = sqlite3.connect(f"file:{tcc_db}?mode=ro", uri=True)
-    try:
-        cursor = conn.cursor()
-        verified_binaries = []
-        missing_binaries = []
-
-        for binary in active_binaries:
-            cursor.execute(
-                "SELECT service FROM access WHERE client = ? AND auth_value = 2 AND service IN (?, ?)",
-                (binary, "kTCCServiceAccessibility", "kTCCServiceScreenCapture"),
-            )
-            granted_services = {row[0] for row in cursor.fetchall()}
-            if set(REQUIRED_TCC_SERVICES).issubset(granted_services):
-                verified_binaries.append(binary)
-                print(f"      - {Path(binary).name}: verified (auth_value=2 in accessibility & screen capture) [{binary}]")
-            else:
-                missing = set(REQUIRED_TCC_SERVICES) - granted_services
-                missing_binaries.append(binary)
-                print(f"      - {Path(binary).name}: missing {sorted(missing)} [{binary}]")
-
-        if missing_binaries:
-            sys.exit(1)
-    finally:
-        conn.close()
-except (sqlite3.Error, OSError) as exc:
-    print(f"      - TCC.db read failed: {exc}")
-    sys.exit(0)
-'
+  local tcc_db="${TCC_DB_PATH_OVERRIDE:-/Library/Application Support/com.apple.TCC/TCC.db}"
+  python3 "${helper}" --db "${tcc_db}" "$@"
 }
 
 
@@ -911,7 +867,7 @@ except Exception:
     echo "DEGRADED: version-authority drift or target-misalignment detected."
   fi
   if (( TCC_DRIFT != 0 )); then
-    echo "DEGRADED: one or more active CLI realpaths lack verified TCC provenance (auth_value != 2)."
+    echo "DEGRADED: one or more required TCC identities lack verified provenance or csreq signature match."
   fi
   if (( SNAPSHOT_MEASURE_FAILED != 0 )); then
     echo "DEGRADED: snapshot-store measurement could not be produced (reporter failed); store state is unknown, not clear."
@@ -927,6 +883,11 @@ except Exception:
   fi
   if [[ "${SYNC_FAILED}" -ne 0 ]]; then
     echo "$(date '+%Y-%m-%d %H:%M:%S %Z') — FAILED [MODE=${MODE}]: unresolved skill links remain"
+    echo "======================================================================"
+    return 1
+  fi
+  if (( TCC_DRIFT != 0 || PREFLIGHT_FAILED != 0 || SNAPSHOT_MEASURE_FAILED != 0 || INVENTORY_MEASURE_FAILED != 0 || AGENT_COVERAGE_MEASURE_FAILED != 0 || AUTHORITY_DRIFT_DETECTED != 0 || AGENT_UNDECLARED_COUNT != 0 || SCRIPT_DRIFT != 0 )); then
+    echo "$(date '+%Y-%m-%d %H:%M:%S %Z') — DEGRADED [MODE=${MODE}]: required verification or authority checks failed"
     echo "======================================================================"
     return 1
   fi
