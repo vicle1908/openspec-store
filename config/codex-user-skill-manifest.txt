@@ -19,6 +19,7 @@ gws-gmail
 gws-sheets
 gws-tasks
 handoff
+herdr
 openspec-apply-change
 openspec-archive-change
 openspec-bulk-archive-change
@@ -65,3 +66,10 @@ temporal-developer
 temporal-ops
 # Proprietary local knowledge search; canonical content is workspace-owned with no upstream.
 qi-hybrid-search
+# Ponytail official agent skills (upstream: DietrichGebert/ponytail).
+ponytail
+ponytail-audit
+ponytail-debt
+ponytail-gain
+ponytail-help
+ponytail-review
