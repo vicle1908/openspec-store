@@ -5,22 +5,22 @@
 # uv tools, coding agent CLIs, skills parity, skill-content refresh, and
 # OpenSpec store validation.
 #
-# Skill-content refresh notes (change: automate-skill-content-refresh):
+# Skill-content refresh notes (changes: automate-skill-content-refresh,
+# reconcile-ponytail-agent-skills):
 #   • `skills update` has NO --dry-run/--check/--json. Unknown flags are ignored
 #     and a REAL update is executed, so never pass such a flag expecting a dry
-#     run. Its only non-mutating drift signal is the summary line it prints
-#     BEFORE writing: `Found N update(s)` (global) / `Refreshing N skill(s)`.
+#     run. `--check` mode inspects local registry, symlink parity, and accepted
+#     snapshot digests without invoking `skills update`.
 #   • A path-ambiguous upstream entry (same skill published at >1 path, e.g.
 #     docfork-docs) is reported by the CLI as "Multiple current paths match …
 #     skipping them". That is INFORMATIONAL, not stale/broken/failed.
-#   • Drift is never judged from the skills-lock.json `computedHash` digest: it
-#     is CLI-internal and is not reproducible for multi-file skills.
+#   • Local byte integrity is verified against `.agents/.skill-snapshots/current/`
+#     via `sync-workspace-agent-skills.py --accept-refresh` rather than trusting
+#     `skills-lock.json` `computedHash` alone.
 #   • The refresh stage reports five outcomes in one line, e.g.
 #       drift=1 refreshed=42 already_current=0 path_ambiguous=1 failed=0
-#     meaning: drift available / entries refreshed / already current /
-#     path-ambiguous skips / refresh failures. Drift availability is reported
-#     BEFORE any content is replaced, so 'checked, nothing changed' is
-#     distinguishable from 'checked and pulled new content'.
+#     meaning: post-update drift observed / entries refreshed / already current /
+#     path-ambiguous skips / refresh failures.
 #   • Bounds: the refresh runs under SKILL_REFRESH_TIMEOUT (1800s) and each
 #     agent updater under AGENT_UPDATE_TIMEOUT (900s). A timeout returns 124 and
 #     is reported as a failure (refresh_failed / agent FAILED) rather than
@@ -38,7 +38,7 @@ set -euo pipefail
 umask 022
 
 export HOME="${HOME:-/Users/androidteam}"
-export PATH="${HOME}/.kimi-code/bin:${HOME}/.npm-global/bin:${HOME}/.local/bin:${HOME}/.bun/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="${HOME}/.kimi-code/bin:${HOME}/.qoder/entry:${HOME}/.npm-global/bin:${HOME}/.local/bin:${HOME}/.bun/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export STORE_DIR="${HOME}/Developer/platform/openspec-store"
 export WORKSPACE_DIR="${HOME}/Developer"
 
@@ -99,39 +99,79 @@ run_with_timeout() {
 
 # Classify captured `skills update` output into the five spec outcomes.
 # Echoes: "drift=N refreshed=N already_current=N path_ambiguous=N failed=N".
-# A nonzero exit (incl. timeout 124) always wins as a failure.
+# A nonzero exit (incl. timeout 124), fatal error line, incomplete Refreshing N,
+# or unrecognized output always wins as a failure.
 classify_refresh() {
   local clean="$1" rc="${2:-0}"
   local drift=0 refreshed=0 already=0 ambiguous=0 failed=0
+  local has_completion=0 has_recognized_summary=0
 
-  # Drift available BEFORE mutation (v1.7.0 'Found/Refreshing', v1.7.2 'Updated').
-  if grep -qE 'Found [0-9]+ (global )?update|Refreshing [0-9]+ skill|Updated [0-9]+ skill|^[[:space:]]*✓ Updated ' <<<"$clean"; then
+  # 1. Refreshed count (completed updates only; summary-first, no double-counting).
+  local num_ref=""
+  num_ref="$(sed -nE 's/.*Updated ([0-9]+) skill\(s\).*/\1/p; s/.*(^|[^0-9])([0-9]+) skills? (refreshed|updated).*/\2/p; s/.*(refreshed|updated):[[:space:]]*([0-9]+).*/\2/p' <<<"$clean" | head -1)"
+  if [[ -n "$num_ref" ]]; then
+    refreshed="$num_ref"
+    has_completion=1
+    has_recognized_summary=1
+  elif grep -qE '^[[:space:]]*✓[[:space:]]+Updated[[:space:]]+[^0-9[:space:]]' <<<"$clean"; then
+    refreshed="$(grep -cE '^[[:space:]]*✓[[:space:]]+Updated[[:space:]]+[^0-9[:space:]]' <<<"$clean" || true)"
+    has_completion=1
+    has_recognized_summary=1
+  fi
+
+  # 2. Drift (observed update activity: refreshed > 0 or positive activity/drift header).
+  local num_drift=""
+  num_drift="$(sed -nE 's/.*(^|[^0-9])([1-9][0-9]*) (skills? )?drifted.*/\2/p; s/.*drift:[[:space:]]*([1-9][0-9]*).*/\1/p' <<<"$clean" | head -1)"
+  if [[ -n "$num_drift" ]]; then
+    drift=1
+    has_recognized_summary=1
+  elif (( refreshed > 0 )); then
+    drift=1
+  elif grep -qE 'Found [1-9][0-9]* (global )?update|Refreshing [1-9][0-9]* skill' <<<"$clean"; then
     drift=1
   fi
 
-  # Refreshed count: project scope prints a tally, global prints per-skill lines.
-  if grep -qE 'Updated [0-9]+ skill' <<<"$clean"; then
-    refreshed="$(grep -oE 'Updated [0-9]+ skill' <<<"$clean" | grep -oE '[0-9]+' | head -1)"
-  elif grep -qE '^[[:space:]]*✓ Updated [^0-9]' <<<"$clean"; then
-    refreshed="$(grep -cE '^[[:space:]]*✓ Updated [^0-9]' <<<"$clean")"
-  fi
-
-  # Path-ambiguous entries (informational, never a failure on their own).
-  if grep -qE 'Multiple current paths match' <<<"$clean"; then
-    ambiguous="$(grep -cE '^[[:space:]]*[[:punct:]] ' <<<"$clean" || true)"
+  # 3. Path-ambiguous entries (informational, never a failure on their own).
+  local num_amb=""
+  num_amb="$(sed -nE 's/.*(^|[^0-9])([0-9]+) (skills? )?(path )?ambiguous.*/\2/p; s/.*ambiguous:[[:space:]]*([0-9]+).*/\1/p' <<<"$clean" | head -1)"
+  if [[ -n "$num_amb" ]]; then
+    ambiguous="$num_amb"
+    has_recognized_summary=1
+  elif grep -qE 'Multiple current paths match' <<<"$clean"; then
+    ambiguous="$(grep -cE '^[[:space:]]*[-*•][[:space:]]+' <<<"$clean" || true)"
+    if (( ambiguous == 0 )); then
+      ambiguous="$(grep -cE 'Multiple current paths match' <<<"$clean" || true)"
+    fi
     (( ambiguous == 0 )) && ambiguous=1
+    has_recognized_summary=1
   fi
 
-  # Failure: nonzero exit, or no recognizable summary of any kind.
+  # 4. Already current (requires explicit up-to-date evidence; never inferred from Checking + ambiguity alone).
+  local num_already=""
+  num_already="$(sed -nE 's/.*(^|[^0-9])([0-9]+) (project |global )?skills?(\(s\))? already[[:space:]]+(current|up to date).*/\2/p; s/.*(already[[:space:]]+current|already[[:space:]]+up to date):[[:space:]]*([0-9]+).*/\2/p' <<<"$clean" | head -1)"
+  if [[ -n "$num_already" ]]; then
+    already="$num_already"
+    has_recognized_summary=1
+  elif grep -qE 'All (project |global )?skills are up to date|(project |global )?skill\(s\) already[[:space:]]+up to date' <<<"$clean"; then
+    has_recognized_summary=1
+    if (( refreshed == 0 )); then
+      already=1
+    fi
+  fi
+
+  # 5. Failure: nonzero exit, fatal error line, incomplete Refreshing N, or no recognizable summary.
+  local num_fail=""
+  num_fail="$(sed -nE 's/.*(^|[^0-9])([1-9][0-9]*) (skills? )?(failed|failures).*/\2/p; s/.*failed:[[:space:]]*([1-9][0-9]*).*/\1/p' <<<"$clean" | head -1)"
   if (( rc != 0 )); then
     failed=1
-  elif ! grep -qE 'Updated [0-9]+ skill|Found [0-9]+ (global )?update|Refreshing [0-9]+ skill|Multiple current paths match|^[[:space:]]*✓ Updated |All (project )?skills are up to date|project skill\(s\) already[[:space:]]+up to date' <<<"$clean"; then
+  elif [[ -n "$num_fail" ]]; then
     failed=1
-  fi
-
-  # Already current: recognized summary, no drift, nothing refreshed, no skips.
-  if (( failed == 0 )) && (( drift == 0 )) && (( refreshed == 0 )) && (( ambiguous == 0 )); then
-    already=1
+  elif grep -qE '(^|[[:space:]])(Error:|ERR!|fatal:|EACCES|ENOENT)' <<<"$clean"; then
+    failed=1
+  elif grep -qE 'Found [1-9][0-9]* (global )?update|Refreshing [1-9][0-9]* skill' <<<"$clean" && (( has_completion == 0 )); then
+    failed=1
+  elif (( has_recognized_summary == 0 )); then
+    failed=1
   fi
 
   printf 'drift=%d refreshed=%d already_current=%d path_ambiguous=%d failed=%d\n' \
@@ -161,6 +201,23 @@ refresh_skill_content() {
   ambiguous="$(sed -nE 's/.*path_ambiguous=([0-9]+).*/\1/p' <<<"$result")"
   failed="$(sed -nE 's/.*failed=([0-9]+).*/\1/p' <<<"$result")"
 
+  local snap_manifest="${WORKSPACE_DIR}/.agents/.skill-snapshots/current/manifest.json"
+  if (( failed == 0 )); then
+    if [[ -f "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" ]]; then
+      if ! python3 "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" --accept-refresh 2>&1; then
+        echo "    REFRESH FAILED: post-refresh acceptance verification failed"
+        failed=1
+        if [[ -f "${snap_manifest}" ]]; then
+          python3 "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" --recover-from-snapshot 2>&1 || true
+        fi
+      fi
+    fi
+  else
+    if [[ -f "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" ]] && [[ -f "${snap_manifest}" ]]; then
+      python3 "${STORE_DIR}/scripts/sync-workspace-agent-skills.py" --recover-from-snapshot 2>&1 || true
+    fi
+  fi
+
   REFRESH_REFRESHED="${refreshed}"
   REFRESH_ALREADY="${already}"
   REFRESH_AMBIGUOUS="${ambiguous}"
@@ -170,12 +227,12 @@ refresh_skill_content() {
     if (( rc == 124 )); then
       echo "    REFRESH FAILED: skills update exceeded ${SKILL_REFRESH_TIMEOUT}s bound (terminated)"
     else
-      echo "    REFRESH FAILED: skills update returned rc=${rc} (upstream unreachable or output unrecognized)"
+      echo "    REFRESH FAILED: skills update returned rc=${rc} (upstream unreachable, acceptance failed, or output unrecognized)"
     fi
   elif (( drift == 1 )); then
-    echo "    drift available: yes; refreshed ${refreshed} entr(y/ies)"
+    echo "    post-update drift observed: yes; refreshed ${refreshed} entr(y/ies)"
   else
-    echo "    drift available: no; all upstream content already current"
+    echo "    post-update drift observed: no; all upstream content already current"
   fi
 
   if (( ambiguous > 0 )); then
@@ -197,7 +254,7 @@ auggie:Auggie:update --skip-confirmation
 qoder:Qoder:update
 pi:Pi:update --self
 kimi:Kimi Code:update
-ntn:Notion CLI:ntn update"
+ntn:Notion CLI:update"
 
 AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent happy cursor-agent hermes-agent buzz cce kilo muse qwen herdr"
 
@@ -265,8 +322,8 @@ agent_cli_coverage() {
       out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" codex update 2>&1)" || rc=$?
     elif [[ "${bin}" == "ntn" ]]; then
       out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" ntn update 2>&1)" || rc=$?
-    elif [[ "${bin}" == "qoder" && -x "${HOME}/.qoder/entry" ]]; then
-      out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" "${HOME}/.qoder/entry" update 2>&1)" || rc=$?
+    elif [[ "${bin}" == "qoder" && -x "${HOME}/.qoder/entry/qoder" ]]; then
+      out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" "${HOME}/.qoder/entry/qoder" update 2>&1)" || rc=$?
     else
       # shellcheck disable=SC2086  # ${args} intentionally word-splits into argv
       out="$(run_with_timeout "${AGENT_UPDATE_TIMEOUT}" "${bin}" ${args} 2>&1)" || rc=$?

@@ -462,6 +462,7 @@ class TestHomePrefixHijackReconciliation(unittest.TestCase):
             home_dir = Path(tmp) / "home"
             (home_dir / "node_modules" / "gitnexus").mkdir(parents=True)
             (home_dir / "node_modules" / "@usebruno" / "cli").mkdir(parents=True)
+            (home_dir / "node_modules" / "pyright").mkdir(parents=True)
             items = inv.inventory_tools(home_dir=home_dir)
             gn_item = next((i for i in items if i.name == "gitnexus"), None)
             bru_item = next((i for i in items if i.name == "bru"), None)
@@ -475,12 +476,12 @@ class TestHomePrefixHijackReconciliation(unittest.TestCase):
             self.assertIsNotNone(bru_adhoc)
             self.assertFalse(bru_adhoc.is_sanctioned)
             self.assertTrue(bru_adhoc.sanctioned_replacement.endswith("/.local/share/home-toolchain/node_modules"))
-            manifest_res = inv.reconcile_with_manifest(inventory_items=items)
+            manifest_res = inv.reconcile_with_manifest(inventory_items=items, home_dir=home_dir)
             self.assertEqual(manifest_res["status"], "drift")
-            self.assertGreaterEqual(manifest_res["unsanctioned_count"], 2)
+            self.assertGreaterEqual(manifest_res["unsanctioned_count"], 3)
             self.assertIn("gitnexus", manifest_res["summary"]["unsanctioned"])
             self.assertIn("bru", manifest_res["summary"]["unsanctioned"])
-
+            self.assertIn("pyright", manifest_res["summary"]["unsanctioned"])
 
 
 class TestTCCProvenanceAndBashFallback(unittest.TestCase):

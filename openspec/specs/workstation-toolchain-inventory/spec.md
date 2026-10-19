@@ -31,13 +31,11 @@ or `~/.local/lib/node_modules`.
 
 ### Requirement: The declared npm global prefix is authoritative and singular
 
-The workstation SHALL declare exactly one npm global prefix, the prefix npm reports for
-`npm config get prefix` SHALL equal the prefix the maintenance pipeline installs globals into,
-and `$HOME` SHALL NOT contain a `package.json`, lockfile (`package-lock.json`, `pnpm-lock.yaml`,
-`pnpm-workspace.yaml`, `bun.lock`, `bun.lockb`, `yarn.lock`), or `node_modules` directory that
-hijacks `npm prefix` resolution from `~/Developer`. Where these disagree or `$HOME` hijacks
-local prefix resolution, the inventory SHALL report the defect rather than treating the state
-as reconciled.
+The workstation SHALL declare one npm global prefix (`npm config get prefix` matching the
+maintenance pipeline prefix), and `$HOME` SHALL NOT contain `package.json`, lockfiles
+(`package-lock.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `bun.lock`, `bun.lockb`,
+`yarn.lock`), or `node_modules` that hijack `npm prefix` from `~/Developer`. Any prefix split or
+`$HOME` hijack SHALL be reported as a defect.
 
 #### Scenario: npm's effective prefix disagrees with the intended prefix
 
@@ -67,12 +65,11 @@ as reconciled.
 
 ### Requirement: Preferred package-manager source is used where one exists
 
-Where a system package manager or a vendor package manager provides a tool and that tool's
-official documentation names it as an installation channel, that source SHALL be preferred over
-an unsigned external download or a manual placement, and the inventory SHALL report an
-installation that bypasses an available documented source. Where official documentation names
-more than one channel, the inventory SHALL record every documented channel, and the version
-authority SHALL be resolved by the active installation rather than by preference alone.
+Where a system or vendor package manager provides a tool and official documentation names it as
+an installation channel, that source SHALL be preferred over unsigned downloads or manual
+placement, and the inventory SHALL report installations bypassing a documented source. When
+multiple channels are documented, the inventory SHALL record all documented channels and resolve
+version authority from the active installation.
 
 #### Scenario: Homebrew ships the tool
 

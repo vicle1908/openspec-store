@@ -24,7 +24,7 @@ Every development CLI is governed by exactly one authoritative installation owne
 | **Bruno** | Pinned JS Toolbelt | Isolated Toolchain | npm in isolated root | `bru --version` | **Isolated Toolchain Exception**. Active verified at 4.2.1 via `~/.local/bin/bru -> ~/.local/share/home-toolchain/node_modules/.bin/bru` (alongside `yaml-language-server` 2.0.0, `newman-reporter-htmlextra` 1.23.1, and `pyright` 1.1.414). |
 | **Muse Code** | Official Cask | `cask "muse-code"` | `brew upgrade --cask muse-code` | `muse --version` | **Official Homebrew Cask**. Meta Muse Code CLI assistant installed via Homebrew Cask. |
 | **Qwen Code** | Homebrew Formula | `brew "qwen-code"` | `brew upgrade qwen-code` | `qwen --version` | **Homebrew Formula**. Qwen Code CLI installed via `qwen-code` formula. |
-| **Herdr** | Homebrew Formula | `brew "herdr"` | `brew upgrade herdr` | `herdr --version && herdr status` | **Homebrew Formula**. Terminal multiplexer and runtime for AI coding agents (`v0.9.5+`). Supervised via `homebrew.mxcl.herdr.plist`. |
+| **Herdr** | Homebrew Formula | `brew "herdr"` | `brew upgrade herdr` | `herdr --version && herdr status` | **Homebrew Formula (Package) + Host-Local LaunchAgent**. Package owned by `brew "herdr"` (`v0.9.5+`; formula has no `service do` block). Daemon supervised via host-local `~/Library/LaunchAgents/homebrew.mxcl.herdr.plist`. |
 | **Hermes Agent** | Standalone Installer | Vendor Standalone | `hermes update` | `hermes --version` | **Standalone Exception**. Standalone runtime in `~/.hermes` and `~/.local/bin/hermes-agent`. |
 | **Notion CLI** | Standalone Binary | Vendor Standalone | `ntn update` | `ntn --version` | **Standalone Exception**. Managed standalone binary in `~/.local/bin/ntn`. |
 | **Google Workspace CLI** | Homebrew Formula | `brew "googleworkspace-cli"` | `brew upgrade googleworkspace-cli` | `gws --version` | **Homebrew Formula**. Google Workspace CLI (`gws`). |
@@ -144,7 +144,7 @@ cd ~/.local/share/home-toolchain
 # Install pinned dependencies deterministically from package-lock.json
 npm ci --no-audit --no-fund
 ```
-- Active binaries: `~/.local/share/home-toolchain/node_modules/.bin/newman`, `bru`
+- Active binaries: `~/.local/share/home-toolchain/node_modules/.bin/bru`, `yaml-language-server`, `newman-reporter-htmlextra` (symlinked into `~/.local/bin`)
 
 #### Active vs. Declared Target State
 
@@ -200,8 +200,7 @@ The update engine executes as a durable, 9-step transactional pipeline governed 
 6. **Global NPM Packages**: Discovers outdated tools via `npm outdated -g --json`, shielding pinned coding agents (`codex`, `claude`, `pi`, `kilo`).
 7. **Coding Agent CLIs**: Executes time-bounded updates (900s) from static maps with pre/post-update version probes.
 8. **Remote Skills Refresh & Parity**: Runs `skills update -y` (1800s bound) and verifies symlink parity across `.agents/skills/`.
-9. **Integrity & Strict Store Validation**: Reconciles script copy provenance against `script-provenance-manifest.tsv` and runs `openspec validate --all --store openspec-store`.
-
+9. **Integrity, Native TCC Provenance & Strict Store Validation**: Executes `scripts/tcc_provenance.py` (`verify_tcc_provenance()` evaluating role-scoped TCC grants and stored `csreq` signatures via `Security.framework`), reconciles script copy provenance against `script-provenance-manifest.tsv`, checks snapshot store growth bounds, evaluates toolchain inventory reconciliation (`conflict_count`, `drift_count`, `target_misalignment_count`, `unknown_count`) and agent CLI coverage, and runs `openspec validate --all --store openspec-store`. Any Darwin TCC verification error/skip/drift, reporter failure, or inventory drift propagates to non-success (`DEGRADED` / `PARTIAL` in `shb-schedule`, nonzero exit in `workstation-daily-update.sh`).
 Every run persists an immutable JSON telemetry artifact to `~/Developer/data/updates/YYYY-MM-DD.json` (mode `0600`). If degraded or failed, alert payloads are dispatched to the Telegram channel (`Home` `88d95325258b`).
 
 To prevent package manager lock collisions during manual maintenance, use native launchd controls:
@@ -343,22 +342,69 @@ brew services stop redis
   Follow with `git -C ~/.agentmemory/snapshots fsck --no-dangling` during the maintenance window to confirm complete pack integrity.
 
 
-### Herdr Multiplexer Daemon & HerdrChat Notifier Supervision
-- **Herdr Server (`homebrew.mxcl.herdr`)**:
-  - Supervised via `~/Library/LaunchAgents/homebrew.mxcl.herdr.plist` executing `/opt/homebrew/opt/herdr/bin/herdr server` over Unix domain socket `~/.config/herdr/herdr.sock`.
-  - `EnvironmentVariables.PATH` in `homebrew.mxcl.herdr.plist` must include `$HOME/.local/bin:$HOME/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin` so background pane commands resolve Homebrew and user-local binaries deterministically.
-  - Runtime configuration in `~/.config/herdr/config.toml` sets `onboarding = false` and `[session] resume_agents_on_restore = true`; reload live via `herdr server reload-config`.
-- **macOS TCC Responsible-Process Coalition Attribution**:
-  - Because `herdr server` owns the PTY master/slave descriptors for all managed panes, macOS `launchd` assigns `responsible path = /opt/homebrew/Cellar/herdr/<version>/bin/herdr` to every interactive shell (`-zsh`) and coding agent running inside a Herdr pane (`HERDR_ENV=1`).
-  - Consequently, `/opt/homebrew/Cellar/herdr/<version>/bin/herdr` must hold `auth_value = 2` in `/Library/Application Support/com.apple.TCC/TCC.db` across `kTCCServiceAccessibility`, `kTCCServiceScreenCapture`, and `kTCCServiceSystemPolicyAllFiles`, with `3026-01-01 00:00:00 +0000` recorded in `~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist`.
-  - Because the Homebrew `herdr` bottle is ad-hoc linker-signed (`flags=0x20002`), every `brew upgrade herdr` changes its Cellar path and `CDHash`; `"herdr"` is registered in `CANONICAL_TCC_CLIS` across `shb-schedule` and `workstation-daily-update.sh` to detect post-upgrade TCC drift automatically.
-- **HerdrChat Companion Notifier (`dev.herdr.herdrchat-notifier`)**:
-  - Supervised via `~/Library/LaunchAgents/dev.herdr.herdrchat-notifier.plist` executing `/opt/homebrew/bin/python3 ~/.local/share/herdrchat/herdr-notifier.py` (`WATCHER_VERSION = 5`) under Homebrew Python (`org.python.python`).
-  - Polls `herdr api snapshot` every 2 seconds and tails Claude (`~/.claude/projects/`) and Codex (`~/.codex/sessions/`) JSONL transcripts to dispatch APNs push notifications (`api.push.apple.com`). Both `org.python.python` and the resolved Homebrew Python `realpath` hold `auth_value = 2` in `TCC.db`.
-- **Built-in Agent Integrations & Official Skill**:
-  - Install lifecycle and session-restore hooks across all 16 provisioned coding agent directories (`pi`, `omp`, `claude`, `codex`, `copilot`, `devin`, `droid`, `kimi`, `opencode`, `kilo`, `hermes`, `qodercli`, `qwen`, `cursor`, `antigravity-cli`, `grok`) via `herdr integration install <target>` and verify with `herdr integration status`.
-  - Keep `PI_CODING_AGENT_DIR` and `PI_CONFIG_DIR` unset in shell startup files so `pi` (`~/.pi/agent/extensions/herdr-agent-state.ts`) and `omp` (`~/.omp/agent/extensions/herdr-omp-agent-state.ts`) maintain separate extension directories.
-  - Synchronize the official `herdr` skill (`herdr --skill`, enforcing the `test "${HERDR_ENV:-}" = 1` caller guard) via `config/claude-user-skill-manifest.txt`, `config/codex-user-skill-manifest.txt`, and `python3 scripts/sync-workspace-agent-skills.py`.
+### Herdr Multiplexer Daemon, Native TCC Provenance & HerdrChat Notifier Supervision
+- **Package Ownership vs. Host-Local Service Supervision (`homebrew.mxcl.herdr`)**:
+  - **Package Authority**: Herdr is installed and upgraded via Homebrew formula `brew "herdr"` (`brew upgrade herdr`). Self-update commands (`herdr update`, `herdr update --handoff`) remain disabled so `~/.local/bin/herdr` never shadows `/opt/homebrew/bin/herdr` (standalone installer reference: `https://herdr.dev/install.sh`).
+  - **Host-Local LaunchAgent**: The upstream `herdr` Homebrew formula has no `service do` block, so `brew services` cannot create, manage, or restart the daemon. Instead, supervision is owned by the host-local LaunchAgent `~/Library/LaunchAgents/homebrew.mxcl.herdr.plist`, which runs `/opt/homebrew/opt/herdr/bin/herdr server` over Unix domain socket `~/.config/herdr/herdr.sock`.
+  - **Staged Disk `PATH` vs. Live Process `PATH` & Destructive Restart Gate**:
+    - Setting `EnvironmentVariables.PATH` (`$HOME/.local/bin:$HOME/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin`) in `~/Library/LaunchAgents/homebrew.mxcl.herdr.plist` and validating with `plutil -lint` establishes **staged disk configuration only**.
+    - Running `herdr server reload-config` reloads `~/.config/herdr/config.toml` (`onboarding = false`, `[session] resume_agents_on_restore = true`), **not** the `launchd` job definition or an existing server process's environment (a running `herdr server` keeps its launch-time `PATH` until the `launchd` job is reloaded).
+    - **Operator Approval Gate**: Stopping or reloading `homebrew.mxcl.herdr` (`launchctl bootout`, `launchctl kickstart -k`, or `herdr server stop`) terminates active pane processes. Preserving layout metadata in `~/.config/herdr/session.json` is not lossless process preservation. When active panes are preserved, live `PATH` activation remains an open operator-gated maintenance step; applying it requires explicit operator approval after preserving active agent sessions, followed by verifying the replacement PID's live `PATH` (`ps eww -p <pid>`) and `herdr status`.
+- **Native TCC Provenance Verifier (`scripts/tcc_provenance.py`) & Permission Roles**:
+  - Both `shb-schedule` (`verify_tcc_provenance()` in `workstation_update.py`) and `workstation-daily-update.sh` delegate to the central read-only helper `scripts/tcc_provenance.py`, which queries `/Library/Application Support/com.apple.TCC/TCC.db` strictly read-only (`mode=ro`).
+  - **Stored `csreq` Code-Signing Verification**: Path strings and `auth_value = 2` alone are insufficient. For every required identity and service, the verifier checks that the resolved executable exists and is executable (`os.X_OK`), matches the expected `client_type` (`1` for absolute paths, `0` for bundle identifiers), holds `auth_value = 2`, and satisfies the record's stored `csreq` blob via native macOS `Security.framework` APIs (`SecRequirementCreateWithData`, `SecStaticCodeCreateWithPath`, `SecStaticCodeCheckValidity`) with deterministic `CFRelease` cleanup. Both ad-hoc linker-signed `CDHash` requirements (which change on `brew upgrade` or same-path binary replacement) and certificate-signed designated requirements are evaluated. Missing/malformed `csreq`, denied services, wrong `client_type`, missing executables, unresolved required binary names, or empty target sets report `DRIFT`; Darwin missing/unreadable/corrupt `TCC.db` or missing/malformed helper output reports `ERROR` (never a `SKIPPED` success fallback; only non-Darwin platforms return `SKIPPED`).
+  - **Role-Scoped Permission Policy (Dynamic Runtime Resolution, No Hardcoded Cellar Versions)**:
+    - *Canonical Agent CLIs (`omp`, `node`, `opencode`, `goose`, `claude`, `kimi`, `herdr`)*: Resolved dynamically from `$PATH` to active Mach-O `realpath` (`client_type = 1`); all seven require `kTCCServiceAccessibility` and `kTCCServiceScreenCapture`.
+    - *Herdr PTY Supervisor & OMP Host Automation (`herdr`, `omp`)*: Additionally require `kTCCServiceSystemPolicyAllFiles` (Full Disk Access). Because `herdr server` owns the PTY master/slave descriptors for managed panes (`HERDR_ENV=1`), macOS `launchd` attributes child shells and coding agents inside Herdr panes to `herdr`'s `responsible path`, and `omp` performs host computer-use and read-only system `TCC.db` audits. Full Disk Access and `TCC.db` rows do not imply root/SIP bypass or blanket AppleEvents authorization to arbitrary receivers (in-pane `osascript` verification tests `System Events` specifically).
+    - *Shared Host Python Automation (`python3` active `realpath` `client_type = 1` and resolved framework bundle `org.python.python` `client_type = 0`)*: Derived dynamically from the active `python3` executable (`.../Resources/Python.app/Contents/Info.plist` when framework-backed) across `kTCCServiceAccessibility`, `kTCCServiceScreenCapture`, and `kTCCServiceSystemPolicyAllFiles`. **Role Classification**: These three-service Python grants are retained as **shared host automation privileges** for workstation automation scripts — they are **not** required by `herdr-notifier.py`, which only polls `herdr api snapshot`, reads user-owned transcript files, and sends outbound HTTP push notifications. Existing grants are preserved unless revocation is separately authorized.
+  - **Supported macOS Consent Behavior (No Permanent Reminder Suppression Guarantee)**:
+    - Prior far-future timestamps (`3026-01-01 00:00:00 +0000`) in `~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist` are recorded strictly as **historical unsupported private state** and left untouched. Reading back private plist values proves neither `replayd` runtime interpretation nor permanent reminder suppression, and Apple's `forceBypassScreenCaptureAlert` restriction applies only to MDM-managed profiles. No recurring plist-rewrite job or consent-bypass automation is used; standard macOS operator consent handling governs any future system reminder.
+- **HerdrChat Companion Notifier (`dev.herdr.herdrchat-notifier`) & Preview Privacy**:
+  - Supervised via `~/Library/LaunchAgents/dev.herdr.herdrchat-notifier.plist` executing `/opt/homebrew/bin/python3 ~/.local/share/herdrchat/herdr-notifier.py` (`WATCHER_VERSION = 5`).
+  - **Polling & Trigger States**: Polls `herdr api snapshot` every **3 seconds** by default (`POLL_SECONDS = 3`) and notifies on `NOTIFY_ON = "blocked,done"` state transitions.
+  - **Relay-Default Delivery vs. Optional Direct APNs**: By default (`HERDRCHAT_RELAY_URL = "https://push.herdrchat.cobanov.dev/v1/push"`), push payloads are sent through the third-party HerdrChat relay (which holds the App Store build's APNs signing key). Direct APNs delivery (`api.push.apple.com`) is optional and used only when `APNS_KEY_ID`, `APNS_TEAM_ID`, and `APNS_KEY_PATH` are configured for a self-signed build.
+  - **Transcript Preview Privacy (`NOTIFY_PREVIEW`)**: By default (`NOTIFY_PREVIEW = "1"`), the notifier reads recent lines from the session's JSONL transcript (`~/.claude/projects/`, `~/.codex/sessions/`, etc.) and includes a message snippet in the notification body sent to the relay or APNs. Set `NOTIFY_PREVIEW=0` in `~/.config/herdrchat/apns.env` to transmit only workspace/chat labels and state transitions without transcript snippets.
+- **Built-in Agent Integrations (Installed vs. Activated) & Official CLI Surface**:
+  - **16 Installed Integrations (`herdr integration install <target>`)**: Installed for all 16 provisioned coding agent directories (`pi`, `omp`, `claude`, `codex`, `copilot`, `devin`, `droid`, `kimi`, `opencode`, `kilo`, `hermes`, `qodercli`, `qwen`, `cursor`, `antigravity-cli`, `grok`), while leaving unprovisioned optional roots (`~/.letta`, `~/.mastracode`) absent and keeping `PI_CODING_AGENT_DIR` / `PI_CONFIG_DIR` unset so `pi` (`~/.pi/agent/extensions/herdr-agent-state.ts`) and `omp` (`~/.omp/agent/extensions/herdr-omp-agent-state.ts`) remain isolated.
+  - **5 Lifecycle Reporters vs. 11 Session-Only Hooks**: Only **five** integrations (`pi`, `omp`, `kimi`, `opencode`, `kilo`) report live lifecycle state transitions (`herdr agent-state`) in addition to session identity; the other 11 installed hooks record session resume references while relying on Herdr's screen-based state detection.
+  - **Installation vs. Runtime Activation**: `herdr integration status` reporting `current` verifies installed hook files on disk only — existing running agent processes must load hooks on a new session/startup event before reporting live state, and session restoration remains unverified until exercised.
+  - **Official Skill & CLI Subcommands**: Synchronized via `config/claude-user-skill-manifest.txt`, `config/codex-user-skill-manifest.txt`, and `python3 scripts/sync-workspace-agent-skills.py`. Use the installed subcommand surface (`herdr pane split`, `herdr pane run`, `herdr pane send`, `herdr pane capture`, `herdr pane wait`, `herdr agent-state`, `herdr api snapshot`, `herdr server reload-config`), gated by `test "${HERDR_ENV:-}" = 1` when orchestrating panes from inside a Herdr session.
+
+### Ponytail Official Agent Skills (Skills-Only Installation Tier & Snapshot Acceptance)
+- **Canonical Source & User-Scope Manifest Fanout (`DietrichGebert/ponytail`)**:
+  - The six official Ponytail skills (`ponytail`, `ponytail-review`, `ponytail-audit`, `ponytail-debt`, `ponytail-gain`, `ponytail-help`) reside as unmodified upstream copies under `/Users/androidteam/Developer/.agents/skills/ponytail*/SKILL.md` (`142–371` YAML-decoded UTF-8 description bytes; `141–370` trimmed bytes).
+  - Selected user-scope symlinks are reconciled by `python3 /Users/androidteam/Developer/platform/openspec-store/scripts/sync-workspace-agent-skills.py` from `config/codex-user-skill-manifest.txt` (`~/.agents/skills/ponytail*`), `config/claude-user-skill-manifest.txt` (`~/.claude/skills/ponytail*`), and `config/hermes-user-skill-manifest.txt` (`~/.hermes/skills/ponytail*`), while preserving existing Grok (`~/.grok/skills/ponytail*`), Goose (`~/.config/goose/skills/ponytail*`), and unrelated Hermes skills.
+- **Host-Accurate Standalone Invocation Syntax**:
+  - **Codex CLI**: Invoke as standalone skills without a plugin namespace prefix: `$ponytail`, `$ponytail-review`, `$ponytail-audit`, `$ponytail-debt`, `$ponytail-gain`, `$ponytail-help` (do **not** use the plugin-namespaced `$ponytail:ponytail` syntax shown in upstream's plugin-oriented `ponytail-help/SKILL.md`).
+  - **Claude Code & Hermes**: Loaded on demand through each host's verified user-scope skill catalog (`~/.claude/skills/ponytail*` and `~/.hermes/skills/ponytail*`). In hosts exposing slash skill commands, `/ponytail*` invokes the corresponding skill; do not assume identical slash-command parity across hosts that load skills through catalog selection rather than slash commands.
+- **Omitted Plugin & Extension Tier Features**:
+  - Because Ponytail is installed in the standalone **skills-only tier** (keeping canonical `SKILL.md` files unmodified and Claude Code's installation authority unchanged), plugin/extension features referenced in upstream `ponytail-help/SKILL.md` are intentionally inactive on this workstation:
+    - Automatic session-start hook activation (`PONYTAIL_DEFAULT_MODE`, `~/.config/ponytail/config.json`)
+    - Claude statusline band (`/ponytail band`, `ponytail-statusline.sh`)
+    - Pre-prompt regex mapper (`ponytail-map.js`)
+    - Pi/OMP extension (`pi-extension/index.js`)
+    - Plugin marketplace updater (`/plugin update ponytail`, `/plugin marketplace update ponytail`)
+- **Single-Writer Lockfile & `--accept-refresh` Post-Update Workflow**:
+  - `/Users/androidteam/Developer/skills-lock.json` is the sole writable project registry mutated by `/opt/homebrew/bin/skills` (`npx skills`). `/Users/androidteam/Developer/.agents/skills-lock.json` is a generated read-only compatibility replica published only after acceptance verification succeeds.
+  - Bounded recoverable snapshots are maintained at `/Users/androidteam/Developer/.agents/.skill-snapshots/{current,previous}/`.
+  - Standard commands (matching `python3 scripts/sync-workspace-agent-skills.py --help`):
+    ```bash
+    # Reconcile declared user-scope symlinks (Codex, Claude, Hermes)
+    python3 /Users/androidteam/Developer/platform/openspec-store/scripts/sync-workspace-agent-skills.py
+
+    # Initialize accepted snapshots and publish .agents/skills-lock.json
+    python3 /Users/androidteam/Developer/platform/openspec-store/scripts/sync-workspace-agent-skills.py --bootstrap-snapshot
+
+    # Refresh upstream skills via official Skills CLI, then verify and accept
+    (cd /Users/androidteam/Developer && /opt/homebrew/bin/skills update -y)
+    python3 /Users/androidteam/Developer/platform/openspec-store/scripts/sync-workspace-agent-skills.py --accept-refresh
+
+    # Non-mutating parity, YAML frontmatter budget, and snapshot digest check
+    python3 /Users/androidteam/Developer/platform/openspec-store/scripts/sync-workspace-agent-skills.py --check
+
+    # Restore mutated registry-tracked skills and root lockfile from current snapshot after a failed refresh
+    python3 /Users/androidteam/Developer/platform/openspec-store/scripts/sync-workspace-agent-skills.py --recover-from-snapshot
+    ```
 ---
 
 ## 8. Notion Knowledge Mirror Documentation
@@ -396,10 +442,11 @@ When migrating or verifying a secondary machine:
    gitnexus --version && gitnexus status
    which -a newman bru
    /opt/homebrew/bin/newman --version
-   /Users/androidteam/.local/share/home-toolchain/node_modules/.bin/newman --version
    /Users/androidteam/.local/bin/bru --version
+   /Users/androidteam/.local/bin/yaml-language-server --version
+   /Users/androidteam/.local/bin/newman-reporter-htmlextra --version
    prime-agent --version
-   curl -fsS http://localhost:3111/agentmemory/health
+   agentmemory status
    docker --version && docker compose version
    ```
 5. Confirm zero duplicate binary resolution via `which -a <tool>`.

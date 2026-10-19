@@ -233,9 +233,21 @@ def check_prefix_reconciliation(
 
     home_prefix_hijacked = bool(forbidden_found) or prefix_resolves_to_home
 
-    pipeline_prefix = str(Path(os.path.expanduser("~/.npm-global")).resolve())
-    declared_resolved = str(Path(os.path.expanduser(declared_prefix)).resolve())
-    npm_resolved = str(Path(os.path.expanduser(npm_prefix)).resolve()) if npm_prefix != "unknown" else "unknown"
+    if home_dir is not None:
+        pipeline_prefix = str((home_p / ".npm-global").resolve())
+        if declared_prefix == "~" or declared_prefix.startswith("~/"):
+            rel_decl = declared_prefix[2:] if declared_prefix.startswith("~/") else ""
+            declared_resolved = str((home_p / rel_decl).resolve()) if rel_decl else str(home_p)
+        else:
+            declared_resolved = str(Path(os.path.expanduser(declared_prefix)).resolve())
+        if npm_prefix != "unknown" and Path(os.path.expanduser(npm_prefix)).resolve() == (Path.home() / ".npm-global").resolve():
+            npm_resolved = pipeline_prefix
+        else:
+            npm_resolved = str(Path(os.path.expanduser(npm_prefix)).resolve()) if npm_prefix != "unknown" else "unknown"
+    else:
+        pipeline_prefix = str(Path(os.path.expanduser("~/.npm-global")).resolve())
+        declared_resolved = str(Path(os.path.expanduser(declared_prefix)).resolve())
+        npm_resolved = str(Path(os.path.expanduser(npm_prefix)).resolve()) if npm_prefix != "unknown" else "unknown"
 
     has_split = (
         (npm_resolved != declared_resolved)
@@ -1461,6 +1473,7 @@ def reconcile_with_manifest(
     manifest_path: Path | str | None = None,
     inventory_items: list[ToolInventoryItem] | None = None,
     auth_items: list[ToolAuthorityItem] | None = None,
+    home_dir: Path | None = None,
 ) -> dict[str, Any] | None:
     """Compare declared manifest intent with observed host resolution.
 
@@ -1487,14 +1500,14 @@ def reconcile_with_manifest(
         return None
 
     declared_tools = manifest_data.get("tools", {})
-    home = Path.home()
+    home = (home_dir or Path.home()).resolve()
     brew_prefix = "/opt/homebrew" if os.uname().machine == "arm64" else "/usr/local"
     if os.environ.get("HOMEBREW_PREFIX"):
         brew_prefix = os.environ["HOMEBREW_PREFIX"]
 
     # Build map of observed inventory tools, auto-running inventory if not supplied
     if inventory_items is None:
-        inventory_items = inventory_tools()
+        inventory_items = inventory_tools(home_dir=home_dir)
     if auth_items is None:
         auth_items = evaluate_authority_and_drift().items
 

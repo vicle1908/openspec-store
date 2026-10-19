@@ -7,11 +7,10 @@ Governs remediation contracts, dependency upgrade matrices, peer-resolution conf
 
 ### Requirement: Workstation Root Manifest Peer Conflict Resolution
 The relocated workstation toolchain manifest (`~/.local/share/home-toolchain/package.json`) SHALL
-retain the peer-resolution outcome achieved before relocation: `newman-reporter-htmlextra` pinned
-to `^1.23.1` with its peer `newman` (`^6.0.0` resolving `6.2.3`) installed automatically without
-adding a duplicate direct `newman` CLI entry, overrides held at non-vulnerable thresholds, and
-`npm install` / `npm update` completing without `ERESOLVE` errors and without `--force` or
-`--legacy-peer-deps`. No manifest, lockfile, or `node_modules` directory SHALL exist at `$HOME`.
+pin `newman-reporter-htmlextra` (`^1.23.1`, auto-installing peer `newman@6.2.3` without a direct
+`newman` CLI entry), hold overrides at non-vulnerable thresholds, and complete `npm install` /
+`npm update` without `ERESOLVE`, `--force`, or `--legacy-peer-deps`. No manifest, lockfile, or
+`node_modules` directory SHALL exist at `$HOME`.
 
 #### Scenario: newman and htmlextra peer alignment
 - **WHEN** `newman-reporter-htmlextra` is pinned to `^1.23.1` in
@@ -40,14 +39,11 @@ adding a duplicate direct `newman` CLI entry, overrides held at non-vulnerable t
   `npm prefix` executed from any workspace directory resolves to that directory
 
 ### Requirement: Transitive Vulnerability Elimination via Package Overrides
-Node.js package manifests across `mcp-router`, `realtime/frontend`, `legacy/kafka-microservices`,
-the relocated workstation toolchain (`~/.local/share/home-toolchain`), and the preserved TypeScript
-branch of `prime-agent` (`backup/ts-custom-patches`) SHALL declare explicit version overrides for
-transitive dependencies with published security advisories where parent packages have not released
-updated dependency ranges, and SHALL additionally raise any transitive dependency that remains
-behind its latest published version while its parent's declared range already permits the newer
-version. In dual-manager environments like `realtime/frontend`, overrides MUST be synchronized
-across both `overrides` and `pnpm.overrides` to ensure deterministic resolution.
+Node.js manifests across `mcp-router`, `realtime/frontend`, `legacy/kafka-microservices`,
+`~/.local/share/home-toolchain`, and `prime-agent` (`backup/ts-custom-patches`) SHALL declare
+explicit overrides for vulnerable transitive dependencies lacking upstream parent range updates
+and SHALL raise in-range transitive dependencies to their latest published versions. Dual-manager
+manifests (`realtime/frontend`) MUST synchronize `overrides` and `pnpm.overrides`.
 
 #### Scenario: transitive overrides applied in mcp-router
 - **WHEN** `mcp-router` specifies `blockExoticSubdeps: false` and `overrides` in `pnpm-workspace.yaml` for `smol-toml` (`<1.7.1` -> `>=1.7.1`), `fflate` (`>=0.8.0 <0.8.3` -> `0.8.3`, `>=0.4.5 <0.4.9` -> `0.4.9`), `proxy-addr` (`<2.0.8` -> `>=2.0.8`), `shell-quote` (`<1.11.0` -> `>=1.11.0`), `compression` (`<1.8.2` -> `>=1.8.2`), `http-cache-semantics` (`<=4.2.0` -> `>=4.3.0`), `source-map-js` (`<1.2.2` -> `>=1.2.2`), `postcss-selector-parser` (`<7.1.6` -> `>=7.1.6`), `handlebars` (`<4.7.10` -> `>=4.7.10`), and `electron` (`<41.10.7` -> `>=41.10.7`) alongside `electron@^41.10.7` in `apps/electron/package.json`
@@ -184,7 +180,7 @@ The workstation root tooling manifest SHALL make modern, offline-first API testi
 
 #### Scenario: bruno CLI verification
 - **WHEN** `bru --version` is executed
-- **THEN** the command reports version 4.2.0 or higher and exits with status 0
+- **THEN** the command reports version 4.2.1 or higher and exits with status 0
 
 ### Requirement: Electron Workspace TypeScript 7 and Playwright Alignment
 Electron desktop applications in monorepos (`apps/electron` in `platform/mcp-router`) SHALL align their local compiler and testing toolchains to root workspace versions (`typescript@^7.0.2`, `playwright@^1.63.0`), configure `moduleResolution: "bundler"` without obsolete `baseUrl` options, and declare ambient CSS type definitions for side-effect styling imports.
@@ -309,13 +305,11 @@ repeated.
 
 ### Requirement: Upgrade-Only Override Compatibility Gate
 
-A transitive-dependency override proposed as a security remedy SHALL be validated against the
-runtime API of every installed consumer before it is retained. When a forward-only override
-clears an advisory but breaks a consumer's execution, it SHALL be reverted to the pre-change
-state and recorded as a rejected remedy, not as a remediation. Where a shared transitive package
-is consumed by multiple parents with differing API compatibility, the override SHALL be **scoped
-to the consumer that tolerates the newer version** rather than applied globally, and the scoped
-consumer's entry point SHALL be exercised after installation.
+A transitive-dependency security override SHALL be validated against the runtime API of every
+installed consumer before retention. If a forward override breaks a consumer, it SHALL be
+reverted and recorded as a rejected remedy. When multiple parents share a transitive package with
+differing API compatibility, the override SHALL be **scoped to the compatible consumer** rather
+than applied globally, and that consumer's entry point SHALL be exercised after installation.
 
 #### Scenario: faker override clears the advisory but breaks the consumer
 

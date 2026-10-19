@@ -6,7 +6,7 @@ Workstation development tooling is installed across system package managers (Hom
 ## 1. Sanctioned Install Locations
 Declared in `config/workstation-sanctioned-locations.tsv`:
 - `~/.npm-global`: The declared npm global prefix for workstation CLIs.
-- `~/.local/share/home-toolchain`: The isolated package manifest for toolchain CLIs (`bru`, `newman`, etc.).
+- `~/.local/share/home-toolchain`: The isolated package manifest for toolchain CLIs (`bru`, `yaml-language-server`, `newman-reporter-htmlextra`, `pyright`).
 - `/opt/homebrew`: The system package manager prefix.
 - `~/.local/share`: Language and runtime tool managers (`uv`, `mise`, etc.).
 

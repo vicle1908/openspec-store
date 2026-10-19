@@ -46,7 +46,8 @@
       "muse",
       "kimi",
       "qwen",
-      "orca"
+      "orca",
+      "herdr"
     ],
     "isolated-toolchain": [
       "newman",
@@ -205,14 +206,14 @@
       "delegating_to": null,
       "package_name": "newman",
       "known_shadow_paths": [
-        "{{HOME}}/.local/share/home-toolchain/bin/newman"
+        "{{HOME}}/.local/share/home-toolchain/node_modules/newman"
       ],
       "category": "tool",
       "notes": "Homebrew formula newman."
     },
     "bru": {
       "authoritative_owner": "isolated-node",
-      "active_path_pattern": "{{HOME}}/.local/share/home-toolchain/bin/bru",
+      "active_path_pattern": "{{HOME}}/.local/share/home-toolchain/node_modules/.bin/bru",
       "update_authority": "isolated-node",
       "release_channel": "latest",
       "dispatch_classification": "none",
@@ -222,7 +223,7 @@
       "delegating_to": null,
       "package_name": "@usebruno/cli",
       "category": "testing",
-      "notes": "Bruno CLI in isolated toolchain. Targeted upgrade candidate from 4.2.0 to 4.2.1."
+      "notes": "Bruno CLI 4.2.1 active in isolated toolchain (~/.local/share/home-toolchain)."
     },
     "opencode": {
       "authoritative_owner": "brew-formula",
@@ -580,6 +581,23 @@
       "known_shadow_paths": [],
       "category": "ai-agent",
       "notes": "Official Stably AI Orca IDE orchestrator cask (stablyai/orca/orca)."
+    },
+    "herdr": {
+      "authoritative_owner": "brew-formula",
+      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/herdr",
+      "update_authority": "brew",
+      "release_channel": "stable",
+      "dispatch_classification": "none",
+      "verification_smoke_command": "herdr --version",
+      "writer_binary": "brew",
+      "supported_verb": "brew upgrade herdr",
+      "delegating_to": null,
+      "package_name": "herdr",
+      "known_shadow_paths": [
+        "{{HOME}}/.local/bin/herdr"
+      ],
+      "category": "ai-agent",
+      "notes": "Homebrew formula herdr (terminal multiplexer and runtime for AI coding agents)."
     }
   }
 }
