@@ -1,0 +1,132 @@
+{
+  "schema_version": "1.0",
+  "packet_id": "eep-20261019-shb-schedule-reconcile-ponytail-agent-skills",
+  "target_root": "/Users/androidteam/Developer/shb/shb-schedule",
+  "target_repository": "/Users/androidteam/Developer/shb/shb-schedule",
+  "source_commit": "dbcd636f614c30672e0b72ef3c56678d1e07f588",
+  "pre_edit_head_commit_sha": "dbcd636f614c30672e0b72ef3c56678d1e07f588",
+  "allowed_paths": [
+    "src/shb_schedule/workflows/workstation_update.py",
+    "tests/test_workstation_update_workflow.py"
+  ],
+  "excluded_paths": [
+    "graphify-out/.graphify_labels.json",
+    "graphify-out/.graphify_labels.json.sig",
+    "graphify-out/GRAPH_REPORT.md",
+    "graphify-out/graph.json",
+    "graphify-out/manifest.json",
+    ".git",
+    ".env",
+    "*.pem",
+    "*.key",
+    "id_rsa*",
+    "id_ed25519*",
+    "omniroute_data",
+    "docker_volumes",
+    "credentials",
+    "secrets"
+  ],
+  "command": [
+    "uv",
+    "run",
+    "--project",
+    "/Users/androidteam/Developer/shb/shb-schedule",
+    "pytest",
+    "/Users/androidteam/Developer/shb/shb-schedule/tests/test_workstation_update_workflow.py"
+  ],
+  "timestamps": {
+    "started_at": "2026-10-19T12:00:00Z",
+    "completed_at": "2026-10-19T12:05:00Z",
+    "duration_seconds": 300.0
+  },
+  "exit_code": 0,
+  "item_counts": {
+    "inspected": 7,
+    "modified": 2,
+    "created": 0,
+    "pruned": 0,
+    "retained": 5,
+    "skipped": 5
+  },
+  "preservation_status": {
+    "source_preserved": true,
+    "backup_path": null,
+    "details": "Source state and pre-existing uncommitted changes in graphify-out/* and TCC provenance hunks preserved without data loss"
+  },
+  "collision_status": {
+    "collision_detected": false,
+    "quarantined_pids": [],
+    "details": "No port or filesystem collisions detected"
+  },
+  "readback_verification": {
+    "verified": true,
+    "status": "PASSED",
+    "active_version": "dbcd636f614c30672e0b72ef3c56678d1e07f588",
+    "readback_data": {
+      "target_repository": "/Users/androidteam/Developer/shb/shb-schedule",
+      "pre_edit_head_commit_sha": "dbcd636f614c30672e0b72ef3c56678d1e07f588",
+      "allowed_paths": [
+        "src/shb_schedule/workflows/workstation_update.py",
+        "tests/test_workstation_update_workflow.py"
+      ],
+      "allowed_symbols": [
+        "src/shb_schedule/workflows/workstation_update.py:_classify_skills_refresh_output",
+        "src/shb_schedule/workflows/workstation_update.py:step_skills_refresh",
+        "tests/test_workstation_update_workflow.py:SKILLS_REFRESH_CANONICAL_FIXTURES",
+        "tests/test_workstation_update_workflow.py:test_step_skills_refresh_canonical_13_fixtures",
+        "tests/test_workstation_update_workflow.py:test_classify_skills_refresh_output_strips_ansi_and_cr"
+      ],
+      "excluded_paths": [
+        "graphify-out/.graphify_labels.json",
+        "graphify-out/.graphify_labels.json.sig",
+        "graphify-out/GRAPH_REPORT.md",
+        "graphify-out/graph.json",
+        "graphify-out/manifest.json",
+        ".git"
+      ],
+      "fixture_matrix_cases": [
+        "F01_v172_project_all_current",
+        "F02_global_all_current",
+        "F03_v172_per_skill_plus_summary",
+        "F04_explicit_zero_updated",
+        "F05_global_found_refreshing_completed",
+        "F06_refreshing_without_completion_fails",
+        "F07_ambiguous_only_no_current",
+        "F08_ambiguous_with_explicit_current",
+        "F09_numeric_summary_with_counts",
+        "F10_partial_mutation_then_failure",
+        "F11_stderr_fatal_error",
+        "F12_timeout_124",
+        "F13_unrecognized_exit_zero"
+      ]
+    }
+  },
+  "evidence_hashes": {
+    "src/shb_schedule/workflows/workstation_update.py": "sha256:87efe3a855c522acb9787ca76039bb421db39d199b9796814aec88e74d4f6522",
+    "tests/test_workstation_update_workflow.py": "sha256:650f18da4b4caac43305f316d413e04d93fecdf17c381abcd32189c0deaecc59"
+  },
+  "exclusions": [
+    ".env",
+    "*.pem",
+    "*.key",
+    "id_rsa*",
+    "id_ed25519*",
+    "omniroute_data",
+    "docker_volumes",
+    "credentials",
+    "secrets",
+    "graphify-out/.graphify_labels.json",
+    "graphify-out/.graphify_labels.json.sig",
+    "graphify-out/GRAPH_REPORT.md",
+    "graphify-out/graph.json",
+    "graphify-out/manifest.json",
+    ".git"
+  ],
+  "authorization": {
+    "scope_authorized": true,
+    "approved_by": "operator",
+    "approval_token_or_reason": "OpenSpec change reconcile-ponytail-agent-skills Tasks 2.1-2.2 bounded external repository execution gate for shb-schedule step_skills_refresh",
+    "target_root_approved": true
+  },
+  "status": "COMPLETED"
+}

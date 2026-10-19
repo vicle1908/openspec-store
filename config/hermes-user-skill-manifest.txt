@@ -1,0 +1,9 @@
+# Shared workspace skills exposed through ~/.hermes/skills for native Hermes user-scope discovery.
+# Keep the list intentional; canonical content stays in ~/Developer/.agents/skills.
+# Ponytail official agent skills (upstream: DietrichGebert/ponytail).
+ponytail
+ponytail-audit
+ponytail-debt
+ponytail-gain
+ponytail-help
+ponytail-review
