@@ -10,7 +10,7 @@ Declared in `config/workstation-sanctioned-locations.tsv`:
 - `/opt/homebrew`: The system package manager prefix.
 - `~/.local/share`: Language and runtime tool managers (`uv`, `mise`, etc.).
 
-Any installation in an unscoped directory (such as `~/.local/lib/node_modules`) is classified as unsanctioned.
+Any installation in an unscoped directory (such as `~/.local/lib/node_modules` (`adhoc-local`) or `~/node_modules` (`adhoc-home`)) is classified as unsanctioned.
 
 ## 2. Declared npm Global Prefix & Reconciliation
 Because `node` is installed via Homebrew, npm's built-in default prefix is `/opt/homebrew`. If `~/.npmrc` does not explicitly set `prefix`, `npm install -g` places packages into `/opt/homebrew/lib/node_modules`, while maintenance scripts installing with `--prefix ~/.npm-global` place them into `~/.npm-global`.
@@ -21,6 +21,8 @@ Because `node` is installed via Homebrew, npm's built-in default prefix is `/opt
   ```
 - **Declarative Fix**: Add `prefix = /Users/androidteam/.npm-global` to `~/.npmrc`.
 - **Rollback**: Remove the `prefix` line from `~/.npmrc`.
+- **Home-Directory Prefix Hijack Detection**: `PrefixReconciliation` in `scripts/inventory-workstation-toolchain.py` evaluates `home_prefix_hijacked` and `home_forbidden_artifacts` by checking `$HOME` for forbidden package-manager artifacts (`package.json`, `package-lock.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `bun.lock`, `bun.lockb`, `yarn.lock`, `node_modules`) and verifying whether `npm prefix` executed in `~/Developer` resolves to `$HOME`. If any forbidden `$HOME` artifact exists or `npm prefix` in `~/Developer` resolves to `$HOME`, `home_prefix_hijacked` is `True`, `has_split` is `True`, and `status` is reported as `split_detected` (`Status:                      SPLIT_DETECTED`).
+- **Global npm Audit (`EAUDITGLOBAL`)**: Although `npm update -g` prints a quick-audit summary (`run npm audit fix`) via `Arborist.reify()`, `npm audit -g` fails by design with `EAUDITGLOBAL`. Global npm packages (including `@agentmemory/agentmemory@0.9.30` and `happy@1.2.5`, which carry upstream transitive advisories) must be audited per-package in isolated temporary lockfiles rather than running `npm audit` or `npm audit fix` in `~/Developer`.
 
 ## 3. Preferred Sources and Name Collisions
 Where Homebrew provides a formula or cask, that channel is preferred over unsigned downloads or ad-hoc wrappers:

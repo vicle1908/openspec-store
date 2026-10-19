@@ -61,6 +61,7 @@ def check_inventory_reconciliation(manifest_path: Path | None = None) -> dict[st
         if not inv_mod:
             return {"status": "FAIL", "details": "Could not load inventory script"}
 
+        prefix_res = inv_mod.check_prefix_reconciliation("~/.npm-global")
         inventory = inv_mod.inventory_tools()
         auth_recon = inv_mod.evaluate_authority_and_drift("~/.npm-global")
         manifest_res = inv_mod.reconcile_with_manifest(str(manifest_p), inventory, auth_recon.items)
@@ -72,18 +73,33 @@ def check_inventory_reconciliation(manifest_path: Path | None = None) -> dict[st
         drift_count = manifest_res.get("drift_count", 0)
         missing_count = manifest_res.get("missing_count", 0)
         dup_count = manifest_res.get("duplicate_count", 0)
+        unsanc_count = manifest_res.get("unsanctioned_count", 0)
+        has_failure = (
+            manifest_res.get("status") != "aligned"
+            or drift_count > 0
+            or missing_count > 0
+            or unsanc_count > 0
+            or prefix_res.has_split
+        )
 
         return {
-            "status": "PASS",
+            "status": "FAIL" if has_failure else "PASS",
             "manifest_file": str(manifest_p),
             "declared_tools_count": declared_count,
             "aligned_count": aligned_count,
             "drift_count": drift_count,
             "missing_count": missing_count,
             "duplicate_count": dup_count,
+            "unsanctioned_count": unsanc_count,
+            "prefix_reconciliation": {
+                "status": prefix_res.status,
+                "has_split": prefix_res.has_split,
+                "home_prefix_hijacked": prefix_res.home_prefix_hijacked,
+                "home_forbidden_artifacts": prefix_res.home_forbidden_artifacts,
+            },
             "summary": manifest_res.get("summary", {}),
             "proposes_deletion": False,
-            "details": f"Reconciled {declared_count} declared tools ({aligned_count} aligned, {drift_count} drift, {missing_count} missing)",
+            "details": f"Reconciled {declared_count} declared tools ({aligned_count} aligned, {drift_count} drift, {missing_count} missing, {unsanc_count} unsanctioned, prefix={prefix_res.status})",
         }
     except Exception as e:
         return {

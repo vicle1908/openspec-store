@@ -84,7 +84,7 @@ class TestProductionAuthoritativeCopyDuplication(unittest.TestCase):
             self.assertTrue(newman_item.copies[0].is_authoritative, "copies[0] must be authoritative copy")
             self.assertEqual(newman_item.copies[0].owning_manager, "brew")
             self.assertFalse(newman_item.copies[1].is_authoritative)
-            self.assertEqual(newman_item.copies[1].owning_manager, "home-toolchain")
+            self.assertIn(newman_item.copies[1].owning_manager, ("home-toolchain", "adhoc-home"))
         else:
             self.assertEqual(len(newman_item.copies), 1)
             self.assertTrue(newman_item.copies[0].is_authoritative, "copies[0] must be authoritative copy")
@@ -420,6 +420,67 @@ class TestDiscoveryPathNormalization(unittest.TestCase):
         brew_bin_idx = parts.index("/opt/homebrew/bin")
         hermes_idx = parts.index("/Users/androidteam/.hermes/node/bin")
         self.assertLess(brew_bin_idx, hermes_idx)
+
+
+class TestHomePrefixHijackReconciliation(unittest.TestCase):
+    def test_clean_home_dir_reports_not_hijacked(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            home_dir = Path(tmp) / "home"
+            ws_dir = home_dir / "Developer"
+            ws_dir.mkdir(parents=True)
+            rec = inv.check_prefix_reconciliation(
+                "~/.npm-global", home_dir=home_dir, workspace_dir=ws_dir
+            )
+            self.assertFalse(rec.home_prefix_hijacked)
+            self.assertEqual(rec.home_forbidden_artifacts, [])
+            self.assertFalse(rec.has_split)
+            self.assertEqual(rec.status, "reconciled")
+
+    def test_dirty_home_dir_with_node_modules_and_lockfile_reports_hijacked(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            home_dir = Path(tmp) / "home"
+            ws_dir = home_dir / "Developer"
+            ws_dir.mkdir(parents=True)
+            (home_dir / "node_modules").mkdir()
+            (home_dir / "pnpm-lock.yaml").write_text("lockfileVersion: '9.0'\n")
+            rec = inv.check_prefix_reconciliation(
+                "~/.npm-global", home_dir=home_dir, workspace_dir=ws_dir
+            )
+            self.assertTrue(rec.home_prefix_hijacked)
+            self.assertEqual(rec.home_forbidden_artifacts, ["pnpm-lock.yaml", "node_modules"])
+            self.assertTrue(rec.has_split)
+            self.assertEqual(rec.status, "split_detected")
+
+    def test_unsanctioned_adhoc_home_copy_reported_with_sanctioned_replacement(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            home_dir = Path(tmp) / "home"
+            (home_dir / "node_modules" / "gitnexus").mkdir(parents=True)
+            (home_dir / "node_modules" / "@usebruno" / "cli").mkdir(parents=True)
+            items = inv.inventory_tools(home_dir=home_dir)
+            gn_item = next((i for i in items if i.name == "gitnexus"), None)
+            bru_item = next((i for i in items if i.name == "bru"), None)
+            self.assertIsNotNone(gn_item)
+            self.assertIsNotNone(bru_item)
+            gn_adhoc = next((c for c in gn_item.copies if c.owning_manager == "adhoc-home"), None)
+            bru_adhoc = next((c for c in bru_item.copies if c.owning_manager == "adhoc-home"), None)
+            self.assertIsNotNone(gn_adhoc)
+            self.assertFalse(gn_adhoc.is_sanctioned)
+            self.assertTrue(gn_adhoc.sanctioned_replacement.endswith("/.npm-global/lib/node_modules"))
+            self.assertIsNotNone(bru_adhoc)
+            self.assertFalse(bru_adhoc.is_sanctioned)
+            self.assertTrue(bru_adhoc.sanctioned_replacement.endswith("/.local/share/home-toolchain/node_modules"))
+            manifest_res = inv.reconcile_with_manifest(inventory_items=items)
+            self.assertEqual(manifest_res["status"], "drift")
+            self.assertGreaterEqual(manifest_res["unsanctioned_count"], 2)
+            self.assertIn("gitnexus", manifest_res["summary"]["unsanctioned"])
+            self.assertIn("bru", manifest_res["summary"]["unsanctioned"])
+
 
 if __name__ == "__main__":
     unittest.main()

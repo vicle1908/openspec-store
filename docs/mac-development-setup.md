@@ -21,9 +21,10 @@ Every development CLI is governed by exactly one authoritative installation owne
 | **GitNexus** | npm Registry | npm Global Prefix (`~/.npm-global`) | `npm --prefix "$HOME/.npm-global" install --global gitnexus@latest` | `gitnexus --version && gitnexus status` | **npm Global Exception**. Distributed via npm; compiles native `@ladybugdb/core` bindings into explicit user prefix. |
 | **OpenSpec** | npm Registry | npm Global Prefix (`~/.npm-global`) | `npm --prefix "$HOME/.npm-global" install --global @fission-ai/openspec` | `openspec --version` | **npm Global Authoritative Owner**. Governed under `~/.npm-global/bin/openspec`. |
 | **Newman** | Homebrew Formula | `brew "newman"` | `brew upgrade newman` | `newman --version` | **Homebrew Formula**. Authoritative package and update owner at `/opt/homebrew/bin/newman`. |
-| **Bruno** | Pinned JS Toolbelt | Isolated Toolchain | npm in isolated root | `bru --version` | **Isolated Toolchain Exception**. Active verified at 4.2.0 via `~/.local/bin/bru -> ~/.local/share/home-toolchain/node_modules/.bin/bru`. Target 4.2.1 is declared/desired, not current. Package upgrade requires operator authorization. |
+| **Bruno** | Pinned JS Toolbelt | Isolated Toolchain | npm in isolated root | `bru --version` | **Isolated Toolchain Exception**. Active verified at 4.2.1 via `~/.local/bin/bru -> ~/.local/share/home-toolchain/node_modules/.bin/bru` (alongside `yaml-language-server` 2.0.0, `newman-reporter-htmlextra` 1.23.1, and `pyright` 1.1.414). |
 | **Muse Code** | Official Cask | `cask "muse-code"` | `brew upgrade --cask muse-code` | `muse --version` | **Official Homebrew Cask**. Meta Muse Code CLI assistant installed via Homebrew Cask. |
 | **Qwen Code** | Homebrew Formula | `brew "qwen-code"` | `brew upgrade qwen-code` | `qwen --version` | **Homebrew Formula**. Qwen Code CLI installed via `qwen-code` formula. |
+| **Herdr** | Homebrew Formula | `brew "herdr"` | `brew upgrade herdr` | `herdr --version && herdr status` | **Homebrew Formula**. Terminal multiplexer and runtime for AI coding agents (`v0.9.5+`). Supervised via `homebrew.mxcl.herdr.plist`. |
 | **Hermes Agent** | Standalone Installer | Vendor Standalone | `hermes update` | `hermes --version` | **Standalone Exception**. Standalone runtime in `~/.hermes` and `~/.local/bin/hermes-agent`. |
 | **Notion CLI** | Standalone Binary | Vendor Standalone | `ntn update` | `ntn --version` | **Standalone Exception**. Managed standalone binary in `~/.local/bin/ntn`. |
 | **Google Workspace CLI** | Homebrew Formula | `brew "googleworkspace-cli"` | `brew upgrade googleworkspace-cli` | `gws --version` | **Homebrew Formula**. Google Workspace CLI (`gws`). |
@@ -134,6 +135,7 @@ npm --prefix "$HOME/.npm-global" install --global gitnexus@latest
 - Active binary: `~/.npm-global/bin/gitnexus`
 - Update command: `npm --prefix "$HOME/.npm-global" install --global gitnexus@latest`
 - Verification: `gitnexus --version && gitnexus status`
+- **Global npm Audit Semantics (`EAUDITGLOBAL`)**: During `npm update -g`, `Arborist.reify()` submits a quick audit of `~/.npm-global/lib/node_modules` and prints `run npm audit fix`, whereas `npm audit -g` fails by npm design with `EAUDITGLOBAL`. Never run `npm audit fix` in `~/Developer` (or `$HOME`); global packages (`@agentmemory/agentmemory@0.9.30` and `happy@1.2.5`, which carry upstream transitive advisories) must be audited per-package in isolated temporary lockfiles, and `~/.npm-global/bin` / `~/.npm-global/lib/node_modules` must remain free of retired `.bin-HASH` dot-symlinks and empty `@scope` directories.
 
 ### Newman & Bruno (Isolated Toolbelt)
 ```bash
@@ -149,25 +151,24 @@ npm ci --no-audit --no-fund
 1. **Newman (v6.2.3)**:
    - **Authoritative Owner**: Homebrew Formula (`brew "newman"`).
    - **Active Host Resolution**: `/opt/homebrew/bin/newman` (v6.2.3 in Cellar). Authoritative package and update owner.
-   - **De-duplication**: The duplicate unlinked copy under `~/.local/share/home-toolchain/node_modules/newman` (legacy 6.2.2) has been pruned via `npm prune --omit=peer`, leaving a single authoritative binary on `$PATH`.
+   - **De-duplication**: `newman` is not declared as a direct dependency in `~/.local/share/home-toolchain/package.json` (`~/.local/share/home-toolchain/node_modules/newman` v6.2.3 is installed automatically only as an unlinked peer dependency of `newman-reporter-htmlextra@1.23.1`), leaving `/opt/homebrew/bin/newman` as the single authoritative binary on `$PATH`.
    - **Read-Only Verification**:
      ```bash
      which -a newman
      /opt/homebrew/bin/newman --version
      ```
-2. **Bruno (v4.2.0 Active vs. v4.2.1 Declared Target)**:
-   - **Declared Target**: `@usebruno/cli` 4.2.1 (intended/target version).
-   - **Active Host Resolution**: `~/.local/bin/bru` -> `~/.local/share/home-toolchain/node_modules/.bin/bru` (v4.2.0).
-   - **Target vs. Current Distinction**: Target is 4.2.1; active installed version is 4.2.0 as locked in `~/.local/share/home-toolchain/package-lock.json`. 4.2.1 is NOT currently installed on the host.
+2. **Bruno (v4.2.1 Active) & Isolated Toolbelt (`~/.local/share/home-toolchain`)**:
+   - **Declared & Active Target**: `@usebruno/cli` 4.2.1 (and `yaml-language-server` 2.0.0, `newman-reporter-htmlextra` 1.23.1, `pyright` 1.1.414, plus peer `newman` 6.2.3).
+   - **Active Host Resolution**: `~/.local/bin/bru` -> `~/.local/share/home-toolchain/node_modules/.bin/bru` (v4.2.1), and `~/.local/bin/yaml-language-server` -> `~/.local/share/home-toolchain/node_modules/.bin/yaml-language-server` (v2.0.0).
    - **Read-Only Verification**:
      ```bash
      which -a bru
      realpath ~/.local/bin/bru
      /Users/androidteam/.local/share/home-toolchain/node_modules/.bin/bru --version
      /Users/androidteam/.local/bin/bru --version
+     /Users/androidteam/.local/bin/yaml-language-server --version
      ```
-   - **Parent Decision & Operator Gate**: Upgrading to 4.2.1 requires an operator-approved package update (`npm install @usebruno/cli@4.2.1` in `~/.local/share/home-toolchain`) and lockfile change. In-place package mutations without explicit approval are forbidden.
-
+   - **Parent Decision & Operator Gate**: Package updates in `~/.local/share/home-toolchain` require operator-approved lockfile updates (`npm update`). In-place package mutations without explicit approval are forbidden.
 ### Prime Agent (Local Dev Exception)
 - Active entry point: `/opt/homebrew/bin/prime-agent` (Node.js script entry point; verified v0.9.8)
 - Verification: `prime-agent --version`
@@ -341,6 +342,23 @@ brew services stop redis
   ```
   Follow with `git -C ~/.agentmemory/snapshots fsck --no-dangling` during the maintenance window to confirm complete pack integrity.
 
+
+### Herdr Multiplexer Daemon & HerdrChat Notifier Supervision
+- **Herdr Server (`homebrew.mxcl.herdr`)**:
+  - Supervised via `~/Library/LaunchAgents/homebrew.mxcl.herdr.plist` executing `/opt/homebrew/opt/herdr/bin/herdr server` over Unix domain socket `~/.config/herdr/herdr.sock`.
+  - `EnvironmentVariables.PATH` in `homebrew.mxcl.herdr.plist` must include `$HOME/.local/bin:$HOME/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin` so background pane commands resolve Homebrew and user-local binaries deterministically.
+  - Runtime configuration in `~/.config/herdr/config.toml` sets `onboarding = false` and `[session] resume_agents_on_restore = true`; reload live via `herdr server reload-config`.
+- **macOS TCC Responsible-Process Coalition Attribution**:
+  - Because `herdr server` owns the PTY master/slave descriptors for all managed panes, macOS `launchd` assigns `responsible path = /opt/homebrew/Cellar/herdr/<version>/bin/herdr` to every interactive shell (`-zsh`) and coding agent running inside a Herdr pane (`HERDR_ENV=1`).
+  - Consequently, `/opt/homebrew/Cellar/herdr/<version>/bin/herdr` must hold `auth_value = 2` in `/Library/Application Support/com.apple.TCC/TCC.db` across `kTCCServiceAccessibility`, `kTCCServiceScreenCapture`, and `kTCCServiceSystemPolicyAllFiles`, with `3026-01-01 00:00:00 +0000` recorded in `~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist`.
+  - Because the Homebrew `herdr` bottle is ad-hoc linker-signed (`flags=0x20002`), every `brew upgrade herdr` changes its Cellar path and `CDHash`; `"herdr"` is registered in `CANONICAL_TCC_CLIS` across `shb-schedule` and `workstation-daily-update.sh` to detect post-upgrade TCC drift automatically.
+- **HerdrChat Companion Notifier (`dev.herdr.herdrchat-notifier`)**:
+  - Supervised via `~/Library/LaunchAgents/dev.herdr.herdrchat-notifier.plist` executing `/opt/homebrew/bin/python3 ~/.local/share/herdrchat/herdr-notifier.py` (`WATCHER_VERSION = 5`) under Homebrew Python (`org.python.python`).
+  - Polls `herdr api snapshot` every 2 seconds and tails Claude (`~/.claude/projects/`) and Codex (`~/.codex/sessions/`) JSONL transcripts to dispatch APNs push notifications (`api.push.apple.com`). Both `org.python.python` and the resolved Homebrew Python `realpath` hold `auth_value = 2` in `TCC.db`.
+- **Built-in Agent Integrations & Official Skill**:
+  - Install lifecycle and session-restore hooks across all 16 provisioned coding agent directories (`pi`, `omp`, `claude`, `codex`, `copilot`, `devin`, `droid`, `kimi`, `opencode`, `kilo`, `hermes`, `qodercli`, `qwen`, `cursor`, `antigravity-cli`, `grok`) via `herdr integration install <target>` and verify with `herdr integration status`.
+  - Keep `PI_CODING_AGENT_DIR` and `PI_CONFIG_DIR` unset in shell startup files so `pi` (`~/.pi/agent/extensions/herdr-agent-state.ts`) and `omp` (`~/.omp/agent/extensions/herdr-omp-agent-state.ts`) maintain separate extension directories.
+  - Synchronize the official `herdr` skill (`herdr --skill`, enforcing the `test "${HERDR_ENV:-}" = 1` caller guard) via `config/claude-user-skill-manifest.txt`, `config/codex-user-skill-manifest.txt`, and `python3 scripts/sync-workspace-agent-skills.py`.
 ---
 
 ## 8. Notion Knowledge Mirror Documentation
@@ -373,6 +391,7 @@ When migrating or verifying a secondary machine:
    node --version && npm --version
    pnpm --version
    uv --version
+   herdr --version && herdr status && herdr integration status
    qoder --version
    gitnexus --version && gitnexus status
    which -a newman bru
@@ -385,6 +404,6 @@ When migrating or verifying a secondary machine:
    ```
 5. Confirm zero duplicate binary resolution via `which -a <tool>`.
    *Note on Brewfile Casks & Formulae:* On any target Mac, `brew bundle install` provisions declared casks (including `cask "codex"`) and formulae (including `brew "bun"`). Verify binary receipts (`brew list --cask`, `brew list --formula`) and active paths (`which -a codex bun`) to confirm clean Homebrew resolution without uncoordinated package manager duplicates.
-   *Note on Newman & Bruno Toolchain State:* Active `newman` resolves to Homebrew Formula `/opt/homebrew/bin/newman` (6.2.3), with duplicate npm toolchain copies pruned. Active `bru` resolves via `~/.local/bin/bru` to isolated `~/.local/share/home-toolchain/node_modules/.bin/bru` at 4.2.0 (desired target 4.2.1 pending operator-authorized upgrade).
+   *Note on Newman & Bruno Toolchain State:* Active `newman` resolves to Homebrew Formula `/opt/homebrew/bin/newman` (6.2.3). Active `bru` resolves via `~/.local/bin/bru` to isolated `~/.local/share/home-toolchain/node_modules/.bin/bru` at 4.2.1 (alongside `yaml-language-server` at 2.0.0).
 6. Verification Semantics:
    A unified verification PASS indicates that the read-only inspection protocol was executed successfully and declared manifests align without tool invocation errors. Any future host mutations, duplicate removals, or service changes require explicit operator authorization and verified read-back checks.

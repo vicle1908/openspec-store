@@ -177,7 +177,7 @@ The workstation maintenance engine SHALL discover outdated Mac App Store applica
 
 ### Requirement: Global package ecosystems SHALL maintain initialized manifests and non-interactive update paths
 
-All global package managers (NPM, Bun, and UV) SHALL maintain valid global manifests and SHALL execute upgrades dynamically using sanitized identifiers without hardcoded package lists or clobbering pinned coding agent binaries.
+All global package managers (NPM, Bun, and UV) SHALL maintain valid global manifests, SHALL execute upgrades dynamically using sanitized identifiers without hardcoded package lists or clobbering pinned coding agent binaries, SHALL keep `~/.npm-global/bin` and `~/.npm-global/lib/node_modules` free of orphaned `.bin-HASH` retired symlinks and empty `@scope` directories, and SHALL document that `npm audit -g` is unsupported (`EAUDITGLOBAL`) despite `npm update -g` printing a quick-audit summary.
 
 #### Scenario: Bun global manifest initialization
 - **WHEN** Bun global packages are audited or updated
@@ -198,7 +198,10 @@ All global package managers (NPM, Bun, and UV) SHALL maintain valid global manif
 - **AND** it SHALL filter out all tools declared in the authoritative deny and pinned agent rosters (`codex`, `claude`, `pi`, `kilo`)
 - **AND** only non-governed packages SHALL be upgraded via `npm install -g -- "$PKG@latest"`
 
----
+#### Scenario: NPM global prefix directory hygiene and EAUDITGLOBAL documentation
+- **WHEN** `~/.npm-global/bin` and `~/.npm-global/lib/node_modules` are inspected after global npm maintenance
+- **THEN** no dangling retired `.bin-HASH` dot-symlinks (such as `.amp-*`, `.dgrep-*`, `.tsc-*`) SHALL remain in `~/.npm-global/bin` and no empty `@*` scope directories SHALL remain in `~/.npm-global/lib/node_modules`
+- **AND** workstation runbook and audit evidence SHALL record that `npm audit -g` fails by npm design with `EAUDITGLOBAL` and that global package trees (`@agentmemory/agentmemory` and `happy`) MUST be audited per-package in isolated temporary lockfiles rather than by running `npm audit fix` in `~/Developer`
 
 ### Requirement: Scheduled maintenance SHALL execute via durable workflow with discrete step recovery, strict isolation, and structured telemetry
 

@@ -104,8 +104,8 @@ classify_refresh() {
   local clean="$1" rc="${2:-0}"
   local drift=0 refreshed=0 already=0 ambiguous=0 failed=0
 
-  # Drift available BEFORE mutation.
-  if grep -qE 'Found [0-9]+ (global )?update|Refreshing [0-9]+ skill' <<<"$clean"; then
+  # Drift available BEFORE mutation (v1.7.0 'Found/Refreshing', v1.7.2 'Updated').
+  if grep -qE 'Found [0-9]+ (global )?update|Refreshing [0-9]+ skill|Updated [0-9]+ skill|^[[:space:]]*✓ Updated ' <<<"$clean"; then
     drift=1
   fi
 
@@ -125,7 +125,7 @@ classify_refresh() {
   # Failure: nonzero exit, or no recognizable summary of any kind.
   if (( rc != 0 )); then
     failed=1
-  elif ! grep -qE 'Updated [0-9]+ skill|Found [0-9]+ (global )?update|Refreshing [0-9]+ skill|Multiple current paths match|^[[:space:]]*✓ Updated ' <<<"$clean"; then
+  elif ! grep -qE 'Updated [0-9]+ skill|Found [0-9]+ (global )?update|Refreshing [0-9]+ skill|Multiple current paths match|^[[:space:]]*✓ Updated |All (project )?skills are up to date|project skill\(s\) already[[:space:]]+up to date' <<<"$clean"; then
     failed=1
   fi
 
@@ -199,7 +199,7 @@ pi:Pi:update --self
 kimi:Kimi Code:update
 ntn:Notion CLI:ntn update"
 
-AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent happy cursor-agent hermes-agent buzz cce kilo muse qwen"
+AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent happy cursor-agent hermes-agent buzz cce kilo muse qwen herdr"
 
 # Update every covered agent CLI that is installed; report the declared set and
 # any installed agent CLI left uncovered. Each updater is time-bounded.
@@ -422,7 +422,7 @@ verify_tcc_provenance() {
 import os, sys, shutil, sqlite3
 from pathlib import Path
 
-CANONICAL_TCC_CLIS = ("omp", "node", "opencode", "goose", "claude", "kimi")
+CANONICAL_TCC_CLIS = ("omp", "node", "opencode", "goose", "claude", "kimi", "herdr")
 REQUIRED_TCC_SERVICES = ("kTCCServiceAccessibility", "kTCCServiceScreenCapture")
 
 tcc_db = Path("/Library/Application Support/com.apple.TCC/TCC.db")

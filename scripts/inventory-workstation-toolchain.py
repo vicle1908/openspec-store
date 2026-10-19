@@ -47,7 +47,7 @@ def normalize_discovery_path(raw_path: str | None = None, brew_dirs: list[str] |
 
     def _is_lower(p: str) -> bool:
         norm = os.path.normpath(p)
-        return norm in ("/usr/bin", "/bin", "/usr/sbin", "/sbin") or "/.hermes/" in norm
+        return norm in ("/usr/bin", "/bin", "/usr/sbin", "/sbin") or "/.hermes/" in norm or "/.venv/" in norm or norm.endswith("/.venv/bin")
 
     lower_indices = [i for i, p in enumerate(parts) if _is_lower(p)]
     first_lower = lower_indices[0] if lower_indices else len(parts)
@@ -119,11 +119,13 @@ def format_bytes(n: int) -> str:
 @dataclass
 class ToolCopy:
     location_path: str
-    owning_manager: str  # 'npm-global', 'brew-cask', 'brew-formula', 'home-toolchain', 'adhoc'
+    owning_manager: str  # 'npm-global', 'brew-cask', 'brew-formula', 'home-toolchain', 'adhoc-local', 'adhoc-home'
     size_bytes: int
     size_human: str
     is_authoritative: bool
     is_symlinked_from_brew_bin: bool
+    is_sanctioned: bool = True
+    sanctioned_replacement: str | None = None
 
 
 @dataclass
@@ -139,6 +141,7 @@ class ToolInventoryItem:
     estimated_reclaimable_bytes: int = 0
     estimated_reclaimable_human: str = "0 B"
     proposes_deletion: bool = False
+    unsanctioned_copies: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -148,7 +151,8 @@ class PrefixReconciliation:
     declared_prefix: str
     has_split: bool
     status: str
-
+    home_prefix_hijacked: bool = False
+    home_forbidden_artifacts: list[str] = field(default_factory=list)
 
 @dataclass
 class ToolAuthorityItem:
@@ -186,18 +190,58 @@ class AuthorityReconciliation:
     items: list[ToolAuthorityItem] = field(default_factory=list)
     scheduled_writers: dict[str, Any] = field(default_factory=dict)
 
-def check_prefix_reconciliation(declared_prefix: str) -> PrefixReconciliation:
+FORBIDDEN_HOME_ARTIFACTS = (
+    "package.json",
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "bun.lock",
+    "bun.lockb",
+    "yarn.lock",
+    "node_modules",
+)
+
+
+def check_prefix_reconciliation(
+    declared_prefix: str,
+    home_dir: Path | None = None,
+    workspace_dir: Path | None = None,
+) -> PrefixReconciliation:
     try:
         res = subprocess.run(["npm", "config", "get", "prefix"], capture_output=True, text=True, check=True)
         npm_prefix = res.stdout.strip()
     except Exception:
         npm_prefix = "unknown"
 
+    home_p = (home_dir or Path.home()).resolve()
+    ws_p = (workspace_dir or (home_p / "Developer")).resolve()
+
+    forbidden_found = [
+        name for name in FORBIDDEN_HOME_ARTIFACTS if os.path.lexists(home_p / name)
+    ]
+
+    prefix_resolves_to_home = False
+    if ws_p.is_dir() and ws_p != home_p:
+        try:
+            ws_res = subprocess.run(
+                ["npm", "prefix"], cwd=str(ws_p), capture_output=True, text=True
+            )
+            if ws_res.returncode == 0 and ws_res.stdout.strip():
+                prefix_resolves_to_home = Path(ws_res.stdout.strip()).resolve() == home_p
+        except Exception:
+            pass
+
+    home_prefix_hijacked = bool(forbidden_found) or prefix_resolves_to_home
+
     pipeline_prefix = str(Path(os.path.expanduser("~/.npm-global")).resolve())
     declared_resolved = str(Path(os.path.expanduser(declared_prefix)).resolve())
     npm_resolved = str(Path(os.path.expanduser(npm_prefix)).resolve()) if npm_prefix != "unknown" else "unknown"
 
-    has_split = (npm_resolved != declared_resolved) or (npm_resolved != pipeline_prefix)
+    has_split = (
+        (npm_resolved != declared_resolved)
+        or (npm_resolved != pipeline_prefix)
+        or home_prefix_hijacked
+    )
     status = "split_detected" if has_split else "reconciled"
 
     return PrefixReconciliation(
@@ -206,6 +250,8 @@ def check_prefix_reconciliation(declared_prefix: str) -> PrefixReconciliation:
         declared_prefix=declared_prefix,
         has_split=has_split,
         status=status,
+        home_prefix_hijacked=home_prefix_hijacked,
+        home_forbidden_artifacts=forbidden_found,
     )
 
 def is_path_sanctioned(p: Path) -> bool:
@@ -376,6 +422,7 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
         "droid",
         "muse",
         "qwen",
+        "herdr",
     ]
 
     documented_channels_map = {
@@ -456,6 +503,10 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
         ],
         "qwen": [
             "brew-formula: qwen-code",
+        ],
+        "herdr": [
+            "brew-formula: herdr",
+            "vendor_download: standalone installer (https://herdr.dev/install.sh)",
         ],
     }
 
@@ -969,7 +1020,7 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
             consequence = None
             compatible_command = None
 
-        elif name in ("goose", "newman", "qwen"):
+        elif name in ("goose", "newman", "qwen", "herdr"):
             authority = "brew-formula"
             writer = "brew"
             updater_dispatch = "none"
@@ -1204,8 +1255,8 @@ def audit_scheduled_writers() -> dict[str, Any]:
         "candidate_writers": candidate_writers,
     }
 
-def inventory_tools() -> list[ToolInventoryItem]:
-    home = Path.home()
+def inventory_tools(home_dir: Path | None = None) -> list[ToolInventoryItem]:
+    home = (home_dir or Path.home()).resolve()
 
     # Target search roots
     locations = {
@@ -1213,6 +1264,7 @@ def inventory_tools() -> list[ToolInventoryItem]:
         "homebrew": Path("/opt/homebrew/lib/node_modules"),
         "home-toolchain": home / ".local" / "share" / "home-toolchain" / "node_modules",
         "adhoc-local": home / ".local" / "lib" / "node_modules",
+        "adhoc-home": home / "node_modules",
     }
 
     # Tools to evaluate
@@ -1239,6 +1291,7 @@ def inventory_tools() -> list[ToolInventoryItem]:
         "kimi",
         "droid",
         "muse",
+        "herdr",
     ]
 
     preferred_sources = {
@@ -1262,6 +1315,7 @@ def inventory_tools() -> list[ToolInventoryItem]:
         "kimi": ("vendor_download: official Moonshot AI standalone installer", True),
         "prime-agent": ("none (official R2 Mach-O channel)", False),
         "happy": ("none", False),
+        "herdr": ("formula herdr", True),
     }
 
     name_collisions = {
@@ -1340,6 +1394,15 @@ def inventory_tools() -> list[ToolInventoryItem]:
                         except Exception:
                             pass
 
+                    is_sanc = loc_name not in ("adhoc-local", "adhoc-home")
+                    sanc_repl: str | None = None
+                    if not is_sanc:
+                        if tool_name in ("bru", "pyright", "yaml-language-server", "newman-reporter-htmlextra"):
+                            sanc_repl = str(home / ".local" / "share" / "home-toolchain" / "node_modules")
+                        elif tool_name == "newman":
+                            sanc_repl = "/opt/homebrew/bin/newman"
+                        else:
+                            sanc_repl = str(home / ".npm-global" / "lib" / "node_modules")
                     copies.append(
                         ToolCopy(
                             location_path=str(candidate),
@@ -1348,6 +1411,8 @@ def inventory_tools() -> list[ToolInventoryItem]:
                             size_human=format_bytes(sz),
                             is_authoritative=is_auth,
                             is_symlinked_from_brew_bin=is_symlink_target,
+                            is_sanctioned=is_sanc,
+                            sanctioned_replacement=sanc_repl,
                         )
                     )
 
@@ -1373,7 +1438,7 @@ def inventory_tools() -> list[ToolInventoryItem]:
                 pass
         has_dups = len(copies) > 1
         est_reclaim = sum(c.size_bytes for c in copies if not c.is_authoritative) if has_dups else 0
-
+        unsanc_paths = [c.location_path for c in copies if not c.is_sanctioned]
         results.append(
             ToolInventoryItem(
                 name=tool_name,
@@ -1387,6 +1452,7 @@ def inventory_tools() -> list[ToolInventoryItem]:
                 estimated_reclaimable_bytes=est_reclaim,
                 estimated_reclaimable_human=format_bytes(est_reclaim),
                 proposes_deletion=False,
+                unsanctioned_copies=unsanc_paths,
             )
         )
 
@@ -1440,9 +1506,9 @@ def reconcile_with_manifest(
     optional_skipped: list[dict[str, Any]] = []
     rust_dev_tools = set(manifest_data.get("profiles", {}).get("rust-dev", ["rustup", "cargo"]))
     duplicate: list[dict[str, Any]] = []
+    unsanctioned: list[dict[str, Any]] = []
     obsolete_candidate: list[dict[str, Any]] = []
     unknown: list[dict[str, Any]] = []
-
     # Check each declared tool against observed host resolution
     for tool_name, t_meta in declared_tools.items():
         active_bin = shutil.which(tool_name)
@@ -1459,7 +1525,7 @@ def reconcile_with_manifest(
                 "reclaimable_human": inv_item.estimated_reclaimable_human,
                 "copies": [c.location_path for c in inv_item.copies],
             })
-
+        # Unsanctioned copies are collected across all inventory items below
         if not active_bin:
             if expected_path and Path(expected_path).is_file():
                 active_bin = expected_path
@@ -1532,6 +1598,36 @@ def reconcile_with_manifest(
                 "consequence": f"Active path {resolved_active} does not match declared owner {owner}",
             })
 
+    # Collect unsanctioned copies across all inventoried tools (declared or not)
+    seen_unsanc_paths: set[str] = set()
+    for inv_name, inv_item in inv_map.items():
+        if inv_item.unsanctioned_copies:
+            for c in inv_item.copies:
+                if not c.is_sanctioned and c.location_path not in seen_unsanc_paths:
+                    seen_unsanc_paths.add(c.location_path)
+                    unsanctioned.append({
+                        "name": inv_name,
+                        "unsanctioned_path": c.location_path,
+                        "owning_manager": c.owning_manager,
+                        "sanctioned_replacement": c.sanctioned_replacement,
+                    })
+
+    # Also check isolated toolbelt packages in adhoc-home / adhoc-local without inflating unknown_count
+    for adhoc_mgr, adhoc_root in (
+        ("adhoc-local", home / ".local" / "lib" / "node_modules"),
+        ("adhoc-home", home / "node_modules"),
+    ):
+        for tb_pkg in ("pyright", "yaml-language-server", "newman-reporter-htmlextra"):
+            cand = adhoc_root / tb_pkg
+            if cand.exists() and str(cand) not in seen_unsanc_paths:
+                seen_unsanc_paths.add(str(cand))
+                unsanctioned.append({
+                    "name": tb_pkg,
+                    "unsanctioned_path": str(cand),
+                    "owning_manager": adhoc_mgr,
+                    "sanctioned_replacement": str(home / ".local" / "share" / "home-toolchain" / "node_modules"),
+                })
+
     # Detect unknown tools on host (in inventory but not in manifest)
     for inv_name in inv_map:
         if inv_name not in declared_tools:
@@ -1540,7 +1636,6 @@ def reconcile_with_manifest(
                 "state": "unknown",
                 "active_path": inv_map[inv_name].authoritative_path,
             })
-
     # Known obsolete candidates (e.g. deprecated python formula)
     deprecated_candidates = ["python@3.10"]
     for dep in deprecated_candidates:
@@ -1553,7 +1648,7 @@ def reconcile_with_manifest(
                 "rationale": "Deprecated formula in Homebrew; audit dependencies before uninstallation",
             })
 
-    overall_status = "drift" if (drift or missing) else "aligned"
+    overall_status = "drift" if (drift or missing or unsanctioned) else "aligned"
     return {
         "manifest_path": str(m_path),
         "status": overall_status,
@@ -1563,6 +1658,7 @@ def reconcile_with_manifest(
         "missing_count": len(missing),
         "optional_skipped_count": len(optional_skipped),
         "duplicate_count": len(duplicate),
+        "unsanctioned_count": len(unsanctioned),
         "obsolete_candidate_count": len(obsolete_candidate),
         "unknown_count": len(unknown),
         "summary": {
@@ -1571,6 +1667,7 @@ def reconcile_with_manifest(
             "missing": [i["name"] for i in missing],
             "optional_skipped": [i["name"] for i in optional_skipped],
             "duplicate": [i["name"] for i in duplicate],
+            "unsanctioned": [i["name"] for i in unsanctioned],
             "obsolete_candidate": [i["name"] for i in obsolete_candidate],
             "unknown": [i["name"] for i in unknown],
         },
@@ -1580,6 +1677,7 @@ def reconcile_with_manifest(
             "missing": missing,
             "optional_skipped": optional_skipped,
             "duplicate": duplicate,
+            "unsanctioned": unsanctioned,
             "obsolete_candidate": obsolete_candidate,
             "unknown": unknown,
         },
@@ -1613,6 +1711,9 @@ def main() -> int:
         print(f"  npm config get prefix:       {prefix_check.npm_config_prefix}")
         print(f"  maintenance pipeline prefix: {prefix_check.maintenance_pipeline_prefix}")
         print(f"  declared prefix:             {prefix_check.declared_prefix}")
+        print(f"  home prefix hijacked:        {prefix_check.home_prefix_hijacked}")
+        if prefix_check.home_forbidden_artifacts:
+            print(f"  home forbidden artifacts:    {', '.join(prefix_check.home_forbidden_artifacts)}")
         print(f"  Status:                      {prefix_check.status.upper()}")
         print("\n=== Workstation Toolchain Inventory ===")
         for item in inventory:
@@ -1621,7 +1722,8 @@ def main() -> int:
             for c in item.copies:
                 role = "AUTHORITATIVE" if c.is_authoritative else "duplicate"
                 adj = " (symlinked from /opt/homebrew/bin)" if c.is_symlinked_from_brew_bin else ""
-                print(f"    [{c.owning_manager:14}] {c.location_path} ({c.size_human}) -> {role}{adj}")
+                unsanc_note = f" [UNSANCTIONED -> sanctioned location: {c.sanctioned_replacement}]" if not c.is_sanctioned else ""
+                print(f"    [{c.owning_manager:14}] {c.location_path} ({c.size_human}) -> {role}{adj}{unsanc_note}")
             if item.preferred_source != "none":
                 print(f"    preferred_source: {item.preferred_source}")
             if item.name_collision:
@@ -1665,12 +1767,15 @@ def main() -> int:
             print(f"  Drift:                       {manifest_check['drift_count']}")
             print(f"  Missing:                     {manifest_check['missing_count']}")
             print(f"  Duplicates:                  {manifest_check['duplicate_count']}")
+            print(f"  Unsanctioned:                {manifest_check['unsanctioned_count']}")
             print(f"  Obsolete Candidates:         {manifest_check['obsolete_candidate_count']}")
             print(f"  Unknown Tools:               {manifest_check['unknown_count']}")
             if manifest_check['summary']['drift']:
                 print(f"  Drift items:                 {', '.join(manifest_check['summary']['drift'])}")
             if manifest_check['summary']['duplicate']:
                 print(f"  Duplicate items:             {', '.join(manifest_check['summary']['duplicate'])}")
+            if manifest_check['summary']['unsanctioned']:
+                print(f"  Unsanctioned items:          {', '.join(manifest_check['summary']['unsanctioned'])}")
         print("\nPolicy Enforcement: Proposes deletion = False (Strictly read-only; explicit authorization required)")
 
     return 0
