@@ -9,9 +9,9 @@
 | Edge | Status | Provider | Evidence |
 | :--- | :--- | :--- | :--- |
 | **Spec ↔ Code** | PASS | Hermes | Delta spec `jev-decision-runtime` correctly maps to official TypeSafe SDK primitives: `Noul`, `Choice`, `Score`. |
-| **Code ↔ Docs** | PASS | Codex | Aligns with `agent-core` modular design; settings isolated under `agent_core.foundation.settings` (`JEV_` prefix). |
+| **Code ↔ Docs** | PASS | Codex | Aligns with `shb-core` modular design; settings isolated under `shb_core.config.JevSettings` (`JEV_` prefix). |
 | **Docs ↔ Skills** | PASS | Antigravity | Complements fast tool pre-flight dispatch in autonomous agent skills (`claude-code`, `codex`, `pi`). |
-| **Skills ↔ Specs** | PASS | Kimi | Semantic pre-flight guardrail intercepts obfuscated dangerous shell commands without paying 2-5s LLM generation latency. |
+| **Skills ↔ Specs** | PASS | Kimi | Semantic pre-flight guardrail intercepts obfuscated high-risk banking tool invocations without paying 2-5s LLM generation latency. |
 | **Spec ↔ Docs** | PASS | Hermes | AGENTS.md and module docs updated to describe System One non-generative decision runtime. |
 | **Code ↔ Skills** | PASS | Antigravity | Preserves full backward compatibility with regex guards; Jev acts as an upstream accelerator and semantic filter. |
 | **Spec ↔ Tests** | PASS | Codex | Scenarios cover confidence thresholds, choice distribution, score bounds [0.0, 1.0], and timeout fallbacks. |
@@ -38,7 +38,7 @@
 
 ### 2. Codex (Quality & Tests)
 - **Finding**: Guardrail confidence thresholds must adapt to command risk tiers (e.g. read-only vs file deletion).
-- **Adjustment Applied**: Added risk-calibrated thresholding: higher confidence required to suppress human prompt on high-impact commands (`rm`, `dd`, `drop table`).
+- **Adjustment Applied**: Added risk-calibrated thresholding: higher confidence required on state-mutating banking tools (`transfer_funds`, `screen_beneficiary`) vs read-only account queries.
 
 ---
 
