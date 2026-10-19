@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "packet_id": "eep-20261019-090242-1c68b5b51f6e",
+  "target_root": "/Users/androidteam/Developer/shb/shb-schedule",
+  "source_commit": "2814f31340d10ac1b1c49d84863464aed921e8ba",
+  "command": "uv run --project /Users/androidteam/Developer/shb/shb-schedule pytest /Users/androidteam/Developer/shb/shb-schedule/tests/test_workstation_update_workflow.py",
+  "timestamps": {
+    "started_at": "2026-10-19T09:02:42Z",
+    "completed_at": "2026-10-19T09:02:42Z",
+    "duration_seconds": 0.0
+  },
+  "exit_code": 0,
+  "item_counts": {
+    "inspected": 2,
+    "modified": 2,
+    "created": 0,
+    "pruned": 0,
+    "retained": 0,
+    "skipped": 0
+  },
+  "preservation_status": {
+    "source_preserved": true,
+    "backup_path": null,
+    "details": "Excluded graphify-out/*"
+  },
+  "collision_status": {
+    "collision_detected": false,
+    "quarantined_pids": [],
+    "details": "No collisions detected"
+  },
+  "readback_verification": {
+    "verified": true,
+    "status": "PASSED",
+    "active_version": null,
+    "readback_data": {}
+  },
+  "evidence_hashes": {},
+  "exclusions": [
+    ".env",
+    "*.pem",
+    "*.key",
+    "id_rsa*",
+    "id_ed25519*",
+    "omniroute_data",
+    "docker_volumes",
+    "credentials",
+    "secrets"
+  ],
+  "authorization": {
+    "scope_authorized": true,
+    "approved_by": "operator",
+    "approval_token_or_reason": "harden-skill-refresh-acceptance-and-surface-hygiene Phase 2 External Repository Gate",
+    "target_root_approved": true
+  },
+  "status": "COMPLETED"
+}

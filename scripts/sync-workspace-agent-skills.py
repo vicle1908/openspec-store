@@ -385,9 +385,10 @@ def check_workspace_agent_surface(workspace: Path) -> list[str]:
     violations: list[str] = []
     if not workspace.is_dir():
         return violations
-    root_skills = workspace / "skills"
-    if root_skills.exists() or root_skills.is_symlink():
-        violations.append("skills")
+    for forbidden_rel in ("skills", "agent", "data/skills"):
+        p = workspace / forbidden_rel
+        if p.exists() or p.is_symlink():
+            violations.append(forbidden_rel)
     for entry in sorted(workspace.iterdir()):
         if not entry.name.startswith(".") or not entry.is_dir():
             continue
@@ -613,10 +614,10 @@ def accept_or_bootstrap_snapshot(
             "source_revision": source_revision,
             "upstream_verified": upstream_verified,
             "description_bytes": desc_metrics["raw_bytes"],
-            "description_raw_bytes": desc_metrics["raw_bytes"],
             "description_trimmed_bytes": desc_metrics["trimmed_bytes"],
             "files": files_map,
         }
+
 
     if errors:
         _, _, mutated = (
@@ -663,12 +664,6 @@ def accept_or_bootstrap_snapshot(
                 "total_bytes": total_bytes,
                 "skills": manifest_skills,
             }
-            manifest_bytes = (json.dumps(manifest_payload, indent=2, sort_keys=True) + "\n").encode(
-                "utf-8"
-            )
-            (staging_dir / "manifest.json").write_bytes(manifest_bytes)
-            total_bytes += len(manifest_bytes)
-            manifest_payload["total_bytes"] = total_bytes
             manifest_bytes = (json.dumps(manifest_payload, indent=2, sort_keys=True) + "\n").encode(
                 "utf-8"
             )

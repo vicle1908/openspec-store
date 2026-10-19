@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "packet_id": "eep-20261019-090407-23efa0cddcbb",
+  "target_root": "/Users/androidteam/Developer",
+  "source_commit": "0000000000000000000000000000000000000000",
+  "command": "python3 prune_stray_agent_and_data_skills && sync-workspace-agent-skills.py --accept-refresh && sync-workspace-agent-skills.py --check",
+  "timestamps": {
+    "started_at": "2026-10-19T09:04:07Z",
+    "completed_at": "2026-10-19T09:04:07Z",
+    "duration_seconds": 0.0
+  },
+  "exit_code": 0,
+  "item_counts": {
+    "inspected": 12,
+    "modified": 0,
+    "created": 0,
+    "pruned": 10,
+    "retained": 8,
+    "skipped": 0
+  },
+  "preservation_status": {
+    "source_preserved": true,
+    "backup_path": null,
+    "details": "Preserved ~/Developer/data/updates/ and all non-skill ~/Developer/data/* entries; removed only ~/Developer/data/skills symlinks and duplicate ~/Developer/agent/skills/{temporal-developer,temporal-ops}"
+  },
+  "collision_status": {
+    "collision_detected": false,
+    "quarantined_pids": [],
+    "details": "No collisions detected"
+  },
+  "readback_verification": {
+    "verified": true,
+    "status": "PASSED",
+    "active_version": null,
+    "readback_data": {}
+  },
+  "evidence_hashes": {},
+  "exclusions": [
+    ".env",
+    "*.pem",
+    "*.key",
+    "id_rsa*",
+    "id_ed25519*",
+    "omniroute_data",
+    "docker_volumes",
+    "credentials",
+    "secrets"
+  ],
+  "authorization": {
+    "scope_authorized": true,
+    "approved_by": "operator",
+    "approval_token_or_reason": "harden-skill-refresh-acceptance-and-surface-hygiene Phase 3 External Host Gate",
+    "target_root_approved": true
+  },
+  "status": "COMPLETED"
+}

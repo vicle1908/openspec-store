@@ -450,7 +450,7 @@ When a recorded inventory of repositories differs from the inventory its approva
 
 ### Requirement: Verified lockfile compatibility mirror publication and manual update acceptance
 
-The maintenance pipeline SHALL treat `~/Developer/skills-lock.json` as the sole writable Skills CLI project lockfile and SHALL publish `~/Developer/.agents/skills-lock.json` only as a verified compatibility replica after canonical skill bytes, YAML frontmatter, and collision checks pass, including after manual native CLI updates or validated no-op runs.
+The maintenance pipeline (across both `workstation-daily-update.sh` and `shb-schedule:step_skills_refresh`) SHALL treat `~/Developer/skills-lock.json` as the sole writable Skills CLI project lockfile and SHALL invoke `sync-workspace-agent-skills.py --accept-refresh` after healthy `skills update -y` runs (or `--recover-from-snapshot` on failure) before running `--check` parity verification.
 
 #### Scenario: Verified refresh publishes compatibility replica while preserving unrelated entries
 - **WHEN** a scheduled or on-demand skill refresh completes and canonical skill files, YAML frontmatter budgets, and user-scope symlink parity pass verification
@@ -471,6 +471,11 @@ The maintenance pipeline SHALL treat `~/Developer/skills-lock.json` as the sole 
 - **WHEN** post-refresh validation detects a missing or corrupted canonical `SKILL.md`, a frontmatter violation, or an unapproved skill name or source collision in `~/Developer/skills-lock.json`
 - **THEN** the pipeline SHALL refuse to overwrite `~/Developer/.agents/skills-lock.json` or advance the accepted snapshot state
 - **AND** the maintenance run SHALL report a degraded integrity failure
+
+#### Scenario: DBOS step_skills_refresh runs --accept-refresh before --check when skills update succeeds
+- **WHEN** `shb-schedule:step_skills_refresh` runs `skills update -y` and `_classify_skills_refresh_output` reports `failed == 0`
+- **THEN** `step_skills_refresh` SHALL invoke `sync-workspace-agent-skills.py --accept-refresh` to rotate `.skill-snapshots/{current,previous}/` and publish `~/Developer/.agents/skills-lock.json` before invoking `sync-workspace-agent-skills.py --check`
+- **AND** if `--accept-refresh` or `skills update -y` fails, `step_skills_refresh` SHALL set `failed >= 1` and invoke `sync-workspace-agent-skills.py --recover-from-snapshot` when `current/manifest.json` exists
 
 ### Requirement: Recoverable current and previous accepted skill snapshots
 

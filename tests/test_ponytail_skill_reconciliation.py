@@ -472,6 +472,17 @@ class TestHermesAndSnapshotLifecycleInTmpPath(unittest.TestCase):
         self.assertEqual(untracked_md.read_text(encoding="utf-8"), untracked_custom)
         self.assertEqual(sync_mod.main(self._cli_args("--check")), 0)
 
+        # 6. Surface check rejects agent/skills and data/skills while allowing data/updates
+        (self.workspace / "data" / "updates").mkdir(parents=True)
+        (self.workspace / "data" / "updates" / "2026-10-19.json").write_text("{}", encoding="utf-8")
+        self.assertEqual(sync_mod.check_workspace_agent_surface(self.workspace), [])
+
+        (self.workspace / "agent" / "skills").mkdir(parents=True)
+        (self.workspace / "data" / "skills").mkdir(parents=True)
+        violations = sync_mod.check_workspace_agent_surface(self.workspace)
+        self.assertEqual(violations, ["agent", "data/skills"])
+        self.assertEqual(sync_mod.main(self._cli_args("--check")), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
