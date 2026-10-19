@@ -49,19 +49,7 @@ and the Redis service SHALL NOT publish any port to the host.
 
 ### Requirement: OmniRoute SHALL expose an OpenAI-compatible model API
 
-The deployment SHALL expose the configured model endpoint on the local host.
-In the standard three-port profile, the model API endpoint SHALL be
-`http://127.0.0.1:20128/v1`, including `/chat/completions`, `/responses`,
-and `/models` as supported by the selected provider. Published listeners
-SHALL bind to loopback unless an operator explicitly configures another
-network boundary. `HEAD /v1/models` SHALL return HTTP 200 as the public
-availability probe. Anonymous `GET /v1/models` SHALL return HTTP 200 with a
-non-empty catalog when catalog authentication is disabled, and SHALL return
-HTTP 401 with an `invalid_api_key` error when catalog authentication is
-enabled. Since v3.8.50, catalog authentication is opt-out (enforced whenever
-dashboard authentication is required unless `requireAuthForModels` is
-explicitly false). A request carrying a valid Bearer API key SHALL receive
-HTTP 200 with a non-empty catalog in either posture.
+The deployment SHALL expose `http://127.0.0.1:20128/v1` (`/chat/completions`, `/responses`, `/models`) bound to loopback by default. `HEAD /v1/models` SHALL return HTTP 200 publicly. Since v3.8.50, catalog authentication is opt-out (`requireAuthForModels`): anonymous `GET /v1/models` SHALL return HTTP 401 (`invalid_api_key`) when enabled or HTTP 200 when disabled, while requests with a valid Bearer API key SHALL receive HTTP 200 with a non-empty catalog in either posture.
 
 #### Scenario: Chat completion through the proxy
 
@@ -124,14 +112,7 @@ Consumers SHALL use pydantic-ai's native retry behavior and `FallbackModel` for 
 
 ### Requirement: OmniRoute SHALL expose a dashboard and health status
 
-The service SHALL serve its dashboard on the configured main port and SHALL
-expose the health behavior used by the Compose health check. The health check
-SHALL use the image-provided `node healthcheck.mjs` command with a
-30-second interval, 15-second timeout, 3 retries, and 120-second start
-period. The relaxed timeout and start period are deployment-owned overrides
-in `docker-compose.override.yml` because the upstream 5-second timeout
-false-positives during background model and credential sync while the app
-remains functional.
+The service SHALL serve its dashboard on the configured main port and expose the health endpoint probed by `node healthcheck.mjs` with a 30-second interval, 15-second timeout, 3 retries, and 120-second start period in `docker-compose.override.yml` so background model and credential synchronization does not trigger false-positive health check timeouts.
 
 #### Scenario: Dashboard is accessible locally
 
@@ -162,26 +143,12 @@ The deployment SHALL use Docker Compose v2 commands, keep the `base` profile opt
 
 ### Requirement: OmniRoute image upgrades SHALL be fail-closed and evidence-gated
 
-Upgrades of the OmniRoute runtime SHALL be performed by pulling the Docker
-Hub image and recreating the container; source compilation SHALL NOT be
-used. The update workflow SHALL pass a SQLite snapshot gate (live-database
-`integrity_check` equals `ok` and a snapshot copy reaches the host) before
-any image pull, SHALL verify the pulled image digest equals the flagged
-target digest before deployment, and SHALL verify container health, the
-in-image package version, the running container's image id, the dashboard
-and health and model endpoints, and post-deploy database integrity and
-persistence indicators before clearing the update flag. On any failed gate
-the workflow SHALL stop, SHALL retain the update flag, and SHALL record the
-failed gate; the flag SHALL be cleared only after all gates pass. An
-application image upgrade SHALL NOT activate unrelated Compose profiles,
-SHALL NOT change the deployed Redis major version, and SHALL NOT alter the
-loopback-only port bindings, the named-volume layout, or the disabled
-SOCKS5 proxy configuration.
+OmniRoute upgrades SHALL pull the verified Docker Hub image and recreate the container without source compilation under a persistent kernel lock (`~/.omniroute/update.lock` via `/usr/bin/lockf`). The workflow SHALL pass a bounded pre-pull SQLite snapshot gate (`PRAGMA quick_check = ok`, fail-closed `wal_checkpoint(TRUNCATE)`, post-checkpoint `quick_check = ok`), verify pulled digest equality, and verify health, version, image ID, endpoints, and post-deploy data before clearing the flag.
 
 #### Scenario: Snapshot gate blocks an unsafe upgrade
 
-- **WHEN** the pre-update SQLite snapshot fails or the live database `integrity_check` is not `ok`
-- **THEN** the update stops before any image pull and the update flag remains present
+- **WHEN** the pre-update SQLite snapshot fails, live or host `PRAGMA quick_check` is not `ok`, or host snapshot `PRAGMA wal_checkpoint(TRUNCATE)` does not return `0|*` (`busy == 0`)
+- **THEN** the update stops before any image pull, cleans up any temporary in-container snapshot file before releasing the kernel lock on `~/.omniroute/update.lock` (without unlinking the persistent lockfile or removing uncheckpointed host `-wal`/`-shm` sidecars), and retains the update flag
 
 #### Scenario: Digest mismatch blocks deployment
 
@@ -202,3 +169,41 @@ SOCKS5 proxy configuration.
 
 - **WHEN** an application image upgrade is applied
 - **THEN** the Redis image remains the currently deployed major version, no new Compose profile is activated, published ports remain bound to 127.0.0.1, `/app/data` remains on the `omniroute-data` named volume, and the SOCKS5 proxy flags remain disabled
+
+#### Scenario: Upgrade script coordinates exclusive maintenance lock via kernel descriptor locking
+
+- **WHEN** `~/Omniroute/scripts/update.sh <expected-version>` runs past Gate 0 and argument validation
+- **THEN** it SHALL open persistent `~/.omniroute/update.lock` on file descriptor `9` (`umask 077`) and acquire a non-blocking exclusive kernel lock via `/usr/bin/lockf -s -t 0 9` before `pre-state`, exiting `1` and retaining `~/.omniroute/update-available` on contention (`rc = 75`) or failing closed non-zero on other lock errors
+- **AND** once locked, its `EXIT` trap SHALL preserve the original exit status, remove any temporary `/tmp/pre-update-*.sqlite` inside the container before shell exit closes FD `9`, and never parse PID/epoch metadata or unlink `~/.omniroute/update.lock`
+
+### Requirement: Startup database health checks SHALL not block gateway readiness
+
+The OmniRoute deployment SHALL defer startup SQLite health checks off the synchronous initialization path via `DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED=true` and `OMNIROUTE_SKIP_DB_HEALTHCHECK=1` in `docker-compose.override.yml` so HTTP readiness probes respond within `start_period`, managed repairs never run `PRAGMA quick_check` inside `BEGIN IMMEDIATE`, and physical integrity checks execute out of band.
+
+#### Scenario: Container reaches healthy state without main-thread SQLite scan deadlock
+
+- **WHEN** `omniroute-base` starts against the `/app/data/storage.sqlite` database on the `omniroute-data` (`omniroute_omniroute-data`) volume
+- **THEN** `getDbInstance()` SHALL complete without running a synchronous main-thread `PRAGMA quick_check` or full `quota_snapshots` table scan before HTTP listeners accept requests
+- **AND** `GET http://127.0.0.1:20128/healthz` SHALL return `ok` (HTTP 200) and container health SHALL transition to `healthy` within the configured `start_period`
+
+#### Scenario: Deferred startup and managed health checks skip in-transaction quick_check
+
+- **WHEN** `DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED=true` and `OMNIROUTE_SKIP_DB_HEALTHCHECK=1` are configured in `~/Omniroute/docker-compose.override.yml`
+- **THEN** startup, periodic 6-hour, and manual managed health checks (`core.ts:954` / `healthCheckWorker.ts`) SHALL execute logical table checks out of band in the child worker while skipping `PRAGMA quick_check` so `autoRepair` passes inside `BEGIN IMMEDIATE` do not stall main-process writes
+- **AND** physical SQLite B-tree verification SHALL run out of band via read-only `PRAGMA quick_check` in `update.sh` and bounded 6-hour read-only full `PRAGMA integrity_check` (`~/.omniroute/integrity-last-ok`) in `omniroute-watchdog.sh`
+
+### Requirement: Named-volume SQLite storage SHALL maintain bounded retention and snapshot hygiene
+
+The `omniroute-data` (`omniroute_omniroute-data`) volume at `/app/data` SHALL not retain orphaned in-volume snapshot backup files alongside `storage.sqlite` and SHALL enforce bounded retention windows for high-volume telemetry tables (`conversation_turn_nodes`, `quota_snapshots`, `call_logs`) backed by verified host snapshots in `~/.omniroute/snapshots/`.
+
+#### Scenario: Orphaned in-volume snapshot backups are removed and current host backup is retained
+
+- **WHEN** `/app/data/storage.sqlite.snapshot.bak` or superseded pre-migration backups in `/app/data/db_backups/` exist inside `/app/data` on `omniroute-data`
+- **THEN** a verified host snapshot in `~/.omniroute/snapshots/` (`PRAGMA quick_check = ok`, consolidated via fail-closed `PRAGMA wal_checkpoint(TRUNCATE)`, matching live `api_keys`, `provider_connections`, and `combos` counts) SHALL be maintained on the host
+- **AND** redundant in-volume backup files SHALL be removed so `/app/data` retains only active SQLite database files (`1000:1000` `node:node` ownership) and managed runtime directories
+
+#### Scenario: High-volume telemetry tables are pruned and compacted cleanly
+
+- **WHEN** `conversation_turn_nodes`, `quota_snapshots`, or `call_logs` exceed their configured retention window (`conversationTurnNodes <= 7` days, `quotaSnapshots <= 14` days, `callLogs <= 30` days) during offline maintenance under `/usr/bin/lockf -k -t 0 ~/.omniroute/update.lock`
+- **THEN** both flat and dotted `retention.*` keys in `key_value` (`namespace = 'databaseSettings'`) and the ISO-8601 `T`/`Z`-cutoff deletions of expired `conversation_turn_nodes`, orphaned `agentic_conversations`, and `quota_snapshots` SHALL execute in a single joint transaction
+- **AND** offline `PRAGMA wal_checkpoint(TRUNCATE)` and `VACUUM` SHALL run as UID:GID `1000:1000` followed by fail-closed programmatic assertions that `PRAGMA quick_check = ok` and `api_keys`, `provider_connections`, and `combos` counts are preserved
