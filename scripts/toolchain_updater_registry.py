@@ -242,6 +242,15 @@ SUPPORTED_UPDATER_REGISTRY: dict[tuple[str, str], UpdaterDeclaration] = {
         status="uncovered_declared",
         notes="Managed via Homebrew formula qwen-code",
     ),
+    ("herdr", "brew-formula"): UpdaterDeclaration(
+        tool="herdr",
+        source_type="brew-formula",
+        supported_verb=None,
+        updater_dispatch="none",
+        delegating_to="brew",
+        status="uncovered_declared",
+        notes="Managed via Homebrew formula herdr",
+    ),
     ("buzz", "brew-cask"): UpdaterDeclaration(
         tool="buzz",
         source_type="brew-cask",

@@ -92,7 +92,7 @@ class TestWorkstationManifestSchemaAndCanonical(unittest.TestCase):
         with open(self.manifest_path, "r", encoding="utf-8") as f:
             manifest = json.load(f)
         tools = manifest.get("tools", {})
-        required_tools = ["git", "node", "uv", "claude", "codex", "qoder", "qodercli", "gitnexus", "newman", "bru", "opencode"]
+        required_tools = ["git", "node", "uv", "claude", "codex", "qoder", "qodercli", "gitnexus", "newman", "bru", "opencode", "herdr"]
         for tool in required_tools:
             self.assertIn(tool, tools, f"Tool '{tool}' must be declared in canonical manifest")
             t_decl = tools[tool]
@@ -102,7 +102,7 @@ class TestWorkstationManifestSchemaAndCanonical(unittest.TestCase):
             self.assertIn("release_channel", t_decl)
             self.assertIn("dispatch_classification", t_decl)
             self.assertIn("verification_smoke_command", t_decl)
-
+        self.assertIn("herdr", manifest.get("profiles", {}).get("ai-agents", []))
 
 class TestLayeredProfiles(unittest.TestCase):
     def test_brewfile_exists_and_contains_sanctioned_formulae(self):
@@ -113,9 +113,9 @@ class TestLayeredProfiles(unittest.TestCase):
         self.assertIn('brew "node"', content)
         self.assertIn('brew "uv"', content)
         self.assertIn('brew "bun"', content)
+        self.assertIn('brew "herdr"', content)
         self.assertIn('cask "codex"', content)
         self.assertNotIn('cask "qoder"', content)
-
     def test_npm_global_profile_contains_sanctioned_tools(self):
         npm_prof = CONFIG_DIR / "npm-global-tools.json"
         self.assertTrue(npm_prof.is_file(), "npm-global-tools.json must exist")
@@ -142,9 +142,14 @@ class TestLayeredProfiles(unittest.TestCase):
 
     def test_no_duplicate_tool_ownership_across_profiles(self):
         # Extract tool names declared across tool profiles
-        brew_tools = {"git", "node", "uv", "opencode", "block-goose-cli", "hermes-agent", "cursor-cli", "droid", "grok-build", "buzz"}
+        brewfile_text = (CONFIG_DIR / "Brewfile").read_text(encoding="utf-8")
+        brew_tools = {
+            token.split("/")[-1]
+            for token in re.findall(r'^(?:brew|cask)\s+"([^"]+)"', brewfile_text, re.MULTILINE)
+        }
+        self.assertIn("herdr", brew_tools)
         npm_data = json.loads((CONFIG_DIR / "npm-global-tools.json").read_text(encoding="utf-8"))
-        npm_tools = {t["name"] for t in npm_data.get("tools", [])}
+        npm_tools = {t["name"] for t in data.get("tools", [])} if (data := npm_data) else set()
         uv_data = json.loads((CONFIG_DIR / "uv-tools.json").read_text(encoding="utf-8"))
         uv_tools = {t["name"] for t in uv_data.get("tools", [])}
 

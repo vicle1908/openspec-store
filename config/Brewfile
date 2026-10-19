@@ -31,6 +31,7 @@ brew "googleworkspace-cli" # Google Workspace CLI (gws)
 brew "ollama"    # Local LLM runner and model server
 brew "anomalyco/tap/opencode"
 brew "block-goose-cli"
+brew "herdr"
 brew "newman"
 brew "qwen-code"
 brew "ruff"

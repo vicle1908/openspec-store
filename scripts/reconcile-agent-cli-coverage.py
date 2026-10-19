@@ -290,6 +290,7 @@ def reconcile_agent_clis(declared_covered: dict[str, str], declared_uncovered: l
         "muse",
         "qwen",
         "ntn",
+        "herdr",
     ]
 
     records: list[AgentCLIRecord] = []
@@ -336,7 +337,7 @@ def main() -> int:
     parser.add_argument("--json", action="store_true", help="Output machine-readable JSON")
     parser.add_argument(
         "--include-uncovered",
-        default="droid,goose,grok,prime-agent,happy,cursor-agent,hermes-agent,buzz,cce,kilo,muse,qwen",
+        default="droid,goose,grok,prime-agent,happy,cursor-agent,hermes-agent,buzz,cce,kilo,muse,qwen,herdr",
         help="Comma-separated declared uncovered CLIs",
     )
     parser.add_argument(
