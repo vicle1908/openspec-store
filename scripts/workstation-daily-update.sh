@@ -633,6 +633,10 @@ except Exception:
         echo "    SKIPPED: cask upgrades suppressed (authority drift/conflict/misalignment detected: ${deny_cask_csv})"
       else
         brew upgrade --cask 2>&1 || true
+        if [[ -x "/Applications/Docker.app/Contents/MacOS/install" ]] && [[ -x "${WORKSPACE_DIR}/scripts/docker-service.sh" ]]; then
+          "${WORKSPACE_DIR}/scripts/docker-service.sh" start 2>&1 || true
+          "${WORKSPACE_DIR}/scripts/docker-service.sh" up 2>&1 || true
+        fi
       fi
 
       brew cleanup -s 2>&1 || true

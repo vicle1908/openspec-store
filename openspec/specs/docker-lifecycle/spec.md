@@ -159,3 +159,20 @@ A periodic system supervisor (`com.omniroute.watchdog`) SHALL monitor the health
 - **WHEN** `omniroute` is `running`, `State.Health.Status != starting`, and `http://127.0.0.1:20128/healthz` returns HTTP 200 under the Step 0 FD `9` kernel lock, and `~/.omniroute/integrity-last-ok` is missing or its mtime is `>= 21600` seconds (6 hours) old
 - **THEN** `omniroute-watchdog.sh` SHALL execute a read-only full `PRAGMA integrity_check` (`better-sqlite3` `{readonly:true, fileMustExist:true, timeout:15000}`, no `autoRepair`) bounded by an in-container child timeout of `110s` (`SIGKILL`) and outer `gtimeout --signal=TERM --kill-after=5s 120s`
 - **AND** it SHALL update `~/.omniroute/integrity-last-ok` only when all returned rows equal `'ok'`, and on any integrity failure or timeout it SHALL log `ERROR` and exit non-zero without restarting the otherwise healthy `omniroute` container.
+
+### Requirement: Non-interactive privileged helper provisioning on start and restart
+
+The Docker Desktop lifecycle script (`docker-service.sh`) SHALL non-interactively verify and provision macOS privileged helpers (`com.docker.vmnetd` and `com.docker.socket`) before starting or restarting the daemon, clear any pending `osascript` privilege dialogs, and safely expand empty Compose profile arrays under macOS Bash 3.2 `set -u`.
+
+#### Scenario: Missing or mismatched vmnetd helper is provisioned before daemon start
+- **WHEN** `docker-service.sh start` or `docker-service.sh restart` executes and `/Library/LaunchDaemons/com.docker.vmnetd.plist`, `/Library/LaunchDaemons/com.docker.socket.plist`, or `/var/run/docker.sock` is missing, or `/Library/PrivilegedHelperTools/com.docker.vmnetd` differs byte-for-byte from `/Applications/Docker.app/Contents/Library/LaunchServices/com.docker.vmnetd`, or `com.docker.vmnetd` is not running
+- **THEN** `ensure_helpers()` SHALL invoke `sudo -n /Applications/Docker.app/Contents/MacOS/install config --user "${USER:-$(id -un)}" set-vmnetd set-docker-socket` and `sudo -n launchctl kickstart -p system/com.docker.vmnetd` before calling `docker desktop start` or `docker desktop restart`
+- **AND** `com.docker.backend` SHALL start without spawning an interactive `SecurityAgent` password dialog.
+
+#### Scenario: Pending osascript privileged prompt is cleared automatically
+- **WHEN** `ensure_helpers()` finds any `/tmp/docker-desktop-privileged*` directory left by a prior `com.docker.backend` `osascript` invocation
+- **THEN** it SHALL write `0` to `exitcode.txt` inside that directory and terminate the matching `osascript` process via `pkill -f` so headless startup is not blocked.
+
+#### Scenario: Bash 3.2 empty profile_args expansion succeeds across all registered stacks
+- **WHEN** `docker-service.sh drain` or `docker-service.sh up` iterates over `COMPOSE_STACKS` under macOS `/bin/bash` 3.2 with `set -euo pipefail`
+- **THEN** it SHALL expand `${profile_args[@]+"${profile_args[@]}"}` without raising an `unbound variable` error on stacks with an empty `profile_args` array (`/Users/androidteam/Developer/shb/shb-schedule`) while passing `--profile base` for `/Users/androidteam/Omniroute`.

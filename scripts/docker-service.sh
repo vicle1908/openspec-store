@@ -48,6 +48,27 @@ is_daemon_up() {
   docker info >/dev/null 2>&1
 }
 
+ensure_helpers() {
+  local install_bin="/Applications/Docker.app/Contents/MacOS/install"
+  local app_vmnetd="/Applications/Docker.app/Contents/Library/LaunchServices/com.docker.vmnetd"
+  [[ -x "$install_bin" ]] || return 0
+  if [[ ! -f "/Library/LaunchDaemons/com.docker.vmnetd.plist" ]] || \
+     [[ ! -f "/Library/LaunchDaemons/com.docker.socket.plist" ]] || \
+     [[ ! -L "/var/run/docker.sock" ]] || \
+     ! cmp -s "$app_vmnetd" "/Library/PrivilegedHelperTools/com.docker.vmnetd" 2>/dev/null || \
+     ! pgrep -x com.docker.vmnetd >/dev/null 2>&1; then
+    log "Provisioning Docker Desktop privileged helpers (vmnetd + docker.sock) via sudo..."
+    sudo -n "$install_bin" config --user "${USER:-$(id -un)}" set-vmnetd set-docker-socket >/dev/null 2>&1 || true
+    sudo -n launchctl kickstart -p system/com.docker.vmnetd >/dev/null 2>&1 || true
+  fi
+  local priv_dir
+  for priv_dir in /tmp/docker-desktop-privileged*; do
+    [[ -d "$priv_dir" ]] || continue
+    echo 0 > "$priv_dir/exitcode.txt" 2>/dev/null || true
+    pkill -f "$priv_dir" 2>/dev/null || true
+  done
+}
+
 status_json() {
   local session_id="-" status="stopped"
   local json_status
@@ -99,6 +120,7 @@ status_json() {
 cmd_start() {
   local timeout_sec="${1:-$DOCKER_TIMEOUT_SEC}"
   log "Starting Docker Desktop..."
+  ensure_helpers
   if is_daemon_up; then
     echo "✓ Daemon already running."
     return 0
@@ -144,7 +166,7 @@ cmd_drain() {
       profile_args=(--profile base)
     fi
     log "Running: docker compose ${profile_args[*]:-} --project-dir $stack_dir down --timeout $timeout_sec"
-    (cd "$stack_dir" && docker compose "${profile_args[@]}" --project-directory . down --timeout "$timeout_sec")
+    (cd "$stack_dir" && docker compose ${profile_args[@]+"${profile_args[@]}"} --project-directory . down --timeout "$timeout_sec")
     drained_any=true
   done
   if $drained_any; then
@@ -168,7 +190,7 @@ cmd_up() {
       profile_args=(--profile base)
     fi
     log "Running: docker compose ${profile_args[*]:-} --project-dir $stack_dir up -d"
-    (cd "$stack_dir" && docker compose "${profile_args[@]}" --project-directory . up -d)
+    (cd "$stack_dir" && docker compose ${profile_args[@]+"${profile_args[@]}"} --project-directory . up -d)
     if [[ "$stack_dir" == *"/Omniroute"* ]] && [[ -x "$stack_dir/scripts/ensure-muse-wire-compat.sh" ]]; then
       log "Running: $stack_dir/scripts/ensure-muse-wire-compat.sh"
       "$stack_dir/scripts/ensure-muse-wire-compat.sh" || log "WARNING: ensure-muse-wire-compat.sh returned non-zero"
@@ -216,6 +238,7 @@ cmd_restart() {
   log "Restarting Docker Desktop..."
   cmd_drain 65
   echo "Restarting Docker Desktop..."
+  ensure_helpers
   log "Invoking: docker desktop restart --timeout $timeout_sec"
   docker desktop restart --timeout "$timeout_sec"
   if is_daemon_up; then
@@ -276,6 +299,9 @@ cmd_status() {
     done
     if [[ "$status" != "running" ]] || [[ "$socket_exists" == "false" ]]; then
       echo "Remediation: run '$SCRIPT_NAME start'"
+    fi
+    if [[ "$vmnetd" == "down" ]] || [[ "$socket_proc" == "down" ]]; then
+      echo "Helper Remediation: sudo -n /Applications/Docker.app/Contents/MacOS/install config --user ${USER:-$(id -un)} set-vmnetd set-docker-socket"
     fi
   fi
 }
