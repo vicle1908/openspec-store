@@ -6,6 +6,7 @@
 # ==============================================================================
 
 tap "anomalyco/tap"
+tap "can1357/tap"
 
 # Primary Runtimes & Package Managers (Core Formulae)
 # ------------------------------------------------------------------------------
@@ -32,6 +33,7 @@ brew "ollama"    # Local LLM runner and model server
 brew "anomalyco/tap/opencode"
 brew "block-goose-cli"
 brew "herdr"
+brew "can1357/tap/omp"
 brew "newman"
 brew "qwen-code"
 brew "ruff"

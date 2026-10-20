@@ -435,6 +435,7 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
         "muse",
         "qwen",
         "herdr",
+        "omp",
     ]
 
     documented_channels_map = {
@@ -519,6 +520,10 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
         "herdr": [
             "brew-formula: herdr",
             "vendor_download: standalone installer (https://herdr.dev/install.sh)",
+        ],
+        "omp": [
+            "brew-formula: can1357/tap/omp",
+            "npm: @oh-my-pi/pi-coding-agent",
         ],
     }
 
@@ -1045,6 +1050,35 @@ def evaluate_authority_and_drift(declared_prefix: str = "~/.npm-global") -> Auth
             consequence = None
             compatible_command = None
 
+        elif name == "omp":
+            dyn_root, src = derive_install_root_and_source(resolved_path)
+            decl = get_supported_updater("omp", src)
+            if src == "brew-formula" and decl is not None and decl.status == "uncovered_declared":
+                authority = "brew-formula"
+                writer = "brew"
+                updater_dispatch = "none"
+                delegating_to = None
+                update_verb = None
+                selected_channel = "brew-formula"
+                active_install_root = "/opt/homebrew/Cellar"
+                prefix_aligned = True
+                drift_status = "clean"
+                consequence = None
+                compatible_command = None
+            else:
+                brew_decl = decl or get_supported_updater("omp", "brew-formula")
+                authority = src if src != "brew-formula" else "unknown"
+                writer = "unknown"
+                updater_dispatch = "none"
+                delegating_to = None
+                update_verb = None
+                selected_channel = f"{src} ({dyn_root})"
+                active_install_root = dyn_root
+                prefix_aligned = False
+                drift_status = "target_misalignment" if brew_decl else "unknown"
+                consequence = f"Active omp binary at {resolved_path} ({src}) is misaligned or unregistered"
+                compatible_command = "brew upgrade can1357/tap/omp" if brew_decl else None
+
         elif name in ("droid", "cursor-agent", "buzz", "muse"):
             authority = "brew-cask"
             writer = "brew"
@@ -1303,7 +1337,9 @@ def inventory_tools(home_dir: Path | None = None) -> list[ToolInventoryItem]:
         "kimi",
         "droid",
         "muse",
+        "qwen",
         "herdr",
+        "omp",
     ]
 
     preferred_sources = {
@@ -1327,7 +1363,9 @@ def inventory_tools(home_dir: Path | None = None) -> list[ToolInventoryItem]:
         "kimi": ("vendor_download: official Moonshot AI standalone installer", True),
         "prime-agent": ("none (official R2 Mach-O channel)", False),
         "happy": ("none", False),
+        "qwen": ("formula qwen-code", True),
         "herdr": ("formula herdr", True),
+        "omp": ("formula can1357/tap/omp", True),
     }
 
     name_collisions = {
@@ -1372,6 +1410,8 @@ def inventory_tools(home_dir: Path | None = None) -> list[ToolInventoryItem]:
             pkg_keys.append("opencode-ai")
         elif tool_name == "openspec":
             pkg_keys.append("@fission-ai/openspec")
+        elif tool_name == "omp":
+            pkg_keys.append("@oh-my-pi/pi-coding-agent")
 
         for loc_name, loc_dir in locations.items():
             for key in pkg_keys:
@@ -1425,6 +1465,36 @@ def inventory_tools(home_dir: Path | None = None) -> list[ToolInventoryItem]:
                             is_symlinked_from_brew_bin=is_symlink_target,
                             is_sanctioned=is_sanc,
                             sanctioned_replacement=sanc_repl,
+                        )
+                    )
+
+        if tool_name == "omp":
+            for sh_mgr, sh_path in (
+                ("bun-global", home / ".bun" / "bin" / "omp"),
+                ("npm-global", home / ".npm-global" / "bin" / "omp"),
+            ):
+                if sh_path.exists():
+                    try:
+                        sz = sh_path.stat().st_size
+                    except OSError:
+                        sz = 0
+                    is_auth = False
+                    if auth_path != "not_found":
+                        try:
+                            is_auth = (
+                                Path(auth_path) == sh_path
+                                or Path(auth_path).resolve() == sh_path.resolve()
+                            )
+                        except Exception:
+                            pass
+                    copies.append(
+                        ToolCopy(
+                            location_path=str(sh_path),
+                            owning_manager=sh_mgr,
+                            size_bytes=sz,
+                            size_human=format_bytes(sz),
+                            is_authoritative=is_auth,
+                            is_symlinked_from_brew_bin=False,
                         )
                     )
 

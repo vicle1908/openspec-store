@@ -256,7 +256,7 @@ pi:Pi:update --self
 kimi:Kimi Code:update
 ntn:Notion CLI:update"
 
-AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent happy cursor-agent hermes-agent buzz cce kilo muse qwen herdr"
+AGENT_CLI_KNOWN_UNCOVERED="droid goose grok prime-agent happy cursor-agent hermes-agent buzz cce kilo muse qwen herdr omp"
 
 # Update every covered agent CLI that is installed; report the declared set and
 # any installed agent CLI left uncovered. Each updater is time-bounded.

@@ -215,6 +215,65 @@ class TestSharedUpdaterRegistry(unittest.TestCase):
         self.assertEqual(decl_code.delegating_to, "brew")
         self.assertEqual(decl_code.status, "uncovered_declared")
 
+    def test_omp_registered_and_verified_in_registry_inventory_and_coverage(self):
+        import tempfile
+        from unittest.mock import patch
+
+        decl = reg.get_supported_updater("omp", "brew-formula")
+        self.assertIsNotNone(decl)
+        self.assertEqual(decl.tool, "omp")
+        self.assertEqual(decl.source_type, "brew-formula")
+        self.assertIsNone(decl.supported_verb)
+        self.assertEqual(decl.updater_dispatch, "none")
+        self.assertEqual(decl.delegating_to, "brew")
+        self.assertEqual(decl.status, "uncovered_declared")
+
+        # Coverage evaluator verifies registry declaration and reports delegating_to=brew
+        ok, msg = cov.evaluate_update_path("omp", "uncovered_declared", None, "package_manager", "Homebrew (formula/cask)")
+        self.assertTrue(ok)
+        self.assertIn("delegating_to=brew", msg)
+
+        # Unregistered package_manager tool fails closed
+        ok_unreg, msg_unreg = cov.evaluate_update_path("unregistered_brew_tool", "uncovered_declared", None, "package_manager", "Homebrew (formula/cask)")
+        self.assertFalse(ok_unreg)
+        self.assertIn("unregistered or mismatched", msg_unreg)
+
+        # Live authority and drift evaluation for omp
+        rep = inv.evaluate_authority_and_drift("~/.npm-global")
+        omp_auth = next((i for i in rep.items if i.name == "omp"), None)
+        self.assertIsNotNone(omp_auth, "omp must be present in authority reconciliation")
+        self.assertEqual(omp_auth.authority, "brew-formula")
+        self.assertEqual(omp_auth.writer, "brew")
+        self.assertEqual(omp_auth.updater_dispatch, "none")
+        self.assertEqual(omp_auth.drift_status, "clean")
+        self.assertEqual(omp_auth.active_install_root, "/opt/homebrew/Cellar")
+        self.assertTrue(omp_auth.prefix_aligned)
+
+        # Inventory tools includes omp and qwen and detects omp shadow paths
+        with tempfile.TemporaryDirectory() as tmp:
+            home_dir = Path(tmp).resolve() / "home"
+            bun_omp = home_dir / ".bun" / "bin" / "omp"
+            bun_omp.parent.mkdir(parents=True, exist_ok=True)
+            bun_omp.write_text("#!/bin/sh\n")
+            items = inv.inventory_tools(home_dir=home_dir)
+            omp_inv = next((t for t in items if t.name == "omp"), None)
+            qwen_inv = next((t for t in items if t.name == "qwen"), None)
+            self.assertIsNotNone(omp_inv)
+            self.assertIsNotNone(qwen_inv)
+            self.assertEqual(omp_inv.preferred_source, "formula can1357/tap/omp")
+            self.assertEqual(qwen_inv.preferred_source, "formula qwen-code")
+            self.assertTrue(omp_inv.has_duplication)
+            self.assertTrue(any(c.location_path == str(bun_omp) and c.owning_manager == "bun-global" for c in omp_inv.copies))
+
+            # Shadow binary active on PATH triggers target_misalignment
+            orig_which = inv.shutil.which
+            with patch.object(inv.shutil, "which", side_effect=lambda n: str(bun_omp) if n == "omp" else orig_which(n)):
+                rep_shadow = inv.evaluate_authority_and_drift("~/.npm-global")
+                omp_shadow = next(i for i in rep_shadow.items if i.name == "omp")
+                self.assertEqual(omp_shadow.drift_status, "target_misalignment")
+                self.assertFalse(omp_shadow.prefix_aligned)
+                self.assertEqual(omp_shadow.compatible_command, "brew upgrade can1357/tap/omp")
+
 class TestRegistryEnforcementInInventory(unittest.TestCase):
     def test_cleared_registry_fails_closed_in_inventory(self):
         from unittest.mock import patch
@@ -236,6 +295,12 @@ class TestRegistryEnforcementInInventory(unittest.TestCase):
             self.assertEqual(cce_it.drift_status, "unknown")
             self.assertEqual(cce_it.authority, "unknown")
             self.assertEqual(cce_it.writer, "unknown")
+
+            omp_it = next(i for i in rep.items if i.name == "omp")
+            self.assertIsNone(omp_it.update_verb)
+            self.assertEqual(omp_it.updater_dispatch, "none")
+            self.assertEqual(omp_it.drift_status, "unknown")
+            self.assertEqual(omp_it.authority, "unknown")
 
 class TestCrontabSecretRedactionAndMacros(unittest.TestCase):
     def test_crontab_inline_env_secrets_redacted_and_macros_handled(self):

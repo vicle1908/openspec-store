@@ -47,7 +47,8 @@
       "kimi",
       "qwen",
       "orca",
-      "herdr"
+      "herdr",
+      "omp"
     ],
     "isolated-toolchain": [
       "newman",
@@ -598,6 +599,24 @@
       ],
       "category": "ai-agent",
       "notes": "Homebrew formula herdr (terminal multiplexer and runtime for AI coding agents)."
+    },
+    "omp": {
+      "authoritative_owner": "brew-formula",
+      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/omp",
+      "update_authority": "brew",
+      "release_channel": "stable",
+      "dispatch_classification": "none",
+      "verification_smoke_command": "omp --version",
+      "writer_binary": "brew",
+      "supported_verb": "brew upgrade can1357/tap/omp",
+      "delegating_to": null,
+      "package_name": "can1357/tap/omp",
+      "known_shadow_paths": [
+        "{{HOME}}/.bun/bin/omp",
+        "{{HOME}}/.npm-global/bin/omp"
+      ],
+      "category": "ai-agent",
+      "notes": "Oh My Pi coding agent CLI managed via Homebrew tap formula can1357/tap/omp."
     }
   }
 }

@@ -164,7 +164,9 @@ def evaluate_update_path(
     if name == "prime-agent":
         return True, f"managed by ecosystem manager ({source_detail}; uncovered in pipeline)"
     if source_type == "package_manager":
-        return True, f"managed by package manager ({source_detail})"
+        if not decl or decl.status != "uncovered_declared":
+            return False, f"unregistered or mismatched package_manager tool: '{name}'"
+        return True, f"managed by package manager ({source_detail}; delegating_to={decl.delegating_to})"
     if source_type == "ecosystem_manager":
         return True, f"managed by ecosystem manager ({source_detail})"
     if name == "hermes-agent":
@@ -291,6 +293,7 @@ def reconcile_agent_clis(declared_covered: dict[str, str], declared_uncovered: l
         "qwen",
         "ntn",
         "herdr",
+        "omp",
     ]
 
     records: list[AgentCLIRecord] = []
@@ -337,7 +340,7 @@ def main() -> int:
     parser.add_argument("--json", action="store_true", help="Output machine-readable JSON")
     parser.add_argument(
         "--include-uncovered",
-        default="droid,goose,grok,prime-agent,happy,cursor-agent,hermes-agent,buzz,cce,kilo,muse,qwen,herdr",
+        default="droid,goose,grok,prime-agent,happy,cursor-agent,hermes-agent,buzz,cce,kilo,muse,qwen,herdr,omp",
         help="Comma-separated declared uncovered CLIs",
     )
     parser.add_argument(
