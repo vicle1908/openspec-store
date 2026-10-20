@@ -19,6 +19,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 STORE_WATCHDOG = REPO_ROOT / "scripts" / "omniroute-watchdog.sh"
 DEV_WATCHDOG = Path("/Users/androidteam/Developer/scripts/omniroute-watchdog.sh")
 UPDATE_SCRIPT = Path("/Users/androidteam/Omniroute/scripts/update.sh")
+ENTRYPOINT_COMPAT = Path("/Users/androidteam/Omniroute/scripts/container-entrypoint-compat.sh")
+ENSURE_MUSE_COMPAT = Path("/Users/androidteam/Omniroute/scripts/ensure-muse-wire-compat.sh")
 
 
 def _write_executable(path: Path, content: str) -> None:
@@ -407,7 +409,7 @@ exit 0
 sql="${!#}"
 if [[ "$sql" == *"quick_check"* ]]; then echo "ok"; exit 0; fi
 if [[ "$sql" == *"wal_checkpoint"* ]]; then echo "0|0|0"; exit 0; fi
-exit 0
+if [[ "$sql" == *"journal_mode"* ]]; then echo "delete"; exit 0; fi
 """,
         )
         _write_executable(
@@ -415,6 +417,7 @@ exit 0
             """#!/bin/bash
 if [[ "$*" == *"/healthz"* ]]; then printf "ok"; exit 0; fi
 if [[ "$*" == *"/api/monitoring/health"* ]]; then printf '{"status":"healthy","setupComplete":true}'; exit 0; fi
+if [[ "$*" == *"muse-code/models"* && "$*" != *"-w"* ]]; then printf '{"object":"list","data":[{"id":"muse-spark-1.3"}]}'; exit 0; fi
 printf "200"
 exit 0
 """,
@@ -538,6 +541,275 @@ exit 0
         self.assertEqual(int(marker.stat().st_mtime), stale_mtime, "Failed integrity check must not update marker mtime")
         self.assertFalse(restart_calls.exists(), "Failed integrity check must not restart a healthy gateway")
 
+
+    def test_v3852_muse_wire_compat_and_updater_muse_catalog_and_backup_cleanup(self) -> None:
+        """v3.8.52 patches resp_keepalive_omniroute + MUSE_CODE_COMPAT_V2; Gate 8 fails closed on empty catalog; Gate 9 prunes pre-migration backups."""
+        # a. Verify container-entrypoint-compat.sh and ensure-muse-wire-compat.sh patching against temp files
+        peer_file = self.home / "peer-stamp.mjs"
+        chunks_dir = self.home / "chunks"
+        chunks_dir.mkdir(parents=True, exist_ok=True)
+        chunk_file = chunks_dir / "8537.js"
+
+        peer_file.write_text(
+            "export function wrapRequestListenerWithPeerStamp(listener) {\n"
+            "  return function peerStampingRequestHandler(req, res) {\n"
+            "    stampPeerIp(req);\n"
+            "    return listener.call(this, req, res);\n"
+            "  };\n"
+            "}\n",
+            encoding="utf-8",
+        )
+        chunk_file.write_text(
+            'const frame = {type:"response.in_progress",sequence_number:0,response:{id:"resp_keepalive_omniroute",status:"in_progress"}};\n',
+            encoding="utf-8",
+        )
+
+        patch_env = self._base_env()
+        patch_env["OMNIROUTE_PEER_STAMP_PATH"] = str(peer_file)
+        patch_env["OMNIROUTE_CHUNKS_DIR"] = str(chunks_dir)
+        ep_res = subprocess.run(
+            ["/bin/sh", str(ENTRYPOINT_COMPAT), "--patch-only"],
+            env=patch_env,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        self.assertEqual(ep_res.returncode, 0, ep_res.stderr)
+        patched_peer = peer_file.read_text(encoding="utf-8")
+        patched_chunk = chunk_file.read_text(encoding="utf-8")
+        self.assertIn("/* MUSE_CODE_COMPAT_V2 */", patched_peer)
+        self.assertIn('"muse-spark-1.3"', patched_peer)
+        self.assertIn(
+            'response:{id:"resp_keepalive",object:"response",status:"in_progress",output:[],error:null}',
+            patched_chunk,
+        )
+        self.assertNotIn("resp_keepalive_omniroute", patched_chunk)
+
+        # Also verify ensure-muse-wire-compat.sh upgrades v1 peer-stamp.mjs + v3.8.52 chunk and is idempotent on second run
+        peer_file.write_text(
+            "export function wrapRequestListenerWithPeerStamp(listener) {\n"
+            "  return function peerStampingRequestHandler(req, res) {\n"
+            '    if (req.url && (req.url === "/muse-code" || req.url.startsWith("/muse-code/") || req.url.startsWith("/muse-code?"))) { req.url = "/v1" + req.url; }\n'
+            "    stampPeerIp(req);\n"
+            "    return listener.call(this, req, res);\n"
+            "  };\n"
+            "}\n",
+            encoding="utf-8",
+        )
+        chunk_file.write_text(
+            'const frame = {type:"response.in_progress",sequence_number:0,response:{id:"resp_keepalive_omniroute",status:"in_progress"}};\n',
+            encoding="utf-8",
+        )
+        _write_executable(
+            self.local_bin / "docker",
+            f"""#!/bin/bash
+if [[ "$1" == "ps" ]]; then echo "omniroute"; exit 0; fi
+if [[ "$1" == "restart" ]]; then exit 0; fi
+if [[ "$1" == "exec" && "$2" == "omniroute" && "$3" == "test" ]]; then exit 0; fi
+if [[ "$1" == "exec" && "$2" == "omniroute" && "$3" == "/app/container-entrypoint-compat.sh" && "$4" == "--patch-only" ]]; then
+  if [[ -f "{self.home / 'fail_compat'}" ]]; then exit 1; fi
+  OMNIROUTE_PEER_STAMP_PATH="{peer_file}" OMNIROUTE_CHUNKS_DIR="{chunks_dir}" /bin/sh "{ENTRYPOINT_COMPAT}" --patch-only
+  exit $?
+fi
+exit 0
+""",
+        )
+        em1 = subprocess.run(
+            ["/bin/bash", str(ENSURE_MUSE_COMPAT), "omniroute"],
+            env=self._base_env(),
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        self.assertEqual(em1.returncode, 0, em1.stderr)
+        self.assertIn("Applied Muse Code wire-compat normalization", em1.stdout)
+        self.assertIn("/* MUSE_CODE_COMPAT_V2 */", peer_file.read_text(encoding="utf-8"))
+        self.assertIn(
+            'response:{id:"resp_keepalive",object:"response",status:"in_progress",output:[],error:null}',
+            chunk_file.read_text(encoding="utf-8"),
+        )
+        em2 = subprocess.run(
+            ["/bin/bash", str(ENSURE_MUSE_COMPAT), "omniroute"],
+            env=self._base_env(),
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        self.assertEqual(em2.returncode, 0, em2.stderr)
+        self.assertIn("already_ok", em2.stdout)
+
+        # Verify ensure-muse-wire-compat.sh fails closed (exit 1) when container patch fails
+        (self.home / "fail_compat").write_text("1\n", encoding="utf-8")
+        em_fail = subprocess.run(
+            ["/bin/bash", str(ENSURE_MUSE_COMPAT), "omniroute"],
+            env=self._base_env(),
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        self.assertEqual(em_fail.returncode, 1, "ensure-muse-wire-compat.sh must fail closed on error")
+        (self.home / "fail_compat").unlink(missing_ok=True)
+        # b & c. Verify update.sh Gate 8 empty catalog fail-closed and Gate 9 pre-migration backup cleanup
+        flag_file = self.omni_state / "update-available"
+        flag_file.write_text(
+            "sha256:b08a12e876baa8a5ccadd1ebbe346fe7267dba3b1c9f4fd6bb02070fae41ab6c\n",
+            encoding="utf-8",
+        )
+        catalog_mode = self.home / "catalog_mode.txt"
+        catalog_mode.write_text("empty\n", encoding="utf-8")
+        backup_cleanup_log = self.home / "backup_cleanup.log"
+
+        _write_executable(
+            self.local_bin / "docker",
+            f"""#!/bin/bash
+if [[ "$1" == "info" ]]; then exit 0; fi
+if [[ "$1" == "compose" ]]; then
+  if [[ "$*" == *" pull "* ]]; then touch "{self.home / 'pulled'}"; fi
+  if [[ "$*" == *" up "* ]]; then touch "{self.home / 'deployed'}"; fi
+  exit 0
+fi
+if [[ "$1" == "inspect" ]]; then
+  if [[ "$*" == *"Health.Status"* ]]; then echo "healthy"; exit 0; fi
+  if [[ -f "{self.home / 'deployed'}" ]]; then echo "sha256:newimage"; else echo "sha256:oldimage"; fi
+  exit 0
+fi
+if [[ "$1" == "image" ]]; then
+  if [[ "$*" == *"RepoDigests"* ]]; then
+    if [[ -f "{self.home / 'pulled'}" ]]; then
+      echo "diegosouzapw/omniroute@sha256:b08a12e876baa8a5ccadd1ebbe346fe7267dba3b1c9f4fd6bb02070fae41ab6c"
+    else
+      echo "diegosouzapw/omniroute@sha256:8bd462c9f60d8eda79329cfbb6ea7ea723505fe7721beb944f3d43835409e218"
+    fi
+  else
+    echo "sha256:newimage"
+  fi
+  exit 0
+fi
+if [[ "$1" == "tag" ]]; then exit 0; fi
+if [[ "$1" == "cp" ]]; then printf "SQLite snapshot" > "$3"; exit 0; fi
+if [[ "$1" == "exec" ]]; then
+  if [[ "$*" == *"package.json"* ]]; then
+    if [[ -f "{self.home / 'deployed'}" ]]; then printf "3.8.52"; else printf "3.8.51"; fi
+    exit 0
+  fi
+  if [[ "$*" == *"quick_check"* ]]; then printf "ok"; exit 0; fi
+  if [[ "$*" == *"omniroute-field-encryption-v1"* ]]; then
+    node -e '
+      const crypto = require("crypto");
+      const secret = "unit-test-storage-secret";
+      process.env.STORAGE_ENCRYPTION_KEY = secret;
+      const key = crypto.scryptSync(secret, "omniroute-field-encryption-v1", 32);
+      const iv = Buffer.alloc(12, 7);
+      const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+      const ct = cipher.update("sk-valid-v3852-key", "utf8", "hex") + cipher.final("hex");
+      const tag = cipher.getAuthTag().toString("hex");
+      const validEnc = "enc:v1:" + iv.toString("hex") + ":" + ct + ":" + tag;
+      const corruptedEnc = "enc:v1:" + iv.toString("hex") + ":" + ct + ":00000000000000000000000000000000";
+      const rows = [
+        {{ key: corruptedEnc, expires_at: null }},
+        {{ key: validEnc, expires_at: null }}
+      ];
+      const Module = require("module");
+      const origLoad = Module._load;
+      Module._load = function(req, parent, isMain) {{
+        if (req === "better-sqlite3") {{
+          return function FakeDb() {{
+            return {{
+              prepare: () => ({{ all: () => rows }}),
+              close: () => {{}}
+            }};
+          }};
+        }}
+        return origLoad(req, parent, isMain);
+      }};
+      global.fetch = async (url, opts) => {{
+        if (opts && opts.headers && opts.headers.Authorization === "Bearer sk-valid-v3852-key") {{
+          return {{ status: 200, text: async () => JSON.stringify({{ data: [{{ id: "gemini-4-argon" }}] }}) }};
+        }}
+        return {{ status: 401, text: async () => "{{}}" }};
+      }};
+    '"$5"
+    exit $?
+  fi
+  if [[ "$*" == *"FROM api_keys"* ]]; then printf "1"; exit 0; fi
+  if [[ "$*" == *"FROM provider_connections"* ]]; then printf "32"; exit 0; fi
+  if [[ "$*" == *"db_state-"*"_pre-migration.sqlite"* ]]; then
+    echo "$@" >> "{backup_cleanup_log}"
+    exit 0
+  fi
+  exit 0
+fi
+exit 0
+""",
+        )
+        _write_executable(
+            self.local_bin / "sqlite3",
+            """#!/bin/bash
+sql="${!#}"
+if [[ "$sql" == *"quick_check"* ]]; then echo "ok"; exit 0; fi
+if [[ "$sql" == *"wal_checkpoint"* ]]; then echo "0|0|0"; exit 0; fi
+if [[ "$sql" == *"journal_mode"* ]]; then echo "delete"; exit 0; fi
+exit 0
+""",
+        )
+        _write_executable(
+            self.local_bin / "curl",
+            f"""#!/bin/bash
+mode=$(cat "{catalog_mode}")
+if [[ "$*" == *"/healthz"* ]]; then printf "ok"; exit 0; fi
+if [[ "$*" == *"/api/monitoring/health"* ]]; then printf '{{"status":"healthy","setupComplete":true}}'; exit 0; fi
+if [[ "$*" == *"/v1/models"* && "$*" != *"-I"* ]]; then printf "401"; exit 0; fi
+if [[ "$*" == *"muse-code/models"* && "$*" != *"-w"* ]]; then
+  if [[ "$mode" == "empty" ]]; then
+    printf '{{"object":"list","data":[]}}'
+  elif [[ "$mode" == "malformed" ]]; then
+    printf '{{"object":"list","data":[{{"id":"muse-spark-1.3"}}'
+  elif [[ "$mode" == "wrong_shape" ]]; then
+    printf '{{"object":"list","data":[],"id":"muse-spark-1.3"}}'
+  else
+    printf '{{"object":"list","data":[{{"id":"muse-spark-1.3"}}]}}'
+  fi
+  exit 0
+fi
+printf "200"
+exit 0
+""",
+        )
+
+        for bad_mode in ("empty", "malformed", "wrong_shape"):
+            catalog_mode.write_text(f"{bad_mode}\n", encoding="utf-8")
+            bad_res = subprocess.run(
+                ["/bin/bash", str(UPDATE_SCRIPT), "3.8.52"],
+                env=self._base_env(),
+                capture_output=True,
+                text=True,
+                timeout=15,
+            )
+            self.assertEqual(bad_res.returncode, 1, f"Expected Gate 8 failure for mode={bad_mode}")
+            self.assertIn(
+                "GATE FAILED [endpoints]: GET /v1/muse-code/models did not advertise muse-spark-1.3",
+                bad_res.stdout,
+            )
+            self.assertTrue(
+                flag_file.exists(),
+                f"Gate 8 failure on {bad_mode} Muse catalog must retain update-available",
+            )
+            self.assertFalse(
+                backup_cleanup_log.exists(),
+                f"Gate 9 backup cleanup must not run when Gate 8 fails ({bad_mode})",
+            )
+        catalog_mode.write_text("ok\n", encoding="utf-8")
+        pass_res = subprocess.run(
+            ["/bin/bash", str(UPDATE_SCRIPT), "3.8.52"],
+            env=self._base_env(),
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        self.assertEqual(pass_res.returncode, 0, pass_res.stdout + pass_res.stderr)
+        self.assertTrue(backup_cleanup_log.exists(), "Gate 9 did not execute pre-migration backup cleanup")
+        self.assertIn("db_state-*_pre-migration.sqlite", backup_cleanup_log.read_text(encoding="utf-8"))
+        self.assertFalse(flag_file.exists(), "Successful Gate 9 completion must clear update-available")
 
 if __name__ == "__main__":
     unittest.main()

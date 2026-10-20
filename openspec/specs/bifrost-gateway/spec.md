@@ -176,6 +176,12 @@ OmniRoute upgrades SHALL pull the verified Docker Hub image and recreate the con
 - **THEN** it SHALL open persistent `~/.omniroute/update.lock` on file descriptor `9` (`umask 077`) and acquire a non-blocking exclusive kernel lock via `/usr/bin/lockf -s -t 0 9` before `pre-state`, exiting `1` and retaining `~/.omniroute/update-available` on contention (`rc = 75`) or failing closed non-zero on other lock errors
 - **AND** once locked, its `EXIT` trap SHALL preserve the original exit status, remove any temporary `/tmp/pre-update-*.sqlite` inside the container before shell exit closes FD `9`, and never parse PID/epoch metadata or unlink `~/.omniroute/update.lock`
 
+#### Scenario: Endpoint gate validates Muse Code catalog routes advertise muse-spark-1.3
+
+- **WHEN** `~/Omniroute/scripts/update.sh` runs Gate 8 (`endpoints`) against the deployed OmniRoute container
+- **THEN** Gate 8 SHALL verify that `GET /v1/muse-code/models` and `GET /muse-code/models` both return HTTP `200` with a JSON `data` array containing model entry `id === "muse-spark-1.3"`
+- **AND** if either endpoint returns a non-200 status or an empty/missing `muse-spark-1.3` catalog entry, Gate 8 SHALL fail closed and retain `~/.omniroute/update-available`
+
 ### Requirement: Startup database health checks SHALL not block gateway readiness
 
 The OmniRoute deployment SHALL defer startup SQLite health checks off the synchronous initialization path via `DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED=true` and `OMNIROUTE_SKIP_DB_HEALTHCHECK=1` in `docker-compose.override.yml` so HTTP readiness probes respond within `start_period`, managed repairs never run `PRAGMA quick_check` inside `BEGIN IMMEDIATE`, and physical integrity checks execute out of band.
@@ -200,7 +206,7 @@ The `omniroute-data` (`omniroute_omniroute-data`) volume at `/app/data` SHALL no
 
 - **WHEN** `/app/data/storage.sqlite.snapshot.bak` or superseded pre-migration backups in `/app/data/db_backups/` exist inside `/app/data` on `omniroute-data`
 - **THEN** a verified host snapshot in `~/.omniroute/snapshots/` (`PRAGMA quick_check = ok`, consolidated via fail-closed `PRAGMA wal_checkpoint(TRUNCATE)`, matching live `api_keys`, `provider_connections`, and `combos` counts) SHALL be maintained on the host
-- **AND** redundant in-volume backup files SHALL be removed so `/app/data` retains only active SQLite database files (`1000:1000` `node:node` ownership) and managed runtime directories
+- **AND** redundant in-volume backup files (including `db_state-*_pre-migration.sqlite` snapshots created during image upgrade migrations once Gate 9 post-deploy `PRAGMA quick_check = ok` and baseline counts succeed) SHALL be removed so `/app/data` retains only active SQLite database files (`1000:1000` `node:node` ownership) and managed runtime directories
 
 #### Scenario: High-volume telemetry tables are pruned and compacted cleanly
 
