@@ -634,8 +634,14 @@ except Exception:
       else
         brew upgrade --cask 2>&1 || true
         if [[ -x "/Applications/Docker.app/Contents/MacOS/install" ]] && [[ -x "${WORKSPACE_DIR}/scripts/docker-service.sh" ]]; then
-          "${WORKSPACE_DIR}/scripts/docker-service.sh" start 2>&1 || true
-          "${WORKSPACE_DIR}/scripts/docker-service.sh" up 2>&1 || true
+          if ! docker info >/dev/null 2>&1 || \
+             [[ ! -S "/var/run/com.docker.vmnetd.sock" ]] || \
+             [[ ! -r "/Library/PrivilegedHelperTools/com.docker.vmnetd" ]] || \
+             [[ ! -x "/Library/PrivilegedHelperTools/com.docker.socket" ]]; then
+            if "${WORKSPACE_DIR}/scripts/docker-service.sh" start 2>&1; then
+              "${WORKSPACE_DIR}/scripts/docker-service.sh" up 2>&1 || true
+            fi
+          fi
         fi
       fi
 

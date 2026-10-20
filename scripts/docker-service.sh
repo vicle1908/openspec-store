@@ -48,24 +48,41 @@ is_daemon_up() {
   docker info >/dev/null 2>&1
 }
 
+is_vmnetd_up() {
+  [[ -f "/Library/LaunchDaemons/com.docker.vmnetd.plist" ]] && \
+  [[ -r "/Library/PrivilegedHelperTools/com.docker.vmnetd" ]] && \
+  { [[ -S "/var/run/com.docker.vmnetd.sock" ]] || pgrep -x com.docker.vmnetd >/dev/null 2>&1 || sudo -n pgrep -x com.docker.vmnetd >/dev/null 2>&1; }
+}
+
+is_socket_helper_up() {
+  [[ -f "/Library/LaunchDaemons/com.docker.socket.plist" ]] && \
+  [[ -x "/Library/PrivilegedHelperTools/com.docker.socket" ]] && \
+  { { [[ -L "/var/run/docker.sock" ]] && [[ "$(readlink /var/run/docker.sock 2>/dev/null)" == "${socket_path}" ]]; } || pgrep -x com.docker.socket >/dev/null 2>&1; }
+}
+
 ensure_helpers() {
   local install_bin="/Applications/Docker.app/Contents/MacOS/install"
   local app_vmnetd="/Applications/Docker.app/Contents/Library/LaunchServices/com.docker.vmnetd"
+  local app_socket="/Applications/Docker.app/Contents/MacOS/com.docker.socket"
   [[ -x "$install_bin" ]] || return 0
-  if [[ ! -f "/Library/LaunchDaemons/com.docker.vmnetd.plist" ]] || \
-     [[ ! -f "/Library/LaunchDaemons/com.docker.socket.plist" ]] || \
-     [[ ! -L "/var/run/docker.sock" ]] || \
+  if ! is_vmnetd_up || ! is_socket_helper_up || \
      ! cmp -s "$app_vmnetd" "/Library/PrivilegedHelperTools/com.docker.vmnetd" 2>/dev/null || \
-     ! pgrep -x com.docker.vmnetd >/dev/null 2>&1; then
+     ! sudo -n cmp -s "$app_socket" "/Library/PrivilegedHelperTools/com.docker.socket" 2>/dev/null; then
     log "Provisioning Docker Desktop privileged helpers (vmnetd + docker.sock) via sudo..."
     sudo -n "$install_bin" config --user "${USER:-$(id -un)}" set-vmnetd set-docker-socket >/dev/null 2>&1 || true
     sudo -n launchctl kickstart -p system/com.docker.vmnetd >/dev/null 2>&1 || true
+    sudo -n launchctl kickstart -p system/com.docker.socket >/dev/null 2>&1 || true
   fi
   local priv_dir
   for priv_dir in /tmp/docker-desktop-privileged*; do
     [[ -d "$priv_dir" ]] || continue
-    echo 0 > "$priv_dir/exitcode.txt" 2>/dev/null || true
-    pkill -f "$priv_dir" 2>/dev/null || true
+    if pgrep -f "$priv_dir" >/dev/null 2>&1; then
+      echo 0 > "$priv_dir/exitcode.txt" 2>/dev/null || true
+      pkill -f "$priv_dir" 2>/dev/null || true
+      sleep 1
+    fi
+    rm -f "$priv_dir/exitcode.txt" "$priv_dir/cmd" 2>/dev/null || true
+    rmdir "$priv_dir" 2>/dev/null || true
   done
 }
 
@@ -80,12 +97,8 @@ status_json() {
   fi
 
   local helpers_vmnetd="false" helpers_socket="false"
-  pgrep -x com.docker.vmnetd >/dev/null 2>&1 && helpers_vmnetd="true"
-  if [[ -L "/var/run/docker.sock" ]] && [[ "$(readlink /var/run/docker.sock 2>/dev/null)" == *"${socket_path}"* ]]; then
-    helpers_socket="true"
-  elif pgrep -x com.docker.socket >/dev/null 2>&1; then
-    helpers_socket="true"
-  fi
+  is_vmnetd_up && helpers_vmnetd="true"
+  is_socket_helper_up && helpers_socket="true"
   local socket_exists=false
   [[ -S "$socket_path" ]] && socket_exists=true
 
@@ -129,9 +142,12 @@ cmd_start() {
   echo "Starting Docker Desktop... (timeout ${timeout_sec}s)"
   log "Invoking: docker desktop start --timeout $timeout_sec"
   if ! docker desktop start --timeout "$timeout_sec"; then
-    echo "✗ Failed to start Docker Desktop within ${timeout_sec}s."
-    log "Start failed after ${timeout_sec}s."
-    return 1
+    if ! pgrep -x com.docker.backend >/dev/null 2>&1 && ! is_daemon_up; then
+      echo "✗ Failed to start Docker Desktop within ${timeout_sec}s."
+      log "Start failed after ${timeout_sec}s."
+      return 1
+    fi
+    log "com.docker.backend is active; continuing to wait for socket reachability..."
   fi
 
   log "Waiting for socket reachability..."
@@ -267,11 +283,13 @@ cmd_status() {
     [[ -S "$socket_path" ]] && socket_exists=true
 
     local vmnetd="down" socket_proc="down"
-    pgrep -x com.docker.vmnetd >/dev/null 2>&1 && vmnetd="up"
-    if [[ -L "/var/run/docker.sock" ]] && [[ "$(readlink /var/run/docker.sock 2>/dev/null)" == *"${socket_path}"* ]]; then
-      socket_proc="active (symlink verified)"
-    elif pgrep -x com.docker.socket >/dev/null 2>&1; then
-      socket_proc="up"
+    is_vmnetd_up && vmnetd="up"
+    if is_socket_helper_up; then
+      if [[ -L "/var/run/docker.sock" ]] && [[ "$(readlink /var/run/docker.sock 2>/dev/null)" == "${socket_path}" ]]; then
+        socket_proc="active (symlink verified)"
+      else
+        socket_proc="up"
+      fi
     fi
     printf 'Docker Desktop Status:\n'
     printf '  Status: %s\n' "$status"
