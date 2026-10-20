@@ -222,3 +222,104 @@ $ git -C /Users/androidteam/Omniroute status --short --branch
 ?? scripts/ensure-muse-wire-compat.sh
 ?? scripts/update.sh
 ```
+
+### 3.6 Cold Container Startup, End-to-End Gates, and Multi-Dialect Wire Verification
+
+```text
+$ # 1. Cold container startup under lockf
+$ /usr/bin/lockf -s -t 30 ~/.omniroute/update.lock docker compose -f ~/Omniroute/docker-compose.yml -f ~/Omniroute/docker-compose.override.yml --project-directory ~/Omniroute --profile base up -d --no-build --pull never --no-deps --force-recreate omniroute-base
+Container omniroute Recreated
+Container omniroute Starting
+Container omniroute Started
+
+$ docker inspect -f '{{.State.Health.Status}}' omniroute
+healthy
+
+$ ~/Omniroute/scripts/ensure-muse-wire-compat.sh omniroute
+Muse Code wire-compat normalization verified (already_ok)
+
+$ docker inspect omniroute --format '{{json .Config.Env}}' | jq '.[] | select(startswith("CLAUDE_USER_AGENT"))'
+(empty - stale 2.1.121 string successfully eliminated)
+
+$ # 2. Full update.sh run across all 10 gates
+$ echo "sha256:b08a12e876baa8a5ccadd1ebbe346fe7267dba3b1c9f4fd6bb02070fae41ab6c" > ~/.omniroute/update-available
+$ ~/Omniroute/scripts/update.sh 3.8.52
+[2026-10-20 18:48:06] === OmniRoute update starting: target version 3.8.52, target digest sha256:b08a12e876baa8a5ccadd1ebbe346fe7267dba3b1c9f4fd6bb02070fae41ab6c ===
+[2026-10-20 18:48:08] Preflight passed
+[2026-10-20 18:48:08] Pre-state: old_version=3.8.52 old_image_id=sha256:fababa40ede0927ecb9d95b8c7255247fe2da16d0df1bd75a6e390a7fa224a65 old_digest=diegosouzapw/omniroute@sha256:b08a12e876baa8a5ccadd1ebbe346fe7267dba3b1c9f4fd6bb02070fae41ab6c baseline_api_keys=1 baseline_provider_connections=33
+[2026-10-20 18:48:33] Snapshot verified: /Users/androidteam/.omniroute/snapshots/pre-update-20261020-184806.sqlite (live + host quick_check ok, wal_checkpoint=0|0|0, sidecars consolidated)
+[2026-10-20 18:48:35] Pulled image verified: digest=sha256:b08a12e876baa8a5ccadd1ebbe346fe7267dba3b1c9f4fd6bb02070fae41ab6c id=sha256:fababa40ede0927ecb9d95b8c7255247fe2da16d0df1bd75a6e390a7fa224a65
+[2026-10-20 18:48:35] ALREADY_TARGET: container already on expected version + target image — skipping rollback tag and recreation, continuing verification gates
+[2026-10-20 18:48:35] Gate 4 (deploy) skipped: already on target image
+Muse Code wire-compat normalization verified (already_ok)
+[2026-10-20 18:48:36] Gate 4b: Muse Code wire-compat normalization verified
+[2026-10-20 18:48:36] Healthy after 1x5s
+[2026-10-20 18:48:36] Version unchanged (3.8.52) — treating as verification retry of a prior partial run
+[2026-10-20 18:48:36] Running container confirmed on pulled image
+[2026-10-20 18:48:39] Model catalog: anonymous GET=401 (catalog auth enabled — v3.8.50 opt-out); authenticated GET=200 count=1292
+[2026-10-20 18:48:39] Endpoints verified: /healthz=ok dashboard=HTTP307 monitoring=healthy/setupComplete=true HEAD/v1/models=HTTP200 GET/v1/models=HTTP401 muse_v1=HTTP200(muse-spark-1.3) muse_rewrite=HTTP200(muse-spark-1.3)
+[2026-10-20 18:48:41] Post-deploy data verified: quick_check=ok api_keys=1(>=1) provider_connections=33(>=33) pre_migration_backups=cleaned
+[2026-10-20 18:48:41] All gates passed. Update flag cleared.
+
+$ # 3. Snapshot verification
+$ sqlite3 ~/.omniroute/snapshots/pre-update-20261020-184806.sqlite "PRAGMA quick_check; PRAGMA journal_mode;"
+ok
+delete
+
+$ # 4. Watchdog & docker-service.sh status
+$ ~/Developer/scripts/omniroute-watchdog.sh && echo WATCHDOG_EXIT_OK
+WATCHDOG_EXIT_OK
+
+$ ~/Developer/scripts/docker-service.sh status
+Docker Desktop Status: running (helpers active, omniroute: 2 running)
+
+$ # 5. Host CLI Bridge (~/.local/bin/omniroute)
+$ omniroute status
+Version: 3.8.52 (CLI: 3.8.52), Status: healthy, Gateway DB: healthy (remote)
+
+$ omniroute keys list --output json | jq '.keys | length'
+13
+
+$ omniroute combo list --output json 2>/dev/null | jq '.combos | length'
+8
+
+$ # 6. Muse Code Catalog & CLI Probe
+$ curl -fsS http://127.0.0.1:20128/v1/muse-code/models | jq -c '{count: (.data | length), first: .data[0].id}'
+{"count":13,"first":"muse-spark-1.3"}
+
+$ curl -fsS http://127.0.0.1:20128/muse-code/models | jq -c '{count: (.data | length), first: .data[0].id}'
+{"count":13,"first":"muse-spark-1.3"}
+
+$ curl -fsSI http://127.0.0.1:20128/v1/muse-code/models
+HTTP/1.1 200 OK
+
+$ curl -fsS -X OPTIONS -i http://127.0.0.1:20128/v1/muse-code/models
+HTTP/1.1 204 No Content
+
+$ /opt/homebrew/bin/muse exec --disable-approval --disable-reminders --no-session-log "Reply with the single word MUSE_OK"
+MUSE_OK
+
+$ # 7. Inference Wire Dialects
+$ # OpenAI Chat Completions (gemini-4-argon-high & gemini-3.8-flash-high)
+$ curl -fsS http://127.0.0.1:20128/v1/chat/completions -H "Content-Type: application/json" \
+  -d '{"model":"gemini-4-argon-high","messages":[{"role":"user","content":"Reply with ARGON_CHAT_OK"}],"max_tokens":50}' | jq -c '{model: .model, content: .choices[0].message.content}'
+{"model":"gemini-4-argon-high","content":"ARGON_CHAT_OK"}
+
+$ curl -fsS http://127.0.0.1:20128/v1/chat/completions -H "Content-Type: application/json" \
+  -d '{"model":"gemini-3.8-flash-high","messages":[{"role":"user","content":"Reply with FLASH_CHAT_OK"}],"max_tokens":50}' | jq -c '{model: .model, content: .choices[0].message.content}'
+{"model":"gemini-3.8-flash-high","content":"FLASH_CHAT_OK"}
+
+$ # OpenAI Responses streaming (gemini-4-argon-high & muse-spark-1.3)
+$ curl -fsS http://127.0.0.1:20128/v1/responses -H "Content-Type: application/json" \
+  -d '{"model":"gemini-4-argon-high","input":[{"role":"user","content":"Reply with ARGON_RESPONSES_OK"}],"stream":true,"max_tokens":100}' | grep -A 1 'response.output_item.done'
+data: {"type":"response.output_item.done","output_index":0,"item":{"id":"msg_resp_...","type":"message","content":[{"type":"output_text","annotations":[],"logprobs":[],"text":"ARGON_RESPONSES_OK"}],"role":"assistant","status":"completed"},"sequence_number":8}
+
+$ curl -fsS http://127.0.0.1:20128/v1/responses -H "Content-Type: application/json" \
+  -d '{"model":"muse-spark-1.3","input":[{"role":"user","content":"Reply with MUSE_SPARK_RESPONSES_OK"}],"stream":true,"max_tokens":100}' | grep -A 1 'response.output_item.done'
+data: {"type":"response.output_item.done","output_index":0,"item":{"id":"msg_resp_...","type":"message","content":[{"type":"output_text","annotations":[],"logprobs":[],"text":"MUSE_SPARK_RESPONSES_OK"}],"role":"assistant","status":"completed"},"sequence_number":9}
+
+$ # Anthropic Messages (gemini-3.8-flash-high)
+$ curl -fsS http://127.0.0.1:20128/v1/messages -H "Content-Type: application/json" -H "anthropic-version: 2023-06-01" \
+  -d '{"model":"gemini-3.8-flash-high","messages":[{"role":"user","content":"Reply with FLASH_MESSAGES_OK"}],"max_tokens":100}' | jq -c '{model: .model, text: .content[0].text}'
+{"model":"gemini-3.8-flash-high","text":"FLASH_MESSAGES_OK"}
+```
