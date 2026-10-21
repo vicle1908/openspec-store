@@ -1,0 +1,182 @@
+"""Behavioral verification for OmniRoute dedicated TypeSafe (Jev System One) provider.
+
+Verifies the normative scenarios in `openspec/changes/setup-omniroute-typesafe-jev-provider/specs/bifrost-gateway/spec.md`:
+1. Dedicated `typesafe` provider connection is active (`isActive: true`, `testStatus: "active"`)
+   in OmniRoute's SQLite `provider_connections` store and masks `.connection.apiKey` on read.
+2. `POST /api/providers/validate` returns `valid: true` and `method: "typesafe_systemone"` for a
+   valid key and `valid: false` with `"Invalid API key"` for an invalid key.
+3. `POST /api/providers/{id}/test` returns `valid: true` and `diagnosis.type == "ok"`.
+4. `typesafe` (`serviceKinds: []`) is excluded from `GET /v1/models` chat-selectable models,
+   `~/Omniroute` tracked git status remains clean, and `container-entrypoint-compat.sh`
+   contains zero custom `/v1/systemone` reverse-proxy monkeypatches.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import shlex
+import stat
+import subprocess
+import unittest
+import urllib.request
+from pathlib import Path
+from typing import Any
+
+OMNIROUTE_BASE_URL = "http://127.0.0.1:20128"
+OMNIROUTE_ROOT = Path("/Users/androidteam/Omniroute")
+BRIDGE_PATH = Path.home() / ".local" / "bin" / "omniroute"
+
+
+def _load_zshenv_credentials() -> dict[str, str]:
+    zshenv = Path.home() / ".zshenv"
+    mode = stat.S_IMODE(zshenv.stat().st_mode)
+    if (mode & 0o077) != 0:
+        raise AssertionError(f"~/.zshenv must have 0600 permissions, got {oct(mode)}")
+
+    creds: dict[str, str] = {}
+    for raw_line in zshenv.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        tokens = shlex.split(line, comments=True)
+        if tokens and tokens[0] == "export":
+            tokens = tokens[1:]
+        for tok in tokens:
+            if "=" in tok:
+                key, value = tok.split("=", 1)
+                if key in {"TYPESAFE_API_KEY", "OMNIROUTE_API_KEY"} and value:
+                    creds[key] = value
+    return creds
+
+
+def _omniroute_request(
+    method: str,
+    path: str,
+    omniroute_key: str,
+    body: dict[str, Any] | None = None,
+) -> tuple[int, dict[str, Any]]:
+    headers = {
+        "Authorization": f"Bearer {omniroute_key}",
+        "Accept": "application/json",
+    }
+    data: bytes | None = None
+    if body is not None:
+        data = json.dumps(body).encode("utf-8")
+        headers["Content-Type"] = "application/json"
+
+    req = urllib.request.Request(
+        f"{OMNIROUTE_BASE_URL}{path}",
+        data=data,
+        headers=headers,
+        method=method,
+    )
+    with urllib.request.urlopen(req, timeout=20) as resp:
+        return resp.status, json.loads(resp.read().decode("utf-8"))
+
+
+class TestOmniRouteTypeSafeProvider(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        creds = _load_zshenv_credentials()
+        cls.typesafe_key = creds["TYPESAFE_API_KEY"]
+        cls.omniroute_key = os.environ.get("OMNIROUTE_API_KEY") or creds["OMNIROUTE_API_KEY"]
+
+    def test_typesafe_provider_connection_active_and_masked(self) -> None:
+        status, body = _omniroute_request("GET", "/api/providers?limit=5000", self.omniroute_key)
+        self.assertEqual(status, 200)
+        connections = [
+            c for c in body.get("connections", []) if c.get("provider") == "typesafe"
+        ]
+        self.assertEqual(len(connections), 1, "Expected exactly one dedicated typesafe connection")
+        conn_id = connections[0]["id"]
+
+        detail_status, detail_body = _omniroute_request(
+            "GET", f"/api/providers/{conn_id}", self.omniroute_key
+        )
+        self.assertEqual(detail_status, 200)
+        conn = detail_body.get("connection", {})
+        self.assertEqual(conn.get("provider"), "typesafe")
+        self.assertEqual(conn.get("authType"), "apikey")
+        self.assertIs(conn.get("isActive"), True)
+        self.assertEqual(conn.get("testStatus"), "active")
+
+        masked_key = str(conn.get("apiKey") or "")
+        self.assertIn("*", masked_key)
+        self.assertNotEqual(masked_key, self.typesafe_key)
+
+    def test_typesafe_validate_accepts_valid_and_rejects_invalid_key(self) -> None:
+        ok_status, ok_body = _omniroute_request(
+            "POST",
+            "/api/providers/validate",
+            self.omniroute_key,
+            {"provider": "typesafe", "apiKey": self.typesafe_key},
+        )
+        self.assertEqual(ok_status, 200)
+        self.assertIs(ok_body.get("valid"), True)
+        self.assertEqual(ok_body.get("method"), "typesafe_systemone")
+
+        bad_status, bad_body = _omniroute_request(
+            "POST",
+            "/api/providers/validate",
+            self.omniroute_key,
+            {"provider": "typesafe", "apiKey": "ts_invalid_probe_key_000000"},
+        )
+        self.assertEqual(bad_status, 200)
+        self.assertIs(bad_body.get("valid"), False)
+        self.assertIn("Invalid API key", str(bad_body.get("error") or ""))
+
+    def test_typesafe_connection_test_endpoint_returns_ok_diagnosis(self) -> None:
+        _, list_body = _omniroute_request("GET", "/api/providers?limit=5000", self.omniroute_key)
+        conn_id = next(
+            c["id"] for c in list_body.get("connections", []) if c.get("provider") == "typesafe"
+        )
+        t_status, t_body = _omniroute_request(
+            "POST", f"/api/providers/{conn_id}/test", self.omniroute_key, {}
+        )
+        self.assertEqual(t_status, 200)
+        self.assertIs(t_body.get("valid"), True)
+        self.assertEqual(t_body.get("diagnosis", {}).get("type"), "ok")
+
+    def test_typesafe_excluded_from_v1_models_and_zero_monkeypatch_boundary(self) -> None:
+        m_status, m_body = _omniroute_request("GET", "/v1/models", self.omniroute_key)
+        self.assertEqual(m_status, 200)
+        models = m_body.get("data", [])
+        self.assertGreater(len(models), 0)
+        typesafe_models = [
+            m
+            for m in models
+            if "typesafe" in str(m.get("id", "")).lower()
+            or str(m.get("owned_by", "")).lower() == "typesafe"
+        ]
+        self.assertEqual(typesafe_models, [])
+
+        compat_script = (OMNIROUTE_ROOT / "scripts" / "container-entrypoint-compat.sh").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn("systemone", compat_script.lower())
+        self.assertNotIn("typesafe", compat_script.lower())
+
+        git_proc = subprocess.run(
+            ["git", "-C", str(OMNIROUTE_ROOT), "status", "--porcelain", "--untracked-files=no"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        self.assertEqual(git_proc.stdout.strip(), "")
+
+        cli_proc = subprocess.run(
+            [str(BRIDGE_PATH), "providers", "list", "--output", "json"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        cli_providers = json.loads(cli_proc.stdout).get("providers", [])
+        cli_typesafe = [p for p in cli_providers if p.get("provider") == "typesafe"]
+        self.assertEqual(len(cli_typesafe), 1)
+        self.assertIs(cli_typesafe[0].get("isActive"), True)
+        self.assertEqual(cli_typesafe[0].get("testStatus"), "active")
+
+
+if __name__ == "__main__":
+    unittest.main()
