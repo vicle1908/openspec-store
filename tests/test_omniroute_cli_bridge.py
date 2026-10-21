@@ -359,6 +359,52 @@ class TestOmniRouteCliBridge(unittest.TestCase):
         self.assertEqual(res_offline.stdout.strip(), "")
         self.assertIn("unreachable", res_offline.stderr.lower())
 
+    def test_providers_list_formats_table_and_json_and_fails_closed(self) -> None:
+        with _MockOmniRouteServer() as server:
+            # 1. JSON output
+            res_json = _run_bridge(
+                ["providers", "list", "--output", "json", "--base-url", f"http://127.0.0.1:{server.port}"]
+            )
+            self.assertEqual(res_json.returncode, 0, msg=res_json.stderr)
+            data = json.loads(res_json.stdout)
+            self.assertIn("providers", data)
+            providers = data["providers"]
+            self.assertEqual(len(providers), 5)
+            self.assertEqual(providers[0]["id"], "conn-11111111")
+            self.assertEqual(providers[0]["provider"], "openrouter")
+            self.assertEqual(providers[0]["name"], "main-or")
+            self.assertEqual(providers[4]["provider"], "codex")
+            self.assertEqual(providers[4]["authType"], "oauth")
+            self.assertEqual(providers[0]["testStatus"], "unknown")
+            self.assertNotIn("apiKey", providers[0])
+            self.assertNotIn("maskedKey", providers[0])
+
+            # 2. Table output
+            res_table = _run_bridge(
+                ["providers", "list", "--base-url", f"http://127.0.0.1:{server.port}"]
+            )
+            self.assertEqual(res_table.returncode, 0, msg=res_table.stderr)
+            self.assertIn("OmniRoute Providers", res_table.stdout)
+            self.assertIn("conn-111", res_table.stdout)
+            self.assertIn("openrouter", res_table.stdout)
+
+            # 3. 404 failure
+            server.providers_status_code = 404
+            server.providers_payload = {"error": "Not found"}
+            res_404 = _run_bridge(
+                ["providers", "list", "--base-url", f"http://127.0.0.1:{server.port}"]
+            )
+            self.assertEqual(res_404.returncode, 2)
+            self.assertIn("not supported", res_404.stderr.lower())
+
+        # 4. Offline failure
+        dead_port = _find_unused_port()
+        res_offline = _run_bridge(
+            ["providers", "list", "--base-url", f"http://127.0.0.1:{dead_port}"]
+        )
+        self.assertEqual(res_offline.returncode, 3)
+        self.assertIn("unreachable", res_offline.stderr.lower())
+
 
 if __name__ == "__main__":
     unittest.main()

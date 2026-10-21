@@ -65,6 +65,7 @@ The repository workspace SHALL maintain an operational reference guide in `docs/
 #### Scenario: Wiki entity reflects active host CLI bridge governance
 - **WHEN** `wiki/entities/omniroute.md` is inspected
 - **THEN** it SHALL describe the 21 `cli-*` skills as actively served through `~/.local/bin/omniroute` (`2026-10-15-introduce-omniroute-cli-bridge`) rather than deferred to a future change
+
 ### Requirement: Host CLI Bridge Execution and Stdout Stream Cleanliness
 
 The system SHALL provide an executable host CLI bridge at `~/.local/bin/omniroute` that invokes the OmniRoute CLI entrypoint via the host Bun runtime. The bridge MUST normalize `OMNIROUTE_BASE_URL` to strip a trailing `/v1`, and MUST filter startup banner lines matching `📋 Loaded env from` from standard output so structured output remains parseable.
@@ -156,3 +157,18 @@ The host CLI bridge at `~/.local/bin/omniroute` SHALL normalize `localhost` base
 - **WHEN** `~/.local/bin/omniroute` finishes executing any CLI subcommand
 - **THEN** the unique temporary directory created via `fs.mkdtempSync` for that invocation SHALL be removed before exit
 - **AND** consecutive offline fallback runs SHALL NOT share residual SQLite or `.env` state in `/tmp`
+
+### Requirement: Host CLI bridge SHALL query daemon truth for provider inventory
+
+The host CLI bridge (`~/.local/bin/omniroute`) SHALL query the live OmniRoute HTTP daemon on loopback for operational provider listings, routing requests over authenticated HTTP (`/api/providers?limit=5000`) rather than reading from or writing to local ephemeral SQLite state.
+
+#### Scenario: omniroute providers list queries live daemon connections
+- **WHEN** `omniroute providers list` is executed on the host
+- **THEN** it SHALL request `/api/providers?limit=5000` from the active OmniRoute daemon using the resolved API key
+- **AND** it SHALL output the list of active and configured provider connections in table format or JSON format matching upstream's `{ providers: [...] }` schema
+- **AND** it SHALL NOT report "No providers configured." when connections exist in the live container database
+
+#### Scenario: Daemon unreachable fails closed
+- **WHEN** `omniroute providers list` is executed while the OmniRoute daemon is unreachable or down
+- **THEN** it SHALL exit non-zero with an explicit error stating the daemon is unreachable
+- **AND** it SHALL NOT fall back to creating or querying an empty local database
