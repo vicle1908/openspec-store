@@ -549,7 +549,7 @@ for s in sorted(all_specs):
     except Exception:
         pass
 
-    if cap.startswith("agent-core") or cap.startswith("agent-runtime") or cap.startswith("memory-") or "guardrail" in cap:
+    if cap.startswith("agent-core") or cap.startswith("agent-runtime") or cap.startswith("memory-") or "guardrail" in cap or "jev" in cap:
         domains["Agent Runtime & AI Capabilities"].append((cap, purpose))
     elif "doc" in cap or "wiki" in cap:
         domains["Documentation & Knowledge Sync"].append((cap, purpose))
@@ -587,6 +587,31 @@ if os.path.isdir(changes_dir):
             status = f"{completed}/{total}" if total > 0 else "In-Progress"
             active_changes.append((entry, completed, total, status))
 
+# Discover recently archived changes dynamically
+archive_dir = os.path.join(changes_dir, "archive")
+recent_archived = []
+if os.path.isdir(archive_dir):
+    for entry in sorted(os.listdir(archive_dir), reverse=True):
+        p = os.path.join(archive_dir, entry)
+        if os.path.isdir(p) and not entry.startswith("."):
+            tasks_file = os.path.join(p, "tasks.md")
+            completed, total = 0, 0
+            if os.path.isfile(tasks_file):
+                try:
+                    with open(tasks_file, "r", encoding="utf-8") as tf:
+                        for line in tf:
+                            if "- [x]" in line or "- [X]" in line:
+                                completed += 1
+                                total += 1
+                            elif "- [ ]" in line:
+                                total += 1
+                except Exception:
+                    pass
+            status = f"{completed}/{total} (Archived)" if total > 0 else "Archived"
+            recent_archived.append((entry, completed, total, status))
+            if len(recent_archived) >= 10:
+                break
+
 out_path = os.environ.get("CATALOG_FILE", os.path.expanduser("~/.knowledge-refresh/openspec-domain-catalog.md"))
 with open(out_path, "w", encoding="utf-8") as f:
     f.write(f"> Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%SZ')}\n")
@@ -601,17 +626,25 @@ with open(out_path, "w", encoding="utf-8") as f:
         f.write("| *None* | 0 | 0 | Clean |\n")
     f.write("\n")
 
+    if recent_archived:
+        f.write("## Recently Archived Changes\n\n")
+        f.write("| Archived Change | Completed Tasks | Total Tasks | Status |\n")
+        f.write("| :--- | :--- | :--- | :--- |\n")
+        for ch_name, comp, tot, stat in recent_archived:
+            f.write(f"| `{ch_name}` | {comp} | {tot} | {stat} |\n")
+        f.write("\n")
+
     f.write("## Specifications by Architecture Domain\n\n")
     for dom_name, specs in domains.items():
         f.write(f"### {dom_name} ({len(specs)} specs)\n\n")
         f.write("| Capability | Purpose / Contract |\n")
         f.write("| :--- | :--- |\n")
-        for cap, purp in specs[:15]: # Show top 15 per category in overview table
+        for cap, purp in specs[:20]: # Show top 20 per category in overview table
             # clean purp for table
             purp_clean = purp.replace("|", "\\|")[:120]
             f.write(f"| `{cap}` | {purp_clean} |\n")
-        if len(specs) > 15:
-            f.write(f"| *... and {len(specs) - 15} more capabilities* | *See platform/openspec-store/openspec/specs/* |\n")
+        if len(specs) > 20:
+            f.write(f"| *... and {len(specs) - 20} more capabilities* | *See platform/openspec-store/openspec/specs/* |\n")
         f.write("\n")
 PYEOF
 
