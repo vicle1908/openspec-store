@@ -1,13 +1,13 @@
 # jev-decision-runtime Specification
 
 ## Purpose
-Provides sub-second, deterministic System One decision primitives — Noul yes/no probabilities, Choice routing, and ordinal Score — for the SHB Banking Ecosystem (`shb-core`, `shb-agent-core`, `shb-agent-harness`, `shb-ai-harness-skills`, `shb-agent-skills`, `shb-observability`, `shb-ai-review`, `shb-mcp-servers`) and Workspace Ecosystem Foundation, powering banking tool guardrails, AML screening triage, LangGraph harness branching, skill catalog reranking, and trace evaluation without generative token latency or output-token cost.
+Provides sub-second, deterministic System One decision primitives — Noul yes/no probabilities, Choice routing, ordinal Score, and Box spatial grounding — for the SHB Banking Ecosystem (`shb-core`, `shb-agent-core`, `shb-agent-harness`, `shb-ai-harness-skills`, `shb-agent-skills`, `shb-observability`, `shb-ai-review`, `shb-mcp-servers`) and Workspace Ecosystem Foundation, powering banking tool guardrails, AML screening triage, LangGraph harness branching, skill catalog reranking, and trace evaluation without generative token latency or output-token cost.
 
 ## Requirements
 
 ### Requirement: System One Decision Client
 
-The banking runtime foundation SHALL provide a System One decision client (`shb_core.jev.JevDecisionClient`) with process-wide `get_jev_client()` / `reset_jev_client()` singleton helpers wrapping `TypeSafeClient` and `AsyncTypeSafeClient` (`evaluate` and `a_evaluate`) to evaluate `state` against typed `Noul`, `Choice`, and `Score` questions, guarded by a thread-safe `JevCircuitBreaker`.
+The banking runtime foundation SHALL provide a System One decision client (`shb_core.jev.JevDecisionClient`, backed by `typesafe-sdk[http2]>=0.7.5`) with process-wide `get_jev_client()` / `reset_jev_client()` singleton helpers and public `get_sync_sdk_client()` / `get_async_sdk_client()` accessors wrapping `TypeSafeClient` and `AsyncTypeSafeClient` (`evaluate` and `a_evaluate`, including optional `assets=...` attachment for `Image`/`Asset` multimodal inputs) to evaluate `state` against typed `Noul`, `Choice`, `Score`, and `Box` questions, guarded by a thread-safe `JevCircuitBreaker`.
 
 #### Scenario: Successful decision evaluation
 - **WHEN** the client evaluates a state against a question map with a configured `TYPESAFE_API_KEY` (or `PYDANTIC_AI_GATEWAY_API_KEY`)
@@ -15,6 +15,7 @@ The banking runtime foundation SHALL provide a System One decision client (`shb_
 - **AND** a `Noul` answer MUST expose the yes-probability on a 0-to-1 scale ($p \in [0.0, 1.0]$) and certainty $|2p - 1|$ (where $p \approx 0.5$ represents maximal uncertainty between yes and no, not medium intensity)
 - **AND** a `Choice` answer MUST expose the selected value, its distribution concentration `confidence`, and probabilities mapping
 - **AND** a `Score` answer MUST evaluate 0-indexed levels ($0 \dots N-1$, `min_length=2`) and return expected value $\sum_{i=0}^{N-1} i \cdot P(i) \in [0.0, N-1]$ alongside `confidence`, `probabilities`, and `legend`
+- **AND** a `Box` answer (`Box(image=..., instructions=...)` evaluated with `Image` / `Asset` inputs passed via `assets=...` or embedded in `state`) MUST return `BoxAnswer` (`box: BoxCoordinates | None`, `present: float`, `confidence: float | None`) recorded in `JevEvaluationResult.boxes` and lifted as `BoxCoordinates | None` onto plain Pydantic `response_model` attributes
 - **AND** no generative text SHALL be returned or parsed
 
 #### Scenario: Multiple atomic questions evaluated in one request
@@ -92,7 +93,7 @@ The banking agent tool registry (`shb-agent-core`) SHALL provide pre-flight sema
 - **AND** `JevToolGuardrail` MUST execute **once** per tool invocation, strictly deduplicating via an exact `(clean_tool_name, canonical_args)` guard in `_make_dedup_key` (computing and preserving `has_supervisor_token = is_valid_supervisor_token(token)` in `sanitize_invocation_state` and `_make_dedup_key` before stripping `supervisor_approval_token`, and never falling back to tool-name-only matching across different arguments) while `ShbAgent._bind_deps_to_tool_func` injects active `deps.guardrail` and `deps.jev_client` into `@agent.tool_plain` functions across both `ShbAgent.run()` and `ShbAgent.run_async()` so `@hooks.on.before_tool_execute` and direct tool functions (`initiate_fund_transfer`, `pay_bill`, `parse_vietqr`, `screen_beneficiary`) never invoke TypeSafe twice for identical calls and never conflate unapproved vs supervisor-approved retries
 
 #### Scenario: Dynamic tool preparation via Speculative Fan-Out
-- **WHEN** `ShbAgent` prepares tools for an execution turn via Pydantic AI 2.54.0 `PrepareTools(fn)` capability (`Agent(..., capabilities=[PrepareTools(fn)])`) for turn-level tool-schema filtering while `JevToolGuardrail` executes once per tool invocation (deduplicated across `@hooks.on.before_tool_execute` and `initiate_fund_transfer` / `pay_bill` / `parse_vietqr` / `screen_beneficiary` via a strict exact-key `(clean_tool_name, canonical_args)` guard)
+- **WHEN** `ShbAgent` prepares tools for an execution turn via Pydantic AI `pydantic-ai>=2.59.0` `PrepareTools(fn)` and `Caching(retention=True, messages=True)` capabilities (`Agent(..., capabilities=[Caching(retention=True, messages=True), PrepareTools(fn)])`) for prompt caching and turn-level tool-schema filtering while `JevToolGuardrail` executes once per tool invocation (deduplicated across `@hooks.on.before_tool_execute` and `initiate_fund_transfer` / `pay_bill` / `parse_vietqr` / `screen_beneficiary` via a strict exact-key `(clean_tool_name, canonical_args)` guard)
 - **AND** tool names are normalized via `tool_name.removeprefix("tool_")` so both `tool_`-prefixed registrations (`tool_get_account_balance`, `tool_query_transaction_status`, `tool_initiate_fund_transfer`) and unprefixed `tool_plain` tools (`initiate_fund_transfer`, `pay_bill`) match against `TOOL_AUTHORITY_MAP` (`{"initiate_fund_transfer", "pay_bill"}`)
 - **AND** speculative fan-out (`recommended_tool_family` with `confidence >= 0.85`) classifies the user turn intent as read-only
 - **THEN** financial debit tools (`tool_initiate_fund_transfer`, `initiate_fund_transfer`, `pay_bill`) SHALL be dynamically omitted from the active turn toolset so indirect prompt injection (such as malicious VietQR Tag 62 `purpose` payloads) cannot trigger unintended debits
@@ -127,7 +128,7 @@ The banking agent tool registry (`shb-agent-core`) SHALL provide pre-flight sema
 - **AND** SHALL NOT permit unapproved tool execution
 ### Requirement: State-Driven Graph Routing
 
-The workflow engine (`shb-agent-harness`, package `shb_harness`) SHALL support confidence-gated graph routing using TypeSafe `Choice` decisions (`_should_skip_api_contract` / `a_should_skip_api_contract`) wired via `builder.add_conditional_edges(StageName.SPEC.value, ...)`, treating `confidence` as a second axis and failing safe to `StageName.API_CONTRACT` while preserving human interrupt gates.
+The workflow engine (`shb-agent-harness`, package `shb_harness` on `langgraph>=1.2.16` and `langgraph-checkpoint-sqlite>=3.1.2`) SHALL support confidence-gated graph routing using TypeSafe `Choice` decisions (`_should_skip_api_contract` / `a_should_skip_api_contract`) wired via `builder.add_conditional_edges(StageName.SPEC.value, ...)`, treating `confidence` as a second axis and failing safe to `StageName.API_CONTRACT` while preserving human interrupt gates.
 
 #### Scenario: Confident routing decision bypasses intermediate stage
 - **WHEN** `StageName.SPEC` completes and `_should_skip_api_contract` / `a_should_skip_api_contract` evaluates the state (normalizing `state = HarnessState.model_validate(state) if isinstance(state, dict) else state` at entry)
@@ -172,7 +173,7 @@ The skill package (`shb-agent-skills`) SHALL create `shb_skills.matcher.SkillMat
 The evaluation subsystem (`shb-agent-core`, package `shb_agent.evaluation`) SHALL provide a `JevEvaluator` compatible with `pydantic-evals` that assesses trace outputs by scoring independent rubric dimensions (`Score` and `Noul`) in a single parallel request and combining them in code without generative LLM completion.
 
 #### Scenario: Fast rubric evaluation
-- **WHEN** `JevEvaluator` in `src/shb_agent/evaluation/jev_scorer.py` (re-exported in `src/shb_agent/evaluation/__init__.py` alongside built-in `BANKING_EVAL_DATASET` using `pydantic_evals.Dataset` / `Case`) evaluates an agent output or trace against a multi-dimensional rubric (e.g., accuracy, tone, compliance adherence) using `pydantic-evals>=1.70.0`
+- **WHEN** `JevEvaluator` in `src/shb_agent/evaluation/jev_scorer.py` (re-exported in `src/shb_agent/evaluation/__init__.py` alongside built-in `BANKING_EVAL_DATASET` using `pydantic_evals.Dataset` / `Case`) evaluates an agent output or trace against a multi-dimensional rubric (e.g., accuracy, tone, compliance adherence) using `pydantic-evals>=2.59.0`
 - **THEN** it SHALL score each rubric dimension independently using a `Score` (normalized as $\text{score}/(N-1)$) or `Noul` question in one request
 - **AND** it SHALL return a numeric result composed in code without invoking autoregressive LLM completion
 - **AND** the per-dimension answers SHALL remain available so the composition is inspectable, and `src/shb_agent/cli.py` SHALL expose `shb-agent evaluate <prompt> --output <output> [--expected <expected>] [--no-live]` to evaluate agent outputs across the rubric dimensions from the CLI
@@ -185,7 +186,7 @@ All TypeSafe questions, criteria, code-owned weights, and confidence thresholds 
 
 #### Scenario: Questions and thresholds are reviewable in one place
 - **WHEN** a reviewer inspects the decision configuration in `src/shb_core/decisions.py`
-- **THEN** every question, criterion, weight, and threshold across guardrails, triage, routing, and skills SHALL be visible in a single module, using `typesafe_sdk`'s real classes (`typesafe_sdk._core.question_types`, `typesafe_sdk._core.response_types`) when installed and defining only the minimal optional-dependency fallback shims (`Noul`, `Choice`, `Score`, `NoulCriteria`, `SystemOneResponse`, `TypeSafeError`, `TypeSafeAuthenticationError`) once in `src/shb_core/jev.py` (imported by `src/shb_core/decisions.py`) when `typesafe-sdk` is not installed
+- **THEN** every question, criterion, weight, and threshold across guardrails, triage, routing, and skills SHALL be visible in a single module, using `typesafe_sdk`'s real classes (`typesafe_sdk._core.question_types`, `typesafe_sdk._core.response_types`, including `Asset`, `Box`, `BoxAnswer`, `BoxCoordinates`, and `Image` in `typesafe-sdk>=0.7.5`) when installed and defining only the minimal optional-dependency fallback shims (`Noul`, `Choice`, `Score`, `Box`, `BoxCoordinates`, `BoxAnswer`, `Image`, `Asset`, `NoulCriteria`, `SystemOneResponse`, `TypeSafeError`, `TypeSafeAuthenticationError`) once in `src/shb_core/jev.py` (imported by `src/shb_core/decisions.py`) when `typesafe-sdk` is not installed
 - **AND** changing a weight or threshold SHALL NOT require editing the logic that combines the answers
 - **AND** `src/**/*.py` (including `src/shb_core/decisions.py` criteria examples and docstrings) MUST NOT contain any `api_key|secret_key|private_key|password|jwt_secret` string literal $\ge 12$ chars (`SEC-001`) or any unmasked 16-digit PAN (`PCI-001`) enforced by `shb-tools` `ComplianceScanner`
 #### Scenario: Questions remain atomic
@@ -215,7 +216,7 @@ Jev decisions SHALL be observable through OpenTelemetry spans (`shb.jev.decision
 - **AND** state projections (<32k tokens) MUST be sanitized via `sanitize_jev_state(state, max_tokens=32_000)` using `shb_core.security.crypto.mask_pan` and recursive secret-key redaction (`secret`, `token`, `password`, `key`, `supervisor_approval_token`, excluding `_NON_SECRET_STRUCTURAL_KEYS` such as `idempotency_key` and `has_supervisor_token`) before creating evaluation states or emitting spans
 ### Requirement: HTTP/2 Transport Multiplexing
 
-The client transport SHALL support HTTP/2 multiplexing via `typesafe-sdk[http2]>=0.7.2` to maintain persistent socket connections and eliminate per-request handshake overhead, lazily creating sync and event-loop-aware async clients, passing explicit timeouts, and providing explicit lifecycle shutdown.
+The client transport SHALL support HTTP/2 multiplexing via `typesafe-sdk[http2]>=0.7.5` (`httpx2>=2.16.0` / `httpcore2==2.16.0`) to maintain persistent socket connections and eliminate per-request handshake overhead, lazily creating sync and event-loop-aware async clients, passing explicit timeouts, and providing explicit lifecycle shutdown.
 
 #### Scenario: HTTP/2 connection pooling
 - **WHEN** the decision client initializes with `settings.jev.http2` enabled
@@ -241,7 +242,7 @@ The client SHALL support structured validation using TypeSafe native response mo
 
 ### Requirement: Pydantic AI Gateway Compatibility
 
-The configuration and client SHALL support proxying requests through custom enterprise proxies or gateways via explicit `base_url` (`settings.jev.base_url` or `TYPESAFE_BASE_URL`) and `PYDANTIC_AI_GATEWAY_API_KEY`, using `_resolve_endpoint_and_api_key()` to resolve the endpoint first so `TYPESAFE_API_KEY` in `~/.zshenv` never overrides a gateway key.
+The configuration and client SHALL support proxying requests through custom enterprise proxies or gateways via explicit `base_url` (`settings.jev.base_url` or `TYPESAFE_BASE_URL`) and `PYDANTIC_AI_GATEWAY_API_KEY`, using `_resolve_endpoint_and_api_key()` to resolve the endpoint first so `TYPESAFE_API_KEY` in `~/.zshenv` never overrides a gateway key, and `shb_agent.model.resolve_typesafe_decision_model()` SHALL integrate `pydantic_ai.models.typesafe.TypeSafeModel`, `TypeSafeModelSettings` (`decision_boolean_threshold`, `decision_route_threshold`, and `max_retries -> TypeSafeRetryPolicy` forwarding in `pydantic-ai>=2.59.0`), and `pydantic_ai.providers.typesafe.TypeSafeProvider` backed by `JevDecisionClient.get_async_sdk_client()`.
 
 #### Scenario: Gateway proxy routing
 - **WHEN** `PYDANTIC_AI_GATEWAY_API_KEY`, `TYPESAFE_API_KEY`, or custom `base_url` (`settings.jev.base_url` or `TYPESAFE_BASE_URL`) is configured (noting that `pydantic_ai/providers/gateway.py:105-112` only supports `openai`, `groq`, `anthropic`, `bedrock`, and `google`/`google-cloud` rather than a built-in `gateway/typesafe` route)
