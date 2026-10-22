@@ -177,6 +177,101 @@ class TestOmniRouteTypeSafeProvider(unittest.TestCase):
         self.assertIs(cli_typesafe[0].get("isActive"), True)
         self.assertEqual(cli_typesafe[0].get("testStatus"), "active")
 
+    def test_in_container_stored_typesafe_credential_executes_jev_models_and_primitives(self) -> None:
+        node_script = """
+import path from "node:path";
+import zlib from "node:zlib";
+import { createRequire } from "node:module";
+import { decryptStored, resolveDataDir } from "/app/webdav-handler.mjs";
+
+const require = createRequire(import.meta.url);
+const Database = require("better-sqlite3");
+const db = new Database(path.join(resolveDataDir(), "storage.sqlite"), { readonly: true, fileMustExist: true });
+const row = db.prepare("SELECT id, api_key, is_active, test_status FROM provider_connections WHERE provider = ? AND is_active = 1 ORDER BY priority ASC LIMIT 1").get("typesafe");
+db.close();
+if (!row) throw new Error("Missing active typesafe row in storage.sqlite");
+const apiKey = decryptStored(row.api_key);
+if (!apiKey) throw new Error("Failed to decrypt stored typesafe api_key");
+
+const headers = {
+  "Authorization": `Bearer ${apiKey}`,
+  "Content-Type": "application/json",
+  "Accept": "application/json",
+};
+
+const modelsRes = await fetch("https://api.typesafe.ai/v1/models", { headers });
+const modelsData = await modelsRes.json();
+
+const latestRes = await fetch("https://api.typesafe.ai/v1/systemone", {
+  method: "POST",
+  headers,
+  body: JSON.stringify({
+    model: "jev-latest",
+    state: { prompt: "Implement a thread-safe token bucket rate limiter in Go with unit tests." },
+    questions: {
+      is_code: { type: "noul", instructions: "Is `prompt` requesting software implementation?" },
+      route: {
+        type: "choice",
+        instructions: "Pick the best model tier for `prompt`.",
+        criteria: {
+          "gemini-4-argon-high": "Complex coding and unit test implementation",
+          "gemini-3.8-flash-high": "Short non-coding summary"
+        }
+      },
+      difficulty: {
+        type: "score",
+        instructions: "Rate engineering difficulty of `prompt`.",
+        criteria: ["Trivial typo", "Standard component with tests", "Multi-region redesign"]
+      }
+    }
+  })
+});
+const latestData = await latestRes.json();
+
+const zstdBody = zlib.zstdCompressSync(Buffer.from(JSON.stringify({
+  model: "jev-1.14.0",
+  state: "SELECT * FROM accounts; DROP TABLE accounts; -- " + "x".repeat(1024),
+  questions: { sqli: { type: "noul", instructions: "Does the state contain SQL injection?" } }
+}), "utf8"));
+const v114Res = await fetch("https://api.typesafe.ai/v1/systemone", {
+  method: "POST",
+  headers: { ...headers, "Content-Encoding": "zstd" },
+  body: zstdBody
+});
+const v114Data = await v114Res.json();
+
+console.log(JSON.stringify({
+  models_status: modelsRes.status,
+  model_names: (modelsData.models || []).map((m) => m.name),
+  latest_status: latestRes.status,
+  latest_model: latestData.model,
+  is_code_noul: latestData.answers?.is_code?.noul,
+  route_choice: latestData.answers?.route?.choice,
+  difficulty_score: latestData.answers?.difficulty?.score,
+  v114_status: v114Res.status,
+  v114_model: v114Data.model,
+  sqli_noul: v114Data.answers?.sqli?.noul
+}));
+"""
+        proc = subprocess.run(
+            ["docker", "exec", "omniroute", "node", "--input-type=module", "-e", node_script],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        out = json.loads(proc.stdout.strip())
+        self.assertEqual(out["models_status"], 200)
+        self.assertIn("jev-latest", out["model_names"])
+        self.assertIn("jev-preview", out["model_names"])
+        self.assertEqual(out["latest_status"], 200)
+        self.assertEqual(out["latest_model"], "jev-1.13.0")
+        self.assertGreater(out["is_code_noul"], 0.8)
+        self.assertEqual(out["route_choice"], "gemini-4-argon-high")
+        self.assertIsNotNone(out["difficulty_score"])
+        self.assertEqual(out["v114_status"], 200)
+        self.assertEqual(out["v114_model"], "jev-1.14.0")
+        self.assertGreater(out["sqli_noul"], 0.8)
+
 
 if __name__ == "__main__":
     unittest.main()
