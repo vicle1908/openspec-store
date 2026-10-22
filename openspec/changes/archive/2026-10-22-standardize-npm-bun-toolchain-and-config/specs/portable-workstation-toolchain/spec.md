@@ -4,14 +4,14 @@
 
 ### Requirement: Global package ecosystems SHALL maintain initialized manifests and non-interactive update paths
 
-All global package managers (NPM, Bun, and UV) SHALL maintain valid global manifests and lockfiles, SHALL execute upgrades dynamically using sanitized identifiers without hardcoded package lists or clobbering pinned coding agent binaries or Homebrew-owned runtimes, SHALL keep `~/.npm-global/bin` and `~/.npm-global/lib/node_modules` free of orphaned `.bin-HASH` retired symlinks and empty `@scope` directories, and SHALL document that `npm audit -g` is unsupported (`EAUDITGLOBAL`) despite `npm update -g` printing a quick-audit summary.
+Global package managers (NPM, Bun, and UV) SHALL maintain valid global manifests and lockfiles, upgrade packages dynamically with sanitized identifiers without clobbering pinned coding agents or Homebrew runtimes, keep `~/.npm-global` free of retired `.bin-HASH` symlinks and empty `@scope` directories, and document `EAUDITGLOBAL` (`npm audit -g`).
 
 #### Scenario: Bun global manifest initialization
 - **WHEN** Bun global packages are audited or updated by `workstation_update.py` or `workstation-daily-update.sh`
 - **THEN** the maintenance pipeline SHALL verify the existence of `~/.bun/install/global/package.json` (mode `0600` inside directory mode `0700`) and `~/.bun/install/global/bun.lock`
 - **AND** if `package.json` is absent, it SHALL initialize `~/.bun/install/global/package.json` with `{"dependencies": {}}` and mode `0600`
-- **AND** when `package.json` has empty `dependencies` (`{}`), it SHALL write the minimal v2 text lockfile (`{"lockfileVersion": 2, "configVersion": 1, "workspaces": {"": {}}, "packages": {}}`, mode `0600`) to `~/.bun/install/global/bun.lock` if absent and skip `bun install` and `bun update -g` so `bun@1.4+` does not delete the empty lockfile and `bun pm ls -g` exits `0`
-- **AND** when `package.json` declares one or more dependencies, it SHALL initialize any missing `bun.lock` via `bun install --cwd ~/.bun/install/global --save-text-lockfile` and execute `bun update -g` non-interactively
+- **AND** when `package.json` has empty `dependencies` (`{}`), it SHALL write the minimal v2 text lockfile (`{"lockfileVersion": 2, "configVersion": 1, "workspaces": {"": {}}, "packages": {}}`) to `~/.bun/install/global/bun.lock` if absent and skip `bun install` and `bun update -g` so `bun@1.4+` does not delete the empty lockfile and `bun pm ls -g` exits `0`
+- **AND** when `package.json` declares one or more dependencies, it SHALL execute single-pass `bun update -g --save-text-lockfile` non-interactively, and in both cases it SHALL enforce mode `0600` on `~/.bun/install/global/bun.lock`
 - **AND** it SHALL NOT execute `bun upgrade` against the Homebrew-managed `/opt/homebrew/bin/bun` binary (which is updated exclusively via `brew upgrade bun` in the Homebrew stage)
 
 #### Scenario: Dynamic uv tool list upgrade with sanitized arguments
@@ -34,7 +34,7 @@ All global package managers (NPM, Bun, and UV) SHALL maintain valid global manif
 
 ### Requirement: Deterministic Zsh PATH deduplication and Homebrew-first precedence
 
-Interactive and login Zsh initialization (`~/.zshenv`, `~/.zprofile`, `~/.zshrc`) and the fallback maintenance runner (`workstation-daily-update.sh`) SHALL enforce unique `PATH` entries via `typeset -U path PATH`, maintain `/opt/homebrew/bin` ahead of `~/.npm-global/bin`, `~/.bun/bin`, and `~/Library/pnpm` (`PNPM_HOME`), expose `/opt/homebrew/opt/libpq/bin` for `psql`, omit unused `nvm` shell function wrappers when Homebrew `node` is authoritative, explicitly filter out inherited `~/.orbstack/bin` entries via `path=(${path:#"$HOME/.orbstack/bin"})`, and guard `~/.iterm2_shell_integration.zsh` behind `[[ -t 0 && -t 1 ]]`.
+Interactive and login Zsh profiles (`~/.zshenv`, `~/.zprofile`, `~/.zshrc`) and `workstation-daily-update.sh` SHALL deduplicate `PATH` (`typeset -U path PATH`), keep `/opt/homebrew/bin` ahead of `~/.npm-global/bin`, `~/.bun/bin`, and `PNPM_HOME`, expose `libpq` (`psql`), omit unused `nvm` wrappers, strip `~/.orbstack/bin`, and guard iTerm2 integration behind `[[ -t 0 && -t 1 ]]`.
 
 #### Scenario: Interactive and inherited shells preserve Homebrew precedence, deduplicate PATH, and strip OrbStack
 - **WHEN** a fresh login shell (`zsh -ilc 'print -l $path'`) or a subshell inheriting `PATH="$HOME/.orbstack/bin:$PATH"` (`PATH="$HOME/.orbstack/bin:$PATH" zsh -ic 'print -l $path'`) is evaluated

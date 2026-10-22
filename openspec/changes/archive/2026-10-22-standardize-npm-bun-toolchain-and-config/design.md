@@ -76,14 +76,15 @@ Empirical verification uncovered six critical implementation constraints:
   - Remove `bun upgrade` from `scripts/workstation-daily-update.sh` (and `~/Developer/scripts/workstation-daily-update.sh`) and `shb-schedule`'s `step_bun_global_update()` (`src/shb_schedule/workflows/workstation_update.py` and `tests/test_workstation_update_workflow.py`).
   - Ensure both runners verify `~/.bun/install/global` (`mode 0700`) and `~/.bun/install/global/package.json` (`mode 0600`, default `{"dependencies": {}}`).
   - Inspect `dependencies` (and `devDependencies` / `optionalDependencies`) in `~/.bun/install/global/package.json`:
-    - When empty (`{}`): if `~/.bun/install/global/bun.lock` is absent, write `{"lockfileVersion": 2, "configVersion": 1, "workspaces": {"": {}}, "packages": {}}\n` with mode `0600`, and skip `bun install` / `bun update -g` (preventing `bun@1.4.3` from unlinking the empty lockfile).
-    - When non-empty: if `bun.lock` is absent, run `bun install --cwd ~/.bun/install/global --save-text-lockfile`, then run `bun update -g`.
-- **Rationale**: Preserves single-owner Homebrew authority (`brew upgrade bun`) and guarantees `bun pm ls -g` exits `0` whether 0 or $N$ global Bun packages are installed.
+    - When empty (`{}`): if `~/.bun/install/global/bun.lock` is absent, write `{"lockfileVersion": 2, "configVersion": 1, "workspaces": {"": {}}, "packages": {}}\n`, and skip `bun install` / `bun update -g` (preventing `bun@1.4.3` from unlinking the empty lockfile).
+    - When non-empty: execute single-pass `bun update -g --save-text-lockfile` (which creates or updates `bun.lock` in one pass without a separate `bun install` call).
+    - After both branches, enforce `chmod 0600` (`os.chmod(bun_lock, 0o600)`) on `~/.bun/install/global/bun.lock` whenever it exists on disk so Bun's `0644` write does not weaken lockfile permissions.
+- **Rationale**: Preserves single-owner Homebrew authority (`brew upgrade bun`), avoids double registry round-trips, and guarantees `bun pm ls -g` exits `0` with mode `0600` whether 0 or $N$ global Bun packages are installed.
 
 ### 3. Symlink-Aware Shadow Detection (`os.path.lexists`) and Homebrew Bundled `npm` Attribution
 - **Decision**:
-  - In `scripts/inventory-workstation-toolchain.py:1476`, replace `if sh_path.exists():` with `if sh_path.is_symlink() or sh_path.exists():` and fall back to `sh_path.lstat().st_size` when `sh_path.stat()` raises `OSError` on a dangling symlink. Remove `/Users/androidteam/.bun/bin/omp`.
-  - In `derive_install_root_and_source()` (`scripts/inventory-workstation-toolchain.py`), before classifying general `/opt/homebrew/lib/node_modules/<pkg>` paths as `"npm"`, check if the package root is `/opt/homebrew/lib/node_modules/npm` or `/usr/local/lib/node_modules/npm` and return `(pkg_root, "brew-formula")`.
+  - In `scripts/inventory-workstation-toolchain.py`, evaluate `known_shadow_paths` from `config/workstation-toolchain-manifest.json` inside `inventory_tools()` (and for non-inventoried manifest tools in `reconcile_with_manifest()`) using `sh_path.is_symlink() or sh_path.exists()` with `sh_path.lstat().st_size` fallback on dangling symlinks. Remove `/Users/androidteam/.bun/bin/omp`.
+  - In `derive_install_root_and_source()` (`scripts/inventory-workstation-toolchain.py`), before classifying general `/opt/homebrew/lib/node_modules/<pkg>` paths as `"npm"`, check if the package root is `/opt/homebrew/lib/node_modules/npm` or `/usr/local/lib/node_modules/npm` and return `(pkg_root, "brew-formula")`, and add regression tests for both in `scripts/test-version-authority-governance.py`.
 - **Rationale**: Ensures dangling shadow symlinks like `~/.bun/bin/omp` are detected by inventory checks, and ensures Homebrew's bundled `npm`/`npx` executables (`../Cellar/node/<ver>/bin/npm -> /opt/homebrew/lib/node_modules/npm/bin/npm-cli.js`) are attributed to `brew-formula` rather than misclassified as standalone `npm` installs.
 
 ### 4. Zsh Startup Optimization (`nvm` Removal) and Deterministic `PATH` Precedence

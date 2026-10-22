@@ -5,28 +5,23 @@ Ensures omp resolves to the single Homebrew installation at /opt/homebrew/bin/om
 ## Requirements
 ### Requirement: Canonical omp binary resolution
 
-A fresh login shell SHALL resolve exactly one omp binary path.
-The canonical path SHALL be `/opt/homebrew/bin/omp`.
-No Bun-managed omp path SHALL appear in `which -a omp` output.
-`omp --version` SHALL report the version matching the installed Homebrew formula.
+A fresh login shell SHALL resolve exactly one `omp` binary path at `/opt/homebrew/bin/omp`, no Bun-managed or npm-managed `omp` file or dangling symlink SHALL exist at `~/.bun/bin/omp` or `~/.npm-global/bin/omp`, and `omp --version` SHALL report the version matching the installed Homebrew formula.
 
 #### Scenario: single omp binary in fresh shell
-
-Given the Bun-managed omp packages have been removed
-When a fresh login shell runs `command -v omp`
-Then the output SHALL be `/opt/homebrew/bin/omp`.
+- **WHEN** a fresh login shell runs `command -v omp` after Bun-managed `omp` packages have been removed
+- **THEN** the output SHALL be `/opt/homebrew/bin/omp`
 
 #### Scenario: no Bun-managed omp in PATH
+- **WHEN** a fresh login shell runs `which -a omp` after Bun-managed `omp` packages have been removed
+- **THEN** the output SHALL contain exactly one path (`/opt/homebrew/bin/omp`)
 
-Given the Bun-managed omp packages have been removed
-When a fresh login shell runs `which -a omp`
-Then the output SHALL contain exactly one path.
+#### Scenario: no dangling or active omp symlink in Bun or npm global bin directories
+- **WHEN** `~/.bun/bin/omp` and `~/.npm-global/bin/omp` are inspected with symlink-aware checks (`test ! -L ~/.bun/bin/omp && test ! -e ~/.bun/bin/omp`)
+- **THEN** neither an executable nor a dangling symlink SHALL exist at either shadow path
 
 #### Scenario: version matches Homebrew formula
-
-When a fresh login shell runs `omp --version`
-Then the reported version SHALL match the version installed by Homebrew.
-
+- **WHEN** a fresh login shell runs `omp --version`
+- **THEN** the reported version SHALL match the version installed by Homebrew (`can1357/tap/omp`)
 ### Requirement: Homebrew omp functional acceptance
 
 Homebrew omp SHALL pass the live default-role smoke test.
@@ -38,21 +33,19 @@ Then the response SHALL contain `pong` and exit code SHALL be 0.
 
 ### Requirement: Unrelated Bun packages preserved
 
-Removing the three `@oh-my-pi/*` packages SHALL NOT remove or
-break any unrelated Bun-installed package.
+Removing `@oh-my-pi/*` artifacts and dangling `~/.bun/bin/omp` symlinks SHALL NOT break Bun global package inspection (`bun pm ls -g`) or remove unrelated tools in sanctioned prefixes (`gitnexus` in `~/.npm-global` and `pyright` in `~/.local/share/home-toolchain`).
 
 #### Scenario: gitnexus remains installed
-
-Given the three `@oh-my-pi/*` packages have been removed
-When `bun pm ls -g` is inspected
-Then `gitnexus` SHALL still appear.
+- **WHEN** `which gitnexus` is inspected after the `@oh-my-pi/*` packages and `~/.bun/bin/omp` have been removed
+- **THEN** `gitnexus` (`~/.npm-global/bin/gitnexus`) SHALL still exist and execute cleanly
 
 #### Scenario: pyright remains installed
+- **WHEN** the `pyright` binary (`/opt/homebrew/bin/pyright` and `~/.local/share/home-toolchain/node_modules/.bin/pyright`) is located after the `@oh-my-pi/*` packages and `~/.bun/bin/omp` have been removed
+- **THEN** it SHALL exist
 
-Given the three `@oh-my-pi/*` packages have been removed
-When the pyright binary is located
-Then it SHALL exist.
-
+#### Scenario: bun global package listing exits cleanly with initialized lockfile
+- **WHEN** `bun pm ls -g` is executed against `~/.bun/install/global`
+- **THEN** `~/.bun/install/global/bun.lock` SHALL be present and `bun pm ls -g` SHALL exit with status `0` without `missing lockfile` errors
 ### Requirement: omp configuration untouched
 
 The removal SHALL NOT modify `~/.omp/agent/models.yml` or

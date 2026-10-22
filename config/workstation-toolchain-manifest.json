@@ -5,6 +5,7 @@
   "description": "Canonical declarative toolchain ownership manifest for macOS development workstation",
   "sanctioned_roots": [
     "~/.npm-global",
+    "~/.bun",
     "~/.local/share/home-toolchain",
     "/opt/homebrew",
     "~/.local/share",
@@ -17,6 +18,9 @@
     "core": [
       "git",
       "node",
+      "npm",
+      "pnpm",
+      "bun",
       "uv",
       "claude",
       "codex",
@@ -96,6 +100,59 @@
       "package_name": "node",
       "category": "runtime",
       "notes": "Node.js JavaScript runtime."
+    },
+    "npm": {
+      "authoritative_owner": "brew-formula",
+      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/npm",
+      "update_authority": "brew",
+      "release_channel": "stable",
+      "dispatch_classification": "none",
+      "verification_smoke_command": "npm --version",
+      "writer_binary": "brew",
+      "supported_verb": "brew upgrade node",
+      "delegating_to": null,
+      "package_name": "node",
+      "known_shadow_paths": [
+        "{{HOME}}/.npm-global/bin/npm"
+      ],
+      "category": "package-manager",
+      "notes": "Bundled with Homebrew Node.js formula."
+    },
+    "pnpm": {
+      "authoritative_owner": "brew-formula",
+      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/pnpm",
+      "update_authority": "brew",
+      "release_channel": "stable",
+      "dispatch_classification": "none",
+      "verification_smoke_command": "pnpm --version",
+      "writer_binary": "brew",
+      "supported_verb": "brew upgrade pnpm",
+      "delegating_to": null,
+      "package_name": "pnpm",
+      "known_shadow_paths": [
+        "{{HOME}}/Library/pnpm/pnpm",
+        "{{HOME}}/.npm-global/bin/pnpm"
+      ],
+      "category": "package-manager",
+      "notes": "Homebrew pnpm package manager."
+    },
+    "bun": {
+      "authoritative_owner": "brew-formula",
+      "active_path_pattern": "{{HOMEBREW_PREFIX}}/bin/bun",
+      "update_authority": "brew",
+      "release_channel": "stable",
+      "dispatch_classification": "none",
+      "verification_smoke_command": "bun --version",
+      "writer_binary": "brew",
+      "supported_verb": "brew upgrade bun",
+      "delegating_to": null,
+      "package_name": "bun",
+      "known_shadow_paths": [
+        "{{HOME}}/.bun/bin/bun",
+        "{{HOME}}/.npm-global/bin/bun"
+      ],
+      "category": "runtime",
+      "notes": "Homebrew Bun JavaScript runtime and package manager."
     },
     "uv": {
       "authoritative_owner": "brew-formula",

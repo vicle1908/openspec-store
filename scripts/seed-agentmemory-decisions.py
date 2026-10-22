@@ -62,7 +62,7 @@ CANONICAL_DECISIONS = [
     {
         "id": "shell-path-precedence",
         "title": "Shell PATH Precedence Alignment",
-        "content": "Documented PATH precedence places ~/.npm-global/bin and ~/.local/bin ahead of system and Homebrew binaries in interactive and daily update environments.",
+        "content": "Documented PATH precedence places ~/.local/bin ahead of /opt/homebrew/bin and places /opt/homebrew/bin ahead of ~/.npm-global/bin and ~/.bun/bin across interactive and daily update environments.",
         "concepts": ["workstation-governance", "shell-path-precedence", "path-policy"],
     },
 ]

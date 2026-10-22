@@ -66,6 +66,12 @@ class TestCellarAndBundleProvenance(unittest.TestCase):
         self.assertEqual(src, "npm")
         self.assertEqual(root, "/opt/homebrew/lib/prime-agent")
 
+    def test_homebrew_bundled_npm_evaluated_as_brew_formula(self):
+        path = "/opt/homebrew/lib/node_modules/npm/bin/npm-cli.js"
+        root, src = inv.derive_install_root_and_source(path)
+        self.assertEqual(src, "brew-formula")
+        self.assertEqual(root, "/opt/homebrew/lib/node_modules/npm")
+
     def test_vendor_download_local_share(self):
         path = "/Users/androidteam/.local/share/claude/versions/2.1.289/claude"
         root, src = inv.derive_install_root_and_source(path)
@@ -254,7 +260,9 @@ class TestSharedUpdaterRegistry(unittest.TestCase):
             home_dir = Path(tmp).resolve() / "home"
             bun_omp = home_dir / ".bun" / "bin" / "omp"
             bun_omp.parent.mkdir(parents=True, exist_ok=True)
-            bun_omp.write_text("#!/bin/sh\n")
+            bun_omp.symlink_to(home_dir / ".bun" / "install" / "global" / "node_modules" / "@oh-my-pi" / "pi-coding-agent" / "dist" / "cli.js")
+            self.assertTrue(bun_omp.is_symlink())
+            self.assertFalse(bun_omp.exists())
             items = inv.inventory_tools(home_dir=home_dir)
             omp_inv = next((t for t in items if t.name == "omp"), None)
             qwen_inv = next((t for t in items if t.name == "qwen"), None)

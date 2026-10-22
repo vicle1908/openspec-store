@@ -32,6 +32,66 @@
       "package": "happy",
       "version": "latest",
       "description": "Happy CLI"
+    },
+    {
+      "name": "agentmemory",
+      "package": "@agentmemory/agentmemory",
+      "version": "latest",
+      "description": "AgentMemory CLI and server"
+    },
+    {
+      "name": "agentmemory-mcp",
+      "package": "@agentmemory/mcp",
+      "version": "latest",
+      "description": "AgentMemory MCP server"
+    },
+    {
+      "name": "brightdata",
+      "package": "@brightdata/cli",
+      "version": "latest",
+      "description": "Bright Data CLI"
+    },
+    {
+      "name": "anydoc",
+      "package": "@firecrawl/anydoc",
+      "version": "latest",
+      "description": "Firecrawl AnyDoc CLI"
+    },
+    {
+      "name": "grepai",
+      "package": "@grepai/cli",
+      "version": "latest",
+      "description": "GrepAI CLI"
+    },
+    {
+      "name": "mcpr",
+      "package": "@mcp_router/cli",
+      "version": "latest",
+      "description": "MCP Router CLI"
+    },
+    {
+      "name": "deepwiki",
+      "package": "@seflless/deepwiki",
+      "version": "latest",
+      "description": "DeepWiki CLI"
+    },
+    {
+      "name": "codexuse",
+      "package": "codexuse-cli",
+      "version": "latest",
+      "description": "CodexUse CLI"
+    },
+    {
+      "name": "exa",
+      "package": "exa-cli",
+      "version": "latest",
+      "description": "Exa AI search CLI"
+    },
+    {
+      "name": "node-gyp",
+      "package": "node-gyp",
+      "version": "latest",
+      "description": "Node.js native addon build tool"
     }
   ]
 }

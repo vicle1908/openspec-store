@@ -38,7 +38,7 @@ set -euo pipefail
 umask 022
 
 export HOME="${HOME:-/Users/androidteam}"
-export PATH="${HOME}/.kimi-code/bin:${HOME}/.qoder/entry:${HOME}/.npm-global/bin:${HOME}/.local/bin:${HOME}/.bun/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="${HOME}/.kimi-code/bin:${HOME}/.qoder/entry:${HOME}/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/libpq/bin:${HOME}/.pi/agent/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export STORE_DIR="${HOME}/Developer/platform/openspec-store"
 export WORKSPACE_DIR="${HOME}/Developer"
 
@@ -654,13 +654,26 @@ except Exception:
   echo ">>> [Stage 2/12] Bun Runtime & Globals"
   if command -v bun &>/dev/null; then
     if [[ "${MODE}" == "check" ]]; then
-      echo "    check mode: bun upgrade suppressed"
+      echo "    check mode: bun global update suppressed"
     elif (( PREFLIGHT_FAILED != 0 )); then
-      echo "    SKIPPED: bun upgrade suppressed (preflight authority check failed)"
+      echo "    SKIPPED: bun global update suppressed (preflight authority check failed)"
     elif (( GLOBAL_PAUSE != 0 )); then
-      echo "    SKIPPED: Bun upgrade paused by policy (DISABLE_UPDATES)"
+      echo "    SKIPPED: Bun global update paused by policy (DISABLE_UPDATES)"
     else
-      bun upgrade 2>&1 || true
+      mkdir -p "${HOME}/.bun/install/global"
+      chmod 700 "${HOME}/.bun/install/global"
+      if [[ ! -f "${HOME}/.bun/install/global/package.json" ]]; then
+        printf '{"dependencies": {}}\n' > "${HOME}/.bun/install/global/package.json"
+      fi
+      chmod 600 "${HOME}/.bun/install/global/package.json"
+      if jq -e '((.dependencies // {}) + (.devDependencies // {}) + (.optionalDependencies // {})) | length > 0' "${HOME}/.bun/install/global/package.json" >/dev/null 2>&1; then
+        bun update -g --save-text-lockfile 2>&1 || true
+      else
+        if [[ ! -f "${HOME}/.bun/install/global/bun.lock" ]]; then
+          printf '{"lockfileVersion": 2, "configVersion": 1, "workspaces": {"": {}}, "packages": {}}\n' > "${HOME}/.bun/install/global/bun.lock"
+        fi
+      fi
+      [[ -f "${HOME}/.bun/install/global/bun.lock" ]] && chmod 600 "${HOME}/.bun/install/global/bun.lock"
     fi
   fi
 

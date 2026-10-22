@@ -504,7 +504,7 @@ class TestReconciledToolchainUpdaterAndDailyRunner(unittest.TestCase):
         self.assertTrue(runner_path.is_file())
         content = runner_path.read_text(encoding="utf-8")
 
-        # Verify PATH puts .npm-global/bin and .local/bin ahead of /opt/homebrew/bin
+        # Verify PATH puts .local/bin ahead of /opt/homebrew/bin and /opt/homebrew/bin ahead of .npm-global/bin
         path_line = [line for line in content.splitlines() if line.startswith("export PATH=")][0]
         npm_idx = path_line.find(".npm-global/bin")
         local_idx = path_line.find(".local/bin")
@@ -513,8 +513,8 @@ class TestReconciledToolchainUpdaterAndDailyRunner(unittest.TestCase):
         self.assertNotEqual(npm_idx, -1)
         self.assertNotEqual(local_idx, -1)
         self.assertNotEqual(brew_idx, -1)
-        self.assertLess(npm_idx, brew_idx, "npm-global/bin must precede /opt/homebrew/bin")
         self.assertLess(local_idx, brew_idx, "local/bin must precede /opt/homebrew/bin")
+        self.assertLess(brew_idx, npm_idx, "/opt/homebrew/bin must precede .npm-global/bin")
 
     def test_daily_update_script_handles_codex_and_qoder_target_misalignment(self):
         runner_path = SCRIPTS_DIR / "workstation-daily-update.sh"

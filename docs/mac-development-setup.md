@@ -138,6 +138,49 @@ npm --prefix "$HOME/.npm-global" install --global gitnexus@latest
 - Verification: `gitnexus --version && gitnexus status`
 - **Global npm Audit Semantics (`EAUDITGLOBAL`)**: During `npm update -g`, `Arborist.reify()` submits a quick audit of `~/.npm-global/lib/node_modules` and prints `run npm audit fix`, whereas `npm audit -g` fails by npm design with `EAUDITGLOBAL`. Never run `npm audit fix` in `~/Developer` (or `$HOME`); global packages (`@agentmemory/agentmemory@0.9.30` and `happy@1.2.5`, which carry upstream transitive advisories) must be audited per-package in isolated temporary lockfiles, and `~/.npm-global/bin` / `~/.npm-global/lib/node_modules` must remain free of retired `.bin-HASH` dot-symlinks and empty `@scope` directories.
 
+
+### Maximized Permissive `~/.npmrc` & `~/.bunfig.toml` Configuration Baseline
+- **`~/.npmrc` (`mode 0600`, 13 verified `npm@11.20.0` keys, zero stderr warnings)**:
+  ```ini
+  prefix=/Users/androidteam/.npm-global
+  dangerously-allow-all-scripts=true
+  allow-remote=all
+  allow-git=all
+  allow-file=all
+  allow-directory=all
+  ignore-scripts=false
+  foreground-scripts=false
+  maxsockets=64
+  prefer-dedupe=true
+  fund=false
+  audit=false
+  update-notifier=false
+  ```
+- **`~/.bunfig.toml` (`mode 0600`)**:
+  ```toml
+  [install]
+  auto = "auto"
+  saveTextLockfile = true
+  concurrentScripts = 32
+  networkConcurrency = 64
+  linker = "hoisted"
+  globalDir = "/Users/androidteam/.bun/install/global"
+  globalBinDir = "/Users/androidteam/.bun/bin"
+  exact = false
+  production = false
+  optional = true
+  dev = true
+  peer = true
+
+  [install.cache]
+  dir = "/Users/androidteam/.bun/install/cache"
+  disable = false
+  disableManifest = false
+
+  [run]
+  shell = "bun"
+  ```
+
 ### Newman & Bruno (Isolated Toolbelt)
 ```bash
 mkdir -p ~/.local/share/home-toolchain
@@ -196,7 +239,7 @@ The update engine executes as a durable, 9-step transactional pipeline governed 
 1. **Pre-flight Power & Lock Check**: Validates AC power (`pmset -g batt`), verifies 0 lockfile contentions, and respects `DISABLE_UPDATES`.
 2. **Homebrew Maintenance**: Upgrades formulae and casks non-interactively without `sudo`, inspecting active GUI process locks (`pgrep -x`) before cask upgrades.
 3. **Mac App Store (`mas`)**: Discovers outdated App Store apps via `mas outdated` and skips actively running apps without terminating sessions.
-4. **Bun Global Ecosystem**: Ensures `~/.bun/install/global/package.json` (mode `0600`) exists; runs `bun upgrade` and `bun update -g`.
+4. **Bun Global Ecosystem**: Single-owner Homebrew authority (`brew upgrade bun` in Stage 1; never `bun upgrade`). Ensures `~/.bun/install/global` (`mode 0700`), `~/.bun/install/global/package.json` (`mode 0600`), and `~/.bun/install/global/bun.lock` (`mode 0600`) exist, running `bun update -g --save-text-lockfile` only when global dependencies are declared so `bun pm ls -g` always exits `0`.
 5. **Python / uv Standalone Tools**: Dynamically queries `uv tool list` and upgrades each managed venv using discrete `--` arguments.
 6. **Global NPM Packages**: Discovers outdated tools via `npm outdated -g --json`, shielding pinned coding agents (`codex`, `claude`, `pi`, `kilo`).
 7. **Coding Agent CLIs**: Executes time-bounded updates (900s) from static maps with pre/post-update version probes.

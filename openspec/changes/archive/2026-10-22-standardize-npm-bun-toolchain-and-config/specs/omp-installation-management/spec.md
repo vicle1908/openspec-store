@@ -31,7 +31,7 @@ Removing `@oh-my-pi/*` artifacts and dangling `~/.bun/bin/omp` symlinks SHALL NO
 - **THEN** `gitnexus` (`~/.npm-global/bin/gitnexus`) SHALL still exist and execute cleanly
 
 #### Scenario: pyright remains installed
-- **WHEN** the `pyright` binary (`~/.local/bin/pyright`) is located after the `@oh-my-pi/*` packages and `~/.bun/bin/omp` have been removed
+- **WHEN** the `pyright` binary (`/opt/homebrew/bin/pyright` and `~/.local/share/home-toolchain/node_modules/.bin/pyright`) is located after the `@oh-my-pi/*` packages and `~/.bun/bin/omp` have been removed
 - **THEN** it SHALL exist
 
 #### Scenario: bun global package listing exits cleanly with initialized lockfile

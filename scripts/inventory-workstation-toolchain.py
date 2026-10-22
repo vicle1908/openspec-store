@@ -273,6 +273,7 @@ def is_path_sanctioned(p: Path) -> bool:
         home = Path.home()
         sanctioned_roots = [
             home / ".npm-global",
+            home / ".bun",
             home / ".local" / "share",
             home / ".local" / "bin",
             home / ".hermes",
@@ -333,6 +334,8 @@ def derive_install_root_and_source(resolved_path: str) -> tuple[str, str]:
             return str(pkg_root), "npm"
         elif idx + 1 < len(parts):
             pkg_root = Path(*parts[:idx + 2])
+            if str(pkg_root) in ("/opt/homebrew/lib/node_modules/npm", "/usr/local/lib/node_modules/npm"):
+                return str(pkg_root), "brew-formula"
             return str(pkg_root), "npm"
     if "Applications" in parts:
         for parent in [p] + list(p.parents):
@@ -1375,6 +1378,14 @@ def inventory_tools(home_dir: Path | None = None) -> list[ToolInventoryItem]:
     }
 
     results: list[ToolInventoryItem] = []
+    brew_prefix = os.environ.get("HOMEBREW_PREFIX") or ("/opt/homebrew" if os.uname().machine == "arm64" else "/usr/local")
+    manifest_tools: dict[str, Any] = {}
+    try:
+        m_file = Path(__file__).resolve().parent.parent / "config" / "workstation-toolchain-manifest.json"
+        if m_file.is_file():
+            manifest_tools = json.loads(m_file.read_text(encoding="utf-8")).get("tools", {})
+    except Exception:
+        pass
 
     normalize_discovery_path()
 
@@ -1468,35 +1479,54 @@ def inventory_tools(home_dir: Path | None = None) -> list[ToolInventoryItem]:
                         )
                     )
 
-        if tool_name == "omp":
-            for sh_mgr, sh_path in (
-                ("bun-global", home / ".bun" / "bin" / "omp"),
-                ("npm-global", home / ".npm-global" / "bin" / "omp"),
-            ):
-                if sh_path.exists():
+        shadow_patterns = manifest_tools.get(tool_name, {}).get("known_shadow_paths") or (
+            ["{{HOME}}/.bun/bin/omp", "{{HOME}}/.npm-global/bin/omp"] if tool_name == "omp" else []
+        )
+        for raw_sh in shadow_patterns:
+            sh_path = Path(raw_sh.replace("{{HOME}}", str(home)).replace("{{HOMEBREW_PREFIX}}", brew_prefix))
+            if sh_path.is_symlink() or sh_path.exists():
+                already_covered = any(
+                    c.location_path == str(sh_path)
+                    or (
+                        sh_path.exists()
+                        and Path(c.location_path).exists()
+                        and sh_path.resolve().is_relative_to(Path(c.location_path).resolve())
+                    )
+                    for c in copies
+                )
+                if already_covered:
+                    continue
+                sh_mgr = (
+                    "bun-global"
+                    if "/.bun/" in str(sh_path)
+                    else ("npm-global" if "/.npm-global/" in str(sh_path) else ("homebrew" if "/homebrew/" in str(sh_path) else "standalone"))
+                )
+                try:
+                    sz = sh_path.stat().st_size
+                except OSError:
                     try:
-                        sz = sh_path.stat().st_size
+                        sz = sh_path.lstat().st_size
                     except OSError:
                         sz = 0
-                    is_auth = False
-                    if auth_path != "not_found":
-                        try:
-                            is_auth = (
-                                Path(auth_path) == sh_path
-                                or Path(auth_path).resolve() == sh_path.resolve()
-                            )
-                        except Exception:
-                            pass
-                    copies.append(
-                        ToolCopy(
-                            location_path=str(sh_path),
-                            owning_manager=sh_mgr,
-                            size_bytes=sz,
-                            size_human=format_bytes(sz),
-                            is_authoritative=is_auth,
-                            is_symlinked_from_brew_bin=False,
+                is_auth = False
+                if auth_path != "not_found":
+                    try:
+                        is_auth = (
+                            Path(auth_path) == sh_path
+                            or Path(auth_path).resolve() == sh_path.resolve()
                         )
+                    except Exception:
+                        pass
+                copies.append(
+                    ToolCopy(
+                        location_path=str(sh_path),
+                        owning_manager=sh_mgr,
+                        size_bytes=sz,
+                        size_human=format_bytes(sz),
+                        is_authoritative=is_auth,
+                        is_symlinked_from_brew_bin=False,
                     )
+                )
 
         # Ensure authoritative copy is always first in copies list (copies[0])
         auth_idx = next((i for i, c in enumerate(copies) if c.is_authoritative), -1)
@@ -1599,7 +1629,7 @@ def reconcile_with_manifest(
         path_pattern = t_meta.get("active_path_pattern", "")
         expected_path = path_pattern.replace("{{HOME}}", str(home)).replace("{{HOMEBREW_PREFIX}}", brew_prefix)
 
-        # Check duplicates from inventory
+        # Check duplicates from inventory or manifest known_shadow_paths
         inv_item = inv_map.get(tool_name)
         if inv_item and inv_item.has_duplication:
             duplicate.append({
@@ -1608,6 +1638,15 @@ def reconcile_with_manifest(
                 "reclaimable_human": inv_item.estimated_reclaimable_human,
                 "copies": [c.location_path for c in inv_item.copies],
             })
+        elif active_bin:
+            shadow_hits = [
+                str(p)
+                for r in (t_meta.get("known_shadow_paths") or [])
+                if ((p := Path(r.replace("{{HOME}}", str(home)).replace("{{HOMEBREW_PREFIX}}", brew_prefix))).is_symlink() or p.exists())
+                and str(p) != active_bin
+            ]
+            if shadow_hits:
+                duplicate.append({"name": tool_name, "copies_count": 1 + len(shadow_hits), "reclaimable_human": "0 B", "copies": [active_bin, *shadow_hits]})
         # Unsanctioned copies are collected across all inventory items below
         if not active_bin:
             if expected_path and Path(expected_path).is_file():

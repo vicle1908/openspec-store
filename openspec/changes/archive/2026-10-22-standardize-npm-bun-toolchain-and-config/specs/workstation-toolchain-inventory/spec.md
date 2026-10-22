@@ -4,7 +4,7 @@
 
 ### Requirement: Sanctioned install locations
 
-Workstation tooling SHALL be installed into one of the sanctioned locations only: the declared npm global prefix (`~/.npm-global`), the Bun global root (`~/.bun`), the relocated toolbelt `~/.local/share/home-toolchain`, the system package-manager prefix (`/opt/homebrew`), standalone vendor roots (`~/.kimi-code`, `~/.qoder`, `~/.pi`, `~/.hermes`, `~/.grok`, `~/.local/bin`), or a language-specific tool manager under `~/.local/share`. A tool SHALL NOT be installed into an unscoped ad-hoc directory under `$HOME`, including `~/node_modules` or `~/.local/lib/node_modules`.
+Workstation tooling SHALL be installed only into sanctioned roots (`~/.npm-global`, `~/.bun`, `~/.local/share/home-toolchain`, `/opt/homebrew`, `~/.local/share`, `~/.local/bin`, `~/.kimi-code`, `~/.qoder`, `~/.pi`, `~/.hermes`, `~/.grok`) and SHALL NOT be installed into unscoped `$HOME` directories (`~/node_modules` or `~/.local/lib/node_modules`).
 
 #### Scenario: Tool installed into an unsanctioned location
 - **WHEN** a node package is installed into a directory that is not a sanctioned location, such as `~/.local/lib/node_modules` or `~/node_modules`
