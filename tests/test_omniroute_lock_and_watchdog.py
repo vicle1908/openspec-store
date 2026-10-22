@@ -543,12 +543,15 @@ exit 0
 
 
     def test_v3852_muse_wire_compat_and_updater_muse_catalog_and_backup_cleanup(self) -> None:
-        """v3.8.52 patches resp_keepalive_omniroute + MUSE_CODE_COMPAT_V2; Gate 8 fails closed on empty catalog; Gate 9 prunes pre-migration backups."""
+        """v3.8.52 patches MUSE_CODE_REWRITE_V3 without touching chunks; Gate 8 fails closed on empty catalog (401 & 200); Gate 9 prunes pre-migration backups."""
         # a. Verify container-entrypoint-compat.sh and ensure-muse-wire-compat.sh patching against temp files
         peer_file = self.home / "peer-stamp.mjs"
         chunks_dir = self.home / "chunks"
         chunks_dir.mkdir(parents=True, exist_ok=True)
         chunk_file = chunks_dir / "8537.js"
+        original_chunk = (
+            'const frame = {type:"response.in_progress",sequence_number:0,response:{id:"resp_keepalive_omniroute",status:"in_progress"}};\n'
+        )
 
         peer_file.write_text(
             "export function wrapRequestListenerWithPeerStamp(listener) {\n"
@@ -559,10 +562,7 @@ exit 0
             "}\n",
             encoding="utf-8",
         )
-        chunk_file.write_text(
-            'const frame = {type:"response.in_progress",sequence_number:0,response:{id:"resp_keepalive_omniroute",status:"in_progress"}};\n',
-            encoding="utf-8",
-        )
+        chunk_file.write_text(original_chunk, encoding="utf-8")
 
         patch_env = self._base_env()
         patch_env["OMNIROUTE_PEER_STAMP_PATH"] = str(peer_file)
@@ -575,17 +575,43 @@ exit 0
             timeout=10,
         )
         self.assertEqual(ep_res.returncode, 0, ep_res.stderr)
+        self.assertEqual(ep_res.stdout, "patched")
         patched_peer = peer_file.read_text(encoding="utf-8")
         patched_chunk = chunk_file.read_text(encoding="utf-8")
-        self.assertIn("/* MUSE_CODE_COMPAT_V2 */", patched_peer)
-        self.assertIn('"muse-spark-1.3"', patched_peer)
-        self.assertIn(
-            'response:{id:"resp_keepalive",object:"response",status:"in_progress",output:[],error:null}',
-            patched_chunk,
-        )
-        self.assertNotIn("resp_keepalive_omniroute", patched_chunk)
+        self.assertIn("/* MUSE_CODE_REWRITE_V3 */", patched_peer)
+        self.assertIn('req.url = "/v1" + req.url;', patched_peer)
+        self.assertNotIn("MUSE_CODE_COMPAT_V2", patched_peer)
+        self.assertNotIn("MUSE_CATALOG_DATA", patched_peer)
+        self.assertEqual(patched_chunk, original_chunk, "chunk_file must remain completely untouched")
 
-        # Also verify ensure-muse-wire-compat.sh upgrades v1 peer-stamp.mjs + v3.8.52 chunk and is idempotent on second run
+        # Verify container-entrypoint-compat.sh upgrades a MUSE_CODE_COMPAT_V2-patched peer-stamp.mjs to V3
+        peer_file.write_text(
+            "export function wrapRequestListenerWithPeerStamp(listener) {\n"
+            "  return function peerStampingRequestHandler(req, res) {\n"
+            "    /* MUSE_CODE_COMPAT_V2 */\n"
+            '    const MUSE_CATALOG_DATA = [["muse-spark-1.3"]];\n'
+            "    stampPeerIp(req);\n"
+            "    return listener.call(this, req, res);\n"
+            "  };\n"
+            "}\n",
+            encoding="utf-8",
+        )
+        ep_v2_res = subprocess.run(
+            ["/bin/sh", str(ENTRYPOINT_COMPAT), "--patch-only"],
+            env=patch_env,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        self.assertEqual(ep_v2_res.returncode, 0, ep_v2_res.stderr)
+        self.assertEqual(ep_v2_res.stdout, "patched")
+        upgraded_from_v2 = peer_file.read_text(encoding="utf-8")
+        self.assertIn("/* MUSE_CODE_REWRITE_V3 */", upgraded_from_v2)
+        self.assertNotIn("MUSE_CODE_COMPAT_V2", upgraded_from_v2)
+        self.assertNotIn("MUSE_CATALOG_DATA", upgraded_from_v2)
+        self.assertEqual(chunk_file.read_text(encoding="utf-8"), original_chunk)
+
+        # Also verify ensure-muse-wire-compat.sh upgrades v1 peer-stamp.mjs to V3, leaves chunk untouched, and is idempotent on second run
         peer_file.write_text(
             "export function wrapRequestListenerWithPeerStamp(listener) {\n"
             "  return function peerStampingRequestHandler(req, res) {\n"
@@ -596,10 +622,7 @@ exit 0
             "}\n",
             encoding="utf-8",
         )
-        chunk_file.write_text(
-            'const frame = {type:"response.in_progress",sequence_number:0,response:{id:"resp_keepalive_omniroute",status:"in_progress"}};\n',
-            encoding="utf-8",
-        )
+        chunk_file.write_text(original_chunk, encoding="utf-8")
         _write_executable(
             self.local_bin / "docker",
             f"""#!/bin/bash
@@ -623,11 +646,8 @@ exit 0
         )
         self.assertEqual(em1.returncode, 0, em1.stderr)
         self.assertIn("Applied Muse Code wire-compat normalization", em1.stdout)
-        self.assertIn("/* MUSE_CODE_COMPAT_V2 */", peer_file.read_text(encoding="utf-8"))
-        self.assertIn(
-            'response:{id:"resp_keepalive",object:"response",status:"in_progress",output:[],error:null}',
-            chunk_file.read_text(encoding="utf-8"),
-        )
+        self.assertIn("/* MUSE_CODE_REWRITE_V3 */", peer_file.read_text(encoding="utf-8"))
+        self.assertEqual(chunk_file.read_text(encoding="utf-8"), original_chunk)
         em2 = subprocess.run(
             ["/bin/bash", str(ENSURE_MUSE_COMPAT), "omniroute"],
             env=self._base_env(),
@@ -649,7 +669,7 @@ exit 0
         )
         self.assertEqual(em_fail.returncode, 1, "ensure-muse-wire-compat.sh must fail closed on error")
         (self.home / "fail_compat").unlink(missing_ok=True)
-        # b & c. Verify update.sh Gate 8 empty catalog fail-closed and Gate 9 pre-migration backup cleanup
+        # b & c. Verify update.sh Gate 8 empty catalog fail-closed (both 401 and 200 postures) and Gate 9 pre-migration backup cleanup
         flag_file = self.omni_state / "update-available"
         flag_file.write_text(
             "sha256:b08a12e876baa8a5ccadd1ebbe346fe7267dba3b1c9f4fd6bb02070fae41ab6c\n",
@@ -657,6 +677,8 @@ exit 0
         )
         catalog_mode = self.home / "catalog_mode.txt"
         catalog_mode.write_text("empty\n", encoding="utf-8")
+        vm_posture = self.home / "vm_posture.txt"
+        vm_posture.write_text("401\n", encoding="utf-8")
         backup_cleanup_log = self.home / "backup_cleanup.log"
 
         _write_executable(
@@ -694,7 +716,8 @@ if [[ "$1" == "exec" ]]; then
   fi
   if [[ "$*" == *"quick_check"* ]]; then printf "ok"; exit 0; fi
   if [[ "$*" == *"omniroute-field-encryption-v1"* ]]; then
-    node -e '
+    MOCK_CATALOG_MODE_FILE="{catalog_mode}" node -e '
+      const fs = require("fs");
       const crypto = require("crypto");
       const secret = "unit-test-storage-secret";
       process.env.STORAGE_ENCRYPTION_KEY = secret;
@@ -724,6 +747,13 @@ if [[ "$1" == "exec" ]]; then
       }};
       global.fetch = async (url, opts) => {{
         if (opts && opts.headers && opts.headers.Authorization === "Bearer sk-valid-v3852-key") {{
+          if (String(url).includes("muse-code/models")) {{
+            const mode = fs.readFileSync(process.env.MOCK_CATALOG_MODE_FILE, "utf8").trim();
+            if (mode === "empty") return {{ status: 200, text: async () => "{{\\"object\\":\\"list\\",\\"data\\":[]}}" }};
+            if (mode === "malformed") return {{ status: 200, text: async () => "{{\\"object\\":\\"list\\",\\"data\\":[{{\\"id\\":\\"muse-spark-1.3\\"}}" }};
+            if (mode === "wrong_shape") return {{ status: 200, text: async () => "{{\\"object\\":\\"list\\",\\"data\\":[],\\"id\\":\\"muse-spark-1.3\\"}}" }};
+            return {{ status: 200, text: async () => "{{\\"object\\":\\"list\\",\\"data\\":[{{\\"id\\":\\"muse-spark-1.3\\"}}]}}" }};
+          }}
           return {{ status: 200, text: async () => JSON.stringify({{ data: [{{ id: "gemini-4-argon" }}] }}) }};
         }}
         return {{ status: 401, text: async () => "{{}}" }};
@@ -756,9 +786,11 @@ exit 0
             self.local_bin / "curl",
             f"""#!/bin/bash
 mode=$(cat "{catalog_mode}")
+posture=$(cat "{vm_posture}")
 if [[ "$*" == *"/healthz"* ]]; then printf "ok"; exit 0; fi
 if [[ "$*" == *"/api/monitoring/health"* ]]; then printf '{{"status":"healthy","setupComplete":true}}'; exit 0; fi
-if [[ "$*" == *"/v1/models"* && "$*" != *"-I"* ]]; then printf "401"; exit 0; fi
+if [[ "$*" == *"/v1/models"* && "$*" != *"-I"* ]]; then printf "%s" "$posture"; exit 0; fi
+if [[ "$*" == *"muse-code/models"* && "$*" == *"-w"* ]]; then printf "%s" "$posture"; exit 0; fi
 if [[ "$*" == *"muse-code/models"* && "$*" != *"-w"* ]]; then
   if [[ "$mode" == "empty" ]]; then
     printf '{{"object":"list","data":[]}}'
@@ -810,6 +842,37 @@ exit 0
         self.assertTrue(backup_cleanup_log.exists(), "Gate 9 did not execute pre-migration backup cleanup")
         self.assertIn("db_state-*_pre-migration.sqlite", backup_cleanup_log.read_text(encoding="utf-8"))
         self.assertFalse(flag_file.exists(), "Successful Gate 9 completion must clear update-available")
+
+        # Also verify Gate 8 under 200 posture (catalog auth disabled)
+        vm_posture.write_text("200\n", encoding="utf-8")
+        flag_file.write_text(
+            "sha256:b08a12e876baa8a5ccadd1ebbe346fe7267dba3b1c9f4fd6bb02070fae41ab6c\n",
+            encoding="utf-8",
+        )
+        catalog_mode.write_text("empty\n", encoding="utf-8")
+        bad_200_res = subprocess.run(
+            ["/bin/bash", str(UPDATE_SCRIPT), "3.8.52"],
+            env=self._base_env(),
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        self.assertEqual(bad_200_res.returncode, 1)
+        self.assertIn(
+            "GATE FAILED [endpoints]: GET /v1/muse-code/models did not advertise muse-spark-1.3",
+            bad_200_res.stdout,
+        )
+        self.assertTrue(flag_file.exists())
+        catalog_mode.write_text("ok\n", encoding="utf-8")
+        pass_200_res = subprocess.run(
+            ["/bin/bash", str(UPDATE_SCRIPT), "3.8.52"],
+            env=self._base_env(),
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        self.assertEqual(pass_200_res.returncode, 0, pass_200_res.stdout + pass_200_res.stderr)
+        self.assertFalse(flag_file.exists())
 
 if __name__ == "__main__":
     unittest.main()

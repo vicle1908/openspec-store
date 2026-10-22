@@ -405,6 +405,25 @@ class TestOmniRouteCliBridge(unittest.TestCase):
         self.assertEqual(res_offline.returncode, 3)
         self.assertIn("unreachable", res_offline.stderr.lower())
 
+    def test_passthrough_commands_emit_zero_env_shadow_warnings_on_stderr(self) -> None:
+        with _MockOmniRouteServer() as server:
+            res_ver = _run_bridge(["--version"], cwd=OMNIROUTE_ROOT)
+            self.assertEqual(res_ver.returncode, 0, msg=res_ver.stderr)
+            self.assertNotIn("is ignored", res_ver.stdout)
+            self.assertNotIn("is ignored", res_ver.stderr)
+            self.assertNotIn("Loaded env from", res_ver.stdout)
+            self.assertNotIn("Loaded env from", res_ver.stderr)
+
+            res_health = _run_bridge(
+                ["health", "--json", "--base-url", f"http://127.0.0.1:{server.port}"],
+                cwd=OMNIROUTE_ROOT,
+            )
+            self.assertEqual(res_health.returncode, 0, msg=res_health.stderr)
+            self.assertNotIn("is ignored", res_health.stdout)
+            self.assertNotIn("is ignored", res_health.stderr)
+            self.assertNotIn("Loaded env from", res_health.stdout)
+            self.assertNotIn("Loaded env from", res_health.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()
