@@ -7,7 +7,7 @@ Provides sub-second, deterministic System One decision primitives — Noul yes/n
 
 ### Requirement: System One Decision Client
 
-The banking runtime foundation SHALL provide a System One decision client (`shb_core.jev.JevDecisionClient`, backed by `typesafe-sdk[http2]>=0.7.5`) with process-wide `get_jev_client()` / `reset_jev_client()` singleton helpers and public `get_sync_sdk_client()` / `get_async_sdk_client()` accessors wrapping `TypeSafeClient` and `AsyncTypeSafeClient` (`evaluate` and `a_evaluate`, including optional `assets=...` attachment for `Image`/`Asset` multimodal inputs) to evaluate `state` against typed `Noul`, `Choice`, `Score`, and `Box` questions, guarded by a thread-safe `JevCircuitBreaker`.
+The banking runtime foundation SHALL provide a System One decision client (`shb_core.jev.JevDecisionClient` on `typesafe-sdk[http2]>=0.7.5`) with `get_jev_client()` / `reset_jev_client()` singletons and `get_sync_sdk_client()` / `get_async_sdk_client()` accessors wrapping `TypeSafeClient` and `AsyncTypeSafeClient` (`evaluate` and `a_evaluate`, including `assets=...`) to evaluate `state` against typed `Noul`, `Choice`, `Score`, and `Box` questions, guarded by `JevCircuitBreaker`.
 
 #### Scenario: Successful decision evaluation
 - **WHEN** the client evaluates a state against a question map with a configured `TYPESAFE_API_KEY` (or `PYDANTIC_AI_GATEWAY_API_KEY`)
@@ -242,7 +242,7 @@ The client SHALL support structured validation using TypeSafe native response mo
 
 ### Requirement: Pydantic AI Gateway Compatibility
 
-The configuration and client SHALL support proxying requests through custom enterprise proxies or gateways via explicit `base_url` (`settings.jev.base_url` or `TYPESAFE_BASE_URL`) and `PYDANTIC_AI_GATEWAY_API_KEY`, using `_resolve_endpoint_and_api_key()` to resolve the endpoint first so `TYPESAFE_API_KEY` in `~/.zshenv` never overrides a gateway key, and `shb_agent.model.resolve_typesafe_decision_model()` SHALL integrate `pydantic_ai.models.typesafe.TypeSafeModel`, `TypeSafeModelSettings` (`decision_boolean_threshold`, `decision_route_threshold`, and `max_retries -> TypeSafeRetryPolicy` forwarding in `pydantic-ai>=2.59.0`), and `pydantic_ai.providers.typesafe.TypeSafeProvider` backed by `JevDecisionClient.get_async_sdk_client()`.
+The configuration and client SHALL support proxying requests through custom enterprise proxies or gateways via explicit `base_url` (`settings.jev.base_url` or `TYPESAFE_BASE_URL`) and `PYDANTIC_AI_GATEWAY_API_KEY`, using `_resolve_endpoint_and_api_key()` to resolve the endpoint first so `TYPESAFE_API_KEY` in `~/.zshenv` never overrides a gateway key, while `shb_agent.model.resolve_typesafe_decision_model()` integrates `TypeSafeModel`, `TypeSafeModelSettings`, and `TypeSafeProvider`.
 
 #### Scenario: Gateway proxy routing
 - **WHEN** `PYDANTIC_AI_GATEWAY_API_KEY`, `TYPESAFE_API_KEY`, or custom `base_url` (`settings.jev.base_url` or `TYPESAFE_BASE_URL`) is configured (noting that `pydantic_ai/providers/gateway.py:105-112` only supports `openai`, `groq`, `anthropic`, `bedrock`, and `google`/`google-cloud` rather than a built-in `gateway/typesafe` route)
@@ -276,3 +276,22 @@ The decision runtime in `shb-core` (`shb_core.decisions`) SHALL expose portable 
 - **WHEN** other workspace organizations utilize the decision runtime patterns established in `shb-core`
 - **THEN** `DecisionContract`, `GuardrailPolicy`, and `CitationCheckContract` SHALL operate without depending on banking-specific schemas or any `tdt` packages
 - **AND** `tdt/agent-core` SHALL remain completely frozen and unmodified as an explicit non-goal
+
+### Requirement: Spatial Grounding Box Primitives and Pydantic AI Decision Model Integration
+
+The banking runtime foundation (`shb-core`, backed by `typesafe-sdk[http2]>=0.7.5`) and agent runtime (`shb-agent-core`, backed by `pydantic-ai>=2.59.0` and `pydantic-evals>=2.59.0`) SHALL support multimodal spatial grounding via `Box`, `BoxCoordinates`, `BoxAnswer`, `Image`, and `Asset` primitives alongside native `pydantic-ai` decision model resolution (`resolve_typesafe_decision_model`) and prompt caching (`Caching(retention=True, messages=True)`).
+
+#### Scenario: Multimodal Box spatial grounding evaluation and asset attachment
++- **WHEN** a caller evaluates a `Box(image=..., instructions=...)` question via `JevDecisionClient.evaluate(..., assets=...)` or `await JevDecisionClient.a_evaluate(..., assets=...)` with `Image` or `Asset` inputs passed via `assets=...` (`attach_assets`) or embedded inside `state`
++- **THEN** `JevDecisionClient` MUST forward attached assets to `TypeSafeClient.system_one` / `AsyncTypeSafeClient.system_one`, extract `response.boxes` into `JevEvaluationResult.boxes: dict[str, BoxAnswer]`, and expose `BoxAnswer` (`box: BoxCoordinates | None` with normalized coordinates `x_min`, `y_min`, `x_max`, `y_max`, `present: float`, and `confidence: float | None`)
++- **AND** when a plain Pydantic `BaseModel` is supplied as `response_model`, `JevDecisionClient` MUST lift `BoxAnswer.box` (`BoxCoordinates | None`) onto matching model attributes
++- **AND** when `typesafe-sdk` is not installed, `src/shb_core/jev.py` (re-exported by `shb_core.decisions` and `shb_core`) MUST provide single-source optional-dependency fallback shims for `Box`, `BoxCoordinates`, `BoxAnswer`, `Image`, and `Asset`
+
+#### Scenario: Native Pydantic AI TypeSafeModel and Caching integration
++- **WHEN** `shb_agent.model.resolve_typesafe_decision_model()` resolves a System One decision model in `shb-agent-core` (`src/shb_agent/model.py`)
++- **THEN** it MUST construct `pydantic_ai.models.typesafe.TypeSafeModel` configured with `TypeSafeModelSettings` (`decision_boolean_threshold`, `decision_route_threshold`, and `max_retries` mapped to `TypeSafeRetryPolicy` in `pydantic-ai>=2.59.0`) and `pydantic_ai.providers.typesafe.TypeSafeProvider` backed by `JevDecisionClient.get_async_sdk_client()`
++- **AND** `ShbAgent` (`src/shb_agent/agent.py`) MUST enable `pydantic_ai.capabilities.Caching(retention=True, messages=True)` alongside `PrepareTools` while binding `deps.guardrail` and `deps.jev_client` into `@agent.tool_plain` functions via `ShbAgent._bind_deps_to_tool_func()` (`**_kwargs` stripped from `__signature__`) across both synchronous `ShbAgent.run()` and asynchronous `await ShbAgent.run_async()`
+
+#### Scenario: Missing credential or absent image target during spatial grounding or decision model resolution
++- **WHEN** `resolve_typesafe_decision_model()` or `JevDecisionClient.evaluate(..., assets=...)` is invoked without a valid TypeSafe credential (`allow_env_file_fallback=False`), or when a `Box` target is absent from the inspected image (`present < 0.5`)
++- **THEN** missing credentials MUST fail closed with `TypeSafeError` before issuing any network request, and an absent spatial target MUST return `BoxAnswer(box=None, present=..., confidence=...)` without raising an attribute or validation error
