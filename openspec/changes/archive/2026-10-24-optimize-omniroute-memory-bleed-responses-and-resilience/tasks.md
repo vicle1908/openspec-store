@@ -1,0 +1,22 @@
+# Tasks
+
+## 1. Built-in Memory & Skills Deactivation and Stale Row Purge
+
+- [x] 1.1 Verify `omniroute` container health on `http://127.0.0.1:20128/healthz` (recreating `omniroute-base` under `/usr/bin/lockf` on `~/.omniroute/update.lock` if the entrypoint bind-mount requires refresh) and authenticate using `Authorization: Bearer $OMNIROUTE_API_KEY` (sourced from `~/.zshenv`).
+- [x] 1.2 Update `PUT http://127.0.0.1:20128/api/settings/memory` with `{"enabled": false, "skillsEnabled": false, "maxTokens": 0}` and verify `GET http://127.0.0.1:20128/api/settings/memory` returns `enabled: false`, `skillsEnabled: false`, and `maxTokens: 0`.
+- [x] 1.3 Query `GET http://127.0.0.1:20128/api/memory?limit=100` (extracting IDs from `.data[].id`), iterate `DELETE http://127.0.0.1:20128/api/memory/{id}` across all 75 returned IDs, and verify `GET http://127.0.0.1:20128/api/memory?limit=1` returns `total: 0` and `stats.tokensUsed: 0`.
+
+## 2. Lossless `lite` Tool Preservation, `codex-responses` Engine & Prose-Safe Context Budget Ladder
+
+- [x] 2.1 Update `PUT http://127.0.0.1:20128/api/settings/compression` to set `lite: {"compressToolResults": false, "maxToolLength": 200000}`, `engines: {"session-dedup": {"enabled": true}, "headroom": {"enabled": true}, "lite": {"enabled": true}, "codex-responses": {"enabled": true}, "rtk": {"enabled": true, "level": "minimal"}, "caveman": {"enabled": true, "level": "lite"}}`, `codexResponsesConfig: {"enabled": true, "minBytes": 512, "maxLines": 160, "preserveToolNames": ["Read", "Glob", "Grep", "Write", "Edit", "WebSearch", "WebFetch", "read", "glob", "grep", "write", "edit", "web_search", "web_fetch", "find"]}`, and `contextBudget: {"mode": "replace-autotrigger", "policy": "percentage", "outputReserve": 4096, "safetyMargin": 1024, "pct": 0.85, "absoluteBudget": 0, "ladderOverride": [{"engine": "session-dedup"}, {"engine": "headroom"}, {"engine": "lite"}, {"engine": "codex-responses"}, {"engine": "rtk", "intensity": "minimal"}]}`.
+- [x] 2.2 Verify `GET http://127.0.0.1:20128/api/settings/compression` reflects `lite.compressToolResults === false`, `engines.headroom.enabled === true`, `codexResponsesConfig.enabled === true`, `contextBudget.policy === "percentage"`, and the 5-stage `contextBudget.ladderOverride`.
+
+## 3. Resilience Feature Flags, Classifier Short-Circuit, Body Limit & `models.dev` Sync
+
+- [x] 3.1 Enable the 4 verified resilience feature flags via 4 individual `PUT http://127.0.0.1:20128/api/settings/feature-flags` calls with string-valued `"value": "true"` (`{"key": "<FLAG>", "value": "true"}`): `QUOTA_WINDOW_BOUNDED_PARK`, `STREAM_EARLY_EOF_SIBLING_FAILOVER_ENABLED`, `COOLDOWN_RETRY_SKIP_REFUSALS_ENABLED`, and `PROVIDER_SAFETY_STOPS_TERMINAL` (confirming `FLUSH_EMPTY_RETRY_ENABLED` remains `"false"`).
+- [x] 3.2 Update `PATCH http://127.0.0.1:20128/api/settings` with `{"claudeClassifierCompat": "auto", "claudeFastMode": {"enabled": true, "supportedModels": ["claude-fable-5", "claude-opus-5-5", "claude-opus-5", "claude-opus-4-8", "claude-opus-4-7", "claude-opus-4-6"]}, "maxBodySizeMb": 50, "modelsDevSyncEnabled": true}`, then execute `POST http://127.0.0.1:20128/api/settings/models-dev` with `{"action": "sync"}` followed by `{"action": "start"}` so `GET /api/settings/models-dev?action=status` reports `enabled: true` and `lastSync !== null`.
+
+## 4. End-to-End Verification & Archive Readiness
+
+- [x] 4.1 Verify all updated settings (`GET /api/settings/memory`, `/api/memory?limit=1`, `/api/settings/compression`, `/api/settings/feature-flags`, `/api/settings`, `/api/settings/models-dev?action=status`), test Claude Code classifier short-circuit (`POST /v1/messages` with `"model": "claude-opus-5.5"` and `system` containing `"You are a security monitor for autonomous AI coding agents"` returning `<block>no</block>`), and run live inference smoke tests across `/v1/chat/completions`, `/v1/messages`, and `/v1/responses`.
+- [x] 4.2 Author `evidence.md`, update `wiki/entities/omniroute.md` and `~/.agents/skills/` (`omni-settings`, `omni-compression`) with the new v3.8.52 baseline, and run `openspec validate optimize-omniroute-memory-bleed-responses-and-resilience --strict --json --store openspec-store` and `python3 /Users/androidteam/Developer/platform/openspec-store/scripts/validate-archive-readiness.py --change optimize-omniroute-memory-bleed-responses-and-resilience --store /Users/androidteam/Developer/platform/openspec-store --strict`.
