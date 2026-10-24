@@ -611,6 +611,45 @@ exit 0
         self.assertNotIn("MUSE_CATALOG_DATA", upgraded_from_v2)
         self.assertEqual(chunk_file.read_text(encoding="utf-8"), original_chunk)
 
+        # Verify container-entrypoint-compat.sh normalizes Gemini-4 trailing model turn and agy exact lockout chunks idempotently
+        gemini_chunk = chunks_dir / "7449.js"
+        lock_chunk = chunks_dir / "32946.js"
+        gemini_chunk.write_text(
+            "return!/(?:^|-)image(?:-|$)/.test(b)&&/^gemini-(?:3(?:\\.\\d+)?(?:-[a-z0-9-]+)?|pro-agent)$/.test(b)}\n",
+            encoding="utf-8",
+        )
+        lock_chunk.write_text(
+            "const d=[/\\bmodel.*not.*(?:available|found|supported|accessible)\\b/i];"
+            "function e(a){let b=String(a||\"\");return!!b&&(!!d.some(a=>a.test(b))||/\\bmodel\\b[\\s\\S]{0,80}?\\b(?:not\\s+supported|unsupported|unknown|unavailable)\\b/i.test(b))}"
+            "function au(a,b,c,d,e,f){return!(!at(a,c,f)||!c||aE(a))&&((\"antigravity\"===ag(a)?bz:ap)(a,b,c,d,e),!0)}\n",
+            encoding="utf-8",
+        )
+        ep_chunk_res1 = subprocess.run(
+            ["/bin/sh", str(ENTRYPOINT_COMPAT), "--patch-only"],
+            env=patch_env,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        self.assertEqual(ep_chunk_res1.returncode, 0, ep_chunk_res1.stderr)
+        self.assertEqual(ep_chunk_res1.stdout, "patched")
+        self.assertIn("/^gemini-(?:[34](?:\\.\\d+)?(?:-[a-z0-9-]+)?|pro-agent)$/", gemini_chunk.read_text(encoding="utf-8"))
+        patched_lock_src = lock_chunk.read_text(encoding="utf-8")
+        self.assertIn("/\\bmodel(?!\\s+turn\\b).*not.*(?:available|found|supported|accessible)\\b/i", patched_lock_src)
+        self.assertIn("/\\bmodel(?!\\s+turn\\b)\\b[\\s\\S]{0,80}?\\b(?:not\\s+supported|unsupported|unknown|unavailable)\\b/i", patched_lock_src)
+        self.assertIn("(\"antigravity\"===ag(a)||\"agy\"===ag(a)?bz:ap)(a,b,c,d,e)", patched_lock_src)
+        ep_chunk_res2 = subprocess.run(
+            ["/bin/sh", str(ENTRYPOINT_COMPAT), "--patch-only"],
+            env=patch_env,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        self.assertEqual(ep_chunk_res2.returncode, 0, ep_chunk_res2.stderr)
+        self.assertEqual(ep_chunk_res2.stdout, "already_ok")
+        gemini_chunk.unlink()
+        lock_chunk.unlink()
+
         # Also verify ensure-muse-wire-compat.sh upgrades v1 peer-stamp.mjs to V3, leaves chunk untouched, and is idempotent on second run
         peer_file.write_text(
             "export function wrapRequestListenerWithPeerStamp(listener) {\n"

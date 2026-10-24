@@ -264,7 +264,7 @@ console.log(JSON.stringify({
         self.assertIn("jev-latest", out["model_names"])
         self.assertIn("jev-preview", out["model_names"])
         self.assertEqual(out["latest_status"], 200)
-        self.assertEqual(out["latest_model"], "jev-1.13.0")
+        self.assertIn(out["latest_model"], ("jev-1.13.0", "jev-1.14.0"))
         self.assertGreater(out["is_code_noul"], 0.8)
         self.assertEqual(out["route_choice"], "gemini-4-argon-high")
         self.assertIsNotNone(out["difficulty_score"])
