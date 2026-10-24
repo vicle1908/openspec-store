@@ -69,8 +69,8 @@ The workstation node (`iosteam-mac-mini`) SHALL maintain disabled key expiry (`K
 
 #### Scenario: Peer relay avoids blackholing under unforwarded double NAT
 - **WHEN** `tailscale debug portmap` reports `{PCP:false PMP:false UPnP:false}` behind double-NAT gateways (`192.168.10.1` and `192.168.1.1`) without inbound `UDP 41642` port forwarding
-- **THEN** `iosteam-mac-mini` SHALL keep local `RelayServerPort: 41642` bound on `udp4:41642` and `udp6:41642` while `tailscale debug peer-relay-servers` remains empty (`[]`) so remote symmetric-NAT peers route cleanly through DERP (`sin` / `hkg`) without timeout penalties
-- **AND** LAN peers (`iphone-15-pro-max` on `192.168.10.67:41641`) SHALL connect directly over UDP (`<10ms` RTT)
+- **THEN** `iosteam-mac-mini` SHALL keep local `RelayServerPort: 41642` bound on `udp4:41642` and `udp6:41642` while `tailscale debug peer-relay-servers` remains empty (`[]`) so remote symmetric-NAT peers route cleanly through `DERP(hkg)` without timeout penalties
+- **AND** LAN peers (`iphone-15-pro-max` on `192.168.10.67` ephemeral UDP port) SHALL connect directly over UDP (`<10ms` RTT)
 
 ### Requirement: Randomized WireGuard client port and DERP 20 regional convergence
 
@@ -83,5 +83,5 @@ The workstation SHALL avoid static UDP `:41641` LAN source-port collisions by en
 
 #### Scenario: DERP 3 suppression converges Hanoi peers on DERP 20 while preserving peer-relay prefs
 - **WHEN** `"derpMap": {"Regions": {"3": null}}` is configured in the tailnet policy and `tailscale debug netmap` and `tailscale debug prefs` are inspected
-- **THEN** `DERPMap.Regions` in `tailscale debug netmap` SHALL omit region `3` (`sin`) and `SelfNode.HomeDERP` SHALL be `20` (`hkg`)
-- **THEN** `DERPMap.Regions` in `tailscale debug netmap` SHALL omit region `3` (`sin`) and `Self.Relay` in `tailscale status --json` SHALL be `"hkg"`
+- **THEN** `DERPMap.Regions` in `tailscale debug netmap` SHALL omit region `3` (`sin`), `Self.Relay` in `tailscale status --json` SHALL be `"hkg"`, and online Hanoi peers (`Peers[].HomeDERP`) SHALL report `20`
+- **AND** `tailscale debug prefs` SHALL preserve `RelayServerPort: 41642` and `RelayServerStaticEndpoints: ["1.54.174.244:41642"]`
