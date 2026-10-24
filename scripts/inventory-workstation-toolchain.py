@@ -1807,6 +1807,43 @@ def reconcile_with_manifest(
 
 
 
+def has_unaligned_authority_drift(auth_rec: dict[str, Any], manifest_rec: dict[str, Any] | None) -> bool:
+    """Return True unless every target_misalignment is an aligned updater_dispatch=='none' manifest item."""
+    if not isinstance(manifest_rec, dict):
+        return True
+    aligned_names: set[str] = set()
+    summary_obj = manifest_rec.get("summary")
+    if isinstance(summary_obj, dict) and isinstance(summary_obj.get("aligned"), list):
+        aligned_names.update(str(n) for n in summary_obj["aligned"] if isinstance(n, str) and n)
+    items_obj = manifest_rec.get("items")
+    if isinstance(items_obj, dict) and isinstance(items_obj.get("aligned"), list):
+        aligned_names.update(
+            str(it["name"])
+            for it in items_obj["aligned"]
+            if isinstance(it, dict) and isinstance(it.get("name"), str) and it.get("name")
+        )
+    unaligned_misalignments = sum(
+        1
+        for it in (auth_rec.get("items") or [])
+        if isinstance(it, dict)
+        and it.get("drift_status") == "target_misalignment"
+        and not (it.get("updater_dispatch") == "none" and it.get("name") in aligned_names)
+    )
+    manifest_drift = sum(
+        int(manifest_rec.get(k, 0)) for k in ("drift_count", "missing_count", "unsanctioned_count", "unknown_count")
+    )
+    manifest_status = str(manifest_rec.get("status", "aligned")).strip().lower()
+    conflict_count = int(auth_rec.get("conflict_count", 0))
+    unknown_count = int(auth_rec.get("unknown_count", 0))
+    return bool(
+        conflict_count > 0
+        or unknown_count > 0
+        or unaligned_misalignments > 0
+        or manifest_drift > 0
+        or manifest_status not in ("aligned", "reconciled", "clean", "ok")
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Inventory workstation toolchain install locations.")
     parser.add_argument("--json", action="store_true", help="Output machine-readable JSON")
@@ -1818,6 +1855,12 @@ def main() -> int:
     inventory = inventory_tools()
     auth_reconciliation = evaluate_authority_and_drift(args.declared_prefix)
     manifest_check = reconcile_with_manifest(args.manifest, inventory, auth_reconciliation.items)
+    auth_dict = asdict(auth_reconciliation)
+    reconciled_auth_status = (
+        "drift_detected" if has_unaligned_authority_drift(auth_dict, manifest_check) else "reconciled"
+    )
+    if isinstance(manifest_check, dict):
+        manifest_check["reconciled_authority_status"] = reconciled_auth_status
 
     if args.json:
         data = {
@@ -1884,6 +1927,7 @@ def main() -> int:
         if manifest_check:
             print("\n=== Manifest Intent Reconciliation ===")
             print(f"  Status:                      {manifest_check['status'].upper()}")
+            print(f"  Reconciled Authority Status: {reconciled_auth_status.upper()}")
             print(f"  Declared Tools:              {manifest_check['declared_tools_count']}")
             print(f"  Aligned:                     {manifest_check['aligned_count']}")
             print(f"  Drift:                       {manifest_check['drift_count']}")

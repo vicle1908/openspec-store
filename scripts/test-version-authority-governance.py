@@ -656,5 +656,34 @@ class TestTCCProvenanceAndBashFallback(unittest.TestCase):
                 )
                 self.assertNotEqual(proc_mismatch.returncode, 0)
 
+    def test_has_unaligned_authority_drift_reconciles_local_dev_and_fails_closed_on_unaligned(self):
+        auth_aligned_local_dev = {
+            "conflict_count": 0,
+            "unknown_count": 0,
+            "items": [
+                {"name": "prime-agent", "drift_status": "target_misalignment", "updater_dispatch": "none"},
+            ],
+        }
+        manifest_ok = {
+            "status": "aligned",
+            "drift_count": 0,
+            "missing_count": 0,
+            "unsanctioned_count": 0,
+            "unknown_count": 0,
+            "summary": {"aligned": ["prime-agent"]},
+        }
+        self.assertFalse(inv.has_unaligned_authority_drift(auth_aligned_local_dev, manifest_ok))
+
+        # Unaligned target_misalignment (covered tool or missing from aligned manifest) fails closed
+        auth_unaligned = {
+            "conflict_count": 0,
+            "unknown_count": 0,
+            "items": [
+                {"name": "rogue-cli", "drift_status": "target_misalignment", "updater_dispatch": "npm"},
+            ],
+        }
+        self.assertTrue(inv.has_unaligned_authority_drift(auth_unaligned, manifest_ok))
+        self.assertTrue(inv.has_unaligned_authority_drift(auth_aligned_local_dev, {**manifest_ok, "drift_count": 1}))
+
 if __name__ == "__main__":
     unittest.main()

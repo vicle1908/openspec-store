@@ -187,6 +187,8 @@ refresh_skill_content() {
   raw="$(cd "${WORKSPACE_DIR}" && run_with_timeout "${SKILL_REFRESH_TIMEOUT}" \
     skills update -y 2>&1)" || rc=$?
 
+  rm -rf "${WORKSPACE_DIR}/data/skills" "${WORKSPACE_DIR}/agent/skills" 2>/dev/null || true
+  rmdir "${WORKSPACE_DIR}/agent" 2>/dev/null || true
   local clean
   clean="$(printf '%s' "$raw" | strip_ansi)"
 
@@ -460,6 +462,42 @@ detect_script_drift() {
   return 0
 }
 
+# Maintain code-signing and symlink invariants for TCC-governed binaries
+# (goose Cellar symlink, Python.app bundle org.python.python, and python3).
+sign_agent_binaries() {
+  [[ "$(uname -s)" != "Darwin" ]] && return 0
+  if command -v brew &>/dev/null && [[ ! -L "/opt/homebrew/bin/goose" || ! -e "/opt/homebrew/bin/goose" ]] && [[ -d "/opt/homebrew/Cellar/block-goose-cli" ]]; then
+    brew unlink block-goose-cli >/dev/null 2>&1 || true
+    brew link --overwrite block-goose-cli >/dev/null 2>&1 || true
+  fi
+  local cert_sha1="65340D85AFD298131C682D8463087891292A2B59"
+  if ! security find-identity -v -p codesigning 2>/dev/null | grep -qi "${cert_sha1}"; then
+    return 0
+  fi
+  if [[ -x "/opt/homebrew/bin/python3" ]]; then
+    local py_real py_app py_plist
+    py_real="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' /opt/homebrew/bin/python3 2>/dev/null || true)"
+    if [[ -n "${py_real}" && -f "${py_real}" ]]; then
+      py_app="$(dirname "$(dirname "${py_real}")")/Resources/Python.app"
+      py_plist="${py_app}/Contents/Info.plist"
+      if [[ -d "${py_app}" ]]; then
+        if [[ ! -f "${py_plist}" ]]; then
+          python3 -c 'import plistlib,sys; p=sys.argv[1]; plistlib.dump({"CFBundleIdentifier":"org.python.python","CFBundleExecutable":"Python","CFBundleName":"Python","CFBundlePackageType":"APPL"}, open(p,"wb"))' "${py_plist}" 2>/dev/null || true
+        fi
+        codesign -f -s "${cert_sha1}" --identifier "org.python.python" --deep "${py_app}" >/dev/null 2>&1 || true
+      fi
+      codesign -f -s "${cert_sha1}" --identifier "org.python.python3" "${py_real}" >/dev/null 2>&1 || true
+    fi
+  fi
+  if [[ -L "/opt/homebrew/bin/goose" || -f "/opt/homebrew/bin/goose" ]]; then
+    local goose_real
+    goose_real="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' /opt/homebrew/bin/goose 2>/dev/null || true)"
+    if [[ -n "${goose_real}" && -f "${goose_real}" ]]; then
+      codesign -f -s "${cert_sha1}" --identifier "com.block.goose" "${goose_real}" >/dev/null 2>&1 || true
+    fi
+  fi
+}
+
 # Verify active canonical coding agent Mach-O CLI realpaths and shared Python
 # automation identities in TCC.db (read-only) with native csreq signature checks.
 verify_tcc_provenance() {
@@ -646,6 +684,7 @@ except Exception:
       fi
 
       brew cleanup -s 2>&1 || true
+      sign_agent_binaries || true
     fi
   fi
 
@@ -743,8 +782,8 @@ except Exception:
     elif (( GLOBAL_PAUSE != 0 )); then
       echo "    SKIPPED: uv tool upgrades paused by policy (DISABLE_UPDATES)"
     else
-      uv tool upgrade graphifyy 2>&1 || true
-      uv tool upgrade tavily-cli 2>&1 || true
+      uv python upgrade 2>&1 || true
+      uv tool upgrade --all 2>&1 || true
     fi
   fi
 
@@ -768,6 +807,7 @@ except Exception:
     echo "    SKIPPED: agent CLI updates suppressed (preflight authority check failed)"
   else
     agent_cli_coverage "${DENY_ROSTER}" "${PAUSED_ROSTER}"
+    sign_agent_binaries || true
   fi
 
   # 6. Cross-Agent Skills Synchronization & Parity
@@ -849,7 +889,7 @@ except Exception:
       if grep -q "Status:                      SPLIT_DETECTED" <<<"${inv_out}"; then
         PREFIX_SPLIT_DETECTED=1
       fi
-      if grep -q "Status:                      DRIFT_DETECTED" <<<"${inv_out}"; then
+      if grep -q "Status:                      DRIFT_DETECTED" <<<"${inv_out}" && ! grep -q "Reconciled Authority Status: RECONCILED" <<<"${inv_out}"; then
         AUTHORITY_DRIFT_DETECTED=1
       fi
     fi

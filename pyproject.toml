@@ -11,10 +11,16 @@ dev = [
     "pytest>=9.1.1",
     "ruff>=0.16.3",
 ]
+[tool.uv]
+default-groups = ["dev"]
+required-version = ">=0.11.15"
+python-preference = "only-managed"
+package = false
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
-addopts = "--ignore=openspec/changes"
-
+testpaths = ["tests", "scripts/test-version-authority-governance.py"]
+addopts = "--ignore=openspec/changes -p no:cacheprovider"
 [tool.ruff]
 target-version = "py314"
 line-length = 100

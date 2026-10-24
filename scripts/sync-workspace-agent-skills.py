@@ -380,6 +380,24 @@ def reconcile_links(
     return Result(created, removed, conflicts, broken)
 
 
+def prune_unallowlisted_skill_surfaces(workspace: Path) -> list[str]:
+    """Remove unallowlisted data/skills and agent/skills trees recreated by `skills update -y`."""
+    pruned: list[str] = []
+    if not workspace.is_dir():
+        return pruned
+    for forbidden_rel in ("data/skills", "agent/skills", "agent"):
+        p = workspace / forbidden_rel
+        if forbidden_rel == "agent" and p.is_dir() and not p.is_symlink():
+            # Only remove `agent` if it is empty or contains only `skills`
+            entries = [e.name for e in p.iterdir()]
+            if entries and entries != ["skills"]:
+                continue
+        if p.exists() or p.is_symlink():
+            remove_path(p)
+            pruned.append(forbidden_rel)
+    return pruned
+
+
 def check_workspace_agent_surface(workspace: Path) -> list[str]:
     """Verify no unallowlisted project skill trees exist in workspace root."""
     violations: list[str] = []
@@ -517,6 +535,7 @@ def accept_or_bootstrap_snapshot(
     current_dir = snapshot_root / "current"
     previous_dir = snapshot_root / "previous"
 
+    prune_unallowlisted_skill_surfaces(workspace)
     surface_violations = check_workspace_agent_surface(workspace)
     for v in surface_violations:
         errors.append(f"surface-violation:{v}")
@@ -678,8 +697,9 @@ def accept_or_bootstrap_snapshot(
                 if current_dir.exists():
                     shutil.rmtree(current_dir)
                 os.replace(staging_dir, current_dir)
-                if not previous_dir.exists():
-                    shutil.copytree(current_dir, previous_dir, symlinks=False)
+                if previous_dir.exists():
+                    shutil.rmtree(previous_dir)
+                shutil.copytree(current_dir, previous_dir, symlinks=False)
         finally:
             if staging_dir.exists():
                 shutil.rmtree(staging_dir, ignore_errors=True)
@@ -918,6 +938,8 @@ def main(argv: list[str] | None = None) -> int:
     for finding in malformed:
         print("malformed_entries.finding=" + finding)
 
+    if not args.check:
+        prune_unallowlisted_skill_surfaces(workspace)
     surface_violations = check_workspace_agent_surface(workspace)
     if surface_violations:
         print("surface_violations=" + ",".join(surface_violations))
