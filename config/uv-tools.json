@@ -14,6 +14,12 @@
       "package": "tavily-cli",
       "version": "latest",
       "description": "Tavily search CLI"
+    },
+    {
+      "name": "browser-use",
+      "package": "browser-use @ git+https://github.com/browser-use/browser-use.git",
+      "version": "latest",
+      "description": "Browser Use CLI and Cloud V4 agent/browser harness"
     }
   ]
 }

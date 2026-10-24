@@ -136,7 +136,7 @@ class TestLayeredProfiles(unittest.TestCase):
         names = {t["name"] for t in data.get("tools", [])}
         self.assertIn("graphifyy", names)
         self.assertIn("tavily-cli", names)
-
+        self.assertIn("browser-use", names)
     def test_capability_profiles_exist(self):
         db_prof = CONFIG_DIR / "db-tools-profile.json"
         rust_prof = CONFIG_DIR / "rust-dev-profile.json"

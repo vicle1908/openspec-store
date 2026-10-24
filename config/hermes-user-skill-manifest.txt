@@ -7,3 +7,8 @@ ponytail-debt
 ponytail-gain
 ponytail-help
 ponytail-review
+# Browser Use official agent skills (upstream: browser-use/browser-use).
+browser-use
+cloud
+open-source
+qa
