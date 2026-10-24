@@ -17,7 +17,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from toolchain_updater_registry import get_supported_updater, is_truthy_pause  # noqa: E402
+from toolchain_updater_registry import get_supported_updater, is_truthy_pause
 
 
 @dataclass
@@ -95,7 +95,7 @@ def classify_source(binary_path: str) -> tuple[str, str]:
         return "vendor_download", "vendor release channel"
     p = Path(resolved)
     home = Path.home()
-    for parent in [p] + list(p.parents)[:4]:
+    for parent in [p, *list(p.parents)[:4]]:
         if parent in (home, home / ".local", home / ".local" / "bin"):
             continue
         if (parent / "package.json").is_file():
@@ -241,7 +241,7 @@ def audit_background_auto_update_settings() -> dict[str, Any]:
             grok_keys = {}
             for line in content.splitlines():
                 line = line.strip()
-                if line.startswith("auto_update") or line.startswith("installer"):
+                if line.startswith(("auto_update", "installer")):
                     parts = line.split("=", 1)
                     if len(parts) == 2:
                         k = parts[0].strip()

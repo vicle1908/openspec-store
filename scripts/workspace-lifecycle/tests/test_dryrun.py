@@ -21,8 +21,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import dryrun  # noqa: E402
-import retention  # noqa: E402
+import dryrun
+import retention
 
 TOOL_DIR = Path(__file__).resolve().parents[1]
 CLI = TOOL_DIR / "workspace-lifecycle.py"
@@ -225,7 +225,7 @@ def test_two_consecutive_dry_runs_are_non_mutating() -> None:
         status_mid = git(repo, "status", "--porcelain")
         checksum_mid = file_list_checksum(root, report_dir)
 
-        doc_two, _ = dryrun.run_dry_run(obs, inventory, "plan-test-0002",
+        _doc_two, _ = dryrun.run_dry_run(obs, inventory, "plan-test-0002",
                                         RUN_TWO_AT, report_dir=report_dir)
         status_after = git(repo, "status", "--porcelain")
         checksum_after = file_list_checksum(root, report_dir)

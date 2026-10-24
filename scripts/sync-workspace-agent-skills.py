@@ -17,7 +17,7 @@ import shutil
 import subprocess
 import tempfile
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -212,9 +212,7 @@ def check_description_budget(skill_md_path: Path, is_vendor: bool = True) -> boo
         return False
     if metrics["raw_bytes"] == 0 or metrics["raw_bytes"] > MAX_VENDOR_DESCRIPTION_BYTES:
         return False
-    if not is_vendor and metrics["char_length"] > MAX_INTERNAL_DESCRIPTION_CHARS:
-        return False
-    return True
+    return not (not is_vendor and metrics["char_length"] > MAX_INTERNAL_DESCRIPTION_CHARS)
 
 
 def _skill_entry_violations(path: Path) -> list[str]:
@@ -678,7 +676,7 @@ def accept_or_bootstrap_snapshot(
 
             manifest_payload = {
                 "version": 1,
-                "accepted_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "accepted_at": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "cli_version": detect_cli_version(),
                 "total_bytes": total_bytes,
                 "skills": manifest_skills,

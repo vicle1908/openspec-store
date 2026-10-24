@@ -76,24 +76,24 @@ class TestNotionKnowledgeSync(unittest.TestCase):
         if extra_env:
             env.update(extra_env)
 
-        cmd = [str(SYNC_SCRIPT)] + args
+        cmd = [str(SYNC_SCRIPT), *args]
         return subprocess.run(cmd, env=env, capture_output=True, text=True)
 
     def test_dry_run_is_strictly_read_only(self):
         """--dry-run MUST NOT touch log file, invoke mkdir -p, or mutate manifest."""
         res = self._run_sync_cmd(["--dry-run"])
-        self.assertEqual(res.returncode, 0, f"Dry-run failed: {res.stderr}")
+        assert res.returncode == 0, f"Dry-run failed: {res.stderr}"
 
         # Target state dir should not even exist
-        self.assertFalse(self.state_dir.exists(), "STATE_DIR was created during --dry-run")
-        self.assertFalse(self.log_file.exists(), "LOG_FILE was created during --dry-run")
-        self.assertFalse(self.manifest_file.exists(), "MANIFEST_FILE was created during --dry-run")
+        assert not self.state_dir.exists(), "STATE_DIR was created during --dry-run"
+        assert not self.log_file.exists(), "LOG_FILE was created during --dry-run"
+        assert not self.manifest_file.exists(), "MANIFEST_FILE was created during --dry-run"
 
         # Zero files created in entire temp root
         created_files = list(self.tmp_path.glob("**/*"))
         # Only self.wiki_dir hierarchy should exist
         non_wiki_files = [f for f in created_files if not str(f).startswith(str(self.tmp_path / "wiki"))]
-        self.assertEqual(len(non_wiki_files), 0, f"Found unexpected files created: {non_wiki_files}")
+        assert len(non_wiki_files) == 0, f"Found unexpected files created: {non_wiki_files}"
 
     def test_dry_run_does_not_mutate_existing_manifest(self):
         """--dry-run MUST NOT alter existing manifest or mutate section IDs."""
@@ -109,9 +109,9 @@ class TestNotionKnowledgeSync(unittest.TestCase):
         before_content = self.manifest_file.read_text(encoding="utf-8")
 
         res = self._run_sync_cmd(["--dry-run"])
-        self.assertEqual(res.returncode, 0)
+        assert res.returncode == 0
         after_content = self.manifest_file.read_text(encoding="utf-8")
-        self.assertEqual(before_content, after_content, "Manifest content changed during --dry-run")
+        assert before_content == after_content, "Manifest content changed during --dry-run"
 
     def test_dynamic_home_redaction(self):
         """Dynamic regex s#/Users/[^/]+/#~/#g replaces arbitrary usernames with ~/."""
@@ -123,17 +123,17 @@ class TestNotionKnowledgeSync(unittest.TestCase):
         )
         bash_cmd = f'source "{SYNC_SCRIPT}" && printf "%s" "{test_cases}" | sanitize_content'
         proc = subprocess.run(["bash", "-c", bash_cmd], capture_output=True, text=True)
-        self.assertEqual(proc.returncode, 0)
+        assert proc.returncode == 0
         out = proc.stdout
 
-        self.assertNotIn("androidteam", out)
-        self.assertNotIn("custom_user", out)
-        self.assertNotIn("some_dev_99", out)
-        self.assertNotIn("isolated_user", out)
-        self.assertIn("~/Developer/repo/main.go", out)
-        self.assertIn("~/.zshrc", out)
-        self.assertIn("~/Developer/project", out)
-        self.assertIn("~", out)
+        assert "androidteam" not in out
+        assert "custom_user" not in out
+        assert "some_dev_99" not in out
+        assert "isolated_user" not in out
+        assert "~/Developer/repo/main.go" in out
+        assert "~/.zshrc" in out
+        assert "~/Developer/project" in out
+        assert "~" in out
 
     def test_secret_redaction_and_allowlist(self):
         """Sanitization redacts credentials while allowing explicitly allowlisted terms."""
@@ -145,15 +145,15 @@ class TestNotionKnowledgeSync(unittest.TestCase):
         )
         bash_cmd = f'source "{SYNC_SCRIPT}" && printf "%s" "{secret_payload}" | sanitize_content'
         proc = subprocess.run(["bash", "-c", bash_cmd], capture_output=True, text=True)
-        self.assertEqual(proc.returncode, 0)
+        assert proc.returncode == 0
         out = proc.stdout
 
-        self.assertNotIn("sk-test12345678901234567890", out)
-        self.assertNotIn("ghp_12345678901234567890", out)
-        self.assertNotIn("secretpass123", out)
-        self.assertIn("OPENAI_API_KEY=REDACTED", out)
-        self.assertIn("GITHUB_TOKEN=REDACTED", out)
-        self.assertIn("postgres://REDACTED@localhost:5432/db", out)
+        assert "sk-test12345678901234567890" not in out
+        assert "ghp_12345678901234567890" not in out
+        assert "secretpass123" not in out
+        assert "OPENAI_API_KEY=REDACTED" in out
+        assert "GITHUB_TOKEN=REDACTED" in out
+        assert "postgres://REDACTED@localhost:5432/db" in out
 
     def test_residual_secret_scan_fails_closed(self):
         """Residual secret scanner MUST reject unredacted tokens and private keys."""
@@ -161,19 +161,19 @@ class TestNotionKnowledgeSync(unittest.TestCase):
         bad_key = "-----BEGIN " + "RSA PRIVATE KEY-----\\nKEYDATA\\n-----END RSA PRIVATE KEY-----"
         cmd_key = f'source "{SYNC_SCRIPT}" && scan_residual_secrets "{bad_key}"'
         proc_key = subprocess.run(["bash", "-c", cmd_key], capture_output=True, text=True)
-        self.assertNotEqual(proc_key.returncode, 0, "Private key was not caught by residual scanner")
+        assert proc_key.returncode != 0, "Private key was not caught by residual scanner"
 
         # 2. Raw unredacted token detection
         bad_token = "Here is raw token: sk-ant-api03-abcdef12345678901234567890"
         cmd_token = f'source "{SYNC_SCRIPT}" && scan_residual_secrets "{bad_token}"'
         proc_token = subprocess.run(["bash", "-c", cmd_token], capture_output=True, text=True)
-        self.assertNotEqual(proc_token.returncode, 0, "Raw API key token was not caught by residual scanner")
+        assert proc_token.returncode != 0, "Raw API key token was not caught by residual scanner"
 
         # 3. Clean content passes
         clean = "# Curated Knowledge\nOPENAI_API_KEY=REDACTED\n`api_key=your_api_key`\n"
         cmd_clean = f'source "{SYNC_SCRIPT}" && scan_residual_secrets "{clean}"'
         proc_clean = subprocess.run(["bash", "-c", cmd_clean], capture_output=True, text=True)
-        self.assertEqual(proc_clean.returncode, 0, f"Clean content failed residual scanner: {proc_clean.stderr}")
+        assert proc_clean.returncode == 0, f"Clean content failed residual scanner: {proc_clean.stderr}"
 
     def test_write_receipt_required_before_manifest_advances(self):
         """Manifest SHA-256 MUST ONLY advance when ntn returns exit 0 with valid JSON page ID."""
@@ -217,11 +217,11 @@ class TestNotionKnowledgeSync(unittest.TestCase):
             f'sync_document "wiki/concepts/test.md" "concepts"\n'
         )
         proc = subprocess.run(["bash", "-c", bash_cmd], capture_output=True, text=True)
-        self.assertNotEqual(proc.returncode, 0, "sync_document should fail when ntn fails")
+        assert proc.returncode != 0, "sync_document should fail when ntn fails"
 
         # Manifest must NOT have recorded the document
         data = json.loads(self.manifest_file.read_text(encoding="utf-8"))
-        self.assertNotIn("wiki/concepts/test.md", data.get("documents", {}))
+        assert "wiki/concepts/test.md" not in data.get("documents", {})
 
     def test_offline_resilience_and_successful_retry(self):
         """Failed write retains previous state; subsequent successful run advances SHA and enables fresh_noop."""
@@ -270,11 +270,11 @@ class TestNotionKnowledgeSync(unittest.TestCase):
         )
 
         proc1 = subprocess.run(["bash", "-c", base_env + 'sync_document "wiki/concepts/retry.md" "concepts"\n'], capture_output=True, text=True)
-        self.assertNotEqual(proc1.returncode, 0)
+        assert proc1.returncode != 0
 
         # Confirm old SHA retained
         data1 = json.loads(self.manifest_file.read_text(encoding="utf-8"))
-        self.assertEqual(data1["documents"]["wiki/concepts/retry.md"]["sha256"], "old-sha-digest")
+        assert data1["documents"]["wiki/concepts/retry.md"]["sha256"] == "old-sha-digest"
 
         # 2. Second run: connectivity restored; ntn edit succeeds returning receipt JSON
         mock_ntn.write_text(
@@ -286,16 +286,16 @@ class TestNotionKnowledgeSync(unittest.TestCase):
         mock_ntn.chmod(0o755)
 
         proc2 = subprocess.run(["bash", "-c", base_env + 'sync_document "wiki/concepts/retry.md" "concepts"\n'], capture_output=True, text=True)
-        self.assertEqual(proc2.returncode, 0, f"Retry sync failed: {proc2.stderr}")
+        assert proc2.returncode == 0, f"Retry sync failed: {proc2.stderr}"
 
         data2 = json.loads(self.manifest_file.read_text(encoding="utf-8"))
         new_sha = data2["documents"]["wiki/concepts/retry.md"]["sha256"]
-        self.assertNotEqual(new_sha, "old-sha-digest")
+        assert new_sha != "old-sha-digest"
 
         # 3. Third run: unchanged document triggers fresh_noop without calling ntn edit
         proc3 = subprocess.run(["bash", "-c", base_env + 'sync_document "wiki/concepts/retry.md" "concepts"\n'], capture_output=True, text=True)
-        self.assertEqual(proc3.returncode, 0)
-        self.assertIn("fresh_noop", proc3.stderr)
+        assert proc3.returncode == 0
+        assert "fresh_noop" in proc3.stderr
 
     def test_environment_variable_parameterization(self):
         """KNOWLEDGE_ROOT_ID and section page IDs can be supplied via environment."""
@@ -307,7 +307,7 @@ class TestNotionKnowledgeSync(unittest.TestCase):
             "NOTION_SECTION_FRESHNESS_ID": "custom-freshness-uuid-4",
         }
         res = self._run_sync_cmd(["--dry-run"], extra_env=extra_env)
-        self.assertEqual(res.returncode, 0, f"Dry-run with env vars failed: {res.stderr}")
+        assert res.returncode == 0, f"Dry-run with env vars failed: {res.stderr}"
 
 
 class TestExternalExecutionPacket(unittest.TestCase):
@@ -333,11 +333,11 @@ class TestExternalExecutionPacket(unittest.TestCase):
         )
 
         valid, errors = eep_mod.validate_packet(packet)
-        self.assertTrue(valid, f"Conforming packet failed validation: {errors}")
-        self.assertEqual(packet["status"], "COMPLETED")
-        self.assertEqual(packet["schema_version"], "1.0")
-        self.assertIn(".env", packet["exclusions"])
-        self.assertIn("omniroute_data", packet["exclusions"])
+        assert valid, f"Conforming packet failed validation: {errors}"
+        assert packet["status"] == "COMPLETED"
+        assert packet["schema_version"] == "1.0"
+        assert ".env" in packet["exclusions"]
+        assert "omniroute_data" in packet["exclusions"]
 
     def test_missing_scope_authorization_fails_closed(self):
         """Unauthorized packet defaults to BLOCKED; claiming COMPLETED without authorization is rejected."""
@@ -347,15 +347,15 @@ class TestExternalExecutionPacket(unittest.TestCase):
             command="rm -rf /opt/homebrew/lib/node_modules/shadow-copy",
             scope_authorized=False,
         )
-        self.assertEqual(blocked_packet["status"], "BLOCKED")
+        assert blocked_packet["status"] == "BLOCKED"
         valid, _ = eep_mod.validate_packet(blocked_packet)
-        self.assertTrue(valid, "BLOCKED state should be valid representation of unauthorized packet")
+        assert valid, "BLOCKED state should be valid representation of unauthorized packet"
 
         # 2. Fabricated COMPLETED status without scope authorization must fail validation
         blocked_packet["status"] = "COMPLETED"
         valid, errors = eep_mod.validate_packet(blocked_packet)
-        self.assertFalse(valid, "Validation must reject COMPLETED status when scope_authorized is False")
-        self.assertTrue(any("scope authorization" in e.lower() for e in errors))
+        assert not valid, "Validation must reject COMPLETED status when scope_authorized is False"
+        assert any("scope authorization" in e.lower() for e in errors)
 
     def test_mandatory_exclusions_enforced(self):
         """Validation MUST reject packets lacking secret or Docker volume exclusions."""
@@ -366,8 +366,8 @@ class TestExternalExecutionPacket(unittest.TestCase):
             exclusions=["only_temp_files"],  # Missing .env and volumes
         )
         valid, errors = eep_mod.validate_packet(packet)
-        self.assertFalse(valid, "Validation must reject packet with inadequate exclusions")
-        self.assertTrue(any("secret" in e.lower() or "exclusions" in e.lower() for e in errors))
+        assert not valid, "Validation must reject packet with inadequate exclusions"
+        assert any("secret" in e.lower() or "exclusions" in e.lower() for e in errors)
 
     def test_value_blind_scan_rejects_credentials_in_packet(self):
         """Packet containing unredacted API key or private key MUST fail validation."""
@@ -377,8 +377,8 @@ class TestExternalExecutionPacket(unittest.TestCase):
             scope_authorized=True,
         )
         valid, errors = eep_mod.validate_packet(packet)
-        self.assertFalse(valid, "Validation must reject packet containing unredacted API key")
-        self.assertTrue(any("unredacted credential" in e.lower() for e in errors))
+        assert not valid, "Validation must reject packet containing unredacted API key"
+        assert any("unredacted credential" in e.lower() for e in errors)
 
     def test_cli_create_and_validate_roundtrip(self):
         """CLI create piped to validate over stdin confirms command-line usability."""
@@ -403,7 +403,7 @@ class TestExternalExecutionPacket(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertEqual(proc_create.returncode, 0, f"CLI create failed: {proc_create.stderr}")
+        assert proc_create.returncode == 0, f"CLI create failed: {proc_create.stderr}"
 
         proc_validate = subprocess.run(
             [
@@ -416,8 +416,8 @@ class TestExternalExecutionPacket(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertEqual(proc_validate.returncode, 0, f"CLI validate failed: {proc_validate.stderr}")
-        self.assertIn("VALID", proc_validate.stdout)
+        assert proc_validate.returncode == 0, f"CLI validate failed: {proc_validate.stderr}"
+        assert "VALID" in proc_validate.stdout
 
 
 class TestUnifiedWorkstationVerification(unittest.TestCase):
@@ -427,36 +427,36 @@ class TestUnifiedWorkstationVerification(unittest.TestCase):
         """Unified verification runs in read-only mode and outputs structured JSON evidence bundle."""
         bundle = verify_mod.run_workstation_verification()
 
-        self.assertEqual(bundle.get("schema_version"), "1.0")
-        self.assertTrue(bundle.get("read_only"), "Evidence bundle must assert read_only: True")
-        self.assertIn("evidence_hash", bundle)
-        self.assertIn("summary", bundle)
-        self.assertIn("checks", bundle)
+        assert bundle.get("schema_version") == "1.0"
+        assert bundle.get("read_only"), "Evidence bundle must assert read_only: True"
+        assert "evidence_hash" in bundle
+        assert "summary" in bundle
+        assert "checks" in bundle
 
         summary = bundle["summary"]
-        self.assertEqual(summary["total_checks"], 5)
-        self.assertIn("inventory_reconciliation", summary["checks_status"])
-        self.assertIn("preflight", summary["checks_status"])
-        self.assertIn("templates", summary["checks_status"])
-        self.assertIn("port_conflicts", summary["checks_status"])
-        self.assertIn("notion_sanitization", summary["checks_status"])
+        assert summary["total_checks"] == 5
+        assert "inventory_reconciliation" in summary["checks_status"]
+        assert "preflight" in summary["checks_status"]
+        assert "templates" in summary["checks_status"]
+        assert "port_conflicts" in summary["checks_status"]
+        assert "notion_sanitization" in summary["checks_status"]
 
     def test_template_audit_validates_concrete_launchd_plists(self):
         """Audited templates in config/launchd must have 0 unresolved {{...}} tags."""
         res = verify_mod.check_templates()
-        self.assertIn(res["status"], ("PASS", "WARN"))
-        self.assertEqual(res["unresolved_tags_count"], 0, f"Found unresolved tags: {res}")
+        assert res["status"] in ("PASS", "WARN")
+        assert res["unresolved_tags_count"] == 0, f"Found unresolved tags: {res}"
 
     def test_notion_sanitization_audit_passes(self):
         """Notion sanitization audit within unified runner confirms all security checks pass."""
         res = verify_mod.check_notion_sanitization()
-        self.assertEqual(res["status"], "PASS")
+        assert res["status"] == "PASS"
         checks = res.get("checks", {})
-        self.assertEqual(checks.get("dynamic_home_redaction"), "PASS")
-        self.assertEqual(checks.get("secret_redaction"), "PASS")
-        self.assertEqual(checks.get("residual_token_fail_closed"), "PASS")
-        self.assertEqual(checks.get("residual_key_fail_closed"), "PASS")
-        self.assertEqual(checks.get("residual_allowlist_pass"), "PASS")
+        assert checks.get("dynamic_home_redaction") == "PASS"
+        assert checks.get("secret_redaction") == "PASS"
+        assert checks.get("residual_token_fail_closed") == "PASS"
+        assert checks.get("residual_key_fail_closed") == "PASS"
+        assert checks.get("residual_allowlist_pass") == "PASS"
 
     def test_cli_execution_in_read_only_mode(self):
         """Running verify-workstation-toolchain.py via CLI outputs valid JSON and exits 0."""
@@ -465,10 +465,10 @@ class TestUnifiedWorkstationVerification(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertEqual(proc.returncode, 0, f"Runner failed: {proc.stderr}")
+        assert proc.returncode == 0, f"Runner failed: {proc.stderr}"
         data = json.loads(proc.stdout)
-        self.assertEqual(data.get("overall_status"), "PASS")
-        self.assertTrue(data.get("read_only"))
+        assert data.get("overall_status") == "PASS"
+        assert data.get("read_only")
 
 
 if __name__ == "__main__":

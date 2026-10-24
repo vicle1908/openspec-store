@@ -146,7 +146,7 @@ class _MockOmniRouteServer:
                 self.end_headers()
                 self.wfile.write(raw)
 
-            def log_message(self, format: str, *args: object) -> None:
+            def log_message(self, fmt: str, *args: object) -> None:
                 return
 
         self._httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
@@ -209,34 +209,28 @@ class TestOmniRouteCliBridge(unittest.TestCase):
                 ],
                 cwd=Path(tmp_cwd),
             )
-            self.assertEqual(res.returncode, 0, msg=res.stderr)
-            self.assertEqual(res.stderr, "")
+            assert res.returncode == 0, res.stderr
+            assert res.stderr == ""
             payload = json.loads(res.stdout)
-            self.assertEqual(payload["status"], "healthy")
-            self.assertEqual(payload["gateway"], "healthy")
-            self.assertEqual(payload["version"], "3.8.51")
-            self.assertEqual(payload["cliVersion"], expected_pkg_version)
-            self.assertEqual(payload["baseUrl"], f"http://127.0.0.1:{server.port}")
-            self.assertEqual(
-                payload["database"],
-                {"status": "healthy", "connected": True, "source": "remote"},
-            )
-            self.assertEqual(
-                payload["providers"],
-                {"configured": 3, "active": 2, "healthy": 2, "disabled": 1},
-            )
+            assert payload["status"] == "healthy"
+            assert payload["gateway"] == "healthy"
+            assert payload["version"] == "3.8.51"
+            assert payload["cliVersion"] == expected_pkg_version
+            assert payload["baseUrl"] == f"http://127.0.0.1:{server.port}"
+            assert payload["database"] == {"status": "healthy", "connected": True, "source": "remote"}
+            assert payload["providers"] == {"configured": 3, "active": 2, "healthy": 2, "disabled": 1}
             paths = [p for _, p, _ in server.requests]
-            self.assertIn("/api/monitoring/health", paths)
-            self.assertIn("/api/omniroute/status", paths)
+            assert "/api/monitoring/health" in paths
+            assert "/api/omniroute/status" in paths
 
     def test_status_fails_closed_when_daemon_unreachable(self) -> None:
         dead_port = _find_unused_port()
         res = _run_bridge(
             ["status", "--output", "json", "--base-url", f"http://127.0.0.1:{dead_port}"]
         )
-        self.assertEqual(res.returncode, 3)
-        self.assertEqual(res.stdout.strip(), "")
-        self.assertIn("unreachable", res.stderr.lower())
+        assert res.returncode == 3
+        assert res.stdout.strip() == ""
+        assert "unreachable" in res.stderr.lower()
 
     def test_status_fails_closed_on_degraded_gateway_or_unauthorized(self) -> None:
         with _MockOmniRouteServer() as server:
@@ -250,10 +244,10 @@ class TestOmniRouteCliBridge(unittest.TestCase):
                     f"http://127.0.0.1:{server.port}",
                 ]
             )
-            self.assertEqual(res.returncode, 1)
+            assert res.returncode == 1
             payload = json.loads(res.stdout)
-            self.assertEqual(payload["gateway"], "degraded")
-            self.assertFalse(payload["database"]["connected"])
+            assert payload["gateway"] == "degraded"
+            assert not payload["database"]["connected"]
 
             server.omniroute_status_code = 401
             server.omniroute_status_payload = {"error": "Invalid management token"}
@@ -266,9 +260,9 @@ class TestOmniRouteCliBridge(unittest.TestCase):
                     f"http://127.0.0.1:{server.port}",
                 ]
             )
-            self.assertEqual(res_unauth.returncode, 4)
-            self.assertEqual(res_unauth.stdout.strip(), "")
-            self.assertIn("401", res_unauth.stderr)
+            assert res_unauth.returncode == 4
+            assert res_unauth.stdout.strip() == ""
+            assert "401" in res_unauth.stderr
 
     def test_status_rejects_unsupported_output_and_unknown_flags(self) -> None:
         for bad_args in (
@@ -278,8 +272,8 @@ class TestOmniRouteCliBridge(unittest.TestCase):
             ["status", "extra-arg"],
         ):
             res = _run_bridge(bad_args)
-            self.assertEqual(res.returncode, 2, msg=f"args={bad_args} stderr={res.stderr}")
-            self.assertEqual(res.stdout.strip(), "")
+            assert res.returncode == 2, f"args={bad_args} stderr={res.stderr}"
+            assert res.stdout.strip() == ""
 
     def test_keys_list_filters_apikey_connections_and_masks_strictly(self) -> None:
         with _MockOmniRouteServer() as server:
@@ -293,45 +287,18 @@ class TestOmniRouteCliBridge(unittest.TestCase):
                     f"http://localhost:{server.port}/v1",
                 ]
             )
-            self.assertEqual(res.returncode, 0, msg=res.stderr)
-            self.assertNotIn("pa-raw-secret-value-1234567890abcd", res.stdout)
-            self.assertNotIn("shortkey", res.stdout)
+            assert res.returncode == 0, res.stderr
+            assert "pa-raw-secret-value-1234567890abcd" not in res.stdout
+            assert "shortkey" not in res.stdout
             data = json.loads(res.stdout)
             keys = data["keys"]
-            self.assertEqual(len(keys), 3)
-            self.assertEqual(
-                keys[0],
-                {
-                    "id": "conn-11111111",
-                    "provider": "openrouter",
-                    "name": "main-or",
-                    "isActive": True,
-                    "maskedKey": "sk-or-***99aa",
-                },
-            )
-            self.assertEqual(
-                keys[1],
-                {
-                    "id": "conn-22222222",
-                    "provider": "voyage-ai",
-                    "name": "unmasked-server-test",
-                    "isActive": False,
-                    "maskedKey": "pa-raw***abcd",
-                },
-            )
-            self.assertEqual(
-                keys[2],
-                {
-                    "id": "conn-33333333",
-                    "provider": "jina-ai",
-                    "name": "short-key-test",
-                    "isActive": True,
-                    "maskedKey": "***",
-                },
-            )
+            assert len(keys) == 3
+            assert keys[0] == {"id": "conn-11111111", "provider": "openrouter", "name": "main-or", "isActive": True, "maskedKey": "sk-or-***99aa"}
+            assert keys[1] == {"id": "conn-22222222", "provider": "voyage-ai", "name": "unmasked-server-test", "isActive": False, "maskedKey": "pa-raw***abcd"}
+            assert keys[2] == {"id": "conn-33333333", "provider": "jina-ai", "name": "short-key-test", "isActive": True, "maskedKey": "***"}
             paths = [p for _, p, _ in server.requests]
-            self.assertIn("/api/providers?limit=5000", paths)
-            self.assertFalse(any(p.startswith("/api/keys") for p in paths))
+            assert "/api/providers?limit=5000" in paths
+            assert not any(p.startswith("/api/keys") for p in paths)
 
     def test_keys_list_fails_closed_on_404_or_offline_without_local_db_fallback(self) -> None:
         with _MockOmniRouteServer() as server:
@@ -347,17 +314,17 @@ class TestOmniRouteCliBridge(unittest.TestCase):
                     f"http://127.0.0.1:{server.port}",
                 ]
             )
-            self.assertEqual(res_404.returncode, 2)
-            self.assertEqual(res_404.stdout.strip(), "")
-            self.assertIn("not supported", res_404.stderr.lower())
+            assert res_404.returncode == 2
+            assert res_404.stdout.strip() == ""
+            assert "not supported" in res_404.stderr.lower()
 
         dead_port = _find_unused_port()
         res_offline = _run_bridge(
             ["keys", "list", "--output", "json", "--base-url", f"http://127.0.0.1:{dead_port}"]
         )
-        self.assertEqual(res_offline.returncode, 3)
-        self.assertEqual(res_offline.stdout.strip(), "")
-        self.assertIn("unreachable", res_offline.stderr.lower())
+        assert res_offline.returncode == 3
+        assert res_offline.stdout.strip() == ""
+        assert "unreachable" in res_offline.stderr.lower()
 
     def test_providers_list_formats_table_and_json_and_fails_closed(self) -> None:
         with _MockOmniRouteServer() as server:
@@ -365,28 +332,28 @@ class TestOmniRouteCliBridge(unittest.TestCase):
             res_json = _run_bridge(
                 ["providers", "list", "--output", "json", "--base-url", f"http://127.0.0.1:{server.port}"]
             )
-            self.assertEqual(res_json.returncode, 0, msg=res_json.stderr)
+            assert res_json.returncode == 0, res_json.stderr
             data = json.loads(res_json.stdout)
-            self.assertIn("providers", data)
+            assert "providers" in data
             providers = data["providers"]
-            self.assertEqual(len(providers), 5)
-            self.assertEqual(providers[0]["id"], "conn-11111111")
-            self.assertEqual(providers[0]["provider"], "openrouter")
-            self.assertEqual(providers[0]["name"], "main-or")
-            self.assertEqual(providers[4]["provider"], "codex")
-            self.assertEqual(providers[4]["authType"], "oauth")
-            self.assertEqual(providers[0]["testStatus"], "unknown")
-            self.assertNotIn("apiKey", providers[0])
-            self.assertNotIn("maskedKey", providers[0])
+            assert len(providers) == 5
+            assert providers[0]["id"] == "conn-11111111"
+            assert providers[0]["provider"] == "openrouter"
+            assert providers[0]["name"] == "main-or"
+            assert providers[4]["provider"] == "codex"
+            assert providers[4]["authType"] == "oauth"
+            assert providers[0]["testStatus"] == "unknown"
+            assert "apiKey" not in providers[0]
+            assert "maskedKey" not in providers[0]
 
             # 2. Table output
             res_table = _run_bridge(
                 ["providers", "list", "--base-url", f"http://127.0.0.1:{server.port}"]
             )
-            self.assertEqual(res_table.returncode, 0, msg=res_table.stderr)
-            self.assertIn("OmniRoute Providers", res_table.stdout)
-            self.assertIn("conn-111", res_table.stdout)
-            self.assertIn("openrouter", res_table.stdout)
+            assert res_table.returncode == 0, res_table.stderr
+            assert "OmniRoute Providers" in res_table.stdout
+            assert "conn-111" in res_table.stdout
+            assert "openrouter" in res_table.stdout
 
             # 3. 404 failure
             server.providers_status_code = 404
@@ -394,35 +361,35 @@ class TestOmniRouteCliBridge(unittest.TestCase):
             res_404 = _run_bridge(
                 ["providers", "list", "--base-url", f"http://127.0.0.1:{server.port}"]
             )
-            self.assertEqual(res_404.returncode, 2)
-            self.assertIn("not supported", res_404.stderr.lower())
+            assert res_404.returncode == 2
+            assert "not supported" in res_404.stderr.lower()
 
         # 4. Offline failure
         dead_port = _find_unused_port()
         res_offline = _run_bridge(
             ["providers", "list", "--base-url", f"http://127.0.0.1:{dead_port}"]
         )
-        self.assertEqual(res_offline.returncode, 3)
-        self.assertIn("unreachable", res_offline.stderr.lower())
+        assert res_offline.returncode == 3
+        assert "unreachable" in res_offline.stderr.lower()
 
     def test_passthrough_commands_emit_zero_env_shadow_warnings_on_stderr(self) -> None:
         with _MockOmniRouteServer() as server:
             res_ver = _run_bridge(["--version"], cwd=OMNIROUTE_ROOT)
-            self.assertEqual(res_ver.returncode, 0, msg=res_ver.stderr)
-            self.assertNotIn("is ignored", res_ver.stdout)
-            self.assertNotIn("is ignored", res_ver.stderr)
-            self.assertNotIn("Loaded env from", res_ver.stdout)
-            self.assertNotIn("Loaded env from", res_ver.stderr)
+            assert res_ver.returncode == 0, res_ver.stderr
+            assert "is ignored" not in res_ver.stdout
+            assert "is ignored" not in res_ver.stderr
+            assert "Loaded env from" not in res_ver.stdout
+            assert "Loaded env from" not in res_ver.stderr
 
             res_health = _run_bridge(
                 ["health", "--json", "--base-url", f"http://127.0.0.1:{server.port}"],
                 cwd=OMNIROUTE_ROOT,
             )
-            self.assertEqual(res_health.returncode, 0, msg=res_health.stderr)
-            self.assertNotIn("is ignored", res_health.stdout)
-            self.assertNotIn("is ignored", res_health.stderr)
-            self.assertNotIn("Loaded env from", res_health.stdout)
-            self.assertNotIn("Loaded env from", res_health.stderr)
+            assert res_health.returncode == 0, res_health.stderr
+            assert "is ignored" not in res_health.stdout
+            assert "is ignored" not in res_health.stderr
+            assert "Loaded env from" not in res_health.stdout
+            assert "Loaded env from" not in res_health.stderr
 
 
 if __name__ == "__main__":

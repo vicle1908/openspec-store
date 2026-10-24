@@ -14,7 +14,6 @@ import argparse
 import datetime
 import hashlib
 import json
-import os
 import re
 import subprocess
 import sys
@@ -171,7 +170,7 @@ def create_packet(
     """Create a structured External Execution Packet dictionary."""
     commit = source_commit or _resolve_source_commit()
 
-    now_utc = datetime.datetime.now(datetime.timezone.utc)
+    now_utc = datetime.datetime.now(datetime.UTC)
     now_iso = now_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     t_start_str = started_at or now_iso
@@ -266,7 +265,7 @@ def validate_packet(packet_input: dict[str, Any] | str | Path) -> tuple[bool, li
             if not path.is_file():
                 return False, [f"Packet file not found: {path}"]
             try:
-                with open(path, "r", encoding="utf-8") as f:
+                with open(path, encoding="utf-8") as f:
                     packet = json.load(f)
             except Exception as e:
                 return False, [f"Failed to read packet file {path}: {e}"]
@@ -287,7 +286,7 @@ def validate_packet(packet_input: dict[str, Any] | str | Path) -> tuple[bool, li
     target_root = packet.get("target_root")
     if not target_root or not isinstance(target_root, str):
         errors.append("Missing or invalid target_root")
-    elif not (target_root.startswith("/") or target_root.startswith("~")):
+    elif not (target_root.startswith(("/", "~"))):
         errors.append(f"target_root must be an absolute path or home-relative path: '{target_root}'")
 
     # 4. Source commit

@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import importlib.util
 import json
-import math
 import os
 import sys
 import urllib.request
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock, patch
+
 try:
     import pytest
 except ImportError:
@@ -17,7 +18,8 @@ except ImportError:
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "probe-prime-agent-delivery.py"
 spec = importlib.util.spec_from_file_location("probe_script", SCRIPT_PATH)
-assert spec is not None and spec.loader is not None
+assert spec is not None
+assert spec.loader is not None
 probe = importlib.util.module_from_spec(spec)
 sys.modules["probe_script"] = probe
 spec.loader.exec_module(probe)
@@ -282,7 +284,7 @@ def test_safe_redirect_handler_case_insensitive_header_purge() -> None:
     new_req = handler.redirect_request(req, None, 302, "Found", {}, "https://example.com/v1/responses-redirected")
     assert new_req is not None
     for header in ("Authorization", "x-api-key", "X-api-key", "Proxy-Authorization", "Cookie"):
-        assert header.lower() not in [k.lower() for k in new_req.headers.keys()]
+        assert header.lower() not in [k.lower() for k in new_req.headers]
     # Forbid HTTPS to HTTP downgrade
     assert handler.redirect_request(req, None, 302, "Found", {}, "http://example.com/v1/downgrade") is None
 
@@ -330,7 +332,7 @@ def test_make_request_token_usage_boundaries() -> None:
         resp.__enter__.return_value = resp
         resp.__exit__.return_value = None
         with patch("urllib.request.OpenerDirector.open", return_value=resp):
-            tokens, model, out, err = probe.make_request(
+            tokens, _model, _out, err = probe.make_request(
                 base_url="http://127.0.0.1:1234/v1",
                 api_key="sk-test",
                 protocol=proto,
@@ -348,7 +350,7 @@ def test_make_request_oversize_response_bound() -> None:
     resp.__enter__.return_value = resp
     resp.__exit__.return_value = None
     with patch("urllib.request.OpenerDirector.open", return_value=resp):
-        tokens, model, out, err = probe.make_request(
+        _tokens, _model, _out, err = probe.make_request(
             base_url="http://127.0.0.1:1234/v1",
             api_key="sk-test",
             protocol="openai-responses",
@@ -586,7 +588,7 @@ def test_probe_registration_zero_vs_missing_baseline_http() -> None:
             self.end_headers()
             self.wfile.write(resp_bytes)
 
-        def log_message(self, format: str, *args: Any) -> None:
+        def log_message(self, fmt: str, *args: Any) -> None:
             pass
 
     server = http.server.HTTPServer(("127.0.0.1", 0), ZeroVsMissingHandler)
@@ -739,9 +741,9 @@ def test_endpoint_url_resolution_direct_and_prefixed() -> None:
 
 def test_probe_script_http_fixture_scenarios() -> None:
     import http.server
-    import threading
-    import tempfile
     import io
+    import tempfile
+    import threading
 
     class ComprehensiveFixtureHandler(http.server.BaseHTTPRequestHandler):
         mode = "reasoning"
@@ -826,7 +828,7 @@ def test_probe_script_http_fixture_scenarios() -> None:
             self.end_headers()
             self.wfile.write(payload)
 
-        def log_message(self, format: str, *args: Any) -> None:
+        def log_message(self, fmt: str, *args: Any) -> None:
             pass
 
     server = http.server.HTTPServer(("127.0.0.1", 0), ComprehensiveFixtureHandler)

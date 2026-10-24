@@ -12,11 +12,11 @@ import argparse
 import fnmatch
 import importlib.util
 import json
-import os
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
+lazy from collections.abc import Sequence
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 
@@ -193,7 +193,7 @@ def generate_dry_run_plan(
     m_path = manifest_path or store_root / "config" / "workstation-toolchain-manifest.json"
     if m_path.is_file():
         try:
-            with open(m_path, "r", encoding="utf-8") as f:
+            with open(m_path, encoding="utf-8") as f:
                 manifest_data = json.load(f)
             tools = manifest_data.get("tools", {})
             rust_dev_tools = set(manifest_data.get("profiles", {}).get("rust-dev", ["rustup", "cargo"]))
@@ -234,7 +234,7 @@ def generate_dry_run_plan(
                         details=f"Tool '{tool_name}' authoritative owner: {owner}",
                     )
                 )
-        except Exception as exc:
+        except Exception:
             pass
 
     # 3. Brewfile Actions

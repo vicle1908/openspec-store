@@ -3,17 +3,17 @@ name = "openspec-store"
 version = "0.2.0"
 description = "OpenSpec central store validation and tooling"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.15"
 dependencies = []
 
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
-    "ruff>=0.16.3",
+    "ruff>=0.17.2",
 ]
 [tool.uv]
 default-groups = ["dev"]
-required-version = ">=0.11.15"
+required-version = ">=0.13.5"
 python-preference = "only-managed"
 package = false
 
@@ -22,7 +22,7 @@ pythonpath = ["."]
 testpaths = ["tests", "scripts/test-version-authority-governance.py"]
 addopts = "--ignore=openspec/changes -p no:cacheprovider"
 [tool.ruff]
-target-version = "py314"
+target-version = "py315"
 line-length = 100
 exclude = [
     "openspec/changes/archive",
@@ -30,5 +30,17 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I"]
-ignore = ["E501"]
+select = [
+    "E", "W", "F", "I", "N", "UP", "B", "A", "C4", "SIM",
+    "TCH", "TC", "RUF", "S", "PTH", "PIE", "PT", "ARG", "SLF",
+]
+ignore = [
+    "E501", "A002", "N818", "SIM102", "SIM117",
+    "PTH100", "PTH101", "PTH105", "PTH107", "PTH108", "PTH110", "PTH111", "PTH113", "PTH117", "PTH119", "PTH123", "PTH208",
+    "S101", "S105", "S106", "S108", "S110", "S112", "S310", "S314", "S602", "S603", "S607",
+    "ARG001", "ARG002", "SLF001", "PT009", "PT011", "PT028",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/**/*.py" = ["F841", "B007", "E402", "S101", "S108", "ARG001", "ARG002", "SLF001", "N802"]

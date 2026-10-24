@@ -18,8 +18,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import observations  # noqa: E402
-import retirement  # noqa: E402
+import observations
+import retirement
 
 OBSERVED_AT = "2026-08-25T19:00:00Z"
 REVISION = "beef000000000000000000000000000000000042"
@@ -190,7 +190,7 @@ def test_happy_path_follows_ownership_order() -> None:
           plan.classification == "RECLAIMED")
     check("every transition audited in order",
           [entry[0] for entry in plan.audit]
-          == ["plan"] + list(retirement.TRANSITION_STEPS),
+          == ["plan", *list(retirement.TRANSITION_STEPS)],
           str(plan.audit))
 
 
@@ -247,8 +247,7 @@ def test_failure_at_each_transition_is_auditable() -> None:
         # No compensating direct deletion: nothing past the failure is
         # skipped or silently completed; every step is accounted exactly
         # once and the record exposes no removal action.
-        accounted = (plan.completed_steps + (plan.failed_step,)
-                     + plan.pending_steps)
+        accounted = ((*plan.completed_steps, plan.failed_step, *plan.pending_steps))
         check(f"failure at {failing_step}: no compensating deletion",
               accounted == steps, str(accounted))
 

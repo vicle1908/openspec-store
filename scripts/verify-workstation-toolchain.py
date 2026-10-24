@@ -18,12 +18,9 @@ import datetime
 import hashlib
 import importlib.util
 import json
-import os
 import plistlib
-import re
 import subprocess
 import sys
-from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
@@ -288,7 +285,7 @@ def check_notion_sanitization() -> dict[str, Any]:
 
 def run_workstation_verification(manifest_path: Path | None = None) -> dict[str, Any]:
     """Execute unified read-only workstation verification and return evidence bundle."""
-    now_utc = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    now_utc = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     inv_res = check_inventory_reconciliation(manifest_path)
     preflight_res = check_preflight()

@@ -19,11 +19,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import approval  # noqa: E402
-import classify  # noqa: E402
-import manifest  # noqa: E402
-import observations  # noqa: E402
-import retention  # noqa: E402
+import approval
+import classify
+import manifest
+import observations
+import retention
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 RETENTION_FIXTURE = FIXTURES / "retention-inventory.protected-and-candidate.json"
@@ -273,15 +273,15 @@ def test_approval_record_roundtrip_and_secrets() -> None:
             check("credential-shaped record rejected",
                   "credential-shaped" in str(exc), str(exc))
 
-    base_kwargs = dict(
-        plan_id=plan["plan_id"], plan_identity=plan["plan_identity"],
-        operator="operator-fixture", approval_note="note",
-        approved_at=APPROVED_AT, paths=[RECLAIMABLE_PATH],
-    )
+    base_kwargs = {
+        "plan_id": plan["plan_id"], "plan_identity": plan["plan_identity"],
+        "operator": "operator-fixture", "approval_note": "note",
+        "approved_at": APPROVED_AT, "paths": [RECLAIMABLE_PATH],
+    }
     for name, override in [
-        ("missing note", dict(approval_note="")),
-        ("missing operator", dict(operator="")),
-        ("missing paths", dict(paths=[])),
+        ("missing note", {"approval_note": ""}),
+        ("missing operator", {"operator": ""}),
+        ("missing paths", {"paths": []}),
     ]:
         try:
             approval.make_approval(**{**base_kwargs, **override})

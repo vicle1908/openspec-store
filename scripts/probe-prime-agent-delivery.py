@@ -22,6 +22,7 @@ Safety & Governance:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import math
 import os
@@ -33,7 +34,7 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 SAFE_ENV_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 MAX_RESPONSE_BYTES = 10 * 1024 * 1024  # 10 MB bound to prevent memory exhaustion
@@ -51,7 +52,7 @@ class SafeRedirectHandler(urllib.request.HTTPRedirectHandler):
         msg: str,
         headers: Any,
         newurl: str,
-    ) -> Optional[urllib.request.Request]:
+    ) -> urllib.request.Request | None:
         orig_parsed = urllib.parse.urlsplit(req.full_url)
         new_parsed = urllib.parse.urlsplit(newurl)
 
@@ -79,7 +80,7 @@ class SafeRedirectHandler(urllib.request.HTTPRedirectHandler):
         return new_req
 
 
-def parse_token_count(val: Any) -> Optional[int]:
+def parse_token_count(val: Any) -> int | None:
     """Validate and convert token count to non-negative integer.
 
     Fails closed (returns None) for booleans, negative numbers, non-finite floats,
@@ -110,7 +111,7 @@ def sanitize_url(url: str) -> str:
         return "<sanitized-url>"
 
 
-def resolve_env_identifier(var_name: Optional[str]) -> Optional[str]:
+def resolve_env_identifier(var_name: str | None) -> str | None:
     """Resolve an environment variable securely via os.environ or login shell evaluation."""
     if not var_name or not isinstance(var_name, str):
         return None
@@ -120,7 +121,7 @@ def resolve_env_identifier(var_name: Optional[str]) -> Optional[str]:
     if not SAFE_ENV_NAME.match(var_name):
         return None
 
-    if var_name in os.environ and os.environ[var_name]:
+    if os.environ.get(var_name):
         return os.environ[var_name]
 
     # Evaluate via non-interactive login shell without echoing secrets
@@ -137,7 +138,7 @@ def resolve_env_identifier(var_name: Optional[str]) -> Optional[str]:
         return None
 
 
-def resolve_credential(raw_key: Optional[str]) -> Optional[str]:
+def resolve_credential(raw_key: str | None) -> str | None:
     """Resolve API key safely from environment variable reference or literal value.
 
     Safety:
@@ -166,12 +167,12 @@ def resolve_credential(raw_key: Optional[str]) -> Optional[str]:
     return raw_key
 
 
-def extract_content_text(data: Dict[str, Any], protocol: str) -> str:
+def extract_content_text(data: dict[str, Any], protocol: str) -> str:
     """Extract visible text, function arguments, and reasoning from response."""
     if not isinstance(data, dict):
         return ""
 
-    collected: List[str] = []
+    collected: list[str] = []
 
     if protocol == "anthropic-messages":
         content = data.get("content")
@@ -190,10 +191,8 @@ def extract_content_text(data: Dict[str, Any], protocol: str) -> str:
                     elif b_type == "tool_use":
                         inp = block.get("input")
                         if inp is not None:
-                            try:
+                            with contextlib.suppress(Exception):
                                 collected.append(json.dumps(inp))
-                            except Exception:
-                                pass
         elif isinstance(content, str) and content:
             collected.append(content)
     else:
@@ -289,14 +288,14 @@ def extract_content_text(data: Dict[str, Any], protocol: str) -> str:
 
 def make_request(
     base_url: str,
-    api_key: Optional[str],
+    api_key: str | None,
     protocol: str,
     model_id: str,
-    system_prompt: Optional[str],
+    system_prompt: str | None,
     user_prompt: str,
     max_tokens: int = 256,
     timeout: float = 30.0,
-) -> Tuple[Optional[int], Optional[str], Optional[str], Optional[str]]:
+) -> tuple[int | None, str | None, str | None, str | None]:
     """Execute API request and return (input_tokens, actual_model, output_text, sanitized_error)."""
     bounded_timeout = max(1.0, min(float(timeout), 60.0))
     headers = {"Content-Type": "application/json"}
@@ -315,7 +314,7 @@ def make_request(
             url = f"{base}/messages"
         else:
             url = f"{base}/v1/messages"
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "model": model_id,
             "max_tokens": max_tokens,
             "messages": [{"role": "user", "content": user_prompt}],
@@ -330,7 +329,7 @@ def make_request(
             url = f"{base}/responses"
         else:
             url = f"{base}/v1/responses"
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "model": model_id,
             "input": [{"role": "user", "content": user_prompt}],
             "max_output_tokens": max_tokens,
@@ -434,11 +433,11 @@ def probe_registration(
     provider_name: str,
     model_id: str,
     base_url: str,
-    api_key: Optional[str],
+    api_key: str | None,
     protocol: str,
     challenge_length: int = 5000,
     timeout: float = 30.0,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Execute paired control and challenge probes for a single registration."""
     nonce = secrets.token_hex(8)
     secret_marker = f"NONCE_{nonce}"
@@ -587,11 +586,11 @@ def main() -> int:
         print(f"Error: models config file not found: {models_path}", file=sys.stderr)
         return 1
 
-    with open(models_path, "r", encoding="utf-8") as f:
+    with open(models_path, encoding="utf-8") as f:
         models_data = json.load(f)
 
     providers = models_data.get("providers", {})
-    targets: List[Tuple[str, str, Dict[str, Any]]] = []
+    targets: list[tuple[str, str, dict[str, Any]]] = []
 
     if args.all:
         for p_name, p_cfg in providers.items():

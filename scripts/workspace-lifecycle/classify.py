@@ -27,10 +27,9 @@ mutates anything.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
 import retention
-from observations import PathRecord
+lazy from observations import PathRecord
 
 CLASSIFICATIONS = ("PROTECTED", "REVIEW_REQUIRED", "RECLAIMABLE", "RECLAIMED")
 
@@ -46,7 +45,7 @@ class Classification:
 
 def classify_path(
     record: PathRecord,
-    retention_inventory: Optional[retention.RetentionInventory] = None,
+    retention_inventory: retention.RetentionInventory | None = None,
 ) -> Classification:
     """Classify one correlated path record using strict precedence."""
     blockers: list[str] = []
@@ -69,9 +68,7 @@ def classify_path(
             (f"retention:{decision.reason}",),
             (f"retention_entry:{decision.entry.path}",),
         )
-    if decision.outcome == retention.REVIEW_ONLY_CANDIDATE:
-        blockers.append(f"retention:{decision.reason}")
-    elif decision.outcome == retention.REVIEW_REQUIRED:
+    if decision.outcome == retention.REVIEW_ONLY_CANDIDATE or decision.outcome == retention.REVIEW_REQUIRED:
         blockers.append(f"retention:{decision.reason}")
     elif decision.outcome == retention.UNAVAILABLE:
         blockers.append("retention_inventory_unavailable")

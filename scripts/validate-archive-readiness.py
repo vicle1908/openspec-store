@@ -170,7 +170,7 @@ def check_change_readiness(
 
     delta_specs: list[Path] = []
     if specs_dir.exists():
-        delta_specs = [p for p in specs_dir.rglob("*.md")]
+        delta_specs = list(specs_dir.rglob("*.md"))
 
     delta_specs_count = len(delta_specs)
     if not skip_specs and delta_specs_count == 0:

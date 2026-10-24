@@ -19,7 +19,10 @@ import tempfile
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
 
 ARCHIMATE_NS = "http://www.opengroup.org/xsd/archimate/3.0/"
 XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
@@ -501,13 +504,13 @@ class ArchimateModel:
                         prefix_decl.group(0), b'xmlns="' + self.default_ns.encode("utf-8") + b'"'
                     )
         return payload
-    
+
     def _apply(self, op: Mapping[str, Any]) -> None:
         action = op.get("op")
         if action == "create_element":
             element_type = str(op.get("type", ""))
             name = str(op.get("name", ""))
-            layer = str(op.get("layer", ""))
+            str(op.get("layer", ""))
             if not element_type or not name:
                 raise ModelError("MUTATION_INVALID_ELEMENT: type and name are required")
             identifier = str(

@@ -20,9 +20,9 @@ approval, and the first version performs no deletion at all.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Mapping, Optional
+lazy from collections.abc import Mapping
 
-from observations import PathRecord
+lazy from observations import PathRecord
 
 # Terminal states: connected terminals block outright; orphaned terminals
 # block as REVIEW_REQUIRED (spec: no filesystem removal is proposed while an
@@ -49,7 +49,7 @@ def is_orca_managed(record: PathRecord) -> bool:
 
 def orca_preconditions(
     record: PathRecord,
-    child_states: Optional[Mapping[str, str]] = None,
+    child_states: Mapping[str, str] | None = None,
 ) -> PreconditionResult:
     """Evaluate Orca retirement preconditions for one correlated path.
 
@@ -276,13 +276,13 @@ class RetirementRecord:
         )
 
     @property
-    def failed_step(self) -> Optional[str]:
+    def failed_step(self) -> str | None:
         for name, status in self.steps.items():
             if status == STEP_FAILED:
                 return name
         return None
 
-    def _next_actionable(self) -> Optional[str]:
+    def _next_actionable(self) -> str | None:
         for name, status in self.steps.items():
             if status in (STEP_PENDING, STEP_FAILED):
                 return name
@@ -328,7 +328,7 @@ class RetirementRecord:
 def plan_retirement(
     record: PathRecord,
     plan_id: str,
-    child_states: Optional[Mapping[str, str]] = None,
+    child_states: Mapping[str, str] | None = None,
 ) -> RetirementRecord:
     """Build the ordered retirement record for one correlated path.
 

@@ -44,7 +44,7 @@ import hashlib
 import json
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 POLICY_NAME = "workspace-artifact-retention-policy"
@@ -89,12 +89,12 @@ def parse_iso(value: str) -> datetime:
         text = text[:-1] + "+00:00"
     parsed = datetime.fromisoformat(text)
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
+        parsed = parsed.replace(tzinfo=UTC)
     return parsed
 
 
 def now_iso() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def git_head(path: str) -> str | None:
@@ -258,7 +258,7 @@ def check_freshness(entry: dict) -> tuple[bool, str]:
             when = parse_iso(observed_at)
         except Exception:
             return False, "runtime_observation provenance has unparseable observed_at"
-        if when > datetime.now(timezone.utc):
+        if when > datetime.now(UTC):
             return False, "runtime_observation observed_at is in the future"
         return True, "runtime observation recorded"
 

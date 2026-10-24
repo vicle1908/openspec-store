@@ -16,9 +16,10 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Optional
+from typing import Any
 
 from observations import Observation
 
@@ -223,7 +224,7 @@ class IndexTarget:
 @dataclass(frozen=True)
 class TargetDecision:
     eligible: bool
-    skip_reason: Optional[str]
+    skip_reason: str | None
 
 
 def classify_index_target(

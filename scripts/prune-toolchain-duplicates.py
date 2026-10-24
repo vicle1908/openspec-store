@@ -19,7 +19,6 @@ import argparse
 import hashlib
 import json
 import os
-import re
 import subprocess
 import sys
 from dataclasses import asdict, dataclass
@@ -80,10 +79,7 @@ def check_references(
     for root in search_roots:
         if not root.exists():
             continue
-        if root.is_file():
-            files_to_check = [root]
-        else:
-            files_to_check = [p for p in root.rglob("*") if p.is_file()]
+        files_to_check = [root] if root.is_file() else [p for p in root.rglob("*") if p.is_file()]
 
         for fpath in files_to_check:
             if str(fpath.resolve()) == current_script or ".git" in fpath.parts:
@@ -278,7 +274,7 @@ def check_external_approval(
     # 2. Check approval packet file
     if approval_file and approval_file.is_file():
         try:
-            with open(approval_file, "r", encoding="utf-8") as f:
+            with open(approval_file, encoding="utf-8") as f:
                 packet = json.load(f)
             approved_targets = packet.get("approved_targets", [])
             normalized_approved = [os.path.normpath(os.path.expanduser(t)) for t in approved_targets]
@@ -396,7 +392,7 @@ def main() -> int:
 
     manifest_data = None
     if args.manifest.is_file():
-        with open(args.manifest, "r", encoding="utf-8") as f:
+        with open(args.manifest, encoding="utf-8") as f:
             manifest_data = json.load(f)
 
     packet = evaluate_prune_gate(

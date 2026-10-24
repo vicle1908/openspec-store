@@ -17,17 +17,20 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Iterable, Mapping, Optional, Tuple
+from typing import TYPE_CHECKING
 
 import classify
 import manifest
-import retention
 from observations import correlate, load_observations
+lazy import retention
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping
 
 
 def scan(
     records: Mapping,
-    retention_inventory: Optional[retention.RetentionInventory],
+    retention_inventory: retention.RetentionInventory | None,
     plan_id: str,
     generated_at: str,
     workspace_root: str = "~/Developer",
@@ -54,7 +57,7 @@ def scan(
 
 def render_summary(document: Mapping) -> str:
     """Human-readable dry-run summary (proposals only, nothing applied)."""
-    counts = {name: 0 for name in manifest.CLASSIFICATIONS}
+    counts = dict.fromkeys(manifest.CLASSIFICATIONS, 0)
     for entry in document["entries"]:
         counts[entry["classification"]] += 1
     policy = document["retention_policy"]
@@ -92,7 +95,7 @@ def render_summary(document: Mapping) -> str:
     return "\n".join(lines) + "\n"
 
 
-def write_report(document: Mapping, report_dir: Path) -> Tuple[Path, Path]:
+def write_report(document: Mapping, report_dir: Path) -> tuple[Path, Path]:
     """Write manifest + summary into the scoped report directory only.
 
     File names derive from the plan identity, so repeated scans of unchanged
@@ -113,12 +116,12 @@ def write_report(document: Mapping, report_dir: Path) -> Tuple[Path, Path]:
 
 def run_dry_run(
     raw_observations: Iterable[Mapping],
-    retention_inventory: Optional[retention.RetentionInventory],
+    retention_inventory: retention.RetentionInventory | None,
     plan_id: str,
     generated_at: str,
-    report_dir: Optional[Path] = None,
+    report_dir: Path | None = None,
     workspace_root: str = "~/Developer",
-) -> Tuple[dict, Optional[Tuple[Path, Path]]]:
+) -> tuple[dict, tuple[Path, Path] | None]:
     """Full default dry-run: validate, correlate, classify, report."""
     records = correlate(load_observations(list(raw_observations)))
     document = scan(records, retention_inventory, plan_id, generated_at, workspace_root)

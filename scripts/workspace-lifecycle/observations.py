@@ -17,9 +17,10 @@ shape validated here.
 from __future__ import annotations
 
 import os
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Any, Iterable, Mapping
+from datetime import UTC, datetime
+from typing import Any
 
 AUTHORITIES = ("openspec", "git", "orca", "runtime", "index")
 
@@ -62,11 +63,7 @@ class Observation:
             return True
         if self.authority == "openspec" and int(self.facts.get("incomplete_tasks") or 0) > 0:
             return True
-        if self.authority == "git" and bool(self.facts.get("dirty")) and not bool(
-            self.facts.get("generated_only")
-        ):
-            return True
-        return False
+        return bool(self.authority == "git" and bool(self.facts.get("dirty")) and not bool(self.facts.get("generated_only")))
 
     @property
     def indicates_reclaimable_leaning(self) -> bool:
@@ -86,7 +83,7 @@ def parse_observed_at(value: str) -> datetime:
     except (TypeError, ValueError) as exc:
         raise ObservationError(f"invalid observed_at timestamp: {value!r}") from exc
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
+        parsed = parsed.replace(tzinfo=UTC)
     return parsed
 
 

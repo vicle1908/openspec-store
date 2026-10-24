@@ -65,11 +65,11 @@ class TestOmniRouteLockAndWatchdog(unittest.TestCase):
         """Developer and openspec-store omniroute-watchdog.sh must be byte-identical and valid bash."""
         dev_sha = hashlib.sha256(DEV_WATCHDOG.read_bytes()).hexdigest()
         store_sha = hashlib.sha256(STORE_WATCHDOG.read_bytes()).hexdigest()
-        self.assertEqual(dev_sha, store_sha, "omniroute-watchdog.sh provenance mirror drifted")
+        assert dev_sha == store_sha, "omniroute-watchdog.sh provenance mirror drifted"
 
         for script in (DEV_WATCHDOG, STORE_WATCHDOG, UPDATE_SCRIPT):
             res = subprocess.run(["/bin/bash", "-n", str(script)], capture_output=True, text=True)
-            self.assertEqual(res.returncode, 0, f"bash -n failed for {script}: {res.stderr}")
+            assert res.returncode == 0, f"bash -n failed for {script}: {res.stderr}"
 
     def test_watchdog_excluded_while_lock_held_and_ignores_old_metadata(self) -> None:
         """Watchdog skips cycle (exit 0) without calling docker while kernel lock is held, even if file contents look stale."""
@@ -98,7 +98,7 @@ class TestOmniRouteLockAndWatchdog(unittest.TestCase):
         )
         try:
             ready_line = holder.stdout.readline().strip() if holder.stdout else ""
-            self.assertEqual(ready_line, "READY")
+            assert ready_line == "READY"
 
             res = subprocess.run(
                 ["/bin/bash", str(STORE_WATCHDOG)],
@@ -107,11 +107,11 @@ class TestOmniRouteLockAndWatchdog(unittest.TestCase):
                 text=True,
                 timeout=10,
             )
-            self.assertEqual(res.returncode, 0)
-            self.assertFalse(docker_calls.exists(), "Watchdog invoked docker while maintenance lock was held")
-            self.assertTrue(lock_file.exists(), "Watchdog unlinked active update.lock")
+            assert res.returncode == 0
+            assert not docker_calls.exists(), "Watchdog invoked docker while maintenance lock was held"
+            assert lock_file.exists(), "Watchdog unlinked active update.lock"
             watchdog_log = (self.omni_state / "watchdog.log").read_text(encoding="utf-8")
-            self.assertIn("Maintenance lock active", watchdog_log)
+            assert "Maintenance lock active" in watchdog_log
         finally:
             holder.terminate()
             holder.wait(timeout=5)
@@ -149,9 +149,9 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertEqual(res.returncode, 0, res.stderr)
-        self.assertTrue(docker_calls.exists(), "Watchdog did not proceed when lock was unheld")
-        self.assertTrue(lock_file.exists(), "Persistent update.lock must not be unlinked")
+        assert res.returncode == 0, res.stderr
+        assert docker_calls.exists(), "Watchdog did not proceed when lock was unheld"
+        assert lock_file.exists(), "Persistent update.lock must not be unlinked"
 
     def test_non_contention_lock_open_error_fails_closed(self) -> None:
         """If update.lock cannot be opened as a file (e.g., is a directory), both watchdog and updater fail closed nonzero."""
@@ -165,7 +165,7 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertNotEqual(w_res.returncode, 0)
+        assert w_res.returncode != 0
 
         flag_file = self.omni_state / "update-available"
         flag_file.write_text("sha256:1111111111111111111111111111111111111111111111111111111111111111\n", encoding="utf-8")
@@ -176,8 +176,8 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertNotEqual(u_res.returncode, 0)
-        self.assertTrue(flag_file.exists(), "Update flag must be retained on lock open failure")
+        assert u_res.returncode != 0
+        assert flag_file.exists(), "Update flag must be retained on lock open failure"
 
     def test_updater_no_flag_and_simultaneous_contention_and_cleanup_before_unlock(self) -> None:
         """Verify updater no-flag exit 0, simultaneous contention (only 1 enters pre-state), and temp snapshot cleanup before lock release."""
@@ -189,8 +189,8 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertEqual(res_no_flag.returncode, 0)
-        self.assertFalse((self.omni_state / "update.lock").exists())
+        assert res_no_flag.returncode == 0
+        assert not (self.omni_state / "update.lock").exists()
 
         # 2. Simultaneous acquisition + cleanup ordering before lock release
         flag_file = self.omni_state / "update-available"
@@ -236,7 +236,7 @@ exit 0
             deadline = time.time() + 10
             while not entered_preflight.exists() and time.time() < deadline:
                 time.sleep(0.05)
-            self.assertTrue(entered_preflight.exists(), "First updater did not reach preflight")
+            assert entered_preflight.exists(), "First updater did not reach preflight"
 
             # Contending second updater must fail closed with exit 1 and retain flag
             second = subprocess.run(
@@ -246,14 +246,14 @@ exit 0
                 text=True,
                 timeout=10,
             )
-            self.assertEqual(second.returncode, 1)
-            self.assertIn("lockf exit 75", second.stdout)
-            self.assertTrue(flag_file.exists())
+            assert second.returncode == 1
+            assert "lockf exit 75" in second.stdout
+            assert flag_file.exists()
 
             # Release first updater (which fails at docker info -> exit 1)
             release_holder.write_text("go\n", encoding="utf-8")
             first.communicate(timeout=10)
-            self.assertEqual(first.returncode, 1)
+            assert first.returncode == 1
         finally:
             if first.poll() is None:
                 first.kill()
@@ -261,18 +261,18 @@ exit 0
 
         # Exactly one process entered preflight
         entries = prestate_entries.read_text(encoding="utf-8").strip().splitlines()
-        self.assertEqual(len(entries), 1)
+        assert len(entries) == 1
         # Temp snapshot cleanup ran BEFORE lock was released
-        self.assertEqual(cleanup_lock_state.read_text(encoding="utf-8").strip(), "LOCKED_DURING_CLEANUP")
+        assert cleanup_lock_state.read_text(encoding="utf-8").strip() == "LOCKED_DURING_CLEANUP"
         # After first exited, lock is immediately acquirable and persistent file mode is 0600
         lock_path = self.omni_state / "update.lock"
-        self.assertTrue(lock_path.exists())
-        self.assertEqual(stat.S_IMODE(lock_path.stat().st_mode), 0o600)
+        assert lock_path.exists()
+        assert stat.S_IMODE(lock_path.stat().st_mode) == 384
         probe = subprocess.run(
             ["/usr/bin/lockf", "-k", "-s", "-t", "0", str(lock_path), "/usr/bin/true"],
             capture_output=True,
         )
-        self.assertEqual(probe.returncode, 0, "Lock remained held after updater exited")
+        assert probe.returncode == 0, "Lock remained held after updater exited"
 
     def test_updater_gate1_checkpoint_fail_closed_preserves_sidecars(self) -> None:
         """Gate 1 must fail closed and retain host -wal/-shm sidecars when PRAGMA wal_checkpoint(TRUNCATE) fails."""
@@ -325,15 +325,15 @@ exit 0
             text=True,
             timeout=15,
         )
-        self.assertEqual(res.returncode, 1)
-        self.assertIn("wal_checkpoint(TRUNCATE) failed", res.stdout)
-        self.assertTrue(flag_file.exists())
+        assert res.returncode == 1
+        assert "wal_checkpoint(TRUNCATE) failed" in res.stdout
+        assert flag_file.exists()
 
         snapshots = list((self.omni_state / "snapshots").glob("pre-update-*.sqlite"))
-        self.assertEqual(len(snapshots), 1)
+        assert len(snapshots) == 1
         snap = snapshots[0]
-        self.assertTrue(Path(f"{snap}-wal").exists(), "Host -wal sidecar was deleted despite checkpoint failure")
-        self.assertTrue(Path(f"{snap}-shm").exists(), "Host -shm sidecar was deleted despite checkpoint failure")
+        assert Path(f"{snap}-wal").exists(), "Host -wal sidecar was deleted despite checkpoint failure"
+        assert Path(f"{snap}-shm").exists(), "Host -shm sidecar was deleted despite checkpoint failure"
 
 
     def test_updater_digest_mismatch_and_post_deploy_data_gates_retain_flag(self) -> None:
@@ -430,10 +430,10 @@ exit 0
             text=True,
             timeout=15,
         )
-        self.assertEqual(mismatch.returncode, 1)
-        self.assertIn("GATE FAILED [digest-match]", mismatch.stdout)
-        self.assertFalse(up_calls.exists(), "Digest mismatch must stop before container deployment")
-        self.assertTrue(flag_file.exists())
+        assert mismatch.returncode == 1
+        assert "GATE FAILED [digest-match]" in mismatch.stdout
+        assert not up_calls.exists(), "Digest mismatch must stop before container deployment"
+        assert flag_file.exists()
 
         (self.home / "seen_baseline").unlink(missing_ok=True)
         (self.home / "pulled").unlink(missing_ok=True)
@@ -445,10 +445,10 @@ exit 0
             text=True,
             timeout=15,
         )
-        self.assertEqual(regressed.returncode, 1)
-        self.assertIn("GATE FAILED [post-deploy-data]", regressed.stdout)
-        self.assertTrue(up_calls.exists())
-        self.assertTrue(flag_file.exists())
+        assert regressed.returncode == 1
+        assert "GATE FAILED [post-deploy-data]" in regressed.stdout
+        assert up_calls.exists()
+        assert flag_file.exists()
     def test_watchdog_periodic_6h_integrity_check_pass_skip_and_fail(self) -> None:
         """Watchdog runs bounded 6h physical integrity_check when due, skips when fresh, and exits nonzero without restarting on failure."""
         marker = self.omni_state / "integrity-last-ok"
@@ -509,9 +509,9 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertEqual(res1.returncode, 0)
-        self.assertTrue(marker.exists(), "integrity-last-ok marker was not created on pass")
-        self.assertEqual(len(integrity_calls.read_text(encoding="utf-8").splitlines()), 1)
+        assert res1.returncode == 0
+        assert marker.exists(), "integrity-last-ok marker was not created on pass"
+        assert len(integrity_calls.read_text(encoding="utf-8").splitlines()) == 1
 
         # 2. Fresh marker (< 6h) -> skips physical integrity check
         res2 = subprocess.run(
@@ -521,8 +521,8 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertEqual(res2.returncode, 0)
-        self.assertEqual(len(integrity_calls.read_text(encoding="utf-8").splitlines()), 1)
+        assert res2.returncode == 0
+        assert len(integrity_calls.read_text(encoding="utf-8").splitlines()) == 1
 
         # 3. Stale marker (> 6h) + failing integrity check -> exits nonzero, does NOT update marker mtime, does NOT restart gateway
         stale_mtime = int(time.time()) - 25000
@@ -536,10 +536,10 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertNotEqual(res3.returncode, 0, "Watchdog must exit nonzero when physical integrity_check fails")
-        self.assertEqual(len(integrity_calls.read_text(encoding="utf-8").splitlines()), 2)
-        self.assertEqual(int(marker.stat().st_mtime), stale_mtime, "Failed integrity check must not update marker mtime")
-        self.assertFalse(restart_calls.exists(), "Failed integrity check must not restart a healthy gateway")
+        assert res3.returncode != 0, "Watchdog must exit nonzero when physical integrity_check fails"
+        assert len(integrity_calls.read_text(encoding="utf-8").splitlines()) == 2
+        assert int(marker.stat().st_mtime) == stale_mtime, "Failed integrity check must not update marker mtime"
+        assert not restart_calls.exists(), "Failed integrity check must not restart a healthy gateway"
 
 
     def test_v3852_muse_wire_compat_and_updater_muse_catalog_and_backup_cleanup(self) -> None:
@@ -574,15 +574,15 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertEqual(ep_res.returncode, 0, ep_res.stderr)
-        self.assertEqual(ep_res.stdout, "patched")
+        assert ep_res.returncode == 0, ep_res.stderr
+        assert ep_res.stdout == "patched"
         patched_peer = peer_file.read_text(encoding="utf-8")
         patched_chunk = chunk_file.read_text(encoding="utf-8")
-        self.assertIn("/* MUSE_CODE_REWRITE_V3 */", patched_peer)
-        self.assertIn('req.url = "/v1" + req.url;', patched_peer)
-        self.assertNotIn("MUSE_CODE_COMPAT_V2", patched_peer)
-        self.assertNotIn("MUSE_CATALOG_DATA", patched_peer)
-        self.assertEqual(patched_chunk, original_chunk, "chunk_file must remain completely untouched")
+        assert "/* MUSE_CODE_REWRITE_V3 */" in patched_peer
+        assert 'req.url = "/v1" + req.url;' in patched_peer
+        assert "MUSE_CODE_COMPAT_V2" not in patched_peer
+        assert "MUSE_CATALOG_DATA" not in patched_peer
+        assert patched_chunk == original_chunk, "chunk_file must remain completely untouched"
 
         # Verify container-entrypoint-compat.sh upgrades a MUSE_CODE_COMPAT_V2-patched peer-stamp.mjs to V3
         peer_file.write_text(
@@ -603,13 +603,13 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertEqual(ep_v2_res.returncode, 0, ep_v2_res.stderr)
-        self.assertEqual(ep_v2_res.stdout, "patched")
+        assert ep_v2_res.returncode == 0, ep_v2_res.stderr
+        assert ep_v2_res.stdout == "patched"
         upgraded_from_v2 = peer_file.read_text(encoding="utf-8")
-        self.assertIn("/* MUSE_CODE_REWRITE_V3 */", upgraded_from_v2)
-        self.assertNotIn("MUSE_CODE_COMPAT_V2", upgraded_from_v2)
-        self.assertNotIn("MUSE_CATALOG_DATA", upgraded_from_v2)
-        self.assertEqual(chunk_file.read_text(encoding="utf-8"), original_chunk)
+        assert "/* MUSE_CODE_REWRITE_V3 */" in upgraded_from_v2
+        assert "MUSE_CODE_COMPAT_V2" not in upgraded_from_v2
+        assert "MUSE_CATALOG_DATA" not in upgraded_from_v2
+        assert chunk_file.read_text(encoding="utf-8") == original_chunk
 
         # Verify container-entrypoint-compat.sh normalizes Gemini-4 trailing model turn and agy exact lockout chunks idempotently
         gemini_chunk = chunks_dir / "7449.js"
@@ -631,13 +631,13 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertEqual(ep_chunk_res1.returncode, 0, ep_chunk_res1.stderr)
-        self.assertEqual(ep_chunk_res1.stdout, "patched")
-        self.assertIn("/^gemini-(?:[34](?:\\.\\d+)?(?:-[a-z0-9-]+)?|pro-agent)$/", gemini_chunk.read_text(encoding="utf-8"))
+        assert ep_chunk_res1.returncode == 0, ep_chunk_res1.stderr
+        assert ep_chunk_res1.stdout == "patched"
+        assert "/^gemini-(?:[34](?:\\.\\d+)?(?:-[a-z0-9-]+)?|pro-agent)$/" in gemini_chunk.read_text(encoding="utf-8")
         patched_lock_src = lock_chunk.read_text(encoding="utf-8")
-        self.assertIn("/\\bmodel(?!\\s+turn\\b).*not.*(?:available|found|supported|accessible)\\b/i", patched_lock_src)
-        self.assertIn("/\\bmodel(?!\\s+turn\\b)\\b[\\s\\S]{0,80}?\\b(?:not\\s+supported|unsupported|unknown|unavailable)\\b/i", patched_lock_src)
-        self.assertIn("(\"antigravity\"===ag(a)||\"agy\"===ag(a)?bz:ap)(a,b,c,d,e)", patched_lock_src)
+        assert "/\\bmodel(?!\\s+turn\\b).*not.*(?:available|found|supported|accessible)\\b/i" in patched_lock_src
+        assert "/\\bmodel(?!\\s+turn\\b)\\b[\\s\\S]{0,80}?\\b(?:not\\s+supported|unsupported|unknown|unavailable)\\b/i" in patched_lock_src
+        assert '("antigravity"===ag(a)||"agy"===ag(a)?bz:ap)(a,b,c,d,e)' in patched_lock_src
         ep_chunk_res2 = subprocess.run(
             ["/bin/sh", str(ENTRYPOINT_COMPAT), "--patch-only"],
             env=patch_env,
@@ -645,8 +645,8 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertEqual(ep_chunk_res2.returncode, 0, ep_chunk_res2.stderr)
-        self.assertEqual(ep_chunk_res2.stdout, "already_ok")
+        assert ep_chunk_res2.returncode == 0, ep_chunk_res2.stderr
+        assert ep_chunk_res2.stdout == "already_ok"
         gemini_chunk.unlink()
         lock_chunk.unlink()
 
@@ -683,10 +683,10 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertEqual(em1.returncode, 0, em1.stderr)
-        self.assertIn("Applied Muse Code wire-compat normalization", em1.stdout)
-        self.assertIn("/* MUSE_CODE_REWRITE_V3 */", peer_file.read_text(encoding="utf-8"))
-        self.assertEqual(chunk_file.read_text(encoding="utf-8"), original_chunk)
+        assert em1.returncode == 0, em1.stderr
+        assert "Applied Muse Code wire-compat normalization" in em1.stdout
+        assert "/* MUSE_CODE_REWRITE_V3 */" in peer_file.read_text(encoding="utf-8")
+        assert chunk_file.read_text(encoding="utf-8") == original_chunk
         em2 = subprocess.run(
             ["/bin/bash", str(ENSURE_MUSE_COMPAT), "omniroute"],
             env=self._base_env(),
@@ -694,8 +694,8 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertEqual(em2.returncode, 0, em2.stderr)
-        self.assertIn("already_ok", em2.stdout)
+        assert em2.returncode == 0, em2.stderr
+        assert "already_ok" in em2.stdout
 
         # Verify ensure-muse-wire-compat.sh fails closed (exit 1) when container patch fails
         (self.home / "fail_compat").write_text("1\n", encoding="utf-8")
@@ -706,7 +706,7 @@ exit 0
             text=True,
             timeout=10,
         )
-        self.assertEqual(em_fail.returncode, 1, "ensure-muse-wire-compat.sh must fail closed on error")
+        assert em_fail.returncode == 1, "ensure-muse-wire-compat.sh must fail closed on error"
         (self.home / "fail_compat").unlink(missing_ok=True)
         # b & c. Verify update.sh Gate 8 empty catalog fail-closed (both 401 and 200 postures) and Gate 9 pre-migration backup cleanup
         flag_file = self.omni_state / "update-available"
@@ -856,19 +856,10 @@ exit 0
                 text=True,
                 timeout=15,
             )
-            self.assertEqual(bad_res.returncode, 1, f"Expected Gate 8 failure for mode={bad_mode}")
-            self.assertIn(
-                "GATE FAILED [endpoints]: GET /v1/muse-code/models did not advertise muse-spark-1.3",
-                bad_res.stdout,
-            )
-            self.assertTrue(
-                flag_file.exists(),
-                f"Gate 8 failure on {bad_mode} Muse catalog must retain update-available",
-            )
-            self.assertFalse(
-                backup_cleanup_log.exists(),
-                f"Gate 9 backup cleanup must not run when Gate 8 fails ({bad_mode})",
-            )
+            assert bad_res.returncode == 1, f"Expected Gate 8 failure for mode={bad_mode}"
+            assert "GATE FAILED [endpoints]: GET /v1/muse-code/models did not advertise muse-spark-1.3" in bad_res.stdout
+            assert flag_file.exists(), f"Gate 8 failure on {bad_mode} Muse catalog must retain update-available"
+            assert not backup_cleanup_log.exists(), f"Gate 9 backup cleanup must not run when Gate 8 fails ({bad_mode})"
         catalog_mode.write_text("ok\n", encoding="utf-8")
         pass_res = subprocess.run(
             ["/bin/bash", str(UPDATE_SCRIPT), "3.8.52"],
@@ -877,10 +868,10 @@ exit 0
             text=True,
             timeout=15,
         )
-        self.assertEqual(pass_res.returncode, 0, pass_res.stdout + pass_res.stderr)
-        self.assertTrue(backup_cleanup_log.exists(), "Gate 9 did not execute pre-migration backup cleanup")
-        self.assertIn("db_state-*_pre-migration.sqlite", backup_cleanup_log.read_text(encoding="utf-8"))
-        self.assertFalse(flag_file.exists(), "Successful Gate 9 completion must clear update-available")
+        assert pass_res.returncode == 0, pass_res.stdout + pass_res.stderr
+        assert backup_cleanup_log.exists(), "Gate 9 did not execute pre-migration backup cleanup"
+        assert "db_state-*_pre-migration.sqlite" in backup_cleanup_log.read_text(encoding="utf-8")
+        assert not flag_file.exists(), "Successful Gate 9 completion must clear update-available"
 
         # Also verify Gate 8 under 200 posture (catalog auth disabled)
         vm_posture.write_text("200\n", encoding="utf-8")
@@ -896,12 +887,9 @@ exit 0
             text=True,
             timeout=15,
         )
-        self.assertEqual(bad_200_res.returncode, 1)
-        self.assertIn(
-            "GATE FAILED [endpoints]: GET /v1/muse-code/models did not advertise muse-spark-1.3",
-            bad_200_res.stdout,
-        )
-        self.assertTrue(flag_file.exists())
+        assert bad_200_res.returncode == 1
+        assert "GATE FAILED [endpoints]: GET /v1/muse-code/models did not advertise muse-spark-1.3" in bad_200_res.stdout
+        assert flag_file.exists()
         catalog_mode.write_text("ok\n", encoding="utf-8")
         pass_200_res = subprocess.run(
             ["/bin/bash", str(UPDATE_SCRIPT), "3.8.52"],
@@ -910,8 +898,8 @@ exit 0
             text=True,
             timeout=15,
         )
-        self.assertEqual(pass_200_res.returncode, 0, pass_200_res.stdout + pass_200_res.stderr)
-        self.assertFalse(flag_file.exists())
+        assert pass_200_res.returncode == 0, pass_200_res.stdout + pass_200_res.stderr
+        assert not flag_file.exists()
 
 if __name__ == "__main__":
     unittest.main()

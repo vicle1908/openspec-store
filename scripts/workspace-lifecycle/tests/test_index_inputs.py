@@ -19,10 +19,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import classify  # noqa: E402
-import index_inputs  # noqa: E402
-import observations  # noqa: E402
-import retention  # noqa: E402
+import classify
+import index_inputs
+import observations
+import retention
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 INVENTORY_FIXTURE = FIXTURES / "knowledge-refresh-inventory.fixture.tsv"

@@ -14,10 +14,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
 import sys
 from dataclasses import asdict, dataclass
-from pathlib import Path
 from typing import Any
 
 

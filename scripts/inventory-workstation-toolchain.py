@@ -20,7 +20,9 @@ from typing import Any
 
 # Add script directory for shared updater registry import
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from toolchain_updater_registry import (  # noqa: E402
+import contextlib
+
+from toolchain_updater_registry import (
     get_supported_updater,
     is_global_pause_active,
 )
@@ -338,7 +340,7 @@ def derive_install_root_and_source(resolved_path: str) -> tuple[str, str]:
                 return str(pkg_root), "brew-formula"
             return str(pkg_root), "npm"
     if "Applications" in parts:
-        for parent in [p] + list(p.parents):
+        for parent in [p, *list(p.parents)]:
             if parent.suffix == ".app":
                 return str(parent), "app_bundle"
         return str(p.parent), "app_bundle"
@@ -353,7 +355,7 @@ def derive_install_root_and_source(resolved_path: str) -> tuple[str, str]:
     if ".qoder" in parts:
         return str(Path.home() / ".qoder"), "vendor_download"
     # 6. Check for package.json in parent directories (npm package bundle without explicit node_modules in path)
-    for parent in [p] + list(p.parents)[:4]:
+    for parent in [p, *list(p.parents)[:4]]:
         if (parent / "package.json").is_file():
             return str(parent), "npm"
     return str(p.parent), "standalone"
@@ -1298,7 +1300,7 @@ def audit_scheduled_writers() -> dict[str, Any]:
 
     return {
         "scan_boundaries": {
-            "scanned_paths": scanned_locations + ["crontab -l"],
+            "scanned_paths": [*scanned_locations, "crontab -l"],
             "excluded_limitations": excluded_boundaries,
         },
         "candidate_writers": candidate_writers,
@@ -1435,10 +1437,7 @@ def inventory_tools(home_dir: Path | None = None) -> list[ToolInventoryItem]:
                             resolved_auth = Path(auth_path).resolve()
                             resolved_cand = candidate.resolve()
                             is_auth = (
-                                resolved_auth == candidate
-                                or candidate in resolved_auth.parents
-                                or resolved_auth == resolved_cand
-                                or resolved_cand in resolved_auth.parents
+                                resolved_auth in (candidate, resolved_cand) or candidate in resolved_auth.parents or resolved_cand in resolved_auth.parents
                             )
                         except Exception:
                             pass
@@ -1449,10 +1448,7 @@ def inventory_tools(home_dir: Path | None = None) -> list[ToolInventoryItem]:
                             brew_target = brew_bin.resolve()
                             resolved_cand = candidate.resolve()
                             is_symlink_target = (
-                                brew_target == candidate
-                                or candidate in brew_target.parents
-                                or brew_target == resolved_cand
-                                or resolved_cand in brew_target.parents
+                                brew_target in (candidate, resolved_cand) or candidate in brew_target.parents or resolved_cand in brew_target.parents
                             )
                         except Exception:
                             pass
@@ -1510,13 +1506,11 @@ def inventory_tools(home_dir: Path | None = None) -> list[ToolInventoryItem]:
                         sz = 0
                 is_auth = False
                 if auth_path != "not_found":
-                    try:
+                    with contextlib.suppress(Exception):
                         is_auth = (
                             Path(auth_path) == sh_path
                             or Path(auth_path).resolve() == sh_path.resolve()
                         )
-                    except Exception:
-                        pass
                 copies.append(
                     ToolCopy(
                         location_path=str(sh_path),
@@ -1594,7 +1588,7 @@ def reconcile_with_manifest(
     normalize_discovery_path()
 
     try:
-        with open(m_path, "r", encoding="utf-8") as f:
+        with open(m_path, encoding="utf-8") as f:
             manifest_data = json.load(f)
     except Exception:
         return None
@@ -1674,32 +1668,10 @@ def reconcile_with_manifest(
         # Evaluate alignment
         auth_item = auth_map.get(tool_name)
         is_aligned = False
-        if auth_item and auth_item.drift_status == "clean":
-            is_aligned = True
-        elif tool_name == "psql" and (resolved_active == expected_path or active_bin == expected_path or "libpq" in resolved_active):
-            is_aligned = True
-        elif tool_name == "cce" and owner == "standalone" and ".local/bin/cce" in active_bin:
-            is_aligned = True
-        elif tool_name == "prime-agent" and owner == "local-dev" and ("prime-agent" in resolved_active or "prime-agent" in active_bin):
-            is_aligned = True
-        elif tool_name == "qoder" and (auth_item and auth_item.drift_status == "clean" or ".qoder" in resolved_active or ".qoder" in active_bin or expected_path in (resolved_active, active_bin)):
-            is_aligned = True
-        elif tool_name == "kimi" and (auth_item and auth_item.drift_status == "clean" or ".kimi-code" in resolved_active or ".kimi-code" in active_bin or expected_path in (resolved_active, active_bin)):
+        if (auth_item and auth_item.drift_status == "clean") or (tool_name == "psql" and (resolved_active == expected_path or active_bin == expected_path or "libpq" in resolved_active)) or (tool_name == "cce" and owner == "standalone" and ".local/bin/cce" in active_bin) or (tool_name == "prime-agent" and owner == "local-dev" and ("prime-agent" in resolved_active or "prime-agent" in active_bin)) or (tool_name == "qoder" and ((auth_item and auth_item.drift_status == "clean") or ".qoder" in resolved_active or ".qoder" in active_bin or expected_path in (resolved_active, active_bin))) or (tool_name == "kimi" and ((auth_item and auth_item.drift_status == "clean") or ".kimi-code" in resolved_active or ".kimi-code" in active_bin or expected_path in (resolved_active, active_bin))):
             is_aligned = True
         else:
-            if expected_path and (resolved_active == expected_path or active_bin == expected_path):
-                is_aligned = True
-            elif owner == "brew-formula" and ("/Cellar/" in resolved_active or "/opt/homebrew/" in resolved_active or "/usr/local/" in resolved_active):
-                is_aligned = True
-            elif owner == "brew-cask" and ("/Caskroom/" in resolved_active or "/Applications/" in resolved_active):
-                is_aligned = True
-            elif owner == "npm-global" and ".npm-global" in resolved_active:
-                is_aligned = True
-            elif owner == "isolated-node" and "home-toolchain" in resolved_active:
-                is_aligned = True
-            elif owner == "standalone" and (".local" in resolved_active or ".cargo" in resolved_active or ".pi" in resolved_active or ".kimi-code" in resolved_active or ".qoder" in resolved_active):
-                is_aligned = True
-            elif owner == "local-dev" and ("prime-agent" in resolved_active or "prime-agent" in active_bin):
+            if (expected_path and (resolved_active == expected_path or active_bin == expected_path)) or (owner == "brew-formula" and ("/Cellar/" in resolved_active or "/opt/homebrew/" in resolved_active or "/usr/local/" in resolved_active)) or (owner == "brew-cask" and ("/Caskroom/" in resolved_active or "/Applications/" in resolved_active)) or (owner == "npm-global" and ".npm-global" in resolved_active) or (owner == "isolated-node" and "home-toolchain" in resolved_active) or (owner == "standalone" and (".local" in resolved_active or ".cargo" in resolved_active or ".pi" in resolved_active or ".kimi-code" in resolved_active or ".qoder" in resolved_active)) or (owner == "local-dev" and ("prime-agent" in resolved_active or "prime-agent" in active_bin)):
                 is_aligned = True
         if is_aligned:
             aligned.append({

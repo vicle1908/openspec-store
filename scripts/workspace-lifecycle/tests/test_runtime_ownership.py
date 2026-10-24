@@ -16,11 +16,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import classify  # noqa: E402
-import manifest  # noqa: E402
-import observations  # noqa: E402
-import retention  # noqa: E402
-import runtime  # noqa: E402
+import classify
+import manifest
+import observations
+import retention
+import runtime
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 RETENTION_FIXTURE = FIXTURES / "retention-inventory.protected-and-candidate.json"

@@ -18,7 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import retention  # noqa: E402
+import retention
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 GOOD_FIXTURE = FIXTURES / "retention-inventory.protected-and-candidate.json"

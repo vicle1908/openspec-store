@@ -16,8 +16,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import observations  # noqa: E402
-import retirement  # noqa: E402
+import observations
+import retirement
 
 OBSERVED_AT = "2026-08-25T17:00:00Z"
 
@@ -35,7 +35,7 @@ def check(name: str, condition: bool, detail: str = "") -> None:
         print(f"  FAIL {name} {detail}")
 
 
-def orca_obs(path: str, subject: str = None, **overrides) -> dict:
+def orca_obs(path: str, subject: str | None = None, **overrides) -> dict:
     """Fully released Orca observation; overrides introduce the condition."""
     facts = {
         "workspace_id": f"ws-{Path(path).name}",
@@ -178,10 +178,10 @@ def test_live_session_blockers() -> None:
     print("=== T6: connected terminal, host activity, and PTY block ===")
     cases = [
         ("connected terminal",
-         dict(live_terminal=True, terminal_state="connected"),
+         {"live_terminal": True, "terminal_state": "connected"},
          "orca_terminal_connected"),
-        ("host activity", dict(host_activity=True), "orca_host_activity"),
-        ("attached PTY", dict(attached_pty=True), "orca_attached_pty"),
+        ("host activity", {"host_activity": True}, "orca_host_activity"),
+        ("attached PTY", {"attached_pty": True}, "orca_attached_pty"),
     ]
     for name, overrides, expected in cases:
         record = record_for(orca_obs(f"/fixtures/retire/{expected}", **overrides))

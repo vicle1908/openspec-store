@@ -11,11 +11,11 @@ import subprocess
 import sys
 
 
-def smoke(provider: str, sentinel: str, timeout: int = 120) -> bool:
+def smoke(provider: str, token_marker: str, timeout: int = 120) -> bool:
     """Run fresh-login smoke for a provider launcher."""
     cmd = [
         "zsh", "-lic",
-        f"{provider} --print --output-format json \"Return exactly {sentinel}\"",
+        f'{provider} --print --output-format json "Return exactly {token_marker}"',
     ]
 
     result = subprocess.run(
@@ -47,7 +47,7 @@ def smoke(provider: str, sentinel: str, timeout: int = 120) -> bool:
     except json.JSONDecodeError:
         result_text = clean[:200] if clean else "<empty>"
 
-    ok = result.returncode == 0 and is_error is False and result_text is not None
+    ok = result.returncode == 0 and is_error is False and result_text is not None and token_marker in result_text
     status = "PASS" if ok else "FAIL"
 
     print(f"\n{'='*50}")
@@ -74,7 +74,7 @@ def main() -> int:
     print(f"\n{'='*50}")
     print("  SUMMARY")
     print(f"{'='*50}")
-    for (prov, _), ok in zip(providers, results):
+    for (prov, _), ok in zip(providers, results, strict=False):
         print(f"  {prov}: {'PASS' if ok else 'FAIL'}")
 
     if all(results):

@@ -24,13 +24,13 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import dryrun  # noqa: E402
-import retention  # noqa: E402
+import dryrun
+import retention
 
 DEFAULT_REPORT_DIR = Path.home() / "Developer" / ".workspace-lifecycle"
 
@@ -72,7 +72,7 @@ def main(argv=None) -> int:
         return 2
 
     inventory = retention.load_or_unavailable(Path(args.retention))
-    generated_at = args.generated_at or datetime.now(timezone.utc).strftime(
+    generated_at = args.generated_at or datetime.now(UTC).strftime(
         "%Y-%m-%dT%H:%M:%SZ"
     )
 

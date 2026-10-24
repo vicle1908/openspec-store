@@ -13,7 +13,8 @@ SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "validate-archiv
 spec = importlib.util.spec_from_file_location("validator", SCRIPT_PATH)
 validator = importlib.util.module_from_spec(spec)
 sys.modules["validator"] = validator
-assert spec is not None and spec.loader is not None
+assert spec is not None
+assert spec.loader is not None
 spec.loader.exec_module(validator)
 
 

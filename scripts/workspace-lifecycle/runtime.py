@@ -21,9 +21,12 @@ failing the scan.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Callable, Mapping, Optional
+from typing import TYPE_CHECKING, Any
 
 from manifest import redact_facts
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Mapping
 
 # Bounded runtime ownership surface (task 4.1, design Decision C).
 RUNTIME_KINDS = (
@@ -58,7 +61,7 @@ def unknown(kind: str) -> RuntimeCheckOutcome:
 
 
 def run_check(
-    kind: str, path: str, probe: Optional[Callable[[str], Any]]
+    kind: str, path: str, probe: Callable[[str], Any] | None
 ) -> RuntimeCheckOutcome:
     """Run one bounded probe; any failure degrades to UNKNOWN.
 

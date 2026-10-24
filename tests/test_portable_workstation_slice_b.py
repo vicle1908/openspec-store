@@ -39,13 +39,14 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
-import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 from typing import Any
+
+import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CONFIG_DIR = REPO_ROOT / "config"
@@ -76,27 +77,27 @@ class TestSmokeTestToolchain(unittest.TestCase):
             return 0, "mock-tool version 1.2.3", "", 12.0
 
         res = smoke_mod.run_tool_smoke_check("mock-tool", stage="pre", runner=mock_runner)
-        self.assertEqual(res.status, "PASS")
-        self.assertEqual(res.version_readback, "mock-tool version 1.2.3")
-        self.assertEqual(res.exit_code, 0)
-        self.assertIsNone(res.error)
+        assert res.status == "PASS"
+        assert res.version_readback == "mock-tool version 1.2.3"
+        assert res.exit_code == 0
+        assert res.error is None
 
     def test_nonzero_exit_detected_as_fail(self):
         def mock_runner(cmd: str, timeout: float):
             return 1, "", "Binary not found", 5.0
 
         res = smoke_mod.run_tool_smoke_check("missing-tool", stage="pre", runner=mock_runner)
-        self.assertEqual(res.status, "FAIL")
-        self.assertEqual(res.exit_code, 1)
-        self.assertIn("Binary not found", res.error)
+        assert res.status == "FAIL"
+        assert res.exit_code == 1
+        assert "Binary not found" in res.error
 
     def test_zero_exit_with_error_marker_detected_as_fail(self):
         def mock_runner(cmd: str, timeout: float):
             return 0, "error: command failed to initialize runtime", "", 8.0
 
         res = smoke_mod.run_tool_smoke_check("buggy-tool", stage="pre", runner=mock_runner)
-        self.assertEqual(res.status, "FAIL")
-        self.assertIn("status code 0 but reported error", res.error)
+        assert res.status == "FAIL"
+        assert "status code 0 but reported error" in res.error
 
     def test_already_target_version_matched_in_post_mutation(self):
         def mock_runner(cmd: str, timeout: float):
@@ -108,9 +109,9 @@ class TestSmokeTestToolchain(unittest.TestCase):
             target_version="2.5.0",
             runner=mock_runner,
         )
-        self.assertEqual(res.status, "PASS")
-        self.assertTrue(res.already_target)
-        self.assertEqual(res.version_readback, "tool version 2.5.0 (stable)")
+        assert res.status == "PASS"
+        assert res.already_target
+        assert res.version_readback == "tool version 2.5.0 (stable)"
 
     def test_command_template_placeholder_resolution(self):
         cmd = smoke_mod.resolve_command_template(
@@ -118,7 +119,7 @@ class TestSmokeTestToolchain(unittest.TestCase):
             home="/Users/testuser",
             brew_prefix="/opt/custombrew",
         )
-        self.assertEqual(cmd, "/opt/custombrew/bin/git --version")
+        assert cmd == "/opt/custombrew/bin/git --version"
 
 
 class TestPruneToolchainDuplicatesGate(unittest.TestCase):
@@ -148,10 +149,10 @@ class TestPruneToolchainDuplicatesGate(unittest.TestCase):
             mock_operational=True,
             approval_token=None,
         )
-        self.assertEqual(packet.status, "BLOCKED")
-        self.assertFalse(packet.checks["external_approval"].passed)
-        self.assertIn("External approval check failed", packet.blocked_reasons[0])
-        self.assertEqual(packet.action_taken, "BLOCKED_NO_MUTATION")
+        assert packet.status == "BLOCKED"
+        assert not packet.checks["external_approval"].passed
+        assert "External approval check failed" in packet.blocked_reasons[0]
+        assert packet.action_taken == "BLOCKED_NO_MUTATION"
 
     def test_active_process_holding_binary_fails_closed(self):
         packet = prune_mod.evaluate_prune_gate(
@@ -165,10 +166,10 @@ class TestPruneToolchainDuplicatesGate(unittest.TestCase):
             mock_operational=True,
             approval_token="FORCE_APPROVED_FOR_TEST",
         )
-        self.assertEqual(packet.status, "BLOCKED")
-        self.assertFalse(packet.checks["processes"].passed)
-        self.assertIn("Active processes holding binary: [4242]", packet.checks["processes"].details)
-        self.assertEqual(packet.action_taken, "BLOCKED_NO_MUTATION")
+        assert packet.status == "BLOCKED"
+        assert not packet.checks["processes"].passed
+        assert "Active processes holding binary: [4242]" in packet.checks["processes"].details
+        assert packet.action_taken == "BLOCKED_NO_MUTATION"
 
     def test_reference_in_scripts_fails_closed(self):
         packet = prune_mod.evaluate_prune_gate(
@@ -182,9 +183,9 @@ class TestPruneToolchainDuplicatesGate(unittest.TestCase):
             mock_operational=True,
             approval_token="FORCE_APPROVED_FOR_TEST",
         )
-        self.assertEqual(packet.status, "BLOCKED")
-        self.assertFalse(packet.checks["references"].passed)
-        self.assertEqual(packet.action_taken, "BLOCKED_NO_MUTATION")
+        assert packet.status == "BLOCKED"
+        assert not packet.checks["references"].passed
+        assert packet.action_taken == "BLOCKED_NO_MUTATION"
 
     def test_manifest_reconciliation_rejects_non_authoritative_retained_path(self):
         packet = prune_mod.evaluate_prune_gate(
@@ -198,8 +199,8 @@ class TestPruneToolchainDuplicatesGate(unittest.TestCase):
             mock_operational=True,
             approval_token="FORCE_APPROVED_FOR_TEST",
         )
-        self.assertEqual(packet.status, "BLOCKED")
-        self.assertFalse(packet.checks["manifest_reconciliation"].passed)
+        assert packet.status == "BLOCKED"
+        assert not packet.checks["manifest_reconciliation"].passed
 
     def test_manifest_reconciliation_rejects_pruning_authoritative_path(self):
         packet = prune_mod.evaluate_prune_gate(
@@ -213,8 +214,8 @@ class TestPruneToolchainDuplicatesGate(unittest.TestCase):
             mock_operational=True,
             approval_token="FORCE_APPROVED_FOR_TEST",
         )
-        self.assertEqual(packet.status, "BLOCKED")
-        self.assertFalse(packet.checks["manifest_reconciliation"].passed)
+        assert packet.status == "BLOCKED"
+        assert not packet.checks["manifest_reconciliation"].passed
 
     def test_dependency_integrity_failure_fails_closed(self):
         packet = prune_mod.evaluate_prune_gate(
@@ -228,8 +229,8 @@ class TestPruneToolchainDuplicatesGate(unittest.TestCase):
             mock_operational=False,  # Retained binary failed smoke test
             approval_token="FORCE_APPROVED_FOR_TEST",
         )
-        self.assertEqual(packet.status, "BLOCKED")
-        self.assertFalse(packet.checks["dependency_integrity"].passed)
+        assert packet.status == "BLOCKED"
+        assert not packet.checks["dependency_integrity"].passed
 
     def test_all_five_checks_pass_dry_run_approved(self):
         packet = prune_mod.evaluate_prune_gate(
@@ -244,10 +245,10 @@ class TestPruneToolchainDuplicatesGate(unittest.TestCase):
             approval_token="FORCE_APPROVED_FOR_TEST",
             execute=False,
         )
-        self.assertEqual(packet.status, "APPROVED")
-        self.assertTrue(packet.dry_run)
-        self.assertEqual(packet.action_taken, "APPROVED_DRY_RUN")
-        self.assertEqual(len(packet.blocked_reasons), 0)
+        assert packet.status == "APPROVED"
+        assert packet.dry_run
+        assert packet.action_taken == "APPROVED_DRY_RUN"
+        assert len(packet.blocked_reasons) == 0
 
 
 class TestBenchmarkShellStartupHarness(unittest.TestCase):
@@ -265,15 +266,15 @@ class TestBenchmarkShellStartupHarness(unittest.TestCase):
             check=True,
         )
         data = json.loads(proc.stdout)
-        self.assertEqual(data["runs_count"], 5)
-        self.assertIn("cold", data)
-        self.assertIn("warm", data)
-        self.assertEqual(len(data["cold"]["timings_ms"]), 5)
-        self.assertEqual(len(data["warm"]["timings_ms"]), 5)
+        assert data["runs_count"] == 5
+        assert "cold" in data
+        assert "warm" in data
+        assert len(data["cold"]["timings_ms"]) == 5
+        assert len(data["warm"]["timings_ms"]) == 5
         self.assertAlmostEqual(data["cold"]["median_ms"], 120.5, delta=0.5)
         self.assertAlmostEqual(data["warm"]["median_ms"], 45.0, delta=0.5)
-        self.assertGreater(data["cold"]["variance"], 0.0)
-        self.assertGreater(data["warm"]["variance"], 0.0)
+        assert data["cold"]["variance"] > 0.0
+        assert data["warm"]["variance"] > 0.0
 
     def test_fewer_than_five_runs_fails_closed(self):
         script_path = SCRIPTS_DIR / "benchmark-shell-startup.sh"
@@ -282,8 +283,8 @@ class TestBenchmarkShellStartupHarness(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertNotEqual(proc.returncode, 0)
-        self.assertIn("must be at least 5", proc.stderr)
+        assert proc.returncode != 0
+        assert "must be at least 5" in proc.stderr
 
 
 class TestCheckServicePorts(unittest.TestCase):
@@ -296,9 +297,9 @@ class TestCheckServicePorts(unittest.TestCase):
             }
         }
         report = ports_mod.inspect_service_ports(fixture_data=fixture, check_docker=False)
-        self.assertEqual(report["status"], "PASS")
-        self.assertFalse(report["has_quarantine"])
-        self.assertEqual(report["quarantined_processes_count"], 0)
+        assert report["status"] == "PASS"
+        assert not report["has_quarantine"]
+        assert report["quarantined_processes_count"] == 0
 
     def test_foreign_process_on_ollama_port_quarantined_without_kill(self):
         fixture = {
@@ -309,11 +310,11 @@ class TestCheckServicePorts(unittest.TestCase):
             }
         }
         report = ports_mod.inspect_service_ports(fixture_data=fixture, check_docker=False)
-        self.assertEqual(report["status"], "COLLISION_QUARANTINED")
-        self.assertTrue(report["has_quarantine"])
-        self.assertEqual(report["quarantined_processes_count"], 1)
-        self.assertTrue(report["ports"]["11434"]["quarantined"])
-        self.assertEqual(report["ports"]["11434"]["status"], "FOREIGN_PROCESS")
+        assert report["status"] == "COLLISION_QUARANTINED"
+        assert report["has_quarantine"]
+        assert report["quarantined_processes_count"] == 1
+        assert report["ports"]["11434"]["quarantined"]
+        assert report["ports"]["11434"]["status"] == "FOREIGN_PROCESS"
 
     def test_port_collision_multiple_listeners_quarantined(self):
         fixture = {
@@ -327,21 +328,21 @@ class TestCheckServicePorts(unittest.TestCase):
             }
         }
         report = ports_mod.inspect_service_ports(fixture_data=fixture, check_docker=False)
-        self.assertEqual(report["status"], "COLLISION_QUARANTINED")
-        self.assertEqual(report["collisions_count"], 1)
-        self.assertEqual(report["ports"]["3111"]["status"], "COLLISION")
-        self.assertTrue(report["ports"]["3111"]["quarantined"])
+        assert report["status"] == "COLLISION_QUARANTINED"
+        assert report["collisions_count"] == 1
+        assert report["ports"]["3111"]["status"] == "COLLISION"
+        assert report["ports"]["3111"]["quarantined"]
 
 
 class TestCheckAgentMemoryHealth(unittest.TestCase):
     def test_root_path_strictly_rejected(self):
-        with self.assertRaises(ValueError) as ctx:
+        with pytest.raises(ValueError) as ctx:
             am_health_mod.check_health_and_alignment(url="http://localhost:3111/")
-        self.assertIn("Root '/' endpoint is forbidden", str(ctx.exception))
+        assert "Root '/' endpoint is forbidden" in str(ctx.value)
 
-        with self.assertRaises(ValueError) as ctx2:
+        with pytest.raises(ValueError) as ctx2:
             am_health_mod.check_health_and_alignment(url="http://localhost:3111")
-        self.assertIn("Root '/' endpoint is forbidden", str(ctx2.exception))
+        assert "Root '/' endpoint is forbidden" in str(ctx2.value)
 
     def test_healthy_endpoint_with_aligned_engine(self):
         report = am_health_mod.check_health_and_alignment(
@@ -350,10 +351,10 @@ class TestCheckAgentMemoryHealth(unittest.TestCase):
             mock_http_response=(200, {"status": "ok", "engine": "0.22.1"}),
             mock_processes={3111: [{"pid": 50, "name": "node", "command_line": "node agentmemory"}], 49134: []},
         )
-        self.assertEqual(report.status, "HEALTHY")
-        self.assertEqual(report.http_status, 200)
-        self.assertTrue(report.alignment.is_aligned)
-        self.assertEqual(len(report.quarantine), 0)
+        assert report.status == "HEALTHY"
+        assert report.http_status == 200
+        assert report.alignment.is_aligned
+        assert len(report.quarantine) == 0
 
     def test_engine_version_mismatch_detected(self):
         report = am_health_mod.check_health_and_alignment(
@@ -362,9 +363,9 @@ class TestCheckAgentMemoryHealth(unittest.TestCase):
             mock_http_response=(200, {"status": "ok", "engine": "0.19.0"}),
             mock_processes={3111: [], 49134: []},
         )
-        self.assertEqual(report.status, "MISALIGNED")
-        self.assertFalse(report.alignment.is_aligned)
-        self.assertIn("diverges from pinned '0.22.1'", report.alignment.details)
+        assert report.status == "MISALIGNED"
+        assert not report.alignment.is_aligned
+        assert "diverges from pinned '0.22.1'" in report.alignment.details
 
     def test_foreign_engine_process_quarantined_on_port_49134(self):
         report = am_health_mod.check_health_and_alignment(
@@ -376,10 +377,10 @@ class TestCheckAgentMemoryHealth(unittest.TestCase):
                 49134: [{"pid": 999, "name": "legacy-iii-0.19", "command_line": "legacy-iii --port 49134"}],
             },
         )
-        self.assertEqual(report.status, "QUARANTINED")
-        self.assertEqual(len(report.quarantine), 1)
-        self.assertEqual(report.quarantine[0].pid, 999)
-        self.assertEqual(report.quarantine[0].port, 49134)
+        assert report.status == "QUARANTINED"
+        assert len(report.quarantine) == 1
+        assert report.quarantine[0].pid == 999
+        assert report.quarantine[0].port == 49134
 
 
 class TestSeedAgentMemoryDecisions(unittest.TestCase):
@@ -388,11 +389,11 @@ class TestSeedAgentMemoryDecisions(unittest.TestCase):
             dry_run=True,
             mock_existing=[],
         )
-        self.assertTrue(report["dry_run"])
-        self.assertEqual(report["seeded_count"], 0)
-        self.assertEqual(report["would_seed_count"], 6)
-        self.assertEqual(report["duplicate_skipped_count"], 0)
-        self.assertEqual(report["status"], "PASS")
+        assert report["dry_run"]
+        assert report["seeded_count"] == 0
+        assert report["would_seed_count"] == 6
+        assert report["duplicate_skipped_count"] == 0
+        assert report["status"] == "PASS"
 
     def test_duplicate_observations_suppressed(self):
         mock_existing = [
@@ -403,8 +404,8 @@ class TestSeedAgentMemoryDecisions(unittest.TestCase):
             dry_run=True,
             mock_existing=mock_existing,
         )
-        self.assertEqual(report["duplicate_skipped_count"], 2)
-        self.assertEqual(report["would_seed_count"], 4)
+        assert report["duplicate_skipped_count"] == 2
+        assert report["would_seed_count"] == 4
 
     def test_apply_seeds_unregistered_decisions_via_hook(self):
         mock_existing = [
@@ -421,11 +422,11 @@ class TestSeedAgentMemoryDecisions(unittest.TestCase):
             mock_existing=mock_existing,
             post_hook=mock_post_hook,
         )
-        self.assertFalse(report["dry_run"])
-        self.assertEqual(report["duplicate_skipped_count"], 1)
-        self.assertEqual(report["seeded_count"], 5)
-        self.assertNotIn("docker-persistent-volumes", posted_decisions)
-        self.assertIn("codex-update-authority", posted_decisions)
+        assert not report["dry_run"]
+        assert report["duplicate_skipped_count"] == 1
+        assert report["seeded_count"] == 5
+        assert "docker-persistent-volumes" not in posted_decisions
+        assert "codex-update-authority" in posted_decisions
 
 
 class TestAgentMemoryLaunchAgentWatchdogTemplate(unittest.TestCase):
@@ -433,13 +434,13 @@ class TestAgentMemoryLaunchAgentWatchdogTemplate(unittest.TestCase):
         self.template_path = CONFIG_DIR / "launchd" / "com.agentmemory.server.plist.tmpl"
 
     def test_template_file_exists_and_contains_bounded_restart_keys(self):
-        self.assertTrue(self.template_path.is_file(), f"Missing template at {self.template_path}")
+        assert self.template_path.is_file(), f"Missing template at {self.template_path}"
         content = self.template_path.read_text(encoding="utf-8")
-        self.assertIn("<key>ThrottleInterval</key>", content)
-        self.assertIn("<integer>30</integer>", content)
-        self.assertIn("<key>KeepAlive</key>", content)
-        self.assertIn("<key>SuccessfulExit</key>", content)
-        self.assertIn("<false/>", content)
+        assert "<key>ThrottleInterval</key>" in content
+        assert "<integer>30</integer>" in content
+        assert "<key>KeepAlive</key>" in content
+        assert "<key>SuccessfulExit</key>" in content
+        assert "<false/>" in content
 
     def test_template_passes_plutil_lint(self):
         proc = subprocess.run(
@@ -448,7 +449,7 @@ class TestAgentMemoryLaunchAgentWatchdogTemplate(unittest.TestCase):
             text=True,
             check=True,
         )
-        self.assertIn("OK", proc.stdout)
+        assert "OK" in proc.stdout
 
     def test_rendered_template_has_zero_unresolved_tags_and_passes_plutil(self):
         render_res = render_mod.render_file(
@@ -464,10 +465,10 @@ class TestAgentMemoryLaunchAgentWatchdogTemplate(unittest.TestCase):
         )
         rendered_text = render_res.content
         unresolved = render_res.unresolved_tags
-        self.assertEqual(unresolved, [])
-        self.assertNotIn("{{", rendered_text)
-        self.assertIn("/opt/homebrew/bin/node", rendered_text)
-        self.assertIn("/Users/testuser/.npm-global/bin/agentmemory", rendered_text)
+        assert unresolved == []
+        assert "{{" not in rendered_text
+        assert "/opt/homebrew/bin/node" in rendered_text
+        assert "/Users/testuser/.npm-global/bin/agentmemory" in rendered_text
 
         with tempfile.NamedTemporaryFile("w", suffix=".plist", delete=False) as tf:
             tf.write(rendered_text)
@@ -480,7 +481,7 @@ class TestAgentMemoryLaunchAgentWatchdogTemplate(unittest.TestCase):
                 text=True,
                 check=True,
             )
-            self.assertIn("OK", proc.stdout)
+            assert "OK" in proc.stdout
         finally:
             os.unlink(temp_plist_path)
 
@@ -488,42 +489,42 @@ class TestAgentMemoryLaunchAgentWatchdogTemplate(unittest.TestCase):
 class TestReconciledToolchainUpdaterAndDailyRunner(unittest.TestCase):
     def test_updater_registry_declares_codex_npm_authority_and_writer(self):
         codex_decl = reg_mod.get_supported_updater("codex", "npm")
-        self.assertIsNotNone(codex_decl)
-        self.assertIn("npm", str(codex_decl.supported_verb))
-        self.assertEqual(codex_decl.writer_binary, "npm")
-        self.assertNotEqual(codex_decl.updater_dispatch, "native")  # Native verb is invalid and replaced
+        assert codex_decl is not None
+        assert "npm" in str(codex_decl.supported_verb)
+        assert codex_decl.writer_binary == "npm"
+        assert codex_decl.updater_dispatch != "native"  # Native verb is invalid and replaced
 
     def test_updater_registry_declares_qoder_standalone_dispatcher(self):
         qoder_decl = reg_mod.get_supported_updater("qoder", "vendor_download")
-        self.assertIsNotNone(qoder_decl)
-        self.assertIn(".qoder/entry", str(qoder_decl.writer_binary))
-        self.assertEqual(qoder_decl.updater_dispatch, "native")
+        assert qoder_decl is not None
+        assert ".qoder/entry" in str(qoder_decl.writer_binary)
+        assert qoder_decl.updater_dispatch == "native"
 
     def test_daily_update_script_path_precedence_order(self):
         runner_path = SCRIPTS_DIR / "workstation-daily-update.sh"
-        self.assertTrue(runner_path.is_file())
+        assert runner_path.is_file()
         content = runner_path.read_text(encoding="utf-8")
 
         # Verify PATH puts .local/bin ahead of /opt/homebrew/bin and /opt/homebrew/bin ahead of .npm-global/bin
-        path_line = [line for line in content.splitlines() if line.startswith("export PATH=")][0]
+        path_line = next(line for line in content.splitlines() if line.startswith("export PATH="))
         npm_idx = path_line.find(".npm-global/bin")
         local_idx = path_line.find(".local/bin")
         brew_idx = path_line.find("/opt/homebrew/bin")
 
-        self.assertNotEqual(npm_idx, -1)
-        self.assertNotEqual(local_idx, -1)
-        self.assertNotEqual(brew_idx, -1)
-        self.assertLess(local_idx, brew_idx, "local/bin must precede /opt/homebrew/bin")
-        self.assertLess(brew_idx, npm_idx, "/opt/homebrew/bin must precede .npm-global/bin")
+        assert npm_idx != -1
+        assert local_idx != -1
+        assert brew_idx != -1
+        assert local_idx < brew_idx, "local/bin must precede /opt/homebrew/bin"
+        assert brew_idx < npm_idx, "/opt/homebrew/bin must precede .npm-global/bin"
 
     def test_daily_update_script_handles_codex_and_qoder_target_misalignment(self):
         runner_path = SCRIPTS_DIR / "workstation-daily-update.sh"
         content = runner_path.read_text(encoding="utf-8")
 
         # Qoder target prefix check
-        self.assertIn('[[ "${bin}" == "qoder" ]] && [[ "${real_bin}" != "${HOME}/.local"* && "${real_bin}" != "${HOME}/.qoder"* ]]', content)
+        assert '[[ "${bin}" == "qoder" ]] && [[ "${real_bin}" != "${HOME}/.local"* && "${real_bin}" != "${HOME}/.qoder"* ]]' in content
         # Codex update execution
-        self.assertIn('codex update', content)
+        assert 'codex update' in content
 
 
 if __name__ == "__main__":

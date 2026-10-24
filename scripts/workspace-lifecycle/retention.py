@@ -25,9 +25,10 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping, Optional
+from typing import Any
 
 POLICY_NAME = "workspace-artifact-retention-policy"
 DEFAULT_INVENTORY_PATH = (
@@ -151,14 +152,14 @@ class RetentionInventory:
     entries: tuple  # RetentionEntry
     source_path: str
 
-    def entry_for(self, canonical_path: str) -> Optional[RetentionEntry]:
+    def entry_for(self, canonical_path: str) -> RetentionEntry | None:
         for entry in self.entries:
             if entry.path == canonical_path:
                 return entry
         return None
 
 
-def load_inventory(path: Optional[Path] = None) -> RetentionInventory:
+def load_inventory(path: Path | None = None) -> RetentionInventory:
     """Load and validate the retention inventory. Raises RetentionError."""
     source = Path(path) if path is not None else DEFAULT_INVENTORY_PATH
     if not source.is_file():
@@ -239,7 +240,7 @@ def load_inventory(path: Optional[Path] = None) -> RetentionInventory:
     )
 
 
-def load_or_unavailable(path: Optional[Path] = None) -> Optional[RetentionInventory]:
+def load_or_unavailable(path: Path | None = None) -> RetentionInventory | None:
     """Load the inventory; return None when unavailable (fail-closed input)."""
     try:
         return load_inventory(path)
@@ -259,10 +260,10 @@ UNAVAILABLE = "unavailable"
 class GateDecision:
     outcome: str
     reason: str
-    entry: Optional[RetentionEntry] = None
+    entry: RetentionEntry | None = None
 
 
-def gate(inventory: Optional[RetentionInventory], canonical_path: str) -> GateDecision:
+def gate(inventory: RetentionInventory | None, canonical_path: str) -> GateDecision:
     """Apply the retention exclusion/gating layer to one candidate path.
 
     - Missing/unapproved/malformed inventory -> UNAVAILABLE (fail closed).

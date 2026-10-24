@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import fcntl
-import os
 import shutil
 from pathlib import Path
 
@@ -28,7 +27,8 @@ def test_read_queries_are_side_effect_free_and_bounded(tmp_path: Path) -> None:
     assert model.relationships(type="Serving", limit=1)
     result = model.neighbors("ea-a87d473086132d9f", depth=2, limit=1)
     assert result["truncated"] is True
-    assert path.read_bytes() == before and path.stat().st_mtime_ns == mtime
+    assert path.read_bytes() == before
+    assert path.stat().st_mtime_ns == mtime
 
 
 def test_create_element_identity_and_idempotence(tmp_path: Path) -> None:
@@ -37,7 +37,8 @@ def test_create_element_identity_and_idempotence(tmp_path: Path) -> None:
     op = {"op": "create_element", "type": "BusinessActor", "name": "Smoke Actor"}
     model.mutate([op])
     expected = deterministic_id("element", "BusinessActor", "Smoke Actor")
-    assert expected.startswith("ea-") and len(expected) == 19
+    assert expected.startswith("ea-")
+    assert len(expected) == 19
     assert sum(e["identifier"] == expected for e in model.elements()) == 1
     model.mutate([op])
     assert sum(e["identifier"] == expected for e in model.elements()) == 1
@@ -79,11 +80,14 @@ def test_preservation_and_fail_closed_inputs(tmp_path: Path) -> None:
     model = ArchimateModel.load(path)
     model.mutate([{"op": "update_element", "identifier": "ea-d01ae79cb61c7f9d", "name": "Registry Updated"}], backup=False)
     output = path.read_text(encoding="utf-8")
-    assert "bendpoint" in output and "organizations" in output and "ext:extension" in output and "propertyDefinitionRef" in output
+    assert "bendpoint" in output
+    assert "organizations" in output
+    assert "ext:extension" in output
+    assert "propertyDefinitionRef" in output
     for marker in ("<!DOCTYPE x>", "<![CDATA[unsafe]]>"):
         bad = tmp_path / ("doctype.xml" if "DOCTYPE" in marker else "cdata.xml")
         bad.write_text(f"<?xml version='1.0'?><model>{marker}<elements/></model>", encoding="utf-8")
-        with pytest.raises(ModelError, match="PRESERVATION_FAIL_CLOSED|STRUCTURE_XML_NOT_WELL_FORMED"):
+        with pytest.raises(ModelError, match=r"PRESERVATION_FAIL_CLOSED|STRUCTURE_XML_NOT_WELL_FORMED"):
             ArchimateModel.load(bad).mutate([{"op": "create_element", "type": "BusinessActor", "name": "x"}], backup=False)
 
 def test_reload_round_trip_and_lock_serialization(tmp_path: Path) -> None:
@@ -107,7 +111,7 @@ def test_reversed_serving_rejected_after_ns_fallback_reload(tmp_path: Path) -> N
     model = ArchimateModel.load(path)
     model.mutate([{"op": "create_element", "type": "BusinessRole", "name": "Policy Owner"}], backup=False)
     reloaded = ArchimateModel.load(path)
-    before = path.read_bytes()
+    path.read_bytes()
     role = reloaded.elements(name="Policy Owner")[0]["identifier"]
     service = "ea-b31c7f23b5ca624e"  # ApplicationService Register Claim
     with pytest.raises(ModelError, match="SEMANTIC_SERVING_REVERSED"):

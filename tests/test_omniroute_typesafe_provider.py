@@ -84,26 +84,26 @@ class TestOmniRouteTypeSafeProvider(unittest.TestCase):
 
     def test_typesafe_provider_connection_active_and_masked(self) -> None:
         status, body = _omniroute_request("GET", "/api/providers?limit=5000", self.omniroute_key)
-        self.assertEqual(status, 200)
+        assert status == 200
         connections = [
             c for c in body.get("connections", []) if c.get("provider") == "typesafe"
         ]
-        self.assertEqual(len(connections), 1, "Expected exactly one dedicated typesafe connection")
+        assert len(connections) == 1, "Expected exactly one dedicated typesafe connection"
         conn_id = connections[0]["id"]
 
         detail_status, detail_body = _omniroute_request(
             "GET", f"/api/providers/{conn_id}", self.omniroute_key
         )
-        self.assertEqual(detail_status, 200)
+        assert detail_status == 200
         conn = detail_body.get("connection", {})
-        self.assertEqual(conn.get("provider"), "typesafe")
-        self.assertEqual(conn.get("authType"), "apikey")
-        self.assertIs(conn.get("isActive"), True)
-        self.assertEqual(conn.get("testStatus"), "active")
+        assert conn.get("provider") == "typesafe"
+        assert conn.get("authType") == "apikey"
+        assert conn.get("isActive") is True
+        assert conn.get("testStatus") == "active"
 
         masked_key = str(conn.get("apiKey") or "")
-        self.assertIn("*", masked_key)
-        self.assertNotEqual(masked_key, self.typesafe_key)
+        assert "*" in masked_key
+        assert masked_key != self.typesafe_key
 
     def test_typesafe_validate_accepts_valid_and_rejects_invalid_key(self) -> None:
         ok_status, ok_body = _omniroute_request(
@@ -112,9 +112,9 @@ class TestOmniRouteTypeSafeProvider(unittest.TestCase):
             self.omniroute_key,
             {"provider": "typesafe", "apiKey": self.typesafe_key},
         )
-        self.assertEqual(ok_status, 200)
-        self.assertIs(ok_body.get("valid"), True)
-        self.assertEqual(ok_body.get("method"), "typesafe_systemone")
+        assert ok_status == 200
+        assert ok_body.get("valid") is True
+        assert ok_body.get("method") == "typesafe_systemone"
 
         bad_status, bad_body = _omniroute_request(
             "POST",
@@ -122,9 +122,9 @@ class TestOmniRouteTypeSafeProvider(unittest.TestCase):
             self.omniroute_key,
             {"provider": "typesafe", "apiKey": "ts_invalid_probe_key_000000"},
         )
-        self.assertEqual(bad_status, 200)
-        self.assertIs(bad_body.get("valid"), False)
-        self.assertIn("Invalid API key", str(bad_body.get("error") or ""))
+        assert bad_status == 200
+        assert bad_body.get("valid") is False
+        assert "Invalid API key" in str(bad_body.get("error") or "")
 
     def test_typesafe_connection_test_endpoint_returns_ok_diagnosis(self) -> None:
         _, list_body = _omniroute_request("GET", "/api/providers?limit=5000", self.omniroute_key)
@@ -134,28 +134,28 @@ class TestOmniRouteTypeSafeProvider(unittest.TestCase):
         t_status, t_body = _omniroute_request(
             "POST", f"/api/providers/{conn_id}/test", self.omniroute_key, {}
         )
-        self.assertEqual(t_status, 200)
-        self.assertIs(t_body.get("valid"), True)
-        self.assertEqual(t_body.get("diagnosis", {}).get("type"), "ok")
+        assert t_status == 200
+        assert t_body.get("valid") is True
+        assert t_body.get("diagnosis", {}).get("type") == "ok"
 
     def test_typesafe_excluded_from_v1_models_and_zero_monkeypatch_boundary(self) -> None:
         m_status, m_body = _omniroute_request("GET", "/v1/models", self.omniroute_key)
-        self.assertEqual(m_status, 200)
+        assert m_status == 200
         models = m_body.get("data", [])
-        self.assertGreater(len(models), 0)
+        assert len(models) > 0
         typesafe_models = [
             m
             for m in models
             if "typesafe" in str(m.get("id", "")).lower()
             or str(m.get("owned_by", "")).lower() == "typesafe"
         ]
-        self.assertEqual(typesafe_models, [])
+        assert typesafe_models == []
 
         compat_script = (OMNIROUTE_ROOT / "scripts" / "container-entrypoint-compat.sh").read_text(
             encoding="utf-8"
         )
-        self.assertNotIn("systemone", compat_script.lower())
-        self.assertNotIn("typesafe", compat_script.lower())
+        assert "systemone" not in compat_script.lower()
+        assert "typesafe" not in compat_script.lower()
 
         git_proc = subprocess.run(
             ["git", "-C", str(OMNIROUTE_ROOT), "status", "--porcelain", "--untracked-files=no"],
@@ -163,7 +163,7 @@ class TestOmniRouteTypeSafeProvider(unittest.TestCase):
             text=True,
             check=True,
         )
-        self.assertEqual(git_proc.stdout.strip(), "")
+        assert git_proc.stdout.strip() == ""
 
         cli_proc = subprocess.run(
             [str(BRIDGE_PATH), "providers", "list", "--output", "json"],
@@ -173,9 +173,9 @@ class TestOmniRouteTypeSafeProvider(unittest.TestCase):
         )
         cli_providers = json.loads(cli_proc.stdout).get("providers", [])
         cli_typesafe = [p for p in cli_providers if p.get("provider") == "typesafe"]
-        self.assertEqual(len(cli_typesafe), 1)
-        self.assertIs(cli_typesafe[0].get("isActive"), True)
-        self.assertEqual(cli_typesafe[0].get("testStatus"), "active")
+        assert len(cli_typesafe) == 1
+        assert cli_typesafe[0].get("isActive") is True
+        assert cli_typesafe[0].get("testStatus") == "active"
 
     def test_in_container_stored_typesafe_credential_executes_jev_models_and_primitives(self) -> None:
         node_script = """
@@ -260,17 +260,17 @@ console.log(JSON.stringify({
             check=True,
         )
         out = json.loads(proc.stdout.strip())
-        self.assertEqual(out["models_status"], 200)
-        self.assertIn("jev-latest", out["model_names"])
-        self.assertIn("jev-preview", out["model_names"])
-        self.assertEqual(out["latest_status"], 200)
-        self.assertIn(out["latest_model"], ("jev-1.13.0", "jev-1.14.0"))
-        self.assertGreater(out["is_code_noul"], 0.8)
-        self.assertEqual(out["route_choice"], "gemini-4-argon-high")
-        self.assertIsNotNone(out["difficulty_score"])
-        self.assertEqual(out["v114_status"], 200)
-        self.assertEqual(out["v114_model"], "jev-1.14.0")
-        self.assertGreater(out["sqli_noul"], 0.8)
+        assert out["models_status"] == 200
+        assert "jev-latest" in out["model_names"]
+        assert "jev-preview" in out["model_names"]
+        assert out["latest_status"] == 200
+        assert out["latest_model"] in ("jev-1.13.0", "jev-1.14.0")
+        assert out["is_code_noul"] > 0.8
+        assert out["route_choice"] == "gemini-4-argon-high"
+        assert out["difficulty_score"] is not None
+        assert out["v114_status"] == 200
+        assert out["v114_model"] == "jev-1.14.0"
+        assert out["sqli_noul"] > 0.8
 
 
 if __name__ == "__main__":

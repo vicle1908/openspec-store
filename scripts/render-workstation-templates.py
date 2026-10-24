@@ -9,15 +9,12 @@ with concrete absolute paths. Standard library only.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
-import os
 import re
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any
-
-import importlib.util
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 preflight_path = SCRIPT_DIR / "bootstrap-workstation-preflight.py"

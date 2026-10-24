@@ -116,46 +116,46 @@ class SchemaRejectionTests(unittest.TestCase):
         doc = make_doc(policy_identity="")
         path = write_inventory(self.dir, doc)
         code, _, err = run_cli(path)
-        self.assertEqual(code, vri.EXIT_SCHEMA)
-        self.assertIn("policy_identity", err)
+        assert code == vri.EXIT_SCHEMA
+        assert "policy_identity" in err
 
     def test_missing_policy_version_rejected(self):
         doc = make_doc(policy_version="")
         path = write_inventory(self.dir, doc)
         code, _, err = run_cli(path)
-        self.assertEqual(code, vri.EXIT_SCHEMA)
-        self.assertIn("policy_version", err)
+        assert code == vri.EXIT_SCHEMA
+        assert "policy_version" in err
 
     def test_secret_field_rejected(self):
         entry = make_entry()
         entry["password"] = "hunter2"
         path = write_inventory(self.dir, make_doc([entry]))
         code, _, err = run_cli(path)
-        self.assertEqual(code, vri.EXIT_SCHEMA)
-        self.assertIn("forbidden field 'password'", err)
+        assert code == vri.EXIT_SCHEMA
+        assert "forbidden field 'password'" in err
 
     def test_request_body_field_rejected(self):
         entry = make_entry()
         entry["request_body"] = {"k": "v"}
         path = write_inventory(self.dir, make_doc([entry]))
         code, _, err = run_cli(path)
-        self.assertEqual(code, vri.EXIT_SCHEMA)
-        self.assertIn("request_body", err)
+        assert code == vri.EXIT_SCHEMA
+        assert "request_body" in err
 
     def test_malformed_provenance_type_rejected(self):
         entry = make_entry(provenance={"type": "bogus"})
         path = write_inventory(self.dir, make_doc([entry]))
         code, _, err = run_cli(path)
-        self.assertEqual(code, vri.EXIT_SCHEMA)
-        self.assertIn("provenance.type", err)
+        assert code == vri.EXIT_SCHEMA
+        assert "provenance.type" in err
 
     def test_invalid_class_rejected(self):
         entry = make_entry()
         entry["class"] = "not a reviewed class"
         path = write_inventory(self.dir, make_doc([entry]))
         code, _, err = run_cli(path)
-        self.assertEqual(code, vri.EXIT_SCHEMA)
-        self.assertIn("class", err)
+        assert code == vri.EXIT_SCHEMA
+        assert "class" in err
 
 
 class ApprovalTests(unittest.TestCase):
@@ -171,10 +171,10 @@ class ApprovalTests(unittest.TestCase):
         doc = make_doc()
         path = write_inventory(self.dir, doc)
         code, report, _ = run_cli(path)
-        self.assertEqual(code, vri.EXIT_OK)
-        self.assertTrue(report["approved"])
-        self.assertEqual(report["policy_identity"], "warp-1.0.0-test")
-        self.assertEqual(report["policy_version"], "1.0.0")
+        assert code == vri.EXIT_OK
+        assert report["approved"]
+        assert report["policy_identity"] == "warp-1.0.0-test"
+        assert report["policy_version"] == "1.0.0"
 
     def test_digest_mismatch_rejected_as_unapproved(self):
         doc = make_doc()
@@ -184,23 +184,23 @@ class ApprovalTests(unittest.TestCase):
         tampered["entries"][0]["justification"] = "changed after approval"
         path.write_text(json.dumps(tampered))
         code, _, err = run_cli(path)
-        self.assertEqual(code, vri.EXIT_UNAPPROVED)
-        self.assertIn("digest mismatch", err)
+        assert code == vri.EXIT_UNAPPROVED
+        assert "digest mismatch" in err
 
     def test_missing_approval_file_rejected(self):
         doc = make_doc()
         path = write_inventory(self.dir, doc)
         (self.dir / "retention-inventory.approval.sha256").unlink()
         code, _, err = run_cli(path)
-        self.assertEqual(code, vri.EXIT_UNAPPROVED)
-        self.assertIn("not found", err)
+        assert code == vri.EXIT_UNAPPROVED
+        assert "not found" in err
 
     def test_malformed_json_rejected(self):
         path = self.dir / "retention-inventory.json"
         path.write_text("{ not valid json")
         code, _, err = run_cli(path)
-        self.assertEqual(code, vri.EXIT_SCHEMA)
-        self.assertIn("malformed JSON", err)
+        assert code == vri.EXIT_SCHEMA
+        assert "malformed JSON" in err
 
 
 class FreshnessTests(unittest.TestCase):
@@ -221,16 +221,16 @@ class FreshnessTests(unittest.TestCase):
         entry = make_entry(provenance={"type": "runtime_observation",
                                        "observed_at": None})
         code, report = self._write_and_load(make_doc([entry]))
-        self.assertEqual(code, vri.EXIT_OK)
-        self.assertEqual(report["entries"][0]["effective_state"], "REVIEW_REQUIRED")
-        self.assertEqual(report["summary"]["stale_downgraded"], 1)
+        assert code == vri.EXIT_OK
+        assert report["entries"][0]["effective_state"] == "REVIEW_REQUIRED"
+        assert report["summary"]["stale_downgraded"] == 1
 
     def test_missing_evidence_reference_downgrades(self):
         entry = make_entry(provenance={"type": "evidence_identity",
                                        "evidence": str(self.dir / "absent.md")})
         code, report = self._write_and_load(make_doc([entry]))
-        self.assertEqual(code, vri.EXIT_OK)
-        self.assertEqual(report["entries"][0]["effective_state"], "REVIEW_REQUIRED")
+        assert code == vri.EXIT_OK
+        assert report["entries"][0]["effective_state"] == "REVIEW_REQUIRED"
 
     def test_present_evidence_reference_is_fresh(self):
         evidence = self.dir / "evidence.md"
@@ -238,9 +238,9 @@ class FreshnessTests(unittest.TestCase):
         entry = make_entry(provenance={"type": "evidence_identity",
                                        "evidence": str(evidence)})
         code, report = self._write_and_load(make_doc([entry]))
-        self.assertEqual(code, vri.EXIT_OK)
-        self.assertEqual(report["entries"][0]["effective_state"], "PROTECTED")
-        self.assertTrue(report["entries"][0]["fresh"])
+        assert code == vri.EXIT_OK
+        assert report["entries"][0]["effective_state"] == "PROTECTED"
+        assert report["entries"][0]["fresh"]
 
     def test_stale_repo_revision_downgrades(self):
         repo = self.dir / "repo"
@@ -255,9 +255,9 @@ class FreshnessTests(unittest.TestCase):
                            provenance={"type": "repo_revision",
                                        "revision": "0" * 40})
         code, report = self._write_and_load(make_doc([entry]))
-        self.assertEqual(code, vri.EXIT_OK)
-        self.assertEqual(report["entries"][0]["effective_state"], "REVIEW_REQUIRED")
-        self.assertIn("stale", report["entries"][0]["freshness_reason"])
+        assert code == vri.EXIT_OK
+        assert report["entries"][0]["effective_state"] == "REVIEW_REQUIRED"
+        assert "stale" in report["entries"][0]["freshness_reason"]
 
     def test_fresh_repo_revision_stays_protected(self):
         repo = self.dir / "repo2"
@@ -275,9 +275,9 @@ class FreshnessTests(unittest.TestCase):
                            policy_state="PROTECTED",
                            provenance={"type": "repo_revision", "revision": head})
         code, report = self._write_and_load(make_doc([entry]))
-        self.assertEqual(code, vri.EXIT_OK)
-        self.assertEqual(report["entries"][0]["effective_state"], "PROTECTED")
-        self.assertTrue(report["entries"][0]["fresh"])
+        assert code == vri.EXIT_OK
+        assert report["entries"][0]["effective_state"] == "PROTECTED"
+        assert report["entries"][0]["fresh"]
 
 
 class ExclusionHandoffTests(unittest.TestCase):
@@ -309,25 +309,22 @@ class ExclusionHandoffTests(unittest.TestCase):
         ]
         path = write_inventory(self.dir, make_doc(entries))
         code, report, _ = run_cli(path)
-        self.assertEqual(code, vri.EXIT_OK)
+        assert code == vri.EXIT_OK
         excluded_paths = {e["path"] for e in report["exclusions"]}
-        self.assertEqual(
-            excluded_paths,
-            {"/tmp/x/reports", "/tmp/x/snapshots", "/tmp/x/fixture", "/tmp/x/index"},
-        )
+        assert excluded_paths == {"/tmp/x/reports", "/tmp/x/snapshots", "/tmp/x/fixture", "/tmp/x/index"}
         for exclusion in report["exclusions"]:
-            self.assertIn(exclusion["class"], exclusion["reason"])
-            self.assertIn(exclusion["owner"], exclusion["reason"])
-            self.assertIn("SHALL skip", exclusion["reason"])
-        self.assertEqual(report["summary"]["exclusions"], 4)
+            assert exclusion["class"] in exclusion["reason"]
+            assert exclusion["owner"] in exclusion["reason"]
+            assert "SHALL skip" in exclusion["reason"]
+        assert report["summary"]["exclusions"] == 4
 
     def test_review_required_entry_is_not_an_exclusion(self):
         entry = make_entry(provenance={"type": "runtime_observation",
                                        "observed_at": None})
         path = write_inventory(self.dir, make_doc([entry]))
         code, report, _ = run_cli(path)
-        self.assertEqual(code, vri.EXIT_OK)
-        self.assertEqual(report["exclusions"], [])
+        assert code == vri.EXIT_OK
+        assert report["exclusions"] == []
 
 
 class ReviewProposalTests(unittest.TestCase):
@@ -359,27 +356,27 @@ class ReviewProposalTests(unittest.TestCase):
         before_approval = approval.read_bytes()
 
         code, report, _ = run_cli(path)
-        self.assertEqual(code, vri.EXIT_OK)
-        self.assertEqual(len(report["review_proposals"]), 1)
+        assert code == vri.EXIT_OK
+        assert len(report["review_proposals"]) == 1
         proposal = report["review_proposals"][0]
-        self.assertEqual(proposal["path"], str(fixture))
-        self.assertIn("do not auto-delete", proposal["reason"])
-        self.assertEqual(report["exclusions"], [])
+        assert proposal["path"] == str(fixture)
+        assert "do not auto-delete" in proposal["reason"]
+        assert report["exclusions"] == []
         # No filesystem mutation anywhere.
-        self.assertEqual(path.read_bytes(), before_inventory)
-        self.assertEqual(approval.read_bytes(), before_approval)
-        self.assertEqual(fixture.read_bytes(), before_fixture)
-        self.assertTrue(fixture.exists())
+        assert path.read_bytes() == before_inventory
+        assert approval.read_bytes() == before_approval
+        assert fixture.read_bytes() == before_fixture
+        assert fixture.exists()
 
     def test_unknown_owner_candidate_is_not_reclaimable_proposal(self):
         entry = make_entry(policy_state="RECLAIMABLE", owner="UNKNOWN",
                            candidate=True)
         path = write_inventory(self.dir, make_doc([entry]))
         code, report, _ = run_cli(path)
-        self.assertEqual(code, vri.EXIT_OK)
-        self.assertEqual(report["entries"][0]["effective_state"], "REVIEW_REQUIRED")
-        self.assertEqual(report["review_proposals"], [])
-        self.assertEqual(report["summary"]["reclaimable"], 0)
+        assert code == vri.EXIT_OK
+        assert report["entries"][0]["effective_state"] == "REVIEW_REQUIRED"
+        assert report["review_proposals"] == []
+        assert report["summary"]["reclaimable"] == 0
 
 
 class AdapterFailClosedTests(unittest.TestCase):
@@ -405,13 +402,13 @@ class AdapterFailClosedTests(unittest.TestCase):
         )
         entry["review"]["note"] = "adapter=launchagent; unavailable at review time"
         code, report = self._load(entry)
-        self.assertEqual(code, vri.EXIT_OK)
+        assert code == vri.EXIT_OK
         result = report["entries"][0]
-        self.assertEqual(result["effective_state"], "REVIEW_REQUIRED")
-        self.assertNotEqual(result["effective_state"], "RECLAIMABLE")
-        self.assertIn("owner UNKNOWN blocks reclamation", result["freshness_reason"])
-        self.assertEqual(report["summary"]["reclaimable"], 0)
-        self.assertEqual(report["review_proposals"], [])
+        assert result["effective_state"] == "REVIEW_REQUIRED"
+        assert result["effective_state"] != "RECLAIMABLE"
+        assert "owner UNKNOWN blocks reclamation" in result["freshness_reason"]
+        assert report["summary"]["reclaimable"] == 0
+        assert report["review_proposals"] == []
 
     def test_container_adapter_unavailable_blocks_reclamation(self):
         entry = make_entry(
@@ -422,18 +419,18 @@ class AdapterFailClosedTests(unittest.TestCase):
         )
         entry["review"]["note"] = "adapter=container; unavailable at review time"
         code, report = self._load(entry)
-        self.assertEqual(code, vri.EXIT_OK)
+        assert code == vri.EXIT_OK
         result = report["entries"][0]
-        self.assertEqual(result["effective_state"], "REVIEW_REQUIRED")
-        self.assertEqual(report["summary"]["reclaimable"], 0)
-        self.assertEqual(report["exclusions"], [])
+        assert result["effective_state"] == "REVIEW_REQUIRED"
+        assert report["summary"]["reclaimable"] == 0
+        assert report["exclusions"] == []
 
     def test_unknown_owner_reclaimed_claim_downgraded(self):
         entry = make_entry(policy_state="RECLAIMED", owner="UNKNOWN")
         code, report = self._load(entry)
-        self.assertEqual(code, vri.EXIT_OK)
-        self.assertEqual(report["entries"][0]["effective_state"], "REVIEW_REQUIRED")
-        self.assertEqual(report["summary"]["reclaimed"], 0)
+        assert code == vri.EXIT_OK
+        assert report["entries"][0]["effective_state"] == "REVIEW_REQUIRED"
+        assert report["summary"]["reclaimed"] == 0
 
 
 class ReadOnlyTests(unittest.TestCase):
@@ -449,9 +446,9 @@ class ReadOnlyTests(unittest.TestCase):
         approval = dirpath / "retention-inventory.approval.sha256"
         approval_before = approval.read_bytes()
         code, _, _ = run_cli(path)
-        self.assertEqual(code, vri.EXIT_OK)
-        self.assertEqual(path.read_bytes(), before)
-        self.assertEqual(approval.read_bytes(), approval_before)
+        assert code == vri.EXIT_OK
+        assert path.read_bytes() == before
+        assert approval.read_bytes() == approval_before
 
 
 if __name__ == "__main__":

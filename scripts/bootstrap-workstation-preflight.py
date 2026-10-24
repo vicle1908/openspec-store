@@ -47,7 +47,7 @@ def detect_system_info(
     """Derive system paths and architecture dynamically."""
     os_name = os_override or os.environ.get("WORKSTATION_OS") or platform.system()
     arch = arch_override or os.environ.get("WORKSTATION_ARCH") or platform.machine()
-    
+
     # Normalize architecture
     if arch in ("arm64", "aarch64"):
         norm_arch = "arm64"
@@ -57,7 +57,7 @@ def detect_system_info(
         norm_arch = arch
 
     home = home_override or os.environ.get("WORKSTATION_HOME") or os.environ.get("HOME") or str(Path.home())
-    
+
     # Homebrew prefix logic:
     # 1. Explicit override or environment variable
     # 2. On arm64 -> /opt/homebrew
@@ -257,7 +257,7 @@ def run_preflight(
 ) -> PreflightReport:
     """Run full preflight evaluation, supporting fixtures or live detection."""
     if fixture_path:
-        with open(fixture_path, "r", encoding="utf-8") as f:
+        with open(fixture_path, encoding="utf-8") as f:
             fixture = json.load(f)
         sys_info = fixture.get("system", {})
         # If fixture defines mock_missing or overrides

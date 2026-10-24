@@ -22,10 +22,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import dryrun  # noqa: E402
-import manifest  # noqa: E402
-import pytest  # noqa: E402
-import retention  # noqa: E402
+import dryrun
+import manifest
+import pytest
+import retention
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 E2E_FIXTURE = FIXTURES / "e2e-dryrun.fixture.json"

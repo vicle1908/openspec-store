@@ -17,7 +17,6 @@ import argparse
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
 from dataclasses import asdict, dataclass
@@ -107,7 +106,7 @@ def inspect_port_lsof(port: int) -> list[int]:
                 line = line.strip()
                 if line.isdigit():
                     pids.append(int(line))
-            return sorted(list(set(pids)))
+            return sorted(set(pids))
     except Exception:
         pass
     return []
@@ -278,7 +277,7 @@ def main() -> int:
 
     fixture_data = None
     if args.fixture and args.fixture.is_file():
-        with open(args.fixture, "r", encoding="utf-8") as f:
+        with open(args.fixture, encoding="utf-8") as f:
             fixture_data = json.load(f)
 
     report = inspect_service_ports(
@@ -298,9 +297,9 @@ def main() -> int:
         for port_str, pinfo in report["ports"].items():
             sym = "PASS" if not pinfo["quarantined"] else "QUARANTINED"
             print(f"  [{sym:<11}] Port {port_str:<5} ({pinfo['service']}): {pinfo['details']}")
-            for l in pinfo["listeners"]:
-                q_tag = " [FOREIGN/QUARANTINE]" if l["is_foreign"] else " [ALIGNED]"
-                print(f"      -> PID {l['pid']}: {l['name']}{q_tag}")
+            for listener in pinfo["listeners"]:
+                q_tag = " [FOREIGN/QUARANTINE]" if listener["is_foreign"] else " [ALIGNED]"
+                print(f"      -> PID {listener['pid']}: {listener['name']}{q_tag}")
         if report.get("docker"):
             d = report["docker"]
             print("-" * 60)

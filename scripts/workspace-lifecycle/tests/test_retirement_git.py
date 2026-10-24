@@ -19,8 +19,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import observations  # noqa: E402
-import retirement  # noqa: E402
+import observations
+import retirement
 
 OBSERVED_AT = "2026-08-25T18:00:00Z"
 REVISION = "abcd000000000000000000000000000000000001"
@@ -39,7 +39,7 @@ def check(name: str, condition: bool, detail: str = "") -> None:
         print(f"  FAIL {name} {detail}")
 
 
-def git_obs(path: str, subject: str = None, **overrides) -> dict:
+def git_obs(path: str, subject: str | None = None, **overrides) -> dict:
     """Clean, merge-preserved Git observation; overrides introduce the case."""
     facts = {
         "repo_identity": f"{path}/.git",

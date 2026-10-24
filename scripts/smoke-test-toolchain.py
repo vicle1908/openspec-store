@@ -176,7 +176,7 @@ def load_manifest(manifest_path: Path) -> dict[str, Any]:
     """Load tools from manifest JSON."""
     if not manifest_path.is_file():
         return {}
-    with open(manifest_path, "r", encoding="utf-8") as f:
+    with open(manifest_path, encoding="utf-8") as f:
         return json.load(f)
 
 

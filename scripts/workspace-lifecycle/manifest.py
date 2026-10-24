@@ -26,12 +26,12 @@ import hashlib
 import json
 import os
 import re
-from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
-from typing import Any, Iterable, Mapping, Optional
+from collections.abc import Iterable, Mapping
+from datetime import timedelta
+from typing import Any
 
-import retention
 from observations import AUTHORITIES, Observation, parse_observed_at
+lazy import retention
 
 MANIFEST_NAME = "workspace-lifecycle-cleanup-manifest"
 SCHEMA_VERSION = "0.1.0"
@@ -172,7 +172,7 @@ def build_manifest(
     plan_id: str,
     entries: Iterable[Mapping[str, Any]],
     generated_at: str,
-    retention_inventory: Optional[retention.RetentionInventory] = None,
+    retention_inventory: retention.RetentionInventory | None = None,
     workspace_root: str = "~/Developer",
 ) -> dict:
     """Assemble the dry-run manifest document (in memory, read-only)."""

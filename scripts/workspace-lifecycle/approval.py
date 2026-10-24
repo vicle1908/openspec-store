@@ -17,14 +17,14 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import timedelta
 from pathlib import Path
-from typing import Mapping, Optional
 
 import classify
-import retention
 from observations import PathRecord, parse_observed_at
+lazy import retention
 
 DEFAULT_MAX_PRE_ACTION_AGE_MINUTES = 15
 DEFAULT_MAX_PLAN_AGE_HOURS = 24
@@ -150,8 +150,8 @@ def validate_approval(
     approval: ApprovalRecord,
     manifest: Mapping,
     pre_action_records: Mapping[str, PathRecord],
-    retention_inventory: Optional[retention.RetentionInventory] = None,
-    now: Optional[str] = None,
+    retention_inventory: retention.RetentionInventory | None = None,
+    now: str | None = None,
     max_pre_action_age_minutes: int = DEFAULT_MAX_PRE_ACTION_AGE_MINUTES,
     max_plan_age_hours: int = DEFAULT_MAX_PLAN_AGE_HOURS,
 ) -> Authorization:

@@ -16,10 +16,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import classify  # noqa: E402
-import manifest  # noqa: E402
-import observations  # noqa: E402
-import retention  # noqa: E402
+import classify
+import manifest
+import observations
+import retention
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 AUTHORITY_FIXTURE = FIXTURES / "authority-observations.fixture.json"

@@ -91,7 +91,7 @@ def read_package_engine_pin(pkg_path: Path | None) -> tuple[str | None, str | No
         return None, None
 
     try:
-        with open(pkg_path, "r", encoding="utf-8") as f:
+        with open(pkg_path, encoding="utf-8") as f:
             data = json.load(f)
         pkg_version = data.get("version")
         deps = data.get("dependencies", {})

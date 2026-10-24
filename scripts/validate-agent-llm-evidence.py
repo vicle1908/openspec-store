@@ -10,6 +10,7 @@ JSON result beneath the change-owned ``evidence/results`` directory.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
 import importlib.metadata
 import json
@@ -19,10 +20,12 @@ import secrets
 import shutil
 import subprocess
 import sys
-from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping, Sequence
 
 CHANGE_NAME = "complete-agent-llm-config-integration"
 SCHEMA_VERSION = "1.0.0"
@@ -1477,10 +1480,8 @@ def evaluate_dependencies(
         actual_repository = repository_for_path(origin, roots)
         actual_git_root: Path | None = None
         actual_sha: str | None = None
-        try:
+        with contextlib.suppress(LocalIdentityUnavailable, OSError):
             actual_git_root, actual_sha = enclosing_git_identity(origin)
-        except (LocalIdentityUnavailable, OSError):
-            pass
         compare(
             comparisons,
             field=f"dependency.{identifier}.installed.origin_path",
@@ -2101,10 +2102,8 @@ def validate_output_path(output: Path, store_root: Path) -> Path:
 
 
 def atomic_write(path: Path, payload: bytes) -> None:
-    try:
+    with contextlib.suppress(FileExistsError):
         path.parent.mkdir(mode=0o700)
-    except FileExistsError:
-        pass
     directory_flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
     directory_flags |= getattr(os, "O_NOFOLLOW", 0)
     directory_fd = os.open(path.parent, directory_flags)
@@ -2128,10 +2127,8 @@ def atomic_write(path: Path, payload: bytes) -> None:
         )
         os.fsync(directory_fd)
     finally:
-        try:
+        with contextlib.suppress(FileNotFoundError):
             os.unlink(temporary_name, dir_fd=directory_fd)
-        except FileNotFoundError:
-            pass
         os.close(directory_fd)
 
 
@@ -2309,7 +2306,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
     # The CLI boundary must always emit the contracted redacted JSON shape, even
     # for an unexpected implementation defect. Exception values are never used.
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         comparisons.append(
             invalid_comparison("validator.internal", f"internal_{type(exc).__name__}")
         )

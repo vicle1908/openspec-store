@@ -508,9 +508,9 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         exit_code: int,
         decision: str,
     ) -> None:
-        self.assertEqual(process.returncode, exit_code, process.stderr)
-        self.assertEqual(result["exit_code"], exit_code)
-        self.assertEqual(result["decision"], decision)
+        assert process.returncode == exit_code, process.stderr
+        assert result["exit_code"] == exit_code
+        assert result["decision"] == decision
 
     def comparison(self, result: dict[str, object], field: str) -> dict[str, object]:
         return next(item for item in result["comparisons"] if item["field"] == field)
@@ -519,14 +519,11 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         first, result = self.fixture.result()
         second = self.fixture.invoke()
         self.assertDecision(first, result, exit_code=0, decision="current")
-        self.assertEqual(first.stdout, second.stdout)
-        self.assertNotIn("observed_at", result)
-        self.assertEqual(result["affected_records"], [])
+        assert first.stdout == second.stdout
+        assert "observed_at" not in result
+        assert result["affected_records"] == []
         comparisons = result["comparisons"]
-        self.assertEqual(
-            [item["field"] for item in comparisons],
-            sorted(item["field"] for item in comparisons),
-        )
+        assert [item["field"] for item in comparisons] == sorted(item["field"] for item in comparisons)
 
     def test_current_live_row_passes_live_launch_gate(self) -> None:
         self.fixture.make_live_record()
@@ -559,7 +556,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=2, decision="stale")
         expected = sorted(item["id"] for item in self.fixture.repository_map["records"])
-        self.assertEqual(result["affected_records"], expected)
+        assert result["affected_records"] == expected
 
     def test_each_concrete_planning_artifact_drift_is_stale(self) -> None:
         relative_paths = [
@@ -575,10 +572,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
                 path.write_text(path.read_text(encoding="utf-8") + "drift\n")
                 process, result = fixture.result()
                 self.assertDecision(process, result, exit_code=2, decision="stale")
-                self.assertEqual(
-                    result["affected_records"],
-                    sorted(item["id"] for item in fixture.repository_map["records"]),
-                )
+                assert result["affected_records"] == sorted(item["id"] for item in fixture.repository_map["records"])
 
     def test_record_must_contain_exact_five_delta_specs(self) -> None:
         artifacts = self.fixture.record["planning"]["artifacts"]
@@ -602,10 +596,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         evidence.write_text("{}\n", encoding="utf-8")
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=2, decision="stale")
-        self.assertEqual(
-            self.comparison(result, "planning.corrective_tree_sha256")["decision"],
-            "stale",
-        )
+        assert self.comparison(result, "planning.corrective_tree_sha256")["decision"] == "stale"
 
     def test_results_subtree_is_excluded_from_corrective_tree_digest(self) -> None:
         result_file = (
@@ -657,17 +648,14 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         git(self.fixture.store, "commit", "-m", "evidence only")
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=0, decision="current")
-        self.assertNotEqual(result["observed_store_head"], self.fixture.store_sha)
+        assert result["observed_store_head"] != self.fixture.store_sha
 
     def test_missing_or_nonancestor_baseline_is_stale(self) -> None:
         self.fixture.record["planning"]["baseline_sha"] = "f" * 40
         self.fixture.write_inputs()
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=2, decision="stale")
-        self.assertEqual(
-            result["affected_records"],
-            sorted(item["id"] for item in self.fixture.repository_map["records"]),
-        )
+        assert result["affected_records"] == sorted(item["id"] for item in self.fixture.repository_map["records"])
 
     def test_baseline_tree_mismatch_is_stale(self) -> None:
         self.fixture.record["planning"]["baseline_tree_sha"] = "a" * 40
@@ -692,16 +680,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         (self.fixture.tdt / "untracked.txt").write_text("dirt\n", encoding="utf-8")
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=2, decision="stale")
-        self.assertEqual(
-            result["affected_records"],
-            [
-                "agent-core-handoff",
-                "agent-docs-sync-handoff",
-                "agent-harness-handoff",
-                "ai-harness-skills-live",
-                "ai-review-live",
-            ],
-        )
+        assert result["affected_records"] == ["agent-core-handoff", "agent-docs-sync-handoff", "agent-harness-handoff", "ai-harness-skills-live", "ai-review-live"]
 
     def test_nul_delimited_dirt_handles_newline_in_filename(self) -> None:
         unusual = self.fixture.consumer / "untracked\nname.txt"
@@ -713,9 +692,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
             for item in result["comparisons"]
             if item["field"] == "repository.agent-core.dirt_sha256"
         )
-        self.assertEqual(
-            comparison["current"], sha256_bytes(raw_git_status(self.fixture.consumer))
-        )
+        assert comparison["current"] == sha256_bytes(raw_git_status(self.fixture.consumer))
 
     def test_rename_porcelain_pair_matches_raw_bytes_exactly(self) -> None:
         old = self.fixture.consumer / "tests" / "test_agent_core.py"
@@ -725,17 +702,15 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=2, decision="stale")
         mechanism = self.comparison(result, "mechanism.agent-core-test-mechanism")
-        self.assertEqual(mechanism["current"], "missing")
-        self.assertEqual(mechanism["decision"], "stale")
+        assert mechanism["current"] == "missing"
+        assert mechanism["decision"] == "stale"
         dependency_dirt = self.comparison(
             result, "repository.agent-core.dependency_relevant_dirt"
         )
-        self.assertEqual(dependency_dirt["current"], [])
-        self.assertEqual(result["affected_records"], ["agent-core-handoff"])
+        assert dependency_dirt["current"] == []
+        assert result["affected_records"] == ["agent-core-handoff"]
         comparison = self.comparison(result, "repository.agent-core.dirt_sha256")
-        self.assertEqual(
-            comparison["current"], sha256_bytes(raw_git_status(self.fixture.consumer))
-        )
+        assert comparison["current"] == sha256_bytes(raw_git_status(self.fixture.consumer))
 
     def test_classified_non_secret_dirt_matches_content_and_raw_porcelain(self) -> None:
         relative = "tests/generated proof.txt"
@@ -769,7 +744,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=2, decision="stale")
         inventory = self.comparison(result, "repository.agent-core.dirt_inventory")
-        self.assertEqual(inventory["current"][0]["category"], "unclassified")
+        assert inventory["current"][0]["category"] == "unclassified"
 
     def test_invalid_beats_blocked_and_stale(self) -> None:
         self.fixture.record["dependencies"] = []
@@ -830,12 +805,12 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         )
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=0, decision="current")
-        self.assertNotIn("TARGET_PACKAGE_MUST_NOT_BE_IMPORTED", process.stderr)
+        assert "TARGET_PACKAGE_MUST_NOT_BE_IMPORTED" not in process.stderr
 
     def test_origin_discovery_does_not_import_target_package(self) -> None:
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=0, decision="current")
-        self.assertNotIn("TARGET_PACKAGE_MUST_NOT_BE_IMPORTED", process.stderr)
+        assert "TARGET_PACKAGE_MUST_NOT_BE_IMPORTED" not in process.stderr
 
     def test_required_dependency_cannot_be_omitted(self) -> None:
         self.fixture.record["dependencies"] = []
@@ -865,7 +840,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         result = json.loads(process.stdout)
         self.assertDecision(process, result, exit_code=4, decision="invalid")
         combined = process.stdout + process.stderr
-        self.assertNotIn("VALIDATOR_CREDENTIAL_CANARY_DO_NOT_EMIT", combined)
+        assert "VALIDATOR_CREDENTIAL_CANARY_DO_NOT_EMIT" not in combined
 
     def test_missing_attestation_is_blocked(self) -> None:
         self.fixture.repository_map["attestations"] = {}
@@ -895,7 +870,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         self.fixture.write_inputs()
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=4, decision="invalid")
-        self.assertNotIn("REPOSITORY_MAP_CANARY_MUST_NOT_APPEAR", process.stdout)
+        assert "REPOSITORY_MAP_CANARY_MUST_NOT_APPEAR" not in process.stdout
 
     def test_attestation_state_rejects_arbitrary_string(self) -> None:
         self.fixture.repository_map["attestations"]["contained-target"]["state"] = (
@@ -904,7 +879,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         self.fixture.write_inputs()
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=4, decision="invalid")
-        self.assertNotIn("ARBITRARY_ATTESTATION_VALUE_MUST_NOT_APPEAR", process.stdout)
+        assert "ARBITRARY_ATTESTATION_VALUE_MUST_NOT_APPEAR" not in process.stdout
 
     def test_tdt_core_drift_propagates_to_actual_downstream_records(self) -> None:
         source = self.fixture.tdt / "src" / "tdt_core" / "__init__.py"
@@ -913,16 +888,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         git(self.fixture.tdt, "commit", "-m", "upstream drift")
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=2, decision="stale")
-        self.assertEqual(
-            result["affected_records"],
-            [
-                "agent-core-handoff",
-                "agent-docs-sync-handoff",
-                "agent-harness-handoff",
-                "ai-harness-skills-live",
-                "ai-review-live",
-            ],
-        )
+        assert result["affected_records"] == ["agent-core-handoff", "agent-docs-sync-handoff", "agent-harness-handoff", "ai-harness-skills-live", "ai-review-live"]
 
     def test_agent_core_committed_drift_propagates_only_to_ai_review(self) -> None:
         source = self.fixture.consumer / "src" / "agent_core" / "__init__.py"
@@ -933,9 +899,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         git(self.fixture.consumer, "commit", "-m", "agent-core drift")
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=2, decision="stale")
-        self.assertEqual(
-            result["affected_records"], ["agent-core-handoff", "ai-review-live"]
-        )
+        assert result["affected_records"] == ["agent-core-handoff", "ai-review-live"]
 
     def test_consumer_mechanism_drift_affects_only_current_record(self) -> None:
         mechanism = self.fixture.consumer / "tests" / "test_agent_core.py"
@@ -944,7 +908,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         )
         process, result = self.fixture.result()
         self.assertDecision(process, result, exit_code=2, decision="stale")
-        self.assertEqual(result["affected_records"], ["agent-core-handoff"])
+        assert result["affected_records"] == ["agent-core-handoff"]
 
     def test_environment_presence_never_serializes_value(self) -> None:
         self.fixture.record["prerequisites"].append(
@@ -960,7 +924,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         environment["VALIDATOR_PROVIDER_KEY"] = "ENVIRONMENT_VALUE_MUST_NOT_APPEAR"
         process, result = self.fixture.result(env=environment)
         self.assertDecision(process, result, exit_code=0, decision="current")
-        self.assertNotIn("ENVIRONMENT_VALUE_MUST_NOT_APPEAR", process.stdout)
+        assert "ENVIRONMENT_VALUE_MUST_NOT_APPEAR" not in process.stdout
 
     def test_executable_and_path_prerequisites_are_current(self) -> None:
         executable = self.fixture.bin / "fixture-tool"
@@ -1052,7 +1016,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
             )
             for path in (self.fixture.store, self.fixture.tdt, self.fixture.consumer)
         }
-        self.assertEqual(before, after)
+        assert before == after
 
     def test_selected_output_is_atomic_contained_and_self_excluded(self) -> None:
         output = (
@@ -1066,16 +1030,16 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         )
         first, result = self.fixture.result(output=output)
         self.assertDecision(first, result, exit_code=0, decision="current")
-        self.assertEqual(json.loads(output.read_text(encoding="utf-8")), result)
+        assert json.loads(output.read_text(encoding="utf-8")) == result
         second, second_result = self.fixture.result(output=output)
         self.assertDecision(second, second_result, exit_code=0, decision="current")
-        self.assertEqual(first.stdout, second.stdout)
+        assert first.stdout == second.stdout
 
     def test_output_outside_evidence_results_is_invalid_and_not_written(self) -> None:
         output = self.fixture.base / "outside.json"
         process, result = self.fixture.result(output=output)
         self.assertDecision(process, result, exit_code=4, decision="invalid")
-        self.assertFalse(output.exists())
+        assert not output.exists()
 
     def test_symlinked_results_root_is_invalid_and_never_written(self) -> None:
         external = self.fixture.base / "external-results"
@@ -1093,7 +1057,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         output = results_root / "escape.json"
         process, result = self.fixture.result(output=output)
         self.assertDecision(process, result, exit_code=4, decision="invalid")
-        self.assertFalse((external / "escape.json").exists())
+        assert not (external / "escape.json").exists()
 
     def test_output_prefix_collision_is_not_self_excluded(self) -> None:
         output = (
@@ -1110,8 +1074,8 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         backup.write_text("unrelated\n", encoding="utf-8")
         process, result = self.fixture.result(output=output)
         self.assertDecision(process, result, exit_code=2, decision="stale")
-        self.assertEqual(json.loads(output.read_text(encoding="utf-8")), result)
-        self.assertEqual(backup.read_text(encoding="utf-8"), "unrelated\n")
+        assert json.loads(output.read_text(encoding="utf-8")) == result
+        assert backup.read_text(encoding="utf-8") == "unrelated\n"
 
     def test_observed_at_is_metadata_only(self) -> None:
         plain, plain_result = self.fixture.result()
@@ -1120,10 +1084,8 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         )
         self.assertDecision(plain, plain_result, exit_code=0, decision="current")
         self.assertDecision(stamped, stamped_result, exit_code=0, decision="current")
-        self.assertEqual(
-            plain_result["comparison_digest"], stamped_result["comparison_digest"]
-        )
-        self.assertEqual(stamped_result["observed_at"], "2026-08-13T12:00:00Z")
+        assert plain_result["comparison_digest"] == stamped_result["comparison_digest"]
+        assert stamped_result["observed_at"] == "2026-08-13T12:00:00Z"
 
     def test_status_artifact_set_mismatch_is_invalid(self) -> None:
         self.fixture.status["artifactPaths"]["specs"]["existingOutputPaths"] = []
@@ -1206,7 +1168,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         )
         result = json.loads(process.stdout)
         self.assertDecision(process, result, exit_code=4, decision="invalid")
-        self.assertNotIn("SCHEMA_CANARY_MUST_NOT_APPEAR", process.stdout)
+        assert "SCHEMA_CANARY_MUST_NOT_APPEAR" not in process.stdout
 
     def test_malformed_cli_arguments_return_canonical_invalid_json(self) -> None:
         process = run(
@@ -1221,8 +1183,8 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         )
         result = json.loads(process.stdout)
         self.assertDecision(process, result, exit_code=4, decision="invalid")
-        self.assertEqual(process.stderr, "")
-        self.assertNotIn("CLI_ARGUMENT_CANARY_MUST_NOT_APPEAR", process.stdout)
+        assert process.stderr == ""
+        assert "CLI_ARGUMENT_CANARY_MUST_NOT_APPEAR" not in process.stdout
 
     def test_subprocess_surface_is_one_guarded_local_runner(self) -> None:
         source = SCRIPT.read_text(encoding="utf-8")
@@ -1240,14 +1202,14 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
             and node.func.value.id == "subprocess"
             and node.func.attr == "run"
         ]
-        self.assertEqual(len(calls), 1)
+        assert len(calls) == 1
         current: ast.AST | None = calls[0]
         while current is not None and not isinstance(
             current, (ast.FunctionDef, ast.AsyncFunctionDef)
         ):
             current = parents.get(current)
-        self.assertIsInstance(current, ast.FunctionDef)
-        self.assertEqual(current.name, "run_local")
+        assert isinstance(current, ast.FunctionDef)
+        assert current.name == "run_local"
 
         forbidden_attributes = {
             "urlopen",
@@ -1258,7 +1220,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         used_attributes = {
             node.attr for node in ast.walk(tree) if isinstance(node, ast.Attribute)
         }
-        self.assertTrue(forbidden_attributes.isdisjoint(used_attributes))
+        assert forbidden_attributes.isdisjoint(used_attributes)
 
     def test_result_contains_no_temporary_output_files(self) -> None:
         output = (
@@ -1273,7 +1235,7 @@ class ValidateAgentLlmEvidenceTests(unittest.TestCase):
         process, result = self.fixture.result(output=output)
         self.assertDecision(process, result, exit_code=0, decision="current")
         leftovers = list(output.parent.glob(f".{output.name}.*"))
-        self.assertEqual(leftovers, [])
+        assert leftovers == []
 
 
 if __name__ == "__main__":

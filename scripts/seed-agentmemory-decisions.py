@@ -14,7 +14,6 @@ Contract:
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 import sys
@@ -23,7 +22,8 @@ import urllib.parse
 import urllib.request
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
+lazy from collections.abc import Callable
 
 DEFAULT_BASE_URL = "http://localhost:3111"
 
@@ -263,7 +263,7 @@ def main() -> int:
 
     mock_existing = None
     if args.mock_file and args.mock_file.is_file():
-        with open(args.mock_file, "r", encoding="utf-8") as f:
+        with open(args.mock_file, encoding="utf-8") as f:
             mock_existing = json.load(f)
 
     report = seed_decisions(

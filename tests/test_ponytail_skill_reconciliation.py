@@ -34,7 +34,8 @@ LIVE_SKILLS_DIR = STORE_ROOT.parent.parent / ".agents" / "skills"
 
 def _load_sync_module():
     spec = importlib.util.spec_from_file_location("sync_workspace_agent_skills", SYNC_SCRIPT)
-    assert spec is not None and spec.loader is not None
+    assert spec is not None
+    assert spec.loader is not None
     mod = importlib.util.module_from_spec(spec)
     sys.modules["sync_workspace_agent_skills"] = mod
     spec.loader.exec_module(mod)
@@ -165,7 +166,7 @@ class TestClassifyRefreshBashFixtures(unittest.TestCase):
         for name, stdout, stderr, rc, expected in CANONICAL_FIXTURES:
             with self.subTest(fixture=name):
                 actual = self._run_classify_refresh(stdout, stderr, rc)
-                self.assertEqual(actual, expected, f"{name}: got {actual}, expected {expected}")
+                assert actual == expected, f"{name}: got {actual}, expected {expected}"
 
 
 class TestYamlFrontmatterAndPonytailBudgets(unittest.TestCase):
@@ -186,20 +187,18 @@ class TestYamlFrontmatterAndPonytailBudgets(unittest.TestCase):
         trimmed_lengths = []
         for slug, exp_raw in expected_raw.items():
             skill_md = LIVE_SKILLS_DIR / slug / "SKILL.md"
-            self.assertTrue(skill_md.is_file(), f"Missing {skill_md}")
+            assert skill_md.is_file(), f"Missing {skill_md}"
             metrics = sync_mod.measure_description_bytes(skill_md)
-            self.assertEqual(metrics["raw_bytes"], exp_raw, f"{slug} raw_bytes mismatch")
-            self.assertEqual(
-                metrics["trimmed_bytes"], expected_trimmed[slug], f"{slug} trimmed_bytes mismatch"
-            )
-            self.assertTrue(sync_mod.check_description_budget(skill_md, is_vendor=True))
+            assert metrics["raw_bytes"] == exp_raw, f"{slug} raw_bytes mismatch"
+            assert metrics["trimmed_bytes"] == expected_trimmed[slug], f"{slug} trimmed_bytes mismatch"
+            assert sync_mod.check_description_budget(skill_md, is_vendor=True)
             raw_lengths.append(metrics["raw_bytes"])
             trimmed_lengths.append(metrics["trimmed_bytes"])
 
-        self.assertEqual(min(raw_lengths), 142)
-        self.assertEqual(max(raw_lengths), 371)
-        self.assertEqual(min(trimmed_lengths), 141)
-        self.assertEqual(max(trimmed_lengths), 370)
+        assert min(raw_lengths) == 142
+        assert max(raw_lengths) == 371
+        assert min(trimmed_lengths) == 141
+        assert max(trimmed_lengths) == 370
 
     def test_block_scalar_variants_and_budget_helper(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -211,10 +210,8 @@ class TestYamlFrontmatterAndPonytailBudgets(unittest.TestCase):
                 "---\nname: test\ndescription: >-\n  first line\n  second line\n---\n",
                 encoding="utf-8",
             )
-            self.assertEqual(
-                sync_mod.decode_frontmatter_description(p_strip), "first line second line"
-            )
-            self.assertTrue(sync_mod.check_description_budget(p_strip, is_vendor=False))
+            assert sync_mod.decode_frontmatter_description(p_strip) == "first line second line"
+            assert sync_mod.check_description_budget(p_strip, is_vendor=False)
 
             # Literal clip (|)
             p_lit = tmp_path / "SKILL_lit.md"
@@ -222,9 +219,7 @@ class TestYamlFrontmatterAndPonytailBudgets(unittest.TestCase):
                 "---\nname: test\ndescription: |\n  line one\n  line two\n---\n",
                 encoding="utf-8",
             )
-            self.assertEqual(
-                sync_mod.decode_frontmatter_description(p_lit), "line one\nline two\n"
-            )
+            assert sync_mod.decode_frontmatter_description(p_lit) == "line one\nline two\n"
 
             # Internal skill > 60 chars fails internal budget but passes vendor budget <= 1024B
             p_mid = tmp_path / "SKILL_mid.md"
@@ -232,8 +227,8 @@ class TestYamlFrontmatterAndPonytailBudgets(unittest.TestCase):
                 f"---\nname: test\ndescription: {'a' * 120}\n---\n",
                 encoding="utf-8",
             )
-            self.assertFalse(sync_mod.check_description_budget(p_mid, is_vendor=False))
-            self.assertTrue(sync_mod.check_description_budget(p_mid, is_vendor=True))
+            assert not sync_mod.check_description_budget(p_mid, is_vendor=False)
+            assert sync_mod.check_description_budget(p_mid, is_vendor=True)
 
             # Vendor skill > 1024 bytes fails both budgets and malformed_entries
             skill_dir = tmp_path / "oversized-skill"
@@ -243,10 +238,10 @@ class TestYamlFrontmatterAndPonytailBudgets(unittest.TestCase):
                 f"---\nname: oversized-skill\ndescription: >\n  {'x' * 1050}\n---\n",
                 encoding="utf-8",
             )
-            self.assertFalse(sync_mod.check_description_budget(p_over, is_vendor=True))
+            assert not sync_mod.check_description_budget(p_over, is_vendor=True)
             findings = sync_mod.malformed_entries(tmp_path)
-            self.assertEqual(len(findings), 1)
-            self.assertIn("oversized-skill:description-exceeds-1024-bytes", findings[0])
+            assert len(findings) == 1
+            assert "oversized-skill:description-exceeds-1024-bytes" in findings[0]
 
 
 class TestHermesAndSnapshotLifecycleInTmpPath(unittest.TestCase):
@@ -365,22 +360,22 @@ class TestHermesAndSnapshotLifecycleInTmpPath(unittest.TestCase):
         broken_link.symlink_to(self.workspace / ".agents" / "skills" / "nonexistent")
 
         rc = sync_mod.main(self._cli_args())
-        self.assertEqual(rc, 0)
+        assert rc == 0
 
         for slug in sync_mod.PONYTAIL_SKILLS:
             link = hermes_dir / slug
-            self.assertTrue(link.is_symlink(), f"Expected symlink at {link}")
-            self.assertEqual(
-                Path(os.path.realpath(link)),
-                (self.workspace / ".agents" / "skills" / slug).resolve(),
-            )
+            assert link.is_symlink(), f"Expected symlink at {link}"
+            assert Path(os.path.realpath(link)) == (self.workspace / ".agents" / "skills" / slug).resolve()
 
-        self.assertTrue(native_dir.is_dir() and not native_dir.is_symlink())
-        self.assertTrue(unlisted_link.is_symlink() and unlisted_link.exists())
-        self.assertFalse(broken_link.exists() or broken_link.is_symlink())
+        assert native_dir.is_dir()
+        assert not native_dir.is_symlink()
+        assert unlisted_link.is_symlink()
+        assert unlisted_link.exists()
+        assert not (broken_link.exists())
+        assert not (broken_link.is_symlink())
 
         # --check must pass with rc=0
-        self.assertEqual(sync_mod.main(self._cli_args("--check")), 0)
+        assert sync_mod.main(self._cli_args("--check")) == 0
 
         # Removing ponytail-gain from hermes-user-skill-manifest.txt prunes ponytail-gain
         # (because it was tracked in .hermes-managed-links.txt) while still preserving extra-ws-skill
@@ -388,35 +383,33 @@ class TestHermesAndSnapshotLifecycleInTmpPath(unittest.TestCase):
         (self.store / "config" / "hermes-user-skill-manifest.txt").write_text(
             "\n".join(reduced) + "\n", encoding="utf-8"
         )
-        self.assertEqual(sync_mod.main(self._cli_args()), 0)
-        self.assertFalse((hermes_dir / "ponytail-gain").is_symlink())
-        self.assertTrue(unlisted_link.is_symlink())
+        assert sync_mod.main(self._cli_args()) == 0
+        assert not (hermes_dir / "ponytail-gain").is_symlink()
+        assert unlisted_link.is_symlink()
 
     def test_bootstrap_accept_refresh_drift_detection_and_recovery(self):
         # First reconcile symlinks
-        self.assertEqual(sync_mod.main(self._cli_args()), 0)
+        assert sync_mod.main(self._cli_args()) == 0
 
         # 1. Bootstrap snapshot
-        self.assertEqual(sync_mod.main(self._cli_args("--bootstrap-snapshot")), 0)
+        assert sync_mod.main(self._cli_args("--bootstrap-snapshot")) == 0
         snap_root = self.workspace / ".agents" / ".skill-snapshots"
         current_manifest_path = snap_root / "current" / "manifest.json"
         previous_manifest_path = snap_root / "previous" / "manifest.json"
         replica_lock = self.workspace / ".agents" / "skills-lock.json"
 
-        self.assertTrue(current_manifest_path.is_file())
-        self.assertTrue(previous_manifest_path.is_file())
-        self.assertTrue(replica_lock.is_file())
-        self.assertEqual(
-            replica_lock.read_bytes(), (self.workspace / "skills-lock.json").read_bytes()
-        )
+        assert current_manifest_path.is_file()
+        assert previous_manifest_path.is_file()
+        assert replica_lock.is_file()
+        assert replica_lock.read_bytes() == (self.workspace / "skills-lock.json").read_bytes()
 
         m_data = json.loads(current_manifest_path.read_text(encoding="utf-8"))
-        self.assertEqual(m_data["skills"]["ponytail"]["source_revision"], "unknown")
-        self.assertFalse(m_data["skills"]["ponytail"]["upstream_verified"])
-        self.assertIn(m_data["skills"]["ponytail"]["description_bytes"], range(142, 372))
+        assert m_data["skills"]["ponytail"]["source_revision"] == "unknown"
+        assert not m_data["skills"]["ponytail"]["upstream_verified"]
+        assert m_data["skills"]["ponytail"]["description_bytes"] in range(142, 372)
 
         # --check passes when snapshot and replica match live state
-        self.assertEqual(sync_mod.main(self._cli_args("--check")), 0)
+        assert sync_mod.main(self._cli_args("--check")) == 0
 
         # 2. Simulate manual CLI update (updates root skills-lock.json + ponytail/SKILL.md)
         ponytail_md = self.workspace / ".agents" / "skills" / "ponytail" / "SKILL.md"
@@ -433,23 +426,19 @@ class TestHermesAndSnapshotLifecycleInTmpPath(unittest.TestCase):
         )
 
         # Before --accept-refresh, --check MUST detect unaccepted manual CLI drift and fail
-        self.assertEqual(sync_mod.main(self._cli_args("--check")), 1)
+        assert sync_mod.main(self._cli_args("--check")) == 1
         # Default link-sync must NOT overwrite .agents/skills-lock.json
-        self.assertEqual(sync_mod.main(self._cli_args()), 0)
-        self.assertNotEqual(
-            replica_lock.read_bytes(), (self.workspace / "skills-lock.json").read_bytes()
-        )
+        assert sync_mod.main(self._cli_args()) == 0
+        assert replica_lock.read_bytes() != (self.workspace / "skills-lock.json").read_bytes()
 
         # 3. Run --accept-refresh: rotates current -> previous, writes new current, updates replica
-        self.assertEqual(sync_mod.main(self._cli_args("--accept-refresh")), 0)
+        assert sync_mod.main(self._cli_args("--accept-refresh")) == 0
         prev_m = json.loads(previous_manifest_path.read_text(encoding="utf-8"))
         curr_m = json.loads(current_manifest_path.read_text(encoding="utf-8"))
-        self.assertEqual(prev_m["skills"]["ponytail"]["computedHash"], old_hash)
-        self.assertEqual(curr_m["skills"]["ponytail"]["computedHash"], new_hash)
-        self.assertEqual(
-            replica_lock.read_bytes(), (self.workspace / "skills-lock.json").read_bytes()
-        )
-        self.assertEqual(sync_mod.main(self._cli_args("--check")), 0)
+        assert prev_m["skills"]["ponytail"]["computedHash"] == old_hash
+        assert curr_m["skills"]["ponytail"]["computedHash"] == new_hash
+        assert replica_lock.read_bytes() == (self.workspace / "skills-lock.json").read_bytes()
+        assert sync_mod.main(self._cli_args("--check")) == 0
 
         # 4. Simulate partial mutation / corrupt refresh (tamper with ponytail-debt & lockfile,
         # while modifying untracked local-untracked skill)
@@ -462,26 +451,26 @@ class TestHermesAndSnapshotLifecycleInTmpPath(unittest.TestCase):
         untracked_md.write_text(untracked_custom, encoding="utf-8")
 
         # --accept-refresh must fail closed and refuse to update replica
-        self.assertEqual(sync_mod.main(self._cli_args("--accept-refresh")), 1)
-        self.assertEqual(sync_mod.main(self._cli_args("--check")), 1)
+        assert sync_mod.main(self._cli_args("--accept-refresh")) == 1
+        assert sync_mod.main(self._cli_args("--check")) == 1
 
         # 5. --recover-from-snapshot restores ponytail-debt to good_debt_bytes
         # while leaving local-untracked untouched!
-        self.assertEqual(sync_mod.main(self._cli_args("--recover-from-snapshot")), 0)
-        self.assertEqual(debt_md.read_bytes(), good_debt_bytes)
-        self.assertEqual(untracked_md.read_text(encoding="utf-8"), untracked_custom)
-        self.assertEqual(sync_mod.main(self._cli_args("--check")), 0)
+        assert sync_mod.main(self._cli_args("--recover-from-snapshot")) == 0
+        assert debt_md.read_bytes() == good_debt_bytes
+        assert untracked_md.read_text(encoding="utf-8") == untracked_custom
+        assert sync_mod.main(self._cli_args("--check")) == 0
 
         # 6. Surface check rejects agent/skills and data/skills while allowing data/updates
         (self.workspace / "data" / "updates").mkdir(parents=True)
         (self.workspace / "data" / "updates" / "2026-10-19.json").write_text("{}", encoding="utf-8")
-        self.assertEqual(sync_mod.check_workspace_agent_surface(self.workspace), [])
+        assert sync_mod.check_workspace_agent_surface(self.workspace) == []
 
         (self.workspace / "agent" / "skills").mkdir(parents=True)
         (self.workspace / "data" / "skills").mkdir(parents=True)
         violations = sync_mod.check_workspace_agent_surface(self.workspace)
-        self.assertEqual(violations, ["agent", "data/skills"])
-        self.assertEqual(sync_mod.main(self._cli_args("--check")), 1)
+        assert violations == ["agent", "data/skills"]
+        assert sync_mod.main(self._cli_args("--check")) == 1
 
 
 if __name__ == "__main__":
