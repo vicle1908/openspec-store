@@ -1,0 +1,49 @@
+# Proposal
+
+## Why
+
+A full-stack behavioral evaluation of live OmniRoute (`v3.8.52`) after the Voyage AI subscription upgrade (`0` HTTP `429`s across `6,764` post-`10:18Z` calls) and the 3-Ultra-account `gemini-4-argon*` expansion surfaced four critical performance and quota-isolation bottlenecks:
+
+1. **Uncached Qdrant Embeddings, Leaked Health-Check Points & FTS5 32-Word `AND` in Hybrid Memory**:
+   - `src/lib/memory/qdrant.ts:embedText()` (`chunks/54843.js`) calls `createEmbeddingResponse()` directly without an in-memory LRU cache, firing an uncached ~1,060 ms remote `voyage-ai/voyage-code-3` HTTP call on every chat turn.
+   - `src/lib/memory/retrieval/scoring.ts:sanitizeFts5Query()` (`chunks/54843.js` module `541915`) joins 32 prompt words as an implicit FTS5 `AND`, while all 7 SQLite `memories` rows are pre-`10:18Z` regex-scraped fragments with `needs_reindex = 1` and `0` operator points in Qdrant (plus 2 leaked `apiKeyId: "health-check"` points from `verifyExtractionPipeline`). Consequently, Qdrant (`0` operator points) and FTS5 (`0` hits) both return empty and trigger a second `voyage-ai/voyage-code-3` fallback embed on the same turn, while `skillsEnabled: true` in `key_value` re-enables `memory_*` tool injection.
+2. **`gemini-3.8-flash-high` Draining the 3 Ultra Accounts' Weekly Gemini Quota & Missing `rateLimitProtection`**:
+   - `gemini-3.8-flash-high` (`7555d851-b4f3-44c6-b1fb-c6fdceabf388`) currently uses `strategy: "context-relay"` (`context_cache_protection: null`) across all 15 `agy` accounts, routing 1,113 Flash requests in 6 hours through the 3 Google AI Ultra accounts (`62af823b`, `0532bad4`, `338764b8`) and draining their shared `gemini_weekly` quota (`0532bad4` at 0%, `338764b8` at 7%, `62af823b` at 24%) while the 11 `g1-pro-tier` accounts sit at 67–100% quota. In addition, `0532bad4` (`vinhvumobile@gmail.com`) and `338764b8` (`vinhghtk1908@gmail.com`) have `rateLimitProtection: false` in `/api/rate-limits`.
+3. **Timeout Drift on `claude-opus-5.5`, `claude-sonnet-5.5`, `kimi-k3.1-pro` & `deepseek-v4.1-flash`**:
+   - When `configure-claude-combos-antigravity-pools` updated `claude-opus-5.5` (`15` `agy/claude-opus-4-6-thinking` steps) and `claude-sonnet-5.5` (`15` `agy/claude-sonnet-4-6` steps) at `15:10:03Z`, it set `targetTimeoutMs: 25000` and `predictiveTtftMs: 25000` (overwriting the `180000 / 60000` deep-reasoning timeout on `claude-opus-5.5`), and `kimi-k3.1-pro` (`maxDur: 74.4s`, `maxTtft: 34.0s`) and `deepseek-v4.1-flash` (`maxDur: 80.3s`, `maxTtft: 79.9s`) on Nexus (`nx`) also still have `targetTimeoutMs: 25000` and `maxRetries: null`.
+4. **Unentitled 5.5 Custom Models, Expired `ollama-cloud` Connection, `.env` / Semantic Cache Bridge & Entrypoint/SQLite Hygiene**:
+   - `/api/provider-models` still registers custom `claude-opus-5-5-high` and `claude-sonnet-5-5-high` on `agy`/`antigravity` (plus alias `test-opus-55-high`), causing `auto/*` combos to hit non-existent 5.5 endpoints (59 HTTP `429`s in 6h) and marking all 15 `antigravity` accounts `degraded` in `GET /api/providers/health-matrix`.
+   - Expired connection `6fb701a5` (`ollama-cloud`, `401`) remains `isActive: true`, and `auto/*` `candidatePool` includes unstable `ollama-cloud`, `uncloseai`, `anthropic-compatible-6408e370-2373-4ae0-9942-7f4095ba976c` (`phanmemvip`), and `muse-code`; `/Users/androidteam/Omniroute/.env` uses unread `OMNIROUTE_SEMANTIC_CACHE_TIMEOUT_MS=3000` instead of `OMNIROUTE_SEMANTIC_CACHE_EMBEDDING_TIMEOUT_MS=3000`; `getSemanticCacheManager()` does not auto-initialize `ensureSemanticCacheDbBridge()` on `/v1/responses` or `/v1/messages` cold starts; `container-entrypoint-compat.sh` skips missing chunk numbers (`if (matchedFiles.length === 0) continue;`) and omits 8 core rule markers; and `storage.sqlite` (`507.7 MB`) retains 1,744 expired `semantic_cache` rows and 277,051 `conversation_turn_nodes` rows (`193.1 MB`).
+
+## What Changes
+
+- **Package 1 — Optimize Paid Voyage AI + Qdrant Hybrid Memory (`container-entrypoint-compat.sh` & `/api/settings/memory`)**:
+  - Set `PUT /api/settings/memory` to `{"enabled":true,"maxTokens":2000,"retentionDays":60,"strategy":"hybrid","skillsEnabled":false,"embeddingSource":"remote","embeddingProviderModel":"voyage-ai/voyage-code-3","rerankEnabled":true,"rerankProviderModel":"voyage-ai/rerank-2.5","vectorStore":"qdrant"}` (enforcing `skillsEnabled: false`).
+  - Patch `qdrant.ts:embedText()` (`chunks/54843.js`) via `container-entrypoint-compat.sh` to check and populate a process-wide `globalThis.__omnirouteQdrantEmbedCache` LRU `Map` (capacity `1,000`, TTL `300,000 ms`) before calling `createEmbeddingResponse()`, short-circuit `upsertSemanticMemoryPoint` when `a.apiKeyId === "health-check"` so `/api/memory/health` never leaks orphaned points into Qdrant, and patch `sanitizeFts5Query()` (`chunks/54843.js` module `541915`) to join filtered tokens (`length > 2`) with `" OR "` instead of implicit 32-word `" "` (`AND`).
+  - Delete all 7 pre-`10:18Z` regex-scraped fragments from SQLite `memories` (`DELETE /api/memory/{id}`), delete the 2 leaked `health-check` points from Qdrant `omniroute_memory`, and seed a clean workspace architecture memory via `POST /api/memory` so both Qdrant (`points_count: 1`) and `vec_memories` (`needsReindex: 0`) are populated.
+- **Package 2 — Reserve 3 Ultra Accounts Exclusively for `gemini-4-argon*` & Switch `gemini-3.8-flash-high` to `auto` Across the 11 Pro Accounts**:
+  - Enable `rateLimitProtection: true` on `0532bad4-2486-4286-8f06-510e9c678620` (`vinhvumobile@gmail.com`) and `338764b8-1cd7-4946-b789-ee5dad4c5073` (`vinhghtk1908@gmail.com`) via `POST /api/rate-limits` (`{"connectionId": "<id>", "enabled": true}`) so both in-memory `rateLimitManager` state and SQLite report `rateLimitProtection: true` across all 14 active `agy` accounts.
+  - Update `gemini-3.8-flash-high` (`7555d851-b4f3-44c6-b1fb-c6fdceabf388`) from `strategy: "context-relay"` (`15` steps) to `strategy: "auto"`, `context_cache_protection: false`, and **11 `kind: "model"` steps** scoped strictly to the 11 active `g1-pro-tier` `agy` connections (excluding the 3 `g1-ultra-tier` accounts `62af823b`, `0532bad4`, `338764b8` and the exhausted `free-tier` account `ce95e1cb`), preserving 100% of Ultra Gemini quota for `gemini-4-argon*`.
+- **Package 3 — Align Timeouts on Claude & Nexus Combos + Archive `configure-claude-combos-antigravity-pools`**:
+  - Update `claude-opus-5.5` (`4b2430da-0b3b-4b0e-9773-ec0f97adc252`, 15 `agy/claude-opus-4-6-thinking` steps) to `targetTimeoutMs: 180000` and `predictiveTtftMs: 60000`.
+  - Update `claude-sonnet-5.5` (`9447399c-856b-4f52-8820-b3bf3dc3f132`, 15 `agy/claude-sonnet-4-6` steps), `kimi-k3.1-pro` (`c9a838ef-a011-4a21-8d73-c577cfa9a628`), and `deepseek-v4.1-flash` (`c028902e-60f1-4df2-8e81-cf4ea317c37e`) to `targetTimeoutMs: 120000`, `predictiveTtftMs: 45000`, and `maxRetries: 1`.
+  - Sync and archive the completed `configure-claude-combos-antigravity-pools` change in `openspec-store`.
+- **Package 4 — Clean Up Unentitled 5.5 Custom Models, Expired `ollama-cloud`, `.env`, Entrypoint Markers & SQLite Bloat**:
+  - Remove custom `claude-opus-5-5-high` and `claude-sonnet-5-5-high` from `/api/provider-models` (`DELETE /api/provider-models?provider=agy&model=...` and `provider=antigravity`) and delete alias `test-opus-55-high`.
+  - Set `isActive: false` on expired connection `6fb701a5-d060-422c-bc34-0cca543d0eda` (`ollama-cloud`) while keeping `phanmemvip` (`f3aaa87c`) and `muse-code` (`51795cf9`) active for their dedicated combos (`phanmemvip` and `muse-spark-1.3`), and restrict `auto/*` combos' `config.candidatePool` to `["agy", "codex", "github"]`.
+  - Rename `OMNIROUTE_SEMANTIC_CACHE_TIMEOUT_MS=3000` to `OMNIROUTE_SEMANTIC_CACHE_EMBEDDING_TIMEOUT_MS=3000` (and add `OMNIROUTE_SEMANTIC_CACHE_TTL_MS=18000000`) in `/Users/androidteam/Omniroute/.env`, wire `ensureSemanticCacheDbBridge()` into `getSemanticCacheManager()` for `/v1/responses` and `/v1/messages` cold starts, harden `container-entrypoint-compat.sh` to fail closed across all patch markers without `if (matchedFiles.length === 0) continue;`, and prune expired `semantic_cache` rows + old `conversation_turn_nodes` rows (`WAL` checkpoint) in `storage.sqlite`.
+
+## Capabilities
+
+### New Capabilities
+- None.
+
+### Modified Capabilities
+- `omniroute-compression-and-routing`: Add requirements for cached Qdrant `embedText()` (`globalThis.__omnirouteQdrantEmbedCache`), `health-check` Qdrant point guard, FTS5 `OR` tokenization (`chunks/54843.js`), 11-Pro-account `gemini-3.8-flash-high` (`strategy: "auto"`, `context_cache_protection: false`) isolated from the 3 Ultra accounts, tier-appropriate `targetTimeoutMs` / `predictiveTtftMs` on `claude-opus-5.5` (`180000 / 60000`) and `claude-sonnet-5.5` / `kimi-k3.1-pro` / `deepseek-v4.1-flash` (`120000 / 45000`), and fail-closed entrypoint marker verification.
+- `omniroute-agent-cli-routing`: Update `gemini-3.8-flash-high`, `claude-opus-5.5` (`15` `agy/claude-opus-4-6-thinking` steps), and `claude-sonnet-5.5` (`15` `agy/claude-sonnet-4-6` steps) pool requirements, mandate `rateLimitProtection: true` across all 14 active `agy` accounts (3 Ultra + 11 Pro), and forbid unentitled custom `claude-*-5-5-high` entries in `/api/provider-models`.
+
+## Impact
+
+- Cuts Hybrid Memory per-turn Voyage AI embedding latency from ~2.1s (2 uncached calls) to `<0.1ms` on cache hits and 1 call on cache misses, with `needsReindex: 0` and populated Qdrant `int8` vectors.
+- Reserves 100% of the 3 Google AI Ultra accounts' weekly Gemini quota for `gemini-4-argon*` while routing `gemini-3.8-flash-high` across the 11 `g1-pro-tier` accounts via 16-factor `auto` scoring.
+- Prevents premature 25s timeout aborts on `claude-opus-5.5` (`claude-opus-4-6-thinking`), `claude-sonnet-5.5`, `kimi-k3.1-pro`, and `deepseek-v4.1-flash`, and restores 100% healthy `auto/*` provider selection without breaking `phanmemvip` or `muse-spark-1.3`.
