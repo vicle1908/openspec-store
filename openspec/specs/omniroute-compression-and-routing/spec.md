@@ -236,7 +236,7 @@ OmniRoute SHALL separate configuration across SQLite runtime tables, ~/Omniroute
 
 ### Requirement: Three-Ultra-Account Gemini-4-Argon Combo Routing
 
-OmniRoute SHALL configure `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, and `gemini-4-argon-low` combos with explicit connection-scoped model steps (`kind: "model"`, `providerId: "agy"`, `weight: 0`, and non-empty account email `label`) for all 3 active Google AI Ultra Antigravity accounts (`62af823b-f3d7-4e6b-87a9-98069167d4f6` / `vicgnome19094@gmail.com`, `0532bad4-2486-4286-8f06-510e9c678620` / `vinhvumobile@gmail.com`, `338764b8-1cd7-4946-b789-ee5dad4c5073` / `vinhghtk1908@gmail.com`), preserving `strategy: "auto"`, `context_cache_protection: false`, and `config.targetTimeoutMs: 25000`.
+OmniRoute SHALL configure `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, and `gemini-4-argon-low` combos with explicit connection-scoped model steps (`kind: "model"`, `providerId: "agy"`, `weight: 0`, and non-empty account email `label`) for all 3 active Google AI Ultra Antigravity accounts (`62af823b-f3d7-4e6b-87a9-98069167d4f6` / `vicgnome19094@gmail.com`, `0532bad4-2486-4286-8f06-510e9c678620` / `vinhvumobile@gmail.com`, `338764b8-1cd7-4946-b789-ee5dad4c5073` / `vinhghtk1908@gmail.com`), preserving `strategy: "auto"`, `context_cache_protection: false`, and `config.targetTimeoutMs: 180000`.
 
 #### Scenario: All three Ultra accounts present in every gemini-4-argon* combo
 - **WHEN** `GET /api/combos/{id}` is queried for `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, or `gemini-4-argon-low`
@@ -245,7 +245,7 @@ OmniRoute SHALL configure `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-arg
 
 #### Scenario: Live gemini-4-argon inference succeeds with 3 Ultra accounts
 - **WHEN** a completion request is sent to `gemini-4-argon` or `gemini-4-argon-high` (or when one Ultra account returns `HTTP 429`)
-- **THEN** OmniRoute SHALL route across the 3 Ultra accounts with `HTTP 200` and bound any single stalled upstream target attempt to `25,000 ms`
+- **THEN** OmniRoute SHALL route across the 3 Ultra accounts with `HTTP 200` and bound any single stalled upstream target attempt to `180,000 ms`
 
 ### Requirement: Multi-Agent Heavyweight Chat Admission Concurrency and Composite-Combo Prune Protection
 
