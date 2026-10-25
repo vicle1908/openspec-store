@@ -140,7 +140,7 @@ OmniRoute SHALL disable `caveman` (`engines.caveman.enabled: false`, `cavemanCon
 
 ### Requirement: Predictive TTFT Circuit Breaker, Unleased 2-Account Pool Concurrency, and Subscription-Scoped Ban Auto-Disable
 
-OmniRoute SHALL enable `zeroLatencyOptimizationsEnabled: true` (`predictiveTtftMs: 25000`, `targetTimeoutMs: 25000`, `hedging: false`, `fallbackCompressionMode: "off"`) in `/api/settings/combo-defaults` and `agy` combos (`gemini-3.8-flash-high`, `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, `gemini-4-argon-low`, `claude-opus-5.5`, `muse-spark-1.3`), set `ANTIGRAVITY_ACCOUNT_LEASE_ENABLED` to `"false"`, and configure `/api/settings/auto-disable-accounts` (`enabled: true`, `scope: "subscription"`, `threshold: 3`).
+OmniRoute SHALL enable `zeroLatencyOptimizationsEnabled: true` (`predictiveTtftMs: 25000`, `targetTimeoutMs: 25000`, `hedging: false`, `fallbackCompressionMode: "off"`) in `/api/settings/combo-defaults` and all `agy` combos, set `ANTIGRAVITY_ACCOUNT_LEASE_ENABLED` to `"false"`, and configure `/api/settings/auto-disable-accounts` (`enabled: true`, `scope: "subscription"`, `threshold: 3`).
 
 #### Scenario: Stalled target exceeding 25-second average latency skipped on attempt 0 without fallback re-truncation
 - **WHEN** `zeroLatencyOptimizationsEnabled` is `true` (`predictiveTtftMs: 25000`, `targetTimeoutMs: 25000`, `hedging: false`, `fallbackCompressionMode: "off"`) and a target's historical `avgLatencyMs` in `getComboMetrics` exceeds 25,000 milliseconds
@@ -236,7 +236,7 @@ OmniRoute SHALL separate configuration across SQLite runtime tables, ~/Omniroute
 
 ### Requirement: Three-Ultra-Account Gemini-4-Argon Combo Routing
 
-OmniRoute SHALL configure `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, and `gemini-4-argon-low` combos with explicit connection-scoped model steps (`kind: "model"`, `providerId: "agy"`, `weight: 0`, and non-empty account email `label`) for all 3 active Google AI Ultra Antigravity accounts (`62af823b-f3d7-4e6b-87a9-98069167d4f6` / `vicgnome19094@gmail.com`, `0532bad4-2486-4286-8f06-510e9c678620` / `vinhvumobile@gmail.com`, `338764b8-1cd7-4946-b789-ee5dad4c5073` / `vinhghtk1908@gmail.com`), preserving `strategy: "auto"`, `context_cache_protection: false`, and `config.targetTimeoutMs: 180000`.
+OmniRoute SHALL configure `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, and `gemini-4-argon-low` combos with explicit connection-scoped model steps for all 3 active Google AI Ultra Antigravity accounts (`62af823b-f3d7-4e6b-87a9-98069167d4f6`, `0532bad4-2486-4286-8f06-510e9c678620`, `338764b8-1cd7-4946-b789-ee5dad4c5073`), preserving `strategy: "auto"` and setting `context_cache_protection: false`.
 
 #### Scenario: All three Ultra accounts present in every gemini-4-argon* combo
 - **WHEN** `GET /api/combos/{id}` is queried for `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, or `gemini-4-argon-low`
@@ -258,3 +258,24 @@ OmniRoute SHALL configure `OMNIROUTE_CHAT_MAX_HEAVY_IN_FLIGHT=16` and `OMNIROUTE
 #### Scenario: Composite combo with trailing `combo-ref` retains explicit model steps across catalog syncs
 - **WHEN** `COMBO_AUTO_PRUNE_STALE_STEPS` is `"false"` in `GET /api/settings/feature-flags` and scheduled provider model sync runs
 - **THEN** OmniRoute SHALL preserve all explicit `kind: "model"` steps in `claude-opus-5.5` ahead of its `combo-ref: gemini-3.8-flash-high` fallback
+
+### Requirement: Multi-Account Claude Opus and Sonnet Combo Pooling across Antigravity Accounts
+
+OmniRoute SHALL configure `claude-opus-5.5` and `claude-sonnet-5.5` combos to pool all 15 active Antigravity OAuth connections across explicit connection-scoped model steps (`agy/claude-opus-4-6-thinking` and `agy/claude-sonnet-4-6`) with `strategy: "auto"`, `candidatePool: ["agy"]`, and `context_cache_protection: false`, and SHALL preserve the 15-account topology for upstream 5.5 model cutover.
+
+#### Scenario: Claude Opus 5.5 combo pools all 15 Antigravity accounts
+- **WHEN** `GET /api/combos/{id}` is queried for `claude-opus-5.5` (`4b2430da-0b3b-4b0e-9773-ec0f97adc252`)
+- **THEN** OmniRoute SHALL return a combo with 15 explicit model steps targeting `agy/claude-opus-4-6-thinking` (one for each active `agy` connection), with `strategy: "auto"`, `candidatePool: ["agy"]`, and `context_cache_protection: false`
+
+#### Scenario: Claude Sonnet 5.5 combo pools all 15 Antigravity accounts
+- **WHEN** `GET /api/combos/{id}` is queried for `claude-sonnet-5.5` (`9447399c-856b-4f52-8820-b3bf3dc3f132`)
+- **THEN** OmniRoute SHALL return a combo with 15 explicit model steps targeting `agy/claude-sonnet-4-6` (one for each active `agy` connection), with `strategy: "auto"`, `candidatePool: ["agy"]`, and `context_cache_protection: false`
+
+#### Scenario: Live chat completions route through multi-account Claude combos to authentic Claude models
+- **WHEN** `POST /v1/chat/completions` is called with `model: "claude-opus-5.5"` or `model: "claude-sonnet-5.5"`
+- **THEN** OmniRoute SHALL return HTTP 200 with a completion served by `claude-opus-4-6-thinking` or `claude-sonnet-4-6` on one of the 15 active Antigravity accounts
+
+#### Scenario: Upstream Claude 5.5 model cutover contract
+- **WHEN** upstream Google Antigravity provisions and advertises `claude-opus-5-5-*` or `claude-sonnet-5-5-*` in its live discovery catalog
+- **THEN** OmniRoute SHALL update the explicit model steps in `claude-opus-5.5` and `claude-sonnet-5-5` combos from 4.6 to the corresponding 5.5 identifiers while preserving all 15 connection mappings
+
