@@ -6,20 +6,45 @@
     {
       "name": "graphifyy",
       "package": "graphifyy",
-      "version": "latest",
+      "source": "pypi",
+      "version": "0.9.95",
+      "extras": [
+        "mcp",
+        "watch",
+        "office",
+        "pdf",
+        "postgres"
+      ],
       "description": "Graphify knowledge graph CLI"
     },
     {
       "name": "tavily-cli",
       "package": "tavily-cli",
+      "source": "pypi",
       "version": "latest",
       "description": "Tavily search CLI"
     },
     {
       "name": "browser-use",
       "package": "browser-use @ git+https://github.com/browser-use/browser-use.git",
+      "source": "git+https://github.com/browser-use/browser-use.git",
       "version": "latest",
-      "description": "Browser Use CLI and Cloud V4 agent/browser harness"
+      "description": "Browser Use interactive CDP and cloud automation CLI"
+    },
+    {
+      "name": "infinity-emb",
+      "package": "infinity-emb",
+      "source": "pypi",
+      "version": "latest",
+      "extras": [
+        "server"
+      ],
+      "with": [
+        "requests",
+        "huggingface-hub<1.0",
+        "click<8.2"
+      ],
+      "description": "Infinity embedding server CLI"
     }
   ]
 }

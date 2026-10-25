@@ -47,3 +47,11 @@ The system MUST allow local durable execution validation to succeed when the DBO
 #### Scenario: DBOS_DATABASE_URL satisfies durable execution validation
 - **WHEN** `crash_recovery.enabled=true` and `DBOS_DATABASE_URL` is set
 - **THEN** required-secret validation MUST succeed even if `POSTGRES_URL` is unset
+
+### Requirement: Python 3.15.1 and uv 0.13.5 App Container Image Baseline
+The `agent-core` local development Docker Compose stack SHALL build the `app` service from `python:3.15.1-slim-trixie` using `ghcr.io/astral-sh/uv:0.13.5` to satisfy `requires-python = ">=3.15"` and `required-version = ">=0.13.5"` in `pyproject.toml`.
+
+#### Scenario: Local development stack uses Python 3.15.1 and uv 0.13.5
+- **WHEN** the `agent-core` local Docker Compose configuration is inspected
+- **THEN** the `app` image SHALL build from `python:3.15.1-slim-trixie` with `ghcr.io/astral-sh/uv:0.13.5`
+- **AND** the `postgres` service SHALL retain `postgres:18.6-trixie` with its PostgreSQL-18-versioned named volume.

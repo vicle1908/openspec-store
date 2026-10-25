@@ -137,6 +137,7 @@ class TestLayeredProfiles(unittest.TestCase):
         assert "graphifyy" in names
         assert "tavily-cli" in names
         assert "browser-use" in names
+        assert "infinity-emb" in names
     def test_capability_profiles_exist(self):
         db_prof = CONFIG_DIR / "db-tools-profile.json"
         rust_prof = CONFIG_DIR / "rust-dev-profile.json"
