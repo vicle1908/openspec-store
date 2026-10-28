@@ -847,7 +847,7 @@ except Exception:
     echo "    No script drift found: every executed script matches its recorded mirror."
   fi
   TCC_DRIFT=0
-  verify_tcc_provenance || TCC_DRIFT=1
+  verify_tcc_provenance --bundles || TCC_DRIFT=1
 
   # 8. Snapshot Store Growth Bounds
   echo ""

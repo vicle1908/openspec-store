@@ -52,6 +52,17 @@ FDA_REQUIRED_TCC_CLIS: tuple[str, ...] = ("herdr", "omp")
 SHARED_PYTHON_AUTOMATION_BINARY = "python3"
 DEFAULT_TCC_DB_PATH = Path("/Library/Application Support/com.apple.TCC/TCC.db")
 
+CANONICAL_TCC_BUNDLES: dict[str, tuple[str, str, tuple[str, ...]]] = {
+    "org.python.python": ("Python.app", "shared_host_python_bundle_automation", ALL_THREE_TCC_SERVICES),
+    "com.stablyai.orca": ("/Applications/Orca.app", "orchestrator_bundle", ALL_THREE_TCC_SERVICES),
+    "com.trycua.driver": ("/Applications/CuaDriver.app", "computer_use_driver", ALL_THREE_TCC_SERVICES),
+    "com.electron.goose": ("/Applications/Goose.app", "canonical_agent_bundle", ALL_THREE_TCC_SERVICES),
+    "ai.opencode.desktop": ("/Applications/OpenCode.app", "canonical_agent_bundle", ("kTCCServiceAccessibility", FULL_DISK_ACCESS_SERVICE)),
+    "com.openai.codex": ("/Applications/ChatGPT.app", "canonical_agent_bundle", ALL_THREE_TCC_SERVICES),
+    "com.nousresearch.hermes": ("/Applications/Hermes.app", "host_agent_bundle", ALL_THREE_TCC_SERVICES),
+    "org.p0deje.Maccy": ("/Applications/Maccy.app", "utility_bundle", ("kTCCServiceAccessibility", "kTCCServicePostEvent")),
+}
+
 STANDARD_PATH = (
     "/opt/homebrew/bin:/opt/homebrew/sbin:"
     "/opt/homebrew/opt/libpq/bin:"
@@ -387,6 +398,66 @@ def build_required_targets(
             )
             continue
 
+        if raw_item.startswith("bundle:"):
+            b_spec = raw_item[7:].strip()
+            if "=" in b_spec:
+                b_id, b_path_str = b_spec.split("=", 1)
+                b_id = b_id.strip()
+                app_p = Path(os.path.realpath(b_path_str.strip()))
+            else:
+                b_id = b_spec
+                app_hint = CANONICAL_TCC_BUNDLES.get(b_id, (f"/Applications/{b_id}.app",))[0]
+                app_p = Path(app_hint)
+            exec_name = app_p.stem
+            info_p = app_p / "Contents" / "Info.plist"
+            if info_p.is_file():
+                try:
+                    data = plistlib.loads(info_p.read_bytes())
+                    exec_name = data.get("CFBundleExecutable") or exec_name
+                except Exception:
+                    pass
+            exec_p = app_p / "Contents" / "MacOS" / exec_name
+            role = CANONICAL_TCC_BUNDLES.get(b_id, ("", "canonical_agent_bundle", REQUIRED_TCC_SERVICES))[1]
+            svcs = CANONICAL_TCC_BUNDLES.get(b_id, ("", "", REQUIRED_TCC_SERVICES))[2]
+            specs.append(
+                TCCRecordAudit(
+                    name=b_id,
+                    role=role,
+                    client=b_id,
+                    client_type=0,
+                    target_path=str(app_p),
+                    executable_path=str(exec_p),
+                    required_services=list(svcs),
+                )
+            )
+            continue
+
+        if raw_item in CANONICAL_TCC_BUNDLES and raw_item != "org.python.python":
+            app_hint, b_role, svcs = CANONICAL_TCC_BUNDLES[raw_item]
+            app_p = Path(app_hint)
+            if app_p.is_dir():
+                exec_name = app_p.stem
+                info_p = app_p / "Contents" / "Info.plist"
+                if info_p.is_file():
+                    try:
+                        data = plistlib.loads(info_p.read_bytes())
+                        exec_name = data.get("CFBundleExecutable") or exec_name
+                    except Exception:
+                        pass
+                exec_p = app_p / "Contents" / "MacOS" / exec_name
+                specs.append(
+                    TCCRecordAudit(
+                        name=raw_item,
+                        role=b_role,
+                        client=raw_item,
+                        client_type=0,
+                        target_path=str(app_p),
+                        executable_path=str(exec_p),
+                        required_services=list(svcs),
+                    )
+                )
+                continue
+
         if raw_item == "org.python.python":
             py_which = shutil.which(SHARED_PYTHON_AUTOMATION_BINARY, path=eff_path)
             bundle_info = (
@@ -497,6 +568,7 @@ def verify_tcc_provenance(
     *,
     search_path: str | None = None,
     include_python_automation: bool | None = None,
+    bundles: bool = False,
 ) -> dict[str, Any]:
     """Verify active canonical coding agent CLIs and shared Python automation identities in TCC.db."""
     if sys.platform != "darwin":
@@ -508,8 +580,12 @@ def verify_tcc_provenance(
     if not tcc_db.is_file() or not os.access(tcc_db, os.R_OK):
         return _tcc_result("ERROR", reason=f"TCC.db not readable: {tcc_db}")
 
+    target_binaries = binaries
+    if bundles and target_binaries is None:
+        target_binaries = list(CANONICAL_TCC_BUNDLES.keys())
+
     specs = build_required_targets(
-        binaries=binaries,
+        binaries=target_binaries,
         search_path=search_path,
         include_python_automation=include_python_automation,
     )
@@ -656,12 +732,18 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Exclude shared host Python automation identities when --binary is not specified.",
     )
+    parser.add_argument(
+        "--bundles",
+        action="store_true",
+        help="Verify canonical client_type=0 bundle identities rather than ephemeral CLI realpaths.",
+    )
     args = parser.parse_args(argv)
 
     result = verify_tcc_provenance(
         tcc_db_path=Path(args.db),
         binaries=args.binaries,
         include_python_automation=not args.no_python_automation if args.binaries is None else None,
+        bundles=args.bundles,
     )
 
     if args.json:

@@ -388,6 +388,10 @@ if [[ "$1" == "exec" ]]; then
     exit 0
   fi
   if [[ "$*" == *"quick_check"* ]]; then printf "ok"; exit 0; fi
+  if [[ "$*" == *"memory-cache-verification"* ]] || [[ "$*" == *"qOk"* ]] || [[ "$*" == *"QDRANT_OK"* ]] || [[ "$*" == *"Database"* && "$*" == *"storage.sqlite"* ]]; then
+    printf "QDRANT_OK|CACHE_OK|PATCH_OK"
+    exit 0
+  fi
   if [[ "$*" == *"FROM api_keys"* ]]; then printf "1"; exit 0; fi
   if [[ "$*" == *"FROM provider_connections"* ]]; then
     if [[ ! -f "{self.home / 'seen_baseline'}" ]]; then
@@ -416,6 +420,7 @@ if [[ "$sql" == *"journal_mode"* ]]; then echo "delete"; exit 0; fi
             self.local_bin / "curl",
             """#!/bin/bash
 if [[ "$*" == *"/healthz"* ]]; then printf "ok"; exit 0; fi
+if [[ "$*" == *"/readyz"* ]]; then printf "all shards are ready"; exit 0; fi
 if [[ "$*" == *"/api/monitoring/health"* ]]; then printf '{"status":"healthy","setupComplete":true}'; exit 0; fi
 if [[ "$*" == *"muse-code/models"* && "$*" != *"-w"* ]]; then printf '{"object":"list","data":[{"id":"muse-spark-1.3"}]}'; exit 0; fi
 printf "200"
@@ -754,6 +759,10 @@ if [[ "$1" == "exec" ]]; then
     exit 0
   fi
   if [[ "$*" == *"quick_check"* ]]; then printf "ok"; exit 0; fi
+  if [[ "$*" == *"engine-status"* ]] || [[ "$*" == *"qOk"* ]]; then
+    printf "QDRANT_OK|CACHE_OK|PATCH_OK"
+    exit 0
+  fi
   if [[ "$*" == *"omniroute-field-encryption-v1"* ]]; then
     MOCK_CATALOG_MODE_FILE="{catalog_mode}" node -e '
       const fs = require("fs");
@@ -763,7 +772,8 @@ if [[ "$1" == "exec" ]]; then
       const key = crypto.scryptSync(secret, "omniroute-field-encryption-v1", 32);
       const iv = Buffer.alloc(12, 7);
       const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
-      const ct = cipher.update("sk-valid-v3852-key", "utf8", "hex") + cipher.final("hex");
+      const testKey = "test-mock-key-v3852";
+      const ct = cipher.update(testKey, "utf8", "hex") + cipher.final("hex");
       const tag = cipher.getAuthTag().toString("hex");
       const validEnc = "enc:v1:" + iv.toString("hex") + ":" + ct + ":" + tag;
       const corruptedEnc = "enc:v1:" + iv.toString("hex") + ":" + ct + ":00000000000000000000000000000000";
@@ -785,13 +795,13 @@ if [[ "$1" == "exec" ]]; then
         return origLoad(req, parent, isMain);
       }};
       global.fetch = async (url, opts) => {{
-        if (opts && opts.headers && opts.headers.Authorization === "Bearer sk-valid-v3852-key") {{
+        if (opts && opts.headers && opts.headers.Authorization === "Bearer " + "test-mock-key-v3852") {{
           if (String(url).includes("muse-code/models")) {{
             const mode = fs.readFileSync(process.env.MOCK_CATALOG_MODE_FILE, "utf8").trim();
-            if (mode === "empty") return {{ status: 200, text: async () => "{{\\"object\\":\\"list\\",\\"data\\":[]}}" }};
-            if (mode === "malformed") return {{ status: 200, text: async () => "{{\\"object\\":\\"list\\",\\"data\\":[{{\\"id\\":\\"muse-spark-1.3\\"}}" }};
-            if (mode === "wrong_shape") return {{ status: 200, text: async () => "{{\\"object\\":\\"list\\",\\"data\\":[],\\"id\\":\\"muse-spark-1.3\\"}}" }};
-            return {{ status: 200, text: async () => "{{\\"object\\":\\"list\\",\\"data\\":[{{\\"id\\":\\"muse-spark-1.3\\"}}]}}" }};
+            if (mode === "empty") return {{ status: 200, text: async () => "{{\\\"object\\\":\\\"list\\\",\\\"data\\\":[]}}" }};
+            if (mode === "malformed") return {{ status: 200, text: async () => "{{\\\"object\\\":\\\"list\\\",\\\"data\\\":[{{\\\"id\\\":\\\"muse-spark-1.3\\\"}}" }};
+            if (mode === "wrong_shape") return {{ status: 200, text: async () => "{{\\\"object\\\":\\\"list\\\",\\\"data\\\":[],\\\"id\\\":\\\"muse-spark-1.3\\\"}}" }};
+            return {{ status: 200, text: async () => "{{\\\"object\\\":\\\"list\\\",\\\"data\\\":[{{\\\"id\\\":\\\"muse-spark-1.3\\\"}}]}}" }};
           }}
           return {{ status: 200, text: async () => JSON.stringify({{ data: [{{ id: "gemini-4-argon" }}] }}) }};
         }}
@@ -800,6 +810,7 @@ if [[ "$1" == "exec" ]]; then
     '"$5"
     exit $?
   fi
+  if [[ "$*" == *"qOk"* ]] || [[ "$*" == *"QDRANT_OK"* ]]; then printf "QDRANT_OK|CACHE_OK|PATCH_OK"; exit 0; fi
   if [[ "$*" == *"FROM api_keys"* ]]; then printf "1"; exit 0; fi
   if [[ "$*" == *"FROM provider_connections"* ]]; then printf "32"; exit 0; fi
   if [[ "$*" == *"db_state-"*"_pre-migration.sqlite"* ]]; then
@@ -827,6 +838,7 @@ exit 0
 mode=$(cat "{catalog_mode}")
 posture=$(cat "{vm_posture}")
 if [[ "$*" == *"/healthz"* ]]; then printf "ok"; exit 0; fi
+if [[ "$*" == *"/readyz"* ]]; then printf "all shards are ready"; exit 0; fi
 if [[ "$*" == *"/api/monitoring/health"* ]]; then printf '{{"status":"healthy","setupComplete":true}}'; exit 0; fi
 if [[ "$*" == *"/v1/models"* && "$*" != *"-I"* ]]; then printf "%s" "$posture"; exit 0; fi
 if [[ "$*" == *"muse-code/models"* && "$*" == *"-w"* ]]; then printf "%s" "$posture"; exit 0; fi

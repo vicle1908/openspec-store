@@ -154,7 +154,7 @@ def check_health_and_alignment(
         raise ValueError("Root '/' endpoint is forbidden; health probe MUST target '/agentmemory/health'")
 
     # 1. Package metadata resolution
-    resolved_pkg_path = find_agentmemory_package_json(package_json_path)
+    resolved_pkg_path = find_agentmemory_package_json(package_json_path) if (mock_http_response is None or package_json_path is not None) else None
     pkg_ver, declared_engine = read_package_engine_pin(resolved_pkg_path)
     pinned_engine = declared_engine or expected_engine
 

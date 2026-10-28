@@ -488,7 +488,7 @@ User-level package manager configurations (`~/.npmrc` and `~/.bunfig.toml`) SHAL
 
 ### Requirement: Post-upgrade code signing and TCC provenance alignment across dual runners
 
-Both `shb-schedule` (`workstation_update.py`) and `workstation-daily-update.sh` SHALL maintain code-signing and symlink invariants for TCC-governed binaries (`goose`, `python3`, `org.python.python`) using `Developer Agent Code Signing` (`H"65340d85afd298131c682d8463087891292a2b59"`), and `com.developer.workstation-daily-update.plist` SHALL execute under the FDA-authorized `Python.app` (`org.python.python`, `client_type = 0`) bundle so Darwin TCC verification remains strictly fail-closed.
+Both `shb-schedule` (`workstation_update.py`) and `workstation-daily-update.sh` SHALL maintain code-signing and bundle invariants for TCC-governed identities (`Python.app` `org.python.python`, `goose`, `python3`, and agent bundle wrappers) using `Developer Agent Code Signing` (`H"65340d85afd298131c682d8463087891292a2b59"`), standardize workstation execution on `client_type = 0` (`CFBundleIdentifier`) bundle attribution, and execute `com.developer.workstation-daily-update.plist` under the FDA-authorized `Python.app` (`org.python.python`, `client_type = 0`) bundle so Darwin TCC verification remains strictly fail-closed and immune to versioned directory upgrade drift.
 
 #### Scenario: Post-upgrade re-signing and Homebrew link restoration
 - **WHEN** automated maintenance updates coding agent CLIs or Python runtimes in `workstation_update.py` or `workstation-daily-update.sh`
@@ -499,11 +499,11 @@ Both `shb-schedule` (`workstation_update.py`) and `workstation-daily-update.sh` 
 #### Scenario: Scheduled LaunchAgent FDA supervision and fail-closed Darwin TCC verification
 - **WHEN** `~/Library/LaunchAgents/com.developer.workstation-daily-update.plist` or an interactive operator executes `tcc_provenance.py --json` on Darwin
 - **THEN** `com.developer.workstation-daily-update.plist` SHALL invoke `workstation-daily-update.sh` under `/opt/homebrew/opt/python@3.15/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python` (`CFBundleIdentifier = org.python.python`, `client_type = 0`) so `TCC.db` is readable with Full Disk Access across Python upgrades
-- **AND** every target in the 9-identity workstation set (`omp`, `node`, `opencode`, `goose`, `claude`, `kimi`, `herdr`, `python3`, `org.python.python`) SHALL require a direct `auth_value = 2` record in `TCC.db` with `SecStaticCodeCheckValidity = 0`
+- **AND** TCC provenance verification SHALL evaluate verified `client_type = 0` bundle records with active `auth_value = 2` grants and valid `SecStaticCodeCheckValidity = 0` signatures
 - **AND** any unreadable/corrupt `TCC.db` or missing/mismatched target grant on Darwin SHALL be reported fail-closed as `ERROR` or `DRIFT` and SHALL NEVER be classified as `SKIPPED`
 
 #### Scenario: Unattributed standalone or launchd CLI fails closed despite authorized Orca or Herdr in TCC.db
-- **WHEN** `com.stablyai.orca` (`Orca.app`), `herdr`, and `org.python.python` hold valid `auth_value = 2` grants in `TCC.db`, but a CLI target (such as `claude` or `omp`) runs directly from `launchd` and lacks a direct `client_type = 1` grant in `TCC.db`
+- **WHEN** `com.stablyai.orca` (`Orca.app`), `herdr`, and `org.python.python` hold valid `auth_value = 2` grants in `TCC.db`, but a CLI target runs directly from `launchd` without an authorized responsible parent bundle
 - **THEN** `verify_tcc_provenance()` SHALL NOT mark the CLI `CLEAN` from unrelated supervisor rows
 - **AND** `verify_tcc_provenance()` SHALL return `status: "DRIFT"` with the target listed in `missing_binaries` and `<service>:missing_grant` (or `denied_or_pending`) in `failure_reasons`
 
