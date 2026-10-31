@@ -389,11 +389,11 @@ The semantic-cache embedding evaluation SHALL identify the effective deadline at
 - **THEN** evidence SHALL record elapsed time, cache-bypass behavior, request outcome, and any uncancelled work; a five-minute chat timeout SHALL NOT substitute for embedding-path verification.
 
 ### Requirement: Cache and Coordination Isolation Evaluation
-Before changing cache scope or Redis eviction policy, the evaluation SHALL classify enabled cache and coordination consumers and verify request isolation, acceptable expiry behavior, and the effect of memory pressure on rate limits, quotas, and coordination state.
+Before changing cache scope or Redis eviction policy, the evaluation SHALL classify enabled cache and coordination consumers and verify request isolation across owners, system policies (`sp:<sha256_16>` covering `body.system`, `body.instructions`, `body.systemInstruction`, and `messages[]` system/developer turns), tool contracts (`ct:<sha256_16>`), tool history (`tc:<sha256_16>`), and freshness state, as well as the effect of memory pressure on rate limits, quotas, and coordination state.
 
 #### Scenario: Similar prompts with different request context
-- **WHEN** similar requests differ in authorized owner, relevant system policy, tool contract, tool history, or freshness-sensitive state
-- **THEN** evaluation SHALL verify that an incompatible cached response is not reused; an unsafe case SHALL remain ineligible for cache promotion until resolved.
+- **WHEN** similar requests differ in authorized owner, system policy (`body.system`, `body.instructions`, `body.systemInstruction`, or `messages[].role` in `["system", "developer"]`), tool contract, tool history, or freshness-sensitive state
+- **THEN** `SemanticCacheManager` SHALL partition Layer-2 cache keys by `ct:<sha256_16>`, `tc:<sha256_16>`, and `sp:<sha256_16>` so an incompatible cached response is never reused across different system policies or tool contracts while identical system-policy repeats hit Layer-2.
 
 #### Scenario: Shared Redis reaches its proposed memory budget
 - **WHEN** a candidate eviction policy is evaluated against a Redis instance shared by cache and coordination consumers
