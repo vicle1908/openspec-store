@@ -254,7 +254,7 @@ codex:OpenAI Codex:update
 opencode:OpenCode:upgrade
 auggie:Auggie:update --skip-confirmation
 qoder:Qoder:update
-pi:Pi:update --self
+pi:Pi:update --all
 kimi:Kimi Code:update
 ntn:Notion CLI:update"
 
