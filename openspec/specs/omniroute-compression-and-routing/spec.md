@@ -82,7 +82,6 @@ OmniRoute SHALL configure `lite.compressToolResults` as `false` (`maxToolLength:
 - **THEN** OmniRoute SHALL execute `codex-responses` (on `/v1/responses` `function_call_output` items, protecting `Read`, `Glob`, `Grep`, `Write`, `Edit`, `WebSearch`, `WebFetch`, `find`) and `rtk` (`minimal` intensity on tool results)
 
 ### Requirement: Bounded Quota Park, Early-EOF Sibling Failover, Refusal Cooldown Skip, and Terminal Safety Stops
-
 OmniRoute SHALL persist 24 enabled v3.8.52 resilience, routing, catalog, and compaction feature flags as "true" and ANTIGRAVITY_ACCOUNT_LEASE_ENABLED and COMBO_AUTO_PRUNE_STALE_STEPS as "false" in SQLite key_value (namespace='feature_flags'), set mcpDescriptionCompressionEnabled to true, set sessionAffinityTtlMs to 300000, and keep FLUSH_EMPTY_RETRY_ENABLED and OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS disabled ("false") while OMNIROUTE_ALLOW_LOCAL_PROVIDER_URLS remains "true".
 
 #### Scenario: Pre-first-frame SSE early EOF fails over once to a sibling connection
@@ -95,7 +94,7 @@ OmniRoute SHALL persist 24 enabled v3.8.52 resilience, routing, catalog, and com
 
 #### Scenario: Expanded v3.8.52 coding-agent feature flags and MCP description compression resolve from authoritative SQLite tables
 - **WHEN** `GET /api/settings/feature-flags` and `GET /api/settings/compression` are queried with management authentication
-- **THEN** all 25 enabled flags (`QUOTA_WINDOW_BOUNDED_PARK`, `STREAM_EARLY_EOF_SIBLING_FAILOVER_ENABLED`, `COOLDOWN_RETRY_SKIP_REFUSALS_ENABLED`, `PROVIDER_SAFETY_STOPS_TERMINAL`, `EMPTY_STREAM_SIBLING_RECOVERY_ENABLED`, `STREAM_READINESS_STALL_RETRY`, `DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED`, `STREAM_LATE_OUTPUT_PROBE_ENABLED`, `RETRY_AFTER_PROVENANCE_ENABLED`, `COMBO_EMPTY_POOL_NO_ELIGIBLE_TARGETS_ENABLED`, `CREDENTIAL_GATE_AUTH_DIAGNOSES_ONLY`, `AUTO_REQUEST_RESOLVED_CAPABILITIES`, `AUTO_COMBO_KEYLESS_TRANSPORT_GATE`, `MODELS_DEV_EFFORT_TIERS_ENABLED`, `CATALOG_MIRROR_REFINEMENTS_ENABLED`, `ANTHROPIC_COMPATIBLE_MID_CONVERSATION_SYSTEM`, `CONTENT_POLICY_REFUSAL_COMBO_STOP_ENABLED`, `CREDENTIAL_HEALTH_RETEST_AUTO_DISABLED`, `MODEL_ENDPOINT_CAPABILITY_GATE_ENABLED`, `OPENCODE_FULL_TEXT_ERROR_RULES_ENABLED`, `CLOUDFLARE_AI_FULL_TEXT_ERROR_RULES_ENABLED`, `PROTECTED_PRIORITY_INFRA_502_ENABLED`, `COMBO_AUTO_PRUNE_STALE_STEPS`, `NATIVE_CODEX_REACTIVE_COMPACTION_ENABLED`, `CLAUDE_OAUTH_SUMMARIZED_THINKING_UNREDACTED`) SHALL report `effectiveValue: "true"` and `source: "db"`, `ANTIGRAVITY_ACCOUNT_LEASE_ENABLED` SHALL report `effectiveValue: "false"` and `source: "db"`, and `GET /api/settings/compression` SHALL report `mcpDescriptionCompressionEnabled: true`
+- **THEN** all 24 enabled flags (`QUOTA_WINDOW_BOUNDED_PARK`, `STREAM_EARLY_EOF_SIBLING_FAILOVER_ENABLED`, `COOLDOWN_RETRY_SKIP_REFUSALS_ENABLED`, `PROVIDER_SAFETY_STOPS_TERMINAL`, `EMPTY_STREAM_SIBLING_RECOVERY_ENABLED`, `STREAM_READINESS_STALL_RETRY`, `DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED`, `STREAM_LATE_OUTPUT_PROBE_ENABLED`, `RETRY_AFTER_PROVENANCE_ENABLED`, `COMBO_EMPTY_POOL_NO_ELIGIBLE_TARGETS_ENABLED`, `CREDENTIAL_GATE_AUTH_DIAGNOSES_ONLY`, `AUTO_REQUEST_RESOLVED_CAPABILITIES`, `AUTO_COMBO_KEYLESS_TRANSPORT_GATE`, `MODELS_DEV_EFFORT_TIERS_ENABLED`, `CATALOG_MIRROR_REFINEMENTS_ENABLED`, `ANTHROPIC_COMPATIBLE_MID_CONVERSATION_SYSTEM`, `CONTENT_POLICY_REFUSAL_COMBO_STOP_ENABLED`, `CREDENTIAL_HEALTH_RETEST_AUTO_DISABLED`, `MODEL_ENDPOINT_CAPABILITY_GATE_ENABLED`, `OPENCODE_FULL_TEXT_ERROR_RULES_ENABLED`, `CLOUDFLARE_AI_FULL_TEXT_ERROR_RULES_ENABLED`, `PROTECTED_PRIORITY_INFRA_502_ENABLED`, `NATIVE_CODEX_REACTIVE_COMPACTION_ENABLED`, `CLAUDE_OAUTH_SUMMARIZED_THINKING_UNREDACTED`) SHALL report `effectiveValue: "true"` and `source: "db"`, `ANTIGRAVITY_ACCOUNT_LEASE_ENABLED` and `COMBO_AUTO_PRUNE_STALE_STEPS` SHALL report `effectiveValue: "false"` and `source: "db"`, and `GET /api/settings/compression` SHALL report `mcpDescriptionCompressionEnabled: true`
 
 #### Scenario: Outbound provider URL guard blocks cloud metadata while permitting Host Ollama
 - **WHEN** `OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS` is `"false"` and `OMNIROUTE_ALLOW_LOCAL_PROVIDER_URLS` is `"true"`
@@ -159,7 +158,7 @@ OmniRoute SHALL enable `zeroLatencyOptimizationsEnabled: true` (`predictiveTtftM
 - **GIVEN** a connection target whose `byTarget[executionKey]` has at least 5 requests with `avgLatencyMs` exceeding `predictiveTtftMs` and whose 120,000-millisecond predictive cooldown window has elapsed
 - **WHEN** concurrent requests arrive for that combo
 - **THEN** OmniRoute SHALL atomically reserve at most one in-flight recovery probe for that `(comboName, executionKey)` in authoritative metrics state before upstream dispatch while concurrent requests skip that target until the reservation settles
-- **AND** if the recovery probe fails, aborts, times out, or succeeds above the predictive threshold, OmniRoute SHALL release the in-flight reservation and start a fresh 120,000-millisecond predictive cooldown window
+- **AND** if the recovery probe fails, aborts, times out, or succeeds above the predictive threshold, OmniRoute SHALL retain the 90,000-millisecond single-flight reservation lock in `__omniProbeAt` to prevent concurrent probe stampedes and maintain predictive cooldown protection
 - **AND** if the recovery probe succeeds with latency at or below `predictiveTtftMs`, OmniRoute SHALL release the reservation and re-seed that target's predictive latency window from the probe duration so cumulative pre-cooldown timeouts do not immediately re-trip `predictive_ttft`, while preserving lifetime request and failure counters
 
 #### Scenario: Eligible-candidate starvation guard respects independent eligibility gates
@@ -267,7 +266,6 @@ OmniRoute SHALL separate configuration across SQLite runtime tables, ~/Omniroute
 - **THEN** `SemanticCacheManager` SHALL initialize from the synchronized `OMNIROUTE_SEMANTIC_CACHE_*` variables in `.env` (returning `X-OmniRoute-Cache: HIT` on a repeated `temperature: 0` request with identical output and tool contracts) and SHALL return `X-OmniRoute-Cache: MISS` when `tools`, `tool_choice`, `response_format`, or tool-history digests differ
 
 ### Requirement: Three-Ultra-Account Gemini-4-Argon Combo Routing
-
 OmniRoute SHALL configure `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, and `gemini-4-argon-low` combos with explicit connection-scoped model steps for all 3 active Google AI Ultra Antigravity accounts (`62af823b-f3d7-4e6b-87a9-98069167d4f6`, `0532bad4-2486-4286-8f06-510e9c678620`, `338764b8-1cd7-4946-b789-ee5dad4c5073`), preserving `strategy: "auto"` and setting `context_cache_protection: false`.
 
 #### Scenario: All three Ultra accounts present in every gemini-4-argon* combo
@@ -280,7 +278,6 @@ OmniRoute SHALL configure `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-arg
 - **THEN** OmniRoute SHALL route across the 3 Ultra accounts with `HTTP 200` and bound any single stalled upstream target attempt to `180,000 ms`
 
 ### Requirement: Multi-Agent Heavyweight Chat Admission Concurrency and Composite-Combo Prune Protection
-
 OmniRoute SHALL configure `OMNIROUTE_CHAT_MAX_HEAVY_IN_FLIGHT=16` and `OMNIROUTE_CHAT_ADMISSION_QUEUE_MS=15000` in `/Users/androidteam/Omniroute/.env` and SHALL persist `COMBO_AUTO_PRUNE_STALE_STEPS` as `"false"` in SQLite `feature_flags` so concurrent tool-bearing subagent streams do not shed with `HTTP 503 chat_admission_busy` and composite combos containing a `combo-ref` fallback retain their explicit model steps across catalog syncs.
 
 #### Scenario: Concurrent tool-bearing subagent turns admit without 503 chat_admission_busy
@@ -289,19 +286,18 @@ OmniRoute SHALL configure `OMNIROUTE_CHAT_MAX_HEAVY_IN_FLIGHT=16` and `OMNIROUTE
 
 #### Scenario: Composite combo with trailing `combo-ref` retains explicit model steps across catalog syncs
 - **WHEN** `COMBO_AUTO_PRUNE_STALE_STEPS` is `"false"` in `GET /api/settings/feature-flags` and scheduled provider model sync runs
-- **THEN** OmniRoute SHALL preserve all explicit `kind: "model"` steps in `claude-opus-5.5` ahead of its `combo-ref: gemini-3.8-flash-high` fallback
+- **THEN** OmniRoute SHALL preserve all explicit `kind: "model"` steps in composite combos containing a `combo-ref` step (such as `muse-spark-1.3`) alongside all 15 explicit `kind: "model"` steps in `claude-opus-5.5`
 
 ### Requirement: Multi-Account Claude Opus and Sonnet Combo Pooling across Antigravity Accounts
-
-OmniRoute SHALL configure `claude-opus-5.5` and `claude-sonnet-5.5` combos to pool all 15 active Antigravity OAuth connections across explicit connection-scoped model steps (`agy/claude-opus-4-6-thinking` and `agy/claude-sonnet-4-6`) with `strategy: "auto"`, `candidatePool: ["agy"]`, and `context_cache_protection: false`, and SHALL preserve the 15-account topology for upstream 5.5 model cutover.
+OmniRoute SHALL configure `claude-opus-5.5` and `claude-sonnet-5.5` combos to pool all 15 active Antigravity OAuth connections (`12` active `g1-pro-tier` and `3` `g1-ultra-tier`, excluding banned `47f334b1-b801-41f6-a709-4ebabb7a86d6`) across 15 connection-scoped `kind: "model"` steps (`agy/claude-opus-4-6-thinking` and `agy/claude-sonnet-4-6`) without `combo-ref` sub-combos, using `strategy: "auto"`, `candidatePool: ["agy"]`, and `context_cache_protection: false`.
 
 #### Scenario: Claude Opus 5.5 combo pools all 15 Antigravity accounts
 - **WHEN** `GET /api/combos/{id}` is queried for `claude-opus-5.5` (`4b2430da-0b3b-4b0e-9773-ec0f97adc252`)
-- **THEN** OmniRoute SHALL return a combo with 15 explicit model steps targeting `agy/claude-opus-4-6-thinking` (one for each active `agy` connection), with `strategy: "auto"`, `candidatePool: ["agy"]`, and `context_cache_protection: false`
+- **THEN** OmniRoute SHALL return a combo with 15 explicit `kind: "model"` steps targeting `agy/claude-opus-4-6-thinking` across the 15 active `agy` connections (`12` Pro and `3` Ultra, excluding banned `47f334b1-b801-41f6-a709-4ebabb7a86d6` and with `0` `combo-ref` steps), with `strategy: "auto"`, `candidatePool: ["agy"]`, `context_cache_protection: false`, `config.targetTimeoutMs: 180000`, and `config.predictiveTtftMs: 60000`
 
 #### Scenario: Claude Sonnet 5.5 combo pools all 15 Antigravity accounts
 - **WHEN** `GET /api/combos/{id}` is queried for `claude-sonnet-5.5` (`9447399c-856b-4f52-8820-b3bf3dc3f132`)
-- **THEN** OmniRoute SHALL return a combo with 15 explicit model steps targeting `agy/claude-sonnet-4-6` (one for each active `agy` connection), with `strategy: "auto"`, `candidatePool: ["agy"]`, and `context_cache_protection: false`
+- **THEN** OmniRoute SHALL return a combo with 15 explicit `kind: "model"` steps targeting `agy/claude-sonnet-4-6` across the 15 active `agy` connections (`12` Pro and `3` Ultra, excluding banned `47f334b1-b801-41f6-a709-4ebabb7a86d6`), with `strategy: "auto"`, `candidatePool: ["agy"]`, `context_cache_protection: false`, `config.targetTimeoutMs: 120000`, and `config.predictiveTtftMs: 45000`
 
 #### Scenario: Live chat completions route through multi-account Claude combos to authentic Claude models
 - **WHEN** `POST /v1/chat/completions` is called with `model: "claude-opus-5.5"` or `model: "claude-sonnet-5.5"`
@@ -329,20 +325,18 @@ OmniRoute SHALL keep Hybrid Memory enabled (`enabled: true`, `skillsEnabled: fal
 - **THEN** `sanitizeFts5Query` SHALL join sanitized tokens (`length > 2`) with `" OR "` rather than implicit `" "` (`AND`) so memories sharing relevant keywords are ranked by BM25 and fused with Qdrant cosine results via RRF (`k=60`)
 
 ### Requirement: Dedicated 11-Pro-Account Auto Pool for `gemini-3.8-flash-high` and Ultra Quota Isolation
-
-OmniRoute SHALL configure `gemini-3.8-flash-high` (`7555d851-b4f3-44c6-b1fb-c6fdceabf388`) with `strategy: "auto"`, `context_cache_protection: false`, `targetTimeoutMs: 25000`, `predictiveTtftMs: 25000`, and 11 `kind: "model"` steps scoped exclusively to the 11 active `g1-pro-tier` `agy` connections (excluding the 3 `g1-ultra-tier` accounts, 1 `free-tier` account, and any banned account), and SHALL enable `rateLimitProtection: true` on all 14 active `agy` accounts via `POST /api/rate-limits`.
+OmniRoute SHALL configure `gemini-3.8-flash-high` (`7555d851-b4f3-44c6-b1fb-c6fdceabf388`) with `strategy: "auto"`, `context_cache_protection: false` persisted in `combos.data`, `targetTimeoutMs: 25000`, `predictiveTtftMs: 25000`, and 12 `kind: "model"` steps scoped exclusively to the 12 active `g1-pro-tier` `agy` connections (excluding the 3 Ultra accounts and banned `47f334b1`), and SHALL enable `rateLimitProtection: true` on all 15 active `agy` accounts.
 
 #### Scenario: `gemini-3.8-flash-high` routes across the 11 Pro accounts without consuming Ultra Gemini quota
 - **WHEN** `GET /api/combos/7555d851-b4f3-44c6-b1fb-c6fdceabf388` (`gemini-3.8-flash-high`) is inspected or invoked
-- **THEN** `strategy` SHALL be `"auto"`, `context_cache_protection` SHALL be `false`, and `models` SHALL contain 11 `agy/gemini-3.8-flash-high` steps mapped to the 11 `g1-pro-tier` connections with non-empty email `label`s
+- **THEN** `strategy` SHALL be `"auto"`, `context_cache_protection` SHALL be `false`, and `models` SHALL contain 12 `agy/gemini-3.8-flash-high` steps mapped to all 12 active `g1-pro-tier` connections (including `ce95e1cb-27a4-433f-9c50-bdb6ad0b6b6b`) with non-empty email `label`s
 - **AND** none of the 3 `g1-ultra-tier` `connectionId`s (`62af823b-f3d7-4e6b-87a9-98069167d4f6`, `0532bad4-2486-4286-8f06-510e9c678620`, `338764b8-1cd7-4946-b789-ee5dad4c5073`) SHALL appear in `gemini-3.8-flash-high`
 
 #### Scenario: All 3 Ultra accounts and 11 Pro accounts enforce `rateLimitProtection: true`
 - **WHEN** `GET /api/rate-limits` is queried
-- **THEN** all 3 `g1-ultra-tier` `agy` accounts (`62af823b`, `0532bad4`, `338764b8`) and all 11 `g1-pro-tier` `agy` accounts SHALL report `rateLimitProtection: true` and `enabled: true`
+- **THEN** all 3 `g1-ultra-tier` `agy` accounts (`62af823b`, `0532bad4`, `338764b8`) and all 12 active `g1-pro-tier` `agy` accounts SHALL report `rateLimitProtection: true` and `enabled: true`
 
 ### Requirement: Tier-Matched Combo Timeouts, Cold-Start Semantic Cache Bridge, and Fail-Closed Entrypoint Guard
-
 OmniRoute SHALL configure `targetTimeoutMs: 180000` and `predictiveTtftMs: 60000` on deep-reasoning combos (`gemini-4-argon*` and `claude-opus-5.5`), SHALL configure `targetTimeoutMs: 120000`, `predictiveTtftMs: 45000`, and `maxRetries: 1` on `claude-sonnet-5.5`, `kimi-k3.1-pro`, and `deepseek-v4.1-flash`, SHALL auto-invoke `ensureSemanticCacheDbBridge()` on semantic cache initialization, and SHALL assert all runtime patch markers fail-closed in `container-entrypoint-compat.sh`.
 
 #### Scenario: Deep-reasoning and high-TTFT combos enforce tier-matched timeouts without premature 25s aborts

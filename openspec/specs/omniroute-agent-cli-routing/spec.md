@@ -35,8 +35,7 @@ A CLI SHALL be mutated only when its official documentation or configuration sch
 - **AND** it SHALL be reported as unsupported or unconfigured with the observed reason
 
 ### Requirement: OmniRoute registrations SHALL use the live `sh/*` namespace with credential indirection
-
-Every OmniRoute model registration added or corrected by this change SHALL use one of the live requested namespace/model pairs: `pm/Claude-Fable` for the Anthropic Messages route or `sh/gpt-5.6-sol` for the OpenAI Responses route. The exact model ID SHALL be present in a fresh `GET http://localhost:20128/v1/models` response at apply time. Retired `dlg/*` inference routes SHALL NOT be added to or retained in an active OmniRoute registration owned by this change. Credentials SHALL use `OMNIROUTE_API_KEY` through the CLI's documented environment, helper, or provider-key mechanism; literal credentials are prohibited except for the documented Kimi Code limitation when its installed provider contract cannot resolve shell variables.
+Every OmniRoute model registration added or corrected by this change SHALL use `pm/Claude-Fable` (Anthropic Messages) or `sh/gpt-5.6-sol` (OpenAI Responses), verified in a fresh `GET http://localhost:20128/v1/models` response at apply time. Retired `dlg/*` routes SHALL NOT be added or retained. Credentials SHALL use `OMNIROUTE_API_KEY` indirection; literal credentials are prohibited except for the documented Kimi Code shell-variable limitation.
 
 #### Scenario: Requested namespace IDs are validated against the live catalog
 
@@ -103,8 +102,7 @@ Each configuration file mutated by this change SHALL receive a mode-600 backup w
 - **AND** the CLI SHALL be reported as a blocker without blocking verification of independent CLIs
 
 ### Requirement: Known OmniRoute SSE heartbeat defect SHALL be documented as a routing blocker
-
-The goose runtime blocker SHALL be documented as a two-part strict-decoder incompatibility, not a single server defect. Part 1: OmniRoute emits a malformed `response.in_progress` SSE heartbeat event (missing the `response` object and `sequence_number` fields) during slow first-token phases on the `/v1/responses` path; the frame and its 15s interval are build-inlined into the Next.js bundle, so the documented `SSE_HEARTBEAT_INTERVAL_MS` env var has no effect. Part 2: goose's strict Responses-API decoder also rejects the upstream's `response.created` event for lacking a `model` field, even when OmniRoute is bypassed. CLIs with strict Responses-API stream decoders SHALL be documented as blocked by these defects, and their registrations SHALL remain valid catalog entries. Vendor build artifacts SHALL NOT be hotfixed as a workaround.
+The goose runtime blocker SHALL be documented as a two-part strict-decoder incompatibility: (1) OmniRoute emits a build-inlined 15s `response.in_progress` SSE heartbeat on `/v1/responses` lacking `response` and `sequence_number` (ignoring `SSE_HEARTBEAT_INTERVAL_MS`), and (2) goose's decoder rejects upstream `response.created` events lacking `model`. Affected CLIs SHALL be documented as blocked while keeping catalog entries valid, without hotfixing vendor build artifacts.
 
 #### Scenario: strict-decoder CLI registered but runtime-blocked
 
@@ -269,8 +267,7 @@ A consumer that supports Anthropic Messages SHALL route `pm/Claude-Fable` throug
 - **AND** its reasoning control SHALL use a live-supported effort tier
 
 ### Requirement: Chat Completions SHALL be an exception-only fallback
-
-A CLI SHALL use the Chat Completions dialect for an OmniRoute requested model only when its native Messages or Responses implementation is unavailable or fails a product-specific compatibility gate. The fallback SHALL be selected from live endpoint evidence, SHALL preserve the exact requested model ID, and SHALL use the versionless `http://localhost:20128/chat/completions` target in the current deployment. The failing versioned `http://localhost:20128/v1/chat/completions` route SHALL NOT be substituted for `sh/gpt-5.6-sol`.
+A CLI SHALL use the Chat Completions dialect for an OmniRoute model only when its native Messages or Responses implementation is unavailable or fails a compatibility gate. The fallback SHALL be selected from live endpoint evidence, preserve the exact requested model ID, and use the versionless `http://localhost:20128/chat/completions` target; the failing `http://localhost:20128/v1/chat/completions` route SHALL NOT be substituted for `sh/gpt-5.6-sol`.
 
 #### Scenario: Native client incompatibility selects the proven fallback
 
@@ -286,8 +283,7 @@ A CLI SHALL use the Chat Completions dialect for an OmniRoute requested model on
 - **AND** the change SHALL NOT downgrade it to Chat Completions merely for uniformity
 
 ### Requirement: Thinking configuration SHALL match the requested model and provider dialect
-
-Each changed CLI SHALL declare reasoning/thinking only through fields supported by its native provider implementation. `pm/Claude-Fable` SHALL use Anthropic thinking controls or the CLI's documented Anthropic effort mapping; `sh/gpt-5.6-sol` SHALL use OpenAI Responses reasoning effort from `none`, `low`, `medium`, `high`, or `xhigh`. A client SHALL NOT send an OpenAI `reasoning.effort` field on the Anthropic Messages route or an Anthropic `thinking` body on the Responses route unless its documented adapter explicitly translates that field.
+Each changed CLI SHALL declare reasoning/thinking only through fields supported by its native provider implementation: `pm/Claude-Fable` SHALL use Anthropic thinking controls or effort mapping, and `sh/gpt-5.6-sol` SHALL use OpenAI Responses `reasoning.effort` (`none`, `low`, `medium`, `high`, or `xhigh`). A client SHALL NOT send OpenAI `reasoning.effort` on Anthropic Messages or Anthropic `thinking` on Responses unless its adapter explicitly translates that field.
 
 #### Scenario: PM thinking is separated from answer text
 
@@ -407,8 +403,7 @@ Any file-mode change that tightens permissions (for example 0644→0600) SHALL b
 - **AND** the apply log SHALL reference the approval entry
 
 ### Requirement: Live verification through credential-carrying configs SHALL be rotation-gated
-
-When a configuration file carries literal credentials that were exposed in any session transcript, no live route verification SHALL be executed through that file until the owner explicitly confirms the credentials were rotated upstream or authorizes proceeding without rotation. The gate, its release condition, and the release decision SHALL be recorded in the active change; verification evidence for such surfaces SHALL remain at config level until release, and the surface SHALL NOT be reported as fully verified while blocked.
+When a configuration file carries literal credentials exposed in any session transcript, no live route verification SHALL run through that file until the owner confirms upstream rotation or authorizes proceeding without rotation. The gate, release condition, and decision SHALL be recorded in the active change; verification evidence SHALL remain at config level until release and SHALL NOT be reported as fully verified while blocked.
 
 #### Scenario: rotation gate blocks live sentinel
 
@@ -451,8 +446,7 @@ When the Cline OmniRoute cleanup retains `openai-compatible` as the working prov
 - **AND** a cleanup4-specific live sentinel through the final provider/model pair SHALL be recorded before closure.
 
 ### Requirement: Gemini combo SHALL be configured as default across supported coding agents
-
-Supported coding-agent CLIs and editors (`pi`, `omp`, `codex`, `opencode`, `grok`, `droid`, `prime-agent`, `goose`, `kimi-code`, `zed`, `continue`, and Claude Code OmniRoute profile) SHALL configure the live `gemini-3.8-flash-high` combo as their active default model via OmniRoute using the OpenAI Responses API (`/v1/responses` or `api: openai-responses` / `wire_api: responses`) where supported by the client, or via OmniRoute's OpenAI-compatible ingress / Anthropic Messages ingress for dialect-specific clients. Pre-existing providers SHALL remain preserved. Hermes Agent SHALL preserve its default MoA (Mixture of Agents) configuration with `omniroute:gemini-3.8-flash-high` as aggregator.
+Supported coding-agent CLIs and editors (`pi`, `omp`, `codex`, `opencode`, `grok`, `droid`, `prime-agent`, `goose`, `kimi-code`, `zed`, `continue`, and Claude Code OmniRoute profile) SHALL configure `gemini-3.8-flash-high` as their default model via OmniRoute (`/v1/responses` where supported, or OpenAI/Anthropic ingress for dialect-specific clients) while preserving existing providers and Hermes Agent's MoA `omniroute:gemini-3.8-flash-high` aggregator.
 
 #### Scenario: Supported CLIs default to Gemini combo
 - **WHEN** coding agents are invoked with default model selection
@@ -635,8 +629,7 @@ Workstation container lifecycle scripts (`~/Developer/scripts/docker-service.sh`
 - **THEN** `~/Omniroute/scripts/ensure-muse-wire-compat.sh` SHALL verify that neither `response:{id:null,status:"in_progress"}` nor unexpanded `response:{id:"resp_keepalive_omniroute",status:"in_progress"}` remains in `/app/.build/next/server/chunks/*.js` and that `/v1/muse-code/models` and `/muse-code/models` both return HTTP 200 advertising `muse-spark-1.3`
 
 ### Requirement: OmniRoute Gemini 4 Argon Tier Combos SHALL Route Exclusively Through Entitled Ultra Antigravity CLI Connections
-
-OmniRoute SHALL expose four top-level routing combos for Gemini 4 Argon (`gemini-4-argon-high`, `gemini-4-argon-medium`, `gemini-4-argon-low`, and `gemini-4-argon`) using `strategy: "auto"`, `context_length: 1000000`, `context_cache_protection: false`, `config.targetTimeoutMs: 180000`, and `config.candidatePool: ["agy"]`. Each combo SHALL contain three model steps pinned to the three Google AI `Ultra` `agy` CLI connections (`62af823b-f3d7-4e6b-87a9-98069167d4f6` / `vicgnome19094@gmail.com`, `0532bad4-2486-4286-8f06-510e9c678620` / `vinhvumobile@gmail.com`, and `338764b8-1cd7-4946-b789-ee5dad4c5073` / `vinhghtk1908@gmail.com`).
+OmniRoute SHALL expose four top-level Gemini 4 Argon combos (`gemini-4-argon-high`, `gemini-4-argon-medium`, `gemini-4-argon-low`, and `gemini-4-argon`) using `strategy: "auto"`, `context_length: 1000000`, `context_cache_protection: false`, `config.targetTimeoutMs: 180000`, `config.predictiveTtftMs: 60000`, and `config.candidatePool: ["agy"]`, each containing three model steps pinned to the three Google AI `Ultra` `agy` connections (`62af823b`, `0532bad4`, `338764b8`).
 
 #### Scenario: Tier combos resolve exclusively to the two Ultra agy CLI connections
 - **WHEN** `GET http://127.0.0.1:20128/api/combos` is queried
@@ -696,13 +689,12 @@ All external host configuration mutations under `/Users/androidteam/` SHALL veri
 - **THEN** each target file's on-disk SHA-256 matches its pre-mutation backup immediately prior to atomic replacement, all provider/credential configs and backups verify at `0600` (`0644` for `~/.codex/cockpit-model-catalog.json`; `~/.factory/settings.json`, `~/.config/muse/settings.json`, and `~/.qwen/settings.json` tightened to `0600`) via `stat -L -f '%04Lp'`, stale `~/.prime/agent/*.bak*` files are relocated out of `~/.prime/agent/`, and unconfigured/vendor-locked CLIs (`qoder`, `cursor-agent`, `auggie`) and legacy `~/.kimi/config.toml` remain untouched
 
 ### Requirement: Muse Code entrypoint compatibility SHALL use URL-prefix rewriting without chunk mutation or static catalog bypass
-
-The compose-mounted `/app/container-entrypoint-compat.sh` and `~/Omniroute/scripts/ensure-muse-wire-compat.sh` SHALL rewrite bare `/muse-code` request paths to `/v1/muse-code` in `/app/peer-stamp.mjs` (`MUSE_CODE_REWRITE_V3`) while delegating `/v1/muse-code/models` to upstream's native authenticated route handler and leaving compiled Next.js server chunks (`/app/.build/next/server/chunks/*.js`) unmodified.
+OmniRoute container startup (`/Users/androidteam/Omniroute/scripts/container-entrypoint-compat.sh`) SHALL inject `MUSE_CODE_REWRITE_V3` into `/app/peer-stamp.mjs` to rewrite `/muse-code` and `/api/provider` prefixes to `/v1/muse-code` and `/v1/api/provider` without Muse-specific chunk rewrites, while applying the 43 non-Muse runtime compatibility rules across 16 server chunk files.
 
 #### Scenario: Entrypoint rewrites /muse-code paths without modifying Next.js server chunks
 - **WHEN** `container-entrypoint-compat.sh` or `ensure-muse-wire-compat.sh` runs inside the `omniroute` container (`v3.8.52+`)
 - **THEN** `/app/peer-stamp.mjs` SHALL strip any prior V1 or `MUSE_CODE_COMPAT_V2` block and contain the `MUSE_CODE_REWRITE_V3` URL prefix rewrite (`req.url = "/v1" + req.url` for `/muse-code`, `/muse-code/*`, and `/muse-code?*`) without injecting a static model catalog
-- **AND** `/app/.build/next/server/chunks/*.js` SHALL remain byte-for-byte identical to the upstream container image layers
+- **AND** `/app/.build/next/server/chunks/*.js` SHALL contain zero Muse-specific rewrites while enforcing the 46 required fail-closed server chunk markers
 - **AND** authenticated `GET /muse-code/models` and `GET /v1/muse-code/models` SHALL return HTTP `200` from upstream's native route advertising `muse-spark-1.3`, while anonymous `GET` returns HTTP `401` when catalog authentication is enabled
 
 #### Scenario: Muse Code binary resolves via canonical Homebrew cask symlink
@@ -711,8 +703,7 @@ The compose-mounted `/app/container-entrypoint-compat.sh` and `~/Omniroute/scrip
 - **AND** the macOS Keychain entry `ai.meta.dev.credentials` SHALL be seeded via `muse auth set --provider meta --api-key-stdin` with `~/.config/muse/auth.json` (`mode 0600`) on `schema_version: 2` (`"storage": "keychain"`) so `muse` executes non-interactively without requiring a `TBH_CREDENTIAL_BACKEND=file` override
 
 ### Requirement: Encapsulated Nested Combo on `muse-spark-1.3`, Auto-Scored Opus Pool on `claude-opus-5.5`, and Loopback API Bridge Port `20129`
-
-OmniRoute SHALL configure `muse-spark-1.3` (`strategy: "priority"`, `nestedComboMode: "execute"`, `targetTimeoutMs: 25000`) and `claude-opus-5.5` (`strategy: "auto"`, `nestedComboMode: "flatten"`, `targetTimeoutMs: 25000`) with `context_cache_protection: false`, SHALL pin `gemini-4-argon{,-high,-medium,-low}` to the three entitled `Ultra` `agy` accounts (`62af823b`, `0532bad4`, and `338764b8`), and SHALL set `API_HOST=0.0.0.0` in `/Users/androidteam/Omniroute/.env` so host loopback port `20129` serves bridge requests.
+OmniRoute SHALL configure `muse-spark-1.3` (`strategy: "priority"`, `nestedComboMode: "execute"`, `targetTimeoutMs: 25000`) and `claude-opus-5.5` (`strategy: "auto"`, `nestedComboMode: "flatten"`, `targetTimeoutMs: 180000`, `predictiveTtftMs: 60000`) with `context_cache_protection: false`, pin `gemini-4-argon*` to the three `Ultra` `agy` accounts, and set `API_HOST=0.0.0.0` in `.env` for loopback port `20129`.
 
 #### Scenario: `muse-spark-1.3` executes `gemini-3.8-flash-high` sub-combo without model-pin warning
 - **WHEN** a request targets `muse-spark-1.3`
@@ -720,19 +711,18 @@ OmniRoute SHALL configure `muse-spark-1.3` (`strategy: "priority"`, `nestedCombo
 
 #### Scenario: `claude-opus-5.5` load-balances and pins across all 8 Opus accounts via `auto` strategy
 - **WHEN** a request targets `claude-opus-5.5`
-- **THEN** OmniRoute SHALL score all 8 `agy` Opus accounts using 16-factor `auto` routing (`tierPriority`, `health`, `quota`) and pin multi-turn sessions via `applySessionStickiness` before falling back to `gemini-3.8-flash-high` targets
+- **THEN** OmniRoute SHALL score all 15 active `agy` Opus accounts (`12` Pro and `3` Ultra, excluding banned `47f334b1-b801-41f6-a709-4ebabb7a86d6`) using 16-factor `auto` routing (`tierPriority`, `health`, `quota`) and pin multi-turn sessions via `applySessionStickiness` without flattening `gemini-3.8-flash-high` into the `auto` candidate pool
 
 #### Scenario: Host loopback port `20129` reaches container API bridge
 - **WHEN** a request is sent to `http://127.0.0.1:20129/v1/models` or `http://127.0.0.1:20129/v1/responses`
 - **THEN** `apiBridgeServer.ts` (`API_HOST=0.0.0.0` inside the container, mapped to `127.0.0.1:20129:20129` on the host) SHALL accept the connection and serve the response
 
 ### Requirement: 15-Account Antigravity Auto Pools for `claude-opus-5.5` and `claude-sonnet-5.5` Without Unentitled Custom 5.5 Model IDs
-
-OmniRoute SHALL configure `claude-opus-5.5` (`15` `agy/claude-opus-4-6-thinking` steps, `targetTimeoutMs: 180000`, `predictiveTtftMs: 60000`) and `claude-sonnet-5.5` (`15` `agy/claude-sonnet-4-6` steps, `targetTimeoutMs: 120000`, `predictiveTtftMs: 45000`) with `strategy: "auto"` and `context_cache_protection: false`, and SHALL remove unentitled custom `claude-*-5-5-high` entries from `/api/provider-models` and unstable providers from `auto/*` `candidatePool` lists.
+OmniRoute SHALL configure `claude-opus-5.5` (`15` active `agy/claude-opus-4-6-thinking` steps with `0` `combo-ref` steps, `targetTimeoutMs: 180000`, `predictiveTtftMs: 60000`) and `claude-sonnet-5.5` (`15` active `agy/claude-sonnet-4-6` steps, `targetTimeoutMs: 120000`, `predictiveTtftMs: 45000`) with `strategy: "auto"` and `context_cache_protection: false` (excluding banned `47f334b1`), and SHALL remove unentitled custom `claude-*-5-5-high` models.
 
 #### Scenario: `claude-opus-5.5` and `claude-sonnet-5.5` route across 15 `agy` accounts with tier-matched timeouts
 - **WHEN** `GET /api/combos` is queried for `claude-opus-5.5` (`4b2430da-0b3b-4b0e-9773-ec0f97adc252`) and `claude-sonnet-5.5` (`9447399c-856b-4f52-8820-b3bf3dc3f132`)
-- **THEN** `claude-opus-5.5` SHALL contain 15 `kind: "model"` steps targeting `agy/claude-opus-4-6-thinking` with `strategy: "auto"`, `context_cache_protection: false`, `config.targetTimeoutMs: 180000`, and `config.predictiveTtftMs: 60000`
+- **THEN** `claude-opus-5.5` SHALL contain 15 `kind: "model"` steps targeting `agy/claude-opus-4-6-thinking` across the 15 active `agy` accounts (`12` Pro and `3` Ultra, excluding banned `47f334b1-b801-41f6-a709-4ebabb7a86d6`) with `strategy: "auto"`, `context_cache_protection: false`, `config.targetTimeoutMs: 180000`, and `config.predictiveTtftMs: 60000`
 - **AND** `claude-sonnet-5.5` SHALL contain 15 `kind: "model"` steps targeting `agy/claude-sonnet-4-6` with `strategy: "auto"`, `context_cache_protection: false`, `config.targetTimeoutMs: 120000`, and `config.predictiveTtftMs: 45000`
 
 #### Scenario: Unentitled `claude-*-5-5-high` custom models and unstable auto-pool providers are excluded without breaking dedicated combos

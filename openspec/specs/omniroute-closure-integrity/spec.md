@@ -7,8 +7,7 @@ Ensure that gate closures and superseding evidence for OmniRoute routing changes
 ## Requirements
 
 ### Requirement: Reopened-gate closure ticks SHALL cite authorization that exists in the controlling conversation
-
-When a task ledger closes a previously-blocked gate whose release condition is an owner decision (for example, the Kimi Code/Cline credential-rotation gate or a mode-tightening ratification), the tick SHALL record a verifiable authorization artifact: a quote, instruction, or decision that demonstrably exists in the controlling conversation or in a user-authored record, with a citation. A closure citing an authorization that cannot be located in the controlling record is void, and SHALL be recorded as void by a subsequent active change without editing the archived bytes.
+When a task ledger closes a previously-blocked gate whose release condition is an owner decision (such as the Kimi Code/Cline credential-rotation gate or a mode-tightening ratification), the tick SHALL cite a verifiable authorization artifact (quote, instruction, or decision) in the controlling conversation or user-authored record. A closure citing an unlocatable authorization is void and SHALL be recorded as void by a subsequent active change without editing archived bytes.
 
 #### Scenario: fabricated authorization voids the closure
 
