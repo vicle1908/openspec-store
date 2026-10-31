@@ -1,0 +1,6 @@
+# Tasks
+
+## 1. Cross-Surface Specification, Skill, Wiki & Memory Synchronization
+
+- [x] 1.1 Update managed skills (`omniroute-v3852-config-and-skill-tuning`, `omniroute-sqlite-startup-and-volume-maintenance`, `muse-code-omniroute-setup`), user-level custom skill blocks (`~/.agents/skills/{omni-combos-routing,cli-routing,omni-settings}/SKILL.md`), wiki/docs (`wiki/entities/{omniroute,muse-code,goose,kimi-code}.md`, `wiki/concepts/omniroute-gemini-4-argon-fleet-routing.md`, `wiki/index.md`, `docs/omniroute-agent-skills.md`), and `memory://root/{memory_summary.md,MEMORY.md,skills/omniroute-and-omp-operations/SKILL.md}` to match live OmniRoute v3.8.52 ground truth.
+- [x] 1.2 Reconcile `omniroute-agent-cli-routing` (`context_cache_protection: false` on `muse-spark-1.3`), `omniroute-agent-skills` (`23 omni-* REST endpoints`), and `claude-code-omniroute-pm-routing` (`"model": "gemini-3.8-flash-high"` in `~/.claude/profiles/omniroute-pm.json` and completed `Scenario: One launcher per provider surface`), record `evidence.md`, archive the change, and verify all 6 OmniRoute specs pass `openspec validate <spec> --type spec --strict --store openspec-store` (`exit 0`) and `sync-workspace-agent-skills.py --check` (`exit 0`).

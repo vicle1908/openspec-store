@@ -526,7 +526,6 @@ Goose CLI tool integrations SHALL remain unified under the `@mcp_router/cli` std
 - **AND** no duplicate individual stdio entries for `gitnexus`, `graphify`, or `agentmemory` SHALL be declared
 
 ### Requirement: Muse Code CLI SHALL route default inference through OmniRoute combo `muse-spark-1.3` with sanctioned bearer transport pinning
-
 Meta Muse Code (`muse`) SHALL target local OmniRoute (`http://127.0.0.1:20128/v1`) using explicit `endpoint_transport` bearer pinning (`"auth": "bearer"`) and default model `"muse-spark-1.3"`, while OmniRoute SHALL define a combo named `muse-spark-1.3` backed by the `gemini-3.8-flash-high` pool so `POST /v1/responses` requests are intercepted ahead of the unauthenticated static `muse-code` provider.
 
 #### Scenario: Sanctioned front-door bearer transport prevents CLI auth withholding
@@ -538,7 +537,7 @@ Meta Muse Code (`muse`) SHALL target local OmniRoute (`http://127.0.0.1:20128/v1
 
 #### Scenario: OmniRoute combo `muse-spark-1.3` intercepts bare model requests and preserves namespace tools
 - **WHEN** Muse Code sends a streaming `POST /v1/responses` request with `"model": "muse-spark-1.3"` and `"type": "namespace"` tool definitions (such as `namespace: "muse"`)
-- **THEN** OmniRoute's combo resolver SHALL match the `muse-spark-1.3` combo (`context_length: 1000000`, `context_cache_protection: true`) before static provider lookup and route inference to the `gemini-3.8-flash-high` Antigravity pool (with `agy/gemini-3.8-flash-medium` fallback)
+- **THEN** OmniRoute's combo resolver SHALL match the `muse-spark-1.3` combo (`context_length: 1000000`, `context_cache_protection: false`) before static provider lookup and route inference to the `gemini-3.8-flash-high` Antigravity pool (with `agy/gemini-3.8-flash-medium` fallback)
 - **AND** OmniRoute SHALL flatten incoming `namespace` tool groups for upstream execution and restore `{"namespace": "muse", "name": "<tool>"}` on returned `function_call` SSE items
 - **AND** `GET /v1/muse-code/models` SHALL return HTTP 200 advertising `muse-spark-1.3`
 
