@@ -689,12 +689,12 @@ All external host configuration mutations under `/Users/androidteam/` SHALL veri
 - **THEN** each target file's on-disk SHA-256 matches its pre-mutation backup immediately prior to atomic replacement, all provider/credential configs and backups verify at `0600` (`0644` for `~/.codex/cockpit-model-catalog.json`; `~/.factory/settings.json`, `~/.config/muse/settings.json`, and `~/.qwen/settings.json` tightened to `0600`) via `stat -L -f '%04Lp'`, stale `~/.prime/agent/*.bak*` files are relocated out of `~/.prime/agent/`, and unconfigured/vendor-locked CLIs (`qoder`, `cursor-agent`, `auggie`) and legacy `~/.kimi/config.toml` remain untouched
 
 ### Requirement: Muse Code entrypoint compatibility SHALL use URL-prefix rewriting without chunk mutation or static catalog bypass
-OmniRoute container startup (`/Users/androidteam/Omniroute/scripts/container-entrypoint-compat.sh`) SHALL inject `MUSE_CODE_REWRITE_V3` into `/app/peer-stamp.mjs` to rewrite `/muse-code` and `/api/provider` prefixes to `/v1/muse-code` and `/v1/api/provider` without Muse-specific chunk rewrites, while applying the 43 non-Muse runtime compatibility rules across 16 server chunk files.
+OmniRoute container startup (`/Users/androidteam/Omniroute/scripts/container-entrypoint-compat.sh`) SHALL inject `MUSE_CODE_REWRITE_V3` into `/app/peer-stamp.mjs` to rewrite `/muse-code` and `/api/provider` prefixes to `/v1/muse-code` and `/v1/api/provider` without Muse-specific chunk rewrites, while applying the 48 non-Muse runtime compatibility rules across 21 server chunk files.
 
 #### Scenario: Entrypoint rewrites /muse-code paths without modifying Next.js server chunks
 - **WHEN** `container-entrypoint-compat.sh` or `ensure-muse-wire-compat.sh` runs inside the `omniroute` container (`v3.8.52+`)
 - **THEN** `/app/peer-stamp.mjs` SHALL strip any prior V1 or `MUSE_CODE_COMPAT_V2` block and contain the `MUSE_CODE_REWRITE_V3` URL prefix rewrite (`req.url = "/v1" + req.url` for `/muse-code`, `/muse-code/*`, and `/muse-code?*`) without injecting a static model catalog
-- **AND** `/app/.build/next/server/chunks/*.js` SHALL contain zero Muse-specific rewrites while enforcing the 46 required fail-closed server chunk markers
+- **AND** `/app/.build/next/server/chunks/*.js` SHALL contain zero Muse-specific rewrites while enforcing the 57 required fail-closed server chunk markers (`60` total markers across `24` compiled files)
 - **AND** authenticated `GET /muse-code/models` and `GET /v1/muse-code/models` SHALL return HTTP `200` from upstream's native route advertising `muse-spark-1.3`, while anonymous `GET` returns HTTP `401` when catalog authentication is enabled
 
 #### Scenario: Muse Code binary resolves via canonical Homebrew cask symlink
@@ -718,12 +718,12 @@ OmniRoute SHALL configure `muse-spark-1.3` (`strategy: "priority"`, `nestedCombo
 - **THEN** `apiBridgeServer.ts` (`API_HOST=0.0.0.0` inside the container, mapped to `127.0.0.1:20129:20129` on the host) SHALL accept the connection and serve the response
 
 ### Requirement: 15-Account Antigravity Auto Pools for `claude-opus-5.5` and `claude-sonnet-5.5` Without Unentitled Custom 5.5 Model IDs
-OmniRoute SHALL configure `claude-opus-5.5` (`15` active `agy/claude-opus-4-6-thinking` steps with `0` `combo-ref` steps, `targetTimeoutMs: 180000`, `predictiveTtftMs: 60000`) and `claude-sonnet-5.5` (`15` active `agy/claude-sonnet-4-6` steps, `targetTimeoutMs: 120000`, `predictiveTtftMs: 45000`) with `strategy: "auto"` and `context_cache_protection: false` (excluding banned `47f334b1`), and SHALL remove unentitled custom `claude-*-5-5-high` models.
+OmniRoute SHALL configure `claude-opus-5.5` (`15` active `agy` steps matching each connection's `syncedAvailableModels` entry: `agy/claude-opus-5-5-high` or `agy/claude-opus-4-6-thinking`, `0` `combo-ref` steps, `targetTimeoutMs: 180000`, `predictiveTtftMs: 60000`) and `claude-sonnet-5.5` (`15` active `agy` steps: `agy/claude-sonnet-5-5-high` or `agy/claude-sonnet-4-6`, `targetTimeoutMs: 120000`, `predictiveTtftMs: 45000`) with `strategy: "auto"` and `context_cache_protection: false`.
 
 #### Scenario: `claude-opus-5.5` and `claude-sonnet-5.5` route across 15 `agy` accounts with tier-matched timeouts
 - **WHEN** `GET /api/combos` is queried for `claude-opus-5.5` (`4b2430da-0b3b-4b0e-9773-ec0f97adc252`) and `claude-sonnet-5.5` (`9447399c-856b-4f52-8820-b3bf3dc3f132`)
-- **THEN** `claude-opus-5.5` SHALL contain 15 `kind: "model"` steps targeting `agy/claude-opus-4-6-thinking` across the 15 active `agy` accounts (`12` Pro and `3` Ultra, excluding banned `47f334b1-b801-41f6-a709-4ebabb7a86d6`) with `strategy: "auto"`, `context_cache_protection: false`, `config.targetTimeoutMs: 180000`, and `config.predictiveTtftMs: 60000`
-- **AND** `claude-sonnet-5.5` SHALL contain 15 `kind: "model"` steps targeting `agy/claude-sonnet-4-6` with `strategy: "auto"`, `context_cache_protection: false`, `config.targetTimeoutMs: 120000`, and `config.predictiveTtftMs: 45000`
+- **THEN** `claude-opus-5.5` SHALL contain 15 `kind: "model"` steps matching each active connection's `syncedAvailableModels` catalog (`agy/claude-opus-5-5-high` on `38782750` and `agy/claude-opus-4-6-thinking` on the remaining 14 active `agy` accounts, excluding banned `47f334b1`) with `strategy: "auto"`, `context_cache_protection: false`, `config.targetTimeoutMs: 180000`, and `config.predictiveTtftMs: 60000`
+- **AND** `claude-sonnet-5.5` SHALL contain 15 `kind: "model"` steps matching each active connection's `syncedAvailableModels` catalog (`agy/claude-sonnet-5-5-high` on `38782750` and `agy/claude-sonnet-4-6` on the remaining 14 active `agy` accounts) with `strategy: "auto"`, `context_cache_protection: false`, `config.targetTimeoutMs: 120000`, and `config.predictiveTtftMs: 45000`
 
 #### Scenario: Unentitled `claude-*-5-5-high` custom models and unstable auto-pool providers are excluded without breaking dedicated combos
 - **WHEN** `GET /api/provider-models`, `GET /api/models/alias`, `GET /api/providers`, and `GET /api/combos` are queried

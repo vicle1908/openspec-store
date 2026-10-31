@@ -1,0 +1,7 @@
+# Tasks
+
+## 1. Per-Account Claude 5.5 Step Alignment & Compatibility Marker Synchronization
+
+- [x] 1.1 Update step `[1]` (`38782750-7a60-46d4-ae3f-e8c13cda296b` / `vicgnome19096@gmail.com`) in `claude-opus-5.5` (`4b2430da-0b3b-4b0e-9773-ec0f97adc252`) to `agy/claude-opus-5-5-high` and in `claude-sonnet-5.5` (`9447399c-856b-4f52-8820-b3bf3dc3f132`) to `agy/claude-sonnet-5-5-high` via `PUT /api/combos/{id}` (preserving full `current.config`), and verify both direct connection probes (`x-omniroute-connection: 38782750-7a60-46d4-ae3f-e8c13cda296b`) and multi-call `claude-opus-5.5` sweeps return `HTTP 200` with zero synthetic deprecation responses.
+- [x] 1.2 Update `/Users/androidteam/Omniroute/scripts/ensure-muse-wire-compat.sh` (`lines 6, 15`) and `/Users/androidteam/Developer/wiki/entities/omniroute.md` (`lines 44, 67, 73`) to reflect `3` non-chunk patches + `48` chunk/route replacement rules (`51` modifications) and `60` fail-closed markers across `24` compiled files (`3` non-chunk + `57` chunk across `21` server chunk files), and verify `bash -n` and live execution (`already_ok`).
+- [x] 1.3 Record verification evidence in `evidence.md`, validate `reconcile-omniroute-per-account-claude55-and-marker-counts` strictly, archive the change to sync the 3 main specs (`omniroute-runtime-customization`, `omniroute-compression-and-routing`, `omniroute-agent-cli-routing`), and verify all 6 OmniRoute specs pass `openspec validate <spec> --type spec --strict --store openspec-store` (`exit 0`).
