@@ -83,7 +83,7 @@ OmniRoute SHALL configure `lite.compressToolResults` as `false` (`maxToolLength:
 
 ### Requirement: Bounded Quota Park, Early-EOF Sibling Failover, Refusal Cooldown Skip, and Terminal Safety Stops
 
-OmniRoute SHALL persist 24 enabled v3.8.52 resilience, routing, catalog, and compaction feature flags as "true" and ANTIGRAVITY_ACCOUNT_LEASE_ENABLED and COMBO_AUTO_PRUNE_STALE_STEPS as "false" in SQLite key_value (namespace='feature_flags'), configure mcpDescriptionCompressionEnabled as true in compression settings, set sessionAffinityTtlMs to 300000, and keep FLUSH_EMPTY_RETRY_ENABLED and OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS disabled ("false") while OMNIROUTE_ALLOW_LOCAL_PROVIDER_URLS remains "true".
+OmniRoute SHALL persist 24 enabled v3.8.52 resilience, routing, catalog, and compaction feature flags as "true" and ANTIGRAVITY_ACCOUNT_LEASE_ENABLED and COMBO_AUTO_PRUNE_STALE_STEPS as "false" in SQLite key_value (namespace='feature_flags'), set mcpDescriptionCompressionEnabled to true, set sessionAffinityTtlMs to 300000, and keep FLUSH_EMPTY_RETRY_ENABLED and OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS disabled ("false") while OMNIROUTE_ALLOW_LOCAL_PROVIDER_URLS remains "true".
 
 #### Scenario: Pre-first-frame SSE early EOF fails over once to a sibling connection
 - **WHEN** `STREAM_EARLY_EOF_SIBLING_FAILOVER_ENABLED` is `true` and an upstream SSE stream closes with `STREAM_EARLY_EOF` before emitting any useful frame
