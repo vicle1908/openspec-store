@@ -16,7 +16,7 @@ The OmniRoute gateway SHALL configure RTK compression at `minimal` intensity for
 
 #### Scenario: Headerless requests honor safe default pipeline and adaptive context budget escalation
 - **WHEN** a client submits a request without an `x-omniroute-compression` header
-- **THEN** OmniRoute's `lossyRequestPolicy` SHALL run `SAFE_DEFAULT_PIPELINE` (`session-dedup` and `lite`) when below the 85% `contextBudget` threshold, and `resolveAdaptivePlan` SHALL escalate along the compression ladder (`session-dedup` -> `rtk` -> `headroom` -> `lite` -> `caveman`) when estimated input tokens exceed the `contextBudget` target
+- **THEN** OmniRoute SHALL run its server-side tool-safe `[session-dedup, lite, rtk, codex-responses, headroom]` stack (`compressionComboId: "default-caveman"`, `caveman: false`, `lite.compressToolResults: false`) when below the 85% `contextBudget` threshold, and `resolveAdaptivePlan` SHALL escalate along the compression ladder when estimated input tokens exceed the `contextBudget` target
 
 #### Scenario: Delegated context editing on long Claude tool loops
 - **WHEN** `contextEditing.enabled` is `true` and a request targets a supported Claude or `anthropic-compatible-cc-*` relay exceeding the 100,000 input token trigger
@@ -44,19 +44,19 @@ OmniRoute combos targeting Antigravity (`agy`) connection subsets SHALL set `con
 
 #### Scenario: Nested combo-ref execution on `muse-spark-1.3` and auto-scored pool on `claude-opus-5.5`
 - **WHEN** `muse-spark-1.3` dispatches to its primary `combo-ref` target (`gemini-3.8-flash-high`)
-- **THEN** OmniRoute SHALL execute `gemini-3.8-flash-high` as an encapsulated runtime unit (`nestedComboMode: "execute"`) using its `auto` strategy before falling back to `agy/gemini-3.8-flash-medium`, while `claude-opus-5.5` (`strategy: "auto"`, `nestedComboMode: "flatten"`) SHALL score all 8 Opus accounts via 16-factor `auto` routing and `applySessionStickiness`
+- **THEN** OmniRoute SHALL execute `gemini-3.8-flash-high` as an encapsulated runtime unit (`nestedComboMode: "execute"`) using its `auto` strategy before falling back to `agy/gemini-3.8-flash-medium`, while `claude-opus-5.5` (`strategy: "auto"`, `nestedComboMode: "flatten"`) SHALL score all 15 Antigravity accounts via 16-factor `auto` routing and `applySessionStickiness`
 
 ### Requirement: Thinking Budget Passthrough and Resilience Feature Flags
 
-OmniRoute SHALL configure `thinkingBudget.mode` as `"passthrough"` and SHALL enable the v3.8.52 resilience feature flags `CREDENTIAL_GATE_AUTH_DIAGNOSES_ONLY`, `ANTIGRAVITY_ACCOUNT_LEASE_ENABLED`, `COMBO_EMPTY_POOL_NO_ELIGIBLE_TARGETS_ENABLED`, `STREAM_LATE_OUTPUT_PROBE_ENABLED`, and `RETRY_AFTER_PROVENANCE_ENABLED` via individual string-valued (`"true"`) flag overrides.
+OmniRoute SHALL configure `thinkingBudget.mode` as `"passthrough"` and SHALL enable the v3.8.52 resilience feature flags `CREDENTIAL_GATE_AUTH_DIAGNOSES_ONLY`, `COMBO_EMPTY_POOL_NO_ELIGIBLE_TARGETS_ENABLED`, `STREAM_LATE_OUTPUT_PROBE_ENABLED`, and `RETRY_AFTER_PROVENANCE_ENABLED` via individual string-valued (`"true"`) flag overrides while keeping `ANTIGRAVITY_ACCOUNT_LEASE_ENABLED` as `"false"`.
 
 #### Scenario: Client reasoning parameters preserved under passthrough mode
 - **WHEN** Codex CLI, Claude Code, or OMP sends a request containing `reasoning`, `reasoning_effort`, `thinking`, or `thinking_config`
 - **THEN** OmniRoute SHALL preserve those fields verbatim without stripping or overwriting them
 
-#### Scenario: Antigravity concurrent account lease protection
-- **WHEN** `ANTIGRAVITY_ACCOUNT_LEASE_ENABLED` is `true` and an in-flight streaming request is active on a specific `(connectionId, model)` pair
-- **THEN** OmniRoute SHALL lease that `(connectionId, model)` pair for the duration of the stream so concurrent requests select an unleased sibling account
+#### Scenario: Antigravity concurrent account lease disabled on small pools
+- **WHEN** `ANTIGRAVITY_ACCOUNT_LEASE_ENABLED` is `"false"` in SQLite `key_value` (`namespace = 'feature_flags'`)
+- **THEN** concurrent streaming requests across small account pools (`gemini-4-argon*`) SHALL route without shedding with HTTP 503 `POOL_BUSY`
 
 ### Requirement: Built-in Memory and Skills Injection Disabled in Favor of Dedicated AgentMemory
 
@@ -74,17 +74,16 @@ OmniRoute SHALL configure `memoryEnabled: true`, `skillsEnabled: false`, and `me
 
 OmniRoute SHALL configure `lite.compressToolResults` as `false` (`maxToolLength: 200000`), SHALL enable `headroom` (`engines.headroom.enabled: true`) and `codex-responses` (`codexResponsesConfig.enabled: true`), and SHALL set `contextBudget` (`mode: "replace-autotrigger"`, `policy: "percentage"`, `pct: 0.85`) with `ladderOverride` ordered as `session-dedup`, `headroom`, `lite`, `codex-responses`, and `rtk` (`minimal`).
 
-#### Scenario: Headerless multi-turn requests preserve prior-turn `Read` and `Grep` tool results under `[session-dedup, lite, headroom]`
+#### Scenario: Headerless multi-turn requests preserve prior-turn `Read` and `Grep` tool results under server-side tool-safe pipeline
 - **WHEN** a coding client submits a multi-turn request without an `x-omniroute-compression` header and with prior-turn tool results exceeding 2,000 characters
-- **THEN** OmniRoute SHALL run its lossless `[session-dedup, lite, headroom]` pipeline and `lite` SHALL NOT truncate prior-turn tool results to 2,000 characters (`compressToolResults: false`)
-
+- **THEN** OmniRoute SHALL run its tool-safe `[session-dedup, lite, rtk, codex-responses, headroom]` pipeline and `lite` SHALL NOT truncate prior-turn tool results to 2,000 characters (`compressToolResults: false`)
 #### Scenario: Lossy-opt-in and `codex-responses` requests compress `/v1/responses` and `/v1/chat/completions` tool outputs while protecting file reads
 - **WHEN** a request opts into lossy compression (`x-omniroute-compression: allow-lossy`, `engine:codex-responses`, or `engine:rtk`) or invokes `ladderOverride` (`basePlan.mode === "off"` at >85% `percentage` context budget)
 - **THEN** OmniRoute SHALL execute `codex-responses` (on `/v1/responses` `function_call_output` items, protecting `Read`, `Glob`, `Grep`, `Write`, `Edit`, `WebSearch`, `WebFetch`, `find`) and `rtk` (`minimal` intensity on tool results)
 
 ### Requirement: Bounded Quota Park, Early-EOF Sibling Failover, Refusal Cooldown Skip, and Terminal Safety Stops
 
-OmniRoute SHALL persist all 25 enabled v3.8.52 resilience, routing, catalog, and compaction feature flags as "true" and ANTIGRAVITY_ACCOUNT_LEASE_ENABLED as "false" in SQLite feature_flags, configure mcpDescriptionCompressionEnabled as true in compression settings, set sessionAffinityTtlMs to 300000, and keep FLUSH_EMPTY_RETRY_ENABLED and OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS disabled ("false") while OMNIROUTE_ALLOW_LOCAL_PROVIDER_URLS remains "true".
+OmniRoute SHALL persist 24 enabled v3.8.52 resilience, routing, catalog, and compaction feature flags as "true" and ANTIGRAVITY_ACCOUNT_LEASE_ENABLED and COMBO_AUTO_PRUNE_STALE_STEPS as "false" in SQLite key_value (namespace='feature_flags'), configure mcpDescriptionCompressionEnabled as true in compression settings, set sessionAffinityTtlMs to 300000, and keep FLUSH_EMPTY_RETRY_ENABLED and OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS disabled ("false") while OMNIROUTE_ALLOW_LOCAL_PROVIDER_URLS remains "true".
 
 #### Scenario: Pre-first-frame SSE early EOF fails over once to a sibling connection
 - **WHEN** `STREAM_EARLY_EOF_SIBLING_FAILOVER_ENABLED` is `true` and an upstream SSE stream closes with `STREAM_EARLY_EOF` before emitting any useful frame
@@ -138,7 +137,7 @@ OmniRoute SHALL disable `caveman` (`engines.caveman.enabled: false`, `cavemanCon
 - **WHEN** a coding client submits a multi-turn request without an `x-omniroute-compression` header containing verbose shell/test tool outputs and `Read`/`Grep` file outputs
 - **THEN** OmniRoute (`config.compressionComboId === "default-caveman"`) SHALL execute `[session-dedup, lite, rtk, codex-responses, headroom]` to compress the shell/test tool outputs while preserving user/assistant prose (`caveman: false`) and `Read`/`Grep`/`Glob`/`Edit`/`Write` file outputs verbatim
 
-### Requirement: Predictive TTFT Circuit Breaker, Unleased 2-Account Pool Concurrency, and Subscription-Scoped Ban Auto-Disable
+### Requirement: Predictive TTFT Circuit Breaker, Unleased 3-Ultra-Account Pool Concurrency, and Subscription-Scoped Ban Auto-Disable
 OmniRoute SHALL enable `zeroLatencyOptimizationsEnabled: true` (`predictiveTtftMs: 25000`, `targetTimeoutMs: 25000`, `hedging: false`, `fallbackCompressionMode: "off"`) in `/api/settings/combo-defaults` and as the default baseline for `agy` combos while preserving explicit higher-latency tier overrides, SHALL isolate per-attempt target latency across direct metrics and retry helpers, and SHALL scope predictive TTFT to individual targets with bounded recovery and starvation guards.
 
 #### Scenario: Stalled target exceeding 25-second average latency skipped on attempt 0 without fallback re-truncation
@@ -174,7 +173,7 @@ OmniRoute SHALL enable `zeroLatencyOptimizationsEnabled: true` (`predictiveTtftM
 - **THEN** `buildAutoCandidates` SHALL prefer `byTarget[executionKey]` latency and success rate whenever `byTarget[executionKey].requests > 0` (using `byModel[modelStr]` or 24-hour model aggregates only as fallback when target history is absent)
 - **AND** routing, metrics inspection, and scoped combo resets (`DELETE /api/combos/metrics?combo=<name>`) SHALL operate on the same active in-memory metrics state without clearing unrelated combo metrics or stopping the periodic metrics cleanup timer
 
-#### Scenario: Concurrent subagent streams on 2-account `gemini-4-argon` pool proceed without lease saturation 503
+#### Scenario: Concurrent subagent streams on 3-Ultra-account `gemini-4-argon` pool proceed without lease saturation 503
 - **WHEN** `ANTIGRAVITY_ACCOUNT_LEASE_ENABLED` is `"false"` and concurrent streaming requests target `gemini-4-argon*` across the three entitled `Ultra` `agy` accounts
 - **THEN** OmniRoute SHALL allow concurrent streams on the three entitled `Ultra` `agy` accounts without returning `503 All eligible Antigravity accounts are currently handling a request for this model`
 
@@ -253,10 +252,10 @@ OmniRoute SHALL configure `/api/settings/cache-config` with `semanticCacheEnable
 
 ### Requirement: Three-Tier Configuration Hierarchy and Coding-Agent V8 Heap Sizing
 
-OmniRoute SHALL separate configuration across SQLite runtime tables, ~/Omniroute/.env, and a structural ~/Omniroute/docker-compose.override.yml with zero environment overrides, aligning overlapping semantic-cache keys across .env and SQLite and sizing omniroute-base with OMNIROUTE_MEMORY_MB=4096, container mem_limit: 5g, and single-heavyweight admission (OMNIROUTE_CHAT_MAX_HEAVY_IN_FLIGHT=1) within the 6 GiB Docker Desktop VM.
+OmniRoute SHALL separate configuration across SQLite runtime tables, ~/Omniroute/.env, and a structural ~/Omniroute/docker-compose.override.yml with zero environment overrides, aligning overlapping semantic-cache keys across .env and SQLite and sizing omniroute-base with OMNIROUTE_MEMORY_MB=4096, container mem_limit: 5g, and multi-agent heavyweight admission (OMNIROUTE_CHAT_MAX_HEAVY_IN_FLIGHT=16) within the 6 GiB Docker Desktop VM.
 
-#### Scenario: Bounded V8 heap, 5 GiB container cgroup limit, and single-heavyweight admission within the 6 GiB Docker VM
-- **WHEN** `omniroute-base` starts with `OMNIROUTE_MEMORY_MB=4096` and `OMNIROUTE_CHAT_MAX_HEAVY_IN_FLIGHT=1` in `.env` and `mem_limit: 5g` in `docker-compose.override.yml` on the `6144` MiB (`MemTotal = 6,210,043,904` bytes) Docker Desktop VM
+#### Scenario: Bounded V8 heap, 5 GiB container cgroup limit, and heavyweight admission within the 6 GiB Docker VM
+- **WHEN** `omniroute-base` starts with `OMNIROUTE_MEMORY_MB=4096` and `OMNIROUTE_CHAT_MAX_HEAVY_IN_FLIGHT=16` in `.env` and `mem_limit: 5g` in `docker-compose.override.yml` on the `6144` MiB (`MemTotal = 6,210,043,904` bytes) Docker Desktop VM
 - **THEN** `/app/check-permissions.sh` SHALL configure `v8.getHeapStatistics().heap_size_limit` (`4,395,630,592` bytes) strictly below `process.constrainedMemory()` (`5,368,709,120` bytes / `5g`), which in turn SHALL remain below Docker VM `MemTotal` (`6,210,043,904` bytes), and `GET /api/monitoring/health` SHALL report `chatAdmission.countCapEnabled: true`, `chatAdmission.budgetSource: "v8_heap"`, and `chatAdmission.maxInflightBytes: 137363456`
 
 #### Scenario: Structural docker-compose.override.yml preserves service identities, healthcheck timing, and zero environment overrides
@@ -274,7 +273,7 @@ OmniRoute SHALL configure `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-arg
 #### Scenario: All three Ultra accounts present in every gemini-4-argon* combo
 - **WHEN** `GET /api/combos/{id}` is queried for `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, or `gemini-4-argon-low`
 - **THEN** `models` SHALL contain 3 steps mapped to `connectionId` values `62af823b-f3d7-4e6b-87a9-98069167d4f6` (`label: "vicgnome19094@gmail.com"`), `0532bad4-2486-4286-8f06-510e9c678620` (`label: "vinhvumobile@gmail.com"`), and `338764b8-1cd7-4946-b789-ee5dad4c5073` (`label: "vinhghtk1908@gmail.com"`)
-- **AND** `strategy` SHALL be `"auto"`, `context_cache_protection` SHALL be `false`, and `config.targetTimeoutMs` SHALL be `25000`
+- **AND** `strategy` SHALL be `"auto"`, `context_cache_protection` SHALL be `false`, `config.targetTimeoutMs` SHALL be `180000`, and `config.predictiveTtftMs` SHALL be `60000`
 
 #### Scenario: Live gemini-4-argon inference succeeds with 3 Ultra accounts
 - **WHEN** a completion request is sent to `gemini-4-argon` or `gemini-4-argon-high` (or when one Ultra account returns `HTTP 429`)
@@ -331,7 +330,7 @@ OmniRoute SHALL keep Hybrid Memory enabled (`enabled: true`, `skillsEnabled: fal
 
 ### Requirement: Dedicated 11-Pro-Account Auto Pool for `gemini-3.8-flash-high` and Ultra Quota Isolation
 
-OmniRoute SHALL configure `gemini-3.8-flash-high` (`7555d851-b4f3-44c6-b1fb-c6fdceabf388`) with `strategy: "auto"`, `context_cache_protection: false`, `targetTimeoutMs: 25000`, `predictiveTtftMs: 25000`, and 11 `kind: "model"` steps scoped exclusively to the 11 active `g1-pro-tier` `agy` connections (excluding the 3 `g1-ultra-tier` accounts and `free-tier`), and SHALL enable `rateLimitProtection: true` on all 14 active `agy` accounts via `POST /api/rate-limits`.
+OmniRoute SHALL configure `gemini-3.8-flash-high` (`7555d851-b4f3-44c6-b1fb-c6fdceabf388`) with `strategy: "auto"`, `context_cache_protection: false`, `targetTimeoutMs: 25000`, `predictiveTtftMs: 25000`, and 11 `kind: "model"` steps scoped exclusively to the 11 active `g1-pro-tier` `agy` connections (excluding the 3 `g1-ultra-tier` accounts, 1 `free-tier` account, and any banned account), and SHALL enable `rateLimitProtection: true` on all 14 active `agy` accounts via `POST /api/rate-limits`.
 
 #### Scenario: `gemini-3.8-flash-high` routes across the 11 Pro accounts without consuming Ultra Gemini quota
 - **WHEN** `GET /api/combos/7555d851-b4f3-44c6-b1fb-c6fdceabf388` (`gemini-3.8-flash-high`) is inspected or invoked
@@ -355,3 +354,47 @@ OmniRoute SHALL configure `targetTimeoutMs: 180000` and `predictiveTtftMs: 60000
 - **WHEN** `container-entrypoint-compat.sh` runs on container startup
 - **THEN** it SHALL verify all patch markers across the compiled server chunks without skipping missing chunk filenames (`process.exit(1)` on any missing marker)
 - **AND** `OMNIROUTE_SEMANTIC_CACHE_EMBEDDING_TIMEOUT_MS=3000` and `OMNIROUTE_SEMANTIC_CACHE_TTL_MS=18000000` SHALL be set in `/Users/androidteam/Omniroute/.env` with `ensureSemanticCacheDbBridge()` auto-invoked on `/v1/responses` and `/v1/messages` cold starts
+
+### Requirement: Compression Accounting Provenance
+Compression accounting SHALL distinguish estimated token reduction from measured usage and billed cost, record the measurement interval and applicable pricing assumptions, and avoid lifetime-volume or minimum-reduction floors as correctness criteria.
+
+#### Scenario: Compression does not reduce a short input
+- **WHEN** an eligible input is already compact or a compressor returns unchanged content
+- **THEN** accounting SHALL report zero reduction without inventing savings or treating the request as a correctness failure.
+
+#### Scenario: Reporting estimated monetary savings
+- **WHEN** a report converts token reduction into an estimated monetary amount
+- **THEN** it SHALL state the model, price basis, measurement window, and limitations and SHALL NOT present the estimate as verified avoided billing.
+
+### Requirement: Optional Compression Quality Gate
+Additional compression engines SHALL remain evaluation candidates until representative coding and instruction-following cases demonstrate preserved protected content and acceptable answer, tool-call, and latency outcomes. Existing prose-preserving defaults SHALL remain unchanged during evaluation.
+
+#### Scenario: Protected content and prompt prefixes
+- **WHEN** an optional compressor is evaluated on instructions, file contents, tool arguments, identifiers, or cacheable prompt prefixes
+- **THEN** the evaluation SHALL check the applicable preservation contract and downstream task correctness, and SHALL NOT accept token reduction alone as sufficient proof.
+
+#### Scenario: Model load or compressor failure
+- **WHEN** a model cannot load, execution times out, or compression expands the request
+- **THEN** verification SHALL check that the supported fallback preserves the request and reports the failure or bypass without claiming successful compression.
+
+### Requirement: Embedding Timeout Path Evidence
+The semantic-cache embedding evaluation SHALL identify the effective deadline at each layer of the embedding request and SHALL distinguish it from chat-header and stream-idle deadlines. Longer timeouts SHALL require measured justification rather than blanket increases.
+
+#### Scenario: Outer setting exceeds inner fetch deadline
+- **WHEN** an outer embedding timeout is longer than a separate inner HTTP deadline
+- **THEN** the report SHALL identify the limiting deadline and SHALL NOT claim that changing the outer setting alone permits a longer operation.
+
+#### Scenario: Slow or unavailable local embedding service
+- **WHEN** an embedding service is cold, slow, or unavailable during evaluation
+- **THEN** evidence SHALL record elapsed time, cache-bypass behavior, request outcome, and any uncancelled work; a five-minute chat timeout SHALL NOT substitute for embedding-path verification.
+
+### Requirement: Cache and Coordination Isolation Evaluation
+Before changing cache scope or Redis eviction policy, the evaluation SHALL classify enabled cache and coordination consumers and verify request isolation, acceptable expiry behavior, and the effect of memory pressure on rate limits, quotas, and coordination state.
+
+#### Scenario: Similar prompts with different request context
+- **WHEN** similar requests differ in authorized owner, relevant system policy, tool contract, tool history, or freshness-sensitive state
+- **THEN** evaluation SHALL verify that an incompatible cached response is not reused; an unsafe case SHALL remain ineligible for cache promotion until resolved.
+
+#### Scenario: Shared Redis reaches its proposed memory budget
+- **WHEN** a candidate eviction policy is evaluated against a Redis instance shared by cache and coordination consumers
+- **THEN** the report SHALL identify which keys can be lost and whether enforcement weakens, and SHALL NOT assume that all expiring keys are disposable cache data or that maxmemory equals total process memory.

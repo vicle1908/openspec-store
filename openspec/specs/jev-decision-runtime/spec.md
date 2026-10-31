@@ -34,6 +34,7 @@ The banking runtime foundation SHALL provide a System One decision client (`shb_
 - **WHEN** the client experiences consecutive transport errors or 5xx failures exceeding `circuit_breaker_threshold` (default 3) across repeated calls via the process-wide `get_jev_client() -> JevDecisionClient` singleton (cleared via `reset_jev_client()`, which is invoked automatically by `shb_core.config.reset_settings()` via a lazy import `from shb_core.jev import reset_jev_client`)
 - **THEN** the thread-safe `JevCircuitBreaker` (protected by `threading.Lock` and `time.monotonic()`) MUST persist consecutive failure counts across tool calls (`initiate_fund_transfer`, `screen_beneficiary`) and LangGraph stage transitions (`_should_skip_api_contract`), transition to open state, and fast-fail subsequent evaluation requests during the `circuit_breaker_cooldown_seconds` (default 30.0s) window without making network calls
 - **AND** the caller SHALL immediately execute its deterministic fallback or fail-closed path
+
 ### Requirement: Configuration Management for Jev System One
 
 The foundation settings module (`shb_core.config`) SHALL expose `JevSettings` on `ShbSettings.jev` (`JEV_` and `SHB_JEV_` `AliasChoices`) loaded from `~/.shb/.env` and environment variables in isolation from `~/.tdt/`, strip API keys via `@model_validator(mode="before")`, lazily invoke `reset_jev_client()` in `reset_settings()`, and surface non-sensitive Jev diagnostics in `shb_core.cli`.
@@ -57,6 +58,7 @@ The foundation settings module (`shb_core.config`) SHALL expose `JevSettings` on
 #### Scenario: Model identifier may be pinned
 - **WHEN** decision thresholds have been calibrated against a specific release
 - **THEN** the configuration SHALL allow pinning versioned model identifiers (`jev-1.13.0` stable or `jev-1.14.0` preview) instead of a moving alias
+
 ### Requirement: Credential and transport handling
 
 The client SHALL resolve its endpoint (`resolved_base_url`) first via `_resolve_endpoint_and_api_key()`, select the matching credential (`TYPESAFE_API_KEY` in Direct Mode vs `PYDANTIC_AI_GATEWAY_API_KEY` before `TYPESAFE_API_KEY` in Gateway Mode), fail fast on an invalid or missing key, and bound every request with a timeout, circuit breaker, and retry policy.
@@ -126,6 +128,7 @@ The banking agent tool registry (`shb-agent-core`) SHALL provide pre-flight sema
 - **WHEN** the guardrail encounters a network error, service timeout, or unavailable credential while evaluating an `OPERATIONAL`, `FINANCIAL_TRANSFER`, or `COMPLIANCE_CRITICAL` invocation
 - **THEN** the guardrail SHALL fail closed (`BLOCK` or escalate to mandatory `supervisor_approval_token` validation, where a valid `supervisor_approval_token` of min 8 chars satisfies `ESCALATE` on `initiate_fund_transfer` and returns `status="COMPLETED"`) in accordance with `fail_closed=True`
 - **AND** SHALL NOT permit unapproved tool execution
+
 ### Requirement: State-Driven Graph Routing
 
 The workflow engine (`shb-agent-harness`, package `shb_harness` on `langgraph>=1.2.16` and `langgraph-checkpoint-sqlite>=3.1.2`) SHALL support confidence-gated graph routing using TypeSafe `Choice` decisions (`_should_skip_api_contract` / `a_should_skip_api_contract`) wired via `builder.add_conditional_edges(StageName.SPEC.value, ...)`, treating `confidence` as a second axis and failing safe to `StageName.API_CONTRACT` while preserving human interrupt gates.
@@ -150,6 +153,7 @@ The workflow engine (`shb-agent-harness`, package `shb_harness` on `langgraph>=1
 - **AND** both functions MUST normalize `dict` or `HarnessState` inputs and evaluate deterministic `classification.metadata` before Jev `Choice` (`"design"` vs `"api_contract"`)
 - **AND** synchronous `graph.invoke(...)` SHALL invoke `_should_skip_api_contract` calling `JevDecisionClient.evaluate()` (`TypeSafeClient`) without raising `TypeError('No synchronous function provided to "branch:to:..."')`
 - **AND** asynchronous `await graph.ainvoke(...)` (`HarnessRunner.a_run_all()` / `HarnessRunner.a_resume()`) SHALL invoke `a_should_skip_api_contract` calling `await JevDecisionClient.a_evaluate()` (`AsyncTypeSafeClient`) with `DualSqliteSaver` delegating `aget_tuple` / `aput` / `aput_writes` / `alist` to `AsyncSqliteSaver` without calling `asyncio.run()` or blocking the active asyncio event loop
+
 ### Requirement: Two-Stage Skill Candidate Selection
 
 The skill package (`shb-agent-skills`) SHALL create `shb_skills.matcher.SkillMatcher` (re-exported in `shb_skills.__init__`) over `SkillsCatalog` to provide Stage 1 deterministic shortlist retrieval (`match()`) and Stage 2 Jev reranking (`match_jev()` / `a_match_jev()`) using one `Noul` per candidate in a single batched request, enforcing shortlist subset invariance and Stage 1 fallback.
@@ -168,6 +172,7 @@ The skill package (`shb-agent-skills`) SHALL create `shb_skills.matcher.SkillMat
 #### Scenario: Reranking failure preserves baseline order
 - **WHEN** candidate reranking encounters a decision timeout, service error, or circuit breaker open state
 - **THEN** the skill matcher SHALL fall back immediately to the initial Stage 1 ranking order without throwing an unhandled exception
+
 ### Requirement: Non-Generative Evaluation Scorer
 
 The evaluation subsystem (`shb-agent-core`, package `shb_agent.evaluation`) SHALL provide a `JevEvaluator` compatible with `pydantic-evals` that assesses trace outputs by scoring independent rubric dimensions (`Score` and `Noul`) in a single parallel request and combining them in code without generative LLM completion.
@@ -180,6 +185,7 @@ The evaluation subsystem (`shb-agent-core`, package `shb_agent.evaluation`) SHAL
 #### Scenario: Evaluator error handling during dataset run
 - **WHEN** the evaluation service encounters a network error or timeout during a test case evaluation in a benchmark run
 - **THEN** the evaluator SHALL record an `EvaluationReason(value=False, reason=...)` failed assertion with the error details and allow the remainder of the dataset run to complete without aborting
+
 ### Requirement: Centralized Question and Threshold Definitions
 
 All TypeSafe questions, criteria, code-owned weights, and confidence thresholds across the SHB ecosystem SHALL be defined in a single reviewable module (`shb_core.decisions`), so reviewers can inspect judgments without editing business logic, and SHALL provide portable foundation contracts (`DecisionContract`, `GuardrailPolicy`, `CitationCheckContract`) reusable across workspace organizations.
@@ -200,6 +206,7 @@ All TypeSafe questions, criteria, code-owned weights, and confidence thresholds 
 #### Scenario: Portable foundation contract reusability
 - **WHEN** another workspace organization (such as `platform`, `vds`, `ascend`, `ghtk`, or `fpt`) adopts System One decision primitives
 - **THEN** `DecisionContract`, `GuardrailPolicy`, and `CitationCheckContract` in `shb_core.decisions` SHALL provide generic parameterization that can be imported without depending on banking-specific schemas
+
 ### Requirement: Decision Observability
 
 Jev decisions SHALL be observable through OpenTelemetry spans (`shb.jev.decision`) emitted via `shb_core.telemetry.get_tracer("shb_core.jev")` and recorded in `shb_observability.collector.TelemetryStore` with metrics. The runtime MUST clamp `typesafe_sdk` logging to `>= logging.INFO` and sanitize state projections with `mask_pan` and `sanitize_payload` before evaluation or logging.
@@ -214,6 +221,7 @@ Jev decisions SHALL be observable through OpenTelemetry spans (`shb.jev.decision
 - **WHEN** decision evaluation executes or debug logging is active
 - **THEN** because `typesafe_sdk._core.transport.RequestState._log_wire` logs unredacted `request.content` when the `"typesafe_sdk"` logger is at `DEBUG`, the runtime MUST clamp `logging.getLogger("typesafe_sdk")` to `>= logging.INFO`
 - **AND** state projections (<32k tokens) MUST be sanitized via `sanitize_jev_state(state, max_tokens=32_000)` using `shb_core.security.crypto.mask_pan` and recursive secret-key redaction (`secret`, `token`, `password`, `key`, `supervisor_approval_token`, excluding `_NON_SECRET_STRUCTURAL_KEYS` such as `idempotency_key` and `has_supervisor_token`) before creating evaluation states or emitting spans
+
 ### Requirement: HTTP/2 Transport Multiplexing
 
 The client transport SHALL support HTTP/2 multiplexing via `typesafe-sdk[http2]>=0.7.5` (`httpx2>=2.16.0` / `httpcore2==2.16.0`) to maintain persistent socket connections and eliminate per-request handshake overhead, lazily creating sync and event-loop-aware async clients, passing explicit timeouts, and providing explicit lifecycle shutdown.
@@ -230,6 +238,7 @@ The client transport SHALL support HTTP/2 multiplexing via `typesafe-sdk[http2]>
 #### Scenario: Explicit lifecycle management
 - **WHEN** the decision client is closed, exits a context, or switches asyncio event loops
 - **THEN** the client MUST expose `close()` and `aclose()` methods and implement sync and async context managers (`__enter__`/`__exit__`, `__aenter__`/`__aexit__`) to cleanly shut down active `TypeSafeClient` / `AsyncTypeSafeClient` connection pools and release resources, while lazily recreating `AsyncTypeSafeClient` on event-loop changes (`id(asyncio.get_running_loop()) != self._async_loop_id`) without resetting `JevCircuitBreaker`
+
 ### Requirement: Native Pydantic Response Models
 
 The client SHALL support structured validation using TypeSafe native response models subclassing `SystemOneResponse` or plain Pydantic `BaseModel` normalized by `JevDecisionClient`.
@@ -251,6 +260,7 @@ The configuration and client SHALL support proxying requests through custom ente
 - **AND** the client SHALL resolve `effective_compression = False` and pass `compression=effective_compression` when `"compression" in inspect.signature(TypeSafeClient.__init__).parameters` unless the gateway endpoint explicitly supports `Content-Encoding: zstd`
 - **AND** the client SHALL route decision requests through the configured gateway endpoint
 - **AND** telemetry headers SHALL be passed transparently for unified fleet governance
+
 ### Requirement: Reusable Cross-Ecosystem Decision Contracts
 
 The decision runtime in `shb-core` (`shb_core.decisions`) SHALL expose portable decision contracts (`DecisionContract`, `GuardrailPolicy`, `CitationCheckContract`, `AuthorityClass`, `GuardrailOutcome`, `TOOL_AUTHORITY_MAP`, `MCP_TOOL_AUTHORITY_MAP`, `evaluate_guardrail_policy`) across all SHB packages without duplicating client logic, while keeping `tdt/agent-core` strictly decoupled and frozen.
@@ -350,3 +360,12 @@ The foundation client (`shb-core`), banking agent runtime (`shb-agent-core`), an
 - **WHEN** `resolve_typesafe_decision_model()` or `create_typesafe_sde_cascade_chain()` in `shb-agent-core` (`src/shb_agent/model.py`) constructs a `TypeSafeModel`
 - **THEN** `resolve_typesafe_decision_model()` MUST pass `typesafe_client=active_jev.get_async_sdk_client()` into `TypeSafeProvider(typesafe_client=...)` whenever `active_jev` has a resolved credential or custom transport, so `TypeSafeModel` shares `JevDecisionClient`'s HTTP/2 connection pool, custom mock transports, and `effective_compression` configuration
 - **AND** `create_typesafe_sde_cascade_chain()` MUST construct a `FallbackModel(typesafe_model, primary_llm, *fallback_llms, fallback_on=DecisionHandOff)` cascade that escalates uncertain System One decisions (`DecisionHandOff`) to the generative fallback model
+
+### Requirement: Clean git working trees and fresh code graphs across SHB Jev repositories
+
+All 13 `/Users/androidteam/Developer/shb/shb-*` repositories participating in the Jev System One runtime and CLI surface SHALL maintain clean committed git working trees (`git status --short` empty) and `FRESH` GitNexus and Graphify indexes (`indexed_commit == HEAD`).
+
+#### Scenario: Post-archive Jev runtime and CLI fixes committed and indexed
+- **WHEN** `shb-core`, `shb-agent-core`, `shb-agent-harness`, `shb-ai-harness-skills`, `shb-agent-skills`, `shb-observability`, `shb-ai-review`, and `shb-mcp-servers` are verified with `uv run pytest`, `uv run ruff check`, and `uv run mypy --strict`
+- **THEN** all modified source and test files SHALL be committed to git so `git status --short` is empty across all 13 `shb/shb-*` repositories and `tdt/agent-core`
+- **AND** `knowledge-status.sh` SHALL report `FRESH` for both GitNexus and Graphify across all 13 `shb/shb-*` repositories

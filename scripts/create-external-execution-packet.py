@@ -170,7 +170,7 @@ def create_packet(
     """Create a structured External Execution Packet dictionary."""
     commit = source_commit or _resolve_source_commit()
 
-    now_utc = datetime.datetime.now(datetime.UTC)
+    now_utc = datetime.datetime.now(datetime.timezone.utc)
     now_iso = now_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     t_start_str = started_at or now_iso
