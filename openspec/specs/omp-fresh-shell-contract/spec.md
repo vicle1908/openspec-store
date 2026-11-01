@@ -104,13 +104,13 @@ The earlier clauses in `omp-fresh-shell-contract` asserting that OMP's `default`
 
 ### Requirement: Antigravity OAuth Credential Hygiene, Throwaway Profile Cleanup, and MCP Timeout
 
-`~/.omp/agent/agent.db` SHALL omit the permanently HTTP 403-rejected `google-antigravity` OAuth credential (`identity_key='email:vicgnome19091@gmail.com'`) while retaining the 15 healthy `google-antigravity` OAuth accounts, `~/.omp/profiles/` SHALL contain no leftover `omp-fresh-*` throwaway smoke profiles, and `~/.omp/agent/mcp.json` (`mode 0600`) SHALL declare `"$schema"`, `"type": "stdio"`, and `"timeout": 300000` on `mcpServers.mcp-router` while preserving `env.MCPR_TOKEN`.
+`~/.omp/agent/agent.db` SHALL omit the HTTP 403-rejected `google-antigravity` OAuth credentials (`vicgnome19091@gmail.com` and `ascenddevtwo@gmail.com`) while retaining the 14 healthy accounts, `~/.omp/profiles/` SHALL contain no leftover `omp-fresh-*` smoke profiles, and `~/.omp/agent/mcp.json` (`mode 0600`) SHALL declare `"$schema"`, `"type": "stdio"`, and `"timeout": 300000` on `mcpServers.mcp-router` while preserving `env.MCPR_TOKEN`.
 
 #### Scenario: Rejected Antigravity OAuth account removed and healthy accounts preserved
 - **WHEN** `~/.omp/agent/agent.db` is queried read-only for `auth_credentials`
-- **THEN** `SELECT COUNT(*) FROM auth_credentials WHERE provider='google-antigravity' AND identity_key='email:vicgnome19091@gmail.com'` SHALL equal `0`
-- **AND** `SELECT COUNT(*) FROM auth_credentials WHERE provider='google-antigravity' AND disabled_cause IS NULL` SHALL equal `15`
-- **AND** fresh OMP session logs under `~/.omp/logs/` SHALL record zero `status=403` Antigravity usage-fetch or model-discovery warnings for `vicgnome19091@gmail.com`
+- **THEN** `SELECT COUNT(*) FROM auth_credentials WHERE provider='google-antigravity' AND identity_key IN ('email:vicgnome19091@gmail.com', 'email:ascenddevtwo@gmail.com')` SHALL equal `0`
+- **AND** `SELECT COUNT(*) FROM auth_credentials WHERE provider='google-antigravity' AND disabled_cause IS NULL` SHALL equal `14`
+- **AND** fresh OMP session logs under `~/.omp/logs/` SHALL record zero `status=403` Antigravity usage-fetch or model-discovery warnings for `vicgnome19091@gmail.com` or `ascenddevtwo@gmail.com`
 
 #### Scenario: Stale throwaway smoke profiles absent and mcp.json hardened
 - **WHEN** `/Users/androidteam/.omp/profiles` and `/Users/androidteam/.omp/agent/mcp.json` are inspected

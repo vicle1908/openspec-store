@@ -121,7 +121,7 @@ Each migrated consumer CLI SHALL pass a non-interactive smoke test against its p
 
 ### Requirement: Consumer CLI OmniRoute registrations SHALL carry the live sh/gpt-5.6-sol and sh/Claude-Fable models
 
-Every consumer CLI governed by this capability that registers an OmniRoute provider SHALL register `sh/gpt-5.6-sol` for the OpenAI Responses route when its native SH probe passes, or SHALL register the exact model through the versionless Chat Completions fallback when a named compatibility failure is captured. It SHALL register `pm/Claude-Fable` for the Anthropic Messages route when that CLI supports the corresponding native protocol. The exact IDs SHALL be present in the live registry at apply time. Retired `dlg/*` inference routes SHALL NOT remain in any active OmniRoute catalog. A client-specific Chat Completions fallback MAY retain the exact requested model only after a native decoder/provider failure is captured and the versionless fallback is independently proven.
+Every consumer CLI governed by this capability that registers an OmniRoute provider SHALL register `sh/gpt-5.6-sol` on OpenAI Responses (or versionless Chat Completions when a native decoder incompatibility is recorded) and `pm/Claude-Fable` on Anthropic Messages, verified in the live `/v1/models` registry at apply time, and SHALL omit retired `dlg/*` routes.
 
 #### Scenario: goose catalog separates native and fallback routes
 
@@ -186,7 +186,7 @@ Every consumer CLI governed by this capability that registers an OmniRoute provi
 
 ### Requirement: Remaining consumer CLIs SHALL register the live sh models with credential indirection
 
-Each consumer CLI that is mutated by this capability SHALL expose the requested models through the most faithful documented protocol available to that client: Anthropic Messages for `pm/Claude-Fable`, OpenAI Responses for `sh/gpt-5.6-sol`, or the empirically proven versionless Chat Completions fallback when the installed client cannot decode the native stream. The configuration SHALL reference `OMNIROUTE_API_KEY` through the client's documented environment mechanism wherever available and SHALL not change defaults implicitly.
+Each consumer CLI mutated by this capability SHALL expose `pm/Claude-Fable` via Anthropic Messages and `sh/gpt-5.6-sol` via OpenAI Responses (or the proven versionless Chat Completions fallback when the client cannot decode the native stream), reference `OMNIROUTE_API_KEY` via environment indirection wherever supported, and preserve existing defaults.
 
 #### Scenario: OpenCode, Kilo, Prime Agent, and Droid use native provider APIs
 
@@ -232,12 +232,12 @@ Each consumer CLI that is mutated by this capability SHALL expose the requested 
 - **AND** default model selections SHALL be byte-identical unless a default change was explicitly approved for that CLI
 
 ### Requirement: Consumer CLI OmniRoute Registries and Prime Agent Allowlist SHALL Include Tiered Gemini 4 Argon Combo Models
-Every active consumer CLI in the workstation provider registry (`omp`, `goose`, `pi`, `prime-agent`, `opencode`, `droid`, `kimi`, and `grok`) SHALL expose `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, and `gemini-4-argon-low` under its active OmniRoute provider entry (`omniroute-responses`, `omniroute`, `omniroute-anthropic`, or `custom_omniroute`), superseding earlier two-model allowlist cardinality restrictions in `~/.prime/agent/models.json`.
+Every active consumer CLI in the workstation provider registry (`omp`, `goose`, `pi`, `prime-agent`, `opencode`, `droid`, `kimi`, `grok`, and `cline`) SHALL expose the canonical OmniRoute combo set (`gemini-3.8-flash-high`, `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, `gemini-4-argon-low`, `claude-opus-5.5`, `claude-sonnet-5.5`, `deepseek-v4.1-flash`, `kimi-k3.1-pro`, and `muse-spark-1.3`) under its active OmniRoute provider entry.
 
 #### Scenario: Prime Agent and Pi Coding Agent resolve Gemini 4 Argon models under omniroute-responses without cost fabrication or backup clutter
-- **WHEN** `prime-agent model list gemini-4-argon` and `pi --list-models gemini-4-argon` are executed in a login shell with `OMNIROUTE_API_KEY` set
-- **THEN** both CLIs list `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, and `gemini-4-argon-low` under `omniroute-responses` with `contextWindow: 1000000`, `maxTokens: 65536`, explicit `thinkingLevelMap`, and `cost` omitted, while `~/.pi/agent/settings.json` and `~/.prime/agent/settings.json` remain unchanged and zero `.bak*` files exist inside `~/.prime/agent/`
+- **WHEN** `prime-agent model list` and `pi --list-models` are executed in a login shell with `OMNIROUTE_API_KEY` set
+- **THEN** both CLIs list `gemini-3.8-flash-high`, `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, `gemini-4-argon-low`, `claude-opus-5.5`, `claude-sonnet-5.5`, `deepseek-v4.1-flash`, `kimi-k3.1-pro`, and `muse-spark-1.3` under `omniroute-responses` with `contextWindow: 1000000`, explicit `thinkingLevelMap`, `"headers": { "x-omniroute-no-memory": "true" }`, and `cost` omitted, while `~/.pi/agent/settings.json` and `~/.prime/agent/settings.json` remain unchanged and zero `.bak*` files exist inside `~/.prime/agent/`
 
 #### Scenario: OpenCode, Kilo Code, Kimi Code, Factory Droid, and Grok Build expose Gemini 4 Argon models under active providers without altering defaults
-- **WHEN** `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, and `gemini-4-argon-low` are registered in `~/.config/opencode/opencode.json` (`provider.omniroute-responses.models`), `~/.config/kilo/kilo.jsonc` (`provider.omniroute-responses.models`), `~/.kimi-code/config.toml` (`[models."gemini-4-argon*"]` with explicit `model` and `provider = "omniroute-anthropic"`), `~/.factory/settings.json` (`customModels[]`), and `~/.grok/config.toml` (`[model.omniroute-gemini-4-argon*]`)
-- **THEN** all pre-existing non-OmniRoute providers (`phanmemvip`, `shopapikey`, `cockpit`, `moonshot-ai`, `zai`), secondary `provider.omniroute` Chat-Completions fallbacks, inactive legacy `~/.kimi/config.toml`, and startup default models remain intact, and each CLI resolves all four `gemini-4-argon*` models on demand
+- **WHEN** `~/.config/opencode/opencode.json` (`provider.omniroute-responses.models`), `~/.config/kilo/kilo.jsonc` (`provider.omniroute-responses.models`), `~/.kimi-code/config.toml` (`[models."<id>"]` with explicit `model` and `provider = "omniroute-anthropic"`), `~/.factory/settings.json` (`customModels[]`), `~/.grok/config.toml` (`[model.omniroute-*]`), and `~/.cline/data/settings/providers.json` (`providers.openai-compatible.settings`) are inspected
+- **THEN** all pre-existing non-OmniRoute providers (`phanmemvip`, `shopapikey`, `cockpit`, `moonshot-ai`, `zai`), secondary `provider.omniroute` Chat-Completions fallbacks, and inactive legacy `~/.kimi/config.toml` remain intact, `kilo` and `cline` default to `gemini-3.8-flash-high`, and each CLI resolves all 10 OmniRoute combos on demand
