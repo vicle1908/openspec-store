@@ -103,8 +103,7 @@ The earlier clauses in `omp-fresh-shell-contract` asserting that OMP's `default`
 - **AND** the session log under `~/.omp/logs/` SHALL record zero `@-import: file not found` warnings for `/Users/androidteam/Developer/.claude/AGENTS.md` and `~/.omp/agent/skills/herdr` SHALL not duplicate `.agents/skills/herdr`
 
 ### Requirement: Antigravity OAuth Credential Hygiene, Throwaway Profile Cleanup, and MCP Timeout
-
-`~/.omp/agent/agent.db` SHALL omit the HTTP 403-rejected `google-antigravity` OAuth credentials (`vicgnome19091@gmail.com`, `ascenddevtwo@gmail.com`, and `phamkive425@gmail.com`) while retaining the 13 healthy accounts, `~/.omp/profiles/` SHALL contain no leftover `omp-fresh-*` smoke profiles, and `~/.omp/agent/mcp.json` (`mode 0600`) SHALL declare `"$schema"`, `"type": "stdio"`, and `"timeout": 300000` on `mcpServers.mcp-router` while preserving `env.MCPR_TOKEN`.
+`~/.omp/agent/agent.db` SHALL omit the HTTP 403-rejected `google-antigravity` OAuth credentials (`vicgnome19091@gmail.com`, `ascenddevtwo@gmail.com`, and `phamkive425@gmail.com`) while retaining the 13 healthy accounts, `~/.omp/profiles/` SHALL contain no leftover `omp-fresh-*` smoke profiles, and `~/.omp/agent/mcp.json` SHALL declare `"$schema"`, `"type": "stdio"`, and `"timeout": 300000` on `mcpServers.mcp-router`.
 
 #### Scenario: Rejected Antigravity OAuth account removed and healthy accounts preserved
 - **WHEN** `~/.omp/agent/agent.db` is queried read-only for `auth_credentials`

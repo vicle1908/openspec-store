@@ -670,11 +670,12 @@ All configurable workstation coding agents and editor integrations SHALL registe
 - **THEN** `~/.hermes/config.yaml` lists `"gemini-4-argon"`, `"gemini-4-argon-high"`, `"gemini-4-argon-medium"`, and `"gemini-4-argon-low"` in `providers.omniroute.models` while preserving `model.provider: "moa"`, and `~/.claude/profiles/omniroute-pm.json` declares all four selectors plus `"gemini-3.8-flash-high"` in `modelPicker.options` (`behavesAs: "claude-fable-5-1"`) while keeping `"model": "gemini-3.8-flash-high"`
 
 ### Requirement: Codex CLI and Muse Code Local Model Catalogs SHALL Advertise Tiered Gemini 4 Argon Selectors Without Dirtying Upstream Git
-OpenAI Codex CLI (`~/.codex/cockpit-model-catalog.json`) and Meta Muse Code (`~/.config/muse/settings.json`) SHALL declare `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, and `gemini-4-argon-low` in their local model catalogs so interactive `/model` and `/models` TUI pickers list all four selectors alongside existing defaults without modifying `~/.codex/config.toml` or any git-tracked file inside `/Users/androidteam/Omniroute`.
+Codex CLI and Muse Code local model catalogs SHALL advertise tiered Gemini 4 Argon selectors with `web_search = "disabled"` and `supports_search_tool: false` on OmniRoute Gemini slugs to protect Gemini `functionDeclarations` tool translation without modifying git-tracked files in `/Users/androidteam/Omniroute`.
 
 #### Scenario: Codex TUI model catalog lists Gemini 4 Argon tiers with standard tool mode and HTTP SSE transport
-- **WHEN** `~/.codex/cockpit-model-catalog.json` is loaded via `model_catalog_json` in `~/.codex/config.toml`
-- **THEN** the `models[]` array includes `slug` entries for `"gemini-4-argon"`, `"gemini-4-argon-high"`, `"gemini-4-argon-medium"`, and `"gemini-4-argon-low"` with `"visibility": "list"`, `"prefer_websockets": false`, `"use_responses_lite": false`, `"tool_mode": null`, `"apply_patch_tool_type": "freeform"`, `"context_window": 1000000`, and tier-matched `default_reasoning_level` (`"high"`, `"medium"`, `"low"`) while `~/.codex/config.toml` remains unchanged
+- **WHEN** `~/.codex/cockpit-model-catalog.json` and `~/.codex/config.toml` are inspected
+- **THEN** `~/.codex/config.toml` SHALL declare `web_search = "disabled"` and `[model_providers.omniroute]` with `http_headers = { "x-omniroute-no-memory" = "true" }`
+- **AND** `~/.codex/cockpit-model-catalog.json` SHALL declare `supports_search_tool: false`, `context_window: 1000000`, `prefer_websockets: false`, `use_responses_lite: false`, and `tool_mode: null` across all 10 OmniRoute slugs
 
 #### Scenario: Muse Code composes visible Gemini 4 Argon catalog rows from user settings while keeping muse-spark-1.3 as default
 - **WHEN** `muse` initializes its model catalog from `~/.config/muse/settings.json`
