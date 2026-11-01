@@ -808,6 +808,12 @@ except Exception:
   else
     agent_cli_coverage "${DENY_ROSTER}" "${PAUSED_ROSTER}"
     sign_agent_binaries || true
+    for pi_lens_log in "${HOME}/.pi-lens"/*.log; do
+      [[ -f "${pi_lens_log}" ]] || continue
+      if (( $(stat -f '%z' "${pi_lens_log}" 2>/dev/null || echo 0) > 5242880 )); then
+        : > "${pi_lens_log}"
+      fi
+    done
   fi
 
   # 6. Cross-Agent Skills Synchronization & Parity

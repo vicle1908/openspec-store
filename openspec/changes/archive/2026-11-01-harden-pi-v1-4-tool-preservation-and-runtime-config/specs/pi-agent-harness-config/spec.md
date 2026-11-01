@@ -4,17 +4,18 @@
 
 ### Requirement: GitNexus Auto-Augment Opt-Out and Cache-Safe System Prompt Interception
 
-The Pi GitNexus configuration `~/.pi/pi-gitnexus.json` SHALL exist with mode `0600` and set `"autoAugment": false` so `tool_result` hooks do not spawn `gitnexus augment` subprocesses or append empty banners, and `~/.pi/agent/extensions/agentmemory/index.js` SHALL intercept static suffix assignments to `event.systemPromptOptions.forceSystemPrompt` during `before_agent_start` and convert them into `promptGuidelines` entries so `forceSystemPrompt` remains `undefined`.
+The Pi GitNexus config `~/.pi/pi-gitnexus.json` SHALL exist with mode `0600` and set `"autoAugment": false`, and `~/.pi/agent/extensions/agentmemory/index.js` SHALL intercept only the exact `[GitNexus active]` suffix on `event.systemPromptOptions.forceSystemPrompt` into `promptGuidelines` (preserving child subagent boundary prompts) and skip `smart-search` and `observe` network calls inside child subagents.
 
 #### Scenario: Read and search tool outputs are not polluted with empty GitNexus Augment banners
 - **WHEN** `~/.pi/pi-gitnexus.json` is inspected and `read`, `grep`, `find`, or `bash` is executed in `/Users/androidteam/Developer`
 - **THEN** `~/.pi/pi-gitnexus.json` SHALL have mode `0600` and declare `{"autoAugment": false}`
 - **AND** `pi-gitnexus` SHALL NOT spawn `gitnexus augment` on `tool_result` events or append `GitNexus Augment (1.6.12)` banners while keeping explicit `gitnexus_*` tools available
 
-#### Scenario: Static before_agent_start systemPrompt suffixes convert to promptGuidelines without setting forceSystemPrompt
+#### Scenario: Exact GitNexus active suffix converts to promptGuidelines while child subagent boundary prompts and network isolation hold
 - **WHEN** `emitBeforeAgentStart` executes in `/Users/androidteam/Developer` with both `agentmemory` and `pi-gitnexus` loaded
-- **THEN** `event.systemPromptOptions.forceSystemPrompt` SHALL remain `undefined` after all `before_agent_start` handlers complete
-- **AND** `event.systemPromptOptions.promptGuidelines` SHALL contain both the `agentmemory` tool guidance and the `[GitNexus active]` guidance
+- **THEN** `event.systemPromptOptions.forceSystemPrompt` SHALL remain `undefined` when `pi-gitnexus` appends the `[GitNexus active]` suffix, and `event.systemPromptOptions.promptGuidelines` SHALL contain both the `agentmemory` tool guidance and the `[GitNexus active]` guidance
+- **AND** when a child subagent handler assigns a replacement `forceSystemPrompt` containing `<active_agent` or Subagent Execution Boundary instructions, `forceSystemPrompt` SHALL be preserved unchanged
+- **AND** when `process.env.PI_SUBAGENT_CHILD` or `ctx.sessionManager.getHeader()?.parentSession` is present, `agentmemory` SHALL still push `TOOL_GUIDANCE` into `promptGuidelines` but SHALL skip `smart-search` and `observe` network calls
 
 ## MODIFIED Requirements
 
@@ -71,3 +72,23 @@ The `pi-web-access` configuration SHALL reside at `~/.pi/agent/web-search.json` 
 - **THEN** `"provider"` and `"searchProvider"` SHALL be absent from `~/.pi/agent/web-search.json` so `getConfiguredSearchRouting()` returns `{ providers: ["exa", "brave", "tavily"], fallbackOn: ["transient", "quota", "network", "invalid-response"] }`
 - **AND** `"firecrawlBaseUrl"` SHALL be `"https://api.firecrawl.dev"` so `isFirecrawlAvailable()` returns `true` for `fetchRouting.providers: ["http", "firecrawl"]`
 - **AND** `"workflow"` SHALL be `"none"` and `"searchModel"` SHALL be `"gemini-3.6-flash"`
+
+### Requirement: Pi Release Hygiene, Package Update Coverage, and Documentation Parity
+
+The `~/.pi/agent/` directory SHALL retain only the active managed release (`1.4.0`) without stale `.bak*` or orphaned `pi-hermes-memory` directories, `workstation-daily-update.sh` SHALL update both Pi core and managed packages via `pi update --all` and truncate `~/.pi-lens/*.log` files exceeding 5 MB (`5242880` bytes), and the Hermes Pi skill and Notion-synced Wiki entity SHALL match the live Pi v1.4.0 configuration.
+
+#### Scenario: Superseded releases, backup files, and orphaned memory directories are absent
+- **WHEN** `~/.pi/agent/` is inspected
+- **THEN** `~/.pi/agent/install/releases/1.3.0`, `~/.pi/agent/skills.bak-20261004164935`, `~/.pi/agent/backups`, `~/.pi/agent/models.json.bak*`, `~/.pi/agent/settings.json.bak*`, `~/.pi/agent/memory`, `~/.pi/agent/tdt`, and `~/.pi/agent/projects-memory` SHALL NOT exist
+- **AND** `/Users/androidteam/Developer/.agentmemory` SHALL NOT exist
+
+#### Scenario: Workstation daily update script invokes pi update --all and maintains mirror parity
+- **WHEN** `~/Developer/scripts/workstation-daily-update.sh` and `platform/openspec-store/scripts/workstation-daily-update.sh` are inspected
+- **THEN** `AGENT_CLI_COVERED` SHALL specify `pi:Pi:update --all`
+- **AND** the script SHALL truncate any `~/.pi-lens/*.log` file whose size exceeds `5242880` bytes (5 MB)
+- **AND** both script files SHALL have identical SHA-256 digests
+
+#### Scenario: Hermes Pi orchestration skill and Wiki/Notion documentation reflect Pi v1.4.0
+- **WHEN** `~/.hermes/skills/autonomous-ai-agents/pi/SKILL.md` and `~/Developer/wiki/entities/pi.md` are inspected
+- **THEN** both documents SHALL reference Pi `1.4.0`, binary `~/.pi/agent/bin/pi`, default model `omniroute-responses/gemini-3.8-flash-high`, and built-in MCP `"exposure": "codemode"`
+- **AND** `wiki/entities/pi.md` SHALL be synchronized to Notion page `3efc4b21-deb4-8129-b9c3-d7c22a453212`
