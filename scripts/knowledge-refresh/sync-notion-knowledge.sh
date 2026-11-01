@@ -16,7 +16,8 @@ export PATH="${HOME}/.npm-global/bin:${HOME}/.local/bin:/opt/homebrew/bin:/usr/l
 readonly NTN_BIN="${NTN_BIN:-${HOME}/.local/bin/ntn}"
 
 # Directory & Manifest Paths
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly _SCRIPT_DIR
 readonly WORKSPACE_ROOT="${WORKSPACE_ROOT:-${HOME}/Developer}"
 readonly OPENSPEC_STORE_ROOT="${OPENSPEC_STORE_ROOT:-${WORKSPACE_ROOT}/platform/openspec-store}"
 export OPENSPEC_STORE_ROOT
@@ -659,18 +660,19 @@ generate_and_sync_freshness() {
     return 0
   fi
   local status_script="${WORKSPACE_ROOT}/scripts/knowledge-refresh/knowledge-status.sh"
-  local status_json=""
-  if [[ -x "$status_script" ]]; then
+  local status_json="${STATUS_JSON:-}"
+  if [[ -z "$status_json" ]] && [[ -x "$status_script" ]]; then
     status_json="$("$status_script" --json 2>/dev/null || true)"
   fi
   local matrix_file="${STATE_DIR}/knowledge-freshness-matrix.md"
 
-  MATRIX_FILE="$matrix_file" python3 - << 'PYEOF'
+  STATUS_JSON="$status_json" MATRIX_FILE="$matrix_file" python3 - << 'PYEOF'
 import json, os
 from datetime import datetime, timezone
 
 status_path = os.environ.get("MATRIX_FILE", os.path.expanduser("~/.knowledge-refresh/knowledge-freshness-matrix.md"))
 raw_json = os.environ.get("STATUS_JSON", "")
+data = {}
 try:
     if raw_json:
         data = json.loads(raw_json)
@@ -690,6 +692,8 @@ for r in repos:
     head = r.get("headSha", "-")
     if r_name not in repo_map:
         repo_map[r_name] = {"GitNexus": "-", "Graphify": "-", "Dirty": "Clean", "HEAD": head}
+    if head and head != "-" and repo_map[r_name]["HEAD"] in ("", "-"):
+        repo_map[r_name]["HEAD"] = head
     if tool == "GitNexus":
         repo_map[r_name]["GitNexus"] = freshness
     elif tool == "Graphify":
@@ -703,7 +707,7 @@ with open(status_path, "w", encoding="utf-8") as f:
     f.write(f"> Inventory Digest: `{digest}`\n")
     f.write(f"> Tool Versions: GitNexus `{versions.get('gitnexus', '-')}`, Graphify `{versions.get('graphify', '-')}`\n\n")
 
-    f.write("## 20-Repository Index Freshness Matrix\n\n")
+    f.write(f"## {len(repo_map)}-Repository Index Freshness Matrix\n\n")
     f.write("| Repository | GitNexus Index | Graphify Graph | Workspace State | HEAD |\n")
     f.write("| :--- | :--- | :--- | :--- | :--- |\n")
     for r_name in sorted(repo_map.keys()):

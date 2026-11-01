@@ -16,7 +16,7 @@ export PATH="/Users/androidteam/.npm-global/bin:/Users/androidteam/.local/bin:/o
 readonly SCRIPT_DIR="$(
   cd "$(dirname "${BASH_SOURCE[0]}")" && pwd
 )"
-readonly OPENSPEC_ROOT="${SCRIPT_DIR}/../.."
+readonly _OPENSPEC_ROOT="${SCRIPT_DIR}/../.."
 readonly INVENTORY_FILE="${SCRIPT_DIR}/knowledge-refresh-inventory.tsv"
 readonly APPROVAL_FILE="${SCRIPT_DIR}/knowledge-refresh-approval.sha256"
 readonly STATE_DIR="${HOME}/Developer/.knowledge-refresh"
@@ -29,7 +29,7 @@ readonly OVERALL_TIMEOUT=7200   # 2 hours
 readonly MAX_LOG_LINES=1000
 readonly WORKTREE_MAX_AGE_DAYS=30
 # Return codes for process_target()
-readonly RC_SUCCESS=0      # success / fresh no-op
+readonly _RC_SUCCESS=0     # success / fresh no-op
 readonly RC_SKIP=10        # policy skip (dirty, transition, uninitialized)
 readonly RC_FAILURE=1      # provider or validation failure
 readonly EPHEMERAL_PATH=".claude/worktrees/"
@@ -165,8 +165,9 @@ is_repo() {
 is_dirty() {
   # Exclude generated files that are expected to change after hooks run.
   # Each pattern is documented why it's excluded:
-  # - graphify-out/: rebuilt by graphify post-commit hook on every commit
-  #   (both untracked ?? and tracked M modifications)
+  # - graphify-out/: rebuilt by graphify post-commit hook or refresh on every commit
+  #   (untracked ??, modified M, or deleted D when HTML viz is disabled)
+  # - .gitnexusignore / .graphifyignore: provider ignore sidecars
   # - uv.lock: dependency lock file, changes on uv sync
   # - .omp/: LSP state files created by editor integrations
   # - AGENTS.md / CLAUDE.md: injected by gitnexus analyze (tracked or untracked)
@@ -176,6 +177,12 @@ is_dirty() {
     | grep -v '^?? graphify-out/' \
     | grep -v '^ M graphify-out/' \
     | grep -v '^M  graphify-out/' \
+    | grep -v '^ D graphify-out/' \
+    | grep -v '^D  graphify-out/' \
+    | grep -v '^?? \.gitnexusignore$' \
+    | grep -v '^?? \.graphifyignore$' \
+    | grep -v '^ M \.gitnexusignore$' \
+    | grep -v '^ M \.graphifyignore$' \
     | grep -v '^ M uv.lock' \
     | grep -v '^?? uv.lock' \
     | grep -v '^?? \.omp/' \
@@ -621,6 +628,25 @@ graphify_refresh() {
   fi
 
   status="success"
+  if [[ -f "${root}/graphify-out/graph.json" ]]; then
+    python3 - "${root}/graphify-out/graph.json" "$root" <<'PY' || true
+import json, subprocess, sys
+from pathlib import Path
+gp = Path(sys.argv[1])
+root = Path(sys.argv[2])
+try:
+    head = subprocess.check_output(["git", "-C", str(root), "rev-parse", "--verify", "HEAD"], text=True).strip()
+    if head:
+        data = json.loads(gp.read_text(encoding="utf-8"))
+        if isinstance(data, dict) and data.get("built_at_commit") != head:
+            data["built_at_commit"] = head
+            tmp = gp.with_suffix(".json.tmp")
+            tmp.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+            tmp.replace(gp)
+except Exception:
+    pass
+PY
+  fi
   note "  Graphify: ${name} refreshed"
   log_line "$name" graphify "$status" "$dur"
 
@@ -659,17 +685,17 @@ refresh_worktrees() {
   local worktree_list
   worktree_list="$(git -C "$canonical_root" worktree list --porcelain 2>/dev/null)" || return 0
 
-  local current_wt="" current_head="" current_branch="" detached=0
+  local current_wt="" _current_head="" current_branch="" detached=0
   while IFS= read -r line; do
     case "$line" in
       worktree\ *)
         current_wt="${line#worktree }"
-        current_head=""
+        _current_head=""
         current_branch=""
         detached=0
         ;;
       HEAD\ *)
-        current_head="${line#HEAD }"
+        _current_head="${line#HEAD }"
         ;;
       branch\ refs/heads/*)
         current_branch="${line#branch refs/heads/}"

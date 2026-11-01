@@ -1,7 +1,7 @@
 # shb-scheduler-docker-lifecycle Specification
 
 ## Purpose
-TBD - created by archiving change remediate-shb-post-archive-drift-and-scheduler-container. Update Purpose after archive.
+Defines the Docker image build and container recreation contract for `shb-schedule-scheduler-1` so the live scheduler API on `127.0.0.1:9110` remains in parity with committed `shb/shb-schedule` `main`.
 
 ## Requirements
 
