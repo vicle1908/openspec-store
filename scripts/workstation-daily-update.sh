@@ -670,7 +670,7 @@ except Exception:
         deny_cask_csv="$(paste -sd, - <<<"${DENY_ROSTER_BREW_CASKS}")"
         echo "    SKIPPED: cask upgrades suppressed (authority drift/conflict/misalignment detected: ${deny_cask_csv})"
       else
-        brew upgrade --cask 2>&1 || true
+        brew upgrade --cask < /dev/null 2>&1 || true
         if [[ -x "/Applications/Docker.app/Contents/MacOS/install" ]] && [[ -x "${WORKSPACE_DIR}/scripts/docker-service.sh" ]]; then
           if ! docker info >/dev/null 2>&1 || \
              [[ ! -S "/var/run/com.docker.vmnetd.sock" ]] || \
