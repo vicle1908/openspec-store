@@ -701,6 +701,46 @@ except Exception:
     fi
   fi
 
+  # 1b. Mac App Store Maintenance (Zero Deferral)
+  if command -v mas &>/dev/null; then
+    echo ""
+    echo ">>> Mac App Store Maintenance (Zero Deferral)"
+    if [[ "${MODE}" == "check" ]]; then
+      echo "    check mode: mas outdated inspection only"
+      mas outdated 2>&1 || true
+    elif (( PREFLIGHT_FAILED != 0 )); then
+      echo "    SKIPPED: mas upgrade suppressed (preflight authority check failed)"
+    elif (( GLOBAL_PAUSE != 0 )); then
+      echo "    SKIPPED: mas upgrade paused by policy (DISABLE_UPDATES)"
+    else
+      local mas_outdated_lines
+      mas_outdated_lines="$(mas outdated 2>/dev/null || true)"
+      if [[ -n "${mas_outdated_lines}" ]]; then
+        while IFS= read -r line; do
+          [[ -z "${line}" ]] && continue
+          local app_id app_name
+          app_id="$(awk '{print $1}' <<<"${line}")"
+          app_name="$(awk '{$1=""; print $0}' <<<"${line}" | sed 's/^[[:space:]]*//; s/([^(]*)$//' | xargs)"
+          [[ -z "${app_id}" || ! "${app_id}" =~ ^[0-9]+$ ]] && continue
+          local was_running=0
+          if pgrep -x "${app_name}" >/dev/null 2>&1 || pgrep -x "${app_name%% *}" >/dev/null 2>&1; then
+            was_running=1
+            pkill -TERM -x "${app_name}" >/dev/null 2>&1 || true
+            pkill -TERM -x "${app_name%% *}" >/dev/null 2>&1 || true
+            sleep 2
+          fi
+          echo "    Upgrading Mac App Store app: ${app_name} (${app_id})..."
+          mas upgrade "${app_id}" < /dev/null 2>&1 || true
+          if (( was_running == 1 )); then
+            local relaunch_target="${app_name}"
+            [[ "${app_name}" =~ Telegram ]] && relaunch_target="Telegram"
+            open -a "${relaunch_target}" --background >/dev/null 2>&1 || true
+          fi
+        done <<<"${mas_outdated_lines}"
+      fi
+    fi
+  fi
+
   # 2. Bun Runtime & Globals
   echo ""
   echo ">>> [Stage 2/12] Bun Runtime & Globals"
