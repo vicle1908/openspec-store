@@ -670,7 +670,20 @@ except Exception:
         deny_cask_csv="$(paste -sd, - <<<"${DENY_ROSTER_BREW_CASKS}")"
         echo "    SKIPPED: cask upgrades suppressed (authority drift/conflict/misalignment detected: ${deny_cask_csv})"
       else
+        # Graceful POSIX termination for running casks to prevent file locking during upgrade
+        local running_casks=( "Tailscale" "warp-svc" "Google Drive" "OneDrive" "Orca" "ChatGPT" "Zed" )
+        for p in "${running_casks[@]}"; do
+          if pgrep -x "$p" >/dev/null 2>&1; then
+            pkill -TERM -x "$p" >/dev/null 2>&1 || true
+          fi
+        done
         brew upgrade --cask < /dev/null 2>&1 || true
+        # Relaunch persistent background utilities
+        for app in "Tailscale" "Cloudflare WARP" "OneDrive" "Google Drive"; do
+          if [[ -d "/Applications/${app}.app" ]]; then
+            open -a "${app}" --background >/dev/null 2>&1 || true
+          fi
+        done
         if [[ -x "/Applications/Docker.app/Contents/MacOS/install" ]] && [[ -x "${WORKSPACE_DIR}/scripts/docker-service.sh" ]]; then
           if ! docker info >/dev/null 2>&1 || \
              [[ ! -S "/var/run/com.docker.vmnetd.sock" ]] || \
