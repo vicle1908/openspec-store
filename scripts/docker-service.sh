@@ -48,12 +48,6 @@ is_daemon_up() {
   docker info >/dev/null 2>&1
 }
 
-is_vmnetd_up() {
-  [[ -f "/Library/LaunchDaemons/com.docker.vmnetd.plist" ]] && \
-  [[ -r "/Library/PrivilegedHelperTools/com.docker.vmnetd" ]] && \
-  { [[ -S "/var/run/com.docker.vmnetd.sock" ]] || pgrep -x com.docker.vmnetd >/dev/null 2>&1 || sudo -n pgrep -x com.docker.vmnetd >/dev/null 2>&1; }
-}
-
 is_socket_helper_up() {
   [[ -f "/Library/LaunchDaemons/com.docker.socket.plist" ]] && \
   [[ -x "/Library/PrivilegedHelperTools/com.docker.socket" ]] && \
@@ -62,15 +56,14 @@ is_socket_helper_up() {
 
 ensure_helpers() {
   local install_bin="/Applications/Docker.app/Contents/MacOS/install"
-  local app_vmnetd="/Applications/Docker.app/Contents/Library/LaunchServices/com.docker.vmnetd"
   local app_socket="/Applications/Docker.app/Contents/MacOS/com.docker.socket"
   [[ -x "$install_bin" ]] || return 0
-  if ! is_vmnetd_up || ! is_socket_helper_up || \
-     ! cmp -s "$app_vmnetd" "/Library/PrivilegedHelperTools/com.docker.vmnetd" 2>/dev/null || \
+  if ! is_socket_helper_up || \
      ! sudo -n cmp -s "$app_socket" "/Library/PrivilegedHelperTools/com.docker.socket" 2>/dev/null; then
-    log "Provisioning Docker Desktop privileged helpers (vmnetd + docker.sock) via sudo..."
-    sudo -n "$install_bin" config --user "${USER:-$(id -un)}" set-vmnetd set-docker-socket >/dev/null 2>&1 || true
-    sudo -n launchctl kickstart -p system/com.docker.vmnetd >/dev/null 2>&1 || true
+    log "Provisioning Docker Desktop privileged helper (com.docker.socket) via sudo non-interactively..."
+    sudo -n "$install_bin" remove-vmnetd >/dev/null 2>&1 || true
+    sudo -n "$install_bin" config --user "${USER:-$(id -un)}" >/dev/null 2>&1 || true
+    sudo -n "$install_bin" socket-symlink-on-startup >/dev/null 2>&1 || true
     sudo -n launchctl kickstart -p system/com.docker.socket >/dev/null 2>&1 || true
   fi
   local priv_dir
@@ -96,8 +89,7 @@ status_json() {
     [[ -z "$status" ]] && status="stopped"
   fi
 
-  local helpers_vmnetd="false" helpers_socket="false"
-  is_vmnetd_up && helpers_vmnetd="true"
+  local helpers_socket="false"
   is_socket_helper_up && helpers_socket="true"
   local socket_exists=false
   [[ -S "$socket_path" ]] && socket_exists=true
@@ -126,8 +118,8 @@ status_json() {
   done
   stacks_json="${stacks_json}]"
 
-  printf '{"status":"%s","session_id":"%s","socket_exists":%s,"socket_path":"%s","context":"desktop-linux","helpers":{"vmnetd":%s,"socket":%s},"stacks":%s}\n' \
-    "${status}" "${session_id}" "${socket_exists}" "${socket_path}" "${helpers_vmnetd}" "${helpers_socket}" "${stacks_json}"
+  printf '{"status":"%s","session_id":"%s","socket_exists":%s,"socket_path":"%s","context":"desktop-linux","helpers":{"socket":%s},"stacks":%s}\n' \
+    "${status}" "${session_id}" "${socket_exists}" "${socket_path}" "${helpers_socket}" "${stacks_json}"
 }
 
 cmd_start() {
@@ -282,8 +274,7 @@ cmd_status() {
     local socket_exists=false
     [[ -S "$socket_path" ]] && socket_exists=true
 
-    local vmnetd="down" socket_proc="down"
-    is_vmnetd_up && vmnetd="up"
+    local socket_proc="down"
     if is_socket_helper_up; then
       if [[ -L "/var/run/docker.sock" ]] && [[ "$(readlink /var/run/docker.sock 2>/dev/null)" == "${socket_path}" ]]; then
         socket_proc="active (symlink verified)"
@@ -297,7 +288,6 @@ cmd_status() {
     printf '  Socket: %s (exists=%s)\n' "$socket_path" "${socket_exists}"
     printf '  Context: desktop-linux\n'
     printf '  Helpers:\n'
-    printf '    com.docker.vmnetd: %s\n' "$vmnetd"
     printf '    com.docker.socket: %s\n' "$socket_proc"
 
     printf '  Registered Stacks:\n'
@@ -318,8 +308,8 @@ cmd_status() {
     if [[ "$status" != "running" ]] || [[ "$socket_exists" == "false" ]]; then
       echo "Remediation: run '$SCRIPT_NAME start'"
     fi
-    if [[ "$vmnetd" == "down" ]] || [[ "$socket_proc" == "down" ]]; then
-      echo "Helper Remediation: sudo -n /Applications/Docker.app/Contents/MacOS/install config --user ${USER:-$(id -un)} set-vmnetd set-docker-socket"
+    if [[ "$socket_proc" == "down" ]]; then
+      echo "Helper Remediation: sudo -n /Applications/Docker.app/Contents/MacOS/install config --user ${USER:-$(id -un)}"
     fi
   fi
 }
