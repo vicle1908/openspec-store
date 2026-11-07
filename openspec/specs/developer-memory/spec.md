@@ -139,7 +139,7 @@ The AgentMemory engine stack (`agentmemory-3111`), LaunchAgent supervisor, and M
 - **AND** loopback (`127.0.0.1`, `localhost`), RFC1918 subnets (`192.168.x.x`, `10.x.x.x`, `172.16-31.x.x`), and IPv6 addresses starting with `fd` SHALL be rejected with `URL blocked: private/local address not allowed`
 
 #### Scenario: Bidirectional last-write-wins delta sync reconciles shared memory scopes
-- **WHEN** `mem::mesh-sync` executes across authenticated peers (`iosteam-mac-mini` at `http://100.70.16.83:3111` and `macbook-pro-m5` at `http://100.101.64.56:3111`)
+- **WHEN** `mem::mesh-sync` executes across authenticated peers (`iosteam-mac-mini` at `http://100.70.16.83:3111` and `macbook-pro-m5` at `http://100.106.143.78:3111`)
 - **THEN** delta records modified since `peer.lastSyncAt` across shared scopes (`memories`, `actions`, `semantic`, `procedural`, `relations`, `graph:nodes`, `graph:edges`) SHALL be transferred via POST `/agentmemory/mesh/receive` and GET `/agentmemory/mesh/export`
 - **AND** incoming records SHALL be merged using monotonic timestamps with keyed locks (`withKeyedLock`), returning metrics for pushed and pulled items
 - **AND** `peer.lastSyncAt` SHALL be updated to the pre-transfer `syncStartedAt` ISO timestamp when zero errors occur, preventing records created during in-flight transfers from being skipped
