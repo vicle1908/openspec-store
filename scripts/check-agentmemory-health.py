@@ -28,8 +28,8 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_HEALTH_URL = "http://localhost:3111/agentmemory/health"
-DEFAULT_PINNED_ENGINE = "0.22.1"
-DEFAULT_EXPECTED_PACKAGE = "0.9.30"
+DEFAULT_PINNED_ENGINE = "0.25.0"
+DEFAULT_EXPECTED_PACKAGE = "0.9.32"
 
 
 @dataclass
@@ -74,7 +74,13 @@ def find_agentmemory_package_json(custom_path: Path | None = None) -> Path | Non
 
     home = Path(os.environ.get("HOME", str(Path.home())))
     candidates = [
-        home / ".npm-global" / "lib" / "node_modules" / "@agentmemory" / "agentmemory" / "package.json",
+        home
+        / ".npm-global"
+        / "lib"
+        / "node_modules"
+        / "@agentmemory"
+        / "agentmemory"
+        / "package.json",
         home / ".npm-global" / "lib" / "node_modules" / "agentmemory" / "package.json",
         Path("/opt/homebrew/lib/node_modules/@agentmemory/agentmemory/package.json"),
         Path("/usr/local/lib/node_modules/@agentmemory/agentmemory/package.json"),
@@ -151,10 +157,16 @@ def check_health_and_alignment(
     # Strict validation: root / is strictly forbidden
     parsed_path = urllib.parse.urlparse(url).path
     if parsed_path in ("", "/"):
-        raise ValueError("Root '/' endpoint is forbidden; health probe MUST target '/agentmemory/health'")
+        raise ValueError(
+            "Root '/' endpoint is forbidden; health probe MUST target '/agentmemory/health'"
+        )
 
     # 1. Package metadata resolution
-    resolved_pkg_path = find_agentmemory_package_json(package_json_path) if (mock_http_response is None or package_json_path is not None) else None
+    resolved_pkg_path = (
+        find_agentmemory_package_json(package_json_path)
+        if (mock_http_response is None or package_json_path is not None)
+        else None
+    )
     pkg_ver, declared_engine = read_package_engine_pin(resolved_pkg_path)
     pinned_engine = declared_engine or expected_engine
 
@@ -166,10 +178,18 @@ def check_health_and_alignment(
     if mock_http_response is not None:
         http_status, response_data = mock_http_response
     else:
-        req = urllib.request.Request(
-            url,
-            headers={"User-Agent": "AgentMemory-HealthProbe/1.0", "Accept": "application/json"},
-        )
+        headers = {"User-Agent": "AgentMemory-HealthProbe/1.0", "Accept": "application/json"}
+        secret = os.environ.get("AGENTMEMORY_SECRET", "").strip()
+        if not secret:
+            sec_file = Path(os.environ.get("HOME", str(Path.home()))) / ".agentmemory" / "secret"
+            if sec_file.is_file():
+                try:
+                    secret = sec_file.read_text(encoding="utf-8").strip()
+                except Exception:
+                    pass
+        if secret:
+            headers["Authorization"] = f"Bearer {secret}"
+        req = urllib.request.Request(url, headers=headers)
         try:
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 http_status = resp.status
@@ -191,7 +211,11 @@ def check_health_and_alignment(
     # Extract reported engine version from response if present
     reported_engine = None
     if isinstance(response_data, dict):
-        reported_engine = response_data.get("engine_version") or response_data.get("engine") or response_data.get("iii_engine")
+        reported_engine = (
+            response_data.get("engine_version")
+            or response_data.get("engine")
+            or response_data.get("iii_engine")
+        )
 
     # 3. Process quarantine inspection for ports 3111 and 49134
     quarantine_entries: list[QuarantineAuditEntry] = []
@@ -199,7 +223,10 @@ def check_health_and_alignment(
     for port in (3111, 49134):
         p_list = []
         if mock_processes is not None and port in mock_processes:
-            p_list = [(p["pid"], p["name"], p.get("command_line", p["name"])) for p in mock_processes[port]]
+            p_list = [
+                (p["pid"], p["name"], p.get("command_line", p["name"]))
+                for p in mock_processes[port]
+            ]
         else:
             p_list = inspect_pids_for_port(port)
 
@@ -208,24 +235,35 @@ def check_health_and_alignment(
             reason = ""
             if port == 3111:
                 # API port expects agentmemory / node / iii
-                if not any(k in pname.lower() or k in pcmd.lower() for k in ("agentmemory", "node", "iii")):
+                if not any(
+                    k in pname.lower() or k in pcmd.lower() for k in ("agentmemory", "node", "iii")
+                ):
                     is_foreign = True
                     reason = f"Unexpected process '{pname}' occupying API port 3111"
             elif port == 49134:
                 # Engine port expects iii-engine or node; legacy versions must be quarantined
-                if "legacy" in pname.lower() or "legacy" in pcmd.lower() or not any(k in pname.lower() or k in pcmd.lower() for k in ("iii-engine", "node")):
+                if (
+                    "legacy" in pname.lower()
+                    or "legacy" in pcmd.lower()
+                    or not any(
+                        k in pname.lower() or k in pcmd.lower()
+                        for k in ("iii-engine", "iii", "node")
+                    )
+                ):
                     is_foreign = True
                     reason = f"Unexpected or legacy process '{pname}' occupying engine port 49134"
 
             if is_foreign:
-                quarantine_entries.append(QuarantineAuditEntry(
-                    port=port,
-                    pid=pid,
-                    process_name=pname,
-                    command_line=pcmd,
-                    quarantined=True,
-                    reason=reason,
-                ))
+                quarantine_entries.append(
+                    QuarantineAuditEntry(
+                        port=port,
+                        pid=pid,
+                        process_name=pname,
+                        command_line=pcmd,
+                        quarantined=True,
+                        reason=reason,
+                    )
+                )
 
     # 4. Synthesize status
     # Check engine alignment
@@ -233,7 +271,9 @@ def check_health_and_alignment(
     align_details = "Engine generation aligns with pinned version"
     if reported_engine and pinned_engine and reported_engine != pinned_engine:
         engine_aligned = False
-        align_details = f"Reported engine '{reported_engine}' diverges from pinned '{pinned_engine}'"
+        align_details = (
+            f"Reported engine '{reported_engine}' diverges from pinned '{pinned_engine}'"
+        )
     elif not pinned_engine:
         engine_aligned = False
         align_details = "Pinned engine version could not be resolved from package metadata"
@@ -248,13 +288,17 @@ def check_health_and_alignment(
 
     if quarantine_entries:
         overall_status = "QUARANTINED"
-        summary_details = f"{len(quarantine_entries)} conflicting process(es) quarantined on ports 3111/49134"
+        summary_details = (
+            f"{len(quarantine_entries)} conflicting process(es) quarantined on ports 3111/49134"
+        )
     elif http_status == 200 and engine_aligned:
         overall_status = "HEALTHY"
         summary_details = "AgentMemory API is healthy and engine is aligned"
     elif http_status == 200 and not engine_aligned:
         overall_status = "MISALIGNED"
-        summary_details = f"AgentMemory responded 200 but engine generation misaligned: {align_details}"
+        summary_details = (
+            f"AgentMemory responded 200 but engine generation misaligned: {align_details}"
+        )
     else:
         overall_status = "UNHEALTHY"
         summary_details = http_error_msg or f"Endpoint returned HTTP {http_status}"
@@ -271,10 +315,18 @@ def check_health_and_alignment(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="AgentMemory health probe and engine alignment verifier")
-    parser.add_argument("--url", default=DEFAULT_HEALTH_URL, help="Health endpoint URL (must not be root /)")
-    parser.add_argument("--package-json", type=Path, default=None, help="Path to agentmemory package.json")
-    parser.add_argument("--pinned-engine", default=DEFAULT_PINNED_ENGINE, help="Expected pinned iii-engine version")
+    parser = argparse.ArgumentParser(
+        description="AgentMemory health probe and engine alignment verifier"
+    )
+    parser.add_argument(
+        "--url", default=DEFAULT_HEALTH_URL, help="Health endpoint URL (must not be root /)"
+    )
+    parser.add_argument(
+        "--package-json", type=Path, default=None, help="Path to agentmemory package.json"
+    )
+    parser.add_argument(
+        "--pinned-engine", default=DEFAULT_PINNED_ENGINE, help="Expected pinned iii-engine version"
+    )
     parser.add_argument("--timeout", type=float, default=5.0, help="HTTP timeout in seconds")
     parser.add_argument("--json", action="store_true", help="Output report as JSON")
 
@@ -298,7 +350,9 @@ def main() -> int:
         print("=== AgentMemory Health Probe ===")
         print(f"Status:       {report.status}")
         print(f"Endpoint:     {report.endpoint_url} (HTTP {report.http_status})")
-        print(f"Package:      version={report.alignment.installed_package_version}, pinned_engine={report.alignment.pinned_engine_version}")
+        print(
+            f"Package:      version={report.alignment.installed_package_version}, pinned_engine={report.alignment.pinned_engine_version}"
+        )
         print(f"Details:      {report.details}")
         if report.quarantine:
             print("\nQuarantine Audit:")
