@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Workstation bootstrap planner and dry-run report generator.
 
 Computes target file actions, validates preflight requirements, and verifies that

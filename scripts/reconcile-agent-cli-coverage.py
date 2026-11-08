@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Reconcile workstation agent CLI coverage declarations against installed binaries.
 
 Standard library only. Read-only by contract: never executes update verbs or removes tools.

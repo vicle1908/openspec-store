@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Read-only macOS TCC provenance and code-signing requirement verifier.
 
 Evaluates active canonical coding agent CLIs and shared host Python automation

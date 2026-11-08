@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Reusable probe script for verifying harness system-prompt delivery.
 
 Evaluates whether a model/provider registration delivers the harness system

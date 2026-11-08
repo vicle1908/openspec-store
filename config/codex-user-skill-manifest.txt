@@ -1,6 +1,27 @@
 # Workspace Agent Skills exposed through ~/.agents/skills for Codex user-scope discovery.
 # Keep the list intentional; canonical content stays in ~/Developer/.agents/skills.
+# Google Workspace official agent skills (upstream: googleworkspace/cli).
+# Agent memory and session continuity skills (declared 2026-10-03: previously linked
+# but undeclared, so reconciliation would prune them and drop cwd-independent coverage).
+# Redis design and operations skills.
+# Temporal developer and operator skills.
+# Proprietary local knowledge search; canonical content is workspace-owned with no upstream.
+# Ponytail official agent skills (upstream: DietrichGebert/ponytail).
+# Browser Use official agent skills (upstream: browser-use/browser-use).
 agent-capability-orchestration
+agentmemory-agents
+agentmemory-architecture
+agentmemory-config
+agentmemory-hooks
+agentmemory-mcp-tools
+agentmemory-rest-api
+browser-use
+cloud
+commit-context
+commit-history
+docker-patterns
+find-docs
+forget
 gitnexus-cli
 gitnexus-debugging
 gitnexus-exploring
@@ -11,7 +32,6 @@ gitnexus-pr-review
 gitnexus-refactoring
 gitnexus-taint-analysis
 graphify
-# Google Workspace official agent skills (upstream: googleworkspace/cli).
 gws-calendar
 gws-docs
 gws-drive
@@ -20,6 +40,11 @@ gws-sheets
 gws-tasks
 handoff
 herdr
+iris-development
+lesson
+memory-discipline
+notion-cli
+open-source
 openspec-apply-change
 openspec-archive-change
 openspec-bulk-archive-change
@@ -32,28 +57,16 @@ openspec-propose
 openspec-sync-specs
 openspec-update-change
 openspec-verify-change
-# Agent memory and session continuity skills (declared 2026-10-03: previously linked
-# but undeclared, so reconciliation would prune them and drop cwd-independent coverage).
-agentmemory-agents
-agentmemory-architecture
-agentmemory-config
-agentmemory-hooks
-agentmemory-mcp-tools
-agentmemory-rest-api
-commit-context
-commit-history
-find-docs
-forget
-iris-development
-lesson
-memory-discipline
-notion-cli
+ponytail
+ponytail-audit
+ponytail-debt
+ponytail-gain
+ponytail-help
+ponytail-review
+qa
+qi-hybrid-search
 recall
 recap
-remember
-session-history
-write-agentmemory-skill
-# Redis design and operations skills.
 redis-clustering
 redis-connections
 redis-core
@@ -61,20 +74,8 @@ redis-observability
 redis-search
 redis-security
 redis-semantic-cache
-# Temporal developer and operator skills.
+remember
+session-history
 temporal-developer
 temporal-ops
-# Proprietary local knowledge search; canonical content is workspace-owned with no upstream.
-qi-hybrid-search
-# Ponytail official agent skills (upstream: DietrichGebert/ponytail).
-ponytail
-ponytail-audit
-ponytail-debt
-ponytail-gain
-ponytail-help
-ponytail-review
-# Browser Use official agent skills (upstream: browser-use/browser-use).
-browser-use
-cloud
-open-source
-qa
+write-agentmemory-skill

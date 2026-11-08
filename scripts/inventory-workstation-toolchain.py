@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Inventory workstation toolchain install locations, detect duplication, and verify ownership.
 
 Standard library only. Read-only by contract: never removes or alters any installation.

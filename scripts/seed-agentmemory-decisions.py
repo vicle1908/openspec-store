@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Idempotent toolchain decision seeding script for AgentMemory.
 
 Publishes durable toolchain governance decisions into AgentMemory via the

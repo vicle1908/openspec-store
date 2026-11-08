@@ -6,7 +6,7 @@ Enforces a clean-break dependency modernization standard across all workspace Py
 ## Requirements
 
 ### Requirement: Purge legacy upper bound constraints
-All Python repositories in the workspace SHALL omit legacy `<` upper bound specifiers from direct runtime dependencies and developer dependency groups, allowing unconstrained resolution to the latest available PyPI releases, and SHALL enforce `requires-python = ">=3.15"`.
+All Python repositories in the workspace, including auxiliary web interfaces such as `platform/hermes-webui`, SHALL omit legacy `<` upper bound specifiers from direct runtime dependencies and developer dependency groups, allowing unconstrained resolution to the latest available PyPI releases, and SHALL enforce `requires-python = ">=3.15"`.
 
 #### Scenario: Manifest constraints are unpinned from legacy ceilings
 - **WHEN** inspecting `project.dependencies` and `dependency-groups` across all workspace `pyproject.toml` files
@@ -17,6 +17,12 @@ All Python repositories in the workspace SHALL omit legacy `<` upper bound speci
 #### Scenario: Minimum Python version requires-python is 3.15
 - **WHEN** inspecting `project.requires-python` across all workspace `pyproject.toml` files
 - **THEN** the value SHALL equal `">=3.15"`.
+
+#### Scenario: Platform Hermes WebUI conforms to workspace Python baseline
+- **WHEN** inspecting `platform/hermes-webui/pyproject.toml`
+- **THEN** `project.requires-python` SHALL specify `">=3.15"`
+- **AND** `requirements.txt` SHALL NOT be present in the repository root
+- **AND** dev dependencies SHALL be defined using modern `[dependency-groups]`
 
 ### Requirement: Zero backward-compatibility shims
 Workspace Python source code SHALL adopt modern upstream APIs directly without preserving legacy polyfills, fallback imports, or deprecated framework mechanisms.
@@ -60,3 +66,13 @@ FastAPI services and webhook handlers SHALL enforce modern boolean form field de
 - **WHEN** FastAPI endpoints in `webhook-receiver`, `shb-webhook-receiver`, or `shb-schedule` define boolean form fields or models
 - **THEN** they SHALL specify explicit default values (e.g. `Field(default=False)`) rather than relying on automatic falsy coercion
 - **AND** dev dependency groups SHALL declare `httpx2>=2.16.0` alongside `httpx` to eliminate Starlette TestClient deprecation warnings.
+
+### Requirement: Container packaging clean-break and zero dead requirements
+Container Dockerfiles across workspace Python services SHALL declare base images satisfying the service's declared Python version baseline (`python:3.15.1-slim-trixie`), build dependencies exclusively using `uv sync --frozen`, and SHALL NOT reference obsolete or deleted `requirements.txt` manifests.
+
+#### Scenario: Docker container builds cleanly with uv and matching Python baseline
+- **WHEN** building a container image for a Python service (such as `tdt/jira-skill`)
+- **THEN** the Dockerfile SHALL declare a base image satisfying the repository's `requires-python` specification (`python:3.15.1-slim-trixie`)
+- **AND** the Dockerfile SHALL obtain `uv` from official multi-stage distribution images (`ghcr.io/astral-sh/uv`)
+- **AND** the Dockerfile SHALL install locked dependencies using `uv sync --frozen --no-dev`
+- **AND** the build SHALL NOT fail due to missing `requirements.txt` files or Python runtime mismatches

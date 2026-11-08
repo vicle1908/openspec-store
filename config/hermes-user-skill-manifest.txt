@@ -1,14 +1,15 @@
 # Shared workspace skills exposed through ~/.hermes/skills for native Hermes user-scope discovery.
 # Keep the list intentional; canonical content stays in ~/Developer/.agents/skills.
 # Ponytail official agent skills (upstream: DietrichGebert/ponytail).
+# Browser Use official agent skills (upstream: browser-use/browser-use).
+browser-use
+cloud
+docker-patterns
+open-source
 ponytail
 ponytail-audit
 ponytail-debt
 ponytail-gain
 ponytail-help
 ponytail-review
-# Browser Use official agent skills (upstream: browser-use/browser-use).
-browser-use
-cloud
-open-source
 qa

@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Validate OpenSpec change archive readiness against tasks, specs, and evidence.
 
 This script is standard-library-only and read-only by default.

@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Workstation duplicate removal authorization gate.
 
 Enforces the five-point verification check before duplicate or shadowed binaries

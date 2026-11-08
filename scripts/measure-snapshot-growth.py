@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Measure Git-backed snapshot store growth, evaluate against ceilings, and report repack actions.
 
 Standard library only. Read-only by contract: never executes repack or deletion.

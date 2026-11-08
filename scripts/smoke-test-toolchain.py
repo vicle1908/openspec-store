@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Workstation toolchain native smoke check suite.
 
 Runs tool-specific pre- and post-mutation native smoke checks (<tool> --version,

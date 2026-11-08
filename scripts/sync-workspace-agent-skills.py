@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Synchronize tracked OpenSpec targets and selected cross-agent skill links.
 
 Authoritative generated targets live in openspec-store. Shared non-generated
@@ -21,9 +25,9 @@ from dataclasses import dataclass
 try:
     from datetime import UTC, datetime
 except ImportError:
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    UTC = timezone.utc
+    UTC = UTC
 from pathlib import Path
 from typing import Any
 
@@ -224,7 +228,7 @@ def measure_description_bytes(skill_md_path: Path) -> dict[str, int]:
 def check_description_budget(skill_md_path: Path, is_vendor: bool = True) -> bool:
     try:
         metrics = measure_description_bytes(skill_md_path)
-    except OSError, ValueError:
+    except (OSError, ValueError):
         return False
     if metrics["raw_bytes"] == 0 or metrics["raw_bytes"] > MAX_VENDOR_DESCRIPTION_BYTES:
         return False
@@ -307,7 +311,7 @@ def _skill_entry_violations(path: Path, locked_skills: set[str] | None = None) -
                 findings.append(f"{path.name}:empty-description")
             elif raw_bytes > allowed_max:
                 findings.append(f"{path.name}:description-exceeds-1024-bytes({raw_bytes})")
-        except OSError, ValueError:
+        except (OSError, ValueError):
             findings.append(f"{path.name}:invalid-frontmatter-description")
     return findings
 

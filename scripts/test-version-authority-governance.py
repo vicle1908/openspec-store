@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Regression test suite for workstation toolchain version authority and drift governance.
 
 Exercises production implementations in:

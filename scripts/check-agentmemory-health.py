@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """AgentMemory health probe and engine alignment verifier.
 
 Queries HTTP GET http://localhost:3111/agentmemory/health (avoiding root /)
@@ -16,6 +20,7 @@ Contract:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import re
@@ -183,10 +188,8 @@ def check_health_and_alignment(
         if not secret:
             sec_file = Path(os.environ.get("HOME", str(Path.home()))) / ".agentmemory" / "secret"
             if sec_file.is_file():
-                try:
+                with contextlib.suppress(Exception):
                     secret = sec_file.read_text(encoding="utf-8").strip()
-                except Exception:
-                    pass
         if secret:
             headers["Authorization"] = f"Bearer {secret}"
         req = urllib.request.Request(url, headers=headers)

@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Development service port collision and quarantine detector.
 
 Checks standard development ports (Ollama: 11434, AgentMemory API: 3111,

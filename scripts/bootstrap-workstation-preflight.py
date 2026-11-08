@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Workstation bootstrap preflight checker.
 
 Detects macOS architecture, Homebrew prefix, user home, and development prerequisites
