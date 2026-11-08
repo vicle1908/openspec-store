@@ -17,10 +17,12 @@ import shutil
 import subprocess
 import tempfile
 from dataclasses import dataclass
+
 try:
     from datetime import UTC, datetime
 except ImportError:
     from datetime import datetime, timezone
+
     UTC = timezone.utc
 from pathlib import Path
 from typing import Any
@@ -64,6 +66,7 @@ OPEN_SPEC_NAMES = tuple(
     sorted(path.name for path in STORE_STANDARD.glob("openspec-*") if (path / "SKILL.md").is_file())
 )
 
+
 @dataclass
 class Result:
     created: list[str]
@@ -99,6 +102,15 @@ def skill_roots(root: Path) -> tuple[dict[str, Path], list[str]]:
 # causing a case-sensitive catalog walk to stop before reaching SKILL.md. They are
 # not part of the Agent Skills layout and are absent from upstream skill sources.
 NON_OFFICIAL_ENTRY_DIRS = (".cursor-plugin", "cursor-plugin", "claude-plugin")
+AGENT_SKILLS_ALLOWED_FIELDS = {
+    "name",
+    "description",
+    "license",
+    "allowed-tools",
+    "metadata",
+    "compatibility",
+}
+SKILL_NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
 
 def decode_frontmatter_description(skill_md_path: Path) -> str:
@@ -212,14 +224,14 @@ def measure_description_bytes(skill_md_path: Path) -> dict[str, int]:
 def check_description_budget(skill_md_path: Path, is_vendor: bool = True) -> bool:
     try:
         metrics = measure_description_bytes(skill_md_path)
-    except (OSError, ValueError):
+    except OSError, ValueError:
         return False
     if metrics["raw_bytes"] == 0 or metrics["raw_bytes"] > MAX_VENDOR_DESCRIPTION_BYTES:
         return False
     return not (not is_vendor and metrics["char_length"] > MAX_INTERNAL_DESCRIPTION_CHARS)
 
 
-def _skill_entry_violations(path: Path) -> list[str]:
+def _skill_entry_violations(path: Path, locked_skills: set[str] | None = None) -> list[str]:
     findings: list[str] = []
     try:
         names = os.listdir(path)
@@ -230,22 +242,53 @@ def _skill_entry_violations(path: Path) -> list[str]:
         findings.append(f"{path.name}:entry-not-canonical-case(has {','.join(variants)})")
     present = sorted(name for name in names if name in NON_OFFICIAL_ENTRY_DIRS)
     if present:
-        findings.append(
-            f"{path.name}:plugin-container-dir(shadows SKILL.md:{','.join(present)})"
-        )
+        findings.append(f"{path.name}:plugin-container-dir(shadows SKILL.md:{','.join(present)})")
     skill_md = path / "SKILL.md"
     if "SKILL.md" in names and skill_md.is_file():
         try:
+            raw_text = skill_md.read_text(encoding="utf-8")
+            if not raw_text.startswith("---"):
+                findings.append(f"{path.name}:missing-yaml-frontmatter")
+            else:
+                parts = raw_text.split("---", 2)
+                if len(parts) < 3:
+                    findings.append(f"{path.name}:unclosed-yaml-frontmatter")
+                else:
+                    fm_lines = parts[1].splitlines()
+                    top_keys: set[str] = set()
+                    name_val: str | None = None
+                    for line in fm_lines:
+                        m = re.match(r"^([a-zA-Z0-9_-]+)\s*:", line)
+                        if m and not line.startswith(" ") and not line.startswith("	"):
+                            k = m.group(1)
+                            top_keys.add(k)
+                            if k == "name":
+                                name_val = line.split(":", 1)[1].strip().strip('"').strip("'")
+                    if not name_val:
+                        findings.append(f"{path.name}:missing-frontmatter-name")
+                    else:
+                        if name_val != path.name:
+                            findings.append(f"{path.name}:name-directory-mismatch({name_val})")
+                        if not SKILL_NAME_RE.match(name_val):
+                            findings.append(f"{path.name}:invalid-name-format({name_val})")
+                    is_vendor = locked_skills is not None and path.name in locked_skills
+                    if not is_vendor:
+                        extras = sorted(top_keys - AGENT_SKILLS_ALLOWED_FIELDS)
+                        if extras:
+                            findings.append(
+                                f"{path.name}:unexpected-frontmatter-fields({','.join(extras)})"
+                            )
+                        if "/Users/" in raw_text:
+                            findings.append(f"{path.name}:hardcoded-user-path")
+
             metrics = measure_description_bytes(skill_md)
             raw_bytes = metrics["raw_bytes"]
-            allowed_max = LEGACY_VENDOR_BYTE_EXCEPTIONS.get(
-                path.name, MAX_VENDOR_DESCRIPTION_BYTES
-            )
+            allowed_max = LEGACY_VENDOR_BYTE_EXCEPTIONS.get(path.name, MAX_VENDOR_DESCRIPTION_BYTES)
             if raw_bytes == 0:
                 findings.append(f"{path.name}:empty-description")
             elif raw_bytes > allowed_max:
                 findings.append(f"{path.name}:description-exceeds-1024-bytes({raw_bytes})")
-        except (OSError, ValueError):
+        except OSError, ValueError:
             findings.append(f"{path.name}:invalid-frontmatter-description")
     return findings
 
@@ -255,13 +298,23 @@ def malformed_entries(root: Path) -> list[str]:
     findings: list[str] = []
     if not root.is_dir():
         return findings
+    lock_path = root.parent / "skills-lock.json"
+    locked_skills: set[str] = set()
+    if lock_path.is_file():
+        try:
+            locked_skills = set(
+                json.loads(lock_path.read_text(encoding="utf-8")).get("skills", {}).keys()
+            )
+        except Exception:
+            pass
     for path in sorted(root.iterdir()):
         if path.name.startswith(".") or not path.is_dir():
             continue
         if not (path / "SKILL.md").is_file():
             continue
-        findings.extend(_skill_entry_violations(path))
+        findings.extend(_skill_entry_violations(path, locked_skills=locked_skills))
     return findings
+
 
 def points_to(link: Path, target: Path) -> bool:
     return link.is_symlink() and Path(os.path.realpath(link)) == target.resolve()
@@ -334,7 +387,11 @@ def reconcile_links(
             continue
         expected = desired.get(path.name)
         if expected is None:
-            if preserve_unlisted_workspace_links and not is_broken and path.name not in previously_managed:
+            if (
+                preserve_unlisted_workspace_links
+                and not is_broken
+                and path.name not in previously_managed
+            ):
                 continue
             removed.append(path.name)
             if not check:
@@ -473,14 +530,16 @@ def load_lockfile(lock_path: Path) -> tuple[dict[str, Any] | None, list[str]]:
         data = json.loads(lock_path.read_text(encoding="utf-8"))
     except Exception as exc:
         return None, [f"invalid-lockfile-json:{lock_path}:{exc}"]
-    if not isinstance(data, dict) or data.get("version") != 1 or not isinstance(data.get("skills"), dict):
+    if (
+        not isinstance(data, dict)
+        or data.get("version") != 1
+        or not isinstance(data.get("skills"), dict)
+    ):
         return None, [f"invalid-lockfile-schema:{lock_path}"]
     return data, []
 
 
-def diff_against_snapshot(
-    workspace: Path, snapshot_dir: Path
-) -> tuple[bool, list[str], list[str]]:
+def diff_against_snapshot(workspace: Path, snapshot_dir: Path) -> tuple[bool, list[str], list[str]]:
     """Compare live workspace against snapshot_dir.
 
     Returns (has_drift, drift_findings, mutated_skills).
@@ -556,7 +615,9 @@ def accept_or_bootstrap_snapshot(
     current_manifest: dict[str, Any] | None = None
     if (current_dir / "manifest.json").is_file():
         try:
-            current_manifest = json.loads((current_dir / "manifest.json").read_text(encoding="utf-8"))
+            current_manifest = json.loads(
+                (current_dir / "manifest.json").read_text(encoding="utf-8")
+            )
         except Exception as exc:
             errors.append(f"corrupt-current-manifest:{exc}")
 
@@ -639,7 +700,6 @@ def accept_or_bootstrap_snapshot(
             "files": files_map,
         }
 
-
     if errors:
         _, _, mutated = (
             diff_against_snapshot(workspace, current_dir)
@@ -649,13 +709,13 @@ def accept_or_bootstrap_snapshot(
         return False, errors, mutated
 
     root_lock_bytes = root_lock_path.read_bytes()
-    has_current = (current_dir / "manifest.json").is_file() and (current_dir / "skills-lock.json").is_file()
+    has_current = (current_dir / "manifest.json").is_file() and (
+        current_dir / "skills-lock.json"
+    ).is_file()
     state_changed = True
     if has_current and current_manifest is not None:
         same_lock = file_digest(root_lock_path) == file_digest(current_dir / "skills-lock.json")
-        prev_files = {
-            k: v.get("files", {}) for k, v in current_manifest.get("skills", {}).items()
-        }
+        prev_files = {k: v.get("files", {}) for k, v in current_manifest.get("skills", {}).items()}
         curr_files = {k: v["files"] for k, v in manifest_skills.items()}
         if same_lock and prev_files == curr_files:
             state_changed = False
@@ -721,7 +781,9 @@ def recover_from_snapshot(*, workspace: Path) -> tuple[bool, list[str], list[str
     if not manifest_path.is_file() or not snap_lock_path.is_file() or not files_root.is_dir():
         return (
             False,
-            ["recovery-failed:missing-accepted-snapshot(computedHash-alone-cannot-reconstruct-bytes)"],
+            [
+                "recovery-failed:missing-accepted-snapshot(computedHash-alone-cannot-reconstruct-bytes)"
+            ],
             [],
         )
 
@@ -785,7 +847,9 @@ def main(argv: list[str] | None = None) -> int:
         help="restore mutated registry-tracked skill directories and root skills-lock.json from .skill-snapshots/current",
     )
     parser.add_argument("--workspace-root", type=Path, default=None, help="override workspace root")
-    parser.add_argument("--store-root", type=Path, default=None, help="override openspec-store root")
+    parser.add_argument(
+        "--store-root", type=Path, default=None, help="override openspec-store root"
+    )
     parser.add_argument("--home-dir", type=Path, default=None, help="override user home directory")
     args = parser.parse_args(argv)
 
