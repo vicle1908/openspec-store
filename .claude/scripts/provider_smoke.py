@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Fresh-login smoke tests for provider launchers.
 
 Usage:
@@ -14,7 +18,8 @@ import sys
 def smoke(provider: str, token_marker: str, timeout: int = 120) -> bool:
     """Run fresh-login smoke for a provider launcher."""
     cmd = [
-        "zsh", "-lic",
+        "zsh",
+        "-lic",
         f'{provider} --print --output-format json "Return exactly {token_marker}"',
     ]
 
@@ -47,12 +52,17 @@ def smoke(provider: str, token_marker: str, timeout: int = 120) -> bool:
     except json.JSONDecodeError:
         result_text = clean[:200] if clean else "<empty>"
 
-    ok = result.returncode == 0 and is_error is False and result_text is not None and token_marker in result_text
+    ok = (
+        result.returncode == 0
+        and is_error is False
+        and result_text is not None
+        and token_marker in result_text
+    )
     status = "PASS" if ok else "FAIL"
 
-    print(f"\n{'='*50}")
+    print(f"\n{'=' * 50}")
     print(f"  {provider} — {status}")
-    print(f"{'='*50}")
+    print(f"{'=' * 50}")
     print(f"  exit_code:    {result.returncode}")
     print(f"  system_model: {system_model}")
     print(f"  result:       {result_text!r}")
@@ -71,9 +81,9 @@ def main() -> int:
 
     results = [smoke(p, s) for p, s in providers]
 
-    print(f"\n{'='*50}")
+    print(f"\n{'=' * 50}")
     print("  SUMMARY")
-    print(f"{'='*50}")
+    print(f"{'=' * 50}")
     for (prov, _), ok in zip(providers, results, strict=False):
         print(f"  {prov}: {'PASS' if ok else 'FAIL'}")
 

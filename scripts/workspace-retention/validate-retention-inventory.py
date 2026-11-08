@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Validate and load the workspace artifact retention inventory.
 
 This is the read-only producer/loader for the retention policy handoff defined
@@ -68,9 +72,22 @@ PROVENANCE_TYPES = {"repo_revision", "evidence_identity", "runtime_observation"}
 # presence is a schema violation (task 2.1) because credentials and
 # request/response bodies are explicit non-goals of the policy.
 FORBIDDEN_KEYS = {
-    "secret", "secrets", "password", "passwd", "token", "access_token",
-    "api_key", "apikey", "credential", "credentials", "private_key",
-    "request_body", "response_body", "authorization", "cookie", "session_token",
+    "secret",
+    "secrets",
+    "password",
+    "passwd",
+    "token",
+    "access_token",
+    "api_key",
+    "apikey",
+    "credential",
+    "credentials",
+    "private_key",
+    "request_body",
+    "response_body",
+    "authorization",
+    "cookie",
+    "session_token",
 }
 
 EXIT_OK = 0
@@ -110,7 +127,9 @@ def git_head(path: str) -> str | None:
     try:
         result = subprocess.run(
             ["git", "-C", str(target), "rev-parse", "HEAD"],
-            capture_output=True, text=True, timeout=15,
+            capture_output=True,
+            text=True,
+            timeout=15,
         )
     except Exception:
         return None
@@ -149,9 +168,7 @@ def validate_schema(doc) -> list[str]:
 
     # Policy identity is required.
     if doc.get("policy") != POLICY_NAME:
-        errors.append(
-            f"policy must be '{POLICY_NAME}', got {doc.get('policy')!r}"
-        )
+        errors.append(f"policy must be '{POLICY_NAME}', got {doc.get('policy')!r}")
     if not _nonempty_str(doc.get("policy_version")):
         errors.append("missing identity: policy_version is required")
     if not _nonempty_str(doc.get("policy_identity")):
@@ -206,10 +223,7 @@ def validate_schema(doc) -> list[str]:
         if not isinstance(provenance, dict):
             errors.append(f"{prefix}.provenance must be an object")
         elif provenance.get("type") not in PROVENANCE_TYPES:
-            errors.append(
-                f"{prefix}.provenance.type must be one of "
-                f"{sorted(PROVENANCE_TYPES)}"
-            )
+            errors.append(f"{prefix}.provenance.type must be one of {sorted(PROVENANCE_TYPES)}")
 
         review = entry.get("review")
         if not isinstance(review, dict):
@@ -237,8 +251,7 @@ def check_freshness(entry: dict) -> tuple[bool, str]:
             return False, "repo_revision provenance: git HEAD unavailable (fail closed)"
         if head != revision:
             return False, (
-                f"repo_revision provenance stale: recorded {revision[:12]} "
-                f"!= HEAD {head[:12]}"
+                f"repo_revision provenance stale: recorded {revision[:12]} != HEAD {head[:12]}"
             )
         return True, "repo_revision matches current HEAD"
 
@@ -294,16 +307,18 @@ def evaluate(doc: dict) -> dict:
             effective = "REVIEW_REQUIRED"
             reason = reason + "; owner UNKNOWN blocks reclamation (adapter unavailable)"
 
-        results.append({
-            "path": entry.get("path"),
-            "class": entry.get("class"),
-            "policy_state": entry.get("policy_state"),
-            "owner": owner,
-            "candidate": entry.get("candidate"),
-            "effective_state": effective,
-            "fresh": fresh,
-            "freshness_reason": reason,
-        })
+        results.append(
+            {
+                "path": entry.get("path"),
+                "class": entry.get("class"),
+                "policy_state": entry.get("policy_state"),
+                "owner": owner,
+                "candidate": entry.get("candidate"),
+                "effective_state": effective,
+                "fresh": fresh,
+                "freshness_reason": reason,
+            }
+        )
 
     def count(state: str) -> int:
         return sum(1 for r in results if r["effective_state"] == state)
@@ -320,7 +335,8 @@ def evaluate(doc: dict) -> dict:
                 f"{r['owner']}; cleanup SHALL skip"
             ),
         }
-        for r in results if r["effective_state"] == "PROTECTED"
+        for r in results
+        if r["effective_state"] == "PROTECTED"
     ]
 
     # Task 3.2: reclamation candidates are proposed for operator review, never
@@ -367,22 +383,25 @@ def default_approval_path(inventory_path: Path) -> Path:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Validate and load the workspace artifact retention "
-                    "inventory (read-only)."
+        description="Validate and load the workspace artifact retention inventory (read-only)."
     )
     parser.add_argument(
         "--inventory",
-        default=str(Path.home() / "Developer" / ".workspace-retention" /
-                    "retention-inventory.json"),
+        default=str(
+            Path.home() / "Developer" / ".workspace-retention" / "retention-inventory.json"
+        ),
         help="Path to the retention inventory JSON.",
     )
     parser.add_argument(
-        "--approval", default=None,
+        "--approval",
+        default=None,
         help="Path to the approval digest file (defaults to "
-             "<inventory stem>.approval.sha256 beside the inventory).",
+        "<inventory stem>.approval.sha256 beside the inventory).",
     )
     parser.add_argument(
-        "--json", action="store_true", dest="as_json",
+        "--json",
+        action="store_true",
+        dest="as_json",
         help="Emit the machine-readable handoff report as JSON.",
     )
     args = parser.parse_args(argv)
@@ -393,8 +412,7 @@ def main(argv: list[str] | None = None) -> int:
         return EXIT_MISSING
 
     approval_path = (
-        Path(expand(args.approval)) if args.approval
-        else default_approval_path(inventory_path)
+        Path(expand(args.approval)) if args.approval else default_approval_path(inventory_path)
     )
 
     raw = inventory_path.read_bytes()

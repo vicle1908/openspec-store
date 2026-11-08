@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """workspace-lifecycle.py — workspace lifecycle cleanup tool (default: dry-run).
 
 Usage:
@@ -64,17 +68,13 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        raw_observations = json.loads(
-            Path(args.observations).read_text(encoding="utf-8")
-        )
+        raw_observations = json.loads(Path(args.observations).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         print(f"error: cannot read observations: {exc}", file=sys.stderr)
         return 2
 
     inventory = retention.load_or_unavailable(Path(args.retention))
-    generated_at = args.generated_at or datetime.now(UTC).strftime(
-        "%Y-%m-%dT%H:%M:%SZ"
-    )
+    generated_at = args.generated_at or datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     try:
         document, written = dryrun.run_dry_run(

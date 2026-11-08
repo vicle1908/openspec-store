@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Replay the canonical agent mutation sequence against the canonical fixture.
 
 CI gate for the ``add-enterprise-architecture-modeling`` change (tasks 6.4
@@ -19,6 +23,7 @@ engine API, then the script asserts:
 
 Any failed assertion makes the script exit non-zero.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -45,12 +50,20 @@ CANONICAL = REPO_ROOT / "docs" / "architecture" / "models" / "canonical.xml"
 # existing Claims Administrator actor to it, then update the new element's
 # name. Assignment (actor -> role) is a legal ArchiMate 3.2 pairing.
 ASSIGNMENT_SOURCE = "ea-a87d473086132d9f"  # Claims Administrator (BusinessActor)
-NEW_ELEMENT = {"op": "create_element", "type": "BusinessRole",
-               "name": "Claims Intake Specialist", "layer": "business"}
+NEW_ELEMENT = {
+    "op": "create_element",
+    "type": "BusinessRole",
+    "name": "Claims Intake Specialist",
+    "layer": "business",
+}
 NEW_ELEMENT_ID = deterministic_id("element", "BusinessRole", "Claims Intake Specialist")
 REVIEWED_NAME = "Claims Intake Specialist (Reviewed)"
-NEW_RELATIONSHIP = {"op": "create_relationship", "type": "Assignment",
-                    "source": ASSIGNMENT_SOURCE, "target": NEW_ELEMENT_ID}
+NEW_RELATIONSHIP = {
+    "op": "create_relationship",
+    "type": "Assignment",
+    "source": ASSIGNMENT_SOURCE,
+    "target": NEW_ELEMENT_ID,
+}
 NEW_RELATIONSHIP_ID = deterministic_id(
     "relationship", "Assignment", f"{ASSIGNMENT_SOURCE}->{NEW_ELEMENT_ID}"
 )
@@ -76,7 +89,8 @@ def census(path: Path) -> dict[str, object]:
             (node.get("{http://www.w3.org/2001/XMLSchema-instance}type") or "").split(":")[-1],
             next((c.text or "" for c in node if c.tag.endswith("}name")), ""),
         )
-        for node in root.iter() if node.tag.endswith("}element")
+        for node in root.iter()
+        if node.tag.endswith("}element")
     }
     relationships = {
         node.get("identifier", ""): (
@@ -84,21 +98,30 @@ def census(path: Path) -> dict[str, object]:
             node.get("source", ""),
             node.get("target", ""),
         )
-        for node in root.iter() if node.tag.endswith("}relationship")
+        for node in root.iter()
+        if node.tag.endswith("}relationship")
     }
     return {
         "model_identifier": root.get("identifier", ""),
         "elements": elements,
         "relationships": relationships,
-        "views": sorted(node.get("identifier", "") for node in root.iter()
-                        if node.tag.endswith("}view")),
+        "views": sorted(
+            node.get("identifier", "") for node in root.iter() if node.tag.endswith("}view")
+        ),
         "bendpoints": sum(1 for node in root.iter() if node.tag.endswith("}bendpoint")),
-        "organization_items": sorted(node.get("identifier", "") for node in root.iter()
-                                     if node.tag.endswith("}item") and node.get("identifier")),
-        "property_definitions": sorted(node.get("identifier", "") for node in root.iter()
-                                       if node.tag.endswith("}propertyDefinition")),
-        "vendor_extensions": sorted(node.get("id", "") for node in root.iter()
-                                    if node.tag.endswith("}extension")),
+        "organization_items": sorted(
+            node.get("identifier", "")
+            for node in root.iter()
+            if node.tag.endswith("}item") and node.get("identifier")
+        ),
+        "property_definitions": sorted(
+            node.get("identifier", "")
+            for node in root.iter()
+            if node.tag.endswith("}propertyDefinition")
+        ),
+        "vendor_extensions": sorted(
+            node.get("id", "") for node in root.iter() if node.tag.endswith("}extension")
+        ),
     }
 
 
@@ -106,8 +129,10 @@ def snapshot(model: ArchimateModel) -> dict[str, object]:
     """Engine-side identifier snapshot for churn detection."""
     return {
         "elements": {e["identifier"]: (e["type"], e["name"]) for e in model.elements(limit=10**6)},
-        "relationships": {r["identifier"]: (r["type"], r["source"], r["target"])
-                          for r in model.relationships(limit=10**6)},
+        "relationships": {
+            r["identifier"]: (r["type"], r["source"], r["target"])
+            for r in model.relationships(limit=10**6)
+        },
     }
 
 
@@ -128,8 +153,9 @@ def main() -> int:
     original_bytes = CANONICAL.read_bytes()
     original_sha = hashlib.sha256(original_bytes).hexdigest()
     models_dir = CANONICAL.parent
-    stray_before = sorted(p.name for p in models_dir.iterdir()
-                          if p.name.endswith(".bak") or ".lock" in p.name)
+    stray_before = sorted(
+        p.name for p in models_dir.iterdir() if p.name.endswith(".bak") or ".lock" in p.name
+    )
 
     with tempfile.TemporaryDirectory(prefix="archimate-replay-") as temp:
         work = Path(temp) / "canonical.xml"
@@ -143,17 +169,26 @@ def main() -> int:
 
         # -- assertions after the first application -------------------------
         issues = model.validate()
-        check("first application: model still validates via engine API",
-              not issues, str([i.rule for i in issues]))
-        check("first application: element added exactly once",
-              NEW_ELEMENT_ID in after_first["elements"]
-              and len(after_first["elements"]) == len(baseline["elements"]) + 1,
-              f"expected {NEW_ELEMENT_ID}")
-        check("first application: element name updated",
-              after_first["elements"].get(NEW_ELEMENT_ID, ("", ""))[1] == REVIEWED_NAME)
-        check("first application: relationship added exactly once",
-              NEW_RELATIONSHIP_ID in after_first["relationships"]
-              and len(after_first["relationships"]) == len(baseline["relationships"]) + 1)
+        check(
+            "first application: model still validates via engine API",
+            not issues,
+            str([i.rule for i in issues]),
+        )
+        check(
+            "first application: element added exactly once",
+            NEW_ELEMENT_ID in after_first["elements"]
+            and len(after_first["elements"]) == len(baseline["elements"]) + 1,
+            f"expected {NEW_ELEMENT_ID}",
+        )
+        check(
+            "first application: element name updated",
+            after_first["elements"].get(NEW_ELEMENT_ID, ("", ""))[1] == REVIEWED_NAME,
+        )
+        check(
+            "first application: relationship added exactly once",
+            NEW_RELATIONSHIP_ID in after_first["relationships"]
+            and len(after_first["relationships"]) == len(baseline["relationships"]) + 1,
+        )
 
         # -- second (idempotent) application --------------------------------
         apply_sequence(model, "second application")
@@ -161,57 +196,93 @@ def main() -> int:
         engine_snapshot_second = snapshot(model)
 
         issues = model.validate()
-        check("second application: model still validates via engine API",
-              not issues, str([i.rule for i in issues]))
-        check("idempotent: no new elements added",
-              after_second["elements"] == after_first["elements"],
-              f"{len(after_second['elements'])} vs {len(after_first['elements'])}")
-        check("idempotent: no new relationships added",
-              after_second["relationships"] == after_first["relationships"])
-        check("identifiers stable: engine element identifiers unchanged",
-              engine_snapshot_second["elements"] == engine_snapshot_first["elements"])
-        check("identifiers stable: engine relationship identifiers unchanged",
-              engine_snapshot_second["relationships"] == engine_snapshot_first["relationships"])
+        check(
+            "second application: model still validates via engine API",
+            not issues,
+            str([i.rule for i in issues]),
+        )
+        check(
+            "idempotent: no new elements added",
+            after_second["elements"] == after_first["elements"],
+            f"{len(after_second['elements'])} vs {len(after_first['elements'])}",
+        )
+        check(
+            "idempotent: no new relationships added",
+            after_second["relationships"] == after_first["relationships"],
+        )
+        check(
+            "identifiers stable: engine element identifiers unchanged",
+            engine_snapshot_second["elements"] == engine_snapshot_first["elements"],
+        )
+        check(
+            "identifiers stable: engine relationship identifiers unchanged",
+            engine_snapshot_second["relationships"] == engine_snapshot_first["relationships"],
+        )
 
         # -- unmodified content preserved ----------------------------------
-        for key in ("model_identifier", "views", "bendpoints",
-                    "organization_items", "property_definitions", "vendor_extensions"):
-            check(f"preserved: {key} identical to fixture",
-                  after_second[key] == baseline[key],
-                  f"{after_second[key]!r} vs {baseline[key]!r}")
-        original_elements = {k: v for k, v in after_second["elements"].items()
-                             if k in baseline["elements"]}
-        check("preserved: all pre-existing elements unchanged",
-              original_elements == baseline["elements"])
-        original_relationships = {k: v for k, v in after_second["relationships"].items()
-                                  if k in baseline["relationships"]}
-        check("preserved: all pre-existing relationships unchanged",
-              original_relationships == baseline["relationships"])
+        for key in (
+            "model_identifier",
+            "views",
+            "bendpoints",
+            "organization_items",
+            "property_definitions",
+            "vendor_extensions",
+        ):
+            check(
+                f"preserved: {key} identical to fixture",
+                after_second[key] == baseline[key],
+                f"{after_second[key]!r} vs {baseline[key]!r}",
+            )
+        original_elements = {
+            k: v for k, v in after_second["elements"].items() if k in baseline["elements"]
+        }
+        check(
+            "preserved: all pre-existing elements unchanged",
+            original_elements == baseline["elements"],
+        )
+        original_relationships = {
+            k: v for k, v in after_second["relationships"].items() if k in baseline["relationships"]
+        }
+        check(
+            "preserved: all pre-existing relationships unchanged",
+            original_relationships == baseline["relationships"],
+        )
 
         # -- CLI surface also validates the mutated model -------------------
         cli = subprocess.run(
             [sys.executable, str(ENGINE), "--model", str(work), "validate"],
-            capture_output=True, text=True, timeout=120,
+            capture_output=True,
+            text=True,
+            timeout=120,
         )
-        check("CLI validate exits 0 on mutated model", cli.returncode == 0,
-              f"exit={cli.returncode} {cli.stdout.strip()[:200]} {cli.stderr.strip()[:200]}")
+        check(
+            "CLI validate exits 0 on mutated model",
+            cli.returncode == 0,
+            f"exit={cli.returncode} {cli.stdout.strip()[:200]} {cli.stderr.strip()[:200]}",
+        )
         check("CLI validate reports model as valid", '"valid": true' in cli.stdout)
 
     # -- repository fixture untouched ----------------------------------------
     final_sha = hashlib.sha256(CANONICAL.read_bytes()).hexdigest()
     check("repository fixture bytes unchanged", final_sha == original_sha)
-    stray_after = sorted(p.name for p in models_dir.iterdir()
-                         if p.name.endswith(".bak") or ".lock" in p.name)
-    check("no backup/lock files left next to repository fixture",
-          stray_after == stray_before, f"{stray_after} vs {stray_before}")
+    stray_after = sorted(
+        p.name for p in models_dir.iterdir() if p.name.endswith(".bak") or ".lock" in p.name
+    )
+    check(
+        "no backup/lock files left next to repository fixture",
+        stray_after == stray_before,
+        f"{stray_after} vs {stray_before}",
+    )
 
     if failures:
         print(f"REPLAY FAILED: {len(failures)} assertion(s) failed:", file=sys.stderr)
         for failure in failures:
             print(f"  - {failure}", file=sys.stderr)
         return 1
-    print("REPLAY PASSED: canonical mutation sequence is valid, idempotent, "
-          "identifier-stable, preservation-safe, and leaves the fixture untouched.")
+    print(
+        "REPLAY PASSED: canonical mutation sequence is valid, idempotent, "
+        "identifier-stable, preservation-safe, and leaves the fixture untouched."
+    )
     return 0
 
 
