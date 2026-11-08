@@ -231,6 +231,23 @@ def check_description_budget(skill_md_path: Path, is_vendor: bool = True) -> boo
     return not (not is_vendor and metrics["char_length"] > MAX_INTERNAL_DESCRIPTION_CHARS)
 
 
+def _load_locked_skill_names(start: Path) -> set[str]:
+    for candidate in (
+        start / "skills-lock.json",
+        start.parent / "skills-lock.json",
+        start.parent.parent / "skills-lock.json",
+        start.parent.parent.parent / "skills-lock.json",
+    ):
+        if candidate.is_file():
+            try:
+                return set(
+                    json.loads(candidate.read_text(encoding="utf-8")).get("skills", {}).keys()
+                )
+            except Exception:
+                pass
+    return set()
+
+
 def _skill_entry_violations(path: Path, locked_skills: set[str] | None = None) -> list[str]:
     findings: list[str] = []
     try:
@@ -272,21 +289,7 @@ def _skill_entry_violations(path: Path, locked_skills: set[str] | None = None) -
                         if not SKILL_NAME_RE.match(name_val):
                             findings.append(f"{path.name}:invalid-name-format({name_val})")
                     if locked_skills is None:
-                        locked_skills = set()
-                        for lock_candidate in (
-                            path.parent.parent / "skills-lock.json",
-                            path.parent.parent.parent / "skills-lock.json",
-                        ):
-                            if lock_candidate.is_file():
-                                try:
-                                    locked_skills = set(
-                                        json.loads(lock_candidate.read_text(encoding="utf-8"))
-                                        .get("skills", {})
-                                        .keys()
-                                    )
-                                    break
-                                except Exception:
-                                    pass
+                        locked_skills = _load_locked_skill_names(path)
                     is_vendor = path.name in locked_skills
                     if not is_vendor:
                         extras = sorted(top_keys - AGENT_SKILLS_ALLOWED_FIELDS)
@@ -314,19 +317,7 @@ def malformed_entries(root: Path) -> list[str]:
     findings: list[str] = []
     if not root.is_dir():
         return findings
-    locked_skills: set[str] = set()
-    for lock_candidate in (
-        root.parent / "skills-lock.json",
-        root.parent.parent / "skills-lock.json",
-    ):
-        if lock_candidate.is_file():
-            try:
-                locked_skills = set(
-                    json.loads(lock_candidate.read_text(encoding="utf-8")).get("skills", {}).keys()
-                )
-                break
-            except Exception:
-                pass
+    locked_skills = _load_locked_skill_names(root)
     for path in sorted(root.iterdir()):
         if path.name.startswith(".") or not path.is_dir():
             continue
