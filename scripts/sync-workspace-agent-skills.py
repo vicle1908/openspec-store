@@ -271,7 +271,23 @@ def _skill_entry_violations(path: Path, locked_skills: set[str] | None = None) -
                             findings.append(f"{path.name}:name-directory-mismatch({name_val})")
                         if not SKILL_NAME_RE.match(name_val):
                             findings.append(f"{path.name}:invalid-name-format({name_val})")
-                    is_vendor = locked_skills is not None and path.name in locked_skills
+                    if locked_skills is None:
+                        locked_skills = set()
+                        for lock_candidate in (
+                            path.parent.parent / "skills-lock.json",
+                            path.parent.parent.parent / "skills-lock.json",
+                        ):
+                            if lock_candidate.is_file():
+                                try:
+                                    locked_skills = set(
+                                        json.loads(lock_candidate.read_text(encoding="utf-8"))
+                                        .get("skills", {})
+                                        .keys()
+                                    )
+                                    break
+                                except Exception:
+                                    pass
+                    is_vendor = path.name in locked_skills
                     if not is_vendor:
                         extras = sorted(top_keys - AGENT_SKILLS_ALLOWED_FIELDS)
                         if extras:
@@ -298,15 +314,19 @@ def malformed_entries(root: Path) -> list[str]:
     findings: list[str] = []
     if not root.is_dir():
         return findings
-    lock_path = root.parent / "skills-lock.json"
     locked_skills: set[str] = set()
-    if lock_path.is_file():
-        try:
-            locked_skills = set(
-                json.loads(lock_path.read_text(encoding="utf-8")).get("skills", {}).keys()
-            )
-        except Exception:
-            pass
+    for lock_candidate in (
+        root.parent / "skills-lock.json",
+        root.parent.parent / "skills-lock.json",
+    ):
+        if lock_candidate.is_file():
+            try:
+                locked_skills = set(
+                    json.loads(lock_candidate.read_text(encoding="utf-8")).get("skills", {}).keys()
+                )
+                break
+            except Exception:
+                pass
     for path in sorted(root.iterdir()):
         if path.name.startswith(".") or not path.is_dir():
             continue
@@ -659,7 +679,9 @@ def accept_or_bootstrap_snapshot(
         if not skill_dir.is_dir():
             errors.append(f"{name}:missing-skill-dir")
             continue
-        entry_violations = _skill_entry_violations(skill_dir)
+        entry_violations = _skill_entry_violations(
+            skill_dir, locked_skills=set(locked_skills.keys())
+        )
         if entry_violations:
             errors.extend(entry_violations)
             continue

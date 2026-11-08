@@ -19,6 +19,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -190,7 +191,9 @@ class TestYamlFrontmatterAndPonytailBudgets(unittest.TestCase):
             assert skill_md.is_file(), f"Missing {skill_md}"
             metrics = sync_mod.measure_description_bytes(skill_md)
             assert metrics["raw_bytes"] == exp_raw, f"{slug} raw_bytes mismatch"
-            assert metrics["trimmed_bytes"] == expected_trimmed[slug], f"{slug} trimmed_bytes mismatch"
+            assert metrics["trimmed_bytes"] == expected_trimmed[slug], (
+                f"{slug} trimmed_bytes mismatch"
+            )
             assert sync_mod.check_description_budget(skill_md, is_vendor=True)
             raw_lengths.append(metrics["raw_bytes"])
             trimmed_lengths.append(metrics["trimmed_bytes"])
@@ -349,7 +352,9 @@ class TestHermesAndSnapshotLifecycleInTmpPath(unittest.TestCase):
         # 1. Native Hermes directory (outside workspace) must be preserved
         native_dir = hermes_dir / "autonomous-ai-agents"
         native_dir.mkdir()
-        (native_dir / "SKILL.md").write_text("---\nname: autonomous-ai-agents\ndescription: x\n---\n")
+        (native_dir / "SKILL.md").write_text(
+            "---\nname: autonomous-ai-agents\ndescription: x\n---\n"
+        )
 
         # 2. Pre-existing resolvable symlink to WORKSPACE_AGENTS NOT in hermes manifest must be preserved
         unlisted_link = hermes_dir / "extra-ws-skill"
@@ -365,7 +370,10 @@ class TestHermesAndSnapshotLifecycleInTmpPath(unittest.TestCase):
         for slug in sync_mod.PONYTAIL_SKILLS:
             link = hermes_dir / slug
             assert link.is_symlink(), f"Expected symlink at {link}"
-            assert Path(os.path.realpath(link)) == (self.workspace / ".agents" / "skills" / slug).resolve()
+            assert (
+                Path(os.path.realpath(link))
+                == (self.workspace / ".agents" / "skills" / slug).resolve()
+            )
 
         assert native_dir.is_dir()
         assert not native_dir.is_symlink()
@@ -471,6 +479,35 @@ class TestHermesAndSnapshotLifecycleInTmpPath(unittest.TestCase):
         violations = sync_mod.check_workspace_agent_surface(self.workspace)
         assert violations == ["agent", "data/skills"]
         assert sync_mod.main(self._cli_args("--check")) == 1
+
+        # 7. Agent Skills conformance checks on untracked local skills vs locked vendor skills
+        untracked_dir = self.workspace / ".agents" / "skills" / "local-untracked"
+        # Restore clean surface first
+        shutil.rmtree(self.workspace / "agent")
+        shutil.rmtree(self.workspace / "data" / "skills")
+        assert sync_mod.main(self._cli_args("--check")) == 0
+
+        # Inject unexpected top-level frontmatter key and hardcoded path into untracked local skill
+        untracked_md.write_text(
+            "---\nname: local-untracked\ndescription: Local edit.\nuser-invocable: true\n---\nPath: /Users/someone/foo\n",
+            encoding="utf-8",
+        )
+        violations = sync_mod._skill_entry_violations(untracked_dir)
+        assert "local-untracked:unexpected-frontmatter-fields(user-invocable)" in violations
+        assert "local-untracked:hardcoded-user-path" in violations
+        assert sync_mod.main(self._cli_args("--check")) == 1
+
+        # Moving user-invocable under metadata and removing hardcoded path resolves violations
+        untracked_md.write_text(
+            '---\nname: local-untracked\ndescription: Local edit.\nmetadata:\n  user-invocable: "true"\n---\nPath: ~/foo\n',
+            encoding="utf-8",
+        )
+        assert sync_mod._skill_entry_violations(untracked_dir) == []
+        assert sync_mod.main(self._cli_args("--check")) == 0
+
+        # Locked vendor skill (ponytail) with top-level argument-hint passes without locked_skills arg
+        ponytail_dir = self.workspace / ".agents" / "skills" / "ponytail"
+        assert sync_mod._skill_entry_violations(ponytail_dir) == []
 
 
 if __name__ == "__main__":
