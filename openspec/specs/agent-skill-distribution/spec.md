@@ -143,7 +143,7 @@ Setup, status, repair, and rollback SHALL support `outer`, `nested`, and `both`,
 
 ### Requirement: Managed product roots MUST NOT duplicate the canonical shared surface
 
-A managed product-specific skill root SHALL NOT hold content that is already available through the canonical shared `.agents/skills` surface. When a product root exists only to expose shared or workspace skills to one agent, that exposure SHALL be provided by supported standard `.agents/skills` discovery or by a link, not by copied files. Removing a product-specific root SHALL proceed only when every entry is either already available through standard discovery or is deliberately promoted, and the removal SHALL be reversible.
+A managed product-specific skill root SHALL NOT duplicate content available in canonical shared `.agents/skills`. When exposing shared skills to an agent, standard discovery or links SHALL be used instead of file copies. Removal of a product root SHALL occur only after confirming all entries exist in the shared surface or are promoted, and removal SHALL remain reversible.
 
 #### Scenario: A product-specific root is a subset of the canonical surface
 

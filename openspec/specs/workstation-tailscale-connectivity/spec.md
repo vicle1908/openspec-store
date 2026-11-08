@@ -91,7 +91,7 @@ The workstation SHALL avoid static UDP `:41641` LAN source-port collisions by en
 - **THEN** `DERPMap.Regions` in `tailscale debug netmap` SHALL omit region `3` (`sin`), `Self.Relay` in `tailscale status --json` SHALL be `"hkg"`, and online Hanoi peers (`Peers[].HomeDERP`) SHALL report `20`
 - **AND** `tailscale debug prefs` SHALL preserve `RelayServerPort: 41642` and `RelayServerStaticEndpoints: ["1.54.174.244:41642"]`
 
-### Requirement: Five-port Tailscale Serve HTTPS and L4 raw TCP forwarding for OmniRoute and Hermes WebUI
+### Requirement: Six-port Tailscale Serve HTTPS and L4 raw TCP forwarding for OmniRoute and Hermes WebUI
 
 The workstation (`iosteam-mac-mini`, `100.70.16.83`) SHALL expose raw L4 TCP forwarders in Tailscale Serve on ports `20128` (`127.0.0.1:20128`), `20129` (`127.0.0.1:20129`), `20132` (`127.0.0.1:20132`), and `3111` (`127.0.0.1:3111`) alongside its tailnet-only HTTPS reverse proxies on ports `443` (`http://127.0.0.1:20128`) and `8443` (`http://127.0.0.1:8787`), while preserving strict Docker loopback bindings (`127.0.0.1:20128-20129` and `127.0.0.1:20132`).
 
