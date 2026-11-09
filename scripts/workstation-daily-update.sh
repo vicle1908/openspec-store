@@ -41,6 +41,14 @@ export HOME="${HOME:-/Users/androidteam}"
 export PATH="${HOME}/.kimi-code/bin:${HOME}/.qoder/entry:${HOME}/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew/opt/libpq/bin:${HOME}/.pi/agent/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export STORE_DIR="${HOME}/Developer/platform/openspec-store"
 export WORKSPACE_DIR="${HOME}/Developer"
+export CI="1"
+export NONINTERACTIVE="1"
+export DEBIAN_FRONTEND="noninteractive"
+export HOMEBREW_NO_AUTO_UPDATE="1"
+export HOMEBREW_NO_INSTALL_CLEANUP="1"
+export HOMEBREW_NO_INTERVENTIONS="1"
+export PIP_NO_INPUT="1"
+export NPM_CONFIG_YES="true"
 
 MODE="apply"
 if [[ "${1:-}" == "--check" ]]; then
@@ -714,12 +722,23 @@ except Exception:
       local mas_outdated_lines
       mas_outdated_lines="$(mas outdated 2>/dev/null || true)"
       if [[ -n "${mas_outdated_lines}" ]]; then
+        local installed_casks=""
+        if command -v brew &>/dev/null; then
+          installed_casks="$(brew list --cask 2>/dev/null || true)"
+        fi
         while IFS= read -r line; do
           [[ -z "${line}" ]] && continue
           local app_id app_name
           app_id="$(awk '{print $1}' <<<"${line}")"
           app_name="$(awk '{$1=""; print $0}' <<<"${line}" | sed 's/^[[:space:]]*//; s/([^(]*)$//' | xargs)"
           [[ -z "${app_id}" || ! "${app_id}" =~ ^[0-9]+$ ]] && continue
+          local app_lower
+          app_lower="$(tr '[:upper:]' '[:lower:]' <<<"${app_name}")"
+          local first_token="${app_lower%% *}"
+          if grep -qi -E "^(${app_lower}|${first_token})$" <<<"${installed_casks}"; then
+            echo "    Skipping ${app_name} (${app_id}): managed by Homebrew Cask"
+            continue
+          fi
           local was_running=0
           if pgrep -x "${app_name}" >/dev/null 2>&1 || pgrep -x "${app_name%% *}" >/dev/null 2>&1; then
             was_running=1
@@ -833,8 +852,18 @@ except Exception:
     elif (( GLOBAL_PAUSE != 0 )); then
       echo "    SKIPPED: uv tool upgrades paused by policy (DISABLE_UPDATES)"
     else
-      uv python upgrade 2>&1 || true
-      uv tool upgrade --all 2>&1 || true
+      uv python upgrade < /dev/null 2>&1 || true
+      local uv_up_out
+      uv_up_out="$(uv tool upgrade --all < /dev/null 2>&1 || true)"
+      echo "${uv_up_out}"
+      if grep -q "is pinned" <<<"${uv_up_out}"; then
+        while IFS= read -r pinned_tool; do
+          if [[ -n "${pinned_tool}" ]]; then
+            echo "    Unpinning and upgrading ${pinned_tool} to latest..."
+            uv tool install --upgrade "${pinned_tool}@latest" < /dev/null 2>&1 || true
+          fi
+        done < <(sed -nE 's/.*`([^`]+)` is pinned.*/\1/p' <<<"${uv_up_out}")
+      fi
     fi
   fi
 

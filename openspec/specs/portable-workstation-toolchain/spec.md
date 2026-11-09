@@ -177,7 +177,7 @@ The workstation maintenance engine SHALL discover outdated Mac App Store applica
 
 ### Requirement: Global package ecosystems SHALL maintain initialized manifests and non-interactive update paths
 
-Global package managers (NPM, Bun, and UV) SHALL maintain valid global manifests and lockfiles, upgrade packages dynamically with sanitized identifiers without clobbering pinned coding agents or Homebrew runtimes, keep `~/.npm-global` free of retired `.bin-HASH` symlinks and empty `@scope` directories, and document `EAUDITGLOBAL` (`npm audit -g`).
+Global package managers (NPM, Bun, and UV) SHALL maintain valid global manifests and lockfiles, upgrade packages dynamically with sanitized identifiers without clobbering pinned coding agents or Homebrew runtimes, keep `~/.npm-global` free of retired `.bin-HASH` symlinks and empty `@scope` directories, document `EAUDITGLOBAL` (`npm audit -g`), and automatically unpin tools to track latest available upstream releases while skipping authority-conflicted Mac App Store applications.
 
 #### Scenario: Bun global manifest initialization
 - **WHEN** Bun global packages are audited or updated by `workstation_update.py` or `workstation-daily-update.sh`
@@ -204,6 +204,22 @@ Global package managers (NPM, Bun, and UV) SHALL maintain valid global manifests
 - **WHEN** `~/.npm-global/bin` and `~/.npm-global/lib/node_modules` are inspected after global npm maintenance
 - **THEN** no dangling retired `.bin-HASH` dot-symlinks (such as `.amp-*`, `.dgrep-*`, `.tsc-*`) SHALL remain in `~/.npm-global/bin` and no empty `@*` scope directories SHALL remain in `~/.npm-global/lib/node_modules`
 - **AND** workstation runbook and audit evidence SHALL record that `npm audit -g` fails by npm design with `EAUDITGLOBAL` and that global package trees (`@agentmemory/agentmemory` and `happy`) MUST be audited per-package in isolated temporary lockfiles rather than by running `npm audit fix` in `~/Developer`
+
+#### Scenario: Unpinned tool upgrading and automatic unpin recovery
+- **WHEN** `uv tool upgrade` reports that a tool has an exact version pin or outputs a pinned hint
+- **THEN** the maintenance runner SHALL automatically reinstall with `uv tool install --upgrade "<tool>@latest"` to unpin and upgrade the tool to latest
+- **AND** `platform/openspec-store/config/uv-tools.json` SHALL declare `"version": "latest"` across all standalone tools
+
+#### Scenario: Mac App Store skips Cask-managed applications and authority collisions
+- **WHEN** `mas outdated` reports an application that is already installed or managed by Homebrew Cask (e.g. `Telegram` / `747648890`)
+- **THEN** the maintenance pipeline SHALL skip the application to prevent installer receipt corruption, interactive Apple ID prompts, and package manager collisions
+- **AND** it SHALL record the skip as an authority-gated bypass rather than an error
+
+#### Scenario: Headless non-interactive environment and zero-sudo execution
+- **WHEN** scheduled maintenance workflows execute unattended
+- **THEN** all subprocess environments SHALL export `NONINTERACTIVE=1`, `CI=1`, `DEBIAN_FRONTEND=noninteractive`, `HOMEBREW_NO_AUTO_UPDATE=1`, `HOMEBREW_NO_INTERVENTIONS=1`, `HOMEBREW_NO_INSTALL_CLEANUP=1`, `PIP_NO_INPUT=1`, and `NPM_CONFIG_YES=true`
+- **AND** standard input SHALL be closed or redirected from `/dev/null`
+- **AND** no automated step SHALL invoke `sudo` or request interactive administrator credentials
 
 ### Requirement: Scheduled maintenance SHALL execute via durable workflow with discrete step recovery, strict isolation, and structured telemetry
 
@@ -532,9 +548,10 @@ The workstation maintenance pipeline and Python repositories SHALL standardize o
 - **AND** `uv lock --check` SHALL exit `0` across all 35 workspace `pyproject.toml` repositories.
 
 ### Requirement: Sanctioned uv Tool Receipt Reconciliation
-The declarative `config/uv-tools.json` manifest in `platform/openspec-store` SHALL accurately record every sanctioned CLI tool installed under `~/.local/share/uv/tools/`, including package extras, pinned version specifiers where intentional, and companion `--with` dependency constraints recorded in `uv-receipt.toml`.
+
+The declarative `config/uv-tools.json` manifest in `platform/openspec-store` SHALL accurately record every sanctioned CLI tool installed under `~/.local/share/uv/tools/` using unpinned `version: latest` so tools always track the latest available releases, while preserving package extras and companion `--with` dependency constraints recorded in `uv-receipt.toml`.
 
 #### Scenario: Reconciling uv-tools.json with installed uv tool receipts
 - **WHEN** inspecting `platform/openspec-store/config/uv-tools.json` against `uv tool list --show-version-specifiers` and `~/.local/share/uv/tools/*/uv-receipt.toml`
-- **THEN** every installed `uv` tool (`graphifyy`, `tavily-cli`, `browser-use`, and `infinity-emb`) SHALL be declared in `config/uv-tools.json`
+- **THEN** every installed `uv` tool (`graphifyy`, `tavily-cli`, `browser-use`, and `infinity-emb`) SHALL be declared in `config/uv-tools.json` with `"version": "latest"`
 - **AND** `graphifyy` SHALL record its required `[mcp,watch,office,pdf,postgres]` extras and `infinity-emb` SHALL record its `[server]` extra and companion `--with` requirements so automated or manual workstation setup reproduces the exact tool environment on Python `3.15`.
