@@ -523,10 +523,6 @@ ensure_muse_credential_hygiene() {
     fi
   fi
 
-  for _ in 1 2 3 4 5; do
-    security delete-generic-password -s "ai.meta.dev.credentials" >/dev/null 2>&1 || break
-  done
-
   if [[ -x "/opt/homebrew/bin/muse" ]]; then
     local auth_json="${HOME}/.config/muse/auth.json"
     local auth_valid="0"
@@ -546,6 +542,9 @@ except Exception:
     fi
 
     if [[ "${auth_valid}" != "1" ]]; then
+      for _ in 1 2 3 4 5; do
+        security delete-generic-password -s "ai.meta.dev.credentials" >/dev/null 2>&1 || break
+      done
       local api_key="${OMNIROUTE_API_KEY:-}"
       if [[ -z "${api_key}" && -f "${HOME}/.zshenv" ]]; then
         api_key="$( (source "${HOME}/.zshenv" 2>/dev/null && printf '%s' "${OMNIROUTE_API_KEY:-}") )"
