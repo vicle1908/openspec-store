@@ -42,7 +42,9 @@ class TestOmniRouteLockAndWatchdog(unittest.TestCase):
         self.compose_dir = self.home / "Omniroute"
         (self.compose_dir / "scripts").mkdir(parents=True, exist_ok=True)
         (self.compose_dir / "docker-compose.yml").write_text("services: {}\n", encoding="utf-8")
-        (self.compose_dir / "docker-compose.override.yml").write_text("services: {}\n", encoding="utf-8")
+        (self.compose_dir / "docker-compose.override.yml").write_text(
+            "services: {}\n", encoding="utf-8"
+        )
         _write_executable(
             self.compose_dir / "scripts" / "ensure-muse-wire-compat.sh",
             "#!/bin/bash\nexit 0\n",
@@ -58,7 +60,9 @@ class TestOmniRouteLockAndWatchdog(unittest.TestCase):
     def _base_env(self) -> dict[str, str]:
         env = os.environ.copy()
         env["HOME"] = str(self.home)
-        env["PATH"] = f"{self.local_bin}:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        env["PATH"] = (
+            f"{self.local_bin}:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        )
         return env
 
     def test_watchdog_provenance_mirror_and_syntax(self) -> None:
@@ -108,7 +112,9 @@ class TestOmniRouteLockAndWatchdog(unittest.TestCase):
                 timeout=10,
             )
             assert res.returncode == 0
-            assert not docker_calls.exists(), "Watchdog invoked docker while maintenance lock was held"
+            assert not docker_calls.exists(), (
+                "Watchdog invoked docker while maintenance lock was held"
+            )
             assert lock_file.exists(), "Watchdog unlinked active update.lock"
             watchdog_log = (self.omni_state / "watchdog.log").read_text(encoding="utf-8")
             assert "Maintenance lock active" in watchdog_log
@@ -168,7 +174,10 @@ exit 0
         assert w_res.returncode != 0
 
         flag_file = self.omni_state / "update-available"
-        flag_file.write_text("sha256:1111111111111111111111111111111111111111111111111111111111111111\n", encoding="utf-8")
+        flag_file.write_text(
+            "sha256:1111111111111111111111111111111111111111111111111111111111111111\n",
+            encoding="utf-8",
+        )
         u_res = subprocess.run(
             ["/bin/bash", str(UPDATE_SCRIPT), "3.8.52"],
             env=self._base_env(),
@@ -194,7 +203,10 @@ exit 0
 
         # 2. Simultaneous acquisition + cleanup ordering before lock release
         flag_file = self.omni_state / "update-available"
-        flag_file.write_text("sha256:2222222222222222222222222222222222222222222222222222222222222222\n", encoding="utf-8")
+        flag_file.write_text(
+            "sha256:2222222222222222222222222222222222222222222222222222222222222222\n",
+            encoding="utf-8",
+        )
 
         entered_preflight = self.home / "entered_preflight"
         release_holder = self.home / "release_holder"
@@ -212,7 +224,7 @@ if [[ "$1" == "info" ]]; then
 fi
 if [[ "$1" == "exec" && "$*" == *"rm -f /tmp/pre-update-"* ]]; then
   # Verify kernel lock is STILL held while cleanup_update removes temp snapshot
-  if /usr/bin/lockf -s -t 0 "{self.omni_state / 'update.lock'}" /usr/bin/true 2>/dev/null; then
+  if /usr/bin/lockf -s -t 0 "{self.omni_state / "update.lock"}" /usr/bin/true 2>/dev/null; then
     echo "UNLOCKED_DURING_CLEANUP" > "{cleanup_lock_state}"
   else
     echo "LOCKED_DURING_CLEANUP" > "{cleanup_lock_state}"
@@ -277,7 +289,10 @@ exit 0
     def test_updater_gate1_checkpoint_fail_closed_preserves_sidecars(self) -> None:
         """Gate 1 must fail closed and retain host -wal/-shm sidecars when PRAGMA wal_checkpoint(TRUNCATE) fails."""
         flag_file = self.omni_state / "update-available"
-        flag_file.write_text("sha256:3333333333333333333333333333333333333333333333333333333333333333\n", encoding="utf-8")
+        flag_file.write_text(
+            "sha256:3333333333333333333333333333333333333333333333333333333333333333\n",
+            encoding="utf-8",
+        )
 
         _write_executable(
             self.local_bin / "docker",
@@ -332,14 +347,20 @@ exit 0
         snapshots = list((self.omni_state / "snapshots").glob("pre-update-*.sqlite"))
         assert len(snapshots) == 1
         snap = snapshots[0]
-        assert Path(f"{snap}-wal").exists(), "Host -wal sidecar was deleted despite checkpoint failure"
-        assert Path(f"{snap}-shm").exists(), "Host -shm sidecar was deleted despite checkpoint failure"
-
+        assert Path(f"{snap}-wal").exists(), (
+            "Host -wal sidecar was deleted despite checkpoint failure"
+        )
+        assert Path(f"{snap}-shm").exists(), (
+            "Host -shm sidecar was deleted despite checkpoint failure"
+        )
 
     def test_updater_digest_mismatch_and_post_deploy_data_gates_retain_flag(self) -> None:
         """Gate 3 digest mismatch stops before recreate; Gate 9 baseline regression retains flag."""
         flag_file = self.omni_state / "update-available"
-        flag_file.write_text("sha256:4444444444444444444444444444444444444444444444444444444444444444\n", encoding="utf-8")
+        flag_file.write_text(
+            "sha256:4444444444444444444444444444444444444444444444444444444444444444\n",
+            encoding="utf-8",
+        )
         up_calls = self.home / "compose_up_calls.log"
         mode_file = self.home / "updater_mode.txt"
         mode_file.write_text("digest_mismatch\n", encoding="utf-8")
@@ -349,14 +370,15 @@ exit 0
             f"""#!/bin/bash
 mode=$(cat "{mode_file}")
 if [[ "$1" == "info" ]]; then exit 0; fi
+if [[ "$1" == "ps" ]]; then echo "omniroute"; exit 0; fi
 if [[ "$1" == "compose" ]]; then
-  if [[ "$*" == *" pull "* ]]; then touch "{self.home / 'pulled'}"; fi
+  if [[ "$*" == *" pull "* ]]; then touch "{self.home / "pulled"}"; fi
   if [[ "$*" == *" up "* ]]; then echo "$@" >> "{up_calls}"; fi
   exit 0
 fi
 if [[ "$1" == "inspect" ]]; then
   if [[ "$*" == *"Health.Status"* ]]; then echo "healthy"; exit 0; fi
-  if [[ -f "{self.home / 'pulled'}" && -f "{up_calls}" ]]; then
+  if [[ -f "{self.home / "pulled"}" && -f "{up_calls}" ]]; then
     echo "sha256:newimage"
   else
     echo "sha256:oldimage"
@@ -365,7 +387,7 @@ if [[ "$1" == "inspect" ]]; then
 fi
 if [[ "$1" == "image" ]]; then
   if [[ "$*" == *"RepoDigests"* ]]; then
-    if [[ ! -f "{self.home / 'pulled'}" ]]; then
+    if [[ ! -f "{self.home / "pulled"}" ]]; then
       echo "diegosouzapw/omniroute@sha256:0000000000000000000000000000000000000000000000000000000000000000"
     elif [[ "$mode" == "digest_mismatch" ]]; then
       echo "diegosouzapw/omniroute@sha256:9999999999999999999999999999999999999999999999999999999999999999"
@@ -388,14 +410,18 @@ if [[ "$1" == "exec" ]]; then
     exit 0
   fi
   if [[ "$*" == *"quick_check"* ]]; then printf "ok"; exit 0; fi
-  if [[ "$*" == *"memory-cache-verification"* ]] || [[ "$*" == *"qOk"* ]] || [[ "$*" == *"QDRANT_OK"* ]] || [[ "$*" == *"Database"* && "$*" == *"storage.sqlite"* ]]; then
-    printf "QDRANT_OK|CACHE_OK|PATCH_OK"
+  if [[ "$*" == *"/api/settings/memory"* ]] || [[ "$*" == *"MEM_OFF"* ]]; then
+    printf "MEM_OFF|CACHE_ALIGNED|COMP_OFF|TTFT_ZERO|PATCH_OK"
+    exit 0
+  fi
+  if [[ "$*" == *"memory-cache-verification"* ]] || [[ "$*" == *"qOk"* ]] || [[ "$*" == *"QDRANT_OK"* ]]; then
+    printf "MEM_OFF|CACHE_ALIGNED|COMP_OFF|TTFT_ZERO|PATCH_OK"
     exit 0
   fi
   if [[ "$*" == *"FROM api_keys"* ]]; then printf "1"; exit 0; fi
   if [[ "$*" == *"FROM provider_connections"* ]]; then
-    if [[ ! -f "{self.home / 'seen_baseline'}" ]]; then
-      touch "{self.home / 'seen_baseline'}"
+    if [[ ! -f "{self.home / "seen_baseline"}" ]]; then
+      touch "{self.home / "seen_baseline"}"
       printf "32"
     else
       printf "31"
@@ -454,6 +480,7 @@ exit 0
         assert "GATE FAILED [post-deploy-data]" in regressed.stdout
         assert up_calls.exists()
         assert flag_file.exists()
+
     def test_watchdog_periodic_6h_integrity_check_pass_skip_and_fail(self) -> None:
         """Watchdog runs bounded 6h physical integrity_check when due, skips when fresh, and exits nonzero without restarting on failure."""
         marker = self.omni_state / "integrity-last-ok"
@@ -497,7 +524,7 @@ if [[ "$1" == "compose" ]]; then
 fi
 if [[ "$1" == "exec" && "$2" == "omniroute" && "$3" == "node" && "$4" == "-e" ]]; then
   echo "called" >> "{integrity_calls}"
-  NODE_PATH="{self.home / 'node_modules'}" MOCK_INTEGRITY_MODE_FILE="{integrity_mode_file}" node -e "$5"
+  NODE_PATH="{self.home / "node_modules"}" MOCK_INTEGRITY_MODE_FILE="{integrity_mode_file}" node -e "$5"
   exit $?
 fi
 exit 0
@@ -541,11 +568,16 @@ exit 0
             text=True,
             timeout=10,
         )
-        assert res3.returncode != 0, "Watchdog must exit nonzero when physical integrity_check fails"
+        assert res3.returncode != 0, (
+            "Watchdog must exit nonzero when physical integrity_check fails"
+        )
         assert len(integrity_calls.read_text(encoding="utf-8").splitlines()) == 2
-        assert int(marker.stat().st_mtime) == stale_mtime, "Failed integrity check must not update marker mtime"
-        assert not restart_calls.exists(), "Failed integrity check must not restart a healthy gateway"
-
+        assert int(marker.stat().st_mtime) == stale_mtime, (
+            "Failed integrity check must not update marker mtime"
+        )
+        assert not restart_calls.exists(), (
+            "Failed integrity check must not restart a healthy gateway"
+        )
 
     def test_v3852_muse_wire_compat_and_updater_muse_catalog_and_backup_cleanup(self) -> None:
         """v3.8.52 patches MUSE_CODE_REWRITE_V3 without touching chunks; Gate 8 fails closed on empty catalog (401 & 200); Gate 9 prunes pre-migration backups."""
@@ -554,9 +586,7 @@ exit 0
         chunks_dir = self.home / "chunks"
         chunks_dir.mkdir(parents=True, exist_ok=True)
         chunk_file = chunks_dir / "8537.js"
-        original_chunk = (
-            'const frame = {type:"response.in_progress",sequence_number:0,response:{id:"resp_keepalive_omniroute",status:"in_progress"}};\n'
-        )
+        original_chunk = 'const frame = {type:"response.in_progress",sequence_number:0,response:{id:"resp_keepalive_omniroute",status:"in_progress"}};\n'
 
         peer_file.write_text(
             "export function wrapRequestListenerWithPeerStamp(listener) {\n"
@@ -617,7 +647,7 @@ exit 0
         assert chunk_file.read_text(encoding="utf-8") == original_chunk
 
         # Verify container-entrypoint-compat.sh normalizes Gemini-4 trailing model turn and agy exact lockout chunks idempotently
-        gemini_chunk = chunks_dir / "7449.js"
+        gemini_chunk = chunks_dir / "11355.js"
         lock_chunk = chunks_dir / "32946.js"
         gemini_chunk.write_text(
             "return!/(?:^|-)image(?:-|$)/.test(b)&&/^gemini-(?:3(?:\\.\\d+)?(?:-[a-z0-9-]+)?|pro-agent)$/.test(b)}\n",
@@ -625,8 +655,8 @@ exit 0
         )
         lock_chunk.write_text(
             "const d=[/\\bmodel.*not.*(?:available|found|supported|accessible)\\b/i];"
-            "function e(a){let b=String(a||\"\");return!!b&&(!!d.some(a=>a.test(b))||/\\bmodel\\b[\\s\\S]{0,80}?\\b(?:not\\s+supported|unsupported|unknown|unavailable)\\b/i.test(b))}"
-            "function au(a,b,c,d,e,f){return!(!at(a,c,f)||!c||aE(a))&&((\"antigravity\"===ag(a)?bz:ap)(a,b,c,d,e),!0)}\n",
+            'function e(a){let b=String(a||"");return!!b&&(!!d.some(a=>a.test(b))||/\\bmodel\\b[\\s\\S]{0,80}?\\b(?:not\\s+supported|unsupported|unknown|unavailable)\\b/i.test(b))}'
+            'function au(a,b,c,d,e,f){return!(!at(a,c,f)||!c||aE(a))&&(("antigravity"===ak(a)?bE:at)(a,b,c,d,e),!0)}\n',
             encoding="utf-8",
         )
         ep_chunk_res1 = subprocess.run(
@@ -638,11 +668,20 @@ exit 0
         )
         assert ep_chunk_res1.returncode == 0, ep_chunk_res1.stderr
         assert ep_chunk_res1.stdout == "patched"
-        assert "/^gemini-(?:[34](?:\\.\\d+)?(?:-[a-z0-9-]+)?|pro-agent)$/" in gemini_chunk.read_text(encoding="utf-8")
+        assert (
+            "/^gemini-(?:[34](?:\\.\\d+)?(?:-[a-z0-9-]+)?|pro-agent)$/"
+            in gemini_chunk.read_text(encoding="utf-8")
+        )
         patched_lock_src = lock_chunk.read_text(encoding="utf-8")
-        assert "/\\bmodel(?!\\s+turn\\b).*not.*(?:available|found|supported|accessible)\\b/i" in patched_lock_src
-        assert "/\\bmodel(?!\\s+turn\\b)\\b[\\s\\S]{0,80}?\\b(?:not\\s+supported|unsupported|unknown|unavailable)\\b/i" in patched_lock_src
-        assert '("antigravity"===ag(a)||"agy"===ag(a)?bz:ap)(a,b,c,d,e)' in patched_lock_src
+        assert (
+            "/\\bmodel(?!\\s+turn\\b).*not.*(?:available|found|supported|accessible)\\b/i"
+            in patched_lock_src
+        )
+        assert (
+            "/\\bmodel(?!\\s+turn\\b)\\b[\\s\\S]{0,80}?\\b(?:not\\s+supported|unsupported|unknown|unavailable)\\b/i"
+            in patched_lock_src
+        )
+        assert '("antigravity"===ak(a)||"agy"===ak(a)?bE:at)(a,b,c,d,e)' in patched_lock_src
         ep_chunk_res2 = subprocess.run(
             ["/bin/sh", str(ENTRYPOINT_COMPAT), "--patch-only"],
             env=patch_env,
@@ -672,9 +711,10 @@ exit 0
             f"""#!/bin/bash
 if [[ "$1" == "ps" ]]; then echo "omniroute"; exit 0; fi
 if [[ "$1" == "restart" ]]; then exit 0; fi
+if [[ "$1" == "exec" && "$2" == "omniroute" && "$3" == "sh" ]]; then exit 0; fi
 if [[ "$1" == "exec" && "$2" == "omniroute" && "$3" == "test" ]]; then exit 0; fi
-if [[ "$1" == "exec" && "$2" == "omniroute" && "$3" == "/app/container-entrypoint-compat.sh" && "$4" == "--patch-only" ]]; then
-  if [[ -f "{self.home / 'fail_compat'}" ]]; then exit 1; fi
+if [[ "$1" == "exec" && "$2" == "omniroute" && "$3" == "/app/container-entrypoint-compat.sh" ]]; then
+  if [[ -f "{self.home / "fail_compat"}" ]]; then exit 1; fi
   OMNIROUTE_PEER_STAMP_PATH="{peer_file}" OMNIROUTE_CHUNKS_DIR="{chunks_dir}" /bin/sh "{ENTRYPOINT_COMPAT}" --patch-only
   exit $?
 fi
@@ -730,18 +770,18 @@ exit 0
             f"""#!/bin/bash
 if [[ "$1" == "info" ]]; then exit 0; fi
 if [[ "$1" == "compose" ]]; then
-  if [[ "$*" == *" pull "* ]]; then touch "{self.home / 'pulled'}"; fi
-  if [[ "$*" == *" up "* ]]; then touch "{self.home / 'deployed'}"; fi
+  if [[ "$*" == *" pull "* ]]; then touch "{self.home / "pulled"}"; fi
+  if [[ "$*" == *" up "* ]]; then touch "{self.home / "deployed"}"; fi
   exit 0
 fi
 if [[ "$1" == "inspect" ]]; then
   if [[ "$*" == *"Health.Status"* ]]; then echo "healthy"; exit 0; fi
-  if [[ -f "{self.home / 'deployed'}" ]]; then echo "sha256:newimage"; else echo "sha256:oldimage"; fi
+  if [[ -f "{self.home / "deployed"}" ]]; then echo "sha256:newimage"; else echo "sha256:oldimage"; fi
   exit 0
 fi
 if [[ "$1" == "image" ]]; then
   if [[ "$*" == *"RepoDigests"* ]]; then
-    if [[ -f "{self.home / 'pulled'}" ]]; then
+    if [[ -f "{self.home / "pulled"}" ]]; then
       echo "diegosouzapw/omniroute@sha256:b08a12e876baa8a5ccadd1ebbe346fe7267dba3b1c9f4fd6bb02070fae41ab6c"
     else
       echo "diegosouzapw/omniroute@sha256:8bd462c9f60d8eda79329cfbb6ea7ea723505fe7721beb944f3d43835409e218"
@@ -755,12 +795,16 @@ if [[ "$1" == "tag" ]]; then exit 0; fi
 if [[ "$1" == "cp" ]]; then printf "SQLite snapshot" > "$3"; exit 0; fi
 if [[ "$1" == "exec" ]]; then
   if [[ "$*" == *"package.json"* ]]; then
-    if [[ -f "{self.home / 'deployed'}" ]]; then printf "3.8.52"; else printf "3.8.51"; fi
+    if [[ -f "{self.home / "deployed"}" ]]; then printf "3.8.52"; else printf "3.8.51"; fi
     exit 0
   fi
   if [[ "$*" == *"quick_check"* ]]; then printf "ok"; exit 0; fi
   if [[ "$*" == *"engine-status"* ]] || [[ "$*" == *"qOk"* ]]; then
     printf "QDRANT_OK|CACHE_OK|PATCH_OK"
+    exit 0
+  fi
+  if [[ "$*" == *"/api/settings/memory"* ]]; then
+    printf "MEM_OFF|CACHE_ALIGNED|COMP_OFF|TTFT_ZERO|PATCH_OK"
     exit 0
   fi
   if [[ "$*" == *"omniroute-field-encryption-v1"* ]]; then
@@ -869,9 +913,16 @@ exit 0
                 timeout=15,
             )
             assert bad_res.returncode == 1, f"Expected Gate 8 failure for mode={bad_mode}"
-            assert "GATE FAILED [endpoints]: GET /v1/muse-code/models did not advertise muse-spark-1.3" in bad_res.stdout
-            assert flag_file.exists(), f"Gate 8 failure on {bad_mode} Muse catalog must retain update-available"
-            assert not backup_cleanup_log.exists(), f"Gate 9 backup cleanup must not run when Gate 8 fails ({bad_mode})"
+            assert (
+                "GATE FAILED [endpoints]: GET /v1/muse-code/models did not advertise muse-spark-1.3"
+                in bad_res.stdout
+            )
+            assert flag_file.exists(), (
+                f"Gate 8 failure on {bad_mode} Muse catalog must retain update-available"
+            )
+            assert not backup_cleanup_log.exists(), (
+                f"Gate 9 backup cleanup must not run when Gate 8 fails ({bad_mode})"
+            )
         catalog_mode.write_text("ok\n", encoding="utf-8")
         pass_res = subprocess.run(
             ["/bin/bash", str(UPDATE_SCRIPT), "3.8.52"],
@@ -900,7 +951,10 @@ exit 0
             timeout=15,
         )
         assert bad_200_res.returncode == 1
-        assert "GATE FAILED [endpoints]: GET /v1/muse-code/models did not advertise muse-spark-1.3" in bad_200_res.stdout
+        assert (
+            "GATE FAILED [endpoints]: GET /v1/muse-code/models did not advertise muse-spark-1.3"
+            in bad_200_res.stdout
+        )
         assert flag_file.exists()
         catalog_mode.write_text("ok\n", encoding="utf-8")
         pass_200_res = subprocess.run(
@@ -912,6 +966,7 @@ exit 0
         )
         assert pass_200_res.returncode == 0, pass_200_res.stdout + pass_200_res.stderr
         assert not flag_file.exists()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -4,6 +4,7 @@
 
 set -euo pipefail
 
+export HOME="${HOME:-/Users/androidteam}"
 export PATH="${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 OMNIROUTE_DIR="${HOME}/Omniroute"

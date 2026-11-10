@@ -678,6 +678,10 @@ except Exception:
         deny_cask_csv="$(paste -sd, - <<<"${DENY_ROSTER_BREW_CASKS}")"
         echo "    SKIPPED: cask upgrades suppressed (authority drift/conflict/misalignment detected: ${deny_cask_csv})"
       else
+        mkdir -p "${HOME}/.omniroute"
+        exec 8>>"${HOME}/.omniroute/update.lock"
+        /usr/bin/lockf -s -t 0 8 || true
+
         # Graceful POSIX termination for running casks to prevent file locking during upgrade
         local running_casks=( "Tailscale" "warp-svc" "Google Drive" "OneDrive" "Orca" "ChatGPT" "Zed" )
         for p in "${running_casks[@]}"; do
@@ -685,7 +689,10 @@ except Exception:
             pkill -TERM -x "$p" >/dev/null 2>&1 || true
           fi
         done
-        brew upgrade --cask < /dev/null 2>&1 || true
+        if HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 brew outdated --cask --greedy --quiet 2>/dev/null | grep -qx "docker-desktop"; then
+          "${WORKSPACE_DIR}/scripts/docker-service.sh" stop 2>&1 || true
+        fi
+        brew upgrade --cask < /dev/null 8>&- 2>&1 || true
         # Relaunch persistent background utilities
         for app in "Tailscale" "Cloudflare WARP" "OneDrive" "Google Drive"; do
           if [[ -d "/Applications/${app}.app" ]]; then
@@ -695,11 +702,12 @@ except Exception:
         if [[ -x "/Applications/Docker.app/Contents/MacOS/install" ]] && [[ -x "${WORKSPACE_DIR}/scripts/docker-service.sh" ]]; then
           if ! docker info >/dev/null 2>&1 || \
              [[ ! -x "/Library/PrivilegedHelperTools/com.docker.socket" ]]; then
-            if "${WORKSPACE_DIR}/scripts/docker-service.sh" start 2>&1; then
-              "${WORKSPACE_DIR}/scripts/docker-service.sh" up 2>&1 || true
+            if "${WORKSPACE_DIR}/scripts/docker-service.sh" start 8>&- 2>&1; then
+              "${WORKSPACE_DIR}/scripts/docker-service.sh" up 8>&- 2>&1 || true
             fi
           fi
         fi
+        exec 8>&-
       fi
 
       brew cleanup -s 2>&1 || true
