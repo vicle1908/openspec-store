@@ -129,12 +129,12 @@ Critical gateway and dependency containers SHALL configure and run with `HostCon
 
 ### Requirement: Continuous supervisor watchdog monitoring
 
-A periodic system supervisor (`com.omniroute.watchdog`) SHALL monitor the health of the Docker daemon and local gateway stacks, serialize its entire cycle via a non-blocking `/usr/bin/lockf` kernel lock on `~/.omniroute/update.lock` at Step 0, omit decommissioned sidecar endpoints, and run a bounded 6-hour read-only SQLite `PRAGMA integrity_check` (`~/.omniroute/integrity-last-ok`) without restarting a healthy gateway on integrity failure.
+A periodic system supervisor (`com.omniroute.watchdog`) SHALL monitor Docker daemon and local gateway health, serialize its cycle via `/usr/bin/lockf` on `~/.omniroute/update.lock` at Step 0, coordinate with `workstation_update.py` during `docker-desktop` cask upgrades, force-recreate containers stuck in `restarting` state, omit decommissioned sidecar endpoints, and run a 6-hour read-only SQLite `PRAGMA integrity_check` without restarting a healthy gateway.
 
 #### Scenario: Unhealthy or halted container auto-recovery
 - **WHEN** `omniroute` container is halted or fails HTTP health probes outside the startup grace period
 - **THEN** `omniroute-watchdog.sh` SHALL evaluate container status: if the container is running but unhealthy, it SHALL execute `docker compose restart omniroute-base`
-- **AND** if the container is halted or not running, it SHALL execute `docker compose up -d` in the respective stack directory to restore service availability.
+- **AND** if the container is halted or not running, it SHALL execute `docker compose --profile base up -d` in the respective stack directory (adding `--no-build --pull never --force-recreate` when `omni_status` equals `restarting` so a damaged container writable layer is replaced cleanly) to restore service availability.
 
 #### Scenario: Container startup grace period observed
 - **WHEN** `omniroute` is in the `starting` health status during initial boot
@@ -151,7 +151,7 @@ A periodic system supervisor (`com.omniroute.watchdog`) SHALL monitor the health
 
 #### Scenario: Active update or maintenance lock suppresses watchdog restarts
 - **WHEN** `omniroute-watchdog.sh` starts at Step 0 (before Docker daemon or container checks), opens persistent `~/.omniroute/update.lock` (`umask 077`) on file descriptor `9` (`exec 9>>"$LOCK_FILE"`), and invokes `/usr/bin/lockf -s -t 0 9`
-- **THEN** if `/usr/bin/lockf` returns exit code `75` (`EX_TEMPFAIL` because `update.sh`, manual `/usr/bin/lockf -k -t 0 ~/.omniroute/update.lock` maintenance, or another watchdog instance holds the kernel lock), `omniroute-watchdog.sh` SHALL log that the maintenance lock is active and exit `0` without starting the daemon, restarting `omniroute`, or running `docker compose up -d`
+- **THEN** if `/usr/bin/lockf` returns exit code `75` (`EX_TEMPFAIL` because `update.sh`, `workstation_update.py` during a `docker-desktop` cask upgrade, manual `/usr/bin/lockf -k -t 0 ~/.omniroute/update.lock` maintenance, or another watchdog instance holds the kernel lock), `omniroute-watchdog.sh` SHALL log that the maintenance lock is active and exit `0` without starting the daemon, restarting `omniroute`, or running `docker compose up -d`
 - **AND** if `/usr/bin/lockf` fails with any other non-zero exit code, `omniroute-watchdog.sh` SHALL log an error and fail closed with a non-zero exit code
 - **AND** when the kernel lock is acquired (`rc = 0`), `omniroute-watchdog.sh` SHALL retain open FD `9` across its entire cycle until process exit (closing `9>&-` on child invocations), SHALL ignore file contents/mtime without parsing PID/epoch metadata or expiring live locks by age, SHALL NEVER unlink `~/.omniroute/update.lock`, and SHALL remain byte-identical to `/Users/androidteam/Developer/platform/openspec-store/scripts/omniroute-watchdog.sh` per `config/script-provenance-manifest.tsv`.
 
@@ -162,11 +162,11 @@ A periodic system supervisor (`com.omniroute.watchdog`) SHALL monitor the health
 
 ### Requirement: Non-interactive privileged helper provisioning on start and restart
 
-The Docker Desktop lifecycle script (`docker-service.sh`) SHALL non-interactively verify and provision macOS privileged helpers (`com.docker.vmnetd` and `com.docker.socket`) before starting or restarting the daemon, clean up any pending `osascript` privilege dialogs, fall through to socket polling when `com.docker.backend` is mid-boot, and safely expand empty Compose profile arrays under Bash 3.2 `set -u`.
+The Docker Desktop lifecycle script (`docker-service.sh`) SHALL non-interactively verify and provision `com.docker.socket` before starting or restarting the daemon, pass `--user "$target_user"` to both `install config` and `install socket-symlink-on-startup`, synchronously enforce `/var/run/docker.sock`, clean up pending `osascript` dialogs, fall through to socket polling when `com.docker.backend` is mid-boot, and safely expand empty Compose profile arrays under Bash 3.2 `set -u`.
 
 #### Scenario: Missing or mismatched vmnetd helper is provisioned before daemon start
-- **WHEN** `docker-service.sh start` or `docker-service.sh restart` executes and `/Library/LaunchDaemons/com.docker.vmnetd.plist`, `/Library/LaunchDaemons/com.docker.socket.plist`, `/Library/PrivilegedHelperTools/com.docker.vmnetd`, or `/Library/PrivilegedHelperTools/com.docker.socket` is missing, or `/var/run/docker.sock` does not resolve to `${HOME}/.docker/run/docker.sock`, or `/var/run/com.docker.vmnetd.sock` is absent while `com.docker.vmnetd` is not running, or the installed helper binaries differ from `/Applications/Docker.app`
-- **THEN** `ensure_helpers()` SHALL invoke `sudo -n /Applications/Docker.app/Contents/MacOS/install config --user "${USER:-$(id -un)}" set-vmnetd set-docker-socket` and `sudo -n launchctl kickstart -p system/com.docker.vmnetd` before calling `docker desktop start` or `docker desktop restart`
+- **WHEN** `docker-service.sh start` or `docker-service.sh restart` executes and `/Library/LaunchDaemons/com.docker.socket.plist` or `/Library/PrivilegedHelperTools/com.docker.socket` is missing, `/Library/LaunchDaemons/com.docker.socket.plist` does not contain `<string>${target_user}</string>`, `/var/run/docker.sock` does not resolve to `${HOME}/.docker/run/docker.sock`, or `/Library/PrivilegedHelperTools/com.docker.socket` differs from `/Applications/Docker.app/Contents/MacOS/com.docker.socket`
+- **THEN** `ensure_helpers()` SHALL invoke `sudo -n /Applications/Docker.app/Contents/MacOS/install remove-vmnetd`, `sudo -n /Applications/Docker.app/Contents/MacOS/install config --user "$target_user"`, `sudo -n /Applications/Docker.app/Contents/MacOS/install socket-symlink-on-startup --user "$target_user"`, `sudo -n launchctl kickstart -p system/com.docker.socket`, and `sudo -n ln -sfn "$socket_path" /var/run/docker.sock` before calling `docker desktop start` or `docker desktop restart`
 - **AND** `com.docker.backend` SHALL start without spawning an interactive `SecurityAgent` password dialog.
 
 #### Scenario: Pending osascript privileged prompt is cleared automatically
@@ -179,7 +179,7 @@ The Docker Desktop lifecycle script (`docker-service.sh`) SHALL non-interactivel
 
 #### Scenario: Socket helper status requires installed binary and LaunchDaemon plist
 - **WHEN** `docker-service.sh status` or `docker-service.sh status --json` evaluates `com.docker.socket` health
-- **THEN** it SHALL report `com.docker.socket` as active/true only when `/Library/LaunchDaemons/com.docker.socket.plist` and executable `/Library/PrivilegedHelperTools/com.docker.socket` exist alongside the `/var/run/docker.sock` symlink (or a running `com.docker.socket` process).
+- **THEN** it SHALL report `com.docker.socket` as active/true only when `/Library/LaunchDaemons/com.docker.socket.plist` (containing `<string>${target_user}</string>`) and executable `/Library/PrivilegedHelperTools/com.docker.socket` exist alongside the `/var/run/docker.sock` symlink pointing to `${socket_path}`.
 
 #### Scenario: Bash 3.2 empty profile_args expansion succeeds across all registered stacks
 - **WHEN** `docker-service.sh drain` or `docker-service.sh up` iterates over `COMPOSE_STACKS` under macOS `/bin/bash` 3.2 with `set -euo pipefail`

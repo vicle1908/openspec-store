@@ -64,7 +64,11 @@ if [[ "$omni_status" != "running" ]] || { [[ "$omni_health" != "starting" ]] && 
   else
     log "WARNING: OmniRoute (status=$omni_status health=$omni_health) not running. Bringing up stack..."
     if [[ -d "$OMNIROUTE_DIR" ]]; then
-      (cd "$OMNIROUTE_DIR" && docker compose --profile base up -d) >> "$LOG_FILE" 2>&1 9>&- || {
+      up_flags=(--profile base up -d)
+      if [[ "$omni_status" == "restarting" ]]; then
+        up_flags=(--profile base up -d --no-build --pull never --force-recreate)
+      fi
+      (cd "$OMNIROUTE_DIR" && docker compose "${up_flags[@]}") >> "$LOG_FILE" 2>&1 9>&- || {
         log "ERROR: Failed to run docker compose up for OmniRoute."
       }
       if [[ -x "$OMNIROUTE_DIR/scripts/ensure-muse-wire-compat.sh" ]]; then

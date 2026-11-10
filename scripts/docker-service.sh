@@ -49,22 +49,26 @@ is_daemon_up() {
 }
 
 is_socket_helper_up() {
+  local target_user="${USER:-$(id -un)}"
   [[ -f "/Library/LaunchDaemons/com.docker.socket.plist" ]] && \
+  grep -q "<string>${target_user}</string>" "/Library/LaunchDaemons/com.docker.socket.plist" 2>/dev/null && \
   [[ -x "/Library/PrivilegedHelperTools/com.docker.socket" ]] && \
-  { { [[ -L "/var/run/docker.sock" ]] && [[ "$(readlink /var/run/docker.sock 2>/dev/null)" == "${socket_path}" ]]; } || pgrep -x com.docker.socket >/dev/null 2>&1; }
+  [[ -L "/var/run/docker.sock" ]] && [[ "$(readlink /var/run/docker.sock 2>/dev/null)" == "${socket_path}" ]]
 }
 
 ensure_helpers() {
   local install_bin="/Applications/Docker.app/Contents/MacOS/install"
   local app_socket="/Applications/Docker.app/Contents/MacOS/com.docker.socket"
+  local target_user="${USER:-$(id -un)}"
   [[ -x "$install_bin" ]] || return 0
   if ! is_socket_helper_up || \
      ! sudo -n cmp -s "$app_socket" "/Library/PrivilegedHelperTools/com.docker.socket" 2>/dev/null; then
     log "Provisioning Docker Desktop privileged helper (com.docker.socket) via sudo non-interactively..."
     sudo -n "$install_bin" remove-vmnetd >/dev/null 2>&1 || true
-    sudo -n "$install_bin" config --user "${USER:-$(id -un)}" >/dev/null 2>&1 || true
-    sudo -n "$install_bin" socket-symlink-on-startup >/dev/null 2>&1 || true
+    sudo -n "$install_bin" config --user "$target_user" >/dev/null 2>&1 || true
+    sudo -n "$install_bin" socket-symlink-on-startup --user "$target_user" >/dev/null 2>&1 || true
     sudo -n launchctl kickstart -p system/com.docker.socket >/dev/null 2>&1 || true
+    sudo -n ln -sfn "$socket_path" /var/run/docker.sock >/dev/null 2>&1 || true
   fi
   local priv_dir
   for priv_dir in /tmp/docker-desktop-privileged*; do
