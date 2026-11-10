@@ -689,18 +689,18 @@ except Exception:
             pkill -TERM -x "$p" >/dev/null 2>&1 || true
           fi
         done
-        if HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 brew outdated --cask --greedy --quiet 2>/dev/null | grep -qx "docker-desktop"; then
-          "${WORKSPACE_DIR}/scripts/docker-service.sh" stop 2>&1 || true
+        if HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 brew outdated --cask --greedy --quiet 8>&- 2>/dev/null | grep -qx "docker-desktop"; then
+          "${WORKSPACE_DIR}/scripts/docker-service.sh" stop 8>&- 2>&1 || true
         fi
         brew upgrade --cask < /dev/null 8>&- 2>&1 || true
         # Relaunch persistent background utilities
         for app in "Tailscale" "Cloudflare WARP" "OneDrive" "Google Drive"; do
           if [[ -d "/Applications/${app}.app" ]]; then
-            open -a "${app}" --background >/dev/null 2>&1 || true
+            open -a "${app}" --background 8>&- >/dev/null 2>&1 || true
           fi
         done
         if [[ -x "/Applications/Docker.app/Contents/MacOS/install" ]] && [[ -x "${WORKSPACE_DIR}/scripts/docker-service.sh" ]]; then
-          if ! docker info >/dev/null 2>&1 || \
+          if ! docker info 8>&- >/dev/null 2>&1 || \
              [[ ! -x "/Library/PrivilegedHelperTools/com.docker.socket" ]]; then
             if "${WORKSPACE_DIR}/scripts/docker-service.sh" start 8>&- 2>&1; then
               "${WORKSPACE_DIR}/scripts/docker-service.sh" up 8>&- 2>&1 || true

@@ -40,8 +40,8 @@ The compatibility ledger SHALL map each local modification in `/Users/androidtea
 
 #### Scenario: Atomic compatibility file writes and entrypoint readiness serialization
 - **WHEN** `/app/container-entrypoint-compat.sh` patches `/app/peer-stamp.mjs`, Next.js server route files, or server chunks, or when `~/Omniroute/scripts/ensure-muse-wire-compat.sh` verifies container runtime patches after `docker compose up -d`
-- **THEN** `/app/container-entrypoint-compat.sh` SHALL write modified contents via `atomicWriteFileSync` (sibling `.tmp-<pid>-<ts>` write followed by `fs.renameSync`) so interruption or concurrent inspection can never leave a 0-byte truncated file in the container writable layer
-- **AND** `ensure-muse-wire-compat.sh` SHALL poll up to 15 seconds until no `container-entrypoint-compat.sh` process is running inside the container before invoking `/app/container-entrypoint-compat.sh --patch-only`.
+- **THEN** `/app/container-entrypoint-compat.sh` SHALL write modified contents via `atomicWriteFileSync` (sibling `.tmp-<pid>-<ts>` write followed by `fs.renameSync` with error-path `fs.unlinkSync` cleanup) so interruption or concurrent inspection can never leave a 0-byte truncated or orphaned temp file in the container writable layer
+- **AND** `ensure-muse-wire-compat.sh` SHALL poll `/proc/1/cmdline` (`! grep -qF "container-entrypoint-compat.sh" /proc/1/cmdline`) up to 15 seconds until PID 1 finishes `container-entrypoint-compat.sh` before invoking `/app/container-entrypoint-compat.sh --patch-only`.
 
 ### Requirement: Hybrid Retrieval Evaluation and Isolation
 The evaluation plan SHALL compare lexical and semantic retrieval on the same authorized query set and corpus (covering embedding, filtering, ranking, reranking, and fallback costs) and SHALL enforce owner and `expires_at` filtering across SQLite `memories`, `memory_fts`, `vec_memories`, and Qdrant `fetchMemoriesByIds` paths. It SHALL retain the existing hybrid deployment until an alternative passes acceptance and cutover approval.

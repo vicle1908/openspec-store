@@ -129,7 +129,7 @@ Critical gateway and dependency containers SHALL configure and run with `HostCon
 
 ### Requirement: Continuous supervisor watchdog monitoring
 
-A periodic system supervisor (`com.omniroute.watchdog`) SHALL monitor Docker daemon and local gateway health, serialize its cycle via `/usr/bin/lockf` on `~/.omniroute/update.lock` at Step 0, coordinate with `workstation_update.py` during `docker-desktop` cask upgrades, force-recreate containers stuck in `restarting` state, omit decommissioned sidecar endpoints, and run a 6-hour read-only SQLite `PRAGMA integrity_check` without restarting a healthy gateway.
+A periodic system supervisor (`com.omniroute.watchdog`) SHALL monitor Docker daemon and local gateway health, serialize its cycle via `/usr/bin/lockf` on `~/.omniroute/update.lock` at Step 0, coordinate with `workstation_update.py` and `workstation-daily-update.sh` during `docker-desktop` cask upgrades, force-recreate containers stuck in `restarting` state, omit decommissioned sidecar endpoints, and run a 6-hour read-only SQLite `PRAGMA integrity_check` without restarting a healthy gateway.
 
 #### Scenario: Unhealthy or halted container auto-recovery
 - **WHEN** `omniroute` container is halted or fails HTTP health probes outside the startup grace period
@@ -151,7 +151,7 @@ A periodic system supervisor (`com.omniroute.watchdog`) SHALL monitor Docker dae
 
 #### Scenario: Active update or maintenance lock suppresses watchdog restarts
 - **WHEN** `omniroute-watchdog.sh` starts at Step 0 (before Docker daemon or container checks), opens persistent `~/.omniroute/update.lock` (`umask 077`) on file descriptor `9` (`exec 9>>"$LOCK_FILE"`), and invokes `/usr/bin/lockf -s -t 0 9`
-- **THEN** if `/usr/bin/lockf` returns exit code `75` (`EX_TEMPFAIL` because `update.sh`, `workstation_update.py` during a `docker-desktop` cask upgrade, manual `/usr/bin/lockf -k -t 0 ~/.omniroute/update.lock` maintenance, or another watchdog instance holds the kernel lock), `omniroute-watchdog.sh` SHALL log that the maintenance lock is active and exit `0` without starting the daemon, restarting `omniroute`, or running `docker compose up -d`
+- **THEN** if `/usr/bin/lockf` returns exit code `75` (`EX_TEMPFAIL` because `update.sh`, `workstation_update.py` or `workstation-daily-update.sh` during a `docker-desktop` cask upgrade, manual `/usr/bin/lockf -k -t 0 ~/.omniroute/update.lock` maintenance, or another watchdog instance holds the kernel lock), `omniroute-watchdog.sh` SHALL log that the maintenance lock is active and exit `0` without starting the daemon, restarting `omniroute`, or running `docker compose up -d`
 - **AND** if `/usr/bin/lockf` fails with any other non-zero exit code, `omniroute-watchdog.sh` SHALL log an error and fail closed with a non-zero exit code
 - **AND** when the kernel lock is acquired (`rc = 0`), `omniroute-watchdog.sh` SHALL retain open FD `9` across its entire cycle until process exit (closing `9>&-` on child invocations), SHALL ignore file contents/mtime without parsing PID/epoch metadata or expiring live locks by age, SHALL NEVER unlink `~/.omniroute/update.lock`, and SHALL remain byte-identical to `/Users/androidteam/Developer/platform/openspec-store/scripts/omniroute-watchdog.sh` per `config/script-provenance-manifest.tsv`.
 
