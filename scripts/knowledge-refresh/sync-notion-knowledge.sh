@@ -14,6 +14,11 @@ set -euo pipefail
 # Environment & Binary
 export PATH="${HOME}/.npm-global/bin:${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
 readonly NTN_BIN="${NTN_BIN:-${HOME}/.local/bin/ntn}"
+export SSL_CERT_FILE="${SSL_CERT_FILE:-/etc/ssl/cert.pem}"
+if [[ -z "${NOTION_API_TOKEN:-}" && -f "${HOME}/.config/notion/.token" ]]; then
+  NOTION_API_TOKEN="$(cat "${HOME}/.config/notion/.token")"
+  export NOTION_API_TOKEN
+fi
 
 # Directory & Manifest Paths
 _SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -513,6 +513,8 @@ sign_agent_binaries() {
 ensure_muse_credential_hygiene() {
   [[ "$(uname -s)" != "Darwin" ]] && return 0
 
+  pkill -9 -f "security find-generic-password -s gemini" >/dev/null 2>&1 || true
+
   if [[ -f "${HOME}/Library/Keychains/login.keychain-db" ]]; then
     local kc_out line_count non_login
     kc_out="$(security list-keychains -d user 2>/dev/null || true)"
