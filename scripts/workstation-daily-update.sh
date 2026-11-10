@@ -49,6 +49,7 @@ export HOMEBREW_NO_INSTALL_CLEANUP="1"
 export HOMEBREW_NO_INTERVENTIONS="1"
 export PIP_NO_INPUT="1"
 export NPM_CONFIG_YES="true"
+export TBH_CREDENTIAL_BACKEND="file"
 
 MODE="apply"
 if [[ "${1:-}" == "--check" ]]; then
@@ -506,6 +507,79 @@ sign_agent_binaries() {
   fi
 }
 
+# Normalize macOS user Keychain search list to login.keychain-db, purge legacy
+# ai.meta.dev.credentials generic password entries, and maintain ~/.config/muse/auth.json
+# on schema_version: 1 (TBH_CREDENTIAL_BACKEND=file) with mode 0600.
+ensure_muse_credential_hygiene() {
+  [[ "$(uname -s)" != "Darwin" ]] && return 0
+
+  if [[ -f "${HOME}/Library/Keychains/login.keychain-db" ]]; then
+    local kc_out line_count non_login
+    kc_out="$(security list-keychains -d user 2>/dev/null || true)"
+    line_count="$(printf '%s\n' "${kc_out}" | grep -c '[^[:space:]]' || true)"
+    non_login="$(printf '%s\n' "${kc_out}" | grep -v 'login\.keychain-db' | grep -c '[^[:space:]]' || true)"
+    if (( line_count != 1 || non_login > 0 )); then
+      security list-keychains -d user -s "${HOME}/Library/Keychains/login.keychain-db" >/dev/null 2>&1 || true
+    fi
+  fi
+
+  for _ in 1 2 3 4 5; do
+    security delete-generic-password -s "ai.meta.dev.credentials" >/dev/null 2>&1 || break
+  done
+
+  if [[ -x "/opt/homebrew/bin/muse" ]]; then
+    local auth_json="${HOME}/.config/muse/auth.json"
+    local auth_valid="0"
+    if [[ -f "${auth_json}" ]]; then
+      auth_valid="$(python3 -c '
+import json, sys
+try:
+    with open(sys.argv[1], "r", encoding="utf-8") as f:
+        data = json.load(f)
+    if data.get("schema_version") == 1 and bool(data.get("providers", {}).get("meta", {}).get("api_key")):
+        print("1")
+    else:
+        print("0")
+except Exception:
+    print("0")
+' "${auth_json}" 2>/dev/null || echo "0")"
+    fi
+
+    if [[ "${auth_valid}" != "1" ]]; then
+      local api_key="${OMNIROUTE_API_KEY:-}"
+      if [[ -z "${api_key}" && -f "${HOME}/.zshenv" ]]; then
+        api_key="$( (source "${HOME}/.zshenv" 2>/dev/null && printf '%s' "${OMNIROUTE_API_KEY:-}") )"
+        if [[ -z "${api_key}" ]]; then
+          api_key="$(python3 -c '
+import os, re
+zshenv = os.path.expanduser("~/.zshenv")
+if os.path.exists(zshenv):
+    with open(zshenv, "r", encoding="utf-8", errors="ignore") as f:
+        for line in f:
+            m = re.match(r"^export\s+OMNIROUTE_API_KEY=[\"\x27]?([^\"\x27\s]+)", line)
+            if m:
+                print(m.group(1))
+                break
+' 2>/dev/null || true)"
+        fi
+      fi
+      if [[ -n "${api_key}" ]]; then
+        mkdir -p -m 700 "${HOME}/.config/muse"
+        rm -f "${auth_json}"
+        printf '%s' "${api_key}" | TBH_CREDENTIAL_BACKEND=file /opt/homebrew/bin/muse auth set --provider meta --api-key-stdin >/dev/null 2>&1 || true
+        chmod 600 "${auth_json}" 2>/dev/null || true
+      fi
+    fi
+  fi
+
+  if [[ -d "${HOME}/.config/muse" ]]; then
+    chmod 700 "${HOME}/.config/muse" 2>/dev/null || true
+    [[ -f "${HOME}/.config/muse/auth.json" ]] && chmod 600 "${HOME}/.config/muse/auth.json" 2>/dev/null || true
+    [[ -f "${HOME}/.config/muse/settings.json" ]] && chmod 600 "${HOME}/.config/muse/settings.json" 2>/dev/null || true
+  fi
+  return 0
+}
+
 # Verify active canonical coding agent Mach-O CLI realpaths and shared Python
 # automation identities in TCC.db (read-only) with native csreq signature checks.
 verify_tcc_provenance() {
@@ -712,6 +786,7 @@ except Exception:
 
       brew cleanup -s 2>&1 || true
       sign_agent_binaries || true
+      ensure_muse_credential_hygiene || true
     fi
   fi
 
@@ -896,6 +971,7 @@ except Exception:
   else
     agent_cli_coverage "${DENY_ROSTER}" "${PAUSED_ROSTER}"
     sign_agent_binaries || true
+    ensure_muse_credential_hygiene || true
     for pi_lens_log in "${HOME}/.pi-lens"/*.log; do
       [[ -f "${pi_lens_log}" ]] || continue
       if (( $(stat -f '%z' "${pi_lens_log}" 2>/dev/null || echo 0) > 5242880 )); then
