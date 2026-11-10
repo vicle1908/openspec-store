@@ -485,10 +485,10 @@ graphify_refresh() {
   if [[ "${_MODE:-}" != "check" ]]; then
     local gf_version
     gf_version="$(graphify --version 2>/dev/null || echo "")"
-    if [[ "$gf_version" != *"0.9.104"* && "$gf_version" != *"0.9.95"* && "$gf_version" != *"0.9.92"* ]]; then
+    if [[ "$gf_version" != *"0.9.105"* && "$gf_version" != *"0.9.104"* && "$gf_version" != *"0.9.95"* && "$gf_version" != *"0.9.92"* ]]; then
       status="provider_mismatch"
-      warn "  Graphify: provider version mismatch (${gf_version:-unknown} not in 0.9.104/0.9.95) for ${name}"
-      log_line "$name" graphify "$status" "$(elapsed "$start_ts")" "expected=0.9.104;actual=${gf_version:-unknown}"
+      warn "  Graphify: provider version mismatch (${gf_version:-unknown} not in 0.9.105/0.9.104/0.9.95) for ${name}"
+      log_line "$name" graphify "$status" "$(elapsed "$start_ts")" "expected=0.9.105;actual=${gf_version:-unknown}"
       return 0
     fi
   fi
