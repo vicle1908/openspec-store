@@ -418,7 +418,7 @@ OmniRoute SHALL expose four top-level Google Gemini 4 Carbon combos (`gemini-4-c
 - **THEN** OmniRoute SHALL weight candidate selection by `score / (1 + inflight)` across the 3 Ultra accounts, reserve `inflight` synchronously in the same event-loop turn before yielding, and return `HTTP 200` completions with zero `429` dispatches to unentitled Pro accounts
 
 ### Requirement: Quota-Weighted Concurrency Balancing, Ultra Pool Isolation, and Rate-Limit Queue Scaling Across Antigravity Combos
-OmniRoute SHALL configure multi-account Antigravity (`agy`) combos (`gemini-4-argon*`, `gemini-3.8-flash-high`, `claude-opus-5.5`, `claude-sonnet-5.5`) with `strategy: "quota-weighted"`, isolate `gemini-3.8-flash-high`, `claude-opus-5.5`, and `claude-sonnet-5.5` to the 11 active Pro `agy` accounts, disable `rateLimitProtection` on active `agy` connections, and scale `settings.requestQueue` to 64 concurrent requests.
+OmniRoute SHALL configure multi-account Antigravity (`agy`) combos (`gemini-4-argon*`, `gemini-3.8-flash-high`, `claude-opus-5.5`, `claude-sonnet-5.5`) with `strategy: "quota-weighted"`, isolate `gemini-3.8-flash-high`, `claude-opus-5.5`, and `claude-sonnet-5.5` to the 11 active Pro `agy` accounts, disable `rateLimitProtection` on active `agy` connections, and scale `settings.requestQueue` to 64 concurrent requests with zero inter-request pacing delay (`minTimeBetweenRequestsMs: 0`).
 
 #### Scenario: Argon combos prune unentitled Pro accounts and balance across the 3 Ultra accounts via quota-weighted routing
 - **WHEN** `GET /api/combos` is queried for `gemini-4-argon`, `gemini-4-argon-high`, `gemini-4-argon-medium`, and `gemini-4-argon-low`
@@ -435,6 +435,22 @@ OmniRoute SHALL configure multi-account Antigravity (`agy`) combos (`gemini-4-ar
 - **AND** the 9 Pro connections advertising native 5.5 in `syncedAvailableModels` (`38782750`, `9c033d6f`, `37f9924d`, `573e3f41`, `3f3085b1`, `a94216f4`, `a7580e21`, `f511d061`, `9ad0a196`) SHALL use `agy/claude-opus-5-5-high` and `agy/claude-sonnet-5-5-high`, while the remaining 2 active Pro connections (`9d66311f`, `ce95e1cb`) SHALL use `agy/claude-opus-4-6-thinking` and `agy/claude-sonnet-4-6`
 
 #### Scenario: All 14 active Antigravity connections disable local rateLimitProtection and requestQueue scales to 64 concurrent requests
-- **WHEN** `provider_connections` (`provider = 'agy' AND is_active = 1`) and `GET /api/settings` are inspected
+- **WHEN** `provider_connections` (`provider = 'agy' AND is_active = 1`) and `GET /api/resilience` (`GET /api/settings`) are inspected
 - **THEN** all 14 active `agy` connections SHALL have `rate_limit_protection = 0` (`rateLimitProtection: false`) so individual connections are not locally serialized at 20 concurrent requests
-- **AND** `settings.requestQueue` SHALL be configured with `concurrentRequests: 64`, `requestsPerMinute: 600`, and `maxWaitMs: 15000`, while `ANTIGRAVITY_ACCOUNT_LEASE_ENABLED` and `COMBO_AUTO_PRUNE_STALE_STEPS` remain `"false"` in `feature_flags`
+- **AND** `settings.requestQueue` SHALL be configured with `concurrentRequests: 64`, `requestsPerMinute: 600`, `minTimeBetweenRequestsMs: 0`, and `maxWaitMs: 15000` so Bottleneck limiters (`resolveMinTime(0) === 0`) dispatch simultaneous subagent bursts immediately without `200 ms` (`5 req/s`) inter-arrival serialization, while `ANTIGRAVITY_ACCOUNT_LEASE_ENABLED` and `COMBO_AUTO_PRUNE_STALE_STEPS` remain `"false"` in `feature_flags`
+
+### Requirement: Invalid Provider Quarantine, 14-Combo Assignment Reconciliation, and Banned Account Blocklist Preservation
+OmniRoute SHALL deactivate invalid API-key provider connection `f3aaa87c-4af7-4a83-a636-98983119b9bc` (`pm`) and remove unused combo `phanmemvip` (`ad4dace4-9072-42a8-8503-e6188e325890`), SHALL reconcile `compression_combo_assignments` exclusively to the 14 active workstation combo UUIDs, and SHALL preserve inactive banned `agy` rows (`is_active = 0`, `test_status = 'banned'`) as an import-deduplication safety blocklist.
+
+#### Scenario: Invalid `pm` connection deactivated and unused `phanmemvip` combo removed
+- **WHEN** `GET /api/providers` and `GET /api/combos` are queried
+- **THEN** connection `f3aaa87c-4af7-4a83-a636-98983119b9bc` (`anthropic-compatible-6408e370-2373-4ae0-9942-7f4095ba976c`, prefix `pm`) SHALL have `isActive: false` (`is_active = 0`) and `healthCheckInterval: 0` so validation sweeps never emit `HTTP 401 ("Invalid API key")` errors
+- **AND** unused combo `phanmemvip` (`ad4dace4-9072-42a8-8503-e6188e325890`) SHALL be absent from `combos`, leaving the exact 14 active workstation combos (`gemini-4-carbon{,-high,-medium,-low}`, `gemini-4-argon{,-high,-medium,-low}`, `gemini-3.8-flash-high`, `claude-opus-5.5`, `claude-sonnet-5.5`, `deepseek-v4.1-flash`, `kimi-k3.1-pro`, `muse-spark-1.3`)
+
+#### Scenario: `compression_combo_assignments` reconciled to the 14 active combo UUIDs without orphaned or duplicate rows
+- **WHEN** `PUT /api/context/combos/default-caveman/assignments` is applied with the 14 active combo UUIDs and `compression_combo_assignments` is inspected
+- **THEN** `compression_combo_assignments` SHALL contain exactly 14 rows matching the 14 active `combos.id` UUIDs (`0` plain-name duplicates and `0` orphaned rows referencing deleted combos such as `phanmemvip`)
+
+#### Scenario: Inactive banned Antigravity connections retained as import blocklist with zero sweep overhead
+- **WHEN** `provider_connections` (`provider = 'agy' AND is_active = 0 AND test_status = 'banned'`) is inspected or `findExistingAgyConnection` runs during bulk/CLI OAuth import
+- **THEN** all 9 banned `agy` rows SHALL remain present with `is_active = 0` so `findExistingAgyConnection` rejects accidental re-import with `409 duplicate_account` while `tokenHealthCheck` (`!conn.isActive`) skips them with zero outbound network requests

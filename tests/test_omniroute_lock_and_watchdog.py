@@ -6,11 +6,15 @@ updater snapshot checkpointing.
 from __future__ import annotations
 
 import hashlib
+import http.server
+import json
 import os
 import shutil
+import socketserver
 import stat
 import subprocess
 import tempfile
+import threading
 import time
 import unittest
 from pathlib import Path
@@ -21,6 +25,8 @@ DEV_WATCHDOG = Path("/Users/androidteam/Developer/scripts/omniroute-watchdog.sh"
 UPDATE_SCRIPT = Path("/Users/androidteam/Omniroute/scripts/update.sh")
 ENTRYPOINT_COMPAT = Path("/Users/androidteam/Omniroute/scripts/container-entrypoint-compat.sh")
 ENSURE_MUSE_COMPAT = Path("/Users/androidteam/Omniroute/scripts/ensure-muse-wire-compat.sh")
+
+CHECK_UPSTREAM = Path("/Users/androidteam/Omniroute/scripts/check-upstream.sh")
 
 
 def _write_executable(path: Path, content: str) -> None:
@@ -966,6 +972,433 @@ exit 0
         )
         assert pass_200_res.returncode == 0, pass_200_res.stdout + pass_200_res.stderr
         assert not flag_file.exists()
+
+    def test_check_upstream_running_container_multi_digest_and_update_available_mode(self) -> None:
+        """check-upstream.sh parses running container RepoDigests (dual-registry) to single line, and writes 0600 flag when newer."""
+        running_img_id = "sha256:runningcontainerimageid"
+        running_digest = "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        newer_digest = "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+
+        _write_executable(
+            self.local_bin / "docker",
+            f"""#!/bin/bash
+if [[ "$1" == "inspect" ]]; then
+  echo "{running_img_id}"
+  exit 0
+fi
+if [[ "$1" == "image" ]]; then
+  if [[ "$*" == *"{running_img_id}"* ]]; then
+    echo "diegosouzapw/omniroute@{running_digest}"
+    echo "ghcr.io/cheaper-inference/omniroute@{running_digest}"
+  else
+    echo "diegosouzapw/omniroute@{newer_digest}"
+  fi
+  exit 0
+fi
+exit 0
+""",
+        )
+
+        curl_mode = self.home / "curl_mode.txt"
+        curl_mode.write_text("matching\n", encoding="utf-8")
+
+        _write_executable(
+            self.local_bin / "curl",
+            f"""#!/bin/bash
+mode=$(cat "{curl_mode}")
+if [[ "$*" == *"/token"* ]]; then
+  echo '{{"token":"test-token"}}'
+  exit 0
+fi
+if [[ "$mode" == "matching" ]]; then
+  printf "HTTP/1.1 200 OK\\r\\nDocker-Content-Digest: {running_digest}\\r\\n\\r\\n"
+else
+  printf "HTTP/1.1 200 OK\\r\\nDocker-Content-Digest: {newer_digest}\\r\\n\\r\\n"
+fi
+exit 0
+""",
+        )
+
+        flag_file = self.omni_state / "update-available"
+        flag_file.write_text("old-flag-content\n", encoding="utf-8")
+
+        env = self._base_env()
+        env["OMNIROUTE_DOCKERHUB_TOKEN_URL"] = "http://127.0.0.1:9999/token"
+        env["OMNIROUTE_DOCKERHUB_MANIFEST_URL"] = "http://127.0.0.1:9999/manifest"
+
+        # Case A: matching running container digest
+        res_match = subprocess.run(
+            ["/bin/bash", str(CHECK_UPSTREAM)],
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        assert res_match.returncode == 0
+        assert not flag_file.exists(), (
+            "Flag file must be removed when matching running container digest"
+        )
+        log_content = (self.omni_state / "update-check.log").read_text(encoding="utf-8")
+        assert "Up to date" in log_content
+
+        # Case B: newer remote digest vs running container
+        curl_mode.write_text("newer\n", encoding="utf-8")
+        res_newer = subprocess.run(
+            ["/bin/bash", str(CHECK_UPSTREAM)],
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        assert res_newer.returncode == 0
+        assert flag_file.exists(), (
+            "Flag file must be written when remote digest differs from running container"
+        )
+        assert flag_file.read_text(encoding="utf-8").strip() == newer_digest
+        flag_mode = stat.S_IMODE(flag_file.stat().st_mode)
+        assert flag_mode == 0o600, f"Expected flag mode 0600, got {oct(flag_mode)}"
+
+    def test_check_upstream_dual_registry_keychain_free_and_failure_logging(self) -> None:
+        """check-upstream.sh fails over from DH 503 to GHCR without calling osxkeychain, and logs isolated buildx failure summary."""
+
+        class DualRegistryHandler(http.server.BaseHTTPRequestHandler):
+            mode = "ghcr_ok"
+
+            def do_GET(self) -> None:
+                if self.path == "/dh-token":
+                    self.send_response(503)
+                    self.end_headers()
+                    self.wfile.write(b"Docker Hub Down")
+                elif self.path == "/ghcr-token":
+                    if DualRegistryHandler.mode == "ghcr_ok":
+                        self.send_response(200)
+                        self.send_header("Content-Type", "application/json")
+                        self.end_headers()
+                        self.wfile.write(json.dumps({"token": "ghcr-bearer-token"}).encode())
+                    else:
+                        self.send_response(503)
+                        self.end_headers()
+                        self.wfile.write(b"GHCR Down")
+                else:
+                    self.send_response(404)
+                    self.end_headers()
+
+            def do_HEAD(self) -> None:
+                if self.path == "/ghcr-manifest":
+                    if DualRegistryHandler.mode == "ghcr_ok":
+                        self.send_response(200)
+                        self.send_header(
+                            "Docker-Content-Digest",
+                            "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+                        )
+                        self.end_headers()
+                    else:
+                        self.send_response(503)
+                        self.end_headers()
+                else:
+                    self.send_response(404)
+                    self.end_headers()
+
+            def log_message(self, format: str, *args: object) -> None:
+                pass
+
+        server = socketserver.TCPServer(("127.0.0.1", 0), DualRegistryHandler)
+        port = server.server_address[1]
+        srv_thread = threading.Thread(target=server.serve_forever, daemon=True)
+        srv_thread.start()
+
+        try:
+            poison_sentinel = self.home / "poison_invoked.txt"
+            poison = self.local_bin / "docker-credential-osxkeychain"
+            _write_executable(
+                poison,
+                f"""#!/bin/bash
+touch "{poison_sentinel}"
+echo "errSecAuthFailed -25293" >&2
+exit 1
+""",
+            )
+
+            buildx_cfg_seen = self.home / "buildx_cfg_seen.json"
+            docker = self.local_bin / "docker"
+            _write_executable(
+                docker,
+                f"""#!/bin/bash
+if [[ "$1" == "inspect" ]]; then
+  echo "sha256:img123"
+  exit 0
+fi
+if [[ "$1" == "image" ]]; then
+  echo "diegosouzapw/omniroute@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+  exit 0
+fi
+if [[ "$1" == "buildx" ]]; then
+  if [[ -n "$DOCKER_CONFIG" && -f "$DOCKER_CONFIG/config.json" ]]; then
+    cp "$DOCKER_CONFIG/config.json" "{buildx_cfg_seen}"
+  fi
+  echo "buildx: connection refused to registry" >&2
+  exit 1
+fi
+exit 0
+""",
+            )
+
+            env = self._base_env()
+            env["OMNIROUTE_DOCKERHUB_TOKEN_URL"] = f"http://127.0.0.1:{port}/dh-token"
+            env["OMNIROUTE_DOCKERHUB_MANIFEST_URL"] = f"http://127.0.0.1:{port}/dh-manifest"
+            env["OMNIROUTE_GHCR_TOKEN_URL"] = f"http://127.0.0.1:{port}/ghcr-token"
+            env["OMNIROUTE_GHCR_MANIFEST_URL"] = f"http://127.0.0.1:{port}/ghcr-manifest"
+
+            # Phase 1: DH 503 -> GHCR 200 failover without calling osxkeychain
+            DualRegistryHandler.mode = "ghcr_ok"
+            res1 = subprocess.run(
+                ["/bin/bash", str(CHECK_UPSTREAM)],
+                env=env,
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            assert res1.returncode == 0
+            assert not poison_sentinel.exists(), (
+                "docker-credential-osxkeychain must NEVER be invoked"
+            )
+            flag_file = self.omni_state / "update-available"
+            assert flag_file.exists(), "Flag file should be written with GHCR remote digest"
+            assert (
+                flag_file.read_text(encoding="utf-8").strip()
+                == "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+            )
+            flag_file.unlink()
+
+            # Phase 2: All fail (DH fail + GHCR fail + buildx fail) -> isolated DOCKER_CONFIG verified and logged
+            DualRegistryHandler.mode = "all_fail"
+            res2 = subprocess.run(
+                ["/bin/bash", str(CHECK_UPSTREAM)],
+                env=env,
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            assert res2.returncode == 0
+            assert not flag_file.exists()
+            assert buildx_cfg_seen.exists(), "buildx must run with isolated DOCKER_CONFIG"
+            cfg = json.loads(buildx_cfg_seen.read_text(encoding="utf-8"))
+            assert "credHelpers" in cfg
+            for reg, helper in cfg["credHelpers"].items():
+                assert helper == "", f"Expected empty helper override for {reg}, got {helper}"
+
+            log_text = (self.omni_state / "update-check.log").read_text(encoding="utf-8")
+            assert "WARNING: Could not fetch remote digest" in log_text
+            assert "buildx: connection refused to registry" in log_text
+        finally:
+            server.shutdown()
+
+    def test_updater_isolated_docker_config_pull_snapshot_perm_pruning_and_rollback(self) -> None:
+        """update.sh enforces 0600 snapshot mode, isolated DOCKER_CONFIG pull with digest pin, 5-snapshot retention, and rollback on Gate 5/8 failure."""
+        _write_executable(self.local_bin / "sleep", "#!/bin/bash\nexit 0\n")
+
+        snapshot_dir = self.omni_state / "snapshots"
+        snapshot_dir.mkdir(parents=True, exist_ok=True)
+        # Pre-create 6 dummy snapshots with staggered mtimes
+        for i in range(6):
+            f = snapshot_dir / f"snap-{i}.sqlite"
+            f.write_text(f"snapshot {i}\n", encoding="utf-8")
+            mtime = 1000000.0 + i * 10.0
+            os.utime(f, (mtime, mtime))
+
+        old_pin = "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+        target_digest = "sha256:fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210"
+
+        override_yml = self.compose_dir / "docker-compose.override.yml"
+        override_yml.write_text(
+            f"""services:
+  omniroute-base:
+    image: diegosouzapw/omniroute@{old_pin}
+""",
+            encoding="utf-8",
+        )
+
+        flag_file = self.omni_state / "update-available"
+        flag_file.write_text(f"{target_digest}\n", encoding="utf-8")
+
+        deployed_file = self.home / "deployed"
+        docker_calls = self.home / "docker_calls.log"
+        pull_cfg_seen = self.home / "pull_cfg_seen.json"
+        fail_gate = self.home / "fail_gate.txt"
+        fail_gate.write_text("none\n", encoding="utf-8")
+
+        _write_executable(
+            self.local_bin / "docker",
+            f"""#!/bin/bash
+echo "$@" >> "{docker_calls}"
+fg=$(cat "{fail_gate}")
+if [[ "$1" == "info" ]]; then exit 0; fi
+if [[ "$1" == "ps" ]]; then echo "omniroute"; exit 0; fi
+if [[ "$1" == "pull" ]]; then
+  if [[ -n "$DOCKER_CONFIG" && -f "$DOCKER_CONFIG/config.json" ]]; then
+    cp "$DOCKER_CONFIG/config.json" "{pull_cfg_seen}"
+  fi
+  exit 0
+fi
+if [[ "$1" == "compose" ]]; then
+  if [[ "$*" == *" up "* ]]; then touch "{deployed_file}"; fi
+  exit 0
+fi
+if [[ "$1" == "tag" ]]; then exit 0; fi
+if [[ "$1" == "cp" ]]; then printf "SQLite format 3\\x00" > "$3"; exit 0; fi
+if [[ "$1" == "image" ]]; then
+  if [[ "$*" == *"RepoDigests"* ]]; then
+    echo "diegosouzapw/omniroute@{target_digest}"
+  else
+    echo "sha256:targetimgid"
+  fi
+  exit 0
+fi
+if [[ "$1" == "inspect" ]]; then
+  if [[ "$*" == *"Health.Status"* ]]; then
+    if [[ "$fg" == "gate5" ]]; then
+      echo "unhealthy"
+    else
+      echo "healthy"
+    fi
+    exit 0
+  fi
+  if [[ -f "{deployed_file}" ]]; then
+    echo "sha256:targetimgid"
+  else
+    echo "sha256:oldimage"
+  fi
+  exit 0
+fi
+if [[ "$1" == "exec" ]]; then
+  if [[ "$*" == *"package.json"* ]]; then
+    if [[ -f "{deployed_file}" ]]; then printf "3.8.53"; else printf "3.8.52"; fi
+    exit 0
+  fi
+  if [[ "$*" == *"quick_check"* ]]; then printf "ok"; exit 0; fi
+  if [[ "$*" == *"api/settings/memory"* ]] || [[ "$*" == *"MEM_OFF"* ]]; then
+    printf "MEM_OFF|CACHE_ALIGNED|COMP_OFF|TTFT_ZERO|PATCH_OK"
+    exit 0
+  fi
+  if [[ "$*" == *"FROM api_keys"* ]]; then printf "1"; exit 0; fi
+  if [[ "$*" == *"FROM provider_connections"* ]]; then printf "32"; exit 0; fi
+  exit 0
+fi
+exit 0
+""",
+        )
+
+        _write_executable(
+            self.local_bin / "sqlite3",
+            """#!/bin/bash
+sql="${!#}"
+if [[ "$sql" == *"quick_check"* ]]; then echo "ok"; exit 0; fi
+if [[ "$sql" == *"wal_checkpoint"* ]]; then echo "0|0|0"; exit 0; fi
+if [[ "$sql" == *"journal_mode"* ]]; then echo "delete"; exit 0; fi
+exit 0
+""",
+        )
+
+        _write_executable(
+            self.local_bin / "curl",
+            f"""#!/bin/bash
+fg=$(cat "{fail_gate}")
+if [[ "$*" == *"/healthz"* ]]; then printf "ok"; exit 0; fi
+if [[ "$*" == *"/readyz"* ]]; then printf "all shards are ready"; exit 0; fi
+if [[ "$*" == *"/api/monitoring/health"* ]]; then printf '{{"status":"healthy","setupComplete":true}}'; exit 0; fi
+if [[ "$*" == *"muse-code/models"* ]]; then
+  if [[ "$fg" == "gate8" ]]; then
+    printf '{{"object":"list","data":[]}}'
+  else
+    printf '{{"object":"list","data":[{{"id":"muse-spark-1.3"}}]}}'
+  fi
+  exit 0
+fi
+printf "200"
+exit 0
+""",
+        )
+
+        env = self._base_env()
+
+        # 1. Success path: Gate 1 snapshot mode 0600, Gate 2 isolated DOCKER_CONFIG pull, Gate 9 snapshot pruning (7 -> 5)
+        res_ok = subprocess.run(
+            ["/bin/bash", str(UPDATE_SCRIPT), "3.8.53"],
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        assert res_ok.returncode == 0, res_ok.stdout + res_ok.stderr
+
+        calls_text = docker_calls.read_text(encoding="utf-8")
+        assert "pull diegosouzapw/omniroute:latest" in calls_text
+        assert "compose --profile base pull omniroute-base redis" in calls_text
+
+        assert pull_cfg_seen.exists(), "Gate 2 must write isolated DOCKER_CONFIG"
+        cfg = json.loads(pull_cfg_seen.read_text(encoding="utf-8"))
+        assert "credHelpers" in cfg
+        for reg, helper in cfg["credHelpers"].items():
+            assert helper == "", f"Expected empty helper override for {reg}, got {helper}"
+
+        snaps = sorted(list(snapshot_dir.glob("*.sqlite")))
+        assert len(snaps) == 5, f"Expected 5 retained snapshots, got {len(snaps)}"
+        newest_snap = max(snaps, key=lambda s: s.stat().st_mtime)
+        assert stat.S_IMODE(newest_snap.stat().st_mode) == 0o600, (
+            f"Newest snapshot mode was not 0600: {oct(stat.S_IMODE(newest_snap.stat().st_mode))}"
+        )
+        assert not flag_file.exists(), "Flag file should be cleared on success"
+        assert target_digest in override_yml.read_text(encoding="utf-8")
+
+        # 2. Gate 5 failure rollback: docker-compose.override.yml automatically restored to pre-deploy pin
+        deployed_file.unlink(missing_ok=True)
+        fail_gate.write_text("gate5\n", encoding="utf-8")
+        flag_file.write_text(f"{target_digest}\n", encoding="utf-8")
+        override_yml.write_text(
+            f"""services:
+  omniroute-base:
+    image: diegosouzapw/omniroute@{old_pin}
+""",
+            encoding="utf-8",
+        )
+        res_gate5 = subprocess.run(
+            ["/bin/bash", str(UPDATE_SCRIPT), "3.8.53"],
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        assert res_gate5.returncode == 1
+        assert "GATE FAILED [healthy]" in res_gate5.stdout
+        assert old_pin in override_yml.read_text(encoding="utf-8"), (
+            "docker-compose.override.yml must be restored to pre-deploy pin on Gate 5 failure"
+        )
+        assert flag_file.exists()
+
+        # 3. Gate 8 failure rollback: docker-compose.override.yml automatically restored to pre-deploy pin
+        deployed_file.unlink(missing_ok=True)
+        fail_gate.write_text("gate8\n", encoding="utf-8")
+        flag_file.write_text(f"{target_digest}\n", encoding="utf-8")
+        override_yml.write_text(
+            f"""services:
+  omniroute-base:
+    image: diegosouzapw/omniroute@{old_pin}
+""",
+            encoding="utf-8",
+        )
+        res_gate8 = subprocess.run(
+            ["/bin/bash", str(UPDATE_SCRIPT), "3.8.53"],
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        assert res_gate8.returncode == 1
+        assert "GATE FAILED [endpoints]" in res_gate8.stdout
+        assert old_pin in override_yml.read_text(encoding="utf-8"), (
+            "docker-compose.override.yml must be restored to pre-deploy pin on Gate 8 failure"
+        )
+        assert flag_file.exists()
 
 
 if __name__ == "__main__":
