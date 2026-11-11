@@ -13,6 +13,7 @@ directories are preserved; only links owned by this script are reconciled.
 from __future__ import annotations
 
 import argparse
+import fcntl
 import hashlib
 import json
 import os
@@ -28,6 +29,7 @@ except ImportError:
     from datetime import datetime
 
     UTC = UTC
+import contextlib
 from pathlib import Path
 from typing import Any
 
@@ -48,6 +50,7 @@ CODEX_MANIFEST = STORE / "config" / "codex-user-skill-manifest.txt"
 CLAUDE_MANIFEST = STORE / "config" / "claude-user-skill-manifest.txt"
 HERMES_MANIFEST = STORE / "config" / "hermes-user-skill-manifest.txt"
 HERMES_MANAGED_MARKER = ".hermes-managed-links.txt"
+OPENSPEC_SYNC_LOCK = Path("/tmp/openspec-skill-sync.lock")
 
 MAX_VENDOR_DESCRIPTION_BYTES = 1024
 ADVISORY_VENDOR_DESCRIPTION_BYTES = 800
@@ -228,7 +231,7 @@ def measure_description_bytes(skill_md_path: Path) -> dict[str, int]:
 def check_description_budget(skill_md_path: Path, is_vendor: bool = True) -> bool:
     try:
         metrics = measure_description_bytes(skill_md_path)
-    except (OSError, ValueError):
+    except (OSError, ValueError):  # fmt: skip
         return False
     if metrics["raw_bytes"] == 0 or metrics["raw_bytes"] > MAX_VENDOR_DESCRIPTION_BYTES:
         return False
@@ -311,7 +314,7 @@ def _skill_entry_violations(path: Path, locked_skills: set[str] | None = None) -
                 findings.append(f"{path.name}:empty-description")
             elif raw_bytes > allowed_max:
                 findings.append(f"{path.name}:description-exceeds-1024-bytes({raw_bytes})")
-        except (OSError, ValueError):
+        except (OSError, ValueError):  # fmt: skip
             findings.append(f"{path.name}:invalid-frontmatter-description")
     return findings
 
@@ -375,6 +378,8 @@ def reconcile_links(
     preserve_unlisted_workspace_links: bool = False,
 ) -> Result:
     if not destination.is_dir():
+        if not desired:
+            return Result([], [], [], [])
         if check:
             return Result([], [], [f"missing-destination:{destination}"], [])
         destination.mkdir(parents=True, exist_ok=True)
@@ -382,6 +387,17 @@ def reconcile_links(
     removed: list[str] = []
     conflicts: list[str] = []
     broken: list[str] = []
+
+    resolved_roots = tuple(root.resolve() for root in managed_target_roots)
+
+    def _is_managed(t: Path) -> bool:
+        for root in resolved_roots:
+            try:
+                if t == root or t.is_relative_to(root):
+                    return True
+            except ValueError:
+                continue
+        return False
 
     marker_path = destination / HERMES_MANAGED_MARKER
     previously_managed: set[str] = set()
@@ -395,10 +411,7 @@ def reconcile_links(
             continue
         is_broken = not path.exists()
         target = Path(os.path.realpath(path))
-        if not any(
-            target == root.resolve() or root.resolve() in target.parents
-            for root in managed_target_roots
-        ):
+        if not _is_managed(target):
             continue
         expected = desired.get(path.name)
         if expected is None:
@@ -445,12 +458,23 @@ def reconcile_links(
             encoding="utf-8",
         )
 
-    for path in sorted(destination.iterdir()):
-        if path.name.startswith("."):
-            continue
-        if path.is_symlink() and not path.exists():
-            broken.append(path.name)
+    if destination.is_dir():
+        for path in sorted(destination.iterdir()):
+            if path.name.startswith("."):
+                continue
+            if path.is_symlink() and not path.exists():
+                if path.name not in removed:
+                    broken.append(path.name)
 
+    if not desired and not check and destination.is_dir():
+        try:
+            if not any(destination.iterdir()):
+                destination.rmdir()
+                parent = destination.parent
+                if parent.name == "commands" and parent.is_dir() and not any(parent.iterdir()):
+                    parent.rmdir()
+        except OSError:
+            pass
     return Result(created, removed, conflicts, broken)
 
 
@@ -843,6 +867,200 @@ def recover_from_snapshot(*, workspace: Path) -> tuple[bool, list[str], list[str
     return True, findings, mutated_skills
 
 
+def extract_skill_metadata(skill_md_path: Path) -> dict[str, str]:
+    """Extract string fields from `metadata:` block in YAML frontmatter."""
+    if not skill_md_path.is_file():
+        return {}
+    try:
+        raw_text = skill_md_path.read_text(encoding="utf-8")
+    except OSError:
+        return {}
+    if not raw_text.startswith("---"):
+        return {}
+    parts = raw_text.split("---", 2)
+    if len(parts) < 3:
+        return {}
+    fm_lines = parts[1].splitlines()
+    in_metadata = False
+    metadata: dict[str, str] = {}
+    for line in fm_lines:
+        if not line.strip() or line.strip().startswith("#"):
+            continue
+        top_match = re.match(r"^([a-zA-Z0-9_-]+)\s*:", line)
+        if top_match and not line.startswith(" ") and not line.startswith("	"):
+            in_metadata = top_match.group(1) == "metadata"
+            continue
+        if in_metadata:
+            sub_match = re.match(r"^\s+([a-zA-Z0-9_-]+)\s*:\s*(.*)$", line)
+            if sub_match:
+                key = sub_match.group(1)
+                val = sub_match.group(2).strip().strip('"').strip("'")
+                metadata[key] = val
+    return metadata
+
+
+OPENSPEC_ADAPTER_SKILL_TREES: tuple[str, ...] = (
+    ".agents/skills",
+    ".claude/skills",
+    ".factory/skills",
+    ".junie/skills",
+    ".kilocode/skills",
+    ".kiro/skills",
+    ".pi/skills",
+    ".qoder/skills",
+)
+
+OPENSPEC_RETIRED_COMMAND_DIRS: tuple[str, ...] = (
+    ".agents/workflows",
+    ".claude/commands/opsx",
+    ".factory/commands",
+    ".junie/commands",
+    ".kilocode/workflows",
+    ".kiro/prompts",
+    ".pi/prompts",
+    ".qoder/commands/opsx",
+)
+
+
+def _inspect_adapter_skill_trees(store: Path) -> tuple[bool, list[str]]:
+    """Scan active adapter skill trees, verify skill-set consistency across trees, and extract generator versions."""
+    active_trees: list[tuple[str, list[Path]]] = []
+    for rel in OPENSPEC_ADAPTER_SKILL_TREES:
+        tdir = store / rel
+        if tdir.is_dir():
+            skills = sorted(p for p in tdir.glob("openspec-*") if (p / "SKILL.md").is_file())
+            if skills:
+                active_trees.append((rel, skills))
+
+    if not active_trees:
+        return True, []
+
+    found_versions: list[str] = []
+    for _, skills in active_trees:
+        for sdir in skills:
+            meta = extract_skill_metadata(sdir / "SKILL.md")
+            if meta.get("author") == "openspec" or "generatedBy" in meta:
+                gen = meta.get("generatedBy")
+                found_versions.append(gen or "missing")
+
+    reference_names = {p.name for p in active_trees[0][1]}
+    trees_match = all({p.name for p in skills} == reference_names for _, skills in active_trees)
+    return trees_match, found_versions
+
+
+def reconcile_openspec_generator_parity(
+    store: Path,
+    *,
+    check: bool,
+    openspec_bin: str | None = None,
+    config_path: Path | None = None,
+) -> tuple[bool, list[str]]:
+    """Verify and reconcile parity between OpenSpec CLI version and skill metadata.generatedBy."""
+    trees_match, found_versions = _inspect_adapter_skill_trees(store)
+    # Important test-compatibility guard: if zero skills declare metadata.generatedBy,
+    # return (True, []) so minimal synthetic unit-test fixtures remain 100% isolated.
+    if not found_versions:
+        return True, []
+
+    exe = openspec_bin or shutil.which("openspec")
+    if not exe:
+        return True, []
+
+    try:
+        proc = subprocess.run(
+            [exe, "--version"],
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+    except OSError as err:
+        return False, [f"openspec-version-error:{err}"]
+    except subprocess.TimeoutExpired:
+        return False, ["openspec-version-error:timeout"]
+
+    if proc.returncode != 0 or not proc.stdout.strip():
+        return False, [f"openspec-version-error:rc={proc.returncode}"]
+
+    cli_version = proc.stdout.strip().splitlines()[0].strip()
+
+    if trees_match and all(v == cli_version for v in found_versions):
+        print(f"openspec_generator_parity=ok cli={cli_version}")
+        return True, []
+
+    distinct_found = sorted(set(found_versions))
+    if check:
+        print(
+            f"openspec_generator_parity=drift cli={cli_version} skills={','.join(distinct_found)}"
+        )
+        return False, [f"openspec-generator-drift:cli={cli_version},skills={distinct_found}"]
+
+    if os.environ.get("DISABLE_UPDATES", "").strip().lower() in {"1", "true", "yes"}:
+        print("openspec_generator_parity=skipped_disabled")
+        return True, []
+
+    cfg_file = config_path or (Path.home() / ".config" / "openspec" / "config.json")
+    if cfg_file.is_file():
+        try:
+            cfg = json.loads(cfg_file.read_text(encoding="utf-8"))
+            if isinstance(cfg, dict) and "delivery" in cfg and cfg.get("delivery") != "skills":
+                return False, [f"openspec-delivery-mismatch:{cfg.get('delivery')}"]
+        except (OSError, json.JSONDecodeError):  # fmt: skip
+            pass
+
+    try:
+        upd = subprocess.run(
+            [exe, "update", str(store)],
+            capture_output=True,
+            text=True,
+            timeout=120,
+            check=False,
+        )
+    except OSError as err:
+        return False, [f"openspec-update-failed:{err}"]
+    except subprocess.TimeoutExpired:
+        return False, ["openspec-update-failed:timeout"]
+
+    if upd.returncode != 0:
+        return False, [f"openspec-update-failed:rc={upd.returncode}"]
+
+    if upd.stdout.strip():
+        try:
+            data = json.loads(upd.stdout)
+            if isinstance(data, dict):
+                failures = data.get("failures", [])
+                kept = data.get("kept", [])
+                unchecked = data.get("unchecked", [])
+                if failures or kept or unchecked:
+                    return (
+                        False,
+                        [
+                            f"openspec-update-incomplete:failures={len(failures)},kept={kept},unchecked={unchecked}"
+                        ],
+                    )
+        except json.JSONDecodeError:
+            lowered = upd.stdout.lower()
+            for token in ("kept: ", "unchecked: ", "failures: "):
+                idx = lowered.find(token)
+                if idx != -1:
+                    num_part = lowered[idx + len(token) :].split()[0].rstrip(",;")
+                    if num_part.isdigit() and int(num_part) > 0:
+                        return False, [f"openspec-update-incomplete:{token.strip()}{num_part}"]
+
+    for cdir in OPENSPEC_RETIRED_COMMAND_DIRS:
+        target_dir = store / cdir
+        if target_dir.is_dir() and any(target_dir.glob("*.md")):
+            return False, [f"openspec-update-incomplete:commands-not-pruned:{cdir}"]
+    post_trees_match, post_versions = _inspect_adapter_skill_trees(store)
+    if post_trees_match and all(v == cli_version for v in post_versions):
+        print(f"openspec_generator_parity=reconciled cli={cli_version}")
+        return True, []
+
+    post_distinct = sorted(set(post_versions))
+    print(f"openspec_generator_parity=drift cli={cli_version} skills={','.join(post_distinct)}")
+    return False, [f"openspec-generator-drift:cli={cli_version},skills={post_distinct}"]
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Synchronize workspace agent skill symlinks and manage accepted skill snapshots."
@@ -868,6 +1086,24 @@ def main(argv: list[str] | None = None) -> int:
         "--store-root", type=Path, default=None, help="override openspec-store root"
     )
     parser.add_argument("--home-dir", type=Path, default=None, help="override user home directory")
+    parser.add_argument(
+        "--openspec-bin",
+        type=str,
+        default=None,
+        help="path to openspec executable (default: resolved from PATH)",
+    )
+    parser.add_argument(
+        "--openspec-config",
+        type=Path,
+        default=None,
+        help="path to openspec config.json (default: ~/.config/openspec/config.json)",
+    )
+    parser.add_argument(
+        "--sync-lock",
+        type=Path,
+        default=None,
+        help=argparse.SUPPRESS,
+    )
     args = parser.parse_args(argv)
 
     workspace = args.workspace_root.resolve() if args.workspace_root else WORKSPACE
@@ -904,18 +1140,6 @@ def main(argv: list[str] | None = None) -> int:
     hermes_manifest_path = (
         store / "config" / "hermes-user-skill-manifest.txt" if args.store_root else HERMES_MANIFEST
     )
-    open_spec_names = (
-        tuple(
-            sorted(
-                path.name
-                for path in store_standard.glob("openspec-*")
-                if (path / "SKILL.md").is_file()
-            )
-        )
-        if args.store_root
-        else OPEN_SPEC_NAMES
-    )
-
     if args.recover_from_snapshot and not args.accept_refresh and not args.bootstrap_snapshot:
         ok, findings, recovered = recover_from_snapshot(workspace=workspace)
         print(f"snapshot_recovery={'ok' if ok else 'failed'}")
@@ -941,122 +1165,178 @@ def main(argv: list[str] | None = None) -> int:
             print("recovered_skills=" + ",".join(recovered))
         return 0 if ok else 1
 
-    workspace_roots, containers = skill_roots(workspace_agents)
-    codex_selected = manifest(codex_manifest_path) if codex_manifest_path.is_file() else set()
-    claude_selected = manifest(claude_manifest_path) if claude_manifest_path.is_file() else set()
-    hermes_selected = manifest(hermes_manifest_path) if hermes_manifest_path.is_file() else set()
-    selected = codex_selected | claude_selected | hermes_selected
-    missing = sorted(selected - workspace_roots.keys())
-    if missing:
-        print("missing_manifest_entries=" + ",".join(missing))
-        return 1
-
-    # Generated OpenSpec roots are adapter-specific; link each workspace surface
-    # to the matching generated target instead of copying files between adapters.
-    standard_openspec = {name: store_standard / name for name in open_spec_names}
-    claude_openspec = {name: store_claude_skills / name for name in open_spec_names}
-    claude_commands = {path.name: path for path in sorted(store_claude_commands.glob("*.md"))}
-
-    results = {
-        "workspace_agents": reconcile_links(
-            destination=workspace_agents,
-            desired=standard_openspec,
-            managed_target_roots=(store_standard,),
-            check=args.check,
-        ),
-        "user_agents": reconcile_links(
-            destination=user_agents,
-            desired={name: workspace_roots[name] for name in codex_selected},
-            managed_target_roots=(workspace_agents,),
-            check=args.check,
-        ),
-        "workspace_claude_skills": reconcile_links(
-            destination=workspace_claude_skills,
-            desired=claude_openspec,
-            managed_target_roots=(store_claude_skills,),
-            check=args.check,
-        ),
-        "user_claude_skills": reconcile_links(
-            destination=user_claude_skills,
-            desired={
-                **claude_openspec,
-                **{name: workspace_roots[name] for name in claude_selected},
-            },
-            managed_target_roots=(store_claude_skills, workspace_agents),
-            check=args.check,
-        ),
-        "user_hermes_skills": reconcile_links(
-            destination=user_hermes_skills,
-            desired={name: workspace_roots[name] for name in hermes_selected},
-            managed_target_roots=(workspace_agents,),
-            check=args.check,
-            preserve_unlisted_workspace_links=True,
-        ),
-        "workspace_claude_commands": reconcile_links(
-            destination=workspace_claude_commands,
-            desired=claude_commands,
-            managed_target_roots=(store_claude_commands,),
-            check=args.check,
-        ),
-        "user_claude_commands": reconcile_links(
-            destination=user_claude_commands,
-            desired=claude_commands,
-            managed_target_roots=(store_claude_commands,),
-            check=args.check,
-        ),
-    }
-
-    print(
-        f"canonical_direct_roots={len(workspace_roots)} "
-        f"containers={len(containers)} codex_selected={len(codex_selected)} "
-        f"claude_selected={len(claude_selected)} hermes_selected={len(hermes_selected)} "
-        f"openspec_targets={len(open_spec_names)} "
-        f"claude_commands={len(claude_commands)} check={args.check}"
-    )
-    if containers:
-        print("containers=" + ",".join(containers))
-
-    malformed = malformed_entries(workspace_agents)
-    print(f"malformed_entries={len(malformed)}")
-    for finding in malformed:
-        print("malformed_entries.finding=" + finding)
-
-    if not args.check:
-        prune_unallowlisted_skill_surfaces(workspace)
-    surface_violations = check_workspace_agent_surface(workspace)
-    if surface_violations:
-        print("surface_violations=" + ",".join(surface_violations))
-
-    failed = bool(malformed) or bool(surface_violations)
-    for label, result in results.items():
-        print(
-            f"{label}: created={len(result.created)} removed={len(result.removed)} "
-            f"conflicts={len(result.conflicts)} broken={len(result.broken)}"
+    def _execute_sync() -> int:
+        open_spec_names = tuple(
+            sorted(
+                path.name
+                for path in store_standard.glob("openspec-*")
+                if (path / "SKILL.md").is_file()
+            )
         )
-        if result.created:
-            print(f"{label}.created=" + ",".join(result.created))
-        if result.removed:
-            print(f"{label}.removed=" + ",".join(result.removed))
-        if result.conflicts:
-            print(f"{label}.conflicts=" + ",".join(result.conflicts))
-        if result.broken:
-            print(f"{label}.broken=" + ",".join(result.broken))
-        if result.conflicts or result.broken or (args.check and (result.created or result.removed)):
-            failed = True
+        workspace_roots, containers = skill_roots(workspace_agents)
+        codex_selected = manifest(codex_manifest_path) if codex_manifest_path.is_file() else set()
+        claude_selected = (
+            manifest(claude_manifest_path) if claude_manifest_path.is_file() else set()
+        )
+        hermes_selected = (
+            manifest(hermes_manifest_path) if hermes_manifest_path.is_file() else set()
+        )
+        selected = codex_selected | claude_selected | hermes_selected
+        missing = sorted(selected - workspace_roots.keys())
+        if missing:
+            print("missing_manifest_entries=" + ",".join(missing))
+            return 1
 
-    if args.check:
-        current_snap = workspace / ".agents" / ".skill-snapshots" / "current"
-        if (current_snap / "manifest.json").is_file():
-            has_drift, drift_findings, mutated = diff_against_snapshot(workspace, current_snap)
-            print(f"snapshot_check={'failed' if has_drift else 'ok'}")
-            for df in drift_findings:
-                print(f"snapshot_drift={df}")
-            if mutated:
-                print("mutated_skills=" + ",".join(mutated))
-            if has_drift:
+        standard_openspec = {name: store_standard / name for name in open_spec_names}
+        claude_openspec = {name: store_claude_skills / name for name in open_spec_names}
+        claude_commands = (
+            {path.name: path for path in sorted(store_claude_commands.glob("*.md"))}
+            if store_claude_commands.is_dir()
+            else {}
+        )
+
+        results = {
+            "workspace_agents": reconcile_links(
+                destination=workspace_agents,
+                desired=standard_openspec,
+                managed_target_roots=(store_standard,),
+                check=args.check,
+            ),
+            "user_agents": reconcile_links(
+                destination=user_agents,
+                desired={name: workspace_roots[name] for name in codex_selected},
+                managed_target_roots=(workspace_agents,),
+                check=args.check,
+            ),
+            "workspace_claude_skills": reconcile_links(
+                destination=workspace_claude_skills,
+                desired=claude_openspec,
+                managed_target_roots=(store_claude_skills,),
+                check=args.check,
+            ),
+            "user_claude_skills": reconcile_links(
+                destination=user_claude_skills,
+                desired={
+                    **claude_openspec,
+                    **{name: workspace_roots[name] for name in claude_selected},
+                },
+                managed_target_roots=(store_claude_skills, workspace_agents),
+                check=args.check,
+            ),
+            "user_hermes_skills": reconcile_links(
+                destination=user_hermes_skills,
+                desired={name: workspace_roots[name] for name in hermes_selected},
+                managed_target_roots=(workspace_agents,),
+                check=args.check,
+                preserve_unlisted_workspace_links=True,
+            ),
+            "workspace_claude_commands": reconcile_links(
+                destination=workspace_claude_commands,
+                desired=claude_commands,
+                managed_target_roots=(store_claude_commands,),
+                check=args.check,
+            ),
+            "user_claude_commands": reconcile_links(
+                destination=user_claude_commands,
+                desired=claude_commands,
+                managed_target_roots=(store_claude_commands,),
+                check=args.check,
+            ),
+        }
+
+        print(
+            f"canonical_direct_roots={len(workspace_roots)} "
+            f"containers={len(containers)} codex_selected={len(codex_selected)} "
+            f"claude_selected={len(claude_selected)} hermes_selected={len(hermes_selected)} "
+            f"openspec_targets={len(open_spec_names)} "
+            f"claude_commands={len(claude_commands)} check={args.check}"
+        )
+        if containers:
+            print("containers=" + ",".join(containers))
+
+        malformed = malformed_entries(workspace_agents)
+        print(f"malformed_entries={len(malformed)}")
+        for finding in malformed:
+            print("malformed_entries.finding=" + finding)
+
+        if not args.check:
+            prune_unallowlisted_skill_surfaces(workspace)
+        surface_violations = check_workspace_agent_surface(workspace)
+        if surface_violations:
+            print("surface_violations=" + ",".join(surface_violations))
+
+        failed = bool(malformed) or bool(surface_violations)
+        if args.check and not parity_ok:
+            failed = True
+        for label, result in results.items():
+            print(
+                f"{label}: created={len(result.created)} removed={len(result.removed)} "
+                f"conflicts={len(result.conflicts)} broken={len(result.broken)}"
+            )
+            if result.created:
+                print(f"{label}.created=" + ",".join(result.created))
+            if result.removed:
+                print(f"{label}.removed=" + ",".join(result.removed))
+            if result.conflicts:
+                print(f"{label}.conflicts=" + ",".join(result.conflicts))
+            if result.broken:
+                print(f"{label}.broken=" + ",".join(result.broken))
+            if (
+                result.conflicts
+                or result.broken
+                or (args.check and (result.created or result.removed))
+            ):
                 failed = True
 
-    return 1 if failed else 0
+        if args.check:
+            current_snap = workspace / ".agents" / ".skill-snapshots" / "current"
+            if (current_snap / "manifest.json").is_file():
+                has_drift, drift_findings, mutated = diff_against_snapshot(workspace, current_snap)
+                print(f"snapshot_check={'failed' if has_drift else 'ok'}")
+                for df in drift_findings:
+                    print(f"snapshot_drift={df}")
+                if mutated:
+                    print("mutated_skills=" + ",".join(mutated))
+                if has_drift:
+                    failed = True
+
+        return 1 if failed else 0
+
+    parity_findings: list[str] = []
+    parity_ok = True
+    if args.check:
+        parity_ok, parity_findings = reconcile_openspec_generator_parity(
+            store,
+            check=True,
+            openspec_bin=args.openspec_bin,
+            config_path=args.openspec_config,
+        )
+        if not parity_ok:
+            for pf in parity_findings:
+                print(f"openspec_generator_parity.finding={pf}")
+        return _execute_sync()
+    else:
+        lock_path = args.sync_lock if args.sync_lock else OPENSPEC_SYNC_LOCK
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(lock_path, "a+") as lock_fh:
+            with contextlib.suppress(OSError):
+                os.chmod(lock_path, 0o600)
+            fcntl.flock(lock_fh.fileno(), fcntl.LOCK_EX)
+            try:
+                parity_ok, parity_findings = reconcile_openspec_generator_parity(
+                    store,
+                    check=False,
+                    openspec_bin=args.openspec_bin,
+                    config_path=args.openspec_config,
+                )
+                if not parity_ok:
+                    for pf in parity_findings:
+                        print(f"openspec_generator_parity.error={pf}")
+                    return 1
+                return _execute_sync()
+            finally:
+                with contextlib.suppress(OSError):
+                    fcntl.flock(lock_fh.fileno(), fcntl.LOCK_UN)
 
 
 if __name__ == "__main__":

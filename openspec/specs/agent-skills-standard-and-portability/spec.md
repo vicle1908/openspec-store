@@ -51,7 +51,7 @@ Every skill instruction body, script, and reference document SHALL resolve files
 - **THEN** the portability audit SHALL flag the file and line number as a non-portable defect
 
 ### Requirement: Progressive disclosure layout and size boundaries
-Skills SHALL follow the 3-tier progressive disclosure model: Tier 1 (name and description), Tier 2 (`SKILL.md` body, <= 500 lines), and Tier 3 (on-demand `references/`, `scripts/`, `assets/`). Locally authored skills exceeding 500 lines SHALL factor secondary documentation, schemas, and walkthroughs into `references/` or `assets/` with conditional triggers in `SKILL.md`. Upstream vendor skills tracked in `skills-lock.json` SHALL remain exempt from local file splitting.
+Locally authored skills SHALL keep `SKILL.md` <= 500 lines by factoring deep material into conditional `references/` or `assets/`. Upstream vendor skills in `skills-lock.json` and CLI-generated skills declaring `metadata.author: openspec` with `metadata.generatedBy` SHALL remain exempt from local splitting so `skills update -y` and `openspec update` stay idempotent.
 
 #### Scenario: Lean skill body delegates deep references to secondary files
 - **WHEN** a locally authored skill defines extensive domain documentation or schema catalogs
@@ -63,11 +63,15 @@ Skills SHALL follow the 3-tier progressive disclosure model: Tier 1 (name and de
 - **THEN** the file SHALL NOT be split into local reference files
 - **AND** its upstream layout and provenance hash SHALL remain tracked without divergence
 
-#### Scenario: Locally authored skill body stays within size budget
-- **WHEN** validating locally authored skills in `~/Developer/.agents/skills/` or `openspec-store`
-- **THEN** every local `SKILL.md` body SHALL NOT exceed 500 lines
-- **AND** detailed guides and templates SHALL be located in `references/` or `assets/`
+#### Scenario: Generator-owned OpenSpec workflow skill remains unsplit for idempotent updates
+- **WHEN** `openspec update` generates an OpenSpec workflow skill (such as `openspec-onboard/SKILL.md`) declaring `metadata.author: openspec` and `metadata.generatedBy` that exceeds 500 lines
+- **THEN** the generated `SKILL.md` SHALL remain intact as emitted by the OpenSpec CLI without manual local `references/` splitting
+- **AND** re-running `openspec update` at the same CLI version SHALL produce zero Git diff and leave zero orphaned split files
 
+#### Scenario: Locally authored skill body stays within size budget
+- **WHEN** validating locally authored non-generated skills in `~/Developer/.agents/skills/` or `openspec-store`
+- **THEN** every locally authored `SKILL.md` body SHALL NOT exceed 500 lines
+- **AND** detailed guides and templates SHALL be located in `references/` or `assets/`
 ### Requirement: Automated specification conformance and lockfile integrity gate
 
 The workspace skill maintenance tooling (`platform/openspec-store/scripts/sync-workspace-agent-skills.py --check`) SHALL assert that all discoverable skills comply with the Agent Skills specification schema, directory-name matching, description byte limits, zero-hardcoded-path portability rules, and content-addressed hash integrity in `skills-lock.json`.

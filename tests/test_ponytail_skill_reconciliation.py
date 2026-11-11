@@ -510,5 +510,413 @@ class TestHermesAndSnapshotLifecycleInTmpPath(unittest.TestCase):
         assert sync_mod._skill_entry_violations(ponytail_dir) == []
 
 
+class TestOpenSpecSkillsDeliveryAndGeneratorParity(unittest.TestCase):
+    """Verify OpenSpec 1.17+ skills delivery, claude_commands=0 pruning, and generator parity."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        self.workspace = self.root / "workspace"
+        self.store = self.root / "store"
+        self.home = self.root / "home"
+
+        (self.workspace / ".agents" / "skills").mkdir(parents=True)
+        (self.workspace / ".claude" / "skills").mkdir(parents=True)
+        (self.workspace / ".claude" / "commands" / "opsx").mkdir(parents=True)
+        (self.workspace / ".hermes" / "skills").mkdir(parents=True)
+        (self.workspace / ".codex" / "skills" / ".system").mkdir(parents=True)
+
+        (self.store / ".agents" / "skills" / "openspec-explore").mkdir(parents=True)
+        (self.store / ".agents" / "skills" / "openspec-explore" / "SKILL.md").write_text(
+            "---\nname: openspec-explore\ndescription: Use to explore OpenSpec ideas.\n---\n",
+            encoding="utf-8",
+        )
+        (self.store / ".claude" / "skills" / "openspec-explore").mkdir(parents=True)
+        (self.store / ".claude" / "skills" / "openspec-explore" / "SKILL.md").write_text(
+            "---\nname: openspec-explore\ndescription: Use to explore OpenSpec ideas.\n---\n",
+            encoding="utf-8",
+        )
+
+        (self.store / "config").mkdir(parents=True)
+        (self.workspace / "skills-lock.json").write_text(
+            json.dumps({"version": 1, "skills": {}}, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        (self.store / "config" / "codex-user-skill-manifest.txt").write_text("\n", encoding="utf-8")
+        (self.store / "config" / "claude-user-skill-manifest.txt").write_text(
+            "\n", encoding="utf-8"
+        )
+        (self.store / "config" / "hermes-user-skill-manifest.txt").write_text(
+            "\n", encoding="utf-8"
+        )
+
+        self.mock_lock = self.root / "sync.lock"
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def _cli_args(self, *extra: str) -> list[str]:
+        return [
+            "--workspace-root",
+            str(self.workspace),
+            "--store-root",
+            str(self.store),
+            "--home-dir",
+            str(self.home),
+            "--sync-lock",
+            str(self.mock_lock),
+            *extra,
+        ]
+
+    def test_claude_commands_retired_pruning_and_directory_cleanup(self):
+        ws_opsx = self.workspace / ".claude" / "commands" / "opsx"
+        user_opsx = self.home / ".claude" / "commands" / "opsx"
+        user_opsx.mkdir(parents=True)
+
+        # 1. Broken managed symlinks whose target in store/.claude/commands/opsx was deleted
+        dead_explore_target = self.store / ".claude" / "commands" / "opsx" / "explore.md"
+        dead_apply_target = self.store / ".claude" / "commands" / "opsx" / "apply.md"
+
+        (ws_opsx / "explore.md").symlink_to(dead_explore_target)
+        (ws_opsx / "apply.md").symlink_to(dead_apply_target)
+        (user_opsx / "explore.md").symlink_to(dead_explore_target)
+
+        # 2. Non-managed user markdown command file in workspace opsx
+        user_custom = ws_opsx / "custom-user-command.md"
+        user_custom.write_text("# Custom User Command\n", encoding="utf-8")
+
+        # --check verifies that broken managed symlinks are identified as removed, NOT broken
+        res = sync_mod.reconcile_links(
+            destination=ws_opsx,
+            desired={},
+            managed_target_roots=(self.store / ".claude" / "commands" / "opsx",),
+            check=True,
+        )
+        assert set(res.removed) == {"explore.md", "apply.md"}
+        assert res.broken == []
+        assert res.conflicts == []
+        assert user_custom.is_file()
+
+        # In main --check, removals cause rc=1
+        assert sync_mod.main(self._cli_args("--check")) == 1
+
+        # Running normal sync prunes managed symlinks, keeps user file, and preserves ws_opsx
+        assert sync_mod.main(self._cli_args()) == 0
+        assert not (ws_opsx / "explore.md").exists()
+        assert not (ws_opsx / "apply.md").exists()
+        assert user_custom.is_file()
+        assert ws_opsx.is_dir()
+
+        # In user home (where no unmanaged files exist), commands/opsx was completely pruned
+        assert not user_opsx.exists()
+        assert not (self.home / ".claude" / "commands").exists()
+        assert (self.home / ".claude").is_dir()
+
+        # Removing user_custom and running sync removes ws_opsx and commands
+        user_custom.unlink()
+        assert sync_mod.main(self._cli_args()) == 0
+        assert not ws_opsx.exists()
+        assert not (self.workspace / ".claude" / "commands").exists()
+        assert (self.workspace / ".claude").is_dir()
+
+        # Subsequent --check exits 0 with 0 missing-destination conflicts
+        assert sync_mod.main(self._cli_args("--check")) == 0
+
+    def test_reconcile_openspec_generator_parity_drift_detection_and_reconciliation(self):
+        explore_fm = (
+            "---\n"
+            "name: openspec-explore\n"
+            "description: Explore mode.\n"
+            "metadata:\n"
+            "  author: openspec\n"
+            '  generatedBy: "1.12.0"\n'
+            "---\n"
+        )
+        (self.store / ".agents" / "skills" / "openspec-explore" / "SKILL.md").write_text(
+            explore_fm, encoding="utf-8"
+        )
+        (self.store / ".claude" / "skills" / "openspec-explore" / "SKILL.md").write_text(
+            explore_fm, encoding="utf-8"
+        )
+
+        mock_bin = self.root / "mock_openspec"
+        mock_script = f"""#!{sys.executable}
+import sys
+from pathlib import Path
+
+args = sys.argv[1:]
+if not args:
+    sys.exit(1)
+if args[0] == "--version":
+    print("1.17.0")
+    sys.exit(0)
+if args[0] == "update":
+    store = Path(args[1])
+    for sdir in (store / ".agents" / "skills").glob("openspec-*"):
+        md = sdir / "SKILL.md"
+        if md.is_file():
+            text = md.read_text(encoding="utf-8")
+            md.write_text(text.replace('"1.12.0"', '"1.17.0"'), encoding="utf-8")
+    for sdir in (store / ".claude" / "skills").glob("openspec-*"):
+        md = sdir / "SKILL.md"
+        if md.is_file():
+            text = md.read_text(encoding="utf-8")
+            md.write_text(text.replace('"1.12.0"', '"1.17.0"'), encoding="utf-8")
+    cmds = store / ".claude" / "commands" / "opsx"
+    if cmds.is_dir():
+        for f in cmds.glob("*.md"):
+            f.unlink()
+    sys.exit(0)
+sys.exit(1)
+"""
+        mock_bin.write_text(mock_script, encoding="utf-8")
+        mock_bin.chmod(0o755)
+
+        mock_config = self.root / "openspec-config.json"
+        mock_config.write_text(json.dumps({"delivery": "skills"}), encoding="utf-8")
+
+        # 1. reconcile_openspec_generator_parity check=True detects drift without mutating disk
+        ok, findings = sync_mod.reconcile_openspec_generator_parity(
+            self.store,
+            check=True,
+            openspec_bin=str(mock_bin),
+            config_path=mock_config,
+        )
+        assert not ok
+        assert any("openspec-generator-drift:cli=1.17.0" in f for f in findings)
+        assert '"1.12.0"' in (
+            self.store / ".agents" / "skills" / "openspec-explore" / "SKILL.md"
+        ).read_text(encoding="utf-8")
+
+        # In main --check, drift causes exit code 1
+        assert (
+            sync_mod.main(
+                self._cli_args(
+                    "--check",
+                    "--openspec-bin",
+                    str(mock_bin),
+                    "--openspec-config",
+                    str(mock_config),
+                )
+            )
+            == 1
+        )
+
+        # 2. Normal sync reconciles skills to 1.17.0 under lock
+        assert (
+            sync_mod.main(
+                self._cli_args(
+                    "--openspec-bin",
+                    str(mock_bin),
+                    "--openspec-config",
+                    str(mock_config),
+                )
+            )
+            == 0
+        )
+        assert '"1.17.0"' in (
+            self.store / ".agents" / "skills" / "openspec-explore" / "SKILL.md"
+        ).read_text(encoding="utf-8")
+        assert '"1.17.0"' in (
+            self.store / ".claude" / "skills" / "openspec-explore" / "SKILL.md"
+        ).read_text(encoding="utf-8")
+
+        # 3. Subsequent --check passes with rc=0
+        assert (
+            sync_mod.main(
+                self._cli_args(
+                    "--check",
+                    "--openspec-bin",
+                    str(mock_bin),
+                    "--openspec-config",
+                    str(mock_config),
+                )
+            )
+            == 0
+        )
+
+    def test_openspec_generator_parity_skipped_when_disabled(self):
+        explore_fm = (
+            "---\n"
+            "name: openspec-explore\n"
+            "description: Explore mode.\n"
+            "metadata:\n"
+            "  author: openspec\n"
+            '  generatedBy: "1.12.0"\n'
+            "---\n"
+        )
+        (self.store / ".agents" / "skills" / "openspec-explore" / "SKILL.md").write_text(
+            explore_fm, encoding="utf-8"
+        )
+        (self.store / ".claude" / "skills" / "openspec-explore" / "SKILL.md").write_text(
+            explore_fm, encoding="utf-8"
+        )
+
+        mock_bin = self.root / "mock_openspec"
+        mock_script = f"""#!{sys.executable}
+import sys
+args = sys.argv[1:]
+if args and args[0] == "--version":
+    print("1.17.0")
+    sys.exit(0)
+sys.exit(1)
+"""
+        mock_bin.write_text(mock_script, encoding="utf-8")
+        mock_bin.chmod(0o755)
+
+        old_env = os.environ.get("DISABLE_UPDATES")
+        try:
+            os.environ["DISABLE_UPDATES"] = "1"
+            ok, findings = sync_mod.reconcile_openspec_generator_parity(
+                self.store,
+                check=False,
+                openspec_bin=str(mock_bin),
+            )
+            assert ok
+            assert findings == []
+            assert '"1.12.0"' in (
+                self.store / ".agents" / "skills" / "openspec-explore" / "SKILL.md"
+            ).read_text(encoding="utf-8")
+        finally:
+            if old_env is None:
+                os.environ.pop("DISABLE_UPDATES", None)
+            else:
+                os.environ["DISABLE_UPDATES"] = old_env
+
+    def test_openspec_delivery_mismatch_and_update_failures(self):
+        explore_fm = (
+            "---\n"
+            "name: openspec-explore\n"
+            "description: Explore mode.\n"
+            "metadata:\n"
+            "  author: openspec\n"
+            '  generatedBy: "1.12.0"\n'
+            "---\n"
+        )
+        (self.store / ".agents" / "skills" / "openspec-explore" / "SKILL.md").write_text(
+            explore_fm, encoding="utf-8"
+        )
+        (self.store / ".claude" / "skills" / "openspec-explore" / "SKILL.md").write_text(
+            explore_fm, encoding="utf-8"
+        )
+
+        mock_bin = self.root / "mock_openspec"
+        mock_script = f"""#!{sys.executable}
+import sys
+args = sys.argv[1:]
+if args and args[0] == "--version":
+    print("1.17.0")
+    sys.exit(0)
+if args and args[0] == "update":
+    sys.exit(2)
+sys.exit(1)
+"""
+        mock_bin.write_text(mock_script, encoding="utf-8")
+        mock_bin.chmod(0o755)
+
+        # 1. Delivery mismatch fails before update
+        bad_config = self.root / "bad-config.json"
+        bad_config.write_text(json.dumps({"delivery": "commands"}), encoding="utf-8")
+        ok, findings = sync_mod.reconcile_openspec_generator_parity(
+            self.store,
+            check=False,
+            openspec_bin=str(mock_bin),
+            config_path=bad_config,
+        )
+        assert not ok
+        assert findings == ["openspec-delivery-mismatch:commands"]
+
+        # 2. Update failure reported
+        good_config = self.root / "good-config.json"
+        good_config.write_text(json.dumps({"delivery": "skills"}), encoding="utf-8")
+        ok, findings = sync_mod.reconcile_openspec_generator_parity(
+            self.store,
+            check=False,
+            openspec_bin=str(mock_bin),
+            config_path=good_config,
+        )
+        assert not ok
+        assert findings == ["openspec-update-failed:rc=2"]
+
+        # 3. Update incomplete when command files remain unpruned
+        incomplete_bin = self.root / "incomplete_openspec"
+        inc_script = f"""#!{sys.executable}
+import sys
+from pathlib import Path
+args = sys.argv[1:]
+if args and args[0] == "--version":
+    print("1.17.0")
+    sys.exit(0)
+if args and args[0] == "update":
+    store = Path(args[1])
+    for sdir in (store / ".agents" / "skills").glob("openspec-*"):
+        md = sdir / "SKILL.md"
+        if md.is_file():
+            text = md.read_text(encoding="utf-8")
+            md.write_text(text.replace('"1.12.0"', '"1.17.0"'), encoding="utf-8")
+    for sdir in (store / ".claude" / "skills").glob("openspec-*"):
+        md = sdir / "SKILL.md"
+        if md.is_file():
+            text = md.read_text(encoding="utf-8")
+            md.write_text(text.replace('"1.12.0"', '"1.17.0"'), encoding="utf-8")
+    cmds = store / ".claude" / "commands" / "opsx"
+    cmds.mkdir(parents=True, exist_ok=True)
+    (cmds / "stale.md").write_text("# Stale\\n", encoding="utf-8")
+    sys.exit(0)
+sys.exit(1)
+"""
+        incomplete_bin.write_text(inc_script, encoding="utf-8")
+        incomplete_bin.chmod(0o755)
+
+        ok, findings = sync_mod.reconcile_openspec_generator_parity(
+            self.store,
+            check=False,
+            openspec_bin=str(incomplete_bin),
+            config_path=good_config,
+        )
+        assert not ok
+        assert findings == ["openspec-update-incomplete:commands-not-pruned:.claude/commands/opsx"]
+
+    def test_zero_metadata_generated_by_guard(self):
+        assert sync_mod.reconcile_openspec_generator_parity(self.store, check=True) == (True, [])
+        assert sync_mod.reconcile_openspec_generator_parity(self.store, check=False) == (True, [])
+
+    def test_missing_generator_version_detected_as_drift(self):
+        explore_fm = (
+            "---\n"
+            "name: openspec-explore\n"
+            "description: Explore mode.\n"
+            "metadata:\n"
+            "  author: openspec\n"
+            "---\n"
+        )
+        (self.store / ".agents" / "skills" / "openspec-explore" / "SKILL.md").write_text(
+            explore_fm, encoding="utf-8"
+        )
+        (self.store / ".claude" / "skills" / "openspec-explore" / "SKILL.md").write_text(
+            explore_fm, encoding="utf-8"
+        )
+
+        mock_bin = self.root / "mock_openspec"
+        mock_script = f"""#!{sys.executable}
+import sys
+args = sys.argv[1:]
+if args and args[0] == "--version":
+    print("1.17.0")
+    sys.exit(0)
+sys.exit(1)
+"""
+        mock_bin.write_text(mock_script, encoding="utf-8")
+        mock_bin.chmod(0o755)
+
+        ok, findings = sync_mod.reconcile_openspec_generator_parity(
+            self.store,
+            check=True,
+            openspec_bin=str(mock_bin),
+        )
+        assert not ok
+        assert findings == ["openspec-generator-drift:cli=1.17.0,skills=['missing']"]
+
+
 if __name__ == "__main__":
     unittest.main()
