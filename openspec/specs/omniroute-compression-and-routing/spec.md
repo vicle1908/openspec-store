@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Defines the operational behavior, token compression rules, combo routing resilience invariants, thinking-budget passthrough policy, and feature-flag baseline for the OmniRoute AI gateway (`v3.8.52`) when serving multi-turn coding agents over loopback interfaces.
+Defines the operational behavior, token compression rules, combo routing resilience invariants, thinking-budget passthrough policy, and feature-flag baseline for the OmniRoute AI gateway (`v3.8.53+`) when serving multi-turn coding agents over loopback interfaces.
 
 ## Requirements
 
