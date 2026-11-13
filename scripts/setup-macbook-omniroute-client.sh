@@ -163,6 +163,11 @@ with urllib.request.urlopen(req, timeout=10) as resp:
     model_ids = {m.get("id") for m in data.get("data", [])}
     count = len(model_ids)
     required_combos = [
+        "gemini-4-hydrogen",
+        "gemini-4-hydrogen-xhigh",
+        "gemini-4-hydrogen-high",
+        "gemini-4-hydrogen-medium",
+        "gemini-4-hydrogen-low",
         "gemini-4-carbon",
         "gemini-4-carbon-high",
         "gemini-4-carbon-medium",
@@ -179,9 +184,9 @@ with urllib.request.urlopen(req, timeout=10) as resp:
         "muse-spark-1.3",
     ]
     missing_combos = [c for c in required_combos if c not in model_ids]
-    if resp.status != 200 or count < 14 or missing_combos:
+    if resp.status != 200 or count < 19 or missing_combos:
         sys.exit(f"ERROR: /v1/models status={resp.status}, count={count}, missing={missing_combos}")
-    print(f"[omniroute-client] Verified http://{host}:20128/v1/models -> HTTP 200 ({count} models, all 14 required combos present).")
+    print(f"[omniroute-client] Verified http://{host}:20128/v1/models -> HTTP 200 ({count} models, all 19 required combos present).")
 
 req_20129 = urllib.request.Request(f"http://{host}:20129/v1/models", headers={"Authorization": f"Bearer {key}"})
 with urllib.request.urlopen(req_20129, timeout=10) as resp2:
