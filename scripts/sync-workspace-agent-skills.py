@@ -13,6 +13,7 @@ directories are preserved; only links owned by this script are reconciled.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import fcntl
 import hashlib
 import json
@@ -20,16 +21,10 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 from dataclasses import dataclass
-
-try:
-    from datetime import UTC, datetime
-except ImportError:
-    from datetime import datetime
-
-    UTC = UTC
-import contextlib
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -68,10 +63,6 @@ PONYTAIL_SKILLS = (
     "ponytail-review",
 )
 HEX40_RE = re.compile(r"^[0-9a-f]{40}$")
-
-OPEN_SPEC_NAMES = tuple(
-    sorted(path.name for path in STORE_STANDARD.glob("openspec-*") if (path / "SKILL.md").is_file())
-)
 
 
 @dataclass
@@ -410,9 +401,12 @@ def reconcile_links(
         if not path.is_symlink():
             continue
         is_broken = not path.exists()
-        target = Path(os.path.realpath(path))
-        if not _is_managed(target):
+        raw = Path(os.path.normpath(path.parent / path.readlink()))
+        immediate_target = raw.parent.resolve() / raw.name
+        resolved_target = Path(os.path.realpath(path))
+        if not (_is_managed(immediate_target) or _is_managed(resolved_target)):
             continue
+        target = resolved_target
         expected = desired.get(path.name)
         if expected is None:
             if (
@@ -571,7 +565,7 @@ def load_lockfile(lock_path: Path) -> tuple[dict[str, Any] | None, list[str]]:
         return None, [f"invalid-lockfile-json:{lock_path}:{exc}"]
     if (
         not isinstance(data, dict)
-        or data.get("version") != 1
+        or data.get("version") not in (1, 2)
         or not isinstance(data.get("skills"), dict)
     ):
         return None, [f"invalid-lockfile-schema:{lock_path}"]
@@ -899,16 +893,11 @@ def extract_skill_metadata(skill_md_path: Path) -> dict[str, str]:
     return metadata
 
 
-OPENSPEC_ADAPTER_SKILL_TREES: tuple[str, ...] = (
-    ".agents/skills",
-    ".claude/skills",
-    ".factory/skills",
-    ".junie/skills",
-    ".kilocode/skills",
-    ".kiro/skills",
-    ".pi/skills",
-    ".qoder/skills",
-)
+OWN_FILES_SKILL_DIRS: dict[str, str] = {
+    "claude": ".claude/skills",
+    "kiro": ".kiro/skills",
+    "hermes": ".hermes/skills",
+}
 
 OPENSPEC_RETIRED_COMMAND_DIRS: tuple[str, ...] = (
     ".agents/workflows",
@@ -922,30 +911,171 @@ OPENSPEC_RETIRED_COMMAND_DIRS: tuple[str, ...] = (
 )
 
 
-def _inspect_adapter_skill_trees(store: Path) -> tuple[bool, list[str]]:
-    """Scan active adapter skill trees, verify skill-set consistency across trees, and extract generator versions."""
-    active_trees: list[tuple[str, list[Path]]] = []
-    for rel in OPENSPEC_ADAPTER_SKILL_TREES:
-        tdir = store / rel
-        if tdir.is_dir():
-            skills = sorted(p for p in tdir.glob("openspec-*") if (p / "SKILL.md").is_file())
-            if skills:
-                active_trees.append((rel, skills))
+def _build_openspec_subprocess_env(home: Path | None, config_path: Path | None) -> dict[str, str]:
+    env = dict(os.environ)
+    if home is not None:
+        env["HOME"] = str(home)
+    if config_path is not None:
+        env["XDG_CONFIG_HOME"] = str(config_path.parent.parent)
+    return env
 
-    if not active_trees:
-        return True, []
 
-    found_versions: list[str] = []
-    for _, skills in active_trees:
-        for sdir in skills:
-            meta = extract_skill_metadata(sdir / "SKILL.md")
-            if meta.get("author") == "openspec" or "generatedBy" in meta:
-                gen = meta.get("generatedBy")
-                found_versions.append(gen or "missing")
+def _parse_cli_major(cli_version: str) -> int:
+    match = re.match(r"^v?(\d+)", cli_version.strip())
+    return int(match.group(1)) if match else 0
 
-    reference_names = {p.name for p in active_trees[0][1]}
-    trees_match = all({p.name for p in skills} == reference_names for _, skills in active_trees)
-    return trees_match, found_versions
+
+def _inspect_shared_skill_layout(store: Path, cli_version: str) -> list[str]:
+    """Inspect OpenSpec 2.0 shared canonical skill layout, own-files links, and retired host copies."""
+    reasons: list[str] = []
+    target_file = store / ".agents" / "skills" / ".openspec-target"
+    canonical_dir = store / ".agents" / "skills"
+    cli_major = _parse_cli_major(cli_version)
+
+    kept_skills: set[str] = set()
+    own_files_tools: set[str] = set()
+
+    if cli_major >= 2:
+        if not target_file.is_file():
+            reasons.append("openspec-missing-target-list")
+        else:
+            for raw_line in target_file.read_text(encoding="utf-8").splitlines():
+                line = raw_line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split()
+                if len(parts) == 2 and parts[0] == "keep" and parts[1].startswith("openspec-"):
+                    kept_skills.add(parts[1])
+                elif (
+                    len(parts) == 2
+                    and parts[1] == "own-files"
+                    and parts[0] not in {"keep", "own-files"}
+                ):
+                    own_files_tools.add(parts[0])
+                elif len(parts) == 1 and parts[0] not in {"keep", "own-files"}:
+                    pass
+                else:
+                    reasons.append(f"openspec-invalid-target-line:{line}")
+            if "claude" not in own_files_tools:
+                reasons.append("openspec-missing-claude-own-files")
+
+    canonical_skills: list[str] = []
+    found_versions: set[str] = set()
+    if canonical_dir.is_dir():
+        for entry in sorted(canonical_dir.glob("openspec-*")):
+            skill = entry.name
+            if skill in kept_skills:
+                if not entry.exists():
+                    reasons.append(f"openspec-missing-kept-skill:{skill}")
+                continue
+            if entry.is_symlink():
+                reasons.append(f"openspec-canonical-symlink:{skill}")
+                continue
+            if not entry.is_dir():
+                continue
+            skill_md = entry / "SKILL.md"
+            if not skill_md.is_file() or skill_md.is_symlink():
+                reasons.append(f"openspec-missing-skill-md:{skill}")
+                continue
+            canonical_skills.append(skill)
+            extra_mds = [p.name for p in sorted(entry.glob("*.md")) if p.name != "SKILL.md"]
+            if extra_mds:
+                reasons.append(f"openspec-unexpected-split-files:{skill}")
+            meta = extract_skill_metadata(skill_md)
+            gen = meta.get("generatedBy", "").strip()
+            if not gen:
+                reasons.append(f"openspec-missing-generatedBy:{skill}")
+            else:
+                found_versions.add(gen)
+
+    if not canonical_skills and not kept_skills:
+        reasons.append("openspec-missing-canonical-skills")
+    elif found_versions and found_versions != {cli_version}:
+        reasons.append(
+            f"openspec-version-drift:cli={cli_version},skills={','.join(sorted(found_versions))}"
+        )
+
+    canonical_set = set(canonical_skills)
+    for tool in sorted(own_files_tools):
+        rel_dir = OWN_FILES_SKILL_DIRS.get(tool, f".{tool}/skills")
+        tool_dir = store / rel_dir
+        for skill in canonical_skills:
+            entry = tool_dir / skill
+            expected_target = (canonical_dir / skill).resolve()
+            is_valid_rel_symlink = (
+                entry.is_symlink()
+                and not entry.readlink().is_absolute()
+                and entry.exists()
+                and Path(os.path.realpath(entry)) == expected_target
+            )
+            if not is_valid_rel_symlink:
+                reasons.append(f"openspec-broken-own-files-link:{tool}/{skill}")
+        if tool_dir.is_dir():
+            for entry in sorted(tool_dir.glob("openspec-*")):
+                if entry.name in kept_skills:
+                    if not entry.exists():
+                        reasons.append(f"openspec-broken-own-files-link:{tool}/{entry.name}")
+                elif entry.name not in canonical_set:
+                    reasons.append(f"openspec-stale-own-files-entry:{tool}/{entry.name}")
+
+    declared_own_files_rel_dirs = {
+        OWN_FILES_SKILL_DIRS.get(tool, f".{tool}/skills") for tool in own_files_tools
+    }
+    for dot_dir in sorted(store.glob(".*")):
+        if not dot_dir.is_dir() or dot_dir.name in {".agents", ".git"}:
+            continue
+        rel_skills_dir = f"{dot_dir.name}/skills"
+        if rel_skills_dir in declared_own_files_rel_dirs:
+            continue
+        skills_dir = dot_dir / "skills"
+        if skills_dir.is_dir():
+            for entry in sorted(skills_dir.glob("openspec-*")):
+                reasons.append(f"openspec-retired-host-copy:{dot_dir.name}/skills/{entry.name}")
+
+    for cdir in OPENSPEC_RETIRED_COMMAND_DIRS:
+        target_dir = store / cdir
+        if target_dir.is_dir() and any(target_dir.glob("*.md")):
+            reasons.append(f"openspec-retired-command-present:{cdir}")
+
+    return reasons
+
+
+def _verify_openspec_dry_run_clean(exe: str, store: Path, env: dict[str, str]) -> list[str]:
+    try:
+        proc = subprocess.run(
+            [exe, "update", "--dry-run", "--json", str(store)],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=30,
+            env=env,
+        )
+    except OSError as err:
+        return [f"openspec-dry-run-failed:oserror:{err}"]
+    except subprocess.TimeoutExpired:
+        return ["openspec-dry-run-failed:timeout"]
+
+    if proc.returncode != 0:
+        detail = (proc.stderr or proc.stdout).strip()
+        return [f"openspec-dry-run-failed:rc={proc.returncode}:{detail}"]
+
+    try:
+        data = json.loads(proc.stdout)
+    except json.JSONDecodeError as err:
+        return [f"openspec-dry-run-failed:invalid-json:{err}"]
+
+    if not isinstance(data, dict):
+        return ["openspec-dry-run-failed:invalid-json:expected-object"]
+
+    changes = data.get("changes", [])
+    notes = data.get("notes", [])
+    failures = data.get("failures", [])
+    if changes or notes or failures:
+        payload = json.dumps({"changes": changes, "notes": notes, "failures": failures})
+        return [
+            f"openspec-dry-run-drift:changes={len(changes)},notes={len(notes)},failures={len(failures)}:{payload}"
+        ]
+    return []
 
 
 def reconcile_openspec_generator_parity(
@@ -954,18 +1084,38 @@ def reconcile_openspec_generator_parity(
     check: bool,
     openspec_bin: str | None = None,
     config_path: Path | None = None,
+    home: Path | None = None,
 ) -> tuple[bool, list[str]]:
-    """Verify and reconcile parity between OpenSpec CLI version and skill metadata.generatedBy."""
-    trees_match, found_versions = _inspect_adapter_skill_trees(store)
-    # Important test-compatibility guard: if zero skills declare metadata.generatedBy,
-    # return (True, []) so minimal synthetic unit-test fixtures remain 100% isolated.
-    if not found_versions:
+    """Verify and reconcile parity between OpenSpec CLI version and shared skill layout."""
+    target_file = store / ".agents" / "skills" / ".openspec-target"
+    canonical_dir = store / ".agents" / "skills"
+    has_openspec_metadata = False
+    if canonical_dir.is_dir():
+        for sdir in sorted(canonical_dir.glob("openspec-*")):
+            skill_md = sdir / "SKILL.md"
+            if skill_md.is_file():
+                meta = extract_skill_metadata(skill_md)
+                if meta.get("author") == "openspec" or "generatedBy" in meta:
+                    has_openspec_metadata = True
+                    break
+    # Important test-compatibility guard: if .openspec-target is absent and zero
+    # openspec-*/SKILL.md files declare openspec metadata, return (True, []) so
+    # minimal synthetic unit-test fixtures remain isolated.
+    if not target_file.exists() and not has_openspec_metadata:
         return True, []
+
+    if config_path is not None and (
+        config_path.name != "config.json" or config_path.parent.name != "openspec"
+    ):
+        msg = f"openspec-invalid-config-path:{config_path}"
+        print(f"openspec_generator_parity=failed reasons={msg}", file=sys.stderr)
+        return False, [msg]
 
     exe = openspec_bin or shutil.which("openspec")
     if not exe:
         return True, []
 
+    env = _build_openspec_subprocess_env(home, config_path)
     try:
         proc = subprocess.run(
             [exe, "--version"],
@@ -973,6 +1123,7 @@ def reconcile_openspec_generator_parity(
             text=True,
             timeout=15,
             check=False,
+            env=env,
         )
     except OSError as err:
         return False, [f"openspec-version-error:{err}"]
@@ -983,30 +1134,34 @@ def reconcile_openspec_generator_parity(
         return False, [f"openspec-version-error:rc={proc.returncode}"]
 
     cli_version = proc.stdout.strip().splitlines()[0].strip()
+    layout_drift = _inspect_shared_skill_layout(store, cli_version)
 
-    if trees_match and all(v == cli_version for v in found_versions):
+    if check:
+        if layout_drift:
+            print(
+                f"openspec_generator_parity=drift cli={cli_version} reasons={','.join(layout_drift)}",
+                file=sys.stderr,
+            )
+            return False, layout_drift
+        dry_run_drift = _verify_openspec_dry_run_clean(exe, store, env)
+        if dry_run_drift:
+            print(
+                f"openspec_generator_parity=drift cli={cli_version} reasons={','.join(dry_run_drift)}",
+                file=sys.stderr,
+            )
+            return False, dry_run_drift
         print(f"openspec_generator_parity=ok cli={cli_version}")
         return True, []
 
-    distinct_found = sorted(set(found_versions))
-    if check:
-        print(
-            f"openspec_generator_parity=drift cli={cli_version} skills={','.join(distinct_found)}"
-        )
-        return False, [f"openspec-generator-drift:cli={cli_version},skills={distinct_found}"]
+    if not layout_drift:
+        dry_run_drift = _verify_openspec_dry_run_clean(exe, store, env)
+        if not dry_run_drift:
+            print(f"openspec_generator_parity=ok cli={cli_version}")
+            return True, []
 
     if os.environ.get("DISABLE_UPDATES", "").strip().lower() in {"1", "true", "yes"}:
-        print("openspec_generator_parity=skipped_disabled")
+        print(f"openspec_generator_parity=paused cli={cli_version}")
         return True, []
-
-    cfg_file = config_path or (Path.home() / ".config" / "openspec" / "config.json")
-    if cfg_file.is_file():
-        try:
-            cfg = json.loads(cfg_file.read_text(encoding="utf-8"))
-            if isinstance(cfg, dict) and "delivery" in cfg and cfg.get("delivery") != "skills":
-                return False, [f"openspec-delivery-mismatch:{cfg.get('delivery')}"]
-        except (OSError, json.JSONDecodeError):  # fmt: skip
-            pass
 
     try:
         upd = subprocess.run(
@@ -1015,50 +1170,35 @@ def reconcile_openspec_generator_parity(
             text=True,
             timeout=120,
             check=False,
+            env=env,
         )
     except OSError as err:
-        return False, [f"openspec-update-failed:{err}"]
+        msg = f"openspec-update-failed:{err}"
+        print(f"openspec_generator_parity=failed cli={cli_version} reasons={msg}", file=sys.stderr)
+        return False, [msg]
     except subprocess.TimeoutExpired:
-        return False, ["openspec-update-failed:timeout"]
+        msg = "openspec-update-failed:timeout"
+        print(f"openspec_generator_parity=failed cli={cli_version} reasons={msg}", file=sys.stderr)
+        return False, [msg]
 
     if upd.returncode != 0:
-        return False, [f"openspec-update-failed:rc={upd.returncode}"]
+        detail = (upd.stderr or upd.stdout).strip()
+        msg = f"openspec-update-failed:rc={upd.returncode}" + (f":{detail}" if detail else "")
+        print(f"openspec_generator_parity=failed cli={cli_version} reasons={msg}", file=sys.stderr)
+        return False, [msg]
 
-    if upd.stdout.strip():
-        try:
-            data = json.loads(upd.stdout)
-            if isinstance(data, dict):
-                failures = data.get("failures", [])
-                kept = data.get("kept", [])
-                unchecked = data.get("unchecked", [])
-                if failures or kept or unchecked:
-                    return (
-                        False,
-                        [
-                            f"openspec-update-incomplete:failures={len(failures)},kept={kept},unchecked={unchecked}"
-                        ],
-                    )
-        except json.JSONDecodeError:
-            lowered = upd.stdout.lower()
-            for token in ("kept: ", "unchecked: ", "failures: "):
-                idx = lowered.find(token)
-                if idx != -1:
-                    num_part = lowered[idx + len(token) :].split()[0].rstrip(",;")
-                    if num_part.isdigit() and int(num_part) > 0:
-                        return False, [f"openspec-update-incomplete:{token.strip()}{num_part}"]
+    post_layout = _inspect_shared_skill_layout(store, cli_version)
+    post_dry_run = _verify_openspec_dry_run_clean(exe, store, env)
+    post_msgs = post_layout + post_dry_run
+    if post_msgs:
+        print(
+            f"openspec_generator_parity=failed cli={cli_version} reasons={','.join(post_msgs)}",
+            file=sys.stderr,
+        )
+        return False, post_msgs
 
-    for cdir in OPENSPEC_RETIRED_COMMAND_DIRS:
-        target_dir = store / cdir
-        if target_dir.is_dir() and any(target_dir.glob("*.md")):
-            return False, [f"openspec-update-incomplete:commands-not-pruned:{cdir}"]
-    post_trees_match, post_versions = _inspect_adapter_skill_trees(store)
-    if post_trees_match and all(v == cli_version for v in post_versions):
-        print(f"openspec_generator_parity=reconciled cli={cli_version}")
-        return True, []
-
-    post_distinct = sorted(set(post_versions))
-    print(f"openspec_generator_parity=drift cli={cli_version} skills={','.join(post_distinct)}")
-    return False, [f"openspec-generator-drift:cli={cli_version},skills={post_distinct}"]
+    print(f"openspec_generator_parity=reconciled cli={cli_version}")
+    return True, []
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1100,6 +1240,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--sync-lock",
+        dest="sync_lock",
         type=Path,
         default=None,
         help=argparse.SUPPRESS,
@@ -1211,7 +1352,7 @@ def main(argv: list[str] | None = None) -> int:
             "workspace_claude_skills": reconcile_links(
                 destination=workspace_claude_skills,
                 desired=claude_openspec,
-                managed_target_roots=(store_claude_skills,),
+                managed_target_roots=(store_claude_skills, store_standard),
                 check=args.check,
             ),
             "user_claude_skills": reconcile_links(
@@ -1220,7 +1361,7 @@ def main(argv: list[str] | None = None) -> int:
                     **claude_openspec,
                     **{name: workspace_roots[name] for name in claude_selected},
                 },
-                managed_target_roots=(store_claude_skills, workspace_agents),
+                managed_target_roots=(store_claude_skills, store_standard, workspace_agents),
                 check=args.check,
             ),
             "user_hermes_skills": reconcile_links(
@@ -1302,18 +1443,15 @@ def main(argv: list[str] | None = None) -> int:
 
         return 1 if failed else 0
 
-    parity_findings: list[str] = []
     parity_ok = True
     if args.check:
-        parity_ok, parity_findings = reconcile_openspec_generator_parity(
+        parity_ok, _ = reconcile_openspec_generator_parity(
             store,
             check=True,
             openspec_bin=args.openspec_bin,
             config_path=args.openspec_config,
+            home=home,
         )
-        if not parity_ok:
-            for pf in parity_findings:
-                print(f"openspec_generator_parity.finding={pf}")
         return _execute_sync()
     else:
         lock_path = args.sync_lock if args.sync_lock else OPENSPEC_SYNC_LOCK
@@ -1323,15 +1461,14 @@ def main(argv: list[str] | None = None) -> int:
                 os.chmod(lock_path, 0o600)
             fcntl.flock(lock_fh.fileno(), fcntl.LOCK_EX)
             try:
-                parity_ok, parity_findings = reconcile_openspec_generator_parity(
+                parity_ok, _ = reconcile_openspec_generator_parity(
                     store,
                     check=False,
                     openspec_bin=args.openspec_bin,
                     config_path=args.openspec_config,
+                    home=home,
                 )
                 if not parity_ok:
-                    for pf in parity_findings:
-                        print(f"openspec_generator_parity.error={pf}")
                     return 1
                 return _execute_sync()
             finally:
