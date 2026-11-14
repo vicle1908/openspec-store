@@ -22,6 +22,7 @@ LOG_DIR="${HOME}/Library/Logs/docker-service"
 COMPOSE_STACKS=(
   "/Users/androidteam/Omniroute"
   "/Users/androidteam/Developer/shb/shb-schedule"
+  "/Users/androidteam/Developer/docker/ts-media-relay"
 )
 
 mkdir -p "$LOG_DIR"
@@ -110,7 +111,7 @@ status_json() {
     if [[ -d "$stack_dir" ]]; then
       stack_exists=true
       if [[ "$daemon_up" == "true" ]]; then
-        running_count=$(docker compose --project-directory "$stack_dir" ps -q 2>/dev/null | wc -l | tr -d ' ')
+        running_count=$(docker compose --project-directory "$stack_dir" ps -q --status running 2>/dev/null | wc -l | tr -d ' ')
         [[ -z "$running_count" ]] && running_count=0
       fi
     fi
@@ -301,7 +302,7 @@ cmd_status() {
     for stack_dir in "${COMPOSE_STACKS[@]}"; do
       local running_count=0
       if [[ -d "$stack_dir" ]] && [[ "$daemon_up" == "true" ]]; then
-        running_count=$(docker compose --project-directory "$stack_dir" ps -q 2>/dev/null | wc -l | tr -d ' ')
+        running_count=$(docker compose --project-directory "$stack_dir" ps -q --status running 2>/dev/null | wc -l | tr -d ' ')
         [[ -z "$running_count" ]] && running_count=0
       fi
       if [[ ! -d "$stack_dir" ]]; then
