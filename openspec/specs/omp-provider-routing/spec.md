@@ -403,7 +403,7 @@ In `~/.omp/agent/config.yml`, `modelRoles.default` SHALL be assigned to `omnirou
 #### Scenario: Default turn execution via combo
 - **WHEN** OMP executes turns under `default`, `task`, `smol`, `vision`, `slow`, `commit`, `advisor`, or `tiny` role selection
 - **THEN** `default` SHALL route to `omniroute/gemini-4-carbon`, `smol`/`vision`/`slow`/`task` to `omniroute/gemini-4-hydrogen:high`, `commit` to `omniroute/gemini-4-hydrogen:low`, `tiny` to `omniroute/gemini-4-hydrogen-low:low`, and `advisor` to `google-antigravity/gemini-3.8-flash:high`
-- **AND** `~/.omp/agent/agent.db` (`auth_credentials` where `provider = 'google-antigravity'`) SHALL exclude the 7 banned OAuth accounts (`vicgnome19096`, `vicgnome19088`, `ghtkmobile`, `vicgnome19095`, `vicgnome19092`, `vicle1908`, `hongsonle19081952`)
+- **AND** `~/.omp/agent/agent.db` (`auth_credentials` where `provider = 'google-antigravity'`) SHALL exclude all 8 banned OAuth accounts (`vicgnome19094`, `vicgnome19096`, `vicgnome19088`, `ghtkmobile`, `vicgnome19095`, `vicgnome19092`, `vicle1908`, `hongsonle19081952`), leaving the 5 active non-banned rows (`id IN (2, 6, 10, 14, 15)`)
 - **AND** `retry.fallbackChains` SHALL preserve failover to `omniroute/gemini-3.8-flash-high:high` and `google-antigravity/gemini-3.8-flash:high` without unmonitored fallback errors
 
 #### Scenario: Live config role alignment with specification
