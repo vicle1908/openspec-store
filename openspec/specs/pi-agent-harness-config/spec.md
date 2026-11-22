@@ -125,3 +125,18 @@ The Pi GitNexus config `~/.pi/pi-gitnexus.json` SHALL exist with mode `0600` and
 - **THEN** `event.systemPromptOptions.forceSystemPrompt` SHALL remain `undefined` when `pi-gitnexus` appends the `[GitNexus active]` suffix, and `event.systemPromptOptions.promptGuidelines` SHALL contain both the `agentmemory` tool guidance and the `[GitNexus active]` guidance
 - **AND** when a child subagent handler assigns a replacement `forceSystemPrompt` containing `<active_agent` or Subagent Execution Boundary instructions, `forceSystemPrompt` SHALL be preserved unchanged
 - **AND** when `process.env.PI_SUBAGENT_CHILD` or `ctx.sessionManager.getHeader()?.parentSession` is present, `agentmemory` SHALL still push `TOOL_GUIDANCE` into `promptGuidelines` but SHALL skip `smart-search` and `observe` network calls
+
+### Requirement: Pi Default Model Cutover to Gemini 4 Neon
+In `~/.pi/agent/settings.json` on `iosteam-mac-mini`, `defaultModel` and `subagents.defaultModel` SHALL be configured as `"gemini-4-neon"`, `~/.pi/agent/models.json` SHALL declare `gemini-4-neon` under both `omniroute-responses` (`contextWindow: 512000`, `maxTokens: 262144`) and `omp` (`contextWindow: 1048576`, `maxTokens: 262144`), and role-based `subagents.agentOverrides` SHALL route primary subagents to `gemini-4-neon`.
+
+#### Scenario: Pi startup and interactive sessions default to Gemini 4 Neon
+- **WHEN** `~/.pi/agent/settings.json` is inspected
+- **THEN** `defaultProvider` SHALL be `"omniroute-responses"`
+- **AND** `defaultModel` SHALL be `"gemini-4-neon"`
+- **AND** `modelThinkingLevels["omniroute-responses/gemini-4-neon"]` SHALL be `"high"`
+- **AND** `gemini-4-hydrogen` and `gemini-3.8-flash-high` SHALL remain available in `models.json` as selectable and fallback options
+
+#### Scenario: Pi subagent overrides route to Gemini 4 Neon
+- **WHEN** `subagents.agentOverrides` in `~/.pi/agent/settings.json` is inspected
+- **THEN** `scout`, `researcher`, and `worker` SHALL declare `"model": "omniroute-responses/gemini-4-neon"`
+- **AND** `oracle` SHALL preserve `"model": "omniroute-responses/gemini-4-argon-high"` and `reviewer` SHALL preserve `"model": "omniroute-responses/gemini-4-hydrogen-xhigh"`

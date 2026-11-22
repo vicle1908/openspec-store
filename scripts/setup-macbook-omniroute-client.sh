@@ -163,6 +163,11 @@ with urllib.request.urlopen(req, timeout=10) as resp:
     model_ids = {m.get("id") for m in data.get("data", [])}
     count = len(model_ids)
     required_combos = [
+        "gemini-4-neon",
+        "gemini-4-neon-xhigh",
+        "gemini-4-neon-high",
+        "gemini-4-neon-medium",
+        "gemini-4-neon-low",
         "gemini-4-hydrogen",
         "gemini-4-hydrogen-xhigh",
         "gemini-4-hydrogen-high",
@@ -184,9 +189,9 @@ with urllib.request.urlopen(req, timeout=10) as resp:
         "muse-spark-1.3",
     ]
     missing_combos = [c for c in required_combos if c not in model_ids]
-    if resp.status != 200 or count < 19 or missing_combos:
+    if resp.status != 200 or count < 24 or missing_combos:
         sys.exit(f"ERROR: /v1/models status={resp.status}, count={count}, missing={missing_combos}")
-    print(f"[omniroute-client] Verified http://{host}:20128/v1/models -> HTTP 200 ({count} models, all 19 required combos present).")
+    print(f"[omniroute-client] Verified http://{host}:20128/v1/models -> HTTP 200 ({count} models, all 24 required combos present).")
 
 req_20129 = urllib.request.Request(f"http://{host}:20129/v1/models", headers={"Authorization": f"Bearer {key}"})
 with urllib.request.urlopen(req_20129, timeout=10) as resp2:
@@ -210,7 +215,7 @@ audit_and_converge_ssh_and_sockets() {
     if ! grep -q "Host 100.70.16.83 iosteam-mac-mini\* 100.106.143.78" "${ssh_cfg}" 2>/dev/null; then
       cat >> "${ssh_cfg}" <<'EOF'
 
-Host 100.70.16.83 iosteam-mac-mini* 100.106.143.78 100.101.64.56 macbook-pro*
+Host 100.70.16.83 iosteam-mac-mini* 100.106.143.78 macbook-pro*
     ServerAliveInterval 15
     ServerAliveCountMax 3
     TCPKeepAlive yes
@@ -228,7 +233,7 @@ EOF
   fi
 
   local syn_sockets
-  syn_sockets="$(lsof -n -P -iTCP 2>/dev/null | grep -E "100\.(106\.143\.78|101\.64\.56):6768 \(SYN_SENT\)" || true)"
+  syn_sockets="$(lsof -n -P -iTCP 2>/dev/null | grep -E "100\.106\.143\.78:6768 \(SYN_SENT\)" || true)"
   if [[ -n "${syn_sockets}" ]]; then
     log "NOTE: Detected background Orca SYN_SENT dialer to ${CLIENT_TS_IP}:6768 (peer currently asleep/offline)."
   fi
