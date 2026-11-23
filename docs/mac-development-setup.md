@@ -417,6 +417,20 @@ brew services stop redis
   - **Installation vs. Runtime Activation**: `herdr integration status` reporting `current` verifies installed hook files on disk only — existing running agent processes must load hooks on a new session/startup event before reporting live state, and session restoration remains unverified until exercised.
   - **Official Skill & CLI Subcommands**: Synchronized via `config/claude-user-skill-manifest.txt`, `config/codex-user-skill-manifest.txt`, and `python3 scripts/sync-workspace-agent-skills.py`. Use the installed subcommand surface (`herdr pane split`, `herdr pane run`, `herdr pane send`, `herdr pane capture`, `herdr pane wait`, `herdr agent-state`, `herdr api snapshot`, `herdr server reload-config`), gated by `test "${HERDR_ENV:-}" = 1` when orchestrating panes from inside a Herdr session.
 
+### macOS `login.keychain-db` Desync Recovery (`SecKeychainCopySettings` `-25293` vs. `SecKeychainGetStatus == 0x7`)
+- **Failure Signature**: When `securityd` restarts mid-session or loses its in-memory unlock key after long uptime, `SecKeychainGetStatus` can still report unlocked status (`0x7`), masking failures in Cockpit Tools (`v1.4.2`) / Antigravity 2.0 (`v2.34.0`) or `security add-generic-password -U` (`SecKeychainItemModifyContent` / `SecKeychainItemCreateFromContent`: `The user name or passphrase you entered is not correct.`, `errSecAuthFailed = -25293`) while `securityd` logs `is unlocked; decoding for makeUnlocked()` → `MacOS error: -25337` / `CSSMERR_CSP_INVALID_DATA`.
+- **Authoritative Non-Mutating Probe**: Always verify usability with `security show-keychain-info ~/Library/Keychains/login.keychain-db` (`SecKeychainCopySettings`) rather than `SecKeychainGetStatus` or `security dump-keychain` (which reads unencrypted attributes only):
+  ```bash
+  security show-keychain-info ~/Library/Keychains/login.keychain-db
+  # Healthy output: Keychain ".../login.keychain-db" no-timeout
+  ```
+- **Recovery**:
+  ```bash
+  security lock-keychain ~/Library/Keychains/login.keychain-db
+  security unlock-keychain ~/Library/Keychains/login.keychain-db
+  ```
+  If `unlock-keychain` still fails or rejects the current macOS login password, log out/reboot so `loginwindow` re-seeds `securityd`, or sync a stale keychain password via `security set-keychain-password ~/Library/Keychains/login.keychain-db` before retrying Cockpit Tools / Antigravity 2.0 account switches.
+
 ### Ponytail Official Agent Skills (Skills-Only Installation Tier & Snapshot Acceptance)
 - **Canonical Source & User-Scope Manifest Fanout (`DietrichGebert/ponytail`)**:
   - The six official Ponytail skills (`ponytail`, `ponytail-review`, `ponytail-audit`, `ponytail-debt`, `ponytail-gain`, `ponytail-help`) reside as unmodified upstream copies under `/Users/androidteam/Developer/.agents/skills/ponytail*/SKILL.md` (`142–371` YAML-decoded UTF-8 description bytes; `141–370` trimmed bytes).
